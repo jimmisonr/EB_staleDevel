@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	<view title="register" hidden="true">
+		<message><![CDATA[Register view to display registration form to register for a specific event]]></message>
+	</view>
+</metadata>
