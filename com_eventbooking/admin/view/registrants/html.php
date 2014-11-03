@@ -66,6 +66,6 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 	public function addToolbar()
 	{
 		parent::addToolbar();
-		JToolBarHelper::custom('csv_export', 'export', 'export', 'Export Registration', false);
+		JToolBarHelper::custom('csv_export', 'download', 'download', 'Export Registration', false);
 	}
 }

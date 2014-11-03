@@ -296,15 +296,6 @@ if ($this->config->activate_invoice_feature)
 					form.filter_event_id.focus();
 					return;	
 				}					
-			} 
-			else if(pressbutton == 'csv_export') 
-			{
-				if (form.filter_event_id.value == 0)
-				{
-					alert("<?php echo JText::_("EB_SELECT_EVENT_TO_EXPORT_REGISTRANTS"); ?>");
-					form.filter_event_id.focus();
-					return;	
-				}	
 			}
 			Joomla.submitform( pressbutton );		
 		}		

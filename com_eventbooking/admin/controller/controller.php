@@ -42,15 +42,11 @@ class EventbookingController extends RADControllerAdmin
      */
 	function csv_export()
 	{
+		set_time_limit(0);
 		require_once JPATH_ROOT . '/components/com_eventbooking/helper/data.php';
 		$db = JFactory::getDBO();
 		$config = EventbookingHelper::getConfig();
-		$eventId = JRequest::getInt('filter_event_id');
-		if (!$eventId)
-		{
-			JFactory::getApplication()->enqueueMessage(JText::_('EB_SELECT_EVENT_TO_EXPORT_REGISTRANTS'));
-			JFactory::getApplication()->redirect('index.php?option=com_eventbooking&view=registrants');
-		}
+		$eventId = JRequest::getInt('filter_event_id');		
 		$where = array();
 		$where[] = '(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published != 2))';
 		if ($eventId)
@@ -77,25 +73,35 @@ class EventbookingController extends RADControllerAdmin
 		}
 		$db->setQuery($sql);
 		$rows = $db->loadObjectList();
-		if ($config->custom_field_by_category)
+		if ($eventId)
 		{
-			//Select main category
-			$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $eventId . ' AND main_category = 1';
-			$db->setQuery($sql);
-			$categoryId = (int) $db->loadResult();
-			
-			$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 AND (category_id = 0 OR category_id=' . $categoryId .
-			') ORDER BY ordering';
+			if ($config->custom_field_by_category)
+			{
+				//Select main category
+				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $eventId . ' AND main_category = 1';
+				$db->setQuery($sql);
+				$categoryId = (int) $db->loadResult();
+
+				$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 AND (category_id = 0 OR category_id=' . $categoryId .
+					') ORDER BY ordering';
+				$db->setQuery($sql);
+				$rowFields = $db->loadObjectList();
+			}
+			else
+			{
+				$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 AND (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' .
+					$eventId . ')) ORDER BY ordering';
+				$db->setQuery($sql);
+				$rowFields = $db->loadObjectList();
+			}
+		}
+		else
+		{
+			//Get all published custom fields
+			$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 ORDER BY ordering';
 			$db->setQuery($sql);
 			$rowFields = $db->loadObjectList();
 		}
-		else 
-		{
-			$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 AND (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' .
-				$eventId . ')) ORDER BY ordering';
-			$db->setQuery($sql);
-			$rowFields = $db->loadObjectList();
-		}		
 		//Get the custom fields value and store them into an array
 		$sql = 'SELECT id FROM #__eb_registrants AS a WHERE ' . implode(' AND ', $where);
 		$db->setQuery($sql);
