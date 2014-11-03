@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        1.6.5
+ * @version        1.6.6
  * @package		Joomla
  * @subpackage	Event Booking
  * @author  Tuan Pham Ngoc
@@ -29,12 +29,17 @@ class EventBookingViewEvents extends JViewLegacy
 		}
 		$model = $this->getModel();
 		$this->items = $model->getData();
-		;
 		$this->pagination = $model->getPagination();
 		$this->Itemid = JRequest::getInt('Itemid', 0);
 		$this->config = EventbookingHelper::getConfig();
 		$this->nullDate = JFactory::getDbo()->getNullDate();
-		;
+
+		//Add categories filter
+		$state = $model->getState();
+		$this->lists['filter_category_id'] = EventbookingHelperHtml::buildCategoryDropdown($state->filter_category_id, 'filter_category_id',
+			'onchange="submit();"');
+		$this->lists['filter_search'] = $state->filter_search;
+
 		parent::display($tpl);
 	}
 }

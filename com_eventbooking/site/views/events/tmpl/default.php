@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        1.6.5
+ * @version        1.6.6
  * @package		Joomla
  * @subpackage	Event Booking
  * @author  Tuan Pham Ngoc
@@ -12,6 +12,19 @@ defined( '_JEXEC' ) or die ;
 ?>
 <h1 class="eb-page-heading"><?php echo JText::_('EB_USER_EVENTS'); ?></h1>
 <form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=events&Itemid='.$this->Itemid); ; ?>">
+	<table width="100%">
+		<tr>
+			<td align="left">
+				<?php echo JText::_( 'EB_FILTER' ); ?>:
+				<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->lists['filter_search'];?>" class="input-medium" onchange="document.adminForm.submit();" />
+				<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'EB_GO' ); ?></button>
+				<button onclick="document.getElementById('filter_search').value='';this.form.submit();" class="btn"><?php echo JText::_( 'EB_RESET' ); ?></button>
+			</td >
+			<td style="text-align: right;">
+				<?php echo $this->lists['filter_category_id'] ; ?>
+			</td>
+		</tr>
+	</table>
 	<?php
         if(count($this->items))
         {

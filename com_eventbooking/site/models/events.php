@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	1.6.6
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2014 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            1.6.6
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2014 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
@@ -13,8 +13,8 @@ defined('_JEXEC') or die();
 /**
  * Events Booking Events Model
  *
- * @package		Joomla
- * @subpackage	Events Booking
+ * @package        Joomla
+ * @subpackage     Events Booking
  */
 class EventBookingModelEvents extends RADModelList
 {
@@ -23,10 +23,16 @@ class EventBookingModelEvents extends RADModelList
 	{
 		$config = array_merge($config, array('table' => '#__eb_events', 'ignore_session' => true));
 		parent::__construct($config);
+
+		$app     = JFactory::getApplication();
+		$context = $this->option . '.' . $this->name . '.';
+		$this->state->insert('filter_category_id', 'int', $app->getUserStateFromRequest($context . 'filter_category_id', 'filter_category_id', 0))
+			->insert('filter_search', 'string', $app->getUserStateFromRequest($context . 'filter_search', 'filter_search'));
 		$request = EventbookingHelper::getRequestData();
 		$this->state->setData($request);
 		$this->state->set('filter_order_Dir', 'DESC');
-		JFactory::getApplication()->setUserState('eventbooking.limit', $this->state->limit);
+
+		$app->setUserState('eventbooking.limit', $this->state->limit);
 	}
 
 	/**
@@ -40,8 +46,8 @@ class EventBookingModelEvents extends RADModelList
 		// Lets load the content if it doesn't already exist
 		if (empty($this->data))
 		{
-			$rows = parent::getData();
-			$db = $this->getDbo();
+			$rows  = parent::getData();
+			$db    = $this->getDbo();
 			$query = $db->getQuery(true);
 			$query->select('a.name FROM #__eb_categories AS a')->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id');
 			for ($i = 0, $n = count($rows); $i < $n; $i++)
@@ -54,6 +60,7 @@ class EventBookingModelEvents extends RADModelList
 			}
 			$this->data = $rows;
 		}
+
 		return $this->data;
 	}
 
@@ -65,7 +72,7 @@ class EventBookingModelEvents extends RADModelList
 		$query->select('tbl.*')
 			->select('c.name AS location_name')
 			->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants');
-		
+
 		return $this;
 	}
 
@@ -76,8 +83,8 @@ class EventBookingModelEvents extends RADModelList
 	{
 		$query->leftJoin(
 			'#__eb_registrants AS b ON (tbl.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published != 2)))')->leftJoin(
-			'#__eb_locations AS c ON tbl.location_id = c.id ');
-		
+				'#__eb_locations AS c ON tbl.location_id = c.id ');
+
 		return $this;
 	}
 
@@ -87,7 +94,18 @@ class EventBookingModelEvents extends RADModelList
 	protected function _buildQueryWhere(JDatabaseQuery $query)
 	{
 		$query->where('tbl.created_by=' . (int) JFactory::getUser()->id);
-		
+		if ($this->state->filter_category_id)
+		{
+			$query->where('tbl.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id=' . $this->state->filter_category_id . ')');
+		}
+		if ($this->state->filter_search)
+		{
+			$db     = $this->getDbo();
+			$search = $db->Quote('%' . $db->escape($this->state->filter_search, true) . '%', false);
+			$query->where('LOWER(tbl.title) LIKE ' . $search);
+		}
+
+
 		return $this;
 	}
 
@@ -97,7 +115,7 @@ class EventBookingModelEvents extends RADModelList
 	protected function _buildQueryGroup(JDatabaseQuery $query)
 	{
 		$query->group('tbl.id');
-		
+
 		return $this;
 	}
 }
