@@ -21,7 +21,7 @@ class modMiniCalendarHelper
 	{		
 		static $datenow = null;
 		if (!isset($datenow)) 
-		{						
+		{
 			$datenow =& JFactory::getDate("+0 seconds");
 		}
 		return $datenow;
@@ -36,11 +36,7 @@ class modMiniCalendarHelper
 		static $data;
 		if (!isset($data))
 		{
-			$datenow = modMiniCalendarHelper::_getNow();
-			if (version_compare(JVERSION, '3.0', 'ge'))
-				list($year, $month, $day) = explode('-', $datenow->format('Y-m-d'));
-			else
-				list($year, $month, $day) = explode('-', $datenow->toFormat('%Y-%m-%d'));            
+			list($year, $month, $day) = explode('-', JHtml::_('date', 'Now', 'Y-m-d'));
 			$year	= min(2100,abs(intval(JRequest::getVar('year',	$year))));
 			$month	= min(99,abs(intval(JRequest::getVar('month',	$month))));
 			$day	= min(3650,abs(intval(JRequest::getVar('day',	$day))));
@@ -64,7 +60,7 @@ class modMiniCalendarHelper
 	public static function _listIcalEventsByMonth( $year, $month){
 		$app = JFactory::getApplication() ;
 		$db = JFactory::getDbo();
-		$user = & JFactory::getUser() ;		
+		$user = & JFactory::getUser() ;
 		$startdate 	= mktime( 0, 0, 0,  $month,  1, $year );
 		$enddate 	= mktime( 23, 59, 59,  $month, date( 't', $startdate), $year );
 		$startdate = date('Y-m-d',$startdate)." 00:00:00";

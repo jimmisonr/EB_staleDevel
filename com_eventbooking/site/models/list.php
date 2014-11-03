@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	1.6.6
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2014 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            1.6.6
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2014 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
@@ -13,18 +13,18 @@ defined('_JEXEC') or die();
 /**
  * EventBooking Component List  Model, a generic model allows getting list of events in different cases
  *
- * @package		Joomla
- * @subpackage	EventBooking
+ * @package        Joomla
+ * @subpackage     EventBooking
  */
 class EventBookingModelList extends RADModelList
 {
 
 	function __construct($config = array())
 	{
-		$app = JFactory::getApplication();
+		$app             = JFactory::getApplication();
 		$config['table'] = '#__eb_events';
 		parent::__construct($config);
-		$ebConfig = EventbookingHelper::getConfig();
+		$ebConfig   = EventbookingHelper::getConfig();
 		$listLength = $ebConfig->number_events;
 		if (!$listLength)
 		{
@@ -45,7 +45,7 @@ class EventBookingModelList extends RADModelList
 		{
 			$this->state->set('filter_order', 'tbl.ordering');
 		}
-		
+
 		if ($ebConfig->order_direction == 'desc')
 		{
 			$this->state->set('filter_order_Dir', 'DESC');
@@ -72,7 +72,7 @@ class EventBookingModelList extends RADModelList
 			EventbookingHelperData::calculateDiscount($rows);
 			$this->data = $rows;
 		}
-		
+
 		return $this->data;
 	}
 
@@ -82,51 +82,52 @@ class EventBookingModelList extends RADModelList
 	 */
 	public function getCategory()
 	{
-		$db = $this->getDbo();
-		$query = $db->getQuery(true);
+		$db         = $this->getDbo();
+		$query      = $db->getQuery(true);
 		$categoryId = $this->state->id ? $this->state->id : $this->state->category_id;
 		$query->select('*')
 			->from('#__eb_categories')
 			->where('id=' . $categoryId);
 		$db->setQuery($query);
+
 		return $db->loadObject();
 	}
 
 	/**
-     * Builds SELECT columns list for the query
-     */
+	 * Builds SELECT columns list for the query
+	 */
 	protected function _buildQueryColumns(JDatabaseQuery $query)
 	{
 		$query->select('tbl.*')
 			->select('DATEDIFF(tbl.early_bird_discount_date, NOW()) AS date_diff')
 			->select('c.name AS location_name, c.address AS location_address')
 			->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants');
-		
+
 		return $this;
 	}
 
 	/**
-     * Builds LEFT JOINS clauses for the query
-     */
+	 * Builds LEFT JOINS clauses for the query
+	 */
 	protected function _buildQueryJoins(JDatabaseQuery $query)
 	{
 		$query->leftJoin(
 			'#__eb_registrants AS b ON (tbl.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published != 2)))')->leftJoin(
-			'#__eb_locations AS c ON tbl.location_id = c.id ');
-		
+				'#__eb_locations AS c ON tbl.location_id = c.id ');
+
 		return $this;
 	}
 
 	/**
-     * Builds a WHERE clause for the query
-     */
+	 * Builds a WHERE clause for the query
+	 */
 	protected function _buildQueryWhere(JDatabaseQuery $query)
 	{
-		$db = $this->getDbo();
-		$state = $this->getState();
+		$db             = $this->getDbo();
+		$state          = $this->getState();
 		$hidePastEvents = EventbookingHelper::getConfigValue('hide_past_events');
 		$query->where('tbl.published=1')->where('tbl.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
-		
+
 		if ($state->id || $state->category_id)
 		{
 			$categoryId = $state->id ? $state->id : $state->category_id;
@@ -136,7 +137,7 @@ class EventBookingModelList extends RADModelList
 		{
 			$query->where('tbl.location_id=' . $state->location_id);
 		}
-		
+
 		if ($state->search)
 		{
 			$search = $db->Quote('%' . $db->escape($state->search, true) . '%', false);
@@ -153,23 +154,24 @@ class EventBookingModelList extends RADModelList
 		}
 		elseif ($hidePastEvents)
 		{
-			$query->where('DATE(tbl.event_date) >= CURDATE()');
+			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
+			$query->where('DATE(tbl.event_date) >= "' . $currentDate . '"');
 		}
 		if (JFactory::getApplication()->getLanguageFilter())
 		{
 			$query->where('tbl.language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')');
 		}
-		
+
 		return $this;
 	}
 
 	/**
-     * Builds a GROUP BY clause for the query
-     */
+	 * Builds a GROUP BY clause for the query
+	 */
 	protected function _buildQueryGroup(JDatabaseQuery $query)
 	{
 		$query->group('tbl.id');
-		
+
 		return $this;
 	}
 } 

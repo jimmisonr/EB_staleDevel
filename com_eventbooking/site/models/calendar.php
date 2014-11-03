@@ -46,8 +46,7 @@ class EventBookingModelCalendar extends JModelLegacy
 		
 		if (!isset($data))
 		{
-			$datenow = JFactory::getDate("+0 seconds");
-			list ($year, $month, $day) = explode('-', $datenow->format('Y-m-d'));
+			list($year, $month, $day) = explode('-', JHtml::_('date', 'Now', 'Y-m-d'));
 			$year = min(2100, abs(intval(JRequest::getVar('year', $year))));
 			$month = min(99, abs(intval(JRequest::getVar('month', $month))));
 			$day = min(3650, abs(intval(JRequest::getVar('day', $day))));
@@ -95,7 +94,8 @@ class EventBookingModelCalendar extends JModelLegacy
 		}
 		if ($hidePastEvents)
 		{
-			$where[] = 'DATE(event_date) >= CURDATE()';
+			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
+			$where[] = 'DATE(event_date) >= "' . $currentDate . '"';
 		}
 		$where[] = "a.access IN (" . implode(',', $user->getAuthorisedViewLevels()) . ")";
 		if ($app->getLanguageFilter())
@@ -174,7 +174,7 @@ class EventBookingModelCalendar extends JModelLegacy
 		if ($hidePastEvents)
 		{
 			$query = " SELECT a.*,b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON a.location_id = b.id " .
-				 " WHERE (a.published = 1) AND (a.event_date BETWEEN '$startDate' AND '$endDate') AND DATE(a.event_date) >= CURDATE() AND a.access IN(" .
+				 " WHERE (a.published = 1) AND (a.event_date BETWEEN '$startDate' AND '$endDate') AND DATE(a.event_date) >= '".JHtml::_('date', 'Now', 'Y-m-d')."' AND a.access IN(" .
 				 implode(',', $user->getAuthorisedViewLevels()) . ") " . $extraWhere . " ORDER BY a.event_date ASC, a.ordering ASC";
 		}
 		else
@@ -219,7 +219,7 @@ class EventBookingModelCalendar extends JModelLegacy
 		if ($hidePastEvents)
 		{
 			$query = " SELECT a.*,b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON b.id = a.location_id " .
-				 " WHERE (a.published = 1) AND (a.event_date BETWEEN '$startDate' AND '$endDate') AND DATE(event_date) >= CURDATE() AND a.access IN (" .
+				 " WHERE (a.published = 1) AND (a.event_date BETWEEN '$startDate' AND '$endDate') AND DATE(event_date) >= '".JHtml::_('date', 'Now', 'Y-m-d')."' AND a.access IN (" .
 				 implode(',', $user->getAuthorisedViewLevels()) . ") " . $extraWhere . " ORDER BY a.event_date ASC, a.ordering ASC";
 		}
 		else

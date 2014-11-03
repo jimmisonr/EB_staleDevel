@@ -88,7 +88,8 @@ class EventBookingModelCategory extends EventBookingModelList
 		
 		if ($hidePastEvents)
 		{
-			$where[] = 'DATE(event_date) >= CURDATE()';
+			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
+			$where[] = 'DATE(event_date) >= "' . $currentDate . '"';
 		}
 		$where[] = "a.access IN (" . implode(',', $user->getAuthorisedViewLevels()) . ")";
 		if ($app->getLanguageFilter())

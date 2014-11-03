@@ -994,7 +994,7 @@ class EventbookingHelper
 		if ($hidePastEvents)
 			$sql = 'SELECT COUNT(a.id) FROM #__eb_events AS a INNER JOIN #__eb_event_categories AS b ON a.id = b.event_id WHERE b.category_id IN(' .
 				 implode(',', $cats) . ') AND published = 1 AND `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) .
-				 ') AND event_date >= NOW() ';
+				 ') AND event_date >= "'.JHtml::_('date', 'Now', 'Y-m-d').'" ';
 		else
 			$sql = 'SELECT COUNT(a.id) FROM #__eb_events AS a INNER JOIN #__eb_event_categories AS b ON a.id = b.event_id WHERE b.category_id IN(' .
 				 implode(',', $cats) . ') AND `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ') AND published = 1 ';
