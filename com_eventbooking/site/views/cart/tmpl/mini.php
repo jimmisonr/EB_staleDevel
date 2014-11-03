@@ -1,6 +1,6 @@
 <?php
 /**
- * @version		1.6.1
+ * @version		1.6.6
  * @package		Joomla
  * @subpackage	Event Booking
  * @author  Tuan Pham Ngoc
@@ -31,7 +31,8 @@ if (count($this->items)) {
 						<?php echo JText::_('EB_EVENT'); ?>
 					</th>
 					<?php
-						if ($this->config->show_event_date) {
+						if ($this->config->show_event_date)
+						{
 						?>
 							<th class="col_event_date">
 								<?php echo JText::_('EB_EVENT_DATE'); ?>
@@ -57,9 +58,11 @@ if (count($this->items)) {
 			<?php
 				$total = 0 ;
 				$k = 0 ;
-				for ($i = 0 , $n = count($this->items) ; $i < $n; $i++) {
+				for ($i = 0 , $n = count($this->items) ; $i < $n; $i++)
+				{
 					$item = $this->items[$i] ;
-					$total += $item->quantity*$item->rate ;
+					$rate = $this->config->show_discounted_price ? $item->discounted_rate : $item->rate;
+					$total += $item->quantity*$rate;
 		        	$url = JRoute::_('index.php?option=com_eventbooking&view=event&id='.$item->id.'&tmpl=component&Itemid='.$this->Itemid);
 				?>
 					<tr>
@@ -71,9 +74,12 @@ if (count($this->items)) {
 							?>
 								<td class="col_event_date">
 									<?php
-                                        if ($item->event_date == EB_TBC_DATE) {
+                                        if ($item->event_date == EB_TBC_DATE)
+                                        {
                                             echo JText::_('EB_TBC');
-                                        } else {
+                                        }
+                                        else
+                                        {
                                             echo JHtml::_('date', $item->event_date, $this->config->event_date_format, null);
                                         }
 									?>
@@ -86,20 +92,23 @@ if (count($this->items)) {
 							<input id="event_id" type="hidden" name="event_id[]" value="<?php echo $item->id; ?>" />
 						</td>
 						<td class="col_price">
-							<?php echo number_format($item->rate, 2); ?>
+							<?php echo EventbookingHelper::formatAmount($rate, $this->config); ?>
 						</td>
 						<td class="col_quantity">
 							<input id="quantity" type="text" class="input-mini inputbox quantity_box" size="3" value="<?php echo $item->quantity ; ?>" name="quantity[]" <?php echo $readOnly ; ?> />
 						</td>
 						<td class="col_price">
-							<?php echo number_format($item->rate*$item->quantity, 2); ?>
+							<?php echo EventbookingHelper::formatAmount($rate*$item->quantity, $this->config); ?>
 						</td>
 					</tr>
 				<?php
 				}
-				if ($this->config->show_event_date) {
+				if ($this->config->show_event_date)
+				{
 					$cols = 6 ;
-				} else {
+				}
+				else
+				{
 					$cols = 5 ;
 				}
 				?>

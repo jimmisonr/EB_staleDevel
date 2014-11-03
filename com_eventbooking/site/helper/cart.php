@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	1.6.6
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2014 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            1.6.6
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2014 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
@@ -16,7 +16,7 @@ class EventbookingHelperCart
 	function EventbookingHelperCart()
 	{
 		$session = JFactory::getSession();
-		$cart = $session->get('eb_cart');
+		$cart    = $session->get('eb_cart');
 		if ($cart == null)
 		{
 			$cart = array('items' => array(), 'quantities' => array());
@@ -31,11 +31,11 @@ class EventbookingHelperCart
 	 */
 	function add($id)
 	{
-		$config = EventbookingHelper::getConfig();
-		$session = JFactory::getSession();
-		$cart = $session->get('eb_cart');
+		$config     = EventbookingHelper::getConfig();
+		$session    = JFactory::getSession();
+		$cart       = $session->get('eb_cart');
 		$quantities = $cart['quantities'];
-		$items = $cart['items'];
+		$items      = $cart['items'];
 		if (!in_array($id, $items))
 		{
 			array_push($items, $id);
@@ -60,22 +60,23 @@ class EventbookingHelperCart
 				}
 			}
 		}
-		$cart['items'] = $items;
+		$cart['items']      = $items;
 		$cart['quantities'] = $quantities;
 		$session->set('eb_cart', $cart);
 	}
 
 	/**
-	 * Add serveral events into shopping cart		 
+	 * Add serveral events into shopping cart
+	 *
 	 * @param array $cid
 	 */
 	function addEvents($cid)
 	{
-		$config = EventbookingHelper::getConfig();
-		$session = JFactory::getSession();
-		$cart = $session->get('eb_cart');
+		$config     = EventbookingHelper::getConfig();
+		$session    = JFactory::getSession();
+		$cart       = $session->get('eb_cart');
 		$quantities = $cart['quantities'];
-		$items = $cart['items'];
+		$items      = $cart['items'];
 		if (count($cid))
 		{
 			foreach ($cid as $id)
@@ -106,32 +107,33 @@ class EventbookingHelperCart
 				}
 			} //End Foreach
 		}
-		$cart['items'] = $items;
+		$cart['items']      = $items;
 		$cart['quantities'] = $quantities;
 		$session->set('eb_cart', $cart);
 	}
 
 	/**
 	 * Remove an item from shopping cart
+	 *
 	 * @param int $id
 	 */
 	function remove($id)
 	{
-		$session = JFactory::getSession();
-		$cart = $session->get('eb_cart');
-		$items = $cart['items'];
-		$quantities = $cart['quantities'];
-		$newItems = array();
+		$session       = JFactory::getSession();
+		$cart          = $session->get('eb_cart');
+		$items         = $cart['items'];
+		$quantities    = $cart['quantities'];
+		$newItems      = array();
 		$newQuantities = array();
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
 			if ($items[$i] != $id)
 			{
-				$newItems[] = $items[$i];
+				$newItems[]      = $items[$i];
 				$newQuantities[] = $quantities[$i];
 			}
 		}
-		$cart['items'] = $newItems;
+		$cart['items']      = $newItems;
 		$cart['quantities'] = $newQuantities;
 		$session->set('eb_cart', $cart);
 	}
@@ -143,7 +145,7 @@ class EventbookingHelperCart
 	function reset()
 	{
 		$session = JFactory::getSession();
-		$cart = array('items' => array(), 'quantities' => array());
+		$cart    = array('items' => array(), 'quantities' => array());
 		$session->set('eb_cart', $cart);
 	}
 
@@ -154,7 +156,7 @@ class EventbookingHelperCart
 	function getItems()
 	{
 		$session = JFactory::getSession();
-		$cart = $session->get('eb_cart');
+		$cart    = $session->get('eb_cart');
 		if (isset($cart['items']))
 		{
 			return $cart['items'];
@@ -172,7 +174,7 @@ class EventbookingHelperCart
 	function getQuantities()
 	{
 		$session = JFactory::getSession();
-		$cart = $session->get('eb_cart');
+		$cart    = $session->get('eb_cart');
 		if (isset($cart['quantities']))
 		{
 			return $cart['quantities'];
@@ -191,7 +193,7 @@ class EventbookingHelperCart
 	function getCount()
 	{
 		$session = JFactory::getSession();
-		$cart = $session->get('eb_cart');
+		$cart    = $session->get('eb_cart');
 		if (isset($cart['items']))
 		{
 			return count($cart['items']);
@@ -203,25 +205,27 @@ class EventbookingHelperCart
 	}
 
 	/**
-	 * Update cart with new quantities		 
+	 * Update cart with new quantities
+	 *
 	 * @param array $eventIds
 	 * @param array $quantities
 	 */
 	function updateCart($eventIds, $quantities)
 	{
-		$session = JFactory::getSession();
-		$newItems = array();
+		$session       = JFactory::getSession();
+		$newItems      = array();
 		$newQuantities = array();
 		for ($i = 0, $n = count($eventIds); $i < $n; $i++)
 		{
 			if (($eventIds[$i] > 0) && ($quantities[$i] > 0))
 			{
-				$newItems[] = $eventIds[$i];
+				$newItems[]      = $eventIds[$i];
 				$newQuantities[] = $quantities[$i];
 			}
 		}
 		$cart = array('items' => $newItems, 'quantities' => $newQuantities);
 		$session->set('eb_cart', $cart);
+
 		return true;
 	}
 
@@ -231,14 +235,15 @@ class EventbookingHelperCart
 	 */
 	function calculateTotal()
 	{
-		$db = JFactory::getDbo();
-		$items = $this->getItems();
+		$db         = JFactory::getDbo();
+		$items      = $this->getItems();
 		$quantities = $this->getQuantities();
-		$total = 0;
+		$total      = 0;
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
 			$total += $quantities[$i] * EventbookingHelper::getRegistrationRate($items[$i], $quantities[$i]);
 		}
+
 		return $total;
 	}
 
@@ -248,9 +253,9 @@ class EventbookingHelperCart
 	 */
 	function getEvents()
 	{
-		$db = JFactory::getDbo();
-		$items = $this->getItems();
-		$quantities = $this->getQuantities();
+		$db          = JFactory::getDbo();
+		$items       = $this->getItems();
+		$quantities  = $this->getQuantities();
 		$quantityArr = array();
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
@@ -258,14 +263,45 @@ class EventbookingHelperCart
 		}
 		if (count($items))
 		{
-			$sql = 'SELECT a.*, SUM(b.number_registrants) AS total_registrants  FROM #__eb_events AS a LEFT JOIN #__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published != 2))) WHERE a.id IN (' .
-				 implode(',', $items) . ') GROUP BY a.id';
+			$config   = EventbookingHelper::getConfig();
+			$user     = JFactory::getUser();
+			$nullDate = $db->getNullDate();
+			$sql      = 'SELECT a.*, DATEDIFF(a.early_bird_discount_date, NOW()) AS date_diff, SUM(b.number_registrants) AS total_registrants  FROM #__eb_events AS a LEFT JOIN #__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published != 2))) WHERE a.id IN (' .
+				implode(',', $items) . ') GROUP BY a.id';
 			$db->setQuery($sql);
 			$events = $db->loadObjectList();
 			for ($i = 0, $n = count($events); $i < $n; $i++)
 			{
-				$event = $events[$i];
+				$event       = $events[$i];
 				$event->rate = EventbookingHelper::getRegistrationRate($event->id, $quantityArr[$event->id]);
+				if ($config->show_discounted_price)
+				{
+					$discount = 0;
+					if (($event->early_bird_discount_date != $nullDate) && ($event->date_diff >= 0))
+					{
+						if ($event->early_bird_discount_type == 1)
+						{
+							$discount += $event->rate * $event->early_bird_discount_amount / 100;
+						}
+						else
+						{
+							$discount += $event->early_bird_discount_amount;
+						}
+					}
+					//Check to see whether the user belong to a group get member discount or not
+					if ($event->discount > 0 && EventbookingHelper::memberGetDiscount($user, $config))
+					{
+						if ($event->discount_type == 1)
+						{
+							$discount += $event->rate * $event->discount / 100;
+						}
+						else
+						{
+							$discount += $event->discount;
+						}
+					}
+					$event->discounted_rate = $event->individual_price - $discount;
+				}
 				$event->quantity = $quantityArr[$event->id];
 			}
 		}
@@ -273,27 +309,28 @@ class EventbookingHelperCart
 		{
 			$events = array();
 		}
+
 		return $events;
 	}
 
 	/**
 	 * Calculate total discount for the registration
 	 * @return float
-	 * 
+	 *
 	 */
 	function calculateTotalDiscount()
 	{
-		$config = EventbookingHelper::getConfig();
-		$user = JFactory::getUser();
-		$db = JFactory::getDbo();
-		$nullDate = $db->getNullDate();
-		$events = $this->getEvents();
+		$config        = EventbookingHelper::getConfig();
+		$user          = JFactory::getUser();
+		$db            = JFactory::getDbo();
+		$nullDate      = $db->getNullDate();
+		$events        = $this->getEvents();
 		$totalDiscount = 0;
 		for ($i = 0, $n = count($events); $i < $n; $i++)
 		{
-			$event = $events[$i];
+			$event                 = $events[$i];
 			$registrantTotalAmount = $event->rate * $event->quantity;
-			$registrantDiscount = 0;
+			$registrantDiscount    = 0;
 			//Member discount
 			if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
 			{
@@ -329,7 +366,8 @@ class EventbookingHelperCart
 			}
 			//Early bird discount
 			if (($event->early_bird_discount_amount > 0) && ($event->early_bird_discount_date != $nullDate) &&
-				 (strtotime($event->early_bird_discount_date) >= mktime()))
+				(strtotime($event->early_bird_discount_date) >= mktime())
+			)
 			{
 				if ($event->early_bird_discount_type == 1)
 				{
@@ -342,7 +380,9 @@ class EventbookingHelperCart
 			}
 			$totalDiscount += $registrantDiscount;
 		}
+
 		return $totalDiscount;
 	}
 }
+
 ?>
