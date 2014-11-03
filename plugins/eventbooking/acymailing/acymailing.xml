@@ -5,10 +5,10 @@
 	<creationDate>October 2012</creationDate>
 	<copyright>Ossolution Team</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
-	<authorEmail>contact@joomdonation.com</authorEmail>
+	<authorEmail>services@joomdonation.com</authorEmail>
 	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>1.0</version>	
-	<description>This plugin is used to Add Event to Acymailing when they event for a event.</description>
+	<version>1.1</version>
+	<description>This plugin is used to add registrants to Acymailing when they register for an event.</description>
 	<files>
 		<filename plugin="acymailing">acymailing.php</filename>
 	</files>
