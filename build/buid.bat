@@ -25,6 +25,8 @@ cd E:\www\eventbooking\plugins\content\ebevent\
 7z a -tzip E:\www\eventbooking\build/packages/plug_content_ebevent.zip *
 cd E:\www\eventbooking\plugins\content\ebregister\
 7z a -tzip E:\www\eventbooking\build/packages/plug_content_ebregister.zip *
+cd E:\www\eventbooking\plugins\content\ebcategory\
+7z a -tzip E:\www\eventbooking\build/packages/plug_content_ebcategory.zip *
 cd E:\www\eventbooking\plugins\editors-xtd\ebevent\
 7z a -tzip E:\www\eventbooking\build/packages/plug_editors_xtd_ebevent.zip *
 cd E:\www\eventbooking\plugins\editors-xtd\ebregister\
