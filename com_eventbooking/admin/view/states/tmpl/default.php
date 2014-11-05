@@ -20,8 +20,8 @@ defined( '_JEXEC' ) or die ;
 				<button onclick="document.getElementById('filter_search').value='';this.form.submit();" class="btn"><?php echo JText::_( 'Reset' ); ?></button>
 			</td>
 			<td style="text-align: right;">
+				<?php echo $this->lists['filter_country_id']?>
 				<?php echo $this->lists['filter_state'] ; ?>
-				<?php echo $this->lists['filter_country_id']?>				
 			</td>
 		</tr>
 	</table>
