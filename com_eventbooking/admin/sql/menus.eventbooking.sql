@@ -26,4 +26,6 @@ INSERT INTO `#__eb_menus` (`id`, `menu_name`, `menu_parent_id`, `menu_view`, `me
 (9, 'EB_PAYMENT_PLUGINS', 0, 'plugins', NULL, 1, 4),
 (10, 'EB_EMAIL_MESSAGES', 0, 'message', NULL, 1, 5),
 (11, 'EB_TRANSLATION', 0, 'language', NULL, 1, 6),
-(12, 'EB_CONFIGURATION', 0, 'configuration', NULL, 1, 7);
+(12, 'EB_CONFIGURATION', 0, 'configuration', NULL, 1, 7),
+(13, 'EB_COUNTRIES', 2, 'countries', NULL, 1, 7),
+(14, 'EB_STATES', 2, 'states', NULL, 1, 8);

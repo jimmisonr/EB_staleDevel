@@ -231,7 +231,59 @@ class EventbookingController extends RADControllerAdmin
 				}
 			}
 		}
-		
+
+
+		// Countries and states management
+		$fields = array_keys($db->getTableColumns('#__eb_countries'));
+		if (!in_array('id', $fields))
+		{
+			//Change the name of the name of column from country_id to ID
+			$sql = 'ALTER TABLE `#__eb_countries` CHANGE `country_id` `id` INT(11) NOT NULL AUTO_INCREMENT;';
+			$db->setQuery($sql);
+			$db->execute();
+
+			//Add country ID column back for BC
+			$sql = "ALTER TABLE  `#__eb_countries` ADD  `country_id` INT(11) NOT NULL DEFAULT '0';";
+			$db->setQuery($sql);
+			$db->execute();
+
+			//Set country_id value the same with id
+			$sql = 'UPDATE #__eb_countries SET country_id=id';
+			$db->setQuery($sql);
+			$db->execute();
+
+		}
+
+		$fields = array_keys($db->getTableColumns('#__eb_states'));
+
+		if (!in_array('id', $fields))
+		{
+			//Change the name of the name of column from country_id to ID
+			$sql = 'ALTER TABLE `#__eb_states` CHANGE `state_id` `id` INT(11) NOT NULL AUTO_INCREMENT;';
+			$db->setQuery($sql);
+			$db->execute();
+
+			//Add state ID column back for BC
+			$sql = "ALTER TABLE  `#__eb_states` ADD  `state_id` INT(11) NOT NULL DEFAULT '0';";
+			$db->setQuery($sql);
+			$db->execute();
+
+			//Set country_id value the same with id
+			$sql = 'UPDATE #__eb_states SET state_id=id';
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('published', $fields))
+		{
+			$db->setQuery("ALTER TABLE `#__eb_states` ADD `published` TINYINT( 4 ) NOT NULL DEFAULT '1'");
+			$db->execute();
+			$db->setQuery("UPDATE `#__eb_states` SET `published` = 1");
+			$db->execute();
+		}
+
+
+
 		$sql = "SELECT COUNT(*) FROM #__eb_currencies WHERE currency_code='RUB'";
 		$db->setQuery($sql);
 		$total = $db->loadResult();
