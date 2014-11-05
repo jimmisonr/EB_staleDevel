@@ -1,10 +1,10 @@
 <?php
 /**
- * @version        1.5.0
+ * @version        1.6.6
  * @package        Joomla
  * @subpackage     Event Booking
  * @author         Tuan Pham Ngoc
- * @copyright      Copyright (C) 2010 Ossolution Team
+ * @copyright      Copyright (C) 2010 - 2014 Ossolution Team
  * @license        GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -26,7 +26,6 @@ if (file_exists(JPATH_ROOT . '/components/com_eventbooking/helper/helper.php'))
 	}
 
 	$config         = EventbookingHelper::getConfig();
-	$currencySymbol = $config->currency_symbol;
 	$cart           = new EventbookingHelperCart();
 	$rows = $cart->getEvents();
 	if (count($rows) && $config->show_discounted_price)
