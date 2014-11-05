@@ -300,7 +300,11 @@ class EventbookingHelperCart
 							$discount += $event->discount;
 						}
 					}
-					$event->discounted_rate = $event->individual_price - $discount;
+					if ($discount > $event->rate)
+					{
+						$discount = $event->rate;
+					}
+					$event->discounted_rate = $event->rate - $discount;
 				}
 				$event->quantity = $quantityArr[$event->id];
 			}
