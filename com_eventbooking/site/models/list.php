@@ -144,15 +144,11 @@ class EventBookingModelList extends RADModelList
 			$query->where("(LOWER(tbl.title) LIKE $search OR LOWER(tbl.short_description) LIKE $search OR LOWER(tbl.description) LIKE $search)");
 		}
 		$name = $this->getName();
-		if ($name == 'Upcomingevents')
-		{
-			$query->where('DATE(tbl.event_date) >= CURDATE()');
-		}
-		elseif ($name == 'Archive')
+		if ($name == 'Archive')
 		{
 			$query->where('DATE(tbl.event_date) < CURDATE()');
 		}
-		elseif ($hidePastEvents)
+		elseif ($hidePastEvents || ($name == 'Upcomingevents'))
 		{
 			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
 			$query->where('DATE(tbl.event_date) >= "' . $currentDate . '"');
