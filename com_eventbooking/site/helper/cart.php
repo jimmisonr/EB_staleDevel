@@ -230,12 +230,11 @@ class EventbookingHelperCart
 	}
 
 	/**
-	 * Canculate total price of the registration
+	 * Calculate total price of the registration
 	 * @return decimal
 	 */
 	function calculateTotal()
 	{
-		$db         = JFactory::getDbo();
 		$items      = $this->getItems();
 		$quantities = $this->getQuantities();
 		$total      = 0;
@@ -330,6 +329,15 @@ class EventbookingHelperCart
 		$nullDate      = $db->getNullDate();
 		$events        = $this->getEvents();
 		$totalDiscount = 0;
+		if (isset($_SESSION['coupon_id']))
+		{
+			$query = $db->getQuery(true);
+			$query->select('*')
+				->from('#__eb_coupons')
+				->where('id=' . (int) $_SESSION['coupon_id']);
+			$db->setQuery($query);
+			$coupon = $db->loadObject();
+		}
 		for ($i = 0, $n = count($events); $i < $n; $i++)
 		{
 			$event                 = $events[$i];
@@ -351,11 +359,8 @@ class EventbookingHelperCart
 				}
 			}
 			//Calculate the coupon discount
-			if (isset($_SESSION['coupon_id']))
+			if (isset($coupon))
 			{
-				$sql = 'SELECT * FROM #__eb_coupons WHERE id=' . (int) $_SESSION['coupon_id'];
-				$db->setQuery($sql);
-				$coupon = $db->loadObject();
 				if ($coupon && ($coupon->event_id == 0 || $coupon->event_id == $event->id))
 				{
 					if ($coupon->coupon_type == 0)
