@@ -1427,10 +1427,7 @@ class EventbookingHelper
 			->from('#__eb_locations AS a')
 			->innerJoin('#__eb_events AS b ON a.id=b.location_id')
 			->where('b.id=' . $row->event_id);
-		
-		$sql = 'SELECT a.* FROM #__eb_locations AS a ' . ' INNER JOIN #__eb_events AS b ' . ' ON a.id = b.location_id ' . ' WHERE b.id =' .
-			 $row->event_id;
-		;
+
 		$db->setQuery($query);
 		$rowLocation = $db->loadObject();
 		if ($rowLocation)
@@ -1539,7 +1536,24 @@ class EventbookingHelper
 			{
 				$attachments[] = JPATH_ROOT . '/media/com_eventbooking/' . $event->attachment;				
 			}	
-		}		
+		}
+
+		//Generate and send ics file to registrants
+		if ($config->send_ics_file)
+		{
+			$ics = new EventbookingHelperIcs();
+			$ics->setName($event->title)
+				->setDescription($event->description ? $event->description : $event->short_description)
+				->setOrganizer($fromEmail, $fromName)
+				->setStart($event->event_date)
+				->setEnd($event->event_end_date);
+			if ($rowLocation)
+			{
+				$ics->setLocation($rowLocation->name);
+			}
+			$attachments[] = $ics->save(JPATH_ROOT.'/media/com_eventbooking/icsfiles/');
+		}
+
 		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1, null, null, $attachments);
 		$mailer->ClearAttachments();
 		if ($config->send_email_to_group_members && $row->is_group_billing)
