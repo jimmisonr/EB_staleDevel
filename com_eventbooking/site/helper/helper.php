@@ -1551,7 +1551,7 @@ class EventbookingHelper
 			{
 				$ics->setLocation($rowLocation->name);
 			}
-			$attachments[] = $ics->save(JPATH_ROOT.'/media/com_eventbooking/icsfiles/');
+			$attachments[] = $ics->save(JPATH_ROOT.'/media/com_eventbooking/icsfiles/', 'event_'.$event->id.'.ics');
 		}
 
 		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1, null, null, $attachments);
