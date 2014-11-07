@@ -17,14 +17,6 @@ $editor = JFactory::getEditor();
 			<li class="active"><a href="#general-page" data-toggle="tab"><?php echo JText::_('EB_GENERAL');?></a></li>					
 			<li><a href="#theme-page" data-toggle="tab"><?php echo JText::_('EB_THEMES');?></a></li>			
 			<li><a href="#waitinglist-page" data-toggle="tab"><?php echo JText::_('EB_WAITINGLIST_FIELDS');?></a></li>
-			<?php 
-				if ($this->config->cb_integration > 0) 
-				{
-				?>
-					<li><a href="#field-mapping-page" data-toggle="tab"><?php echo JText::_('EB_FIELD_MAPPING');?></a></li>
-				<?php	
-				}
-				?>
 			<li><a href="#sef-setting-page" data-toggle="tab"><?php echo JText::_('EB_SEF_SETTING');?></a></li>						
 			<li><a href="#invoice-page" data-toggle="tab"><?php echo JText::_('EB_INVOICE_SETTINGS');?></a></li>
 		</ul>
@@ -129,7 +121,18 @@ $editor = JFactory::getEditor();
 						<td>
 							&nbsp;
 						</td>
-					</tr>           	
+					</tr>
+					<tr>
+						<td  class="key">
+							<?php echo JText::_('EB_SEND_ICS_FILE'); ?>
+						</td>
+						<td>
+							<?php echo $this->lists['send_ics_file']; ?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_SEND_ICS_FILE_EXPLAIN'); ?>
+						</td>
+					</tr>
 					<tr>
 						<td  class="key">
 							<?php echo JText::_('EB_SIMPLY_REGISTRATION_PROCESS'); ?>
@@ -216,17 +219,6 @@ $editor = JFactory::getEditor();
 						</td>
 						<td>
 							<?php echo JText::_('EB_BYPASS_CAPTCHA_FOR_REGISTERED_USER_EXPLAIN'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td  class="key">
-							<?php echo JText::_('EB_BYPASS_CONFIRMATION_STEP'); ?>
-						</td>
-						<td>
-							<?php echo $this->lists['bypass_confirmation_step']; ?>
-						</td>
-						<td>
-							&nbsp;
 						</td>
 					</tr>
 					<tr>
@@ -1168,111 +1160,6 @@ $editor = JFactory::getEditor();
 					</tr>
 				</table>
 			</div>
-			<?php 
-				if ($this->config->cb_integration > 0) {
-				?>
-					<div class="tab-pane" id="field-mapping-page">
-						<table class="admintable">
-			    			<tr>
-			    				<td colspan="2">
-			    					<p class="message"><strong><?php echo JText::_('EB_FIELD_MAPPING_EXPLAIN'); ?></strong></p>
-			    				</td>
-			    			</tr>
-			    			<tr>
-			    				<td width="30%" class="key">
-			    					<?php echo JText::_('EB_FIRST_NAME'); ?>
-			    				</td>
-			    				<td>
-			    					<?php
-			    					    echo $this->lists['m_firstname'] ;
-			    					?>					
-			    				</td>
-			    			</tr>
-			    			<tr>
-			    				<td width="30%" class="key">
-			    					<?php echo JText::_('EB_LAST_NAME'); ?>
-			    				</td>
-			    				<td>
-			    					<?php echo $this->lists['m_lastname'] ?>
-			    				</td>
-			    			</tr>
-			    			<tr>
-			    				<td width="30%" class="key">
-			    					<?php echo JText::_('EB_ORGANIZATION'); ?>
-			    				</td>
-			    				<td>
-			    					<?php echo $this->lists['m_organization']; ?>
-			    				</td>
-			    			</tr>
-			    			<tr>
-			    				<td width="30%" class="key">
-			    					<?php echo JText::_('EB_ADDRESS'); ?>
-			    				</td>
-			    				<td>
-			    					<?php echo $this->lists['m_address'];?>
-			    				</td>
-			    			</tr>
-			    			<tr>
-			    				<td width="30%" class="key">
-			    					<?php echo JText::_('EB_ADDRESS2'); ?>
-			    				</td>
-			    				<td>
-			    					<?php echo $this->lists['m_address2'] ; ?>
-			    				</td>
-			    			</tr>				
-			    			<tr>
-			    				<td width="30%" class="key">
-			    					<?php echo JText::_('EB_CITY'); ?>
-			    				</td>
-			    				<td>
-			    					<?php echo $this->lists['m_city'] ; ?>
-			    				</td>
-			    			</tr>			
-			    			<tr>
-			    				<td width="30%" class="key">
-			    					<?php echo JText::_('EB_STATE'); ?>
-			    				</td>
-			    				<td>
-			    					<?php echo $this->lists['m_state']; ?>
-			    				</td>
-			    			</tr>			
-			    			<tr>
-			    				<td width="30%" class="key">
-			    					<?php echo JText::_('EB_ZIP'); ?>
-			    				</td>
-			    				<td>
-			    					<?php echo $this->lists['m_zip'] ; ?>
-			    				</td>
-			    			</tr>			
-			    			<tr>
-			    				<td width="30%" class="key">
-			    					<?php echo JText::_('EB_COUNTRY'); ?>
-			    				</td>
-			    				<td>
-			    					<?php echo $this->lists['m_country'] ; ?>
-			    				</td>
-			    			</tr>						
-			    			<tr>
-			    				<td width="30%" class="key">
-			    					<?php echo JText::_('EB_PHONE'); ?>
-			    				</td>
-			    				<td>
-			    					<?php echo $this->lists['m_phone'] ?>
-			    				</td>
-			    			</tr>									
-			    			<tr>
-			    				<td width="30%" class="key">
-			    					<?php echo JText::_('EB_FAX'); ?>
-			    				</td>
-			    				<td>
-			    					<?php echo $this->lists['m_fax'] ; ?>
-			    				</td>
-			    			</tr>
-			    		</table>
-					</div>
-				<?php	
-				}
-				?>
 			<div class="tab-pane" id="sef-setting-page">
 				<table class="admintable">
 	    			<tr>

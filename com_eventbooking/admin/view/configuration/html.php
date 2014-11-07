@@ -69,6 +69,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 			$config->fix_term_and_condition_popup);
 		$lists['activate_recurring_event'] = JHtml::_('select.booleanlist', 'activate_recurring_event', '', $config->activate_recurring_event);
 		$lists['fix_breadcrumbs'] = JHtml::_('select.booleanlist', 'fix_breadcrumbs', '', $config->fix_breadcrumbs);
+		$lists['send_ics_file'] = JHtml::_('select.booleanlist', 'send_ics_file', '', $config->send_ics_file);
 		
 		$query->select('id, title')
 			->from('#__content')
@@ -87,7 +88,6 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 			$config->send_email_to_group_members);
 		$lists['enable_coupon'] = JHtml::_('select.booleanlist', 'enable_coupon', '', $config->enable_coupon);
 		$lists['enable_tax'] = JHtml::_('select.booleanlist', 'enable_tax', '', $config->enable_tax);
-		$lists['bypass_confirmation_step'] = JHtml::_('select.booleanlist', 'bypass_confirmation_step', '', $config->bypass_confirmation_step);
 		
 		$options = array();
 		$options[] = JHtml::_('select.option', 1, JText::_('EB_ORDERING'));
@@ -203,64 +203,6 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['rwt_fax'] = JHtml::_('select.booleanlist', 'rwt_fax', '', $config->rwt_fax);
 		$lists['swt_comment'] = JHtml::_('select.booleanlist', 'swt_comment', '', $config->swt_comment);
 		$lists['rwt_comment'] = JHtml::_('select.booleanlist', 'rwt_comment', '', $config->rwt_comment);
-		$options = array();
-		$options[] = JHtml::_('select.option', '', JText::_('EB_NO_MAPPING'));
-		if ($config->cb_integration > 0 &&
-			 (file_exists(JPATH_ROOT . '/components/com_comprofiler/comprofiler.php') ||
-			 file_exists(JPATH_ROOT . '/components/com_community/community.php') ||
-			 file_exists(JPATH_ROOT . '/components/com_osmembership/osmembership.php')))
-		{
-			if ($config->cb_integration == 1)
-			{
-				//Get list of CB fields   
-				$query->clear();
-				$query->select('name AS `value`, name AS `text`')
-					->from('#__comprofiler_fields')
-					->where('`table` LIKE "%_comprofiler%" AND published=1');
-				$db->setQuery($query);
-				$options = array_merge($options, $db->loadObjectList());
-			}
-			elseif ($config->cb_integration == 2)
-			{
-				//Get list of Jomsocial field code
-				$query->clear();
-				$query->select('fieldcode AS `value`, fieldcode AS `text`')
-					->from('#__community_fields')
-					->where('published=1 AND fieldcode != ""');
-				$db->setQuery($query);
-				$options = array_merge($options, $db->loadObjectList());
-			}
-			else
-			{
-				
-				require_once JPATH_ROOT . '/components/com_osmembership/helper/helper.php';
-				$rowFields = OSMembershipHelper::getProfileFields(0);
-				foreach ($rowFields as $rowField)
-				{
-					$options[] = JHtml::_('select.option', $rowField->name, $rowField->title);
-				}
-			}
-			$fields = array(
-				'm_firstname', 
-				'm_lastname', 
-				'm_organization', 
-				'm_address', 
-				'm_address2', 
-				'm_city', 
-				'm_state', 
-				'm_zip', 
-				'm_country', 
-				'm_phone', 
-				'm_fax');
-			foreach ($fields as $field)
-			{
-				$lists[$field] = JHtml::_('select.genericlist', $options, $field, 'class="inputbox"', 'value', 'text', $config->{$field});
-			}
-		}
-		else
-		{
-			$config->cb_integration = 0;
-		}
 		$options = array();
 		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_POSITION'));
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_BEFORE_AMOUNT'));
