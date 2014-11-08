@@ -1693,4 +1693,29 @@ class EventbookingController extends JControllerLegacy
 			$stateName);
 		$app->close();
 	}
+	/**
+	 * Helper method for debugging Paypal IPN
+	 *
+	 */
+	public function debug_paypal_ipn()
+	{
+		error_reporting(E_ALL);
+		$ipnMessage = '';
+		if ($ipnMessage)
+		{
+			$pairs = explode(", ", $ipnMessage);
+			foreach ($pairs as $pair)
+			{
+				$keyValue = explode('=', $pair);
+				if(count($keyValue) == 2 && $keyValue[1])
+				{
+					$_POST[$keyValue[0]] = $keyValue[1];
+				}
+			}
+
+			JTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_eventbooking/table');
+			$method = os_payments::getPaymentMethod('os_paypal');
+			$method->verifyPayment();
+		}
+	}
 }
