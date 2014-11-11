@@ -1873,4 +1873,100 @@ class EventbookingController extends RADControllerAdmin
 		JFactory::getDbo()->truncateTable('#__eb_urls');
 		$this->setRedirect('index.php?option=com_eventbooking&view=dashboard', JText::_('Urls have successfully reset'));
 	}
+
+	/**
+	 * Get profile data of the registrant, return reson format using for ajax request
+	 *
+	 */
+	function get_profile_data()
+	{
+		$config  = EventbookingHelper::getConfig();
+		$input   = JFactory::getApplication()->input;
+		$userId  = $input->getInt('user_id', 0);
+		$eventId = $input->getInt('event_id');
+		$data    = array();
+		if ($userId && $eventId)
+		{
+			$rowFields = EventbookingHelper::getFormFields($eventId, 0);
+			$db        = JFactory::getDbo();
+			$query     = $db->getQuery(true);
+			$query->clear();
+			$query->select('*')
+				->from('#__eb_registrants')
+				->where('user_id=' . $userId);
+			$db->setQuery($query);
+			$rowProfile = $db->loadObject();
+			if ($rowProfile)
+			{
+				$data = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);
+			}
+			elseif (JPluginHelper::isEnabled('user', 'profile') && !$config->cb_integration)
+			{
+				$syncronizer = new RADSynchronizerJoomla();
+				$mappings    = array();
+				foreach ($rowFields as $rowField)
+				{
+					if ($rowField->profile_field_mapping)
+					{
+						$mappings[$rowField->name] = $rowField->profile_field_mapping;
+					}
+				}
+				$data = $syncronizer->getData($userId, $mappings);
+			}
+			elseif ($config->cb_integration == 1)
+			{
+				$syncronizer = new RADSynchronizerCommunitybuilder();
+				$mappings    = array();
+				foreach ($rowFields as $rowField)
+				{
+					if ($rowField->field_mapping)
+					{
+						$mappings[$rowField->name] = $rowField->field_mapping;
+					}
+				}
+				$data = $syncronizer->getData($userId, $mappings);
+			}
+			elseif ($config->cb_integration == 2)
+			{
+				$syncronizer = new RADSynchronizerJomsocial();
+				$mappings    = array();
+				foreach ($rowFields as $rowField)
+				{
+					if ($rowField->field_mapping)
+					{
+						$mappings[$rowField->name] = $rowField->field_mapping;
+					}
+				}
+				$data = $syncronizer->getData($userId, $mappings);
+			}
+
+		}
+
+		if ($userId && !isset($data['first_name']))
+		{
+			//Load the name from Joomla default name
+			$user = JFactory::getUser($userId);
+			$name = $user->name;
+			if ($name)
+			{
+				$pos = strpos($name, ' ');
+				if ($pos !== false)
+				{
+					$data['first_name'] = substr($name, 0, $pos);
+					$data['last_name']  = substr($name, $pos + 1);
+				}
+				else
+				{
+					$data['first_name'] = $name;
+					$data['last_name']  = '';
+				}
+			}
+		}
+		if ($userId && !isset($data['email']))
+		{
+			$data['email'] = $user->email;
+		}
+		echo json_encode($data);
+		JFactory::getApplication()->close();
+	}
 }

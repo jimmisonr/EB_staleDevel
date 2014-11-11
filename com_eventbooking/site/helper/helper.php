@@ -2256,7 +2256,7 @@ class EventbookingHelper
 	 * Generate User Input Select
 	 * @param int $userId
 	 */
-	public static function getUserInput($userId, $fieldName = 'user_id')
+	public static function getUserInput($userId, $fieldName = 'user_id', $registerId)
 	{
 		// Initialize variables.
 		$html = array();
@@ -2266,13 +2266,17 @@ class EventbookingHelper
 		// Load the modal behavior script.
 		JHtml::_('behavior.modal', 'a.modal_user_id');
 		// Build the script.
-		$script = array();
+		$script   = array();
 		$script[] = '	function jSelectUser_user_id(id, title) {';
 		$script[] = '		var old_id = document.getElementById("user_id").value;';
 		$script[] = '		if (old_id != id) {';
 		$script[] = '			document.getElementById("' . $fieldName . '").value = id;';
 		$script[] = '			document.getElementById("user_id_name").value = title;';
 		$script[] = '		}';
+		if (!$registerId)
+		{
+			$script[] = ' populateRegisterData(id, document.getElementById("event_id").value, title); ';
+		}
 		$script[] = '		SqueezeBox.close();';
 		$script[] = '	}';
 		// Add the script to the document head.
@@ -2290,19 +2294,19 @@ class EventbookingHelper
 		// Create a dummy text field with the user name.
 		$html[] = '<div class="fltlft">';
 		$html[] = '	<input type="text" id="user_id_name"' . ' value="' . htmlspecialchars($table->name, ENT_COMPAT, 'UTF-8') . '"' .
-			 ' disabled="disabled"' . $attr . ' />';
+			' disabled="disabled"' . $attr . ' />';
 		$html[] = '</div>';
 		// Create the user select button.
 		$html[] = '<div class="button2-left">';
 		$html[] = '<div class="blank">';
 		$html[] = '<a class="modal_user_id" title="' . JText::_('JLIB_FORM_CHANGE_USER') . '"' . ' href="' . $link . '"' .
-			 ' rel="{handler: \'iframe\', size: {x: 800, y: 500}}">';
+			' rel="{handler: \'iframe\', size: {x: 800, y: 500}}">';
 		$html[] = '	' . JText::_('JLIB_FORM_CHANGE_USER') . '</a>';
 		$html[] = '</div>';
 		$html[] = '</div>';
 		// Create the real field, hidden, that stored the user id.
 		$html[] = '<input type="hidden" id="' . $fieldName . '" name="' . $fieldName . '" value="' . $userId . '" />';
-		
+
 		return implode("\n", $html);
 	}
 

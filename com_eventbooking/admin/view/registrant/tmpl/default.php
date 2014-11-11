@@ -42,7 +42,7 @@ $selectedState = '';
 				<?php echo  JText::_('EB_USER'); ?>
 			</td>
 			<td>
-				<?php echo EventbookingHelper::getUserInput($this->item->user_id) ; ?>
+				<?php echo EventbookingHelper::getUserInput($this->item->user_id,'user_id',(int) $this->item->id) ; ?>
 			</td>
 		</tr>
 		<tr>
@@ -271,9 +271,8 @@ $selectedState = '';
 	<?php echo JHtml::_( 'form.token' ); ?>
 	<script type="text/javascript">
 		var siteUrl = "<?php echo JUri::root(); ?>";
-		function buildStateField(stateFieldId, countryFieldId, defaultState)
-		{
-			(function($) {
+		(function($){
+			buildStateField = (function(stateFieldId, countryFieldId, defaultState){
 				if($('#' + stateFieldId).length)
 				{
 					//set state
@@ -313,13 +312,48 @@ $selectedState = '';
 						});
 					}						
 				}//end check exits state
-						
-			})(jQuery);		
-		}
-		(function($){
+							
+			});
 			$(document).ready(function(){							
 				buildStateField('state', 'country', '<?php echo $selectedState; ?>');										
 			})
-		})(jQuery);	
+			populateRegisterData = (function(id, registerId, title){
+				$.ajax({
+					type : 'POST',
+					url : 'index.php?option=com_eventbooking&task=get_profile_data&user_id=' + id + '&event_id=' +registerId,
+					dataType: 'json',
+					success : function(json){
+						var selecteds = [];
+						for (var field in json)
+						{
+							value = json[field];
+							if ($("input[name='" + field + "[]']").length)
+							{
+								//This is a checkbox or multiple select
+								if ($.isArray(value))
+								{
+									selecteds = value;
+								}
+								else
+								{
+									selecteds.push(value);
+								}
+								$("input[name='" + field + "[]']").val(selecteds);
+							}
+							else if ($("input[type='radio'][name='" + field + "']").length)
+							{
+								$("input[name="+field+"][value=" + value + "]").attr('checked', 'checked');
+							}
+							else
+							{
+								$('#' + field).val(value);
+							}
+						}
+						$('#user_id').val(id);
+						$('#user_id_name').val(title);
+					}
+				})
+			});		
+		})(jQuery);
 	</script>
 </form>
