@@ -19,9 +19,9 @@ if (!function_exists('curl_init'))
 <tr>
 	<td align="left">
 		<?php echo JText::_( 'Filter' ); ?>:
-		<input type="text" name="filter_search" id=""filter_search"" value="<?php echo $this->state->filter_search;?>" class="text_area search-query" onchange="document.adminForm.submit();" />		
+		<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->state->filter_search;?>" class="text_area search-query" onchange="document.adminForm.submit();" />		
 		<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'Go' ); ?></button>
-		<button onclick="document.getElementById('"filter_search"').value='';this.form.submit();" class="btn"><?php echo JText::_( 'Reset' ); ?></button>		
+		<button onclick="document.getElementById('filter_search').value='';this.form.submit();" class="btn"><?php echo JText::_( 'Reset' ); ?></button>
 	</td>		
 	<td style="text-align: right;">
 		<?php echo $this->lists['filter_language'];?>

@@ -52,7 +52,7 @@ if ($this->config->activate_invoice_feature)
 	<table class="adminlist table table-striped">
 	<thead>
 		<tr>
-			<th width="10">
+			<th width="2%" class="text_center">
 				<input type="checkbox" name="toggle" value="" onclick="Joomla.checkAll(this)" />
 			</th>			
 			<th class="title" style="text-align: left;" width="10%">
@@ -159,7 +159,7 @@ if ($this->config->activate_invoice_feature)
 		}							
 		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td>
+			<td class="text_center">
 				<?php echo $checked; ?>
 			</td>				
 			<td>

@@ -15,7 +15,7 @@ defined( '_JEXEC' ) or die ;
 <tr>
 	<td>
 		<?php echo JText::_( 'Filter' ); ?>:
-		<input type="text" name="filter_search" id=""filter_search"" value="<?php echo $this->state->filter_search;?>" class="text_area search-query" />		
+		<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->state->filter_search;?>" class="text_area search-query" />		
 		<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'Go' ); ?></button>
 		<button onclick="document.getElementById('filter_search').value='';this.form.submit();" class="btn"><?php echo JText::_( 'Reset' ); ?></button>		
 	</td>	

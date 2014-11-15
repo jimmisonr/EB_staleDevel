@@ -29,7 +29,9 @@ JToolBarHelper::title(JText::_('EB_DASHBOARD'), 'generic.png');
 					$this->quickiconButton('index.php?option=com_eventbooking&task=csv_export', 'icon-48-eventbooking-export.png', JText::_('EB_EXPORT_REGISTRANTS'));
 					$this->quickiconButton('index.php?option=com_eventbooking&view=waitings', 'icon-48-eventbooking-waitings.png', JText::_('EB_WAITING_LIST'));
 					$this->quickiconButton('index.php?option=com_eventbooking&view=massmail', 'icon-48-eventbooking-massmail.png', JText::_('EB_MASS_MAIL'));
-                    $this->quickiconButton('index.php?option=com_eventbooking', 'icon-48-download.png', JText::_('EB_UPDATE_CHECKING'), 'update-check');
+                    $this->quickiconButton('index.php?option=com_eventbooking&view=countries', 'icon-48-countries.png', JText::_('EB_COUNTRIES'));
+					$this->quickiconButton('index.php?option=com_eventbooking&view=states', 'icon-48-states.png', JText::_('EB_STATES'));
+					$this->quickiconButton('index.php?option=com_eventbooking', 'icon-48-download.png', JText::_('EB_UPDATE_CHECKING'), 'update-check');
 				?>
 			</div>
 		</td>

@@ -238,15 +238,7 @@ else
 				<td>
 					&nbsp;
 				</td>
-			</tr>     	
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_LANGUAGE'); ?>
-				</td>
-				<td>
-					<?php echo $this->lists['language'] ; ?>
-				</td>			
-			</tr>     
+			</tr>     	    
 			<tr>
 				<td class="key">
 					<?php echo JText::_('EB_PUBLISHED') ; ?>
