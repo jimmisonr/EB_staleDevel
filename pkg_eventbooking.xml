@@ -8,7 +8,7 @@
 	  <authorUrl>http://www.joomdonation.com</authorUrl>
 	  <copyright>Copyright (C) 2012 - 2014 Ossolution Team</copyright>
 	  <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
-	  <version>1.6.6</version>	  
+	  <version>1.6.8</version>	  
 	  <description>Event Booking is a simple, secure, extendable, intuititive event registration extension for Joomla 1.5, 1.6, 1.7, 2.5, 3.x</description>
 	 <files folder="packages">	   
 	   <file type="module" id="eventbooking" client="site">mod_eb_cart.zip</file>

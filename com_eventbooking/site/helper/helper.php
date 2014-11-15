@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.6.6
+ * @version        	1.6.8
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -18,7 +18,7 @@ class EventbookingHelper
      */
 	public static function getInstalledVersion()
 	{
-		return '1.6.6';
+		return '1.6.7';
 	}
 
 	/**
