@@ -238,7 +238,9 @@ class EventbookingModelEvent extends RADModelItem
 	function _storeRecurringEvent(&$data)
 	{
 		$db = $this->getDbo();
+		$config = EventbookingHelper::getConfig();
 		$row = $this->getTable();
+		$nullDate       = $db->getNullDate();
 		if ($this->state->id)
 		{
 			$row->load($this->state->id);
@@ -292,9 +294,16 @@ class EventbookingModelEvent extends RADModelItem
 				(int) $data['number_months'], (int) $data['recurring_occurrencies'], $data['monthdays']);
 			$row->recurring_frequency = $data['number_months'];
 		}
-		$eventDuration = abs(strtotime($row->event_end_date) - strtotime($row->event_date));
-		
-		if (strlen(trim($row->cut_off_date)))
+
+		if (strlen(trim($data['event_end_date'])) && $row->event_end_date != $nullDate)
+		{
+			$eventDuration = abs(strtotime($row->event_end_date) - strtotime($row->event_date));
+		}
+		else
+		{
+			$eventDuration = 0;
+		}
+		if (strlen(trim($row->cut_off_date)) && $row->cut_off_date != $nullDate)
 		{
 			$cutOffDuration = abs(strtotime($row->cut_off_date) - strtotime($row->event_date));
 		}
@@ -302,7 +311,7 @@ class EventbookingModelEvent extends RADModelItem
 		{
 			$cutOffDuration = 0;
 		}
-		if (strlen(trim($row->cancel_before_date)))
+		if (strlen(trim($row->cancel_before_date)) && $row->cancel_before_date != $nullDate)
 		{
 			$cancelDuration = abs(strtotime($row->cancel_before_date) - strtotime($row->event_date));
 		}
@@ -310,14 +319,14 @@ class EventbookingModelEvent extends RADModelItem
 		{
 			$cancelDuration = 0;
 		}		
-		if (strlen(trim($row->early_bird_discount_date)))
+		if (strlen(trim($row->early_bird_discount_date)) && $row->early_bird_discount_date != $nullDate)
 		{
 			$earlyBirdDuration = abs(strtotime($row->early_bird_discount_date) - strtotime($row->event_date));
 		}
 		else
 		{
 			$earlyBirdDuration = 0;
-		}		
+		}
 		if (count($eventDates) == 0)
 		{
 			JFactory::getApplication()->redirect('index.php?option=com_eventbooking&view=events', JText::_('Invalid recurring setting'));
@@ -325,7 +334,15 @@ class EventbookingModelEvent extends RADModelItem
 		else
 		{
 			$row->event_date = $eventDates[0];
-			$row->event_end_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($row->event_date) + $eventDuration);
+			if ($eventDuration)
+			{
+				$row->event_end_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($row->event_date) + $eventDuration);
+			}
+			else
+			{
+				$row->event_end_date = '';
+			}
+
 		}
 		$eventCustomField = EventbookingHelper::getConfigValue('event_custom_field');
 		if ($eventCustomField)
@@ -431,7 +448,15 @@ class EventbookingModelEvent extends RADModelItem
 				$rowChildEvent = clone ($row);
 				$rowChildEvent->id = 0;
 				$rowChildEvent->event_date = $eventDates[$i];
-				$rowChildEvent->event_end_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($eventDates[$i]) + $eventDuration);
+				if ($eventDuration)
+				{
+					$rowChildEvent->event_end_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($eventDates[$i]) + $eventDuration);
+				}
+				else
+				{
+					$rowChildEvent->event_end_date = '';
+				}
+
 				if ($cutOffDuration)
 				{
 					$rowChildEvent->cut_off_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($rowChildEvent->event_date) - $cutOffDuration);
@@ -500,51 +525,81 @@ class EventbookingModelEvent extends RADModelItem
 			$query->clear();
 			$query->select('id')
 				->from('#__eb_events')
-				->where('parent_id=' . $row->id);
-			;
+				->where('parent_id=' . $row->id);;
 			$db->setQuery($query);
 			$children = $db->loadColumn();
 			if (count($children))
 			{
 				$fieldsToUpdate = array(
-					'category_id', 
-					'location_id', 
-					'title', 
-					'short_description', 
-					'description', 
-					'access', 
-					'registration_access', 
-					'individual_price', 
-					'event_capacity', 
-					'registration_type', 
-					'max_group_number', 
-					'discount_type', 
-					'discount', 
-					'paypal_email', 
-					'notification_emails', 
-					'user_email_body', 
-					'user_email_body_offline', 
-					'thanks_message', 
-					'thanks_message_offline', 
-					'params', 
+					'category_id',
+					'location_id',
+					'title',
+					'short_description',
+					'description',
+					'access',
+					'registration_access',
+					'individual_price',
+					'event_capacity',
+					'registration_type',
+					'max_group_number',
+					'discount_type',
+					'discount',
+					'paypal_email',
+					'notification_emails',
+					'user_email_body',
+					'user_email_body_offline',
+					'thanks_message',
+					'thanks_message_offline',
+					'params',
 					'published');
-				$nullDate = $db->getNullDate();
-				if (($row->cut_off_date == $nullDate) || empty($row->cut_off_date))
-				{
-					$fieldsToUpdate[] = 'cut_off_date';
-				}
-				if (($row->event_end_date == $nullDate) || empty($row->cut_off_date))
-				{
-					$fieldsToUpdate[] = 'event_end_date';
-				}
 				$rowChildEvent = $this->getTable();
 				foreach ($children as $childId)
 				{
 					$rowChildEvent->load($childId);
 					foreach ($fieldsToUpdate as $field)
+					{
 						$rowChildEvent->$field = $row->$field;
+					}
+
+					// Allow children event to update hour and minute secure
+					$rowChildEvent->event_date = JHtml::_('date', $rowChildEvent->event_date, 'Y-m-d', null) . ' ' . JHtml::_('date', $row->event_date, 'H:i:s', null);
+
+					if ($eventDuration)
+					{
+						$rowChildEvent->event_end_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($rowChildEvent->event_date) + $eventDuration);
+					}
+					else
+					{
+						$rowChildEvent->event_end_date = '';
+					}
+
+					if ($cutOffDuration)
+					{
+						$rowChildEvent->cut_off_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($rowChildEvent->event_date) - $cutOffDuration);
+					}
+					else
+					{
+						$rowChildEvent->cut_off_date = '';
+					}
+
+					if ($cancelDuration)
+					{
+						$rowChildEvent->cancel_before_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($rowChildEvent->event_date) - $cancelDuration);
+					}
+					else
+					{
+						$rowChildEvent->cancel_before_date = '';
+					}
+					if ($earlyBirdDuration)
+					{
+						$rowChildEvent->early_bird_discount_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($rowChildEvent->event_date) - $earlyBirdDuration);
+					}
+					else
+					{
+						$rowChildEvent->early_bird_discount_date = '';
+					}
+
 					$rowChildEvent->store();
-					
 					$query->clear();
 					$query->delete('#__eb_event_group_prices')->where('event_id=' . $rowChildEvent->id);
 					$db->setQuery($query);
