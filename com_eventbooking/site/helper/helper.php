@@ -18,7 +18,7 @@ class EventbookingHelper
      */
 	public static function getInstalledVersion()
 	{
-		return '1.6.7';
+		return '1.6.8';
 	}
 
 	/**
@@ -161,6 +161,8 @@ class EventbookingHelper
 	/**
 	 * Get field suffix used in sql query
 	 *
+	 * @param null $activeLanguage
+	 *
 	 * @return string
 	 */
 	public static function getFieldSuffix($activeLanguage = null)
@@ -181,6 +183,11 @@ class EventbookingHelper
 		return $prefix;
 	}
 
+	/**
+	 * Get list of language uses on the site
+	 *
+	 * @return array
+	 */
 	public static function getLanguages()
 	{
 		$db = JFactory::getDbo();
@@ -208,6 +215,11 @@ class EventbookingHelper
 		return $params->get('site', 'en-GB');
 	}
 
+	/**
+	 * Get language use for re-captcha
+	 *
+	 * @return string
+	 */
 	public static function getRecaptchaLanguage()
 	{
 		$language = JFactory::getLanguage();
@@ -1299,7 +1311,6 @@ class EventbookingHelper
 	 */
 	public static function sendEmails($row, $config)
 	{
-		$app = JFactory::getApplication();
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$message = self::getMessages();
@@ -1311,7 +1322,7 @@ class EventbookingHelper
 		}
 		else
 		{
-			$fromName = $app->getCfg('from_name');
+			$fromName = JFactory::getConfig()->get('from_name');
 		}
 		if ($config->from_email)
 		{
@@ -1319,7 +1330,7 @@ class EventbookingHelper
 		}
 		else
 		{
-			$fromEmail = $app->getCfg('mailfrom');
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
 		}
 		$query->select('*')
 			->from('#__eb_events')
@@ -1693,7 +1704,6 @@ class EventbookingHelper
 	 */
 	public static function sendRegistrationApprovedEmail($row, $config)
 	{
-		$app = JFactory::getApplication();
 		$mailer = JFactory::getMailer();
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
@@ -1706,7 +1716,7 @@ class EventbookingHelper
 		}
 		else
 		{
-			$fromName = $app->getCfg('fromname');
+			$fromName = JFactory::getConfig()->get('fromname');
 		}
 		if ($config->from_email)
 		{
@@ -1714,7 +1724,7 @@ class EventbookingHelper
 		}
 		else
 		{
-			$fromEmail = $app->getCfg('mailfrom');
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
 		}
 		if ($config->multiple_booking)
 		{
@@ -1775,7 +1785,6 @@ class EventbookingHelper
 		//Add support for location tag
 		$sql = 'SELECT a.* FROM #__eb_locations AS a ' . ' INNER JOIN #__eb_events AS b ' . ' ON a.id = b.location_id ' . ' WHERE b.id =' .
 			 $row->event_id;
-		;
 		$db->setQuery($sql);
 		$rowLocation = $db->loadObject();
 		if ($rowLocation)
@@ -1832,7 +1841,6 @@ class EventbookingHelper
 	 */
 	public static function sendWaitinglistEmail($row, $config)
 	{
-		$app = JFactory::getApplication();
 		$db = JFactory::getDbo();
 		$mailer = JFactory::getMailer();
 		$message = self::getMessages();
@@ -1843,7 +1851,7 @@ class EventbookingHelper
 		}
 		else
 		{
-			$fromName = $app->getCfg('fromname');
+			$fromName = JFactory::getConfig()->get('fromname');
 		}
 		if ($config->from_email)
 		{
@@ -1851,7 +1859,7 @@ class EventbookingHelper
 		}
 		else
 		{
-			$fromEmail = $app->getCfg('mailfrom');
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
 		}
 		$sql = "SELECT * FROM #__eb_events WHERE id=" . $row->event_id;
 		$db->setQuery($sql);
@@ -1947,6 +1955,10 @@ class EventbookingHelper
 	public static function getCountryCode($countryName)
 	{
 		$db = JFactory::getDbo();
+		if (empty($countryName))
+		{
+			$countryName = self::getConfigValue('default_country');
+		}
 		$sql = 'SELECT country_2_code FROM #__eb_countries WHERE LOWER(name)="' . JString::strtolower($countryName) . '"';
 		$db->setQuery($sql);
 		$countryCode = $db->loadResult();
@@ -2244,7 +2256,8 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Calcuate total discount for the registration
+	 * Calculate total discount for the registration
+	 *
 	 * @return decimal
 	 */
 	function calcuateDiscount()
@@ -2356,7 +2369,7 @@ class EventbookingHelper
 		$app = JFactory::getApplication();
 		$db = JFactory::getDbo();
 		$config = self::getConfig();
-		$sitename = $app->getCfg("sitename");
+		$sitename = JFactory::getConfig()->get("sitename");
 		$sql = 'SELECT * FROM #__eb_events WHERE id=' . $row->event_id;
 		$db->setQuery($sql);
 		$rowEvent = $db->loadObject();
