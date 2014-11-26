@@ -117,7 +117,8 @@ class EventBookingModelCart extends JModelLegacy
 			$quantity = $quantities[$i];
 			$rate = EventbookingHelper::getRegistrationRate($eventId, $quantity);
 			$registrantTotalAmount = $rate * $quantity;
-			//Canculte discount
+
+			// Calculate discount
 			$registrantDiscount = 0;
 			if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
 			{

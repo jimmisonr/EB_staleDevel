@@ -527,356 +527,18 @@ class EventbookingController extends JControllerLegacy
 		echo json_encode($arrayToJs);
 		JFactory::getApplication()->close();
 	}
-	/**
-	 * Validate the invidual registration coupon, then update the amount on registration screeen
-	 */
-	function validate_individual_registration_coupon()
-	{
-		$user = JFactory::getUser();
-		$input = JFactory::getApplication()->input;
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$config = EventbookingHelper::getConfig();
-		$eventId = $input->getInt('event_id', 0);
-		$couponCode = $input->getString('coupon_code', '');
-		$data = JRequest::get('post', JREQUEST_ALLOWHTML);
-		$response = array();
-		//First, we will need to calculate registration fee
-		$query->select('*')
-			->from('#__eb_events')
-			->where('id=' . $eventId);
-		$db->setQuery($query);
-		$event = $db->loadObject();
-		$rowFields = EventbookingHelper::getFormFields($eventId, 0);
-		$form = new RADForm($rowFields);
-		$form->bind($data);
-		$totalAmount = $event->individual_price + $form->calculateFee();
-		$discountAmount = 0;
-		if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
-		{
-			if ($event->discount > 0)
-			{
-				if ($event->discount_type == 1)
-				{
-					$discountAmount = $totalAmount * $event->discount / 100;
-				}
-				else
-				{
-					$discountAmount = $event->discount;
-				}
-			}
-		}
-		$todayDate = JHtml::_('date', 'now', 'Y-m-d');
-		//Early bird discount
-		$sql = 'SELECT COUNT(id) FROM #__eb_events WHERE id=' . $eventId . ' AND DATEDIFF(early_bird_discount_date, "' . $todayDate . '") >= 0';
-		$db->setQuery($sql);
-		$total = $db->loadResult();
-		if ($total)
-		{
-			$earlyBirdDiscountAmount = $event->early_bird_discount_amount;
-			if ($earlyBirdDiscountAmount > 0)
-			{
-				if ($event->early_bird_discount_type == 1)
-				{
-					$discountAmount = $discountAmount + $totalAmount * $event->early_bird_discount_amount / 100;
-				}
-				else
-				{
-					$discountAmount = $discountAmount + $event->early_bird_discount_amount;
-				}
-			}
-		}
-		if ($couponCode)
-		{
-			//Validate the coupon
-			$query->clear();
-			$query->select('*')
-				->from('#__eb_coupons')
-				->where('published=1')
-				->where('code="' . $couponCode . '"')
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
-				->where('(times = 0 OR times > used)')
-				->where('(event_id=0 OR event_id=' . $eventId . ')');
-			$db->setQuery($query);
-			$coupon = $db->loadObject();
-			if ($coupon)
-			{
-				$response['coupon_valid'] = 1;
-				if ($coupon->coupon_type == 0)
-				{
-					$discountAmount = $discountAmount + $totalAmount * $coupon->discount / 100;
-				}
-				else
-				{
-					$discountAmount = $discountAmount + $coupon->discount;
-				}
-			}
-			else
-			{
-				$response['coupon_valid'] = 0;
-			}
-		}
-		else
-		{
-			$response['coupon_valid'] = 1;
-		}
-		
-		if ($discountAmount > $totalAmount)
-		{
-			$discountAmount = $totalAmount;
-		}
-		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
-		{
-			$taxAmount = round(($totalAmount - $discountAmount) * $config->tax_rate / 100, 2);
-		}
-		else
-		{
-			$taxAmount = 0;
-		}
-		$amount = $totalAmount - $discountAmount + $taxAmount;
-		$response['total_amount'] = EventbookingHelper::formatAmount($totalAmount, $config);
-		$response['discount_amount'] = EventbookingHelper::formatAmount($discountAmount, $config);
-		$response['tax_amount'] = EventbookingHelper::formatAmount($taxAmount, $config);
-		$response['amount'] = EventbookingHelper::formatAmount($amount, $config);
-		echo json_encode($response);
-		JFactory::getApplication()->close();
-	}
-	/**
-	 * Validate the group registration coupon, then update the amount on billing screeen
-	 */
-	function validate_group_registration_coupon()
-	{
-		$user = JFactory::getUser();
-		$session = JFactory::getSession();
-		$input = JFactory::getApplication()->input;
-		$config = EventbookingHelper::getConfig();
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$eventId = $input->getInt('event_id', 0);
-		$couponCode = $input->getString('coupon_code', '');
-		$data = JRequest::get('post', JREQUEST_ALLOWHTML);
-		$response = array();
-		//First, we will need to calculate registration fee
-		$query->select('*')
-			->from('#__eb_events')
-			->where('id=' . $eventId);
-		$db->setQuery($query);
-		$event = $db->loadObject();
-		$rowFields = EventbookingHelper::getFormFields($eventId, 1);
-		$form = new RADForm($rowFields);
-		$form->bind($data);
-		$extraFee = $form->calculateFee();
-		$numberRegistrants = (int) $session->get('eb_number_registrants', '');
-		$memberFormFields = EventbookingHelper::getFormFields($eventId, 2);
-		//Member data
-		$membersData = $session->get('eb_group_members_data', null);
-		if ($membersData)
-		{
-			$membersData = unserialize($membersData);
-		}
-		else
-		{
-			$membersData = array();
-		}
-		for ($i = 0; $i < $numberRegistrants; $i++)
-		{
-			$memberForm = new RADForm($memberFormFields);
-			$memberForm->setFieldSuffix($i + 1);
-			$memberForm->bind($membersData);
-			$extraFee += $memberForm->calculateFee();
-		}
-		$rate = EventbookingHelper::getRegistrationRate($eventId, $numberRegistrants);
-		if ($event->fixed_group_price > 0)
-		{
-			$totalAmount = $event->fixed_group_price + $extraFee;
-		}
-		else
-		{
-			$totalAmount = $rate * $numberRegistrants + $extraFee;
-		}
-		$discountAmount = 0;
-		if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
-		{
-			if ($event->discount > 0)
-			{
-				if ($event->discount_type == 1)
-				{
-					$discountAmount = $totalAmount * $event->discount / 100;
-				}
-				else
-				{
-					$discountAmount = $numberRegistrants * $event->discount;
-				}
-			}
-		}
-		if ($couponCode)
-		{
-			$query->clear();
-			$query->select('*')
-				->from('#__eb_coupons')
-				->where('published=1')
-				->where('code="' . $couponCode . '"')
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
-				->where('(times = 0 OR times > used)')
-				->where('(event_id=0 OR event_id=' . $eventId . ')');
-			$db->setQuery($query);
-			$coupon = $db->loadObject();
-			if ($coupon)
-			{
-				$response['coupon_valid'] = 1;
-				if ($coupon->coupon_type == 0)
-				{
-					$discountAmount = $discountAmount + $totalAmount * $coupon->discount / 100;
-				}
-				else
-				{
-					$discountAmount = $discountAmount + $numberRegistrants * $coupon->discount;
-				}
-			}
-			else
-			{
-				$response['coupon_valid'] = 0;
-			}
-		}
-		else
-		{
-			$response['coupon_valid'] = 1;
-		}
-		$todayDate = JHtml::_('date', 'now', 'Y-m-d');
-		//Early bird discount
-		$query->clear();
-		$query->select('COUNT(id)')
-			->from('#__eb_events')
-			->where('id=' . $eventId)
-			->where('DATEDIFF(early_bird_discount_date, "' . $todayDate . '") >= 0');
-		$db->setQuery($query);
-		$total = $db->loadResult();
-		if ($total)
-		{
-			$earlyBirdDiscountAmount = $event->early_bird_discount_amount;
-			if ($earlyBirdDiscountAmount > 0)
-			{
-				if ($event->early_bird_discount_type == 1)
-				{
-					$discountAmount = $discountAmount + $totalAmount * $event->early_bird_discount_amount / 100;
-				}
-				else
-				{
-					$discountAmount = $discountAmount + $numberRegistrants * $event->early_bird_discount_amount;
-				}
-			}
-		}
-		if ($discountAmount > $totalAmount)
-		{
-			$discountAmount = $totalAmount;
-		}
-		
-		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
-		{
-			$taxAmount = round(($totalAmount - $discountAmount) * $config->tax_rate / 100, 2);
-		}
-		else
-		{
-			$taxAmount = 0;
-		}
-		$amount = $totalAmount - $discountAmount + $taxAmount;
-		$response['total_amount'] = EventbookingHelper::formatAmount($totalAmount, $config);
-		$response['discount_amount'] = EventbookingHelper::formatAmount($discountAmount, $config);
-		$response['tax_amount'] = EventbookingHelper::formatAmount($taxAmount, $config);
-		$response['amount'] = EventbookingHelper::formatAmount($amount, $config);
-		echo json_encode($response);
-		JFactory::getApplication()->close();
-	}
-	/**
-	 * Validate the invidual registration coupon, then update the amount on registration screeen
-	 */
-	function validate_cart_registration_coupon()
-	{
-		$input = JFactory::getApplication()->input;
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$config = EventbookingHelper::getConfig();
-		$cart = new EventbookingHelperCart();
-		$couponCode = $input->getString('coupon_code', '');
-		$data = JRequest::get('post', JREQUEST_ALLOWHTML);
-		$response = array();
-		if ($couponCode)
-		{
-			$cart = new EventbookingHelperCart();
-			$eventIds = $cart->getItems();
-			if (count($eventIds) == 0)
-			{
-				$eventIds = array();
-				$eventIds[] = 0;
-			}
-			//Validate the coupon
-			$query->clear();
-			$query->select('*')
-				->from('#__eb_coupons')
-				->where('published=1')
-				->where('code="' . $couponCode . '"')
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
-				->where('(times = 0 OR times > used)')
-				->where(' (event_id=0 OR event_id IN(' . implode(',', $eventIds) . '))');
-			$db->setQuery($query);
-			$coupon = $db->loadObject();
-			if ($coupon)
-			{
-				$response['coupon_valid'] = 1;
-				$_SESSION['coupon_id'] = $coupon->id;
-			}
-			else
-			{
-				$response['coupon_valid'] = 0;
-			}
-		}
-		else
-		{
-			$response['coupon_valid'] = 1;
-		}
-		
-		$rowFields = EventbookingHelper::getFormFields(0, 4);
-		$form = new RADForm($rowFields);
-		$form->bind($data);
-		$totalAmount = $cart->calculateTotal() + $form->calculateFee();
-		$discountAmount = $cart->calculateTotalDiscount();
-		if ($discountAmount > $totalAmount)
-		{
-			$discountAmount = $totalAmount;
-		}
-		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
-		{
-			$taxAmount = round(($totalAmount - $discountAmount) * $config->tax_rate / 100, 2);
-		}
-		else
-		{
-			$taxAmount = 0;
-		}
-		$amount = $totalAmount - $discountAmount + $taxAmount;
-		$response['total_amount'] = EventbookingHelper::formatAmount($totalAmount, $config);
-		$response['discount_amount'] = EventbookingHelper::formatAmount($discountAmount, $config);
-		$response['tax_amount'] = EventbookingHelper::formatAmount($taxAmount, $config);
-		$response['amount'] = EventbookingHelper::formatAmount($amount, $config);
-		echo json_encode($response);
-		JFactory::getApplication()->close();
-	}
+
 	/**
 	 * Calculate registration fee, then update the information on registration form
 	 */
 	function calculate_individual_registration_fee()
 	{
-		$user = JFactory::getUser();
 		$config = EventbookingHelper::getConfig();
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$eventId = JRequest::getInt('event_id', 0);
-		$couponCode = JRequest::getVar('coupon_code', '');
 		$data = JRequest::get('post', JREQUEST_ALLOWHTML);
-		$response = array();
-		//First, we will need to calculate registration fee
+
 		$query->select('*')
 			->from('#__eb_events')
 			->where('id=' . $eventId);
@@ -885,85 +547,16 @@ class EventbookingController extends JControllerLegacy
 		$rowFields = EventbookingHelper::getFormFields($eventId, 0);
 		$form = new RADForm($rowFields);
 		$form->bind($data);
-		$totalAmount = $event->individual_price + $form->calculateFee();
-		$discountAmount = 0;
-		if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
-		{
-			if ($event->discount > 0)
-			{
-				if ($event->discount_type == 1)
-				{
-					$discountAmount = $totalAmount * $event->discount / 100;
-				}
-				else
-				{
-					$discountAmount = $event->discount;
-				}
-			}
-		}
-		$todayDate = JHtml::_('date', 'now', 'Y-m-d');
-		//Early bird discount
-		$sql = 'SELECT COUNT(id) FROM #__eb_events WHERE id=' . $eventId . ' AND DATEDIFF(early_bird_discount_date, "' . $todayDate . '") >= 0';
-		$db->setQuery($sql);
-		$total = $db->loadResult();
-		if ($total)
-		{
-			$earlyBirdDiscountAmount = $event->early_bird_discount_amount;
-			if ($earlyBirdDiscountAmount > 0)
-			{
-				if ($event->early_bird_discount_type == 1)
-				{
-					$discountAmount = $discountAmount + $totalAmount * $event->early_bird_discount_amount / 100;
-				}
-				else
-				{
-					$discountAmount = $discountAmount + $event->early_bird_discount_amount;
-				}
-			}
-		}
-		if ($couponCode)
-		{
-			//Validate the coupon
-			$query->clear();
-			$query->select('*')
-				->from('#__eb_coupons')
-				->where('published=1')
-				->where('code="' . $couponCode . '"')
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
-				->where('(times = 0 OR times > used)')
-				->where('(event_id=0 OR event_id=' . $eventId . ')');
-			$db->setQuery($query);
-			$coupon = $db->loadObject();
-			if ($coupon)
-			{
-				if ($coupon->coupon_type == 0)
-				{
-					$discountAmount = $discountAmount + $totalAmount * $coupon->discount / 100;
-				}
-				else
-				{
-					$discountAmount = $discountAmount + $coupon->discount;
-				}
-			}
-		}
-		if ($discountAmount > $totalAmount)
-		{
-			$discountAmount = $totalAmount;
-		}
-		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
-		{
-			$taxAmount = round(($totalAmount - $discountAmount) * $config->tax_rate / 100, 2);
-		}
-		else
-		{
-			$taxAmount = 0;
-		}
-		$amount = $totalAmount - $discountAmount + $taxAmount;
-		$response['total_amount'] = EventbookingHelper::formatAmount($totalAmount, $config);
-		$response['discount_amount'] = EventbookingHelper::formatAmount($discountAmount, $config);
-		$response['tax_amount'] = EventbookingHelper::formatAmount($taxAmount, $config);
-		$response['amount'] = EventbookingHelper::formatAmount($amount, $config);
+		$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config);
+
+		$response = array();
+		$response['total_amount'] = EventbookingHelper::formatAmount($fees['total_amount'], $config);
+		$response['discount_amount'] = EventbookingHelper::formatAmount($fees['discount_amount'], $config);
+		$response['tax_amount'] = EventbookingHelper::formatAmount($fees['tax_amount'], $config);
+		$response['amount'] = EventbookingHelper::formatAmount($fees['amount'], $config);
+		$response['deposit_amount'] = EventbookingHelper::formatAmount($fees['deposit_amount'], $config);
+		$response['coupon_valid'] = $fees['coupon_valid'];
+
 		echo json_encode($response);
 		JFactory::getApplication()->close();
 	}
@@ -972,17 +565,11 @@ class EventbookingController extends JControllerLegacy
 	 */
 	function calculate_group_registration_fee()
 	{
-		$user = JFactory::getUser();
-		$session = JFactory::getSession();
-		$input = JFactory::getApplication()->input;
 		$config = EventbookingHelper::getConfig();
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$eventId = $input->getInt('event_id', 0);
-		$couponCode = $input->getString('coupon_code', '');
+		$eventId = JRequest::getInt('event_id', 0);
 		$data = JRequest::get('post', JREQUEST_ALLOWHTML);
-		$response = array();
-		//First, we will need to calculate registration fee
 		$query->select('*')
 			->from('#__eb_events')
 			->where('id=' . $eventId);
@@ -991,117 +578,16 @@ class EventbookingController extends JControllerLegacy
 		$rowFields = EventbookingHelper::getFormFields($eventId, 1);
 		$form = new RADForm($rowFields);
 		$form->bind($data);
-		$extraFee = $form->calculateFee();
-		$numberRegistrants = (int) $session->get('eb_number_registrants', '');
-		$memberFormFields = EventbookingHelper::getFormFields($eventId, 2);
-		//Member data
-		$membersData = $session->get('eb_group_members_data', null);
-		if ($membersData)
-		{
-			$membersData = unserialize($membersData);
-		}
-		else
-		{
-			$membersData = array();
-		}
-		for ($i = 0; $i < $numberRegistrants; $i++)
-		{
-			$memberForm = new RADForm($memberFormFields);
-			$memberForm->setFieldSuffix($i + 1);
-			$memberForm->bind($membersData);
-			$extraFee += $memberForm->calculateFee();
-		}
-		$rate = EventbookingHelper::getRegistrationRate($eventId, $numberRegistrants);
-		if ($event->fixed_group_price > 0)
-		{
-			$totalAmount = $event->fixed_group_price + $extraFee;
-		}
-		else
-		{
-			$totalAmount = $rate * $numberRegistrants + $extraFee;
-		}
-		$discountAmount = 0;
-		if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
-		{
-			if ($event->discount > 0)
-			{
-				if ($event->discount_type == 1)
-				{
-					$discountAmount = $totalAmount * $event->discount / 100;
-				}
-				else
-				{
-					$discountAmount = $numberRegistrants * $event->discount;
-				}
-			}
-		}
-		if ($couponCode)
-		{
-			$query->clear();
-			$query->select('*')
-				->from('#__eb_coupons')
-				->where('published=1')
-				->where('code="' . $couponCode . '"')
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
-				->where('(times = 0 OR times > used)')
-				->where('(event_id=0 OR event_id=' . $eventId . ')');
-			$db->setQuery($query);
-			$coupon = $db->loadObject();
-			if ($coupon)
-			{
-				if ($coupon->coupon_type == 0)
-				{
-					$discountAmount = $discountAmount + $totalAmount * $coupon->discount / 100;
-				}
-				else
-				{
-					$discountAmount = $discountAmount + $numberRegistrants * $coupon->discount;
-				}
-			}
-		}
-		$todayDate = JHtml::_('date', 'now', 'Y-m-d');
-		//Early bird discount
-		$query->clear();
-		$query->select('COUNT(id)')
-			->from('#__eb_events')
-			->where('id=' . $eventId)
-			->where('DATEDIFF(early_bird_discount_date, "' . $todayDate . '") >= 0');
-		$db->setQuery($query);
-		$total = $db->loadResult();
-		if ($total)
-		{
-			$earlyBirdDiscountAmount = $event->early_bird_discount_amount;
-			if ($earlyBirdDiscountAmount > 0)
-			{
-				if ($event->early_bird_discount_type == 1)
-				{
-					$discountAmount = $discountAmount + $totalAmount * $event->early_bird_discount_amount / 100;
-				}
-				else
-				{
-					$discountAmount = $discountAmount + $numberRegistrants * $event->early_bird_discount_amount;
-				}
-			}
-		}
-		if ($discountAmount > $totalAmount)
-		{
-			$discountAmount = $totalAmount;
-		}
-		
-		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
-		{
-			$taxAmount = round(($totalAmount - $discountAmount) * $config->tax_rate / 100, 2);
-		}
-		else
-		{
-			$taxAmount = 0;
-		}
-		$amount = $totalAmount - $discountAmount + $taxAmount;
-		$response['total_amount'] = EventbookingHelper::formatAmount($totalAmount, $config);
-		$response['discount_amount'] = EventbookingHelper::formatAmount($discountAmount, $config);
-		$response['tax_amount'] = EventbookingHelper::formatAmount($taxAmount, $config);
-		$response['amount'] = EventbookingHelper::formatAmount($amount, $config);
+
+		$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config);
+
+		$response = array();
+		$response['total_amount'] = EventbookingHelper::formatAmount($fees['total_amount'], $config);
+		$response['discount_amount'] = EventbookingHelper::formatAmount($fees['discount_amount'], $config);
+		$response['tax_amount'] = EventbookingHelper::formatAmount($fees['tax_amount'], $config);
+		$response['amount'] = EventbookingHelper::formatAmount($fees['amount'], $config);
+		$response['deposit_amount'] = EventbookingHelper::formatAmount($fees['deposit_amount'], $config);
+		$response['coupon_valid'] = $fees['coupon_valid'];
 		echo json_encode($response);
 		JFactory::getApplication()->close();
 	}
@@ -1124,8 +610,7 @@ class EventbookingController extends JControllerLegacy
 			$eventIds = $cart->getItems();
 			if (count($eventIds) == 0)
 			{
-				$eventIds = array();
-				$eventIds[] = 0;
+				$eventIds = array(0);
 			}
 			//Validate the coupon
 			$query->select('*')
@@ -1141,7 +626,20 @@ class EventbookingController extends JControllerLegacy
 			if ($coupon)
 			{
 				$_SESSION['coupon_id'] = $coupon->id;
+				$response['coupon_valid'] = 1;
 			}
+			else
+			{
+				$response['coupon_valid'] = 0;
+				if (isset($_SESSION['coupon_id']))
+				{
+					unset($_SESSION['coupon_id']);
+				}
+			}
+		}
+		else
+		{
+			$response['coupon_valid'] = 1;
 		}
 		$rowFields = EventbookingHelper::getFormFields(0, 4);
 		$form = new RADForm($rowFields);

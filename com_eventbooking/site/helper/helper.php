@@ -233,6 +233,396 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Calculate fees use for individual registration
+	 *
+	 * @param $event
+	 * @param $form
+	 * @param $data
+	 * @param $config
+	 *
+	 * @return array
+	 */
+	public static function calculateIndividualRegistrationFees($event, $form, $data, $config)
+	{
+		$fees           = array();
+		$user           = JFactory::getUser();
+		$db             = JFactory::getDbo();
+		$query          = $db->getQuery(true);
+		$couponCode     = isset($data['coupon_code']) ? $data['coupon_code'] : '';
+		$totalAmount    = $event->individual_price + $form->calculateFee();
+		$discountAmount = 0;
+		if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
+		{
+			if ($event->discount > 0)
+			{
+				if ($event->discount_type == 1)
+				{
+					$discountAmount = $totalAmount * $event->discount / 100;
+				}
+				else
+				{
+					$discountAmount = $event->discount;
+				}
+			}
+		}
+		$todayDate = JHtml::_('date', 'now', 'Y-m-d');
+		$query->select('COUNT(id)')
+			->from('#__eb_events')
+			->where('id = ' . $event->id)
+			->where('DATEDIFF(early_bird_discount_date, "' . $todayDate . '") >= 0');
+		$db->setQuery($query);
+		$total = $db->loadResult();
+
+		if ($total)
+		{
+			$earlyBirdDiscountAmount = $event->early_bird_discount_amount;
+			if ($earlyBirdDiscountAmount > 0)
+			{
+				if ($event->early_bird_discount_type == 1)
+				{
+					$discountAmount = $discountAmount + $totalAmount * $event->early_bird_discount_amount / 100;
+				}
+				else
+				{
+					$discountAmount = $discountAmount + $event->early_bird_discount_amount;
+				}
+			}
+		}
+		if ($couponCode)
+		{
+			//Validate the coupon
+			$query->clear();
+			$query->select('*')
+				->from('#__eb_coupons')
+				->where('published=1')
+				->where('code="' . $couponCode . '"')
+				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
+				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
+				->where('(times = 0 OR times > used)')
+				->where('(event_id=0 OR event_id=' . $event->id . ')');
+			$db->setQuery($query);
+			$coupon = $db->loadObject();
+			if ($coupon)
+			{
+				$fees['coupon_valid'] = 1;
+				$fees['coupon'] = $coupon;
+				if ($coupon->coupon_type == 0)
+				{
+					$discountAmount = $discountAmount + $totalAmount * $coupon->discount / 100;
+				}
+				else
+				{
+					$discountAmount = $discountAmount + $coupon->discount;
+				}
+			}
+			else
+			{
+				$fees['coupon_valid'] = 0;
+			}
+		}
+		else
+		{
+			$fees['coupon_valid'] = 1;
+		}
+
+		if ($discountAmount > $totalAmount)
+		{
+			$discountAmount = $totalAmount;
+		}
+		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
+		{
+			$taxAmount = round(($totalAmount - $discountAmount) * $config->tax_rate / 100, 2);
+		}
+		else
+		{
+			$taxAmount = 0;
+		}
+
+		$amount = $totalAmount - $discountAmount + $taxAmount;
+
+		// Calculate the deposit amount as well
+		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
+		{
+			if ($event->deposit_type == 2)
+			{
+				$depositAmount = $event->deposit_amount;
+			}
+			else
+			{
+				$depositAmount = $event->deposit_amount * $amount / 100;
+			}
+		}
+		else
+		{
+			$depositAmount = 0;
+		}
+
+		$fees['total_amount']    = $totalAmount;
+		$fees['discount_amount'] = $discountAmount;
+		$fees['tax_amount']      = $taxAmount;
+		$fees['amount']          = $amount;
+		$fees['deposit_amount']  = $depositAmount;
+
+		return $fees;
+	}
+
+	/**
+	 * Calculate fees use for group registration
+	 *
+	 * @param $event
+	 * @param $form
+	 * @param $data
+	 * @param $config
+	 *
+	 * @return array
+	 */
+	public static function calculateGroupRegistrationFees($event, $form, $data, $config)
+	{
+		$fees                  = array();
+		$session               = JFactory::getSession();
+		$user                  = JFactory::getUser();
+		$db                    = JFactory::getDbo();
+		$query                 = $db->getQuery(true);
+		$couponCode            = isset($data['coupon_code']) ? $data['coupon_code'] : '';
+		$eventId               = $event->id;
+		$extraFee              = $form->calculateFee();
+		$numberRegistrants     = (int) $session->get('eb_number_registrants', '');
+		$memberFormFields      = EventbookingHelper::getFormFields($eventId, 2);
+		$rate                  = EventbookingHelper::getRegistrationRate($eventId, $numberRegistrants);
+		$membersForm           = array();
+		$membersTotalAmount    = array();
+		$membersDiscountAmount = array();
+		$membersTaxAmount      = array();
+		// Members data
+		if ($config->collect_member_information)
+		{
+			$membersData = $session->get('eb_group_members_data', null);
+			if ($membersData)
+			{
+				$membersData = unserialize($membersData);
+			}
+			else
+			{
+				$membersData = array();
+			}
+			for ($i = 0; $i < $numberRegistrants; $i++)
+			{
+				$memberForm = new RADForm($memberFormFields);
+				$memberForm->setFieldSuffix($i + 1);
+				$memberForm->bind($membersData);
+				$memberExtraFee = $memberForm->calculateFee();
+				$extraFee += $memberExtraFee;
+				$membersTotalAmount[$i]    = $rate + $memberExtraFee;
+				$membersDiscountAmount[$i] = 0;
+				$membersForm[$i]           = $memberForm;
+			}
+		}
+
+		if ($event->fixed_group_price > 0)
+		{
+			$totalAmount = $event->fixed_group_price + $extraFee;
+		}
+		else
+		{
+			$totalAmount = $rate * $numberRegistrants + $extraFee;
+		}
+
+		// Calculate discount amount
+		$discountAmount = 0;
+		if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
+		{
+			if ($event->discount > 0)
+			{
+				if ($event->discount_type == 1)
+				{
+					$discountAmount = $totalAmount * $event->discount / 100;
+					if ($config->collect_member_information)
+					{
+						for ($i = 0; $i < $numberRegistrants; $i++)
+						{
+							$membersDiscountAmount[$i] += $membersTotalAmount[$i] * $event->discount / 100;
+						}
+					}
+				}
+				else
+				{
+					$discountAmount = $numberRegistrants * $event->discount;
+					if ($config->collect_member_information)
+					{
+						for ($i = 0; $i < $numberRegistrants; $i++)
+						{
+							$membersDiscountAmount[$i] += $event->discount;
+						}
+					}
+				}
+			}
+		}
+		if ($couponCode)
+		{
+			$query->clear();
+			$query->select('*')
+				->from('#__eb_coupons')
+				->where('published=1')
+				->where('code="' . $couponCode . '"')
+				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
+				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
+				->where('(times = 0 OR times > used)')
+				->where('(event_id=0 OR event_id=' . $eventId . ')');
+			$db->setQuery($query);
+			$coupon = $db->loadObject();
+			if ($coupon)
+			{
+				$fees['coupon_valid'] = 1;
+				$fees['coupon'] = $coupon;
+				if ($coupon->coupon_type == 0)
+				{
+					$discountAmount = $discountAmount + $totalAmount * $coupon->discount / 100;
+
+					if ($config->collect_member_information)
+					{
+						for ($i = 0; $i < $numberRegistrants; $i++)
+						{
+							$membersDiscountAmount[$i] += $membersTotalAmount[$i] * $coupon->discount / 100;
+						}
+					}
+				}
+				else
+				{
+					$discountAmount = $discountAmount + $numberRegistrants * $coupon->discount;
+
+					if ($config->collect_member_information)
+					{
+						for ($i = 0; $i < $numberRegistrants; $i++)
+						{
+							$membersDiscountAmount[$i] += $coupon->discount;
+						}
+					}
+				}
+			}
+			else
+			{
+				$fees['coupon_valid'] = 0;
+			}
+		}
+		else
+		{
+			$fees['coupon_valid'] = 1;
+		}
+
+		// Early bird discount
+		$todayDate = JHtml::_('date', 'now', 'Y-m-d');
+		$query->clear();
+		$query->select('COUNT(id)')
+			->from('#__eb_events')
+			->where('id=' . $eventId)
+			->where('DATEDIFF(early_bird_discount_date, "' . $todayDate . '") >= 0');
+		$db->setQuery($query);
+		$total = $db->loadResult();
+		if ($total)
+		{
+			$earlyBirdDiscountAmount = $event->early_bird_discount_amount;
+			if ($earlyBirdDiscountAmount > 0)
+			{
+				if ($event->early_bird_discount_type == 1)
+				{
+					$discountAmount = $discountAmount + $totalAmount * $event->early_bird_discount_amount / 100;
+					if ($config->collect_member_information)
+					{
+						for ($i = 0; $i < $numberRegistrants; $i++)
+						{
+							$membersDiscountAmount[$i] += $membersTotalAmount[$i] * $event->early_bird_discount_amount / 100;
+						}
+					}
+				}
+				else
+				{
+					$discountAmount = $discountAmount + $numberRegistrants * $event->early_bird_discount_amount;
+					if ($config->collect_member_information)
+					{
+						for ($i = 0; $i < $numberRegistrants; $i++)
+						{
+							$membersDiscountAmount[$i] += $event->early_bird_discount_amount;
+						}
+					}
+				}
+			}
+		}
+
+		// In case discount amount greater than total amount, reset it to total amount
+		if ($discountAmount > $totalAmount)
+		{
+			$discountAmount = $totalAmount;
+		}
+
+		if ($config->collect_member_information)
+		{
+			for ($i = 0; $i < $numberRegistrants; $i++)
+			{
+				if ($membersDiscountAmount[$i] > $membersTotalAmount[$i])
+				{
+					$membersDiscountAmount[$i] = $membersTotalAmount[$i];
+				}
+			}
+		}
+
+		// Calculate tax amount
+		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
+		{
+			$taxAmount = round(($totalAmount - $discountAmount) * $config->tax_rate / 100, 2);
+			if ($config->collect_member_information)
+			{
+				for ($i = 0; $i < $numberRegistrants; $i++)
+				{
+					$membersTaxAmount[$i] = round(($membersTotalAmount[$i] - $membersDiscountAmount[$i]) * $config->tax_rate / 100, 2);
+				}
+			}
+		}
+		else
+		{
+			$taxAmount = 0;
+			if ($config->collect_member_information)
+			{
+				for ($i = 0; $i < $numberRegistrants; $i++)
+				{
+					$membersTaxAmount[$i] = 0;
+				}
+			}
+		}
+
+		// Gross amount
+		$amount = $totalAmount - $discountAmount + $taxAmount;
+
+		// Deposit amount
+		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
+		{
+			if ($event->deposit_type == 2)
+			{
+				$depositAmount = $numberRegistrants * $event->deposit_amount;
+			}
+			else
+			{
+				$depositAmount = $event->deposit_amount * $amount / 100;
+			}
+		}
+		else
+		{
+			$depositAmount = 0;
+		}
+
+		$fees['total_amount']            = $totalAmount;
+		$fees['discount_amount']         = $discountAmount;
+		$fees['tax_amount']              = $taxAmount;
+		$fees['amount']                  = $amount;
+		$fees['deposit_amount']          = $depositAmount;
+		$fees['members_form']            = $membersForm;
+		$fees['members_total_amount']    = $membersTotalAmount;
+		$fees['members_discount_amount'] = $membersDiscountAmount;
+		$fees['members_tax_amount']      = $membersTaxAmount;
+
+		return $fees;
+	}
+
+	/**
 	 * Get URL of the site, using for Ajax request
 	 */
 	public static function getSiteUrl()

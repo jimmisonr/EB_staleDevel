@@ -373,7 +373,7 @@ if (!$this->userId && $this->config->user_registration)
 		<div class="control-group">
 			<label class="control-label" for="coupon_code"><?php echo  JText::_('EB_COUPON') ?></label>
 			<div class="controls">
-				<input type="text" class="input-medium" name="coupon_code" id="coupon_code" value="<?php echo JRequest::getVar('coupon_code'); ?>" onchange="validateCartRegistrationCoupon();" />
+				<input type="text" class="input-medium" name="coupon_code" id="coupon_code" value="<?php echo JRequest::getVar('coupon_code'); ?>" onchange="calculateCartRegistrationFee();" />
 				<span class="invalid" id="coupon_validate_msg" style="display: none;"><?php echo JText::_('EB_INVALID_COUPON'); ?></span>	      				      		
 			</div>	
 		</div>				

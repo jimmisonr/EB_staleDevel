@@ -116,7 +116,10 @@ class EventBookingViewRegister extends JViewLegacy
 
 	/**
 	 * Display billing form allow registrant enter billing information for group registration
-	 * @param string $tpl
+	 *
+	 * @param $event
+	 * @param $input
+	 * @param $tpl
 	 */
 	function _displayGroupBillingForm($event, $input, $tpl)
 	{
@@ -179,120 +182,14 @@ class EventBookingViewRegister extends JViewLegacy
 		}
 		$form->bind($data, $useDefault);
 		$form->prepareFormFields('calculateGroupRegistrationFee();');
-		$form->buildFieldsDependency();
+		$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config);
+
 		$paymentMethod = $input->post->getString('payment_method', os_payments::getDefautPaymentMethod(trim($event->payment_methods)));
 		$expMonth = $input->post->getInt('exp_month', date('m'));
 		$expYear = $input->post->getInt('exp_year', date('Y'));
 		$lists['exp_month'] = JHtml::_('select.integerlist', 1, 12, 1, 'exp_month', ' class="input-small" ', $expMonth, '%02d');
 		$currentYear = date('Y');
 		$lists['exp_year'] = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
-		$extraFee = $form->calculateFee();
-		$memberFormFields = EventbookingHelper::getFormFields($eventId, 2);
-		//Member data
-		$membersData = $session->get('eb_group_members_data', null);
-		if ($membersData)
-		{
-			$membersData = unserialize($membersData);
-		}
-		else
-		{
-			$membersData = array();
-		}
-		for ($i = 0; $i < $numberRegistrants; $i++)
-		{
-			$memberForm = new RADForm($memberFormFields);
-			$memberForm->setFieldSuffix($i + 1);
-			$memberForm->bind($membersData);
-			$extraFee += $memberForm->calculateFee();
-		}
-		$rate = EventbookingHelper::getRegistrationRate($eventId, $numberRegistrants);
-		if ($event->fixed_group_price > 0)
-		{
-			$totalAmount = $event->fixed_group_price + $extraFee;
-		}
-		else
-		{
-			$totalAmount = $rate * $numberRegistrants + $extraFee;
-		}
-		$discountAmount = 0;
-		if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
-		{
-			if ($event->discount > 0)
-			{
-				if ($event->discount_type == 1)
-				{
-					$discountAmount = $totalAmount * $event->discount / 100;
-				}
-				else
-				{
-					$discountAmount = $numberRegistrants * $event->discount;
-				}
-			}
-		}
-		$couponCode = $input->post->getString('coupon_code', '');
-		if ($couponCode)
-		{
-			$query->clear();
-			$query->select('*')
-				->from('#__eb_coupons')
-				->where('published=1')
-				->where('code="' . $couponCode . '"')
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
-				->where('(times = 0 OR times > used)')
-				->where('(event_id=0 OR event_id=' . $eventId . ')');
-			$db->setQuery($query);
-			$coupon = $db->loadObject();
-			if ($coupon)
-			{
-				if ($coupon->coupon_type == 0)
-				{
-					$discountAmount = $discountAmount + $totalAmount * $coupon->discount / 100;
-				}
-				else
-				{
-					$discountAmount = $discountAmount + $numberRegistrants * $coupon->discount;
-				}
-			}
-		}
-		$todayDate = JHtml::_('date', 'now', 'Y-m-d');
-		//Early bird discount
-		$query->clear();
-		$query->select('COUNT(id)')
-			->from('#__eb_events')
-			->where('id=' . $eventId)
-			->where('DATEDIFF(early_bird_discount_date, "' . $todayDate . '") >= 0');
-		$db->setQuery($query);
-		$total = $db->loadResult();
-		if ($total)
-		{
-			$earlyBirdDiscountAmount = $event->early_bird_discount_amount;
-			if ($earlyBirdDiscountAmount > 0)
-			{
-				if ($event->early_bird_discount_type == 1)
-				{
-					$discountAmount = $discountAmount + $totalAmount * $event->early_bird_discount_amount / 100;
-				}
-				else
-				{
-					$discountAmount = $discountAmount + $numberRegistrants * $event->early_bird_discount_amount;
-				}
-			}
-		}
-		if ($discountAmount > $totalAmount)
-		{
-			$discountAmount = $totalAmount;
-		}
-		
-		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
-		{
-			$taxAmount = round(($totalAmount - $discountAmount) * $config->tax_rate / 100, 2);
-		}
-		else
-		{
-			$taxAmount = 0;
-		}
-		$amount = $totalAmount - $discountAmount + $taxAmount;
 		$methods = os_payments::getPaymentMethods(trim($event->payment_methods));
 		$options = array();
 		$options[] = JHtml::_('select.option', 'Visa', 'Visa');
@@ -320,13 +217,15 @@ class EventBookingViewRegister extends JViewLegacy
 			$lists['bank_id'] = JHtml::_('select.genericlist', $options, 'bank_id', ' class="inputbox" ', 'value', 'text', 
 				$input->post->getInt('bank_id'));
 		}
-		##Add support for deposit payment
+
+		// Add support for deposit payment
+		$paymentType = $input->post->getInt('payment_type', 0);
 		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
 		{
 			$options = array();
 			$options[] = JHtml::_('select.option', 0, JText::_('EB_FULL_PAYMENT'));
 			$options[] = JHtml::_('select.option', 1, JText::_('EB_DEPOSIT_PAYMENT'));
-			$lists['payment_type'] = JHtml::_('select.genericlist', $options, 'payment_type', ' class="input-large" ', 'value', 'text', 
+			$lists['payment_type'] = JHtml::_('select.genericlist', $options, 'payment_type', ' class="input-large" onchange="showDepositAmount(this);" ', 'value', 'text',
 				$input->post->getInt('payment_type', 0));
 			$depositPayment = 1;
 		}
@@ -334,7 +233,8 @@ class EventBookingViewRegister extends JViewLegacy
 		{
 			$depositPayment = 0;
 		}
-		$showCaptcha = 0;				
+
+		$showCaptcha = 0;
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 		{
 			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
@@ -344,10 +244,9 @@ class EventBookingViewRegister extends JViewLegacy
 				$this->captcha = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
 				$this->captchaPlugin = $captchaPlugin;
 			}
-		}	
-		$this->Itemid = $input->getInt('Itemid', 0);
-		$this->event = $event;			
-		//Assign these parameters		
+		}
+
+		// Assign these parameters
 		$this->paymentMethod = $paymentMethod;
 		$this->lists = $lists;
 		$this->Itemid = $input->getInt('Itemid', 0);
@@ -359,14 +258,16 @@ class EventBookingViewRegister extends JViewLegacy
 		$this->lists = $lists;
 		$this->idealEnabled = $idealEnabled;
 		$this->depositPayment = $depositPayment;
+		$this->paymentType = $paymentType;
 		$this->showCaptcha = $showCaptcha;
 		$this->captchaInvalid = $captchaInvalid;
 		$this->form = $form;
-		$this->totalAmount = $totalAmount;
-		$this->taxAmount = $taxAmount;
-		$this->discountAmount = $discountAmount;
-		$this->amount = $amount;
-		
+		$this->totalAmount = $fees['total_amount'];
+		$this->taxAmount = $fees['tax_amount'];
+		$this->discountAmount = $fees['discount_amount'];
+		$this->amount = $fees['amount'];
+		$this->depositAmount = $fees['deposit_amount'];
+
 		parent::display($tpl);
 	}
 }

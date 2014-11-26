@@ -263,16 +263,51 @@ $selectedState = '';
 		}
 		if ($this->depositPayment) 
 		{
-		?>	
-		<div class="control-group">
-			<label class="control-label" for="payment_type">
-				<?php echo JText::_('EB_PAYMENT_TYPE') ;?>				
-			</label>
-			<div class="controls">      				
-				<?php echo $this->lists['payment_type'] ;?>
-			</div>	
-		</div>			    									
-		<?php    
+			if ($this->paymentType == 1)
+			{
+				$style = '';
+			}
+			else
+			{
+				$style = 'style = "display:none"';
+			}
+		?>
+			<div id="deposit_amount_container" class="control-group"<?php echo $style; ?>>
+				<label class="control-label" for="payment_type">
+					<?php echo JText::_('EB_DEPOSIT_AMOUNT') ;?>
+				</label>
+				<div class="controls">
+					<?php
+					if ($this->config->currency_position == 0)
+					{
+						?>
+						<div class="input-prepend inline-display">
+							<span class="add-on"><?php echo $this->event->currency_symbol ? $this->event->currency_symbol : $this->config->currency_symbol;?></span>
+							<input id="deposit_amount" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->depositAmount, $this->config); ?>" />
+						</div>
+					<?php
+					}
+					else
+					{
+					?>
+						<div class="input-append inline-display">
+							<input id="deposit_amount" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->depositAmount, $this->config); ?>" />
+							<span class="add-on"><?php echo $this->event->currency_symbol ? $this->event->currency_symbol : $this->config->currency_symbol;?></span>
+						</div>
+					<?php
+					}
+					?>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="payment_type">
+					<?php echo JText::_('EB_PAYMENT_TYPE') ;?>
+				</label>
+				<div class="controls">
+					<?php echo $this->lists['payment_type'] ;?>
+				</div>
+			</div>
+		<?php
 		}	
 		if ($this->enableCoupon)
 		{
@@ -280,7 +315,7 @@ $selectedState = '';
 		<div class="control-group">
 			<label class="control-label" for="coupon_code"><?php echo  JText::_('EB_COUPON') ?></label>
 			<div class="controls">
-				<input type="text" class="input-medium" name="coupon_code" id="coupon_code" value="<?php echo JRequest::getVar('coupon_code'); ?>" onchange="validateIndividualRegistrationCoupon();" />
+				<input type="text" class="input-medium" name="coupon_code" id="coupon_code" value="<?php echo JRequest::getVar('coupon_code'); ?>" onchange="calculateIndividualRegistrationFee();" />
 				<span class="invalid" id="coupon_validate_msg" style="display: none;"><?php echo JText::_('EB_INVALID_COUPON'); ?></span>	      				      		
 			</div>	
 		</div>				

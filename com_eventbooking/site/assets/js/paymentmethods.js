@@ -139,60 +139,7 @@ function changePaymentMethod()
 			$('#tr_bank_list').hide();			
 		}	
 	});	
-}		
-function validateIndividualRegistrationCoupon() 
-{
-	Eb.jQuery(function($) {						
-		$('#btn-submit').attr('disabled', 'disabled');
-		$('#ajax-loading-animation').show();															
-		$.ajax({
-			type: 'POST',
-			url: siteUrl + 'index.php?option=com_eventbooking&task=validate_individual_registration_coupon',
-			data: jQuery('#adminForm input[name=\'event_id\'], #adminForm input[name=\'coupon_code\'], #adminForm .payment-calculation input[type=\'text\'], #adminForm .payment-calculation input[type=\'checkbox\']:checked, #adminForm .payment-calculation input[type=\'radio\']:checked, #adminForm .payment-calculation select'),
-			dataType: 'json',
-			success: function(msg, textStatus, xhr) {
-				$('#btn-submit').removeAttr('disabled');
-				$('#ajax-loading-animation').hide();
-				if ($('#total_amount')) 
-				{
-					$('#total_amount').val(msg.total_amount);
-				}
-				if ($('#discount_amount')) 
-				{
-					$('#discount_amount').val(msg.discount_amount);
-				}
-				if ($('#tax_amount')) 
-				{
-					$('#tax_amount').val(msg.tax_amount);
-				}							
-				if ($('#amount')) 
-				{								
-					$('#amount').val(msg.amount);
-				}				
-				if ($('#amount').val() != undefined && msg.amount == 0) 
-				{					
-					$('.payment_information').css('display', 'none');								
-				} else 
-				{								
-					$('.payment_information').css('display', '');
-					changePaymentMethod();
-				}
-				if (msg.coupon_valid == 1) 
-				{						
-					$('#coupon_validate_msg').hide();																																								
-				} 
-				else 
-				{
-					$('#coupon_validate_msg').show();
-				}						
-			},
-			error: function(jqXHR, textStatus, errorThrown) {						
-				alert(textStatus);
-			}
-		});		
-		
-	});
-}	
+}
 
 function calculateIndividualRegistrationFee() 
 {
@@ -223,6 +170,10 @@ function calculateIndividualRegistrationFee()
 				{								
 					$('#amount').val(msg.amount);
 				}
+                if ($('#deposit_amount'))
+                {
+                    $('#deposit_amount').val(msg.deposit_amount);
+                }
                 if (($('#amount').length || $('#total_amount').length) && msg.amount == 0)
                 {
                     $('.payment_information').css('display', 'none');
@@ -232,6 +183,15 @@ function calculateIndividualRegistrationFee()
                     $('.payment_information').css('display', '');
                     changePaymentMethod();
                 }
+
+                if (msg.coupon_valid == 1)
+                {
+                    $('#coupon_validate_msg').hide();
+                }
+                else
+                {
+                    $('#coupon_validate_msg').show();
+                }
             },
 			error: function(jqXHR, textStatus, errorThrown) {						
 				alert(textStatus);
@@ -240,62 +200,6 @@ function calculateIndividualRegistrationFee()
 		
 	});
 }
-
-function validateGroupRegistrationCoupon() 
-{
-	Eb.jQuery(function($) {						
-		$('#btn-process-group-billing').attr('disabled', 'disabled');
-		$('#ajax-loading-animation').show();															
-		$.ajax({
-			type: 'POST',
-			url: siteUrl + 'index.php?option=com_eventbooking&task=validate_group_registration_coupon',
-			data: jQuery('#adminForm input[name=\'event_id\'], #adminForm input[name=\'coupon_code\'], #adminForm .payment-calculation input[type=\'text\'], #adminForm .payment-calculation input[type=\'checkbox\']:checked, #adminForm .payment-calculation input[type=\'radio\']:checked, #adminForm .payment-calculation select'),
-			dataType: 'json',
-			success: function(msg, textStatus, xhr) {
-				$('#btn-process-group-billing').removeAttr('disabled');
-				$('#ajax-loading-animation').hide();
-				if ($('#total_amount')) 
-				{
-					$('#total_amount').val(msg.total_amount);
-				}
-				if ($('#discount_amount')) 
-				{
-					$('#discount_amount').val(msg.discount_amount);
-				}
-				if ($('#tax_amount')) 
-				{
-					$('#tax_amount').val(msg.tax_amount);
-				}							
-				if ($('#amount')) 
-				{								
-					$('#amount').val(msg.amount);
-				}				
-				if ($('#amount').val() != undefined && msg.amount == 0) 
-				{					
-					$('.payment_information').css('display', 'none');								
-				} 
-				else 
-				{								
-					$('.payment_information').css('display', '');
-					changePaymentMethod();
-				}
-				if (msg.coupon_valid == 1) 
-				{						
-					$('#coupon_validate_msg').hide();																																								
-				} 
-				else 
-				{
-					$('#coupon_validate_msg').show();
-				}						
-			},
-			error: function(jqXHR, textStatus, errorThrown) {						
-				alert(textStatus);
-			}
-		});		
-		
-	});
-}	
-
 
 function calculateGroupRegistrationFee() 
 {
@@ -335,6 +239,14 @@ function calculateGroupRegistrationFee()
                     $('.payment_information').css('display', '');
                     changePaymentMethod();
                 }
+                if (msg.coupon_valid == 1)
+                {
+                    $('#coupon_validate_msg').hide();
+                }
+                else
+                {
+                    $('#coupon_validate_msg').show();
+                }
             },
 			error: function(jqXHR, textStatus, errorThrown) {						
 				alert(textStatus);
@@ -342,61 +254,7 @@ function calculateGroupRegistrationFee()
 		});		
 		
 	});
-}	
-
-function validateCartRegistrationCoupon() 
-{
-	Eb.jQuery(function($) {						
-		$('#btn-submit').attr('disabled', 'disabled');
-		$('#ajax-loading-animation').show();															
-		$.ajax({
-			type: 'POST',
-			url: siteUrl + 'index.php?option=com_eventbooking&task=validate_cart_registration_coupon',
-			data: jQuery('#adminForm input[name=\'coupon_code\'], #adminForm .payment-calculation input[type=\'text\'], #adminForm .payment-calculation input[type=\'checkbox\']:checked, #adminForm .payment-calculation input[type=\'radio\']:checked, #adminForm .payment-calculation select'),
-			dataType: 'json',
-			success: function(msg, textStatus, xhr) {
-				$('#btn-submit').removeAttr('disabled');
-				$('#ajax-loading-animation').hide();
-				if ($('#total_amount')) 
-				{
-					$('#total_amount').val(msg.total_amount);
-				}
-				if ($('#discount_amount')) 
-				{
-					$('#discount_amount').val(msg.discount_amount);
-				}
-				if ($('#tax_amount')) 
-				{
-					$('#tax_amount').val(msg.tax_amount);
-				}							
-				if ($('#amount')) 
-				{								
-					$('#amount').val(msg.amount);
-				}				
-				if ($('#amount').val() != undefined && msg.amount == 0) 
-				{					
-					$('.payment_information').css('display', 'none');								
-				} else 
-				{								
-					$('.payment_information').css('display', '');
-					changePaymentMethod();
-				}
-				if (msg.coupon_valid == 1) 
-				{						
-					$('#coupon_validate_msg').hide();																																								
-				} 
-				else 
-				{
-					$('#coupon_validate_msg').show();
-				}						
-			},
-			error: function(jqXHR, textStatus, errorThrown) {						
-				alert(textStatus);
-			}
-		});		
-		
-	});
-}	
+}
 
 function calculateCartRegistrationFee() 
 {
@@ -436,50 +294,21 @@ function calculateCartRegistrationFee()
                     $('.payment_information').css('display', '');
                     changePaymentMethod();
                 }
+
+                if (msg.coupon_valid == 1)
+                {
+                    $('#coupon_validate_msg').hide();
+                }
+                else
+                {
+                    $('#coupon_validate_msg').show();
+                }
             },
 			error: function(jqXHR, textStatus, errorThrown) {						
 				alert(textStatus);
 			}
 		});		
 		
-	});
-}	
-function validateCoupon() {
-	Eb.jQuery(function($) {		
-		var couponCode = $('#coupon_code').val();
-		if (couponCode)
-		{
-			var data = {
-					'task'	:	'validate_coupon',
-					'event_id' : $('#event_id').val(),													
-					'coupon_code'	:	couponCode							
-				};	
-			$('#btn-submit').attr('disabled', 'disabled');
-			$('#ajax-loading-animation').show();															
-			$.ajax({
-				type: 'POST',
-				url: siteUrl + 'index.php?option=com_eventbooking',
-				data: data,
-				dataType: 'text',
-				success: function(msg, textStatus, xhr) {					
-					$('#ajax-loading-animation').hide();				
-					if (msg == 1) {						
-						$('#coupon_validate_msg').hide();
-						$('#btn-submit').removeAttr('disabled');
-					} else {
-						$('#coupon_validate_msg').show();
-					}						
-				},
-				error: function(jqXHR, textStatus, errorThrown) {						
-					alert(textStatus);
-				}
-			});
-		}
-		else
-		{
-			$('#coupon_validate_msg').hide();
-			$('#btn-submit').removeAttr('disabled');
-		}					
 	});
 }
 
@@ -603,4 +432,18 @@ function buildStateField(stateFieldId, countryFieldId, defaultState)
 		}//end check exits state
 				
 	});		
+}
+
+function showDepositAmount(paymentTypeSelect)
+{
+    Eb.jQuery(function($) {
+        if ($(paymentTypeSelect).val() == 1)
+        {
+            $('#deposit_amount_container').show();
+        }
+        else
+        {
+            $('#deposit_amount_container').hide();
+        }
+    });
 }
