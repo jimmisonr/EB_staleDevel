@@ -346,7 +346,7 @@ class RADForm
 						$pathUpload = JPATH_ROOT . '/media/com_eventbooking/files';
 						if (!JFolder::exists($pathUpload))
 						{
-							JFolder::create($pathUpload, 0777);
+							JFolder::create($pathUpload);
 						}
 						$allowedExtensions = EventbookingHelper::getConfigValue('allowed_file_types');
 						if (!$allowedExtensions)

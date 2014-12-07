@@ -256,7 +256,7 @@ class EventbookingHelperIcs
 		// create path if it doesn't exist
 		if (!is_dir($path))
 		{
-			JFolder::create($path, 0777);
+			JFolder::create($path);
 		}
 
 		$handler = fopen($path . $name, 'w+');

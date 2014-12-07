@@ -115,7 +115,7 @@ else
 								<td>
 									<?php echo JHtml::_('date', $item->event_end_date, $this->config->event_date_format, null) ; ?>
 								</td>
-							</div>
+							</tr>
 						<?php	
 						}
 						if ($this->config->show_capacity)
