@@ -239,7 +239,7 @@ span.view_list {
 				<td class="field_cell">
 					<?php echo EventbookingHelper::formatCurrency($amount, $config);?>
 				</td>
-			</div>
+			</tr>
 		<?php
 		}            
 	}

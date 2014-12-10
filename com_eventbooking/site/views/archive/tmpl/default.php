@@ -19,7 +19,7 @@ if ($this->category)
 {
 ?>
     <div id="eb-category">
-        <h2> class="eb-page-heading"><?php echo $this->category->name;?></h2>
+        <h2 class="eb-page-heading"><?php echo $this->category->name;?></h2>
         <?php
         if($this->category->description != '')
         {
