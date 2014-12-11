@@ -2623,22 +2623,45 @@ class EventbookingHelper
 					echo JText::_('GD2_LIB_NOT_INSTALLED');
 					return false;
 				}
-				if ($type == 'JPG')
+				if ($type == 'JPG' || $type == 'JPEG')
+				{
+					$desImage=imagecreatetruecolor($desWidth,$desHeight);
 					$srcImage = imagecreatefromjpeg($srcFile);
+					imagecopyresampled($desImage, $srcImage, 0, 0, 0, 0, $desWidth, $desHeight, $srcWidth, $srcHeight);
+					imagejpeg($desImage, $desFile);
+					imagedestroy($desImage);
+					imagedestroy($srcImage);
+					
+				}
 				elseif ($type == 'PNG')
+				{
+					$desImage=imagecreatetruecolor($desWidth,$desHeight);
 					$srcImage = imagecreatefrompng($srcFile);
-				else
+					imagealphablending($desImage, false);
+					imagesavealpha($desImage,true);
+					$transparent = imagecolorallocatealpha($desImage, 255, 255, 255, 127);
+					imagefilledrectangle($desImage, 0, 0, $desWidth, $desHeight, $transparent);
+					imagecopyresampled($desImage, $srcImage, 0, 0, 0, 0, $desWidth, $desHeight, $srcWidth, $srcHeight);
+					imagepng($desImage, $desFile);
+					imagedestroy($desImage);
+					imagedestroy($srcImage);
+					
+				}
+				elseif ($type == 'GIF')
+				{
+					$desImage=imagecreatetruecolor($desWidth,$desHeight);
 					$srcImage = imagecreatefromgif($srcFile);
+					imagecopyresampled($desImage, $srcImage, 0, 0, 0, 0, $desWidth, $desHeight, $srcWidth, $srcHeight);
+					imagegif($desImage, $desImage);
+					imagedestroy($desImage);
+					imagedestroy($srcImage);
+					
+				}
 				if (!$srcImage)
 				{
 					echo JText::_('JA_INVALID_IMAGE');
 					return false;
 				}
-				$desImage = imagecreatetruecolor($desWidth, $desHeight);
-				imagecopyresampled($desImage, $srcImage, 0, 0, 0, 0, $desWidth, $desHeight, $srcWidth, $srcHeight);
-				imagejpeg($desImage, $desFile, $quality);
-				imagedestroy($srcImage);
-				imagedestroy($desImage);
 				break;
 		}
 		
