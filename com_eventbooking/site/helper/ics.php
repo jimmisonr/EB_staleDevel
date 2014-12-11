@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * @version        	1.6.8
+ * @package        	Joomla
+ * @subpackage		Event Booking
+ * @author  		Tuan Pham Ngoc
+ * @copyright    	Copyright (C) 2010 - 2014 Ossolution Team
+ * @license        	GNU/GPL, see LICENSE.php
+ */
 class EventbookingHelperIcs
 {
 	/**
@@ -138,7 +145,7 @@ class EventbookingHelperIcs
 	 */
 	public function setDescription($body)
 	{
-		$this->description = $body;
+		$this->description = strip_tags($body);
 
 		return $this;
 	}
@@ -212,7 +219,7 @@ class EventbookingHelperIcs
 	 */
 	public function getStart()
 	{
-		return $this->eventDate->format("Ymd\THis\Z");
+		return $this->eventDate->format("Ymd\THis");
 	}
 
 	/**
@@ -221,7 +228,7 @@ class EventbookingHelperIcs
 	 */
 	public function getEnd()
 	{
-		return $this->eventEndDate->format("Ymd\THis\Z");
+		return $this->eventEndDate->format("Ymd\THis");
 	}
 
 	/**
@@ -233,7 +240,7 @@ class EventbookingHelperIcs
 	{
 		$createdDate = new DateTime('Now', new DateTimeZone(JFactory::getConfig()->get('offset')));
 
-		return $createdDate->format("Ymd\THis\Z");
+		return $createdDate->format("Ymd\THis");
 	}
 
 	/**
@@ -260,7 +267,6 @@ class EventbookingHelperIcs
 		}
 
 		$handler = fopen($path . $name, 'w+');
-		print_r($handler);
 		$data = $this->generate();
 		fwrite($handler, $data);
 		fclose($handler);
