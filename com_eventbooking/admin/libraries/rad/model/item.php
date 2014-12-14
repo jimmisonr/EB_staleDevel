@@ -97,17 +97,7 @@ class RADModelItem extends RADModel
 		}
 		if (isset($data['params']) && is_array($data['params']))
 		{
-			$txt = array();
-			foreach ($data['params'] as $k => $v)
-			{
-				if (is_array($v))
-				{
-					$v = implode(',', $v);
-				}
-				$v = str_replace("\r\n", '@@', $v);
-				$txt[] = "$k=\"$v\"";
-			}
-			$data['params'] = implode("\n", $txt);
+			$data['params'] = json_encode($data['params']);
 		}
 		if (!$data['alias'])
 		{

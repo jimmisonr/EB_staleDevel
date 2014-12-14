@@ -461,12 +461,7 @@ class EventBookingModelEvent extends JModelLegacy
 			$params = JRequest::getVar('params', null, 'post', 'array');
 			if (is_array($params))
 			{
-				$txt = array();
-				foreach ($params as $k => $v)
-				{
-					$txt[] = "$k=\"$v\"";
-				}
-				$row->custom_fields = implode("\n", $txt);
+				$row->custom_fields = json_encode($params);
 			}
 		}
 		//Check ordering of the fieds		

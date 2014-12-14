@@ -130,15 +130,9 @@ class EventbookingModelEvent extends RADModelItem
 			$eventCustomField = EventbookingHelper::getConfigValue('event_custom_field');
 			if ($eventCustomField)
 			{
-				$params = $data['params'];
-				if (is_array($params))
+				if (is_array($data['params']))
 				{
-					$txt = array();
-					foreach ($params as $k => $v)
-					{
-						$txt[] = "$k=\"$v\"";
-					}
-					$row->custom_fields = implode("\n", $txt);
+					$row->custom_fields = json_encode($data['params']);
 				}
 			}
 			//Check ordering of the fieds		

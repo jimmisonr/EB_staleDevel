@@ -118,7 +118,7 @@ class EventBookingViewEvent extends JViewLegacy
 		if ($config->event_custom_field && file_exists(JPATH_COMPONENT . '/fields.xml'))
 		{
 			$params = new JRegistry();
-			$params->loadString($item->custom_fields, 'INI');
+			$params->loadString($item->custom_fields, 'JSON');
 			$xml = JFactory::getXML(JPATH_COMPONENT . '/fields.xml');
 			$fields = $xml->fields->fieldset->children();
 			$customFields = array();
