@@ -64,8 +64,7 @@
 		<menu link="option=com_eventbooking&amp;view=waitings">EB_WAITING_LIST</menu>	  	
 		<menu link="option=com_eventbooking&amp;view=massmail">EB_MASS_MAIL</menu>
         <menu link="option=com_eventbooking&amp;view=countries">EB_COUNTRIES</menu>
-        <menu link="option=com_eventbooking&amp;view=states">EB_STATES</menu>
-		<menu link="option=com_eventbooking&amp;view=daylightsaving">EB_FIX_DAY_LIGHT_SAVING_TIME</menu>
+        <menu link="option=com_eventbooking&amp;view=states">EB_STATES</menu>		
     </submenu>    
     <languages>
 	<language tag="en-GB">admin/languages/en-GB/en-GB.com_eventbooking.sys.ini</language>      

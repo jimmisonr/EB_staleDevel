@@ -41,9 +41,17 @@ class com_eventbookingInstallerScript
 		{
 			JFolder::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/views');
 		}
+		if (JFolder::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/daylightsaving'))
+		{
+			JFolder::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/daylightsaving');
+		}
 		if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/views/confirmation'))
 		{
 			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/views/confirmation');
+		}
+		if (JFile::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php'))
+		{
+			JFile::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php');
 		}
 		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/helper/os_cart.php'))
 		{
@@ -61,6 +69,8 @@ class com_eventbookingInstallerScript
 		{
 			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/views/register/tmpl/group_member.php');
 		}
+
+
 		//Delete the css files which are now moved to themes folder
 		$files = array('default.css', 'fire.css', 'leaf.css', 'ocean.css', 'sky.css', 'tree.css');
 		$path = JPATH_ROOT . '/components/com_eventbooking/assets/css/';
