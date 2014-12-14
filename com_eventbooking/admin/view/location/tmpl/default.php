@@ -227,18 +227,22 @@ else
                 <td>
                     <input class="text_area" type="text" name="coordinates" id="coordinates" size="30" maxlength="250" value="<?php echo $this->item->lat.','.$this->item->long;?>" />
                 </td>
-            </tr>	
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_LANGUAGE'); ?>
-				</td>
-				<td>
-					<?php echo $this->lists['language'] ; ?>
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>     	    
+            </tr>
+			<?php
+				if (JLanguageMultilang::isEnabled())
+				{
+				?>
+					<tr>
+						<td class="key">
+							<?php echo JText::_('EB_LANGUAGE'); ?>
+						</td>
+						<td>
+							<?php echo $this->lists['language'] ; ?>
+						</td>
+					</tr>
+				<?php
+				}
+			?>
 			<tr>
 				<td class="key">
 					<?php echo JText::_('EB_PUBLISHED') ; ?>

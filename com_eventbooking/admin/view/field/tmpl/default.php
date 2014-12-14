@@ -355,18 +355,23 @@ defined( '_JEXEC' ) or die ;
 				</tr>
 			<?php	
 			}
-		?>				
-		<tr>
-			<td class="key">
-				<?php echo JText::_('EB_LANGUAGE'); ?>
-			</td>
-			<td>
-				<?php echo $this->lists['language'] ; ?>
-			</td>
-			<td>
-				&nbsp;
-			</td>
-		</tr>
+			if (JLanguageMultilang::isEnabled())
+			{
+			?>
+				<tr>
+					<td class="key">
+						<?php echo JText::_('EB_LANGUAGE'); ?>
+					</td>
+					<td>
+						<?php echo $this->lists['language'] ; ?>
+					</td>
+					<td>
+						&nbsp;
+					</td>
+				</tr>
+			<?php
+			}
+		?>
         <tr>
             <td class="key">
                 <?php echo JText::_('EB_DEPEND_ON_FIELD');?>

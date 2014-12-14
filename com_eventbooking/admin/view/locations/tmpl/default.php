@@ -22,10 +22,17 @@ if (!function_exists('curl_init'))
 		<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->state->filter_search;?>" class="text_area search-query" onchange="document.adminForm.submit();" />		
 		<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'Go' ); ?></button>
 		<button onclick="document.getElementById('filter_search').value='';this.form.submit();" class="btn"><?php echo JText::_( 'Reset' ); ?></button>
-	</td>		
-	<td style="text-align: right;">
-		<?php echo $this->lists['filter_language'];?>
 	</td>
+	<?php
+		if (JLanguageMultilang::isEnabled())
+		{
+		?>
+			<td style="text-align: right;">
+				<?php echo $this->lists['filter_language'];?>
+			</td>
+		<?php
+		}
+	?>
 </tr>
 </table>
 <div id="editcell">

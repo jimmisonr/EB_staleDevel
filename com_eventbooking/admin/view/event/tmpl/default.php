@@ -160,15 +160,22 @@ $format = 'Y-m-d' ;
 							<td>
 								<input type="text" name="max_group_number" id="max_group_number" class="inputbox" size="10" value="<?php echo $this->item->max_group_number; ?>" />
 							</td>
-						</tr>				
-						<tr>
-	        				<td class="key">
-	        					<?php echo JText::_('EB_LANGUAGE'); ?>
-	        				</td>
-	        				<td>
-	        					<?php echo $this->lists['language']; ?>
-	        				</td>
-	        			</tr>								
+						</tr>
+						<?php
+							if (JLanguageMultilang::isEnabled())
+							{
+							?>
+								<tr>
+									<td class="key">
+										<?php echo JText::_('EB_LANGUAGE'); ?>
+									</td>
+									<td>
+										<?php echo $this->lists['language']; ?>
+									</td>
+								</tr>
+							<?php
+							}
+						?>
 						<tr>
 							<td class="key">
 								<?php echo JText::_('EB_PUBLISHED'); ?>
