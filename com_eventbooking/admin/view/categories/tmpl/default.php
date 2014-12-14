@@ -22,7 +22,12 @@ $ordering = ($this->state->filter_order == 'tbl.ordering');
 	</td>
 	<td style="text-align: right;">
 		<?php echo $this->lists['filter_state'] ; ?>
-		<?php echo $this->lists['filter_language']; ?>
+		<?php
+			if (JLanguageMultilang::isEnabled())
+			{
+				echo $this->lists['filter_language'];
+			}
+		?>
 	</td>
 </tr>
 </table>

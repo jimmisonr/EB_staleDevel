@@ -31,7 +31,10 @@ defined( '_JEXEC' ) or die ;
 				echo $this->lists['filter_event_id'];
 			}
 			echo $this->lists['filter_state'];
-			echo $this->lists['filter_language'];
+			if (JLanguageMultilang::isEnabled())
+			{
+				echo $this->lists['filter_language'];
+			}
 		?>				
 	</td>
 </tr>

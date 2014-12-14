@@ -25,7 +25,12 @@ $ordering = ($this->state->filter_order == 'tbl.ordering');
 		<?php echo $this->lists['filter_category_id'] ; ?>
 		<?php echo $this->lists['filter_location_id'] ; ?>
 		<?php echo $this->lists['filter_state'] ; ?>
-    	<?php echo $this->lists['filter_language'] ;?>
+		<?php
+			if (JLanguageMultilang::isEnabled())
+			{
+				echo $this->lists['filter_language'];
+			}
+		?>
         <strong><?php echo JText::_('EB_PAST_EVENTS'); ?></strong>:&nbsp;&nbsp;&nbsp;<?php echo $this->lists['filter_past_events']; ?>
 	</td>
 </tr>
