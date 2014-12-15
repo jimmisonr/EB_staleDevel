@@ -116,7 +116,7 @@ class EventbookingViewEventHtml extends RADViewItem
 		$this->lists['early_bird_discount_type'] = JHtml::_('select.genericlist', $options, 'early_bird_discount_type', 'class="input-small"' , 'value', 'text', $item->early_bird_discount_type);
 		if ($config->activate_deposit_feature) 
 		{
-		    $this->lists['deposit_type'] = JHtml::_('select.genericlist', $options, 'deposit_type', '' , 'value', 'text', $item->deposit_type);       
+		    $this->lists['deposit_type'] = JHtml::_('select.genericlist', $options, 'deposit_type', ' class="input-small" ' , 'value', 'text', $item->deposit_type);
 		}	
 		if (!$item->id)
 		{
@@ -127,7 +127,7 @@ class EventbookingViewEventHtml extends RADViewItem
 		$options[] = JHtml::_('select.option', 1, JText::_('EB_INDIVIDUAL_ONLY')) ;
 		$options[] = JHtml::_('select.option', 2, JText::_('EB_GROUP_ONLY')) ;
 		$options[] = JHtml::_('select.option', 3, JText::_('EB_DISABLE_REGISTRATION')) ;
-		$this->lists['registration_type'] = JHtml::_('select.genericlist', $options, 'registration_type', ' class="inputbox" ', 'value', 'text', $item->registration_type);
+		$this->lists['registration_type'] = JHtml::_('select.genericlist', $options, 'registration_type', ' class="input-xlarge" ', 'value', 'text', $item->registration_type);
 
         $options = array() ;
         $options[] = JHtml::_('select.option', 0, JText::_('EB_USE_GLOBAL_CONFIGURATION')) ;
@@ -139,22 +139,27 @@ class EventbookingViewEventHtml extends RADViewItem
 		$this->lists['access'] = JHtml::_('access.level', 'access', $item->access, 'class="inputbox"', false) ;
 		$this->lists['registration_access'] = JHtml::_('access.level', 'registration_access', $item->registration_access, 'class="inputbox"', false) ;					
 		$this->lists['enable_cancel_registration'] = JHtml::_('select.booleanlist', 'enable_cancel_registration', ' class="inputbox" ', $item->enable_cancel_registration);
-		$this->lists['enable_auto_reminder'] = JHtml::_('select.booleanlist', 'enable_auto_reminder', ' class="inputbox" ', $item->enable_auto_reminder);				
-		$this->lists['attachment'] = EventbookingHelperHtml::attachmentList($item->attachment, $config);				
+		$this->lists['enable_auto_reminder'] = JHtml::_('select.booleanlist', 'enable_auto_reminder', ' class="inputbox" ', $item->enable_auto_reminder);
 		$this->lists['published'] = JHtml::_('select.booleanlist', 'published', ' class="inputbox" ', $item->published);		
-		if ($item->event_date != $db->getNullDate()) {
+		if ($item->event_date != $db->getNullDate())
+		{
 			$selectedHour = date('G', strtotime($item->event_date)) ;
 			$selectedMinute = date('i', strtotime($item->event_date)) ;									
-		} else {
+		}
+		else
+		{
 			$selectedHour = 0 ;
 			$selectedMinute = 0 ;			
 		}
 		$this->lists['event_date_hour'] = JHtml::_('select.integerlist', 0, 23, 1, 'event_date_hour', ' class="inputbox input-mini" ', $selectedHour) ;
 		$this->lists['event_date_minute'] = JHtml::_('select.integerlist', 0, 60, 5, 'event_date_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d') ;			
-		if ($item->event_end_date != $db->getNullDate()) {
+		if ($item->event_end_date != $db->getNullDate())
+		{
 			$selectedHour = date('G', strtotime($item->event_end_date)) ;
 			$selectedMinute = date('i', strtotime($item->event_end_date));									
-		} else {
+		}
+		else
+		{
 			$selectedHour = 0 ;
 			$selectedMinute = 0 ;			
 		}

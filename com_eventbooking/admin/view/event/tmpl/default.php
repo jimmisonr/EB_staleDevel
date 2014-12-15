@@ -122,28 +122,6 @@ $format = 'Y-m-d' ;
 								<?php echo JHtml::_('calendar', ($this->item->event_end_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_end_date, $format, null), 'event_end_date', 'event_end_date') ; ?>
 								<?php echo $this->lists['event_end_date_hour'].' '.$this->lists['event_end_date_minute']; ?>					
 							</td>
-						</tr>				
-						<tr>
-							<td class="key">
-								<?php echo JText::_('EB_PRICE'); ?>
-							</td>				
-							<td>
-								<input type="text" name="individual_price" id="individual_price" class="inputbox" size="10" value="<?php echo $this->item->individual_price; ?>" />					
-							</td>
-						</tr>
-						<tr>
-							<td class="key">
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_EVENT_CAPACITY' );?>::<?php echo JText::_('EB_CAPACITY_EXPLAIN'); ?>"><?php echo JText::_('EB_CAPACITY'); ?></span>
-							</td>
-							<td>
-								<input type="text" name="event_capacity" id="event_capacity" class="inputbox" size="10" value="<?php echo $this->item->event_capacity; ?>" />
-							</td>
-						</tr>
-						<tr>
-							<td class="key"><?php echo JText::_('EB_REGISTRATION_TYPE'); ?></td>
-							<td>
-								<?php echo $this->lists['registration_type'] ; ?>
-							</td>
 						</tr>
 						<tr>
 							<td class="key">
@@ -155,10 +133,41 @@ $format = 'Y-m-d' ;
 						</tr>
 						<tr>
 							<td class="key">
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_MAX_NUMBER_REGISTRANTS' );?>::<?php echo JText::_('EB_MAX_NUMBER_REGISTRANTS_EXPLAIN'); ?>"><?php echo JText::_('EB_MAX_NUMBER_REGISTRANT_GROUP'); ?></span>
+								<?php echo JText::_('EB_PRICE'); ?>
+							</td>				
+							<td>
+								<input type="text" name="individual_price" id="individual_price" class="input-small" size="10" value="<?php echo $this->item->individual_price; ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
+								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_EVENT_CAPACITY' );?>::<?php echo JText::_('EB_CAPACITY_EXPLAIN'); ?>"><?php echo JText::_('EB_CAPACITY'); ?></span>
 							</td>
 							<td>
-								<input type="text" name="max_group_number" id="max_group_number" class="inputbox" size="10" value="<?php echo $this->item->max_group_number; ?>" />
+								<input type="text" name="event_capacity" id="event_capacity" class="input-small" size="10" value="<?php echo $this->item->event_capacity; ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td class="key"><?php echo JText::_('EB_REGISTRATION_TYPE'); ?></td>
+							<td>
+								<?php echo $this->lists['registration_type'] ; ?>
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
+								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_ATTACHMENT' );?>::<?php echo JText::_('EB_ATTACHMENT_EXPLAIN'); ?>"><?php echo JText::_('EB_ATTACHMENT'); ?></span>
+							</td>
+							<td>
+								<input type="file" name="attachment"/>
+								<?php
+								if ($this->item->attachment)
+								{
+								?>
+									<?php echo JText::_('EB_CURRENT_ATTACHMENT'); ?>&nbsp;<a href="<?php echo JURI::root().'media/com_eventbooking/'.$this->item->attachment; ?>" target="_blank"><?php echo $this->item->attachment; ?></a>
+									<input type="checkbox" name="del_attachment" value="1" /><?php echo JText::_('EB_DELETE_CURRENT_ATTACHMENT'); ?>
+								<?php
+								}
+								?>
 							</td>
 						</tr>
 						<?php
@@ -176,14 +185,6 @@ $format = 'Y-m-d' ;
 							<?php
 							}
 						?>
-						<tr>
-							<td class="key">
-								<?php echo JText::_('EB_PUBLISHED'); ?>
-							</td>
-							<td>
-								<?php echo $this->lists['published']; ?>
-							</td>
-						</tr>															
 						<tr>
 							<td class="key">
 								<?php echo  JText::_('EB_SHORT_DESCRIPTION'); ?>
@@ -217,12 +218,16 @@ $format = 'Y-m-d' ;
 						</tr>
 						<?php
 							$n = max(count($this->prices), 3);
-							for ($i = 0 ; $i < $n ; $i++) {
-									if (isset($this->prices[$i])) {
+							for ($i = 0 ; $i < $n ; $i++)
+							{
+									if (isset($this->prices[$i]))
+									{
 										$price = $this->prices[$i] ;
 										$registrantNumber = $price->registrant_number ;
 										$price = $price->price ;
-									} else {
+									}
+									else
+									{
 										$registrantNumber =  null ;
 										$price =  null ;
 									}
@@ -251,14 +256,6 @@ $format = 'Y-m-d' ;
 				<fieldset class="adminform">
 					<legend class="adminform"><?php echo JText::_('EB_MISC'); ?></legend>
 					<table class="admintable">
-                        <tr>
-                            <td class="key">
-                                <?php echo JText::_('ENABLE_COUPON'); ?>
-                            </td>
-                            <td>
-                                <?php echo $this->lists['enable_coupon']; ?>
-                            </td>
-                        </tr>
 						<tr>
 							<td class="key">
 								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_ACCESS' );?>::<?php echo JText::_('EB_ACCESS_EXPLAIN'); ?>"><?php echo JText::_('EB_ACCESS'); ?></span>
@@ -267,20 +264,6 @@ $format = 'Y-m-d' ;
 								<?php echo $this->lists['access']; ?>
 							</td>
 						</tr>
-						<?php
-						    if ($this->config->activate_deposit_feature) {
-						    ?>
-						    	<tr>
-			            			<td class="key" width="30%">
-			            				<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_DEPOSIT_AMOUNT' );?>::<?php echo JText::_('EB_DEPOSIT_AMOUNT_EXPLAIN'); ?>"><?php echo JText::_('EB_DEPOSIT_AMOUNT'); ?></span>
-			            			</td>
-			            			<td>
-			            				<input type="text" name="deposit_amount" id="deposit_amount" class="inputbox" size="5" value="<?php echo $this->item->deposit_amount; ?>" />&nbsp;&nbsp;<?php echo $this->lists['deposit_type'] ; ?>
-			            			</td>
-			            		</tr>
-						    <?php    
-						    }			    
-						?>			
 						<tr>
 							<td class="key">
 								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_REGISTRATION_ACCESS' );?>::<?php echo JText::_('EB_REGISTRATION_ACCESS_EXPLAIN'); ?>"><?php echo JText::_('EB_REGISTRATION_ACCESS'); ?></span>
@@ -289,6 +272,45 @@ $format = 'Y-m-d' ;
 								<?php echo $this->lists['registration_access']; ?>
 							</td>
 						</tr>
+						<tr>
+							<td class="key">
+								<?php echo JText::_('EB_PUBLISHED'); ?>
+							</td>
+							<td>
+								<?php echo $this->lists['published']; ?>
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
+								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_MAX_NUMBER_REGISTRANTS' );?>::<?php echo JText::_('EB_MAX_NUMBER_REGISTRANTS_EXPLAIN'); ?>"><?php echo JText::_('EB_MAX_NUMBER_REGISTRANT_GROUP'); ?></span>
+							</td>
+							<td>
+								<input type="text" name="max_group_number" id="max_group_number" class="input-small" size="10" value="<?php echo $this->item->max_group_number; ?>" />
+							</td>
+						</tr>
+                        <tr>
+                            <td class="key">
+                                <?php echo JText::_('ENABLE_COUPON'); ?>
+                            </td>
+                            <td>
+                                <?php echo $this->lists['enable_coupon']; ?>
+                            </td>
+                        </tr>
+						<?php
+						    if ($this->config->activate_deposit_feature)
+						    {
+						    ?>
+						    	<tr>
+			            			<td class="key" width="30%">
+			            				<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_DEPOSIT_AMOUNT' );?>::<?php echo JText::_('EB_DEPOSIT_AMOUNT_EXPLAIN'); ?>"><?php echo JText::_('EB_DEPOSIT_AMOUNT'); ?></span>
+			            			</td>
+			            			<td>
+			            				<input type="text" name="deposit_amount" id="deposit_amount" class="input-mini" size="5" value="<?php echo $this->item->deposit_amount; ?>" />&nbsp;&nbsp;<?php echo $this->lists['deposit_type'] ; ?>
+			            			</td>
+			            		</tr>
+						    <?php    
+						    }			    
+						?>
 						<tr>
 							<td class="key" style="width: 160px;">
 								<?php echo JText::_('EB_ENABLE_CANCEL'); ?>
@@ -322,7 +344,8 @@ $format = 'Y-m-d' ;
 							</td>
 						</tr>	
 						<?php
-							if ($this->config->term_condition_by_event) {					
+							if ($this->config->term_condition_by_event)
+							{
 							?>
 								<tr>
 									<td class="key">
@@ -334,15 +357,7 @@ $format = 'Y-m-d' ;
 								</tr>
 							<?php	
 							}
-						?>		
-						<tr>
-							<td class="key">
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_ATTACHMENT' );?>::<?php echo JText::_('EB_ATTACHMENT_EXPLAIN'); ?>"><?php echo JText::_('EB_ATTACHMENT'); ?></span>
-							</td>
-							<td>
-								<?php echo $this->lists['attachment'] ; ?>
-							</td>
-						</tr>	
+						?>
 					</table>					
 				</fieldset>
 				<div class="clearfix"></div>
@@ -561,14 +576,14 @@ $format = 'Y-m-d' ;
                 <td>
                     <input type="text" name="api_login" value="<?php echo $this->item->api_login; ?>" class="inputbox" size="30" />
                 </td>
-                <td>&nspb;</td>
+                <td></td>
             </tr>
             <tr>
                 <td class="key"><?php echo JText::_('EB_TRANSACTION_KEY') ; ?></td>
                 <td>
                     <input type="text" name="transaction_key" value="<?php echo $this->item->transaction_key; ?>" class="inputbox" size="30" />
                 </td>
-                <td>&nspb;</td>
+                <td></td>
             </tr>
             <tr>
 				<td width="30%" class="key">

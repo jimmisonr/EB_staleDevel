@@ -53,6 +53,35 @@ class EventbookingModelEvent extends RADModelItem
 				$data['thumb'] = $fileName;
 			}
 		}
+
+		//Process attachment
+		$attachment = $thumbImage = $input->files->get('attachment');
+		if ($attachment['name'])
+		{
+			$pathUpload = JPATH_ROOT . '/media/com_eventbooking';
+			$allowedExtensions = EventbookingHelper::getConfigValue('allowed_file_types');
+			if (!$allowedExtensions)
+			{
+				$allowedExtensions = 'doc, docx, ppt, pptx, pdf, zip, rar, jpg, jepg, png, zipx';
+			}
+			$allowedExtensions = explode(',', $allowedExtensions);
+			$allowedExtensions = array_map('trim', $allowedExtensions);
+			$allowedExtensions = array_map('strtolower', $allowedExtensions);
+			$fileName = $attachment['name'];
+			$fileExt = JFile::getExt($fileName);
+			if (in_array(strtolower($fileExt), $allowedExtensions))
+			{
+				$fileName = JFile::makeSafe($fileName);
+				JFile::upload($attachment['tmp_name'], $pathUpload . '/' . $fileName);
+				$data['attachment'] = $fileName;
+			}
+			else
+			{
+				// Throw notice, but still allow saving the event
+				$data['attachment'] = '';
+			}
+		}
+
 		//Init default data		
 		if (!isset($data['weekdays']))
 		{
@@ -106,7 +135,16 @@ class EventbookingModelEvent extends RADModelItem
 					{
 						JFile::delete(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $row->thumb);
 					}
-					$data['thumb'] = '';
+					$row->thumb = '';
+				}
+
+				if (isset($data['del_attachment']) && $row->attachment)
+				{
+					if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/' . $row->attachment))
+					{
+						JFile::delete(JPATH_ROOT . '/media/com_eventbooking/' . $row->attachment);
+					}
+					$row->attachment = '';
 				}
 			}
 			else
@@ -344,12 +382,7 @@ class EventbookingModelEvent extends RADModelItem
 			$params = $data['params'];
 			if (is_array($params))
 			{
-				$txt = array();
-				foreach ($params as $k => $v)
-				{
-					$txt[] = "$k=\"$v\"";
-				}
-				$row->custom_fields = implode("\n", $txt);
+				$row->custom_fields = json_encode($params);
 			}
 		}
 		//Check ordering of the fieds		

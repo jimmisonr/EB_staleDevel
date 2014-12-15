@@ -142,27 +142,6 @@ abstract class EventbookingHelperHtml
 	}
 
 	/**
-	 * Public function to display list of attachments which can be choose for event
-	 * @param string $attachment
-	 * @param object $config
-	 * @return string attachment list in a dropdown
-	 */
-	public static function attachmentList($attachment, $config)
-	{
-		jimport('joomla.filesystem.folder');
-		$path = JPATH_ROOT . '/media/com_eventbooking';
-		$files = JFolder::files($path, 
-			strlen(trim($config->attachment_file_types)) ? $config->attachment_file_types : 'bmp|gif|jpg|png|swf|zip|doc|pdf|xls');
-		$options = array();
-		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_ATTACHMENT'));
-		for ($i = 0, $n = count($files); $i < $n; $i++)
-		{
-			$file = $files[$i];
-			$options[] = JHtml::_('select.option', $file, $file);
-		}
-		return JHtml::_('select.genericlist', $options, 'attachment', 'class="inputbox"', 'value', 'text', $attachment);
-	}
-	/**
 	 * Function to add dropdown menu
 	 * @param string $vName
 	 */
