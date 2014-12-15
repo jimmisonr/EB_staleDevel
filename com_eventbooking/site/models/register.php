@@ -61,10 +61,11 @@ class EventBookingModelRegister extends JModelLegacy
 			->where('id=' . $eventId);
 		$db->setQuery($query);
 		$event = $db->loadObject();
+		$paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : '';
 		$rowFields = EventbookingHelper::getFormFields($eventId, 0);
 		$form = new RADForm($rowFields);
 		$form->bind($data);
-		$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config);
+		$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
 		$paymentType = JRequest::getInt('payment_type', 0);
 		if ($paymentType == 0)
 		{
@@ -75,6 +76,7 @@ class EventBookingModelRegister extends JModelLegacy
 		$data['tax_amount'] = round($fees['tax_amount']);
 		$data['amount'] = round($fees['amount'], 2);
 		$data['deposit_amount'] = $fees['deposit_amount'];
+		$data['payment_processing_fee'] = $fees['payment_processing_fee'];
 
 		$row->bind($data);
 		$row->group_id = 0;
@@ -199,7 +201,8 @@ class EventBookingModelRegister extends JModelLegacy
 		$form = new RADForm($rowFields);
 		$form->bind($data);
 
-		$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config);
+		$paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : '';
+		$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
 		//Calculate members fee
 		$membersForm = $fees['members_form'];
 		$membersTotalAmount = $fees['members_total_amount'];
@@ -215,6 +218,7 @@ class EventBookingModelRegister extends JModelLegacy
 		$data['discount_amount'] = $fees['discount_amount'];
 		$data['tax_amount'] = $fees['tax_amount'];
 		$data['deposit_amount'] = $fees['deposit_amount'];
+		$data['payment_processing_fee'] = $fees['payment_processing_fee'];
 		$data['amount'] = $fees['amount'];
 		if (!isset($data['first_name']))
 		{

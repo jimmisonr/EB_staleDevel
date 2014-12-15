@@ -18,7 +18,9 @@
 					<option value="1">Live Mode</option>
 				</field>
 				<field name="paypal_id" type="text" size="40" label="Paypal Email" description="Enter your Paypal ID or Paypal Email" default=""></field>	
-				<field name="paypal_currency" type="ebcurrency" label="Paypal Currency" description="Choose Paypal Currency"></field>	
+				<field name="paypal_currency" type="ebcurrency" label="Paypal Currency" description="Choose Paypal Currency"></field>
+                <field name="payment_fee_amount" type="text" label="Payment Processing Fee ($)" description=""></field>
+                <field name="payment_fee_percent" type="text" label="Payment Processing Fee (%)" description=""></field>
 			</fieldset>			
 		</fields>
 	</config>

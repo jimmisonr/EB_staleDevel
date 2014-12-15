@@ -950,6 +950,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
+
+		if (!in_array('payment_processing_fee', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `payment_processing_fee` DECIMAL( 10, 6 ) NULL DEFAULT '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
 		
 		if (!in_array('cart_id', $fields))
 		{

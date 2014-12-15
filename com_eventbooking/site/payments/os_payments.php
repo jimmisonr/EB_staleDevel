@@ -41,8 +41,13 @@ class os_payments
 				if (file_exists($path . $row->name . '.php'))
 				{
 					require_once $path . $row->name . '.php';
-					$method = new $row->name(new JRegistry($row->params));
+					$params        = new JRegistry($row->params);
+					$method = new $row->name($params);
 					$method->setTItle($row->title);
+					if ($params->get('payment_fee_amount') > 0 || $params->get('payment_fee_percent'))
+					{
+						$method->paymentFee = true;
+					}
 					self::$methods[] = $method;
 				}
 			}

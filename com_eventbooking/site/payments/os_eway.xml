@@ -21,7 +21,9 @@
 				<field name="use_cvn" type="list" label="Use CVN" description="If Set to Yes, Eway will check the valid of Card CVV Code">
 					<option value="0">No</option>
 					<option value="1">Yes</option>
-				</field>	
+				</field>
+                <field name="payment_fee_amount" type="text" label="Payment Processing Fee ($)" description=""></field>
+                <field name="payment_fee_percent" type="text" label="Payment Processing Fee (%)" description=""></field>
 			</fieldset>			
 		</fields>
 	</config>

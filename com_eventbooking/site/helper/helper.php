@@ -242,7 +242,7 @@ class EventbookingHelper
 	 *
 	 * @return array
 	 */
-	public static function calculateIndividualRegistrationFees($event, $form, $data, $config)
+	public static function calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod = null)
 	{
 		$fees           = array();
 		$user           = JFactory::getUser();
@@ -337,8 +337,27 @@ class EventbookingHelper
 		{
 			$taxAmount = 0;
 		}
-
 		$amount = $totalAmount - $discountAmount + $taxAmount;
+
+		// Payment processing fee
+		$paymentFeeAmount  = 0;
+		$paymentFeePercent = 0;
+		if ($paymentMethod)
+		{
+			$method            = os_payments::loadPaymentMethod($paymentMethod);
+			$params            = new JRegistry($method->params);
+			$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
+			$paymentFeePercent = (float) $params->get('payment_fee_percent');
+		}
+		if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $amount > 0)
+		{
+			$fees['payment_processing_fee']         = round($paymentFeeAmount + $amount * $paymentFeePercent / 100, 2);
+			$amount += $fees['payment_processing_fee'];
+		}
+		else
+		{
+			$fees['payment_processing_fee']         = 0;
+		}
 
 		// Calculate the deposit amount as well
 		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
@@ -376,7 +395,7 @@ class EventbookingHelper
 	 *
 	 * @return array
 	 */
-	public static function calculateGroupRegistrationFees($event, $form, $data, $config)
+	public static function calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod = null)
 	{
 		$fees                  = array();
 		$session               = JFactory::getSession();
@@ -591,6 +610,26 @@ class EventbookingHelper
 
 		// Gross amount
 		$amount = $totalAmount - $discountAmount + $taxAmount;
+
+		// Payment processing fee
+		$paymentFeeAmount  = 0;
+		$paymentFeePercent = 0;
+		if ($paymentMethod)
+		{
+			$method            = os_payments::loadPaymentMethod($paymentMethod);
+			$params            = new JRegistry($method->params);
+			$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
+			$paymentFeePercent = (float) $params->get('payment_fee_percent');
+		}
+		if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $amount > 0)
+		{
+			$fees['payment_processing_fee']         = round($paymentFeeAmount + $amount * $paymentFeePercent / 100, 2);
+			$amount += $fees['payment_processing_fee'];
+		}
+		else
+		{
+			$fees['payment_processing_fee']         = 0;
+		}
 
 		// Deposit amount
 		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
@@ -1187,7 +1226,12 @@ class EventbookingHelper
 			$sql = 'SELECT SUM(discount_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$discountAmount = $db->loadResult();
-			$amount = $totalAmount - $discountAmount + $taxAmount;
+
+			$sql = 'SELECT SUM(payment_processing_fee) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
+			$db->setQuery($sql);
+			$paymentProcessingFee = $db->loadResult();
+
+			$amount = $totalAmount + $paymentProcessingFee - $discountAmount + $taxAmount;
 			
 			$sql = 'SELECT SUM(deposit_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
 			$db->setQuery($sql);
@@ -1198,6 +1242,7 @@ class EventbookingHelper
 			$data['items'] = $rows;
 			$data['amount'] = $amount;
 			$data['taxAmount'] = $taxAmount;
+			$data['paymentProcessingFee'] = $paymentProcessingFee;
 			$data['depositAmount'] = $depositAmount;
 			$data['form'] = $form;
 		}
@@ -2669,16 +2714,6 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Calculate total discount for the registration
-	 *
-	 * @return decimal
-	 */
-	function calcuateDiscount()
-	{
-		return 10;
-	}
-
-	/**
 	 * Generate User Input Select
 	 * @param int $userId
 	 */
@@ -3533,7 +3568,6 @@ class EventbookingHelper
 						if (($date >= $recurringStartDate) && ($date <= $recurringEndDate))
 						{
 							$eventDates[] = $date->format('Y-m-d H:i:s');
-							$count++;
 						}
 					}
 					if ($date > $recurringEndDate)
@@ -3623,7 +3657,6 @@ class EventbookingHelper
 				$count = 0;			
 				while ($count < $numberOccurrencies)
 				{
-					$loop++;
 					$currentMonth = $date->format('m');
 					$currentYear  = $date->format('Y');
 					foreach ($monthDays as $day)

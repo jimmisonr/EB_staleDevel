@@ -207,8 +207,40 @@ else
 			</div>
 		</div>	
 		<?php	
-		}	
-		if ($this->enableCoupon || $this->discountAmount > 0 || ($this->config->enable_tax && $this->config->tax_rate > 0))
+		}
+		if ($this->showPaymentFee)
+		{
+		?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_PAYMENT_FEE'); ?>
+				</label>
+				<div class="controls">
+					<?php
+					if ($this->config->currency_position == 0)
+					{
+					?>
+						<div class="input-prepend">
+							<span class="add-on"><?php echo $this->config->currency_symbol;?></span>
+							<input id="payment_processing_fee" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->paymentProcessingFee, $this->config); ?>" />
+						</div>
+					<?php
+					}
+					else
+					{
+					?>
+						<div class="input-append">
+							<input id="payment_processing_fee" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->paymentProcessingFee, $this->config); ?>" />
+							<span class="add-on"><?php echo $this->config->currency_symbol;?></span>
+						</div>
+					<?php
+					}
+					?>
+				</div>
+			</div>
+		<?php
+		}
+		if ($this->enableCoupon || $this->discountAmount > 0 || ($this->config->enable_tax && $this->config->tax_rate > 0) || $this->showPaymentFee)
 		{
 		?>
 		<div class="control-group">
@@ -325,7 +357,7 @@ else
 					}		
 				?>
 					<label class="checkbox">
-							<input onclick="changePaymentMethod();" class="validate[required] radio" type="radio" name="payment_method" value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
+							<input onclick="changePaymentMethod('group');" class="validate[required] radio" type="radio" name="payment_method" value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
 					</label>
 				<?php		
 				}	
@@ -490,7 +522,8 @@ else
 		<?php	
 		}						
 	?>
-	<input type="hidden" name="event_id" value="<?php echo $this->event->id; ?>" />	
+	<input type="hidden" name="event_id" value="<?php echo $this->event->id; ?>" />
+	<input type="hidden" name="show_payment_fee" value="<?php echo (int)$this->showPaymentFee ; ?>" />
 	<script type="text/javascript">		
 		var eb_current_page = 'group_billing';	
 		<?php echo os_payments::writeJavascriptObjects();?>

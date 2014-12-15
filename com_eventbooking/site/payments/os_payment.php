@@ -54,6 +54,8 @@ class os_payment
 	 */
 	var $_cardHolderName = false;
 
+	var $paymentFee = false;
+
 	function os_payment()
 	{
 		$this->loadLanguage();

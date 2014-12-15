@@ -228,8 +228,22 @@ span.view_list {
 				</td>
 			</tr>
 		<?php
-		}                    
-		if ($discountAmount > 0 || $taxAmount > 0)
+		}
+
+		if ($paymentProcessingFee > 0)
+		{
+		?>
+			<tr>
+				<td class="title_cell">
+					<?php echo  JText::_('EB_PAYMENT_FEE'); ?>
+				</td>
+				<td class="field_cell">
+					<?php echo EventbookingHelper::formatCurrency($paymentProcessingFee, $config); ?>
+				</td>
+			</tr>
+		<?php
+		}
+		if ($discountAmount > 0 || $taxAmount > 0 || $paymentProcessingFee > 0)
 		{
 		?>                
 			<tr>

@@ -18,7 +18,9 @@
 					<option value="1">Live Mode</option>
 				</field>
 				<field name="x_login" type="text" size="40" label="API Login" description="Enter Your Authorize.net API Login" default=""></field>	
-				<field name="x_tran_key" type="text" label="Transaction Key" description="Enter Transaction Key"></field>		
+				<field name="x_tran_key" type="text" label="Transaction Key" description="Enter Transaction Key"></field>
+                <field name="payment_fee_amount" type="text" label="Payment Processing Fee ($)" description=""></field>
+                <field name="payment_fee_percent" type="text" label="Payment Processing Fee (%)" description=""></field>
 			</fieldset>			
 		</fields>
 	</config>

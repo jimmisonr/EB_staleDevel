@@ -110,7 +110,7 @@ $selectedState = '';
 			</td>
 		</tr>	
 		<?php
-			if ($this->item->discount_amount > 0 || $this->item->tax_amount > 0) 
+			if ($this->item->discount_amount > 0 || $this->item->tax_amount > 0 || $this->item->payment_processing_fee)
 			{
 			    if ($this->item->discount_amount > 0) 
 				{
@@ -137,8 +137,22 @@ $selectedState = '';
         				</td>
         			</tr> 
     			<?php    
-    			}    		    
-			?>			
+    			}
+
+				if ($this->item->payment_processing_fee > 0)
+				{
+					?>
+					<tr>
+						<td width="100" class="key">
+							<?php echo  JText::_('EB_PAYMENT_FEE'); ?>
+						</td>
+						<td>
+							<?php echo $this->config->currency_symbol?><input type="text" name="payment_processing_fee" class="input-medium" value="<?php echo $this->item->payment_processing_fee > 0 ? round($this->item->payment_processing_fee , 2) : null;?>" />
+						</td>
+					</tr>
+				<?php
+				}
+				?>
 			<tr>
 				<td width="100" class="key">
 					<?php echo  JText::_('EB_GROSS_AMOUNT'); ?>

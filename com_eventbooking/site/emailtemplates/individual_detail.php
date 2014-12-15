@@ -120,8 +120,21 @@ defined('_JEXEC') or die;
 					</div>
 				</div>
 			<?php
-			}                    
-			if ($row->discount_amount > 0 || $row->tax_amount > 0)
+			}
+	        if ($row->payment_processing_fee > 0)
+	        {
+		    ?>
+		        <div class="control-group">
+			        <label class="control-label">
+				        <?php echo  JText::_('EB_PAYMENT_FEE'); ?>
+			        </label>
+			        <div class="controls">
+				        <?php echo EventbookingHelper::formatCurrency($row->payment_processing_fee, $config, $rowEvent->currency_symbol); ?>
+			        </div>
+		        </div>
+	        <?php
+	        }
+			if ($row->discount_amount > 0 || $row->tax_amount > 0 || $row->payment_processing_fee > 0)
 			{
 			?>                
 				<div class="control-group">

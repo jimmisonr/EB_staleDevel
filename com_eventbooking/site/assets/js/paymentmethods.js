@@ -83,72 +83,101 @@ function PaymentMethods() {
 /***
  * Process event when someone change a payment method
  */ 
- 
-function changePaymentMethod() 
-{	
-	 Eb.jQuery(function($) {		
-		if($('input:radio[name^=payment_method]').length)
-		{
-			var paymentMethod = $('input:radio[name^=payment_method]:checked').val();
-		}
-		else 
-		{
-			var paymentMethod = $('input[name^=payment_method]').val();
-		}																		
-		method = methods.Find(paymentMethod);		
-		if (!method)	
-		{
-			return;
-		}
-		if (method.getCreditCard()) 
-		{
-			$('#tr_card_number').show();
-			$('#tr_exp_date').show();
-			$('#tr_cvv_code').show();						
-			if (method.getCardType()) 
-			{
-				$('#tr_card_type').show();				
-			} 
-			else 
-			{
-				$('#tr_card_type').hide();				
-			}
-			if (method.getCardHolderName()) 
-			{
-				$('#tr_card_holder_name').show();				
-			} 
-			else 
-			{
-				$('#tr_card_holder_name').show();				
-			}
-		} 
-		else 
-		{
-			$('#tr_card_number').hide();
-			$('#tr_exp_date').hide();
-			$('#tr_cvv_code').hide();	
-			$('#tr_card_type').hide();
-			$('#tr_card_holder_name').hide();								
-		}
-		if (paymentMethod == 'os_ideal') 
-		{
-			$('#tr_bank_list').show();			
-		} 
-		else 
-		{
-			$('#tr_bank_list').hide();			
-		}	
-	});	
+
+function updatePaymentMethod()
+{
+    Eb.jQuery(function($) {
+        if($('input:radio[name^=payment_method]').length)
+        {
+            var paymentMethod = $('input:radio[name^=payment_method]:checked').val();
+        }
+        else
+        {
+            var paymentMethod = $('input[name^=payment_method]').val();
+        }
+        method = methods.Find(paymentMethod);
+        if (!method)
+        {
+            return;
+        }
+        if (method.getCreditCard())
+        {
+            $('#tr_card_number').show();
+            $('#tr_exp_date').show();
+            $('#tr_cvv_code').show();
+            if (method.getCardType())
+            {
+                $('#tr_card_type').show();
+            }
+            else
+            {
+                $('#tr_card_type').hide();
+            }
+            if (method.getCardHolderName())
+            {
+                $('#tr_card_holder_name').show();
+            }
+            else
+            {
+                $('#tr_card_holder_name').show();
+            }
+        }
+        else
+        {
+            $('#tr_card_number').hide();
+            $('#tr_exp_date').hide();
+            $('#tr_cvv_code').hide();
+            $('#tr_card_type').hide();
+            $('#tr_card_holder_name').hide();
+        }
+        if (paymentMethod == 'os_ideal')
+        {
+            $('#tr_bank_list').show();
+        }
+        else
+        {
+            $('#tr_bank_list').hide();
+        }
+    });
+}
+
+function changePaymentMethod(registrationType)
+{
+    updatePaymentMethod();
+    if (document.adminForm.show_payment_fee.value == 1)
+    {
+        // Re-calculate subscription fee in case there is payment fee associated with payment method
+        if (registrationType == 'individual')
+        {
+            calculateIndividualRegistrationFee();
+        }
+        else if (registrationType == 'group')
+        {
+            calculateGroupRegistrationFee();
+        }
+        else
+        {
+            calculateCartRegistrationFee();
+        }
+    }
 }
 
 function calculateIndividualRegistrationFee() 
 {
 	Eb.jQuery(function($) {						
 		$('#btn-submit').attr('disabled', 'disabled');
-		$('#ajax-loading-animation').show();															
+		$('#ajax-loading-animation').show();
+        if($('input:radio[name^=payment_method]').length)
+        {
+            var paymentMethod = $('input:radio[name^=payment_method]:checked').val();
+        }
+        else
+        {
+            var paymentMethod = $('input[name^=payment_method]').val();
+        }
 		$.ajax({
 			type: 'POST',
-			url: siteUrl + 'index.php?option=com_eventbooking&task=calculate_individual_registration_fee',
+			url: siteUrl + 'index.php?option=com_eventbooking&task=calculate_individual_registration_fee&payment_method=' + paymentMethod,
 			data: $('#adminForm input[name=\'event_id\'], #adminForm input[name=\'coupon_code\'], #adminForm .payment-calculation input[type=\'text\'], #adminForm .payment-calculation input[type=\'checkbox\']:checked, #adminForm .payment-calculation input[type=\'radio\']:checked, #adminForm .payment-calculation select'),
 			dataType: 'json',
 			success: function(msg, textStatus, xhr) {
@@ -165,7 +194,11 @@ function calculateIndividualRegistrationFee()
 				if ($('#tax_amount')) 
 				{
 					$('#tax_amount').val(msg.tax_amount);
-				}							
+				}
+                if ($('#payment_processing_fee'))
+                {
+                    $('#payment_processing_fee').val(msg.payment_processing_fee);
+                }
 				if ($('#amount')) 
 				{								
 					$('#amount').val(msg.amount);
@@ -181,7 +214,7 @@ function calculateIndividualRegistrationFee()
                 else
                 {
                     $('.payment_information').css('display', '');
-                    changePaymentMethod();
+                    updatePaymentMethod();
                 }
 
                 if (msg.coupon_valid == 1)
@@ -205,10 +238,18 @@ function calculateGroupRegistrationFee()
 {
 	Eb.jQuery(function($) {						
 		$('#btn-process-group-billing').attr('disabled', 'disabled');
-		$('#ajax-loading-animation').show();															
+		$('#ajax-loading-animation').show();
+        if($('input:radio[name^=payment_method]').length)
+        {
+            var paymentMethod = $('input:radio[name^=payment_method]:checked').val();
+        }
+        else
+        {
+            var paymentMethod = $('input[name^=payment_method]').val();
+        }
 		$.ajax({
 			type: 'POST',
-			url: siteUrl + 'index.php?option=com_eventbooking&task=calculate_group_registration_fee',
+			url: siteUrl + 'index.php?option=com_eventbooking&task=calculate_group_registration_fee&payment_method=' + paymentMethod,
 			data: $('#adminForm input[name=\'event_id\'], #adminForm input[name=\'coupon_code\'], #adminForm .payment-calculation input[type=\'text\'], #adminForm .payment-calculation input[type=\'checkbox\']:checked, #adminForm .payment-calculation input[type=\'radio\']:checked, #adminForm .payment-calculation select'),
 			dataType: 'json',
 			success: function(msg, textStatus, xhr) {
@@ -225,7 +266,11 @@ function calculateGroupRegistrationFee()
 				if ($('#tax_amount')) 
 				{
 					$('#tax_amount').val(msg.tax_amount);
-				}							
+				}
+                if ($('#payment_processing_fee'))
+                {
+                    $('#payment_processing_fee').val(msg.payment_processing_fee);
+                }
 				if ($('#amount')) 
 				{								
 					$('#amount').val(msg.amount);
@@ -237,7 +282,7 @@ function calculateGroupRegistrationFee()
                 else
                 {
                     $('.payment_information').css('display', '');
-                    changePaymentMethod();
+                    updatePaymentMethod();
                 }
                 if (msg.coupon_valid == 1)
                 {
@@ -260,10 +305,18 @@ function calculateCartRegistrationFee()
 {
 	Eb.jQuery(function($) {						
 		$('#btn-submit').attr('disabled', 'disabled');
-		$('#ajax-loading-animation').show();															
+		$('#ajax-loading-animation').show();
+        if($('input:radio[name^=payment_method]').length)
+        {
+            var paymentMethod = $('input:radio[name^=payment_method]:checked').val();
+        }
+        else
+        {
+            var paymentMethod = $('input[name^=payment_method]').val();
+        }
 		$.ajax({
 			type: 'POST',
-			url: siteUrl + 'index.php?option=com_eventbooking&task=calculate_cart_registration_fee',
+			url: siteUrl + 'index.php?option=com_eventbooking&task=calculate_cart_registration_fee&payment_method=' + paymentMethod,
 			data: $('#adminForm input[name=\'coupon_code\'], #adminForm .payment-calculation input[type=\'text\'], #adminForm .payment-calculation input[type=\'checkbox\']:checked, #adminForm .payment-calculation input[type=\'radio\']:checked, #adminForm .payment-calculation select'),
 			dataType: 'json',
 			success: function(msg, textStatus, xhr) {
@@ -280,11 +333,16 @@ function calculateCartRegistrationFee()
 				if ($('#tax_amount')) 
 				{
 					$('#tax_amount').val(msg.tax_amount);
-				}							
+				}
+                if ($('#payment_processing_fee'))
+                {
+                    $('#payment_processing_fee').val(msg.payment_processing_fee);
+                }
 				if ($('#amount')) 
 				{								
 					$('#amount').val(msg.amount);
 				}
+
                 if (($('#amount').length || $('#total_amount').length) && msg.amount == 0)
                 {
                     $('.payment_information').css('display', 'none');
@@ -292,7 +350,7 @@ function calculateCartRegistrationFee()
                 else
                 {
                     $('.payment_information').css('display', '');
-                    changePaymentMethod();
+                    updatePaymentMethod();
                 }
 
                 if (msg.coupon_valid == 1)

@@ -10,7 +10,14 @@
 	<authorUrl>www.joomdonation.com</authorUrl>
 	<version>1.0</version>
 	<description>Offline Payment Plugin For Events Booking Extension</description>
-	<params />	
+    <config>
+        <fields name="params">
+            <fieldset name="basic">
+                <field name="payment_fee_amount" type="text" label="Payment Processing Fee ($)" description=""></field>
+                <field name="payment_fee_percent" type="text" label="Payment Processing Fee (%)" description=""></field>
+            </fieldset>
+        </fields>
+    </config>
 	<files>
 		<filename>os_offline.php</filename>				
 	</files>	

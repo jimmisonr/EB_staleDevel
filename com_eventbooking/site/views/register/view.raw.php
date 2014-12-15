@@ -124,13 +124,10 @@ class EventBookingViewRegister extends JViewLegacy
 	function _displayGroupBillingForm($event, $input, $tpl)
 	{
 		$session = JFactory::getSession();
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
 		$user = JFactory::getUser();
 		$userId = $user->get('id');
 		$config = EventbookingHelper::getConfig();
 		$eventId = $input->getInt('event_id', 0);
-		$numberRegistrants = (int) $session->get('eb_number_registrants');
 		$rowFields = EventbookingHelper::getFormFields($eventId, 1);
 		$groupBillingData = $session->get('eb_group_billing_data', null);
 		if ($groupBillingData)
@@ -182,9 +179,8 @@ class EventBookingViewRegister extends JViewLegacy
 		}
 		$form->bind($data, $useDefault);
 		$form->prepareFormFields('calculateGroupRegistrationFee();');
-		$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config);
-
 		$paymentMethod = $input->post->getString('payment_method', os_payments::getDefautPaymentMethod(trim($event->payment_methods)));
+		$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
 		$expMonth = $input->post->getInt('exp_month', date('m'));
 		$expYear = $input->post->getInt('exp_year', date('Y'));
 		$lists['exp_month'] = JHtml::_('select.integerlist', 1, 12, 1, 'exp_month', ' class="input-small" ', $expMonth, '%02d');
@@ -246,6 +242,17 @@ class EventBookingViewRegister extends JViewLegacy
 			}
 		}
 
+		// Check to see if there is payment processing fee or not
+		$showPaymentFee = false;
+		foreach($methods as $method)
+		{
+			if ($method->paymentFee)
+			{
+				$showPaymentFee = true;
+				break;
+			}
+		}
+
 		// Assign these parameters
 		$this->paymentMethod = $paymentMethod;
 		$this->lists = $lists;
@@ -267,6 +274,8 @@ class EventBookingViewRegister extends JViewLegacy
 		$this->discountAmount = $fees['discount_amount'];
 		$this->amount = $fees['amount'];
 		$this->depositAmount = $fees['deposit_amount'];
+		$this->paymentProcessingFee = $fees['payment_processing_fee'];
+		$this->showPaymentFee = $showPaymentFee;
 
 		parent::display($tpl);
 	}

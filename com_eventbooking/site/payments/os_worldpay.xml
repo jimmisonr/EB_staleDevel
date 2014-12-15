@@ -17,7 +17,9 @@
 					<option value="0">Test Mode</option>
 					<option value="1">Live Mode</option>
 				</field>
-				<field name="wp_installation_id" type="text" size="50" label="Worldpay Installation ID" description="Enter your Worldpay Installation ID" default=""></field>	
+				<field name="wp_installation_id" type="text" size="50" label="Worldpay Installation ID" description="Enter your Worldpay Installation ID" default=""></field>
+                <field name="payment_fee_amount" type="text" label="Payment Processing Fee ($)" description=""></field>
+                <field name="payment_fee_percent" type="text" label="Payment Processing Fee (%)" description=""></field>
 			</fieldset>			
 		</fields>
 	</config>

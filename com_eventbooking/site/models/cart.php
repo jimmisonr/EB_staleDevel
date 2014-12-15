@@ -103,6 +103,19 @@ class EventBookingModelCart extends JModelLegacy
 		{
 			$language = '*';
 		}
+
+		$paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : '';
+		$paymentFeeAmount  = 0;
+		$paymentFeePercent = 0;
+		if ($paymentMethod)
+		{
+			$method            = os_payments::loadPaymentMethod($paymentMethod);
+			$params            = new JRegistry($method->params);
+			$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
+			$paymentFeePercent = (float) $params->get('payment_fee_percent');
+		}
+
+		$paymentProcessingFee = 0;
 		//Store list of registrants
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
@@ -134,7 +147,6 @@ class EventBookingModelCart extends JModelLegacy
 					}
 				}
 			}
-			$registrantDepositAmount = 0;
 			if ($config->activate_deposit_feature && $event->deposit_amount > 0 && $paymentType == 1)
 			{
 				if ($event->deposit_type == 2)
@@ -210,7 +222,19 @@ class EventBookingModelCart extends JModelLegacy
 			{
 				$data['tax_amount'] = 0;
 			}			
-			$data['amount'] = $data['total_amount'] - $registrantDiscount + $data['tax_amount'];						
+			$data['amount'] = $data['total_amount'] - $registrantDiscount + $data['tax_amount'];
+			if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $data['amount'] > 0)
+			{
+				$registrantPaymentProcessingFee         = round($paymentFeeAmount + $data['amount']*$paymentFeePercent / 100, 2);
+				$data['payment_processing_fee'] = $registrantPaymentProcessingFee;
+				$data['amount'] += $registrantPaymentProcessingFee;
+				$paymentProcessingFee += $registrantPaymentProcessingFee;
+			}
+			else
+			{
+
+				$data['payment_processing_fee'] = 0;
+			}
 			if ($registrantDepositAmount > 0)
 			{
 				$data['payment_status'] = 0;
@@ -291,7 +315,8 @@ class EventBookingModelCart extends JModelLegacy
 		{
 			$taxAmount = 0;
 		}
-		$amount = $totalAmount - $totalDiscount + $taxAmount;
+		$amount = $totalAmount - $totalDiscount + $taxAmount + $paymentProcessingFee;
+		// Payment processing fee
 		if ($amount > 0)
 		{
 			if ($depositAmount > 0)

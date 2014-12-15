@@ -123,7 +123,7 @@ class EventBookingViewRegister extends JViewLegacy
 		$currentYear = date('Y');
 		$lists['exp_year'] = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
 		$data['coupon_code'] =  $input->post->getString('coupon_code', '');
-		$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config);
+		$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
 		$methods = os_payments::getPaymentMethods(trim($event->payment_methods));
 		$options = array();
 		$options[] = JHtml::_('select.option', 'Visa', 'Visa');
@@ -150,6 +150,17 @@ class EventBookingViewRegister extends JViewLegacy
 			}
 			$lists['bank_id'] = JHtml::_('select.genericlist', $options, 'bank_id', ' class="inputbox" ', 'value', 'text', 
 				$input->post->getInt('bank_id'));
+		}
+
+		// Check to see if there is payment processing fee or not
+		$showPaymentFee = false;
+		foreach($methods as $method)
+		{
+			if ($method->paymentFee)
+			{
+				$showPaymentFee = true;
+				break;
+			}
 		}
 
 		// Add support for deposit payment
@@ -205,6 +216,8 @@ class EventBookingViewRegister extends JViewLegacy
 		$this->discountAmount = $fees['discount_amount'];
 		$this->depositAmount = $fees['deposit_amount'];
 		$this->amount = $fees['amount'];
+		$this->paymentProcessingFee = $fees['payment_processing_fee'];
+		$this->showPaymentFee = $showPaymentFee;
 
 		parent::display($tpl);
 	}
@@ -411,6 +424,42 @@ class EventBookingViewRegister extends JViewLegacy
 			->order('FIND_IN_SET(id, "' . implode(',', $items) . '")');
 		$db->setQuery($query);
 		$eventTitle = implode(', ', $db->loadColumn());
+
+		// Payment fee
+		// Check to see if there is payment processing fee or not
+		$showPaymentFee = false;
+		foreach($methods as $method)
+		{
+			if ($method->paymentFee)
+			{
+				$showPaymentFee = true;
+				break;
+			}
+		}
+
+		if ($showPaymentFee)
+		{
+			$paymentFeeAmount  = 0;
+			$paymentFeePercent = 0;
+			if ($paymentMethod)
+			{
+				$method            = os_payments::loadPaymentMethod($paymentMethod);
+				$params            = new JRegistry($method->params);
+				$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
+				$paymentFeePercent = (float) $params->get('payment_fee_percent');
+			}
+			if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $amount > 0)
+			{
+				$paymentProcessingFee         = round($paymentFeeAmount + $amount * $paymentFeePercent / 100, 2);
+				$amount += $paymentProcessingFee;
+			}
+			else
+			{
+				$paymentProcessingFee         = 0;
+			}
+
+			$this->paymentProcessingFee = $paymentProcessingFee;
+		}
 		//Assign these parameters
 		$this->paymentMethod = $paymentMethod;
 		$this->lists = $lists;
@@ -428,11 +477,13 @@ class EventBookingViewRegister extends JViewLegacy
 		$this->totalAmount = $totalAmount;
 		$this->taxAmount = $taxAmount;
 		$this->discountAmount = $discountAmount;
+		$this->paymentProcessingFee = $paymentProcessingFee;
 		$this->amount = $amount;
 		$this->items = $events;
 		$this->eventTitle = $eventTitle;
 		$this->form = $form;
 		$this->Itemid = $input->getInt('Itemid', 0);
+		$this->showPaymentFee = $showPaymentFee;
 		parent::display($tpl);
 	}
 }

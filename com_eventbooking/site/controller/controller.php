@@ -538,6 +538,7 @@ class EventbookingController extends JControllerLegacy
 		$query = $db->getQuery(true);
 		$eventId = JRequest::getInt('event_id', 0);
 		$data = JRequest::get('post', JREQUEST_ALLOWHTML);
+		$paymentMethod = JRequest::getVar('payment_method', '');
 
 		$query->select('*')
 			->from('#__eb_events')
@@ -547,12 +548,13 @@ class EventbookingController extends JControllerLegacy
 		$rowFields = EventbookingHelper::getFormFields($eventId, 0);
 		$form = new RADForm($rowFields);
 		$form->bind($data);
-		$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config);
+		$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
 
 		$response = array();
 		$response['total_amount'] = EventbookingHelper::formatAmount($fees['total_amount'], $config);
 		$response['discount_amount'] = EventbookingHelper::formatAmount($fees['discount_amount'], $config);
 		$response['tax_amount'] = EventbookingHelper::formatAmount($fees['tax_amount'], $config);
+		$response['payment_processing_fee'] = EventbookingHelper::formatAmount($fees['payment_processing_fee'], $config);
 		$response['amount'] = EventbookingHelper::formatAmount($fees['amount'], $config);
 		$response['deposit_amount'] = EventbookingHelper::formatAmount($fees['deposit_amount'], $config);
 		$response['coupon_valid'] = $fees['coupon_valid'];
@@ -570,6 +572,7 @@ class EventbookingController extends JControllerLegacy
 		$query = $db->getQuery(true);
 		$eventId = JRequest::getInt('event_id', 0);
 		$data = JRequest::get('post', JREQUEST_ALLOWHTML);
+		$paymentMethod = JRequest::getVar('payment_method', '');
 		$query->select('*')
 			->from('#__eb_events')
 			->where('id=' . $eventId);
@@ -579,12 +582,13 @@ class EventbookingController extends JControllerLegacy
 		$form = new RADForm($rowFields);
 		$form->bind($data);
 
-		$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config);
+		$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
 
 		$response = array();
 		$response['total_amount'] = EventbookingHelper::formatAmount($fees['total_amount'], $config);
 		$response['discount_amount'] = EventbookingHelper::formatAmount($fees['discount_amount'], $config);
 		$response['tax_amount'] = EventbookingHelper::formatAmount($fees['tax_amount'], $config);
+		$response['payment_processing_fee'] = EventbookingHelper::formatAmount($fees['payment_processing_fee'], $config);
 		$response['amount'] = EventbookingHelper::formatAmount($fees['amount'], $config);
 		$response['deposit_amount'] = EventbookingHelper::formatAmount($fees['deposit_amount'], $config);
 		$response['coupon_valid'] = $fees['coupon_valid'];
@@ -659,9 +663,32 @@ class EventbookingController extends JControllerLegacy
 			$taxAmount = 0;
 		}
 		$amount = $totalAmount - $discountAmount + $taxAmount;
+
+		// Payment processing fee
+		$paymentMethod = JRequest::getVar('payment_method', '');
+		$paymentFeeAmount  = 0;
+		$paymentFeePercent = 0;
+		if ($paymentMethod)
+		{
+			$method            = os_payments::loadPaymentMethod($paymentMethod);
+			$params            = new JRegistry($method->params);
+			$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
+			$paymentFeePercent = (float) $params->get('payment_fee_percent');
+		}
+		if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $amount > 0)
+		{
+			$paymentProcessingFee         = round($paymentFeeAmount + $amount * $paymentFeePercent / 100, 2);
+			$amount += $paymentProcessingFee;
+		}
+		else
+		{
+			$paymentProcessingFee         = 0;
+		}
+
 		$response['total_amount'] = EventbookingHelper::formatAmount($totalAmount, $config);
 		$response['discount_amount'] = EventbookingHelper::formatAmount($discountAmount, $config);
 		$response['tax_amount'] = EventbookingHelper::formatAmount($taxAmount, $config);
+		$response['payment_processing_fee'] = EventbookingHelper::formatAmount($paymentProcessingFee, $config);
 		$response['amount'] = EventbookingHelper::formatAmount($amount, $config);
 		echo json_encode($response);
 		JFactory::getApplication()->close();
