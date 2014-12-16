@@ -157,7 +157,7 @@ abstract class EventbookingHelperHtml
 		$db->setQuery($query);
 		$menus = $db->loadObjectList();
 		$html = '';
-		$html .= '<div id="submenu-box"><div class="m"><ul class="nav nav-pills">';
+		$html .= '<ul class="nav nav-tabs">';
 		for ($i = 0; $n = count($menus), $i < $n; $i++)
 		{
 			$menu = $menus[$i];
@@ -176,7 +176,7 @@ abstract class EventbookingHelperHtml
 				{
 					$class = ' class="active"';
 				}
-				$html .= '<li' . $class . '><a href="index.php?option=com_eventbooking&view=' . $menu->menu_view . '">' . JText::_($menu->menu_name) .
+				$html .= '<li' . $class . '><a href="index.php?option=com_eventbooking&view=' . $menu->menu_view . '"><span class="icon-'.$menu->menu_class.'"></span> ' . JText::_($menu->menu_name) .
 					 '</a></li>';
 			}
 			else
@@ -193,7 +193,7 @@ abstract class EventbookingHelperHtml
 					}
 				}
 				$html .= '<li' . $class . '>';
-				$html .= '<a id="drop_' . $menu->id . '" href="#" data-toggle="dropdown" role="button" class="dropdown-toggle">' .
+				$html .= '<a id="drop_' . $menu->id . '" href="#" data-toggle="dropdown" role="button" class="dropdown-toggle"><span class="icon-'.$menu->menu_class.'"></span> ' .
 					 JText::_($menu->menu_name) . ' <b class="caret"></b></a>';
 				$html .= '<ul aria-labelledby="drop_' . $menu->id . '" role="menu" class="dropdown-menu" id="menu_' . $menu->id . '">';
 				for ($j = 0; $m = count($subMenus), $j < $m; $j++)
@@ -211,13 +211,13 @@ abstract class EventbookingHelperHtml
 						$class = ' class="active"';
 					}
 					$html .= '<li' . $class . '><a href="index.php?option=com_eventbooking&view=' . $subMenu->menu_view . $layoutLink .
-						 '" tabindex="-1">' . JText::_($subMenu->menu_name) . '</a></li>';
+						 '" tabindex="-1"><span class="icon-'.$subMenu->menu_class.'"></span> ' . JText::_($subMenu->menu_name) . '</a></li>';
 				}
 				$html .= '</ul>';
 				$html .= '</li>';
 			}
 		}
-		$html .= '</ul></div></div>';
+		$html .= '</ul>';
 		echo $html;
 	}
 }
