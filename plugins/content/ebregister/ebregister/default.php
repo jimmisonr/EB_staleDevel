@@ -228,8 +228,40 @@ $selectedState = '';
 			</div>
 		</div>	
 		<?php	
-		}	
-		if ($enableCoupon || $discountAmount > 0 || ($config->enable_tax && $config->tax_rate > 0))
+		}
+		if ($showPaymentFee)
+		{
+		?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_PAYMENT_FEE'); ?>
+				</label>
+				<div class="controls">
+					<?php
+					if ($config->currency_position == 0)
+					{
+					?>
+						<div class="input-prepend">
+							<span class="add-on"><?php echo $config->currency_symbol;?></span>
+							<input id="payment_processing_fee" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($paymentProcessingFee, $config); ?>" />
+						</div>
+					<?php
+					}
+					else
+					{
+					?>
+						<div class="input-append">
+							<input id="payment_processing_fee" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($paymentProcessingFee, $config); ?>" />
+							<span class="add-on"><?php echo $config->currency_symbol;?></span>
+						</div>
+					<?php
+					}
+					?>
+				</div>
+			</div>
+		<?php
+		}
+		if ($enableCoupon || $discountAmount > 0 || ($config->enable_tax && $config->tax_rate > 0) || $showPaymentFee)
 		{
 		?>
 		<div class="control-group">
@@ -311,7 +343,7 @@ $selectedState = '';
 						}		
 					?>
 						<label class="checkbox">
-							<input onclick="changePaymentMethod();" class="validate[required] radio" type="radio" name="payment_method" value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
+							<input onclick="changePaymentMethod('individual');" class="validate[required] radio" type="radio" name="payment_method" value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
 						</label>
 					<?php		
 					}	
@@ -480,6 +512,7 @@ $selectedState = '';
 	<input type="hidden" name="option" value="com_eventbooking" />	
 	<input type="hidden" name="task" value="process_individual_registration" />
 	<input type="hidden" name="from_article" value="1" />
+	<input type="hidden" name="show_payment_fee" value="<?php echo (int)$showPaymentFee ; ?>" />
 		<script type="text/javascript">		
 				Eb.jQuery(document).ready(function($){
 					$("#adminForm").validationEngine();

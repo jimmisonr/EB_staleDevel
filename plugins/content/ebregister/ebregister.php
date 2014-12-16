@@ -158,86 +158,8 @@ class plgContentEBRegister extends JPlugin
 		$lists['exp_month'] = JHtml::_('select.integerlist', 1, 12, 1, 'exp_month', ' class="input-small" ', $expMonth, '%02d');
 		$currentYear = date('Y');
 		$lists['exp_year'] = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
-		$extraFee = $form->calculateFee();
-		$totalAmount = $event->individual_price + $extraFee;
-		$discountAmount = 0;
-		if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
-		{
-			if ($event->discount > 0)
-			{
-				if ($event->discount_type == 1)
-				{
-					$discountAmount = $totalAmount * $event->discount / 100;
-				}
-				else
-				{
-					$discountAmount = $event->discount;
-				}
-			}
-		}
-		$couponCode = $input->post->getString('coupon_code', '');
-		if ($couponCode)
-		{
-			$query->clear();
-			$query->select('*')
-				->from('#__eb_coupons')
-				->where('published=1')
-				->where('code="' . $couponCode . '"')
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
-				->where('(times = 0 OR times > used)')
-				->where('(event_id=0 OR event_id=' . $eventId . ')');
-			$db->setQuery($query);
-			$coupon = $db->loadObject();
-			if ($coupon)
-			{
-				if ($coupon->coupon_type == 0)
-				{
-					$discountAmount = $discountAmount + $totalAmount * $coupon->discount / 100;
-				}
-				else
-				{
-					$discountAmount = $discountAmount + $coupon->discount;
-				}
-			}
-		}
-		$todayDate = JHtml::_('date', 'now', 'Y-m-d');
-		$query->clear();
-		$query->select('COUNT(id)')
-			->from('#__eb_events')
-			->where('id=' . $eventId)
-			->where('DATEDIFF(early_bird_discount_date, "' . $todayDate . '") >= 0');
-		$db->setQuery($query);
-		$total = $db->loadResult();
-		if ($total)
-		{
-			$earlyBirdDiscountAmount = $event->early_bird_discount_amount;
-			if ($earlyBirdDiscountAmount > 0)
-			{
-				if ($event->early_bird_discount_type == 1)
-				{
-					$discountAmount = $discountAmount + $totalAmount * $event->early_bird_discount_amount / 100;
-				}
-				else
-				{
-					$discountAmount = $discountAmount + $event->early_bird_discount_amount;
-				}
-			}
-		}
-		if ($discountAmount > $totalAmount)
-		{
-			$discountAmount = $totalAmount;
-		}
-		
-		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
-		{
-			$taxAmount = round(($totalAmount - $discountAmount) * $config->tax_rate / 100, 2);
-		}
-		else
-		{
-			$taxAmount = 0;
-		}
-		$amount = $totalAmount - $discountAmount + $taxAmount;
+		$data['coupon_code'] =  $input->post->getString('coupon_code', '');
+		$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
 		$methods = os_payments::getPaymentMethods(trim($event->payment_methods));
 		$options = array();
 		$options[] = JHtml::_('select.option', 'Visa', 'Visa');
@@ -293,7 +215,18 @@ class plgContentEBRegister extends JPlugin
 		{
 			$showCaptcha = 0;
 		}						
-		JFactory::getSession()->set('eb_artcile_url', JUri::getInstance()->toString());		
+		JFactory::getSession()->set('eb_artcile_url', JUri::getInstance()->toString());
+
+		// Check to see if there is payment processing fee or not
+		$showPaymentFee = false;
+		foreach($methods as $method)
+		{
+			if ($method->paymentFee)
+			{
+				$showPaymentFee = true;
+				break;
+			}
+		}
 		//Assign these parameters
 		$data['selectedPaymentMethod'] = $paymentMethod;
 		$data['lists'] = $lists;
@@ -309,10 +242,13 @@ class plgContentEBRegister extends JPlugin
 		$data['fieldSuffix'] = $fieldSuffix;
 		$data['showCaptcha'] = $showCaptcha;
 		$data['form'] = $form;
-		$data['totalAmount'] = $totalAmount;
-		$data['taxAmount'] = $taxAmount;
-		$data['discountAmount'] = $discountAmount;
-		$data['amount'] = $amount;		
+		$data['totalAmount'] = $fees['total_amount'];
+		$data['taxAmount'] = $fees['tax_amount'];
+		$data['discountAmount'] = $fees['discount_amount'];
+		$data['amount'] = $fees['amount'];
+		$data['showPaymentFee'] = $showPaymentFee;
+		$data['paymentProcessingFee'] = $fees['payment_processing_fee'];
+
 		return EventbookingHelperHtml::loadCommonLayout(JPATH_ROOT.'/plugins/content/ebregister/ebregister/default.php', $data);
 	}
 }
