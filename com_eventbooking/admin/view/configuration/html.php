@@ -178,8 +178,6 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 			$config->show_coupon_code_in_registrant_list);
 		$lists['show_multiple_days_event_in_calendar'] = JHtml::_('select.booleanlist', 'show_multiple_days_event_in_calendar', '', 
 			$config->show_multiple_days_event_in_calendar);
-		$lists['member_discount_groups'] = JHtml::_('access.usergroup', 'member_discount_groups[]', explode(',', $config->member_discount_groups), 
-			' multiple="multiple" size="6" ', false);
 		#Waitinglist fields configuration		
 		$lists['swt_lastname'] = JHtml::_('select.booleanlist', 'swt_lastname', '', $config->swt_lastname);
 		$lists['rwt_lastname'] = JHtml::_('select.booleanlist', 'rwt_lastname', '', $config->rwt_lastname);

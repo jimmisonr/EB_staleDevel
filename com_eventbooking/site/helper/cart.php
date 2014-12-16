@@ -252,7 +252,7 @@ class EventbookingHelperCart
 	 */
 	function getEvents()
 	{
-		$db          = JFactory::getDbo();
+		$db   = JFactory::getDbo();
 		$items       = $this->getItems();
 		$quantities  = $this->getQuantities();
 		$quantityArr = array();
@@ -287,18 +287,23 @@ class EventbookingHelperCart
 							$discount += $event->early_bird_discount_amount;
 						}
 					}
-					//Check to see whether the user belong to a group get member discount or not
-					if ($event->discount > 0 && EventbookingHelper::memberGetDiscount($user, $config))
+
+					if ($user->id)
 					{
-						if ($event->discount_type == 1)
+						$discountRate = EventbookingHelper::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
+						if ($discountRate > 0)
 						{
-							$discount += $event->rate * $event->discount / 100;
-						}
-						else
-						{
-							$discount += $event->discount;
+							if ($event->discount_type == 1)
+							{
+								$discount += $event->rate * $discountRate / 100;
+							}
+							else
+							{
+								$discount += $discountRate;
+							}
 						}
 					}
+
 					if ($discount > $event->rate)
 					{
 						$discount = $event->rate;
@@ -343,21 +348,23 @@ class EventbookingHelperCart
 			$event                 = $events[$i];
 			$registrantTotalAmount = $event->rate * $event->quantity;
 			$registrantDiscount    = 0;
-			//Member discount
-			if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
+			// Member discount
+			if ($user->id)
 			{
-				if ($event->discount > 0)
+				$discountRate = EventbookingHelper::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
+				if ($discountRate > 0)
 				{
 					if ($event->discount_type == 1)
 					{
-						$registrantDiscount = $registrantTotalAmount * $event->discount / 100;
+						$registrantDiscount = $registrantTotalAmount * $discountRate / 100;
 					}
 					else
 					{
-						$registrantDiscount = $event->quantity * $event->discount;
+						$registrantDiscount = $event->quantity * $discountRate;
 					}
 				}
 			}
+
 			//Calculate the coupon discount
 			if (isset($coupon))
 			{

@@ -475,6 +475,34 @@ class EventbookingController extends RADControllerAdmin
 		}
 		//Events table
 		$fields = array_keys($db->getTableColumns('#__eb_events'));
+
+		// Discounts
+		if (!in_array('discount_groups', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `discount_groups` VARCHAR( 255 ) NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+			$discountGroups = EventbookingHelper::getConfigValue('member_discount_groups');
+			if ($discountGroups)
+			{
+				$sql = 'UPDATE #__eb_events SET discount_groups=' . $db->quote($discountGroups);
+				$db->setQuery($sql);
+				$db->execute();
+			}
+		}
+
+		if (!in_array('discount_amounts', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `discount_amounts` VARCHAR( 255 ) NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+
+			$sql = 'UPDATE `#__eb_events` SET `discount_amounts` = `discount` WHERE `discount` > 0';
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+
 		if (!in_array('event_end_date', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `event_end_date` DATETIME NULL AFTER  `event_date` ;";
@@ -556,7 +584,8 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
+
 		if (!in_array('user_email_body', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `user_email_body` TEXT NULL;";

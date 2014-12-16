@@ -54,6 +54,11 @@ class EventbookingModelEvent extends RADModelItem
 			}
 		}
 
+		if (isset($data['discount_groups']))
+		{
+			$data['discount_groups'] = implode(',', $data['discount_groups']);
+		}
+
 		//Process attachment
 		$attachment = $thumbImage = $input->files->get('attachment');
 		if ($attachment['name'])

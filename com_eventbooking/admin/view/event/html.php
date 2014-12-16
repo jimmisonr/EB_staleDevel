@@ -220,7 +220,9 @@ class EventbookingViewEventHtml extends RADViewItem
 		$options[] 	= JHtml::_('select.option',  '', JText::_( 'EB_SELECT_CURRENCY' ), 'currency_code', 'currency_name');
 		$options = array_merge($options, $db->loadObjectList()) ;
 		$this->lists['currency_code'] = JHtml::_('select.genericlist', $options, 'currency_code', ' class="inputbox" ', 'currency_code', 'currency_name', $item->currency_code) ;
-		
+		$this->lists['discount_groups'] = JHtml::_('access.usergroup', 'discount_groups[]', explode(',', $item->discount_groups),
+			' multiple="multiple" size="6" ', false);
+
 		#Plugin support
 		JPluginHelper::importPlugin( 'eventbooking' );
 		$dispatcher = JDispatcher::getInstance();		

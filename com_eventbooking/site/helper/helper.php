@@ -251,20 +251,22 @@ class EventbookingHelper
 		$couponCode     = isset($data['coupon_code']) ? $data['coupon_code'] : '';
 		$totalAmount    = $event->individual_price + $form->calculateFee();
 		$discountAmount = 0;
-		if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
+		if ($user->id)
 		{
-			if ($event->discount > 0)
+			$discountRate = self::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
+			if ($discountRate > 0)
 			{
 				if ($event->discount_type == 1)
 				{
-					$discountAmount = $totalAmount * $event->discount / 100;
+					$discountAmount = $totalAmount * $discountRate / 100;
 				}
 				else
 				{
-					$discountAmount = $event->discount;
+					$discountAmount = $discountRate;
 				}
 			}
 		}
+
 		$todayDate = JHtml::_('date', 'now', 'Y-m-d');
 		$query->select('COUNT(id)')
 			->from('#__eb_events')
@@ -448,34 +450,36 @@ class EventbookingHelper
 
 		// Calculate discount amount
 		$discountAmount = 0;
-		if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
+		if ($user->id)
 		{
-			if ($event->discount > 0)
+			$discountRate = self::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
+			if ($discountRate > 0)
 			{
 				if ($event->discount_type == 1)
 				{
-					$discountAmount = $totalAmount * $event->discount / 100;
+					$discountAmount = $totalAmount * $discountRate / 100;
 					if ($config->collect_member_information)
 					{
 						for ($i = 0; $i < $numberRegistrants; $i++)
 						{
-							$membersDiscountAmount[$i] += $membersTotalAmount[$i] * $event->discount / 100;
+							$membersDiscountAmount[$i] += $membersTotalAmount[$i] * $discountRate / 100;
 						}
 					}
 				}
 				else
 				{
-					$discountAmount = $numberRegistrants * $event->discount;
+					$discountAmount = $numberRegistrants * $discountRate;
 					if ($config->collect_member_information)
 					{
 						for ($i = 0; $i < $numberRegistrants; $i++)
 						{
-							$membersDiscountAmount[$i] += $event->discount;
+							$membersDiscountAmount[$i] += $discountRate;
 						}
 					}
 				}
 			}
 		}
+
 		if ($couponCode)
 		{
 			$query->clear();
@@ -1052,6 +1056,54 @@ class EventbookingHelper
 		}
 	}
 
+	/**
+	 * Calculate discount rate which the current user will receive
+	 * @param $discount
+	 * @param $groupIds
+	 *
+	 * @return float
+	 */
+	public static function calculateMemberDiscount($discount, $groupIds)
+	{
+		$user = JFactory::getUser();
+		if (!$discount)
+		{
+			return 0;
+		}
+		if (!$groupIds)
+		{
+			return $discount;
+		}
+		$userGroupIds = explode(',', $groupIds);
+		JArrayHelper::toInteger($userGroupIds);
+		$groups = $user->get('groups');
+		if (count(array_intersect($groups, $userGroupIds)))
+		{
+			//Calculate discount amount
+			if (strpos($discount, ',') !== false)
+			{
+				$discountRates = explode(',', $discount);
+				$maxDiscount = 0;
+				foreach ($groups as $group)
+				{
+					$index = array_search($group, $userGroupIds);
+					if ($index !== false && isset($discountRates[$index]))
+					{
+						$maxDiscount = max($maxDiscount, $discountRates[$index]);
+					}
+				}
+				return $maxDiscount;
+			}
+			else
+			{
+				return $discount;
+			}
+		}
+		else
+		{
+			return 0;
+		}
+	}
 	/**
 	 * Format the currency according to the settings in Configuration
 	 * @param $amount   the input amount

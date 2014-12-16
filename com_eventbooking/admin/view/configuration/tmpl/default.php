@@ -662,17 +662,6 @@ $editor = JFactory::getEditor();
 							&nbsp;
 						</td>
 					</tr>
-					<tr>
-						<td class="key">
-							<?php echo JText::_('EB_MEMBER_DISCOUNT_GROUPS'); ?>
-						</td>
-						<td>
-							<?php echo $this->lists['member_discount_groups']; ?>
-						</td>
-						<td>
-							<?php echo JText::_('EB_MEMBER_DISCOUNT_GROUPS_EXPLAIN'); ?>
-						</td>
-					</tr>
 				</table>		
 			</div>			
 			<div class="tab-pane" id="theme-page">

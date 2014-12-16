@@ -133,20 +133,23 @@ class EventBookingModelCart extends JModelLegacy
 
 			// Calculate discount
 			$registrantDiscount = 0;
-			if ($user->get('id') && EventbookingHelper::memberGetDiscount($user, $config))
+
+			if ($user->id)
 			{
-				if ($event->discount > 0)
+				$discountRate = EventbookingHelper::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
+				if ($discountRate > 0)
 				{
 					if ($event->discount_type == 1)
 					{
-						$registrantDiscount = $registrantTotalAmount * $event->discount / 100;
+						$registrantDiscount = $registrantTotalAmount * $discountRate / 100;
 					}
 					else
 					{
-						$registrantDiscount = $quantity * $event->discount;
+						$registrantDiscount = $quantity * $discountRate;
 					}
 				}
 			}
+
 			if ($config->activate_deposit_feature && $event->deposit_amount > 0 && $paymentType == 1)
 			{
 				if ($event->deposit_type == 2)

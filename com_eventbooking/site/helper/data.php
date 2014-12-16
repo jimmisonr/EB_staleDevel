@@ -156,36 +156,36 @@ class EventbookingHelperData
                 $row = $rows[$i] ;
                 $sql = 'SELECT COUNT(id) FROM #__eb_registrants WHERE user_id='.$userId.' AND event_id='.$row->id.' AND (published=1 OR (payment_method LIKE "os_offline%" AND published != 2))';
                 $db->setQuery($sql) ;
-                $row->user_registered = $db->loadResult() ;                                                
-                //Calculate discount price
-                if ($config->show_discounted_price)
-                {
-                    $discount = 0 ;
-                    if (($row->early_bird_discount_date != $nullDate) && ($row->date_diff >=0))
-                    {
-                        if ($row->early_bird_discount_type == 1)
-                        {
-                            $discount += $row->individual_price*$row->early_bird_discount_amount/100 ;
-                        }
-                        else
-                        {
-                            $discount += $row->early_bird_discount_amount ;
-                        }
-                    }
-                    //Check to see whether the user belong to a group get member discount or not                    
-                    if ($row->discount > 0 && EventbookingHelper::memberGetDiscount($user, $config))
-                    {
-                        if ($row->discount_type == 1)
-                        {
-                            $discount += $row->individual_price*$row->discount/100 ;
-                        }
-                        else
-                        {
-                            $discount += $row->discount ;
-                        }
-                    }
-                    $row->discounted_price = $row->individual_price - $discount ;
-                }
+                $row->user_registered = $db->loadResult() ;
+	            // Calculate discount price
+	            if ($config->show_discounted_price)
+	            {
+		            $discount = 0;
+		            if (($row->early_bird_discount_date != $nullDate) && ($row->date_diff >= 0))
+		            {
+			            if ($row->early_bird_discount_type == 1)
+			            {
+				            $discount += $row->individual_price * $row->early_bird_discount_amount / 100;
+			            }
+			            else
+			            {
+				            $discount += $row->early_bird_discount_amount;
+			            }
+		            }
+		            $discountRate = EventbookingHelper::calculateMemberDiscount($row->discount_amounts, $row->discount_groups);
+		            if ($discountRate > 0)
+		            {
+			            if ($row->discount_type == 1)
+			            {
+				            $discount += $row->individual_price * $discountRate / 100;
+			            }
+			            else
+			            {
+				            $discount += $discountRate;
+			            }
+		            }
+		            $row->discounted_price = $row->individual_price - $discount;
+	            }
             }
         }
         else
