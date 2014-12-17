@@ -162,6 +162,7 @@ class EventbookingController extends RADControllerAdmin
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.folder');
 		$db = JFactory::getDbo();
+		$config = EventbookingHelper::getConfig();
 		//Setup menus
 		$menuSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/menus.eventbooking.sql';
 		$sql = JFile::read($menuSql);
@@ -1910,6 +1911,24 @@ class EventbookingController extends RADControllerAdmin
 		$this->setRedirect('index.php?option=com_eventbooking&view=dashboard', JText::_('Urls have successfully reset'));
 	}
 
+	/**
+	 * Process download a file
+	 */
+	public function download_file()
+	{
+		$filePath = JPATH_ROOT.'/media/com_eventbooking/upload/files';
+		$fileName = JRequest::getVar('file_name', '');
+		if (file_exists($filePath . '/' . $fileName))
+		{
+			while (@ob_end_clean());
+			EventbookingHelper::processDownload($filePath . '/' . $fileName, $fileName, true);
+			JFactory::getApplication()->close();
+		}
+		else
+		{
+			JFactory::getApplication()->redirect('index.php?option=com_eventbooking&view=dashboard', JText::_('File does not exist'));
+		}
+	}
 	/**
 	 * Get profile data of the registrant, return reson format using for ajax request
 	 *

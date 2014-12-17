@@ -181,7 +181,7 @@ if (!$this->userId && $this->config->user_registration)
 		$validateLoginForm = false;
 	}
 	?>		
-	<form method="post" name="adminForm" id="adminForm" action="<?php echo $formUrl; ?>" autocomplete="off" class="form form-horizontal">	
+	<form method="post" name="adminForm" id="adminForm" action="<?php echo $formUrl; ?>" autocomplete="off" class="form form-horizontal" enctype="multipart/form-data">
 	<?php	 									
 		if (!$this->userId && $this->config->user_registration) 
 		{

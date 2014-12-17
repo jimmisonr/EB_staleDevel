@@ -1168,6 +1168,26 @@ class EventbookingController extends JControllerLegacy
 	}
 
 	/**
+	 * Process download a file
+	 */
+	public function download_file()
+	{
+		$Itemid = JRequest::getInt('Itemid');
+		$filePath = JPATH_ROOT.'/media/com_eventbooking/upload/files';
+		$fileName = JRequest::getVar('file_name', '');
+		if (file_exists($filePath . '/' . $fileName))
+		{
+			while (@ob_end_clean());
+			EventbookingHelper::processDownload($filePath . '/' . $fileName, $fileName, true);
+			JFactory::getApplication()->close();
+		}
+		else
+		{
+			JFactory::getApplication()->redirect('index.php?option=com_eventbooking&Itemid=' . $Itemid, JText::_('File does not exist'));
+		}
+	}
+
+	/**
 	 * Get list of states for the selected country, using in AJAX request 
 	 */
 	public function get_states()
