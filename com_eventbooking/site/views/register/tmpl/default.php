@@ -131,7 +131,16 @@ $selectedState = '';
 		foreach ($fields as $field)
 		{						
 			echo $field->getControlGroup();			
-		}															
+		}
+
+		if ($field->name == 'email')
+		{
+			$ajaxAsync = 0;
+		}
+		else
+		{
+			$ajaxAsync = 1;
+		}
 		if (($this->totalAmount > 0) || $this->form->containFeeFields()) 
 		{
             $showPaymentInformation = true;
@@ -549,6 +558,7 @@ $selectedState = '';
 	<input type="hidden" name="option" value="com_eventbooking" />	
 	<input type="hidden" name="task" value="process_individual_registration" />
 	<input type="hidden" name="show_payment_fee" value="<?php echo (int)$this->showPaymentFee ; ?>" />
+	<input type="hidden" id="eb_ajax_async" value="<?php echo $ajaxAsync; ?>" />
 		<script type="text/javascript">	
 			var eb_current_page = 'default';	
 			Eb.jQuery(document).ready(function($){
@@ -579,11 +589,7 @@ $selectedState = '';
 					<?php	
 					}	
 				?>
-				buildStateField('state', 'country', '<?php echo $selectedState; ?>');	
-				if ($('#email').val())
-				{
-					$('#email').validationEngine('validate'); 
-				}
+				buildStateField('state', 'country', '<?php echo $selectedState; ?>');
                 <?php
                 if ($this->amount == 0 && !empty($showPaymentInformation))
                 {

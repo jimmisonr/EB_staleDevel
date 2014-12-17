@@ -111,7 +111,15 @@ else
 		{
 			$dateFields[] = $field->name;	
 		}		
-	}															
+	}
+	if ($field->name == 'email')
+	{
+		$ajaxAsync = 0;
+	}
+	else
+	{
+		$ajaxAsync = 1;
+	}
 	if (($this->totalAmount > 0) || $this->form->containFeeFields()) 
 	{	
 	?>
@@ -524,6 +532,7 @@ else
 	?>
 	<input type="hidden" name="event_id" value="<?php echo $this->event->id; ?>" />
 	<input type="hidden" name="show_payment_fee" value="<?php echo (int)$this->showPaymentFee ; ?>" />
+	<input type="hidden" id="eb_ajax_async" value="<?php echo $ajaxAsync; ?>" />
 	<script type="text/javascript">		
 		var eb_current_page = 'group_billing';	
 		<?php echo os_payments::writeJavascriptObjects();?>

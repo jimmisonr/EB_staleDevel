@@ -1389,10 +1389,20 @@ Eb.jQuery(function($) {
 			 if (options.eventTrigger == "field") {
 				delete(options.ajaxValidCache[field.attr("id")]);
 			 }
-			 if (options.eventTrigger == 'submit')
-			 {												
-					options.isError = !options.ajaxValidCache[field.attr("id")];												 	
-			 }
+             var async = true;
+             if ($('#eb_ajax_async').val() == 0)
+             {
+                 if (options.eventTrigger == 'submit'){
+                     async = false;
+                 }
+             }
+             else
+             {
+                 if (options.eventTrigger == 'submit')
+                 {
+                     options.isError = !options.ajaxValidCache[field.attr("id")];
+                 }
+             }
 			 // If there is an error or if the the field is already validated, do not re-execute AJAX
 			 if (!options.isError && !methods._checkAjaxFieldStatus(field.attr("id"), options)) {
 				 $.ajax({
@@ -1405,6 +1415,7 @@ Eb.jQuery(function($) {
 					 rule: rule,
 					 methods: methods,
 					 options: options,
+                     async : async,
 					 beforeSend: function() {},
 					 error: function(data, transport) {
 						 methods._ajaxError(data, transport);

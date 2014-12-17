@@ -132,7 +132,15 @@ $selectedState = '';
 		foreach ($fields as $field)
 		{						
 			echo $field->getControlGroup();			
-		}															
+		}
+		if ($field->name == 'email')
+		{
+			$ajaxAsync = 0;
+		}
+		else
+		{
+			$ajaxAsync = 1;
+		}
 		if (($totalAmount > 0) || $form->containFeeFields()) 
 		{	
 		?>
@@ -513,6 +521,7 @@ $selectedState = '';
 	<input type="hidden" name="task" value="process_individual_registration" />
 	<input type="hidden" name="from_article" value="1" />
 	<input type="hidden" name="show_payment_fee" value="<?php echo (int)$showPaymentFee ; ?>" />
+	<input type="hidden" id="eb_ajax_async" value="<?php echo $ajaxAsync; ?>" />
 		<script type="text/javascript">		
 				Eb.jQuery(document).ready(function($){
 					$("#adminForm").validationEngine();
