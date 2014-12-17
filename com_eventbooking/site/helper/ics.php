@@ -145,7 +145,9 @@ class EventbookingHelperIcs
 	 */
 	public function setDescription($body)
 	{
-		$this->description = strip_tags($body);
+		$converter = new EventbookingHelperHtml2text($body);
+		$converter->setBaseUrl(JUri::base());
+		$this->description = $converter->getText();
 
 		return $this;
 	}
