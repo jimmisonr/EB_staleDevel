@@ -38,8 +38,7 @@ if (strlen($msg))
 	    <input type="button" name="btn-process-number-members" id="btn-process-number-members" class="btn btn-primary" value="<?php echo JText::_('EB_NEXT'); ?>" />
 	</div>
 </form>		
-<script type="text/javascript">
-	var returnUrl = "<?php echo base64_encode(JFactory::getURI()->toString().'#group_billing'); ?>";
+<script type="text/javascript">	
 	Eb.jQuery(document).ready(function($){
 		$("#eb-form-number-group-members").validationEngine();		
 		$('#btn-process-number-members').click(function(){
