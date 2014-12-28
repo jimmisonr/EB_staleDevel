@@ -107,7 +107,10 @@ class EventbookingModelRegistrant extends RADModelItem
 			}
 			if ($row->published == 1 && $published == 0)
 			{
-				//Change from pending to paid, send emails
+				//Change from pending to paid, trigger event, send emails
+				JPluginHelper::importPlugin('eventbooking');
+				$dispatcher = JDispatcher::getInstance();
+				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
 				EventbookingHelper::sendRegistrationApprovedEmail($row, $config);
 			}
 			elseif($row->published == 2 && $published != 2 && $config->activate_waitinglist_feature)
@@ -138,6 +141,14 @@ class EventbookingModelRegistrant extends RADModelItem
 			}
 			$row->store();
 			$form->storeData($row->id, $data);
+
+			if ($row->published == 1)
+			{
+				// Trigger event and send emails
+				JPluginHelper::importPlugin('eventbooking');
+				$dispatcher = JDispatcher::getInstance();
+				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
+			}
 			$input->set('id', $row->id);
 			return true;
 		}				
@@ -222,6 +233,8 @@ class EventbookingModelRegistrant extends RADModelItem
 		$db = $this->getDbo();
 		if (($state == 1) && count($cid))
 		{
+			JPluginHelper::importPlugin('eventbooking');
+			$dispatcher = JDispatcher::getInstance();
 			$config = EventbookingHelper::getConfig();
 			$row = new RADTable('#__eb_registrants', 'id', $db);
 			foreach ($cid as $registrantId)
@@ -230,6 +243,9 @@ class EventbookingModelRegistrant extends RADModelItem
 				if (!$row->published)
 				{
 					EventbookingHelper::sendRegistrationApprovedEmail($row, $config);
+
+					// Trigger event
+					$dispatcher->trigger('onAfterPaymentSuccess', array($row));
 				}
 			}
 		}
