@@ -289,7 +289,7 @@
 			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !$item->user_registered)
             {
                 $waitingList = true ;
-                $waitinglistUrl = JRoute::_('index.php?option=com_eventbooking&task=waitinglist_form&event_id='.$item->id.'&Itemid='.$this->Itemid);
+                $waitinglistUrl = JRoute::_('index.php?option=com_eventbooking&view=waitinglist&event_id='.$item->id.'&Itemid='.$this->Itemid);
         	}
             else
             {
