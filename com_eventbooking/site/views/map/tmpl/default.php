@@ -20,7 +20,7 @@ if (!$zoomLevel) {
 	$zoomLevel = 8 ;
 }
 $doc = JFactory::getDocument();
-$protocol = JFactory::getConfig()->get('force_ssl') == 2 ? 'https' : 'http';
+$protocol = JUri::getInstance()->getScheme();
 $doc->addScript($protocol . '://maps.google.com/maps/api/js?sensor=true');
 $doc->addScriptDeclaration('
 	var geocoder, map;
