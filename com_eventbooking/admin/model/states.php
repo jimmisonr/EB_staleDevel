@@ -15,6 +15,7 @@ class EventbookingModelStates extends RADModelList
 
 	public function __construct($config = array())
 	{
+		$config['search_fields'] = array('tbl.state_name', 'tbl.state_3_code', 'tbl.state_2_code');
 		parent::__construct($config);
 
 		$this->state->insert('filter_country_id', 'int', 0);
