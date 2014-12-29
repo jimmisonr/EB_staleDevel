@@ -805,12 +805,22 @@ class EventbookingModelEvent extends RADModelItem
 			 ' , registrant_number, price FROM #__eb_event_group_prices ' . ' WHERE event_id=' . $id;
 		$db->setQuery($sql);
 		$db->execute();
-		//Need to insert categories for this event		
+
+		//Need to insert categories for this event
 		$sql = 'INSERT INTO #__eb_event_categories(event_id, category_id, main_category) ' . ' SELECT ' . $newId .
 			 ' , category_id, main_category FROM #__eb_event_categories ' . ' WHERE event_id=' . $id;
 		$db->setQuery($sql);
 		$db->execute();
-		
+
+		// Copy custom fields
+		$config = EventbookingHelper::getConfig();
+		if (!$config->custom_field_by_category)
+		{
+			$sql = "INSERT INTO #__eb_field_events(field_id, event_id) SELECT field_id, $newId FROM #__eb_field_events WHERE event_id = $id";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		return $newId;
 	}
 }
