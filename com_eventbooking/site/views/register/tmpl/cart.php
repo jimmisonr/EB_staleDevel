@@ -631,6 +631,10 @@ if (!$this->userId && $this->config->user_registration)
 					    }
 					});
 					buildStateField('state', 'country', '<?php echo $selectedState; ?>');
+					if ($('#email').val())
+	-				{
+	-					$('#email').validationEngine('validate'); 
+	-				}
                     <?php
                     if ($this->amount == 0 && !empty($showPaymentInformation))
                     {

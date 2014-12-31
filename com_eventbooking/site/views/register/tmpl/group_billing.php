@@ -571,6 +571,10 @@ else
 					
 				?>
 				buildStateField('state', 'country', '<?php echo $selectedState; ?>');
+				if ($('#email').val())
+-				{
+-					$('#email').validationEngine('validate'); 
+-				}
 				<?php
 					if ($this->showCaptcha && $this->captchaPlugin == 'recaptcha')
 					{						
