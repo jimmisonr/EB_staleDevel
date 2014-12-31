@@ -101,7 +101,11 @@ else
 					dataType: 'html',										
 					success: function(html) {
 						$('#eb-group-billing .eb-form-content').html(html);
-						$('#eb-group-billing .eb-form-content').slideDown('slow');										
+						$('#eb-group-billing .eb-form-content').slideDown('slow');
+						if ($('#email').val())
+						{												
+							$('#email').validationEngine('validate'); 
+						}										
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);

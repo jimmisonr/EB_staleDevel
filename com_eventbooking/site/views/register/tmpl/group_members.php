@@ -122,7 +122,11 @@ if ($this->showCaptcha)
 										success: function(html) {						
 											$('#eb-group-billing .eb-form-content').html(html);
 											$('#eb-group-members-information .eb-form-content').slideUp('slow');
-											$('#eb-group-billing .eb-form-content').slideDown('slow');					
+											$('#eb-group-billing .eb-form-content').slideDown('slow');
+											if ($('#email').val())
+											{												
+												$('#email').validationEngine('validate'); 
+											}															
 											$('#return_url').val(returnUrl);																															
 										},
 										error: function(xhr, ajaxOptions, thrownError) {
