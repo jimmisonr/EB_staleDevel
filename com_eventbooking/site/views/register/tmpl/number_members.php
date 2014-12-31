@@ -71,7 +71,11 @@ if (strlen($msg))
 							?>
 								$('#eb-group-billing .eb-form-content').html(html);
 								$('#eb-number-group-members .eb-form-content').slideUp('slow');
-								$('#eb-group-billing .eb-form-content').slideDown('slow');					
+								$('#eb-group-billing .eb-form-content').slideDown('slow');
+								if ($('#email').val())
+								{												
+									$('#email').validationEngine('validate'); 
+								}						
 								$('#return_url').val(returnUrl);																				
 							<?php	
 							}	
