@@ -251,11 +251,13 @@ class EventbookingHelper
 		$couponCode     = isset($data['coupon_code']) ? $data['coupon_code'] : '';
 		$totalAmount    = $event->individual_price + $form->calculateFee();
 		$discountAmount = 0;
+		$fees['discount_rate'] = 0;
 		if ($user->id)
 		{
 			$discountRate = self::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
 			if ($discountRate > 0)
 			{
+				$fees['discount_rate'] = $discountRate;
 				if ($event->discount_type == 1)
 				{
 					$discountAmount = $totalAmount * $discountRate / 100;

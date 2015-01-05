@@ -248,6 +248,8 @@ class plgContentEBRegister extends JPlugin
 		$data['amount'] = $fees['amount'];
 		$data['showPaymentFee'] = $showPaymentFee;
 		$data['paymentProcessingFee'] = $fees['payment_processing_fee'];
+		$data['discountRate'] = $fees['discount_rate'];
+
 
 		return EventbookingHelperHtml::loadCommonLayout(JPATH_ROOT.'/plugins/content/ebregister/ebregister/default.php', $data);
 	}

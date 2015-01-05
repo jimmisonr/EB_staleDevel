@@ -174,7 +174,7 @@ $selectedState = '';
 			</div>
 		</div>			
 		<?php	
-		if ($this->enableCoupon || $this->discountAmount > 0)
+		if ($this->enableCoupon || $this->discountAmount > 0 || $this->discountRate > 0)
 		{
 		?>
 		<div class="control-group">
@@ -270,7 +270,7 @@ $selectedState = '';
 			</div>
 		<?php
 		}
-		if ($this->enableCoupon || $this->discountAmount > 0 || ($this->config->enable_tax && $this->config->tax_rate > 0) || $this->showPaymentFee)
+		if ($this->enableCoupon || $this->discountAmount > 0 || $this->discountRate > 0 || ($this->config->enable_tax && $this->config->tax_rate > 0) || $this->showPaymentFee)
 		{
 		?>
 		<div class="control-group">

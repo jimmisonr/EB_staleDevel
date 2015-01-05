@@ -218,6 +218,7 @@ class EventBookingViewRegister extends JViewLegacy
 		$this->amount = $fees['amount'];
 		$this->paymentProcessingFee = $fees['payment_processing_fee'];
 		$this->showPaymentFee = $showPaymentFee;
+		$this->discountRate = $fees['discount_rate'];
 
 		parent::display($tpl);
 	}
