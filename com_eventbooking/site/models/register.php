@@ -467,6 +467,7 @@ class EventBookingModelRegister extends JModelLegacy
 		$form->bind($data);
 		//Need to over-ridde some config options				
 		$emailContent = EventbookingHelper::getEmailContent($config, $row, true, $form);
+		$query->clear();
 		$query->select('title')
 			->from('#__eb_events')
 			->where('id=' . $row->event_id);

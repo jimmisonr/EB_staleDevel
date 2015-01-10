@@ -2019,6 +2019,10 @@ class EventbookingController extends RADControllerAdmin
 		}
 		if ($userId && !isset($data['email']))
 		{
+			if (empty($user))
+			{
+				$user = JFactory::getUser($userId);
+			}
 			$data['email'] = $user->email;
 		}
 		echo json_encode($data);
