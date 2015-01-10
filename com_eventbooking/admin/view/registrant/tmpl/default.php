@@ -26,7 +26,7 @@ $selectedState = '';
 		}
 	}
 </script>
-<form action="index.php?option=com_eventbooking&view=registrant" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_eventbooking&view=registrant" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data">
 <div class="row-fluid">			
 	<table class="admintable adminform">
 		<tr>

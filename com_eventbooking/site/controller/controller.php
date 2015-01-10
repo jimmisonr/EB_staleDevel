@@ -1173,7 +1173,7 @@ class EventbookingController extends JControllerLegacy
 	public function download_file()
 	{
 		$Itemid = JRequest::getInt('Itemid');
-		$filePath = JPATH_ROOT.'/media/com_eventbooking/upload/files';
+		$filePath = JPATH_ROOT.'/media/com_eventbooking/files';
 		$fileName = JRequest::getVar('file_name', '');
 		if (file_exists($filePath . '/' . $fileName))
 		{
