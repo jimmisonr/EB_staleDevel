@@ -161,6 +161,8 @@ class EventBookingViewComplete extends JViewLegacy
 			$thankMessage = str_replace("[$key]", $value, $thankMessage);
 		}
 		$this->message = $thankMessage;
+		$this->registrationCode = $registrationCode;
+		$this->tmpl = JRequest::getVar('tmpl', '');
 		
 		parent::display($tpl);
 	}
