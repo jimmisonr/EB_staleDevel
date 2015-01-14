@@ -63,6 +63,14 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 				</th>	
 			<?php	
 			}
+			if ($config->show_available_place)
+			{
+			?>
+				<th class="center available-place-col hidden-phone">
+					<?php echo JText::_('EB_AVAILABLE_PLACE'); ?>
+				</th>
+			<?php
+			}
 			?>		
 			<th class="center actions-col hidden-phone">
 				<?php echo JText::_('EB_REGISTER'); ?>
@@ -184,7 +192,8 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 						</td>
 					<?php	
 					}
-					if ($config->show_registered) {
+					if ($config->show_registered)
+					{
 					?>
 						<td class="center hidden-phone">
 							<?php
@@ -200,6 +209,19 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
                             ?>
 						</td>
 					<?php	
+					}
+					if ($config->show_available_place)
+					{
+					?>
+						<td class="center hidden-phone">
+							<?php
+								if ($item->event_capacity)
+								{
+									echo $item->event_capacity - $item->total_registrants;
+								}
+							?>
+						</td>
+					<?php
 					}
 				?>
 					<td class="center hidden-phone">
