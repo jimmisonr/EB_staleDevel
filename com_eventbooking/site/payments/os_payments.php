@@ -18,6 +18,8 @@ class os_payments
 	/**
 	 * Get list of payment methods
 	 *
+	 * @param $methodIds string
+	 *
 	 * @return array
 	 */
 	public static function getPaymentMethods($methodIds = null)
@@ -26,15 +28,17 @@ class os_payments
 		{
 			$path = JPATH_ROOT . '/components/com_eventbooking/payments/';
 			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('*')
+				->from('#__eb_payment_plugins')
+				->where('published=1')
+				->where('`access` IN ('.implode(',', JFactory::getUser()->getAuthorisedViewLevels()).')')
+				->order('ordering');
 			if ($methodIds)
 			{
-				$sql = 'SELECT * FROM #__eb_payment_plugins WHERE published=1 AND id IN (' . $methodIds . ') ORDER BY ordering';
+				$query->where('id IN (' . $methodIds . ')');
 			}
-			else
-			{
-				$sql = 'SELECT * FROM #__eb_payment_plugins WHERE published=1 ORDER BY ordering';
-			}
-			$db->setQuery($sql);
+			$db->setQuery($query);
 			$rows = $db->loadObjectList();
 			foreach ($rows as $row)
 			{
@@ -79,32 +83,43 @@ class os_payments
 	 * Load information about the payment method
 	 *
 	 * @param string $name Name of the payment method
+	 *
+	 * @return object
 	 */
 	public static function loadPaymentMethod($name)
 	{
 		$db = JFactory::getDbo();
-		$sql = 'SELECT * FROM #__eb_payment_plugins WHERE name="' . $name . '"';
-		$db->setQuery($sql);
+		$query = $db->getQuery(true);
+		$query->select('*')
+			->from('#__eb_payment_plugins')
+			->where('name = '. $db->quote($name));
+		$db->setQuery($query);
+
 		return $db->loadObject();
 	}
 
 	/**
 	 * Get default payment gateway
 	 *
+	 * @param $methodIds string Ids of the available payment method
+	 *
 	 * @return string
 	 */
 	public static function getDefautPaymentMethod($methodIds = null)
 	{
 		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('*')
+			->from('#__eb_payment_plugins')
+			->where('published=1')
+			->where('`access` IN ('.implode(',', JFactory::getUser()->getAuthorisedViewLevels()).')')
+			->order('ordering');
 		if ($methodIds)
 		{
-			$sql = 'SELECT name FROM #__eb_payment_plugins WHERE published=1 AND id IN (' . $methodIds . ') ORDER BY ordering LIMIT 1';
+			$query->where('id IN (' . $methodIds . ')');
 		}
-		else
-		{
-			$sql = 'SELECT name FROM #__eb_payment_plugins WHERE published=1 ORDER BY ordering LIMIT 1';
-		}
-		$db->setQuery($sql);
+		$db->setQuery($query, 0, 1);
+
 		return $db->loadResult();
 	}
 

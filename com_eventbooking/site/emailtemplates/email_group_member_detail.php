@@ -78,7 +78,7 @@ defined('_JEXEC') or die;
     $fields = $memberForm->getFields();
     foreach ($fields as $field)
     {
-    	echo $field->getOutput();
+    	echo $field->getOutput(false);
     }
     ?>    																																									
 </table>

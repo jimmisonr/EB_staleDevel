@@ -117,7 +117,7 @@ class EventBookingModelRegistrant extends JModelLegacy
 			for ($i = 0, $n = count($ids); $i < $n; $i++)
 			{
 				$memberId = $ids[$i];
-				$rowMember = $this->getTable();
+				$rowMember = $this->getTable('EventBooking', 'Registrant');
 				$rowMember->load($memberId);
 				$memberForm = new RADForm($memberFormFields);
 				$memberForm->setFieldSuffix($i + 1);

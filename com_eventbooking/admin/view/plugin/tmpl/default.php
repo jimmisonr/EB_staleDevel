@@ -42,7 +42,7 @@ defined( '_JEXEC' ) or die ;
 					<td>
 						<input class="text_area" type="text" name="title" id="title" size="40" maxlength="250" value="<?php echo $this->item->title;?>" />
 					</td>
-				</tr>					
+				</tr>
 				<tr>
 					<td class="key">
 						<?php echo JText::_('EB_AUTHOR'); ?>
@@ -105,6 +105,14 @@ defined( '_JEXEC' ) or die ;
 					</td>
 					<td>
 						<?php echo $this->item->description; ?>
+					</td>
+				</tr>
+				<tr>
+					<td width="100" class="key">
+						<?php echo  JText::_('EB_ACCESS'); ?>
+					</td>
+					<td>
+						<?php echo $this->lists['access']; ?>
 					</td>
 				</tr>
 				<tr>
