@@ -2370,6 +2370,7 @@ class EventbookingHelper
 		$replaces['email'] = $row->email;
 		$replaces['comment'] = $row->comment;
 		$replaces['number_registrants'] = $row->number_registrants;
+		
 		//Notification email send to user
 		if (strlen($message->{'watinglist_confirmation_subject' . $fieldSuffix}))
 		{

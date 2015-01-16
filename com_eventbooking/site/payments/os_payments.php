@@ -109,7 +109,7 @@ class os_payments
 	{
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('*')
+		$query->select('name')
 			->from('#__eb_payment_plugins')
 			->where('published=1')
 			->where('`access` IN ('.implode(',', JFactory::getUser()->getAuthorisedViewLevels()).')')
