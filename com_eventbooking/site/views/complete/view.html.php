@@ -163,6 +163,7 @@ class EventBookingViewComplete extends JViewLegacy
 		$this->message = $thankMessage;
 		$this->registrationCode = $registrationCode;
 		$this->tmpl = JRequest::getVar('tmpl', '');
+		$this->Itemid =  JRequest::getInt('Itemid', 0);
 		
 		parent::display($tpl);
 	}
