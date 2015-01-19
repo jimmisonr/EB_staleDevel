@@ -4,7 +4,7 @@
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2014 Ossolution Team
+ * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */ 
 ?>

@@ -1,5 +1,5 @@
 <?php
-/** * @version		1.6.6 * @package		Joomla * @subpackage	Event Booking * @author  Tuan Pham Ngoc * @copyright	Copyright (C) 2010 - 2014 Ossolution Team * @license		GNU/GPL, see LICENSE.php */
+/** * @version		1.6.6 * @package		Joomla * @subpackage	Event Booking * @author  Tuan Pham Ngoc * @copyright	Copyright (C) 2010 - 2015 Ossolution Team * @license		GNU/GPL, see LICENSE.php */
 defined('_JEXEC') or die();
 error_reporting(0);
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
