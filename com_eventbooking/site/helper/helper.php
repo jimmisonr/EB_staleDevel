@@ -232,6 +232,156 @@ class EventbookingHelper
 		}
 	}
 
+
+	/**
+	 * Buld tags array to use to replace the tags use in email & messages
+	 * @param $row
+	 * @param $form
+	 * @param $event
+	 * @param $config
+	 *
+	 * @return array
+	 */
+	public static function buildTags($row, $form, $event, $config)
+	{
+		$db                         = JFactory::getDbo();
+		$query                      = $db->getQuery(true);
+		$replaces                   = array();
+
+		// Event information
+		if ($config->multiple_booking)
+		{
+			$sql = 'SELECT event_id FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id . ' ORDER BY id';
+			$db->setQuery($sql);
+			$eventIds = $db->loadColumn();
+			$replaces['eventIds'] = $eventIds;
+			$sql      = 'SELECT title FROM #__eb_events WHERE id IN (' . implode(',', $eventIds) . ') ORDER BY FIND_IN_SET(id, "' . implode(',', $eventIds) .
+				'")';
+			$db->setQuery($sql);
+			$eventTitles = $db->loadColumn();
+			$eventTitle  = implode(', ', $eventTitles);
+		}
+		else
+		{
+			$eventTitle = $event->title;
+		}
+		$replaces['date']           = date($config->date_format);
+		$replaces['event_title']    = $eventTitle;
+		$replaces['event_date']     = JHtml::_('date', $event->event_date, $config->event_date_format, null);
+		$replaces['event_end_date'] = JHtml::_('date', $event->event_end_date, $config->event_date_format, null);
+		$replaces['short_description'] = $event->short_description;
+		$replaces['description'] = $event->description;
+
+		// Form fields
+		$fields = $form->getFields();
+		foreach ($fields as $field)
+		{
+			if ($field->hideOnDisplay)
+			{
+				$fieldValue = '';
+			}
+			else
+			{
+				if (is_string($field->value) && is_array(json_decode($field->value)))
+				{
+					$fieldValue = implode(', ', json_decode($field->value));
+				}
+				else
+				{
+					$fieldValue = $field->value;
+				}
+			}
+			$replaces[$field->name] = $fieldValue;
+		}
+		$replaces['transaction_id'] = $row->transaction_id;
+
+		if ($row->coupon_id)
+		{
+			$query->clear();
+			$query->select('a.code')
+				->from('#__eb_coupons AS a')
+				->innerJoin('#__eb_registrants AS b ON a.id = b.coupon_id')
+				->where('b.id=' . $row->id);
+			$db->setQuery($query);
+			$data['couponCode'] = $db->loadResult();
+		}
+		else
+		{
+			$data['couponCode'] = '';
+		}
+		if ($config->multiple_booking)
+		{
+			//Amount calculation
+			$sql = 'SELECT SUM(total_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
+			$db->setQuery($sql);
+			$totalAmount = $db->loadResult();
+
+			$sql = 'SELECT SUM(tax_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
+			$db->setQuery($sql);
+			$taxAmount = $db->loadResult();
+
+			$sql = 'SELECT SUM(discount_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
+			$db->setQuery($sql);
+			$discountAmount = $db->loadResult();
+			$amount = $totalAmount - $discountAmount + $taxAmount;
+
+			$replaces['total_amount'] = EventbookingHelper::formatCurrency($totalAmount, $config, $event->currency_symbol);
+			$replaces['tax_amount'] = EventbookingHelper::formatCurrency($taxAmount, $config, $event->currency_symbol);
+			$replaces['discount_amount'] = EventbookingHelper::formatCurrency($discountAmount, $config, $event->currency_symbol);
+			$replaces['amount'] = EventbookingHelper::formatCurrency($amount, $config, $event->currency_symbol);
+		}
+		else
+		{
+			$replaces['total_amount'] = EventbookingHelper::formatCurrency($row->total_amount, $config, $event->currency_symbol);
+			$replaces['tax_amount'] = EventbookingHelper::formatCurrency($row->tax_amount, $config, $event->currency_symbol);
+			$replaces['discount_amount'] = EventbookingHelper::formatCurrency($row->discount_amount, $config, $event->currency_symbol);
+			$replaces['amount'] = EventbookingHelper::formatCurrency($row->amount, $config, $event->currency_symbol);
+		}
+		// Add support for location tag
+		$query->clear();
+		$query->select('a.*')
+			->from('#__eb_locations AS a')
+			->innerJoin('#__eb_events AS b ON a.id=b.location_id')
+			->where('b.id=' . $row->event_id);
+
+		$db->setQuery($query);
+		$rowLocation = $db->loadObject();
+		if ($rowLocation)
+		{
+			$locationInformation = array();
+			if ($rowLocation->address)
+			{
+				$locationInformation[] = $rowLocation->address;
+			}
+			if ($rowLocation->city)
+			{
+				$locationInformation[] = $rowLocation->city;
+			}
+			if ($rowLocation->state)
+			{
+				$locationInformation[] = $rowLocation->state;
+			}
+			if ($rowLocation->zip)
+			{
+				$locationInformation[] = $rowLocation->zip;
+			}
+			if ($rowLocation->country)
+			{
+				$locationInformation[] = $rowLocation->country;
+			}
+			$replaces['location'] = $rowLocation->name . ' (' . implode(', ', $locationInformation) . ')';
+		}
+		else
+		{
+			$replaces['location'] = '';
+		}
+		$replaces['rowLocation'] = $rowLocation;
+
+		// Registration detail tags
+		$replaces['registration_detail'] = self::getEmailContent($config, $row, true, $form);
+
+		return $replaces;
+	}
 	/**
 	 * Calculate fees use for individual registration
 	 *
@@ -239,6 +389,7 @@ class EventbookingHelper
 	 * @param $form
 	 * @param $data
 	 * @param $config
+	 * @param $paymentMethod
 	 *
 	 * @return array
 	 */
@@ -396,6 +547,7 @@ class EventbookingHelper
 	 * @param $form
 	 * @param $data
 	 * @param $config
+	 * @param $paymentMethod
 	 *
 	 * @return array
 	 */
@@ -1165,19 +1317,6 @@ class EventbookingHelper
 	 */
 	public static function getMemberDetails($config, $rowMember, $rowEvent, $rowLocation, $loadCss = true, $memberForm)
 	{
-		if ($memberForm)
-		{
-			$memberForm->buildFieldsDependency();
-			$fields = $memberForm->getFields();
-			foreach ($fields as $field)
-			{
-				if ($field->hideOnDisplay)
-				{
-					unset($fields[$field->name]);
-				}
-			}
-			$memberForm->setFields($fields);
-		}
 		$data = array();
 		$data['rowMember'] = $rowMember;
 		$data['rowEvent'] = $rowEvent;
@@ -1211,19 +1350,6 @@ class EventbookingHelper
 		$db = JFactory::getDbo();
 		$data = array();
 		$Itemid = JRequest::getInt('Itemid', 0);
-		if ($form)
-		{
-			$form->buildFieldsDependency();
-			$fields = $form->getFields();
-			foreach ($fields as $field)
-			{
-				if ($field->hideOnDisplay)
-				{
-					unset($fields[$field->name]);
-				}
-			}
-			$form->setFields($fields);
-		}
 		if ($config->multiple_booking)
 		{
 			if ($loadCss)
@@ -1841,125 +1967,10 @@ class EventbookingHelper
 		$form = new RADForm($rowFields);
 		$data = self::getRegistrantData($row, $rowFields);
 		$form->bind($data);
-		//Need to over-ridde some config options
-		$emailContent = EventbookingHelper::getEmailContent($config, $row, true, $form);
-		if ($config->multiple_booking)
-		{
-			$sql = 'SELECT event_id FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id . ' ORDER BY id';
-			$db->setQuery($sql);
-			$eventIds = $db->loadColumn();
-			$sql = 'SELECT title FROM #__eb_events WHERE id IN (' . implode(',', $eventIds) . ') ORDER BY FIND_IN_SET(id, "' . implode(',', $eventIds) .
-				'")';
-			$db->setQuery($sql);
-			$eventTitles = $db->loadColumn();
-			$eventTitle = implode(', ', $eventTitles);
-		}
-		else
-		{
-			$eventTitle = $event->title;
-		}
-		$replaces = array();
-		$replaces['event_title'] = $eventTitle;
-		$replaces['event_date'] = JHtml::_('date', $event->event_date, $config->event_date_format, null);
-		$replaces['event_end_date'] = JHtml::_('date', $event->event_end_date, $config->event_date_format, null);
-		$fields = $form->getFields();
-		foreach ($fields as $field)
-		{
-			if (is_string($field->value) && is_array(json_decode($field->value)))
-			{
-				$fieldValue = implode(', ', json_decode($field->value));
-			}
-			else
-			{
-				$fieldValue = $field->value;
-			}
-			$replaces[$field->name] = $fieldValue;
-		}
-		$replaces['transaction_id'] = $row->transaction_id;
-		$replaces['date'] = date($config->date_format);
-		$replaces['short_description'] = $event->short_description;
-		$replaces['description'] = $event->description;
-		if ($row->coupon_id)
-		{
-			$query->clear();
-			$query->select('a.code')
-				->from('#__eb_coupons AS a')
-				->innerJoin('#__eb_registrants AS b ON a.id = b.coupon_id')
-				->where('b.id=' . $row->id);
-			$db->setQuery($query);
-			$data['couponCode'] = $db->loadResult();
-		}
-		else
-		{
-			$data['couponCode'] = '';
-		}
-		if ($config->multiple_booking)
-		{
-			//Amount calculation
-			$sql = 'SELECT SUM(total_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
-			$totalAmount = $db->loadResult();
-
-			$sql = 'SELECT SUM(tax_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
-			$taxAmount = $db->loadResult();
-
-			$sql = 'SELECT SUM(discount_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
-			$discountAmount = $db->loadResult();
-			$amount = $totalAmount - $discountAmount + $taxAmount;
-
-			$replaces['total_amount'] = EventbookingHelper::formatCurrency($totalAmount, $config, $event->currency_symbol);
-			$replaces['tax_amount'] = EventbookingHelper::formatCurrency($taxAmount, $config, $event->currency_symbol);
-			$replaces['discount_amount'] = EventbookingHelper::formatCurrency($discountAmount, $config, $event->currency_symbol);
-			$replaces['amount'] = EventbookingHelper::formatCurrency($amount, $config, $event->currency_symbol);
-		}
-		else
-		{
-			$replaces['total_amount'] = EventbookingHelper::formatCurrency($row->total_amount, $config, $event->currency_symbol);
-			$replaces['tax_amount'] = EventbookingHelper::formatCurrency($row->tax_amount, $config, $event->currency_symbol);
-			$replaces['discount_amount'] = EventbookingHelper::formatCurrency($row->discount_amount, $config, $event->currency_symbol);
-			$replaces['amount'] = EventbookingHelper::formatCurrency($row->amount, $config, $event->currency_symbol);
-		}
-		//Add support for location tag
-		$query->clear();
-		$query->select('a.*')
-			->from('#__eb_locations AS a')
-			->innerJoin('#__eb_events AS b ON a.id=b.location_id')
-			->where('b.id=' . $row->event_id);
-
-		$db->setQuery($query);
-		$rowLocation = $db->loadObject();
-		if ($rowLocation)
-		{
-			$locationInformation = array();
-			if ($rowLocation->address)
-			{
-				$locationInformation[] = $rowLocation->address;
-			}
-			if ($rowLocation->city)
-			{
-				$locationInformation[] = $rowLocation->city;
-			}
-			if ($rowLocation->state)
-			{
-				$locationInformation[] = $rowLocation->state;
-			}
-			if ($rowLocation->zip)
-			{
-				$locationInformation[] = $rowLocation->zip;
-			}
-			if ($rowLocation->country)
-			{
-				$locationInformation[] = $rowLocation->country;
-			}
-			$replaces['location'] = $rowLocation->name . ' (' . implode(', ', $locationInformation) . ')';
-		}
-		else
-		{
-			$replaces['location'] = '';
-		}
-		//Notification email send to user
+		$form->buildFieldsDependency();
+		$replaces = self::buildTags($row, $form, $event, $config);
+		$rowLocation = $replaces['rowLocation'];
+		// Notification email send to user
 		if (strlen($message->{'user_email_subject' . $fieldSuffix}))
 		{
 			$subject = $message->{'user_email_subject' . $fieldSuffix};
@@ -1998,11 +2009,10 @@ class EventbookingHelper
 				$body = $message->user_email_body;
 			}
 		}
-		$subject = str_replace('[EVENT_TITLE]', $eventTitle, $subject);
-		$body = str_replace('[REGISTRATION_DETAIL]', $emailContent, $body);
 		foreach ($replaces as $key => $value)
 		{
 			$key = strtoupper($key);
+			$subject = str_replace("[$key]", $value, $subject);
 			$body = str_replace("[$key]", $value, $body);
 		}
 		$body = self::convertImgTags($body);
@@ -2019,7 +2029,7 @@ class EventbookingHelper
 		}
 		if ($config->multiple_booking)
 		{
-			$sql = 'SELECT attachment FROM #__eb_events WHERE id IN ('.implode(',', $eventIds).')';
+			$sql = 'SELECT attachment FROM #__eb_events WHERE id IN ('.implode(',', $replaces['eventIds']).')';
 			$db->setQuery($sql);
 			$attachmentFiles = $db->loadColumn();
 			foreach($attachmentFiles as $attachmentFile)
@@ -2047,6 +2057,7 @@ class EventbookingHelper
 				->setOrganizer($fromEmail, $fromName)
 				->setStart($event->event_date)
 				->setEnd($event->event_end_date);
+
 			if ($rowLocation)
 			{
 				$ics->setLocation($rowLocation->name);
@@ -2086,7 +2097,6 @@ class EventbookingHelper
 					{
 						$subject = $message->group_member_email_subject;
 					}
-					$subject = str_replace('[EVENT_TITLE]', $eventTitle, $subject);
 					if (strlen(strip_tags($message->{'group_member_email_body' . $fieldSuffix})))
 					{
 						$body = $message->{'group_member_email_body' . $fieldSuffix};
@@ -2107,16 +2117,24 @@ class EventbookingHelper
 					$memberForm = new RADForm($memberFormFields);
 					$memberData = self::getRegistrantData($rowMember, $memberFormFields);
 					$memberForm->bind($memberData);
+					$memberForm->buildFieldsDependency();
 					$fields = $memberForm->getFields();
 					foreach ($fields as $field)
 					{
-						if (is_string($field->value) && is_array(json_decode($field->value)))
+						if ($field->hideOnDisplay)
 						{
-							$fieldValue = implode(', ', json_decode($field->value));
+							$fieldValue = '';
 						}
 						else
 						{
-							$fieldValue = $field->value;
+							if (is_string($field->value) && is_array(json_decode($field->value)))
+							{
+								$fieldValue = implode(', ', json_decode($field->value));
+							}
+							else
+							{
+								$fieldValue = $field->value;
+							}
 						}
 						$memberReplaces[$field->name] = $fieldValue;
 					}
@@ -2158,7 +2176,6 @@ class EventbookingHelper
 		{
 			$subject = $message->admin_email_subject;
 		}
-		$subject = str_replace('[EVENT_TITLE]', $eventTitle, $subject);
 		if (strlen(strip_tags($message->{'admin_email_body' . $fieldSuffix})))
 		{
 			$body = $message->{'admin_email_body' . $fieldSuffix};
@@ -2167,10 +2184,10 @@ class EventbookingHelper
 		{
 			$body = $message->admin_email_body;
 		}
-		$body = str_replace('[REGISTRATION_DETAIL]', $emailContent, $body);
 		foreach ($replaces as $key => $value)
 		{
 			$key = strtoupper($key);
+			$subject = str_replace("[$key]", $value, $subject);
 			$body = str_replace("[$key]", $value, $body);
 		}
 		$body = self::convertImgTags($body);
@@ -2196,7 +2213,7 @@ class EventbookingHelper
 		$mailer = JFactory::getMailer();
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		EventbookingHelper::loadLanguage();
+		self::loadLanguage();
 		$message = self::getMessages();
 		$fieldSuffix = self::getFieldSuffix($row->language);
 		if ($config->from_name)
@@ -2230,61 +2247,13 @@ class EventbookingHelper
 		$form = new RADForm($rowFields);
 		$data = self::getRegistrantData($row, $rowFields);
 		$form->bind($data);
-		//Need to over-ridde some config options
-		$emailContent = EventbookingHelper::getEmailContent($config, $row, true, $form);
+		$form->buildFieldsDependency();
 		$query->select('*')
 			->from('#__eb_events')
 			->where('id=' . $row->event_id);
 		$db->setQuery($query);
 		$event = $db->loadObject();
-		if ($config->multiple_booking)
-		{
-			$sql = 'SELECT event_id FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id . ' ORDER BY id';
-			$db->setQuery($sql);
-			$eventIds = $db->loadColumn();
-			$sql = 'SELECT title FROM #__eb_events WHERE id IN (' . implode(',', $eventIds) . ') ORDER BY FIND_IN_SET(id, "' . implode(',', $eventIds) .
-				'")';
-			$db->setQuery($sql);
-			$eventTitles = $db->loadColumn();
-			$eventTitle = implode(', ', $eventTitles);
-		}
-		else
-		{
-			$eventTitle = $event->title;
-		}
-		$replaces = array();
-		$replaces['event_title'] = $eventTitle;
-		$replaces['event_date'] = JHtml::_('date', $event->event_date, $config->event_date_format, null);
-		$fields = $form->getFields();
-		foreach ($fields as $field)
-		{
-			if (is_string($field->value) && is_array(json_decode($field->value)))
-			{
-				$fieldValue = implode(', ', json_decode($field->value));
-			}
-			else
-			{
-				$fieldValue = $field->value;
-			}
-			$replaces[$field->name] = $fieldValue;
-		}
-		$replaces['transaction_id'] = $row->transaction_id;
-		$replaces['amount'] = EventbookingHelper::formatCurrency($row->amount, $config, $event->currency_symbol);
-
-		//Add support for location tag
-		$sql = 'SELECT a.* FROM #__eb_locations AS a ' . ' INNER JOIN #__eb_events AS b ' . ' ON a.id = b.location_id ' . ' WHERE b.id =' .
-			$row->event_id;
-		$db->setQuery($sql);
-		$rowLocation = $db->loadObject();
-		if ($rowLocation)
-		{
-			$replaces['location'] = $rowLocation->name . ' (' . $rowLocation->address . ', ' . $rowLocation->city . ',' . $rowLocation->state . ', ' .
-				$rowLocation->zip . ', ' . $rowLocation->country . ')';
-		}
-		else
-		{
-			$replaces['location'] = '';
-		}
+		$replaces = self::buildTags($row, $form, $event, $config);
 		if (strlen(trim($event->registration_approved_email_subject)))
 		{
 			$subject = $event->registration_approved_email_subject;
@@ -2310,13 +2279,11 @@ class EventbookingHelper
 		{
 			$body = $message->registration_approved_email_body;
 		}
-
-		$subject = str_replace('[EVENT_TITLE]', $eventTitle, $subject);
-		$body = str_replace('[REGISTRATION_DETAIL]', $emailContent, $body);
 		foreach ($replaces as $key => $value)
 		{
-			$key = strtoupper($key);
-			$body = str_replace("[$key]", $value, $body);
+			$key     = strtoupper($key);
+			$subject = str_replace("[$key]", $value, $subject);
+			$body    = str_replace("[$key]", $value, $body);
 		}
 		$body = self::convertImgTags($body);
 		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
@@ -2869,7 +2836,6 @@ class EventbookingHelper
 	public static function generateInvoicePDF($row)
 	{
 		self::loadLanguage();
-		$app = JFactory::getApplication();
 		$db = JFactory::getDbo();
 		$config = self::getConfig();
 		$sitename = JFactory::getConfig()->get("sitename");

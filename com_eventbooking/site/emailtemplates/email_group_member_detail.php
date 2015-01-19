@@ -78,6 +78,10 @@ defined('_JEXEC') or die;
     $fields = $memberForm->getFields();
     foreach ($fields as $field)
     {
+	    if ($field->hideOnDisplay)
+	    {
+		    continue;
+	    }
     	echo $field->getOutput(false);
     }
     ?>    																																									

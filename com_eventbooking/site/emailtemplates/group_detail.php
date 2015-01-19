@@ -102,6 +102,10 @@ defined('_JEXEC') or die;
             $fields = $form->getFields();
             foreach ($fields as $field)
             {
+	            if ($field->hideOnDisplay)
+	            {
+		            continue;
+	            }
                 echo $field->getOutput();
             }
             if ($row->total_amount > 0)

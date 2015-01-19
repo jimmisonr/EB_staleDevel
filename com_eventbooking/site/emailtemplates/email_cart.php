@@ -189,6 +189,10 @@ span.view_list {
 	$fields = $form->getFields();
 	foreach ($fields as $field)
 	{
+		if ($field->hideOnDisplay)
+		{
+			continue;
+		}
 		echo $field->getOutput(false);						
 	}
 	if ($totalAmount > 0)
