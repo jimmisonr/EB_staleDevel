@@ -583,6 +583,8 @@ class EventbookingModelEvent extends RADModelItem
 					'thanks_message',
 					'thanks_message_offline',
 					'params',
+					'currency_code',
+					'currency_symbol', 
 					'published');
 				$rowChildEvent = $this->getTable();
 				foreach ($children as $childId)

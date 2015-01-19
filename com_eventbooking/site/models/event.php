@@ -731,7 +731,7 @@ class EventBookingModelEvent extends JModelLegacy
 		$row->params = null;
 		$row->custom_fields = null;
 		$row->ordering = 0;
-		$row->published = 0;
+		$row->published = isset($config->default_event_status) ? $config->default_event_status : 0;
 		$this->_data = $row;
 	}
 

@@ -69,6 +69,7 @@ class EventbookingModelMassmail extends RADModel
     		if (count($rows)) {
     		    foreach ($rows as $row) {
     		        $message = $body ;
+					
     		        $email = $row->email ;
     		        if (!in_array($email, $emails)) {
     		            $message = str_replace("[FIRST_NAME]", $row->first_name, $message) ;
