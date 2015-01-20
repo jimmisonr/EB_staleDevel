@@ -293,6 +293,16 @@ class EventbookingHelper
 			}
 			$replaces[$field->name] = $fieldValue;
 		}
+
+		if (isset($replaces['last_name']))
+		{
+			$replaces['name'] = $replaces['first_name'] . ' ' . $replaces['last_name'];
+		}
+		else
+		{
+			$replaces['name'] = $replaces['first_name'];
+		}
+
 		$replaces['transaction_id'] = $row->transaction_id;
 
 		if ($row->coupon_id)
@@ -380,8 +390,6 @@ class EventbookingHelper
 		{
 			$replaces['location'] = '';
 		}
-		$replaces['rowLocation'] = $rowLocation;
-
 		// Registration detail tags
 		$replaces['registration_detail'] = self::getEmailContent($config, $row, true, $form);
 
@@ -1974,7 +1982,16 @@ class EventbookingHelper
 		$form->bind($data);
 		$form->buildFieldsDependency();
 		$replaces = self::buildTags($row, $form, $event, $config);
-		$rowLocation = $replaces['rowLocation'];
+		// Need to get rowLocation from database
+		$query->clear();
+		$query->select('a.*')
+			->from('#__eb_locations AS a')
+			->innerJoin('#__eb_events AS b ON a.id=b.location_id')
+			->where('b.id=' . $row->event_id);
+
+		$db->setQuery($query);
+		$rowLocation = $db->loadObject();
+
 		// Notification email send to user
 		if (strlen($message->{'user_email_subject' . $fieldSuffix}))
 		{
