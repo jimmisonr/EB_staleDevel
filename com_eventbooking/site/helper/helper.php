@@ -329,6 +329,11 @@ class EventbookingHelper
 			$replaces['tax_amount'] = EventbookingHelper::formatCurrency($taxAmount, $config, $event->currency_symbol);
 			$replaces['discount_amount'] = EventbookingHelper::formatCurrency($discountAmount, $config, $event->currency_symbol);
 			$replaces['amount'] = EventbookingHelper::formatCurrency($amount, $config, $event->currency_symbol);
+
+			$replaces['amt_total_amount'] = $totalAmount;
+			$replaces['amt_tax_amount'] = $taxAmount;
+			$replaces['amt_discount_amount'] = $discountAmount;
+			$replaces['amt_amount'] = $amount;
 		}
 		else
 		{
@@ -2837,10 +2842,13 @@ class EventbookingHelper
 	{
 		self::loadLanguage();
 		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
 		$config = self::getConfig();
 		$sitename = JFactory::getConfig()->get("sitename");
-		$sql = 'SELECT * FROM #__eb_events WHERE id=' . $row->event_id;
-		$db->setQuery($sql);
+		$query->select('*')
+			->from('#__eb_events')
+			->where('id = '. (int) $row->event_id);
+		$db->setQuery($query);
 		$rowEvent = $db->loadObject();
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/tcpdf.php";
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/config/lang/eng.php";
@@ -2871,25 +2879,6 @@ class EventbookingHelper
 		{
 			$invoiceOutput = $config->invoice_format;
 		}
-		$replaces = array();
-		$replaces['name'] = $row->first_name . ' ' . $row->last_name;
-		$replaces['email'] = $row->email;
-		$replaces['organization'] = $row->organization;
-		$replaces['address'] = $row->address;
-		$replaces['address2'] = $row->address2;
-		$replaces['city'] = $row->city;
-		$replaces['state'] = $row->state;
-		$replaces['zip'] = $row->zip;
-		$replaces['country'] = $row->country;
-		$replaces['phone'] = $row->phone;
-		$replaces['fax'] = $row->fax;
-		$replaces['invoice_number'] = self::formatInvoiceNumber($row->invoice_number, $config);
-		$replaces['invoice_date'] = date($config->date_format);
-		$replaces['transaction_id'] = $row->transaction_id;
-		$replaces['short_description'] = $rowEvent->short_description;
-		$replaces['description'] = $rowEvent->description;
-		$replaces['event_title'] = $rowEvent->title;
-		$replaces['event_date'] = JHtml::_('date', $rowEvent->event_date, $config->event_date_format, null);
 
 		if ($config->multiple_booking)
 		{
@@ -2904,29 +2893,14 @@ class EventbookingHelper
 			$rowFields = self::getFormFields($row->event_id, 0);
 		}
 
-		$sql = 'SELECT field_id, field_value FROM #__eb_field_values WHERE registrant_id=' . $row->id;
-		$db->setQuery($sql);
-		$rowFieldValues = $db->loadObjectList();
-		$fieldValues = array();
-		if (count($rowFieldValues))
-		{
-			foreach ($rowFieldValues as $rowFieldValue)
-			{
-				$fieldValues[$rowFieldValue->field_id] = $rowFieldValue->field_value;
-			}
-		}
+		$form = new RADForm($rowFields);
+		$data = self::getRegistrantData($row, $rowFields);
+		$form->bind($data);
+		$form->buildFieldsDependency();
 
-		foreach ($rowFields as $rowField)
-		{
-			if (isset($fieldValues[$rowField->id]))
-			{
-				$replaces[strtoupper($rowField->name)] = $fieldValues[$rowField->id];
-			}
-			else
-			{
-				$replaces[strtoupper($rowField->name)] = '';
-			}
-		}
+		$replaces = self::buildTags($row, $form, $rowEvent, $config);
+		$replaces['invoice_number'] = self::formatInvoiceNumber($row->invoice_number, $config);
+		$replaces['invoice_date'] = date($config->date_format);
 
 		if ($row->published == 0)
 		{
@@ -2946,49 +2920,40 @@ class EventbookingHelper
 			$sql = 'SELECT a.title, a.event_date, b.* FROM #__eb_events AS a INNER JOIN #__eb_registrants AS b ' . ' ON a.id = b.event_id ' .
 				' WHERE b.id=' . $row->id . ' OR b.cart_id=' . $row->id;
 			$db->setQuery($sql);
-			$rowEvents = $db->loadObjectList();
-
-			$sql = 'SELECT SUM(total_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
-			$subTotal = $db->loadResult();
-
-			$sql = 'SELECT SUM(tax_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
-			$taxAmount = $db->loadResult();
-
-			$sql = 'SELECT SUM(discount_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
-			$discountAmount = $db->loadResult();
-			$total = $subTotal - $discountAmount + $taxAmount;
-			$replaces['EVENTS_LIST'] = EventbookingHelperHtml::loadCommonLayout(
+			$rowEvents                   = $db->loadObjectList();
+			$subTotal                    = $replaces['amt_total_amount'];
+			$taxAmount                   = $replaces['amt_tax_amount'];
+			$discountAmount              = $replaces['amt_discount_amount'];
+			$total                       = $replaces['amt_amount'];
+			$replaces['EVENTS_LIST']     = EventbookingHelperHtml::loadCommonLayout(
 				JPATH_ROOT . '/components/com_eventbooking/emailtemplates/invoice_items.php',
 				array(
-					'rowEvents' => $rowEvents,
-					'subTotal' => $subTotal,
-					'taxAmount' => $taxAmount,
+					'rowEvents'      => $rowEvents,
+					'subTotal'       => $subTotal,
+					'taxAmount'      => $taxAmount,
 					'discountAmount' => $discountAmount,
-					'total' => $total,
-					'config' => $config));
-			$replaces['SUB_TOTAL'] = EventbookingHelper::formatCurrency($subTotal, $config);
+					'total'          => $total,
+					'config'         => $config));
+			$replaces['SUB_TOTAL']       = EventbookingHelper::formatCurrency($subTotal, $config);
 			$replaces['DISCOUNT_AMOUNT'] = EventbookingHelper::formatCurrency($discountAmount, $config);
-			$replaces['TAX_AMOUNT'] = EventbookingHelper::formatCurrency($taxAmount, $config);
-			$replaces['TOTAL_AMOUNT'] = EventbookingHelper::formatCurrency($total, $config);
+			$replaces['TAX_AMOUNT']      = EventbookingHelper::formatCurrency($taxAmount, $config);
+			$replaces['TOTAL_AMOUNT']    = EventbookingHelper::formatCurrency($total, $config);
 		}
 		else
 		{
-			$replaces['ITEM_QUANTITY'] = 1;
-			$replaces['ITEM_AMOUNT'] = $replaces['ITEM_SUB_TOTAL'] = self::formatCurrency($row->total_amount, $config);
+			$replaces['ITEM_QUANTITY']   = 1;
+			$replaces['ITEM_AMOUNT']     = $replaces['ITEM_SUB_TOTAL'] = self::formatCurrency($row->total_amount, $config);
 			$replaces['DISCOUNT_AMOUNT'] = self::formatCurrency($row->discount_amount, $config);
-			$replaces['SUB_TOTAL'] = self::formatCurrency($row->total_amount - $row->discount_amount, $config);
-			$replaces['TAX_AMOUNT'] = self::formatCurrency($row->tax_amount, $config);
-			$replaces['TOTAL_AMOUNT'] = self::formatCurrency($row->total_amount - $row->discount_amount + $row->tax_amount, $config);
-			$itemName = JText::_('EB_EVENT_REGISTRATION');
-			$itemName = str_replace('[EVENT_TITLE]', $rowEvent->title, $itemName);
-			$replaces['ITEM_NAME'] = $itemName;
+			$replaces['SUB_TOTAL']       = self::formatCurrency($row->total_amount - $row->discount_amount, $config);
+			$replaces['TAX_AMOUNT']      = self::formatCurrency($row->tax_amount, $config);
+			$replaces['TOTAL_AMOUNT']    = self::formatCurrency($row->total_amount - $row->discount_amount + $row->tax_amount, $config);
+			$itemName                    = JText::_('EB_EVENT_REGISTRATION');
+			$itemName                    = str_replace('[EVENT_TITLE]', $rowEvent->title, $itemName);
+			$replaces['ITEM_NAME']       = $itemName;
 		}
 		foreach ($replaces as $key => $value)
 		{
-			$key = strtoupper($key);
+			$key           = strtoupper($key);
 			$invoiceOutput = str_replace("[$key]", $value, $invoiceOutput);
 		}
 
