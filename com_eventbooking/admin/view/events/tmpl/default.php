@@ -14,7 +14,7 @@ $ordering = ($this->state->filter_order == 'tbl.ordering');
 <form action="index.php?option=com_eventbooking&view=events" method="post" name="adminForm" id="adminForm">
 <table width="100%">
 <tr>
-	<td align="left" style="text-align: left; width:40%; vertical-align: top;">
+	<td align="left" style="text-align: left; width:30%; vertical-align: top;">
 		<?php echo JText::_( 'Filter' ); ?>:
 		<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->state->filter_search;?>" class="text_area search-query" onchange="document.adminForm.submit();" />
 		<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'Go' ); ?></button>
@@ -164,4 +164,12 @@ $ordering = ($this->state->filter_order == 'tbl.ordering');
 	<input type="hidden" name="filter_order" value="<?php echo $this->state->filter_order; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->state->filter_order_Dir; ?>" />
 	<?php echo JHtml::_( 'form.token' ); ?>
+
+	<script type="text/javascript">
+		(function($){
+			$(document).ready(function(){
+				$('#filter_state').addClass('input-medium').removeClass('inputbox');
+			})
+		})(jQuery);
+	</script>
 </form>
