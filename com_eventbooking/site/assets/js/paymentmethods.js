@@ -275,6 +275,10 @@ function calculateGroupRegistrationFee()
 				{								
 					$('#amount').val(msg.amount);
 				}
+                if ($('#deposit_amount'))
+                {
+                    $('#deposit_amount').val(msg.deposit_amount);
+                }
                 if (($('#amount').length || $('#total_amount').length) && msg.amount == 0)
                 {
                     $('.payment_information').css('display', 'none');
