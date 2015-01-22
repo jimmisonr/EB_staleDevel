@@ -96,8 +96,8 @@ class EventBookingModelCart extends JModelLegacy
 		$form      = new RADForm($rowFields);
 		$form->bind($data);
 		$data['collect_records_data'] = true;
-		$fees = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
-		//Save the active language
+		$fees                         = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+		// Save the active language
 		if ($app->getLanguageFilter())
 		{
 			$language = JFactory::getLanguage()->getTag();
@@ -107,21 +107,22 @@ class EventBookingModelCart extends JModelLegacy
 			$language = '*';
 		}
 		$recordsData = $fees['records_data'];
-		$cartId  = 0;
-		//Store list of registrants
+		$cartId      = 0;
+		$couponId    = 0;
+		// Store list of registrants
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
-			$eventId = $items[$i];
+			$eventId    = $items[$i];
 			$recordData = $recordsData[$eventId];
 			$row->bind($data);
-			$row->event_id = $eventId;
-			$row->coupon_id = $recordData['coupon_id'];
-			$row->total_amount = $recordData['total_amount'];
-			$row->discount_amount = $recordData['discount_amount'];
-			$row->tax_amount = $recordData['tax_amount'];
+			$row->event_id               = $eventId;
+			$row->coupon_id              = $recordData['coupon_id'];
+			$row->total_amount           = $recordData['total_amount'];
+			$row->discount_amount        = $recordData['discount_amount'];
+			$row->tax_amount             = $recordData['tax_amount'];
 			$row->payment_processing_fee = $recordData['payment_processing_fee'];
-			$row->amount = $recordData['amount'];
-			$row->deposit_amount = $recordData['deposit_amount'];
+			$row->amount                 = $recordData['amount'];
+			$row->deposit_amount         = $recordData['deposit_amount'];
 			if ($row->deposit_amount > 0)
 			{
 				$row->payment_status = 0;
@@ -175,7 +176,10 @@ class EventBookingModelCart extends JModelLegacy
 			{
 				$cartId = $row->id;
 			}
-			$registrantIds[] = $row->id;
+			if ($row->coupon_id > 0)
+			{
+				$couponId = $row->coupon_id;
+			}
 			JPluginHelper::importPlugin('eventbooking');
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('onAfterStoreRegistrant', array($row));
@@ -184,17 +188,13 @@ class EventBookingModelCart extends JModelLegacy
 		$db->setQuery($sql);
 		$eventTitltes        = $db->loadColumn();
 		$data['event_title'] = implode(', ', $eventTitltes);
-		//Now, we will need to creat registrants for each events										
-		//Clear the coupon session
-		if (isset($_SESSION['coupon_id']))
+		if ($couponId > 0)
 		{
-			$sql = 'UPDATE #__eb_coupons SET used = used + 1 WHERE id=' . (int) $_SESSION['coupon_id'];
+			$sql = 'UPDATE #__eb_coupons SET used = used + 1 WHERE id=' . (int) $couponId;
 			$db->setQuery($sql);
 			$db->execute();
-			unset($_SESSION['coupon_id']);
 		}
 		$cart->reset();
-		// Payment processing fee
 		if ($fees['amount'] > 0)
 		{
 			if ($fees['deposit_amount'] > 0)
@@ -222,9 +222,13 @@ class EventBookingModelCart extends JModelLegacy
 			$row->payment_date = gmdate('Y-m-d H:i:s');
 			$row->published    = 1;
 			$row->store();
-			//Update status of all registrants
-			$sql = 'UPDATE #__eb_registrants SET published=1, payment_date=NOW() WHERE cart_id=' . $row->id;
-			$db->setQuery($sql);
+			// Update status of all registrants
+			$query->clear();
+			$query->update('#__eb_registrants')
+				->set('published = 1')
+				->set('payment_date=NOW()')
+				->where('cart_id = ' . $row->id);
+			$db->setQuery($query);
 			$db->execute();
 			EventbookingHelper::sendEmails($row, $config);
 			JPluginHelper::importPlugin('eventbooking');
