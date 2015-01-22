@@ -336,23 +336,9 @@ class EventBookingViewRegister extends JViewLegacy
 		$lists['exp_month'] = JHtml::_('select.integerlist', 1, 12, 1, 'exp_month', ' class="input-small" ', $expMonth, '%02d');
 		$currentYear = date('Y');
 		$lists['exp_year'] = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
-		$extraFee = $form->calculateFee();
+		$data['coupon_code'] =  $input->post->getString('coupon_code', '');
+		$fees = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
 		$events = $cart->getEvents();
-		$totalAmount = $cart->calculateTotal() + $extraFee;
-		$discountAmount = $cart->calculateTotalDiscount();
-		if ($discountAmount > $totalAmount)
-		{
-			$discountAmount = $totalAmount;
-		}
-		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
-		{
-			$taxAmount = round(($totalAmount - $discountAmount) * $config->tax_rate / 100, 2);
-		}
-		else
-		{
-			$taxAmount = 0;
-		}
-		$amount = $totalAmount - $discountAmount + $taxAmount;
 		$methods = os_payments::getPaymentMethods();
 		$options = array();
 		$options[] = JHtml::_('select.option', 'Visa', 'Visa');
@@ -389,13 +375,14 @@ class EventBookingViewRegister extends JViewLegacy
 				$input->post->getInt('bank_id'));
 		}
 		##Add support for deposit payment
+		$paymentType = $input->post->getInt('payment_type', 0);
 		if ($config->activate_deposit_feature)
 		{
 			$options = array();
 			$options[] = JHtml::_('select.option', 0, JText::_('EB_FULL_PAYMENT'));
 			$options[] = JHtml::_('select.option', 1, JText::_('EB_DEPOSIT_PAYMENT'));
-			$lists['payment_type'] = JHtml::_('select.genericlist', $options, 'payment_type', ' class="input-large" ', 'value', 'text', 
-				$input->post->getInt('payment_type', 0));
+			$lists['payment_type'] = JHtml::_('select.genericlist', $options, 'payment_type', ' class="input-large" onchange="showDepositAmount(this);" ', 'value', 'text',
+				$paymentType);
 			$depositPayment = 1;
 		}
 		else
@@ -426,7 +413,6 @@ class EventBookingViewRegister extends JViewLegacy
 		$db->setQuery($query);
 		$eventTitle = implode(', ', $db->loadColumn());
 
-		// Payment fee
 		// Check to see if there is payment processing fee or not
 		$showPaymentFee = false;
 		foreach($methods as $method)
@@ -438,30 +424,7 @@ class EventBookingViewRegister extends JViewLegacy
 			}
 		}
 
-		if ($showPaymentFee)
-		{
-			$paymentFeeAmount  = 0;
-			$paymentFeePercent = 0;
-			if ($paymentMethod)
-			{
-				$method            = os_payments::loadPaymentMethod($paymentMethod);
-				$params            = new JRegistry($method->params);
-				$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
-				$paymentFeePercent = (float) $params->get('payment_fee_percent');
-			}
-			if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $amount > 0)
-			{
-				$paymentProcessingFee         = round($paymentFeeAmount + $amount * $paymentFeePercent / 100, 2);
-				$amount += $paymentProcessingFee;
-			}
-			else
-			{
-				$paymentProcessingFee         = 0;
-			}
-
-			$this->paymentProcessingFee = $paymentProcessingFee;
-		}
-		//Assign these parameters
+		// Assign these parameters
 		$this->paymentMethod = $paymentMethod;
 		$this->lists = $lists;
 		$this->config = $config;
@@ -475,16 +438,19 @@ class EventBookingViewRegister extends JViewLegacy
 		$this->fieldSuffix = $fieldSuffix;
 		$this->showCaptcha = $showCaptcha;
 		$this->form = $form;
-		$this->totalAmount = $totalAmount;
-		$this->taxAmount = $taxAmount;
-		$this->discountAmount = $discountAmount;
-		$this->paymentProcessingFee = $paymentProcessingFee;
-		$this->amount = $amount;
+		$this->totalAmount = $fees['total_amount'];
+		$this->taxAmount = $fees['tax_amount'];
+		$this->discountAmount = $fees['discount_amount'];
+		$this->depositAmount = $fees['deposit_amount'];
+		$this->paymentProcessingFee = $fees['payment_processing_fee'];
+		$this->amount = $fees['amount'];
 		$this->items = $events;
 		$this->eventTitle = $eventTitle;
 		$this->form = $form;
 		$this->Itemid = $input->getInt('Itemid', 0);
 		$this->showPaymentFee = $showPaymentFee;
+		$this->paymentType = $paymentType;
+
 		parent::display($tpl);
 	}
 }

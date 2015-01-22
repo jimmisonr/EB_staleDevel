@@ -601,144 +601,32 @@ class EventbookingController extends JControllerLegacy
 	function calculate_cart_registration_fee()
 	{
 		$input = JFactory::getApplication()->input;
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
 		$config = EventbookingHelper::getConfig();
-		$cart = new EventbookingHelperCart();
-		$couponCode = $input->getString('coupon_code', '');
+		$paymentMethod = $input->getString('payment_method', '');
 		$data = JRequest::get('post', JREQUEST_ALLOWHTML);
+		$data['coupon_code'] = $input->getString('coupon_code', '');
+		$cart = new EventbookingHelperCart();
 		$response = array();
-		if ($couponCode)
-		{
-			$cart = new EventbookingHelperCart();
-			$eventIds = $cart->getItems();
-			if (count($eventIds) == 0)
-			{
-				$eventIds = array(0);
-			}
-			//Validate the coupon
-			$query->select('*')
-				->from('#__eb_coupons')
-				->where('published=1')
-				->where('code="' . $couponCode . '"')
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
-				->where('(times = 0 OR times > used)')
-				->where(' (event_id=0 OR event_id IN(' . implode(',', $eventIds) . '))');
-			$db->setQuery($query);
-			$coupon = $db->loadObject();
-			if ($coupon)
-			{
-				$_SESSION['coupon_id'] = $coupon->id;
-				$response['coupon_valid'] = 1;
-			}
-			else
-			{
-				$response['coupon_valid'] = 0;
-				if (isset($_SESSION['coupon_id']))
-				{
-					unset($_SESSION['coupon_id']);
-				}
-			}
-		}
-		else
-		{
-			$response['coupon_valid'] = 1;
-		}
 		$rowFields = EventbookingHelper::getFormFields(0, 4);
 		$form = new RADForm($rowFields);
 		$form->bind($data);
-		$totalAmount = $cart->calculateTotal() + $form->calculateFee();
-		$discountAmount = $cart->calculateTotalDiscount();
-		if ($discountAmount > $totalAmount)
-		{
-			$discountAmount = $totalAmount;
-		}
-		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
-		{
-			$taxAmount = round(($totalAmount - $discountAmount) * $config->tax_rate / 100, 2);
-		}
-		else
-		{
-			$taxAmount = 0;
-		}
-		$amount = $totalAmount - $discountAmount + $taxAmount;
 
-		// Payment processing fee
-		$paymentMethod = JRequest::getVar('payment_method', '');
-		$paymentFeeAmount  = 0;
-		$paymentFeePercent = 0;
-		if ($paymentMethod)
-		{
-			$method            = os_payments::loadPaymentMethod($paymentMethod);
-			$params            = new JRegistry($method->params);
-			$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
-			$paymentFeePercent = (float) $params->get('payment_fee_percent');
-		}
-		if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $amount > 0)
-		{
-			$paymentProcessingFee         = round($paymentFeeAmount + $amount * $paymentFeePercent / 100, 2);
-			$amount += $paymentProcessingFee;
-		}
-		else
-		{
-			$paymentProcessingFee         = 0;
-		}
-
-		$response['total_amount'] = EventbookingHelper::formatAmount($totalAmount, $config);
-		$response['discount_amount'] = EventbookingHelper::formatAmount($discountAmount, $config);
-		$response['tax_amount'] = EventbookingHelper::formatAmount($taxAmount, $config);
-		$response['payment_processing_fee'] = EventbookingHelper::formatAmount($paymentProcessingFee, $config);
-		$response['amount'] = EventbookingHelper::formatAmount($amount, $config);
+		$fees = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+		$response['total_amount'] = EventbookingHelper::formatAmount($fees['total_amount'], $config);
+		$response['discount_amount'] = EventbookingHelper::formatAmount($fees['discount_amount'], $config);
+		$response['tax_amount'] = EventbookingHelper::formatAmount($fees['tax_amount'], $config);
+		$response['payment_processing_fee'] = EventbookingHelper::formatAmount($fees['payment_processing_fee'], $config);
+		$response['amount'] = EventbookingHelper::formatAmount($fees['amount'], $config);
+		$response['deposit_amount'] = EventbookingHelper::formatAmount($fees['deposit_amount'], $config);
+		$response['coupon_valid'] = $fees['coupon_valid'];
 		echo json_encode($response);
 		JFactory::getApplication()->close();
 	}
+	
 	/**
-	 * Validate the coupon code which users entered on the registration form
+	 * Get depend fields status
+	 *
 	 */
-	public function validate_coupon()
-	{
-		$db = JFactory::getDbo();
-		$config = EventbookingHelper::getConfig();
-		$where = array();
-		$eventId = JRequest::getInt('event_id', 0);
-		$couponCode = JRequest::getVar('coupon_code', '');
-		$where[] = 'published = 1';
-		$where[] = ' code="' . $couponCode . '" ';
-		$where[] = ' (valid_from="0000-00-00" OR valid_from <= NOW()) ';
-		$where[] = ' (valid_to="0000-00-00" OR valid_to >= NOW()) ';
-		$where[] = ' (times = 0 OR times > used)';
-		if ($config->multiple_booking)
-		{
-			$cart = new EventbookingHelperCart();
-			$eventIds = $cart->getItems();
-			if (count($eventIds) == 0)
-			{
-				$eventIds = array();
-				$eventIds[] = 0;
-			}
-			$where[] = ' (event_id=0 OR event_id IN(' . implode(',', $eventIds) . '))';
-		}
-		else
-		{
-			$where[] = ' (event_id=0 OR event_id=' . $eventId . ')';
-		}
-		$sql = 'SELECT * FROM #__eb_coupons WHERE ' . implode(' AND ', $where);
-		$db->setQuery($sql);
-		$rowCoupon = $db->loadObject();
-		if ($rowCoupon)
-		{
-			$_SESSION['coupon_id'] = $rowCoupon->id;
-			echo 1;
-		}
-		else
-		{
-			$_SESSION['coupon_id'] = 0;
-			echo 0;
-		}
-		JFactory::getApplication()->close();
-	}
-
 	public function get_depend_fields_status()
 	{
 		$db = JFactory::getDbo();

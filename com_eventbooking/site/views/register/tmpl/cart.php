@@ -397,7 +397,42 @@ if (!$this->userId && $this->config->user_registration)
 		}
 		if ($this->depositPayment) 
 		{
-		?>	
+			if ($this->paymentType == 1)
+			{
+				$style = '';
+			}
+			else
+			{
+				$style = 'style = "display:none"';
+			}
+		?>
+		<div id="deposit_amount_container" class="control-group"<?php echo $style; ?>>
+			<label class="control-label" for="payment_type">
+				<?php echo JText::_('EB_DEPOSIT_AMOUNT') ;?>
+			</label>
+			<div class="controls">
+				<?php
+				if ($this->config->currency_position == 0)
+				{
+					?>
+					<div class="input-prepend inline-display">
+						<span class="add-on"><?php echo $this->config->currency_symbol;?></span>
+						<input id="deposit_amount" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->depositAmount, $this->config); ?>" />
+					</div>
+				<?php
+				}
+				else
+				{
+					?>
+					<div class="input-append inline-display">
+						<input id="deposit_amount" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->depositAmount, $this->config); ?>" />
+						<span class="add-on"><?php echo $this->config->currency_symbol;?></span>
+					</div>
+				<?php
+				}
+				?>
+			</div>
+		</div>
 		<div class="control-group">
 			<label class="control-label" for="payment_type">
 				<?php echo JText::_('EB_PAYMENT_TYPE') ;?>				

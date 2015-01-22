@@ -184,7 +184,7 @@ $selectedState = '';
     					</td>
     					<td>
     						<?php
-    							$dueAmount = $this->item->amount = $this->item->deposit_amount; 
+    							$dueAmount = $this->item->amount - $this->item->deposit_amount;
     							echo $this->config->currency_symbol?><input type="text" name="due_amount" class="input-medium" value="<?php echo $dueAmount > 0 ? round($dueAmount , 2) : null;?>" />
     					</td>
     				</tr>
