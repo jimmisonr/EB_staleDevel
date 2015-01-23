@@ -131,7 +131,6 @@ class EventBookingModelRegister extends JModelLegacy
 		}
 		if ($row->amount > 0)
 		{
-			$paymentMethod = $data['payment_method'];
 			require_once JPATH_COMPONENT . '/payments/' . $paymentMethod . '.php';
 			$query->clear();
 			$query->select('params')
@@ -336,7 +335,6 @@ class EventBookingModelRegister extends JModelLegacy
 		$session->clear('eb_group_billing_data');
 		if ($row->amount > 0)
 		{
-			$paymentMethod = $data['payment_method'];
 			require_once JPATH_COMPONENT . '/payments/' . $paymentMethod . '.php';
 			$query->clear();
 			$query->select('params')
