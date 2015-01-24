@@ -287,7 +287,7 @@ $selectedState = '';
 		var siteUrl = "<?php echo JUri::root(); ?>";
 		(function($){
 			buildStateField = (function(stateFieldId, countryFieldId, defaultState){
-				if($('#' + stateFieldId).length)
+				if($('#' + stateFieldId).length && $('#' + stateFieldId).is('select'))
 				{
 					//set state
 					if ($('#' + countryFieldId).length)

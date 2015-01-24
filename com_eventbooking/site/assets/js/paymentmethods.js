@@ -456,7 +456,7 @@ function showHideDependFields(fieldId, fieldName, fieldType, fieldSuffix)
 function buildStateField(stateFieldId, countryFieldId, defaultState)
 {
 	Eb.jQuery(function($) {
-		if($('#' + stateFieldId).length)
+        if($('#' + stateFieldId).length && $('#' + stateFieldId).is('select'))
 		{
 			//set state
 			if ($('#' + countryFieldId).length)
