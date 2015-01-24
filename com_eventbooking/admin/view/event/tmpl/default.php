@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.6.9
+ * @version        	1.6.10
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -504,19 +504,19 @@ $format = 'Y-m-d' ;
 		if ($this->config->event_custom_field) {
 		?>
 			<div class="tab-pane" id="extra-information-page">				
-				<table class="admintable">
+				<table class="admintable" width="100%">
 					<?php
 						foreach ($this->form->getFieldset('basic') as $field) {
 						?>
-					<tr>
-						<td width="20%" class="key">
-							<?php echo $field->label ;?>
-						</td>
-						<td>
-							<?php echo  $field->input ; ?>
-						</td>
-					</tr>
-					<?php
+							<tr>
+								<td class="key" width="15%">
+									<?php echo $field->label ;?>
+								</td>
+								<td>
+									<?php echo  $field->input ; ?>
+								</td>
+							</tr>
+						<?php
 						}					
 					?>								
 				</table>
