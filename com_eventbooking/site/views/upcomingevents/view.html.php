@@ -54,7 +54,7 @@ class EventBookingViewUpcomingEvents extends JViewLegacy
 			for ($i = 0, $n = count($items); $i < $n; $i++)
 			{
 				$item = & $items[$i];
-				$params->loadString($item->custom_fields, 'INI');
+				$params->loadString($item->custom_fields, 'JSON');
 				$paramData = array();
 				foreach ($customFields as $name => $label)
 				{
