@@ -860,9 +860,9 @@ class EventbookingHelper
 		$totalAmount          = 0;
 		$discountAmount       = 0;
 		$taxAmount            = 0;
+		$amount               = 0;
 		$depositAmount        = 0;
 		$paymentProcessingFee = 0;
-		$amount               = 0;
 		$feeAmount            = $form->calculateFee();
 		$items                = $cart->getItems();
 		$quantities           = $cart->getQuantities();
@@ -903,16 +903,16 @@ class EventbookingHelper
 
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
-			$eventId  = (int) $items[$i];
-			$quantity = (int) $quantities[$i];
+			$eventId               = (int) $items[$i];
+			$quantity              = (int) $quantities[$i];
+			$recordsData[$eventId] = array();
 			$query->clear();
 			$query->select('*')
 				->from('#__eb_events')
 				->where('id=' . $eventId);
 			$db->setQuery($query);
-			$recordsData[$eventId] = array();
-			$event                 = $db->loadObject();
-			$rate                  = self::getRegistrationRate($eventId, $quantity);
+			$event = $db->loadObject();
+			$rate  = self::getRegistrationRate($eventId, $quantity);
 			if ($i == 0)
 			{
 				$registrantTotalAmount = $rate * $quantity + $feeAmount;
