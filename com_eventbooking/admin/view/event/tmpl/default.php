@@ -504,20 +504,22 @@ $format = 'Y-m-d' ;
 		if ($this->config->event_custom_field) {
 		?>
 			<div class="tab-pane" id="extra-information-page">				
+				<table class="admintable">
 					<?php
 						foreach ($this->form->getFieldset('basic') as $field) {
 						?>
-						<div class="control-group">
-							<div class="control-label">
-								<?php echo $field->label ;?>
-							</div>					
-							<div class="controls">
-								<?php echo  $field->input ; ?>
-							</div>
-						</div>	
+					<tr>
+						<td width="20%" class="key">
+							<?php echo $field->label ;?>
+						</td>
+						<td>
+							<?php echo  $field->input ; ?>
+						</td>
+					</tr>
 					<?php
 						}					
 					?>								
+				</table>
 			</div>
 		<?php	
 		}
