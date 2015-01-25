@@ -17,7 +17,7 @@ class EventbookingModelRegistrants extends RADModelList
 	 */
 	public function __construct($config = array())
 	{
-		$config['search_fields'] = array('tbl.first_name', 'tbl.last_name', 'tbl.transaction_id');		
+		$config['search_fields'] = array('tbl.first_name', 'tbl.last_name', 'tbl.email', 'tbl.transaction_id');	
 		parent::__construct($config);						
 		$app = JFactory::getApplication();
 		$context = $this->option . '.' . $this->name . '.';
