@@ -679,6 +679,17 @@ $editor = JFactory::getEditor();
 					</tr>
 					<tr>
 						<td class="key" style="width:18%;">
+							<?php echo JText::_('EB_SHOW_CALENDAR_LEGEND'); ?>
+						</td>
+						<td width="30%">
+							<?php echo $this->lists['show_calendar_legend']; ?>
+						</td>
+						<td>
+							&nbsp;
+						</td>
+					</tr>
+					<tr>
+						<td class="key" style="width:18%;">
 							<?php echo JText::_('EB_FRONTEND_SUBMIT_EVENT_FORM_LAYOUT'); ?>
 						</td>
 						<td width="30%">

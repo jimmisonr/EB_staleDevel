@@ -18,7 +18,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '1.6.9';
+		return '1.6.10';
 	}
 
 	/**
@@ -2725,6 +2725,32 @@ class EventbookingHelper
 		return $colors[$eventId];
 	}
 
+	/**
+	 * Get categories of the given events
+	 *
+	 * @param array $eventIds
+	 *
+	 * @return array
+	 */
+	public static function getCategories($eventIds = array())
+	{
+		if (count($eventIds))
+		{
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('a.id, a.name, a.color_code')
+				->from('#__eb_categories AS a')
+				->where('published = 1')
+				->where('id IN (SELECT category_id FROM #__eb_event_categories WHERE event_id IN (' . implode(',', $eventIds) . ') AND main_category = 1)');
+			$db->setQuery($query);
+
+			return $db->loadObjectList();
+		}
+		else
+		{
+			return array();
+		}
+	}
 	/**
 	 * Get title of the given payment method
 	 *

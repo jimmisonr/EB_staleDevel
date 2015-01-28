@@ -742,6 +742,27 @@ body .eb-calendar li {
 	margin: 0;
 }
 
+#eb-calendar-legend ul{ margin: 20px 0 0 0;}
+#eb-calendar-legend ul li{
+    float: left;
+    width: auto;
+}
+#eb-calendar-legend span{
+    display: block;
+    width: 25px;
+    height: 25px;
+    float: left;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+#eb-calendar-legend a{
+    font-size: 12px;
+    font-weight: bold;
+    height: 25px;
+    line-height: 25px;
+}
+#eb-calendar-legend ul li {list-style: none;content: "";}
+
 @media screen and (max-width:767px) {
     body .eb-calendar ul.eb-month-browser li {
         font-size: 12px;

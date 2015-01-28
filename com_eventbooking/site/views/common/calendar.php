@@ -39,6 +39,7 @@ EventbookingHelperJquery::equalHeights();
     </ul>
     <ul class="eb-days clearfix">
     <?php
+        $eventIds = array();
         $dataCount = count($data["dates"]);
         $dn=0;
         for ($w=0; $w<6 && $dn < $dataCount; $w++)
@@ -63,6 +64,7 @@ EventbookingHelperJquery::equalHeights();
                         foreach ($currentDay["events"] as $key=> $event)
                         {
                             $color =   EventbookingHelper::getColorCodeOfEvent($event->id);
+	                        $eventIds[] = $event->id;
                             ?>
                             <div class="date day_cell">
                                 <a class="eb_event_link" href="<?php echo JText::_(EventbookingHelperRoute::getEventRoute($event->id, isset($categoryId) ? $categoryId : 0, $Itemid)); ?>" title="<?php echo $event->title; ?>" <?php if ($color) echo 'style="background-color:#'.$color.'";' ; ?>>
@@ -90,6 +92,29 @@ EventbookingHelperJquery::equalHeights();
     ?>
     </ul>
 </div>
+<?php
+	if ($config->show_calendar_legend && empty($categoryId))
+	{
+		$categories = EventbookingHelper::getCategories($eventIds);
+	?>
+		<div id="eb-calendar-legend" class="clearfix row-fluid">
+			<ul>
+				<?php
+					foreach ($categories as $category)
+					{
+					?>
+						<li>
+							<span class="eb-category-legend-color" style="background: #<?php echo $category->color_code; ?>"></span>
+							<a href="<?php echo JRoute::_(EventbookingHelperRoute::getCategoryRoute($category->id, $Itemid)); ?>"><?php echo $category->name; ?></a>
+						</li>
+					<?php
+					}
+				?>
+			</ul>
+		</div>
+	<?php
+	}
+?>
 <script type="text/javascript">
     	Eb.jQuery(document).ready(function($) {
             <?php

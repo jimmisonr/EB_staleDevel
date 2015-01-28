@@ -132,6 +132,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['calendar_theme'] = JHtml::_('select.genericlist', $options, 'calendar_theme', ' class="inputbox" ', 'value', 'text', 
 			$config->calendar_theme);
 		$lists['show_event_time'] = JHtml::_('select.booleanlist', 'show_event_time', '', $config->show_event_time);
+		$lists['show_calendar_legend'] = JHtml::_('select.booleanlist', 'show_calendar_legend', '', $config->show_calendar_legend);
 		$lists['activate_deposit_feature'] = JHtml::_('select.booleanlist', 'activate_deposit_feature', '', $config->activate_deposit_feature);
 		$lists['activate_waitinglist_feature'] = JHtml::_('select.booleanlist', 'activate_waitinglist_feature', '', 
 			$config->activate_waitinglist_feature);

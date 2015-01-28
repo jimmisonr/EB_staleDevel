@@ -95,6 +95,7 @@ class EventbookingHelperRoute
 		{
 			$link .= '&Itemid=' . $item;
 		}
+
 		return $link;
 	}
 
