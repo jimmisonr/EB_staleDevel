@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.6.9
+ * @version            1.6.10
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -308,8 +308,6 @@ class EventbookingHelper
 			$replaces['name'] = $replaces['first_name'];
 		}
 
-		$replaces['transaction_id'] = $row->transaction_id;
-
 		if ($row->coupon_id)
 		{
 			$query->clear();
@@ -395,6 +393,22 @@ class EventbookingHelper
 		{
 			$replaces['location'] = '';
 		}
+
+		// Registration record related tags
+		$replaces['number_registrants'] = $row->number_registrants;
+		$replaces['invoice_number']     = $row->invoice_number;
+		$replaces['transaction_id'] = $row->transaction_id;
+		$method = os_payments::loadPaymentMethod($row->payment_method);
+		if ($method)
+		{
+			$replaces['payment_method'] = JText::_($method->title);
+		}
+		else
+		{
+			$replaces['payment_method'] = '';
+		}
+
+
 		// Registration detail tags
 		$replaces['registration_detail'] = self::getEmailContent($config, $row, true, $form);
 
