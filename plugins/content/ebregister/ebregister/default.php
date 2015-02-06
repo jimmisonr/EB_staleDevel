@@ -478,17 +478,24 @@ $selectedState = '';
 	}
 	if ($config->accept_term ==1)
 	{
-		EventbookingHelperJquery::colorbox('eb-colorbox-term');
+		EventbookingHelperJquery::colorbox('eb-colorbox-term');		
 		$articleId  = $event->article_id ? $event->article_id : $config->article_id ;
+		$db =  JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('id, catid')
+			->from('#__content')
+			->where('id = '. (int) $articleId);
+		$db->setQuery($query);
+		$article = $db->loadObject();
 		require_once JPATH_ROOT.'/components/com_content/helpers/route.php' ;
 		if ($config->fix_term_and_condition_popup) 
 		{
-			$termLink = ContentHelperRoute::getArticleRoute($articleId).'&format=html' ;
+			$termLink = ContentHelperRoute::getArticleRoute($article->id, $article->catid).'&format=html' ;
 			$extra = ' target="_blank" ';
 		} 
 		else 
 		{
-			$termLink = ContentHelperRoute::getArticleRoute($articleId).'&tmpl=component&format=html' ;
+			$termLink = ContentHelperRoute::getArticleRoute($article->id, $article->catid).'&tmpl=component&format=html' ;
 			$extra = ' class="eb-colorbox-term" ' ;
 		}
 		?>

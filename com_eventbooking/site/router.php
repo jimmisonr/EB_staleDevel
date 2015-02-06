@@ -274,5 +274,11 @@ function EventbookingParseRoute($segments)
 			}
 		}
 	}
+	
+	if (isset($vars['tmpl']) && !isset($_GET['tmpl']))
+	{
+			unset($vars['tmpl']);
+	}
+	
 	return $vars;
 }
