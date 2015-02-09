@@ -324,13 +324,13 @@ class EventbookingController extends JControllerLegacy
 		}
 		$config = EventbookingHelper::getConfig();
 		$user = JFactory::getUser();
+		$session = JFactory::getSession();
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 		{
 			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
 			$res = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
 			if (!$res)
 			{
-				$session = JFactory::getSession();
 				JError::raiseWarning('', JText::_('EB_INVALID_CAPTCHA_ENTERED'));
 				$data = JRequest::get('post', JREQUEST_ALLOWHTML);
 				$session->set('eb_group_billing_data', serialize($data));
@@ -341,6 +341,25 @@ class EventbookingController extends JControllerLegacy
 				return;
 			}
 		}
+
+		// Check to see if there is a valid number registrants
+		$numberRegistrants = (int) $session->get('eb_number_registrants', '');
+		if (!$numberRegistrants)
+		{
+			// Session was lost for some reasons, users will have to start over again
+			if ($config->use_https)
+			{
+				$ssl = 1;
+			}
+			else
+			{
+				$ssl = 0;
+			}
+			$Itemid    = $input->getInt('Itemid', 0);
+			$signupUrl = JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id=' . $eventId . '&Itemid=' . $Itemid, false, $ssl);
+			JFactory::getApplication()->redirect($signupUrl, JText::_('Sorry, your session was expired. Please try again!'));
+		}
+
 		$post = JRequest::get('post', JREQUEST_ALLOWHTML);
 		$model = $this->getModel('Register');
 		$model->processGroupRegistration($post);
@@ -444,6 +463,14 @@ class EventbookingController extends JControllerLegacy
 				return;
 			}
 		}
+
+		$cart                   = new EventbookingHelperCart();
+		$items                  = $cart->getItems();
+		if (!count($items))
+		{
+			JFactory::getApplication()->redirect('index.php', JText::_('Sorry, your session was expired. Please try again!'));
+		}
+
 		$post = JRequest::get('post');
 		$model = $this->getModel('cart');
 		$model->processCheckout($post);
