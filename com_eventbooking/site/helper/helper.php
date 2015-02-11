@@ -3246,6 +3246,9 @@ class EventbookingHelper
 			$invoiceStatus = JText::_('EB_INVOICE_STATUS_UNKNOWN');
 		}
 		$replaces['INVOICE_STATUS'] = $invoiceStatus;
+		unset($replaces['total_amount']);
+		unset($replaces['discount_amount']);
+		unset($replaces['tax_amount']);
 		if ($config->multiple_booking)
 		{
 			$sql = 'SELECT a.title, a.event_date, b.* FROM #__eb_events AS a INNER JOIN #__eb_registrants AS b ' . ' ON a.id = b.event_id ' .
@@ -3310,10 +3313,7 @@ class EventbookingHelper
 				$row->store();
 			}
 			$invoiceNumber = self::formatInvoiceNumber($row->invoice_number, $config);
-			if ($row->payment_method == 'os_offline' || !file_exists($invoiceStorePath . $invoiceNumber . '.pdf'))
-			{
-				self::generateInvoicePDF($row);
-			}
+			self::generateInvoicePDF($row);
 			$invoicePath = $invoiceStorePath . $invoiceNumber . '.pdf';
 			$fileName    = $invoiceNumber . '.pdf';
 			while (@ob_end_clean()) ;
