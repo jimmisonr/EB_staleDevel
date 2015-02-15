@@ -35,8 +35,10 @@ if (count($this->items))
 				<?php echo JText::_('EB_REGISTRATION_DATE'); ?>
 			</th>
 			<?php
-				if ($this->displayCustomField) {
-					foreach($this->fields as $fieldId) {
+				if ($this->displayCustomField)
+				{
+					foreach($this->fields as $fieldId)
+					{
 					?>
 						<th class="hidden-phone">
 							<?php echo $this->fieldTitles[$fieldId] ; ?>
@@ -71,11 +73,21 @@ if (count($this->items))
 				<?php echo JHtml::_('date', $row->register_date, $this->config->date_format) ; ?>
 			</td>	
 			<?php
-				if ($this->displayCustomField) {
-					foreach($this->fields as $fieldId) {
+				if ($this->displayCustomField)
+				{
+					foreach($this->fields as $fieldId)
+					{
+						if (isset($this->fieldValues[$row->id][$fieldId]))
+						{
+							$fieldValue = $this->fieldValues[$row->id][$fieldId];
+						}
+						else
+						{
+							$fieldValue = '';
+						}
 					?>
 						<td class="hidden-phone">
-							<?php echo $this->fieldValues[$row->id][$fieldId] ; ?>
+							<?php echo $fieldValue ?>
 						</td>
 					<?php	
 					}	

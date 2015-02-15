@@ -1,14 +1,15 @@
 <?php
 /**
- * @version        	1.6.10
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            1.6.10
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
+
 class EventBookingViewRegistrantList extends JViewLegacy
 {
 
@@ -18,12 +19,13 @@ class EventBookingViewRegistrantList extends JViewLegacy
 		{
 			return;
 		}
-		$config = EventbookingHelper::getConfig();
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
+		$config  = EventbookingHelper::getConfig();
+		$db      = JFactory::getDbo();
+		$query   = $db->getQuery(true);
 		$eventId = JRequest::getInt('id');
 		if ($eventId)
 		{
+			// Get list of registration records
 			$query->select('*')
 				->from('#__eb_registrants AS tbl')
 				->where('tbl.event_id=' . $eventId)
@@ -38,53 +40,75 @@ class EventBookingViewRegistrantList extends JViewLegacy
 				$query->where('tbl.group_id = 0');
 			}
 			$query->order('register_date DESC');
-			$db->setQuery($query);			
+			$db->setQuery($query);
 			$rows = $db->loadObjectList();
+
+			// Check to see whether we need to display custom fields data for this event
+			$query->clear();
+			$query->select('custom_field_ids')
+				->from('#__eb_events')
+				->where('id = ' . $eventId);
+			$db->setQuery($query);
+			$customFieldIds = $db->loadResult();
+			if (strlen(trim($customFieldIds)))
+			{
+				$fields      = explode(',', $customFieldIds);
+				$fieldTitles = array();
+				$fieldValues = array();
+				$query->clear();
+				$query->select('id, name,title, is_core')
+					->from('#__eb_fields')
+					->where('id IN (' . $customFieldIds . ')');
+				$rowFields = $db->loadObjectList();
+				foreach ($rowFields as $rowField)
+				{
+					$fieldTitles[$rowField->id] = $rowField->title;
+				}
+
+				// Getting values for custom fields
+				$registrantIds = array();
+				foreach ($rows as $row)
+				{
+					$registrantIds[] = $row->id;
+					foreach($rowFields as $rowField)
+					{
+						if ($rowField->is_core)
+						{
+							$fieldValues[$row->id][$rowField->id] = $row->{$rowField->name};
+						}
+					}
+
+				}
+
+				$query->clear();
+				$query->select('registrant_id, field_id, field_value')
+					->from('#__eb_field_values')
+					->where('registrant_id IN (' . implode(',', $registrantIds) . ')');
+				$db->setQuery($query);
+				$rowFieldValues = $db->loadObjectList();
+				foreach ($rowFieldValues as $rowFieldValue)
+				{
+					$fieldValues[$rowFieldValue->registrant_id][$rowFieldValue->field_id] = $rowFieldValue->field_value;
+				}
+
+				$this->fieldTitles  = $fieldTitles;
+				$this->fieldValues  = $fieldValues;
+				$this->fields       = $fields;
+				$displayCustomField = true;
+			}
+			else
+			{
+				$displayCustomField = false;
+			}
+			$this->items              = $rows;
+			$this->config             = $config;
+			$this->displayCustomField = $displayCustomField;
+
+			parent::display($tpl);
 		}
 		else
 		{
-			$rows = array();
+			return;
 		}
-		$sql = 'SELECT * FROM #__eb_events WHERE id=' . $eventId;
-		$db->setQuery($sql);
-		$event = $db->loadObject();
-		if (strlen(trim($event->custom_field_ids)))
-		{
-			$fields = explode(',', $event->custom_field_ids);
-			$fieldTitles = array();
-			$fieldValues = array();
-			$sql = 'SELECT id, title FROM #__eb_fields WHERE id IN (' . $event->custom_field_ids . ')';
-			$db->setQuery($sql);
-			$rowFields = $db->loadObjectList();
-			foreach ($rowFields as $rowField)
-			{
-				$fieldTitles[$rowField->id] = $rowField->title;
-			}
-			$registrantIds = array();
-			foreach ($rows as $row)
-			{
-				$registrantIds[] = $row->id;
-			}
-			$sql = 'SELECT registrant_id, field_id, field_value FROM #__eb_field_values WHERE registrant_id IN (' . implode(',', $registrantIds) . ')';
-			$db->setQuery($sql);
-			$rowFields = $db->loadObjectList();
-			foreach ($rowFields as $rowField)
-			{
-				$fieldValues[$rowField->registrant_id][$rowField->field_id] = $rowField->field_value;
-			}
-			$this->fieldTitles = $fieldTitles;
-			$this->fieldValues = $fieldValues;
-			$this->fields = $fields;
-			$displayCustomField = true;
-		}
-		else
-		{
-			$displayCustomField = false;
-		}
-		$this->items = $rows;
-		$this->config = $config;
-		$this->displayCustomField = $displayCustomField;
-		
-		parent::display($tpl);
 	}
 }
