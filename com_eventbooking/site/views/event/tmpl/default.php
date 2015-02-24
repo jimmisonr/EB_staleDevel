@@ -25,7 +25,7 @@ else
 ?>
 <div id="eb-event-page" class="eb-container row-fluid eb-event">
 	<div class="eb-box-heading clearfix">    	
-    	<h1 class="eb-page-heading pull-left span11">																																			
+    	<h1 class="eb-page-heading">
 			<?php echo $item->title; ?>
 		</h1>
     </div>
