@@ -576,6 +576,8 @@ class EventbookingModelEvent extends RADModelItem
 					'max_group_number',
 					'discount_type',
 					'discount',
+					'early_bird_discount_amount',
+					'early_bird_discount_type',
 					'paypal_email',
 					'notification_emails',
 					'user_email_body',
@@ -584,7 +586,7 @@ class EventbookingModelEvent extends RADModelItem
 					'thanks_message_offline',
 					'params',
 					'currency_code',
-					'currency_symbol', 
+					'currency_symbol',
 					'published');
 				$rowChildEvent = $this->getTable();
 				foreach ($children as $childId)
