@@ -131,7 +131,7 @@ class os_paypal extends os_payment
 		$this->setParam('item_name', $itemName);
 		$this->setParam('amount', round($data['amount'], 2));
 		$this->setParam('custom', $row->id);
-		$this->setParam('return', $siteUrl . 'index.php?option=com_eventbooking&view=complete&registration_code=' . $row->registration_code . '&Itemid=' . $Itemid);
+		$this->setParam('return', $siteUrl . 'index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid);
 		$this->setParam('cancel_return', $siteUrl . 'index.php?option=com_eventbooking&task=cancel&id=' . $row->id . '&Itemid=' . $Itemid);
 		$this->setParam('notify_url', $siteUrl . 'index.php?option=com_eventbooking&task=payment_confirm&payment_method=os_paypal');
 		$this->setParam('address1', $row->address);

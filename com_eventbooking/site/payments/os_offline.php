@@ -42,7 +42,7 @@ class os_offline extends os_payment
 			EventbookingHelper::updateGroupRegistrationRecord($row->id);
 		}
 		EventbookingHelper::sendEmails($row, $config);
-		$url = JRoute::_('index.php?option=com_eventbooking&view=complete&registration_code=' . $row->registration_code . '&Itemid=' . $Itemid, false, false);
+		$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false, false);
 		$app->redirect($url);
 	}
 }

@@ -21,6 +21,11 @@ class EventBookingViewComplete extends JViewLegacy
 		$query            = $db->getQuery(true);
 		$config           = EventbookingHelper::getConfig();
 		$registrationCode = JRequest::getVar('registration_code');
+		if (empty($registrationCode))
+		{
+			// Try to get it from session
+			$registrationCode = JFactory::getSession()->get('eb_registration_code', '');
+		}
 		if ($registrationCode)
 		{
 			$sql = 'SELECT id FROM #__eb_registrants WHERE registration_code="' . $registrationCode . '" ORDER BY id LIMIT 1 ';

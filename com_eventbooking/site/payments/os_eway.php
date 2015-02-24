@@ -609,7 +609,7 @@ class os_eway extends os_payment
 			JPluginHelper::importPlugin('eventbooking');
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-			$url = JRoute::_('index.php?option=com_eventbooking&view=complete&registration_code=' . $row->registration_code . '&Itemid=' . $Itemid, false, false);
+			$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false, false);
 			$app->redirect($url);
 		}
 		else

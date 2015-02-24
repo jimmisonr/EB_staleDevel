@@ -129,6 +129,11 @@ class EventBookingModelRegister extends JModelLegacy
 		{
 			$data['amount'] = $row->deposit_amount;
 		}
+
+		// Store registration_code into session, use for registration complete code
+		$session = JFactory::getSession();
+		$session->set('eb_registration_code', $row->registration_code);
+
 		if ($row->amount > 0)
 		{
 			require_once JPATH_COMPONENT . '/payments/' . $paymentMethod . '.php';
@@ -137,22 +142,21 @@ class EventBookingModelRegister extends JModelLegacy
 				->from('#__eb_payment_plugins')
 				->where('name=' . $db->quote($paymentMethod));
 			$db->setQuery($query);
-			$params = new JRegistry($db->loadResult());
+			$params       = new JRegistry($db->loadResult());
 			$paymentClass = new $paymentMethod($params);
 			$paymentClass->processPayment($row, $data);
 		}
 		else
 		{
-			$Itemid = JRequest::getInt('Itemid');
+			$Itemid            = JRequest::getInt('Itemid');
 			$row->payment_date = gmdate('Y-m-d H:i:s');
-			$row->published = 1;
+			$row->published    = 1;
 			$row->store();
 			EventbookingHelper::sendEmails($row, $config);
 			JPluginHelper::importPlugin('eventbooking');
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-			$url = JRoute::_('index.php?option=com_eventbooking&view=complete&registration_code=' . $row->registration_code . '&Itemid=' . $Itemid, 
-				false);
+			$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false);
 			$app->redirect($url);
 		}
 	}
@@ -333,6 +337,10 @@ class EventBookingModelRegister extends JModelLegacy
 		$session->clear('eb_number_registrants');
 		$session->clear('eb_group_members_data');
 		$session->clear('eb_group_billing_data');
+
+		//Store registration code in session, use it for registration complete page
+		$session->set('eb_registration_code', $row->registration_code);
+
 		if ($row->amount > 0)
 		{
 			require_once JPATH_COMPONENT . '/payments/' . $paymentMethod . '.php';
@@ -341,14 +349,14 @@ class EventBookingModelRegister extends JModelLegacy
 				->from('#__eb_payment_plugins')
 				->where('name=' . $db->quote($paymentMethod));
 			$db->setQuery($query);
-			$params = new JRegistry($db->loadResult());
+			$params       = new JRegistry($db->loadResult());
 			$paymentClass = new $paymentMethod($params);
 			$paymentClass->processPayment($row, $data);
 		}
 		else
 		{
 			$row->payment_date = gmdate('Y-m-d H:i:s');
-			$row->published = 1;
+			$row->published    = 1;
 			$row->store();
 			if ($row->is_group_billing)
 			{
@@ -358,9 +366,7 @@ class EventBookingModelRegister extends JModelLegacy
 			JPluginHelper::importPlugin('eventbooking');
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-			$url = JRoute::_(
-				'index.php?option=com_eventbooking&view=complete&registration_code=' . $row->registration_code . '&Itemid=' .
-					 (int) JRequest::getInt('Itemid'), false);
+			$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . (int) JRequest::getInt('Itemid'), false);
 			$app->redirect($url);
 		}
 	}

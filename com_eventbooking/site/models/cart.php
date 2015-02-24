@@ -195,6 +195,8 @@ class EventBookingModelCart extends JModelLegacy
 			$db->execute();
 		}
 		$cart->reset();
+		$session = JFactory::getSession();
+		$session->set('eb_registration_code', $row->registration_code);
 		if ($fees['amount'] > 0)
 		{
 			if ($fees['deposit_amount'] > 0)
@@ -234,8 +236,7 @@ class EventBookingModelCart extends JModelLegacy
 			JPluginHelper::importPlugin('eventbooking');
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-			$url = JRoute::_('index.php?option=com_eventbooking&view=complete&registration_code=' . $row->registration_code . '&Itemid=' . $Itemid,
-				false);
+			$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false);
 			$app->redirect($url);
 		}
 	}
