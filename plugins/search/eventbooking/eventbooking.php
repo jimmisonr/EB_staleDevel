@@ -50,7 +50,7 @@ class plgSearchEventBooking extends JPlugin
 	{
 		require_once JPATH_ROOT.'/components/com_eventbooking/helper/helper.php';
 		require_once JPATH_ROOT.'/components/com_eventbooking/helper/route.php';
-		$db		=& JFactory::getDBO();	
+		$db		= JFactory::getDBO();	
 		$Itemid = EventBookingHelper::getItemid();
 		if (is_array( $areas )) {
 			if (!array_intersect( $areas, array_keys($this->onContentSearchAreas()) )) {
@@ -107,7 +107,7 @@ class plgSearchEventBooking extends JPlugin
 			default:
 				$order = 'a.ordering ';
 		}	
-		$user = & JFactory::getUser() ;		
+		$user = JFactory::getUser() ;		
 		$query = 'SELECT a.id, a.category_id AS cat_id, a.title AS title, a.description AS text, event_date AS `created`, '	
 		.$db->Quote($section) .' AS section,'
 		. ' "1" AS browsernav'
