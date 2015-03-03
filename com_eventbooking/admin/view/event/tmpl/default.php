@@ -258,6 +258,14 @@ $format = 'Y-m-d' ;
 					<table class="admintable">
 						<tr>
 							<td class="key">
+								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_EVENT_PASSWORD' );?>::<?php echo JText::_('EB_EVENT_PASSWORD_EXPLAIN'); ?>"><?php echo JText::_('EB_EVENT_PASSWORD'); ?></span>
+							</td>
+							<td>
+								<input type="text" name="event_password" id="event_password" class="input-small" size="10" value="<?php echo $this->item->event_password; ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
 								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_ACCESS' );?>::<?php echo JText::_('EB_ACCESS_EXPLAIN'); ?>"><?php echo JText::_('EB_ACCESS'); ?></span>
 							</td>
 							<td>

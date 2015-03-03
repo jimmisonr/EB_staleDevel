@@ -800,7 +800,12 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+		if (!in_array('event_password', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `event_password` VARCHAR( 255 ) NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
 		#Support Payment method based on event
 		if (!in_array('payment_methods', $fields))
 		{
