@@ -704,27 +704,57 @@ class EventbookingController extends JControllerLegacy
 			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', $Itemid), false));
 		}
 	}
+
 	/**
 	 * Cancel registration for the event
 	 */
 	public function cancel_registration()
 	{
-		$app = JFactory::getApplication();
-		$Itemid = JRequest::getInt('Itemid', 0);
-		$db = JFactory::getDbo();
-		$user = JFactory::getUser();
-		$id = JRequest::getInt('id');
-		$sql = 'SELECT a.id, a.title, b.user_id FROM #__eb_events AS a INNER JOIN #__eb_registrants AS b ON a.id = b.event_id WHERE b.id=' . $id;
-		$db->setQuery($sql);
-		$rowEvent = $db->loadObject();		
+		$app              = JFactory::getApplication();
+		$db               = JFactory::getDbo();
+		$query            = $db->getQuery(true);
+		$user             = JFactory::getUser();
+		$Itemid           = JRequest::getInt('Itemid', 0);
+		$id               = JRequest::getInt('id');
+		$registrationCode = JRequest::getVar('registration_code', '');
+		if ($id)
+		{
+			$query->select('a.id, a.title, b.user_id, cancel_before_date, DATEDIFF(cancel_before_date, NOW()) AS number_days')
+				->from('#__eb_events AS a')
+				->innerJoin('#__eb_registrants AS b ON a.id = b.event_id')
+				->where('b.id = ' . $id);
+		}
+		else
+		{
+			$query->select('a.id, a.title, b.id AS registrant_id, b.user_id, cancel_before_date, DATEDIFF(cancel_before_date, NOW()) AS number_days')
+				->from('#__eb_events AS a')
+				->innerJoin('#__eb_registrants AS b ON a.id = b.event_id')
+				->where('b.registration_code = ' . $db->quote($registrationCode));
+		}
+		$db->setQuery($query);
+		$rowEvent = $db->loadObject();
+
 		if (!$rowEvent)
 		{
 			$app->redirect(JRoute::_('index.php?option=com_eventbooking&Itemid=' . $Itemid), JText::_('EB_INVALID_ACTION'));
 		}
-		if ($user->get('id') == 0 || ($user->get('id') != $rowEvent->user_id))
+
+		if (($user->get('id') == 0 && !$registrationCode) || ($user->get('id') != $rowEvent->user_id))
 		{
 			$app->redirect(JRoute::_('index.php?option=com_eventbooking&Itemid=' . $Itemid), JText::_('EB_INVALID_ACTION'));
 		}
+
+		if ($rowEvent->number_days < 0)
+		{
+			$msg = JText::sprintf('EB_CANCEL_DATE_PASSED', JHtml::_('date', $rowEvent->cancel_before_date, EventbookingHelper::getConfigValue('date_format'), null));
+			$app->redirect(JRoute::_('index.php?option=com_eventbooking&Itemid=' . $Itemid), $msg);
+		}
+
+		if ($registrationCode)
+		{
+			$id = $rowEvent->registrant_id;
+		}
+
 		$model = $this->getModel('register');
 		$model->cancelRegistration($id);
 		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=registrationcancel&id=' . $id . '&Itemid=' . $Itemid, false));

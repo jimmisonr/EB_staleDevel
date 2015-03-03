@@ -410,10 +410,11 @@ class EventBookingModelRegister extends JModelLegacy
 		$dispatcher->trigger('onRegistrationCancel', array($row));
 		$row->published = 2;
 		$row->store();
-		//Update status of group members record to cancelled as well				
+
+		// Update status of group members record to cancelled as well
 		if ($row->is_group_billing)
 		{
-			//We will need to set group members records to be cancelled
+			// We will need to set group members records to be cancelled
 			$query->update('#__eb_registrants')
 			->set('published=2')
 			->where('group_id='.(int)$row->id);
@@ -436,15 +437,15 @@ class EventBookingModelRegister extends JModelLegacy
 			->where('id = '. (int) $row->event_id);
 		$db->setQuery($query);
 		$event = $db->loadObject();
-		//Send notification email to administrator
-		$app = JFactory::getApplication();
+
+		// Send notification email to administrator
 		if ($config->from_name)
 		{
 			$fromName = $config->from_name;
 		}
 		else
 		{
-			$fromName = $app->getCfg('fromname');
+			$fromName = JFactory::getConfig()->get('fromname');
 		}
 		if ($config->from_email)
 		{
@@ -452,7 +453,7 @@ class EventBookingModelRegister extends JModelLegacy
 		}
 		else
 		{
-			$fromEmail = $app->getCfg('mailfrom');
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
 		}
 		if ($config->multiple_booking)
 		{
@@ -469,7 +470,8 @@ class EventBookingModelRegister extends JModelLegacy
 		$form = new RADForm($rowFields);
 		$data = EventbookingHelper::getRegistrantData($row, $rowFields);
 		$form->bind($data);
-		//Need to over-ridde some config options				
+
+		// Need to over-ridde some config options
 		$emailContent = EventbookingHelper::getEmailContent($config, $row, true, $form);
 		$query->clear();
 		$query->select('title')
