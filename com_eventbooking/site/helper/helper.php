@@ -412,6 +412,27 @@ class EventbookingHelper
 		// Registration detail tags
 		$replaces['registration_detail'] = self::getEmailContent($config, $row, true, $form);
 
+		// Cancel link
+		$query->clear();
+		$query->select('enable_cancel_registration')
+			->from('#__eb_events')
+			->where('id = ' . $row->event_id);
+		$db->setQuery($query);
+		$enableCancel = $db->loadResult();
+		if ($enableCancel)
+		{
+			$replaces['cancel_registration_link'] = '';
+		}
+		else
+		{
+			$Itemid = JRequest::getInt('Itemid', 0);
+			if (!$Itemid)
+			{
+				$Itemid = self::getItemid();
+			}
+			$replaces['cancel_registration_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=cancel_registration&registration_code=' . $row->registration_code.'&Itemid='.$Itemid;
+		}
+
 		return $replaces;
 	}
 
