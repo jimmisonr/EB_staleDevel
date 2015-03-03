@@ -18,7 +18,33 @@ defined('_JEXEC') or die();
  */
 class EventBookingModelRegister extends JModelLegacy
 {
-
+	/**
+	 * Check to see whether registrant entered correct password for private event
+	 *
+	 * @param $eventId
+	 * @param $password
+	 *
+	 * @return bool
+	 */
+	function checkPassword($eventId, $password)
+	{
+		$db = $this->getDbo();
+		$query = $db->getQuery(true);
+		$query->select('COUNT(*)')
+			->from('#__eb_events')
+			->where('id = '. $eventId)
+			->where('event_password = '. $db->quote($password));
+		$db->setQuery($query);
+		$total = $db->loadResult();
+		if ($total)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 	/**
 	 * Process individual registration
 	 *

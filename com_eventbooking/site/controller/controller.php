@@ -123,7 +123,31 @@ class EventbookingController extends JControllerLegacy
 		
 		parent::display($cachable, $urlparams);
 	}
-
+	/**
+	 * Check password
+	 */
+	public function check_event_password()
+	{
+		$password = JRequest::getVar('password', '');
+		$eventId = JRequest::getInt('event_id', 0);
+		$return = JRequest::getVar('return', '');
+		$model = $this->getModel('Register');
+		$success = $model->checkPassword($eventId, $password);
+		if ($success)
+		{
+			JFactory::getSession()->set('eb_passowrd_'.$eventId, 1);
+			$return = base64_decode($return);
+			$this->setRedirect($return);
+		}
+		else
+		{
+			// Redirect back to password view
+			$Itemid = JRequest::getInt('Itemid', 0);
+			$url = JRoute::_('index.php?option=com_eventbooking&view=password&event_id='.$eventId.'&return='.$return.'&Itemid='.$Itemid, false);
+			$this->setMessage(JText::_('EB_INVALID_EVENT_PASSWORD'), 'error');
+			$this->setRedirect($url);
+		}
+	}
 	/**
 	 * Display registration form for Individual registration
 	 */
@@ -147,6 +171,15 @@ class EventbookingController extends JControllerLegacy
 		if (!$event)
 		{
 			return;
+		}
+		if ($event->event_password)
+		{
+			$passwordPassed = JFactory::getSession()->get('eb_passowrd_'.$event->id, 0);
+			if (!$passwordPassed)
+			{
+				$return = base64_encode(JUri::getInstance()->toString());
+				JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_eventbooking&view=password&event_id='.$event->id.'&return='.$return.'&Itemid='.$input->getInt('Itemid', 0), false));
+			}
 		}
 		$query->clear();
 		if ($config->custom_field_by_category)

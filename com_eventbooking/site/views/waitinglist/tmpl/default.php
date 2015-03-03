@@ -25,7 +25,8 @@ else
 {
     $msg = $this->message->waitinglist_form_message;
 }
-if (strlen($msg)) {
+if (strlen($msg))
+{
 	$msg = str_replace('[EVENT_TITLE]', $this->event->title, $msg) ;						
 ?>								
 	<div class="msg"><?php echo $msg ; ?></div>							 															

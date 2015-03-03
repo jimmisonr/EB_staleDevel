@@ -40,6 +40,15 @@ class EventBookingViewRegister extends JViewLegacy
 			->where('id=' . $eventId);
 		$db->setQuery($query);
 		$event = $db->loadObject();
+		if ($event->event_password)
+		{
+			$passwordPassed = JFactory::getSession()->get('eb_passowrd_'.$event->id, 0);
+			if (!$passwordPassed)
+			{
+				$return = base64_encode(JUri::getInstance()->toString());
+				JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_eventbooking&view=password&event_id='.$event->id.'&return='.$return.'&Itemid='.$input->getInt('Itemid', 0), false));
+			}
+		}
 		$pageTitle = JText::_('EB_EVENT_REGISTRATION');
 		$pageTitle = str_replace('[EVENT_TITLE]', $event->title, $pageTitle);
 		JFactory::getDocument()->setTitle($pageTitle);
