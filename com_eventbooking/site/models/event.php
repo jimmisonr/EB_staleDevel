@@ -54,21 +54,35 @@ class EventBookingModelEvent extends JModelLegacy
 	 */
 	function getData()
 	{
-		$db = $this->getDbo();
 		if (empty($this->_data))
 		{
+			$db = $this->getDbo();
+			$query = $db->getQuery(true);
 			$id = JRequest::getInt('id', 0);
-			$sql = 'SELECT *, DATEDIFF(early_bird_discount_date, NOW()) AS date_diff FROM #__eb_events WHERE id=' . $id;
-			$db->setQuery($sql);
+			$query->select('*, DATEDIFF(early_bird_discount_date, NOW()) AS date_diff')
+				->from('#__eb_events')
+				->where('id = '. $id);
+			$db->setQuery($query);
 			$row = $db->loadObject();
+
 			//Get total registered user
-			$sql = 'SELECT SUM(number_registrants) FROM #__eb_registrants WHERE event_id=' . $id .
-				 ' AND group_id=0 AND (published = 1 OR (payment_method LIKE "os_offline%" AND published != 2))';
-			$db->setQuery($sql);
+			$query->clear();
+			$query->select('SUM(number_registrants)')
+				->from('#__eb_registrants')
+				->where('event_id = '. $id)
+				->where('group_id = 0')
+				->where('(published = 1 OR (payment_method LIKE "os_offline%" AND published != 2))');
+			$db->setQuery($query);
 			$row->total_registrants = (int) $db->loadResult();
-			$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $id;
-			$db->setQuery($sql);
-			$row->category_id = $db->loadResult();
+
+			// Get the main category of this event
+			$query->clear();
+			$query->select('category_id')
+				->from('#__eb_event_categories')
+				->where('event_id = '. $id)
+				->where('main_category = 1');
+			$db->setQuery($query);
+			$row->category_id = (int)$db->loadResult();
 			$rows = array();
 			$rows[] = $row;
 			EventbookingHelperData::calculateDiscount($rows);
@@ -77,54 +91,7 @@ class EventBookingModelEvent extends JModelLegacy
 		return $this->_data;
 	}
 
-	/**
-	 * Get categories path to add to gateway
-	 *
-	 * @return array
-	 */
-	function getCategories()
-	{
-		$db = $this->getDbo();
-		$item = $this->getData();
-		$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $item->id;
-		$db->setQuery($sql);
-		$categoryId = $db->loadResult();
-		if (!$categoryId)
-		{
-			return array();
-		}
-		$sql = "SELECT id, name, parent FROM #__eb_categories WHERE id = " . $categoryId . " AND published=1";
-		$db->setQuery($sql);
-		$row = $db->loadObject();
-		$row->total_children = 0; //Fake total children
-		$parents = array();
-		$parents[] = $row;
-		$categoryId = $row->parent;
-		while (true)
-		{
-			$sql = "SELECT id, name, parent FROM #__eb_categories WHERE id = " . $categoryId . " AND published=1";
-			$db->setQuery($sql);
-			$row = $db->loadObject();
-			if ($row)
-			{
-				$sql = 'SELECT COUNT(*) FROM #__eb_categories WHERE parent=' . $row->id . ' AND published = 1';
-				$db->setQuery($sql);
-				$total = $db->loadResult();
-				$row->total_children = $total;
-				$parents[] = $row;
-				$categoryId = $row->parent;
-			}
-			else
-			{
-				break;
-			}
-		}
-		return $parents;
-	}
-	
 	###############################################Added for supporting add/edit events from front-end##########################################################
-	
-
 	/**
 	 * Method to set the event identifier
 	 *
