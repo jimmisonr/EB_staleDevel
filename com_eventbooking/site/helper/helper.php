@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.6.10
+ * @version        	1.7.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -2612,6 +2612,7 @@ class EventbookingHelper
 	{
 		$db          = JFactory::getDbo();
 		$mailer      = JFactory::getMailer();
+		$query       = $db->getQuery(true);
 		$message     = self::getMessages();
 		$fieldSuffix = self::getFieldSuffix($row->language);
 		if ($config->from_name)
@@ -2630,27 +2631,29 @@ class EventbookingHelper
 		{
 			$fromEmail = JFactory::getConfig()->get('mailfrom');
 		}
-		$sql = "SELECT * FROM #__eb_events WHERE id=" . $row->event_id;
-		$db->setQuery($sql);
-		$event = $db->loadObject();
-		//Supported tags
-		$replaces                       = array();
-		$replaces['event_title']        = $event->title;
-		$replaces['first_name']         = $row->first_name;
-		$replaces['last_name']          = $row->last_name;
-		$replaces['organization']       = $row->organization;
-		$replaces['address']            = $row->address;
-		$replaces['address2']           = $row->address;
-		$replaces['city']               = $row->city;
-		$replaces['state']              = $row->state;
-		$replaces['zip']                = $row->zip;
-		$replaces['country']            = $row->country;
-		$replaces['phone']              = $row->phone;
-		$replaces['fax']                = $row->phone;
-		$replaces['email']              = $row->email;
-		$replaces['comment']            = $row->comment;
-		$replaces['number_registrants'] = $row->number_registrants;
 
+		$query->select('*')
+			->from('#__eb_events')
+			->where('id=' . $row->event_id);
+		$db->setQuery($query);
+		$event = $db->loadObject();
+		if ($config->multiple_booking)
+		{
+			$rowFields = self::getFormFields($row->id, 4);
+		}
+		elseif ($row->is_group_billing)
+		{
+			$rowFields = self::getFormFields($row->event_id, 1);
+		}
+		else
+		{
+			$rowFields = self::getFormFields($row->event_id, 0);
+		}
+		$form = new RADForm($rowFields);
+		$data = self::getRegistrantData($row, $rowFields);
+		$form->bind($data);
+		$form->buildFieldsDependency();
+		$replaces = self::buildTags($row, $form, $event, $config);
 		//Notification email send to user
 		if (strlen($message->{'watinglist_confirmation_subject' . $fieldSuffix}))
 		{
@@ -2677,14 +2680,19 @@ class EventbookingHelper
 		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
 		//Send emails to notification emails
 		if (strlen(trim($event->notification_emails)) > 0)
+		{
 			$config->notification_emails = $event->notification_emails;
+		}
 		if ($config->notification_emails == '')
+		{
 			$notificationEmails = $fromEmail;
+		}
 		else
+		{
 			$notificationEmails = $config->notification_emails;
+		}
 		$notificationEmails = str_replace(' ', '', $notificationEmails);
 		$emails             = explode(',', $notificationEmails);
-
 		if (strlen($message->{'watinglist_notification_subject' . $fieldSuffix}))
 		{
 			$subject = $message->{'watinglist_notification_subject' . $fieldSuffix};
