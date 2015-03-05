@@ -2134,8 +2134,10 @@ class EventbookingHelper
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('*')
-			->from('#__eb_waiting_lists')
-			->where('event_id=' . (int) $row->event_id);
+			->from('#__eb_registrants')
+			->where('event_id=' . (int) $row->event_id)
+			->where('published = 3')
+			->order('id');
 		$db->setQuery($query);
 		$registrants = $db->loadObjectList();
 		if (count($registrants))
