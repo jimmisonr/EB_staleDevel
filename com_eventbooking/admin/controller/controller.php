@@ -1011,6 +1011,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
+
+		if (!in_array('notified', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `notified`  TINYINT NOT NULL DEFAULT  '0' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
 		
 		if (!in_array('deposit_amount', $fields))
 		{
@@ -1870,6 +1877,25 @@ class EventbookingController extends RADControllerAdmin
 		$db->setQuery($sql);
 		$db->execute();
 		$db->truncateTable('#__eb_urls');
+
+		// Migrate waiting list data
+		$sql = 'SELECT COUNT(*) FROM #__eb_waiting_lists';
+		$db->setQuery($sql);
+		$total = $db->loadResult();
+		if ($total)
+		{
+			$sql = "INSERT INTO #__eb_registrants(
+				user_id, event_id, first_name, last_name, organization, address, address2, city,
+		 		state, country, zip, phone, fax, email, number_registrants, register_date, notified, published
+			)
+		 	SELECT user_id, event_id, first_name, last_name, organization, address, address2, city,
+		 	state, country, zip, phone, fax, email, number_registrants, register_date, notified, 3
+		 	FROM #__eb_waiting_lists ORDER BY id
+		 	";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+		$db->truncateTable('#__eb_waiting_lists');
 		$installType = JRequest::getVar('install_type');
 		if ($installType == 'install')
 		{
