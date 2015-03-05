@@ -53,6 +53,10 @@ class com_eventbookingInstallerScript
 		{
 			JFile::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php');
 		}
+		if (JFile::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller/daylightsaving.php'))
+		{
+			JFile::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller/daylightsaving.php');
+		}
 		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/helper/os_cart.php'))
 		{
 			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/helper/os_cart.php');
