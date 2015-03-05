@@ -1935,55 +1935,64 @@ class EventbookingHelper
 	 */
 	public static function acceptRegistration($eventId)
 	{
-		$db   = JFactory::getDbo();
 		$user = JFactory::getUser();
-		$gid  = $user->get('aid');
+		$db   = JFactory::getDbo();
+		$query = $db->getQuery(true);
 		if (!$eventId)
+		{
 			return false;
-		$sql = 'SELECT * FROM #__eb_events WHERE id=' . $eventId . ' AND published=1 ';
-		$db->setQuery($sql);
+		}
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
+		$query->select('a.*')
+			->select('DATEDIFF(event_date, "'.$currentDate.'") AS number_event_dates')
+			->select('DATEDIFF(cut_off_date, "'.$currentDate.'") AS number_cut_off_dates')
+			->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
+			->from('#__eb_events AS a')
+			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
+			->where('a.id = '. $eventId)
+			->where('a.published = 1');
+		$db->setQuery($query);
 		$row = $db->loadObject();
 		if (!$row)
+		{
 			return false;
+		}
 		if ($row->registration_type == 3)
+		{
 			return false;
-
+		}
 		if (!in_array($row->registration_access, $user->getAuthorisedViewLevels()))
 		{
 			return false;
 		}
-
 		if ($row->cut_off_date == $db->getNullDate())
 		{
-			$sql = 'SELECT DATEDIFF(NOW(), event_date) AS number_days FROM #__eb_events WHERE id=' . $eventId;
+			$numberDays = $row->number_event_dates;
 		}
 		else
 		{
-			$sql = 'SELECT DATEDIFF(NOW(), cut_off_date) AS number_days FROM #__eb_events WHERE id=' . $eventId;
+			$numberDays = $row->number_cut_off_dates;
 		}
-		$db->setQuery($sql);
-		$numberDays = $db->loadResult();
-		if ($numberDays > 0)
+		if ($numberDays < 0)
 		{
 			return false;
 		}
-		if ($row->event_capacity)
+		if ($row->event_capacity && ($row->total_registrants >= $row->event_capacity))
 		{
-			//Get total registrants for this event
-			$sql = 'SELECT SUM(number_registrants) AS total_registrants FROM #__eb_registrants WHERE event_id=' . $eventId .
-				' AND group_id=0 AND (published=1 OR (payment_method LIKE "os_offline%" AND published != 2))';
-			$db->setQuery($sql);
-			$numberRegistrants = (int) $db->loadResult();
-			if ($numberRegistrants >= $row->event_capacity)
-				return false;
+			return false;
 		}
 		//Check to see whether the current user has registered for the event
 		$preventDuplicateRegistration = EventbookingHelper::getConfigValue('prevent_duplicate_registration');
-		if ($preventDuplicateRegistration && $user->get('id'))
+		$userId = $user->get('id');
+		if ($preventDuplicateRegistration && $userId)
 		{
-			$sql = 'SELECT COUNT(id) FROM #__eb_registrants WHERE event_id=' . $eventId . ' AND user_id=' . $user->get('id') .
-				' AND (published=1 OR (payment_method LIKE "os_offline%" AND published != 2))';
-			$db->setQuery($sql);
+			$query->clear();
+			$query->select('COUNT(id)')
+				->from('#__eb_registrants')
+				->where('event_id = '. $eventId)
+				->where('user_id = '. $userId)
+				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published != 2))');
+			$db->setQuery($query);
 			$total = $db->loadResult();
 			if ($total)
 			{
@@ -2015,21 +2024,13 @@ class EventbookingHelper
 	 * @param int    $eventId
 	 * @param object $config
 	 */
-	public static function getMaxNumberRegistrants($eventId, $config)
+	public static function getMaxNumberRegistrants($event)
 	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('*')
-			->from('#__eb_events')
-			->where('id=' . $eventId);
-		$db->setQuery($query);
-		$event            = $db->loadObject();
-		$totalRegistrants = EventbookingHelper::getTotalRegistrants($eventId);
 		$eventCapacity    = (int) $event->event_capacity;
 		$maxGroupNumber   = (int) $event->max_group_number;
 		if ($eventCapacity)
 		{
-			$maxRegistrants = $eventCapacity - $totalRegistrants;
+			$maxRegistrants = $eventCapacity - $event->total_registrants;
 		}
 		else
 		{
@@ -3661,7 +3662,7 @@ class EventbookingHelper
 		if (!$userId)
 			return false;
 		$sql = 'SELECT id FROM #__eb_registrants WHERE event_id=' . $eventId . ' AND (user_id=' . $userId . ' OR email="' . $email .
-			'") AND (published=1 OR (payment_method LIKE "os_offline%" AND published!=2))';
+			'") AND (published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))';
 		$db->setQuery($sql);
 		$registrantId = $db->loadResult();
 		if (!$registrantId)

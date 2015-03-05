@@ -123,6 +123,14 @@ function EventbookingBuildRoute(&$query)
 			$segments[] = JText::_('EB_SEF_INVITE_FRIEND');
 			unset($query['id']);
 			break;
+		case 'password':
+			if ($id)
+			{
+				$segments[] = EventbookingHelperRoute::getEventTitle($id);
+			}
+			$segments[] = 'password validation';
+			unset($query['id']);
+			break;
 		case 'registrantlist':
 			if ($id)
 			{
@@ -132,11 +140,7 @@ function EventbookingBuildRoute(&$query)
 			unset($query['id']);
 			break;
 		case 'waitinglist':
-			if ($eventId)
-			{
-				$segments[] = EventbookingHelperRoute::getEventTitle($eventId);
-			}
-			$segments[] = JText::_('EB_SEF_WAITINGLIST_FORM');
+			$segments[] = JText::_('EB_SEF_WAITINGLIST_COMPLETE');
 			break;
 		case 'failure':
 			$segments[] = JText::_('EB_SEF_REGISTRATION_FAILURE');
@@ -179,10 +183,6 @@ function EventbookingBuildRoute(&$query)
 				$segments[] = EventbookingHelperRoute::getEventTitle($id);
 			}
 			$segments[] = JText::_('EB_SEF_' . strtoupper($task));
-			unset($query['task']);
-			break;
-		case 'waitinglist_complete':
-			$segments[] = JText::_('EB_SEF_WAITINGLIST_COMPLETE');
 			unset($query['task']);
 			break;
 		case 'csv_export':

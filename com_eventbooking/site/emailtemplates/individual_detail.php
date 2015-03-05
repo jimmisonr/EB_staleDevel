@@ -173,7 +173,7 @@ defined('_JEXEC') or die;
         </div>
         <?php
         }
-        if ($row->amount > 0)
+        if ($row->amount > 0 && $row->published != 3)
         {
         ?>
 		<div class="control-group">

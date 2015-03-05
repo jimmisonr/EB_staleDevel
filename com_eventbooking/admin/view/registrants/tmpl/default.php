@@ -145,7 +145,11 @@ if ($this->config->activate_invoice_feature)
 		if ($row->published == 0 || $row->published == 1) 
 		{
 			$published 	= JHtml::_('grid.published', $row, $i, 'tick.png', 'publish_x.png');	
-		} 
+		}
+		elseif($row->published == 3)
+		{
+			$published = JText::_('EB_WAITING_LIST');
+		}
 		else 
 		{
 			$imageSrc = 'components/com_eventbooking/assets/icons/cancelled.jpg' ;

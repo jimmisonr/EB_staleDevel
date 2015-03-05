@@ -21,9 +21,10 @@ class EventBookingViewRegister extends JViewLegacy
 		$eventId = $input->getInt('event_id', 0);
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('*')
-			->from('#__eb_events')
-			->where('id=' . $eventId);
+		$query->select('a.*, IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
+			->from('#__eb_events AS a')
+			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
+			->where('a.id=' . $eventId);
 		$db->setQuery($query);
 		$event = $db->loadObject();
 		$layout = $this->getLayout();
@@ -49,8 +50,31 @@ class EventBookingViewRegister extends JViewLegacy
 	{
 		$session = JFactory::getSession();
 		$numberRegistrants = $session->get('eb_number_registrants', '');
-		$eventId = JFactory::getApplication()->input->getInt('event_id');
-		$this->maxRegistrants = EventbookingHelper::getMaxNumberRegistrants($eventId, EventbookingHelper::getConfig());
+		$eventId = $event->id;
+		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
+		{
+			$waitingList = true;
+		}
+		else
+		{
+			$waitingList = false;
+		}
+		if ($waitingList)
+		{
+			if ($event->max_group_number)
+			{
+				$this->maxRegistrants = (int) $event->max_group_number;
+			}
+			else
+			{
+				// Hardcode max number of group members
+				$this->maxRegistrants = 10;
+			}
+		}
+		else
+		{
+			$this->maxRegistrants = EventbookingHelper::getMaxNumberRegistrants($eventId);
+		}
 		$this->numberRegistrants = $numberRegistrants;
 		$this->message = EventbookingHelper::getMessages();
 		$this->fieldSuffix = EventbookingHelper::getFieldSuffix();
@@ -167,6 +191,17 @@ class EventBookingViewRegister extends JViewLegacy
 		{
 			$data['country'] = $config->default_country;
 		}
+
+		// Waiting List
+
+		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
+		{
+			$waitingList = true;
+		}
+		else
+		{
+			$waitingList = false;
+		}
 		//Get data				
 		$form = new RADForm($rowFields);
 		if ($captchaInvalid)
@@ -180,7 +215,14 @@ class EventBookingViewRegister extends JViewLegacy
 		$form->bind($data, $useDefault);
 		$form->prepareFormFields('calculateGroupRegistrationFee();');
 		$paymentMethod = $input->post->getString('payment_method', os_payments::getDefautPaymentMethod(trim($event->payment_methods)));
-		$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		if ($waitingList)
+		{
+			$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, null);
+		}
+		else
+		{
+			$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		}
 		$expMonth = $input->post->getInt('exp_month', date('m'));
 		$expYear = $input->post->getInt('exp_year', date('Y'));
 		$lists['exp_month'] = JHtml::_('select.integerlist', 1, 12, 1, 'exp_month', ' class="input-small" ', $expMonth, '%02d');
@@ -253,6 +295,16 @@ class EventBookingViewRegister extends JViewLegacy
 			}
 		}
 
+		// Reset some values if waiting list is activated
+		if ($waitingList)
+		{
+			$enableCoupon = false;
+			$idealEnabled = false;
+			$depositPayment = false;
+			$paymentType = false;
+			$showPaymentFee = false;
+		}
+
 		// Assign these parameters
 		$this->paymentMethod = $paymentMethod;
 		$this->lists = $lists;
@@ -276,6 +328,7 @@ class EventBookingViewRegister extends JViewLegacy
 		$this->depositAmount = $fees['deposit_amount'];
 		$this->paymentProcessingFee = $fees['payment_processing_fee'];
 		$this->showPaymentFee = $showPaymentFee;
+		$this->waitingList = $waitingList;
 
 		parent::display($tpl);
 	}

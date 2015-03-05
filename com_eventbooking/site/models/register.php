@@ -82,16 +82,33 @@ class EventBookingModelRegister extends JModelLegacy
 		// Calculate the payment amount
 		$eventId = (int) $data['event_id'];
 		$query->clear();
-		$query->select('*')
-			->from('#__eb_events')
-			->where('id=' . $eventId);
+		$query->select('a.*, IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
+			->from('#__eb_events AS a')
+			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
+			->where('a.id=' . $eventId);
 		$db->setQuery($query);
 		$event = $db->loadObject();
+		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
+		{
+			$waitingList = true;
+		}
+		else
+		{
+			$waitingList = false;
+		}
 		$paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : '';
 		$rowFields = EventbookingHelper::getFormFields($eventId, 0);
 		$form = new RADForm($rowFields);
 		$form->bind($data);
-		$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		if ($waitingList == true)
+		{
+			$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, '');
+		}
+		else
+		{
+			$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		}
+
 		$paymentType = JRequest::getInt('payment_type', 0);
 		if ($paymentType == 0)
 		{
@@ -145,6 +162,13 @@ class EventBookingModelRegister extends JModelLegacy
 			$db->execute();
 			$row->coupon_id = $coupon->id;
 		}
+
+		if ($waitingList)
+		{
+			$row->published = 3;
+			$row->payment_method = 'os_offline';
+		}
+
 		$row->store();
 		$form->storeData($row->id, $data);
 		$data['event_title'] = $event->title;
@@ -160,7 +184,7 @@ class EventBookingModelRegister extends JModelLegacy
 		$session = JFactory::getSession();
 		$session->set('eb_registration_code', $row->registration_code);
 
-		if ($row->amount > 0)
+		if ($row->amount > 0 && !$waitingList)
 		{
 			require_once JPATH_COMPONENT . '/payments/' . $paymentMethod . '.php';
 			$query->clear();
@@ -175,14 +199,22 @@ class EventBookingModelRegister extends JModelLegacy
 		else
 		{
 			$Itemid            = JRequest::getInt('Itemid');
-			$row->payment_date = gmdate('Y-m-d H:i:s');
-			$row->published    = 1;
-			$row->store();
-			EventbookingHelper::sendEmails($row, $config);
-			JPluginHelper::importPlugin('eventbooking');
-			$dispatcher = JDispatcher::getInstance();
-			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-			$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false);
+			if (!$waitingList)
+			{
+				$row->payment_date = gmdate('Y-m-d H:i:s');
+				$row->published    = 1;
+				$row->store();
+				EventbookingHelper::sendEmails($row, $config);
+				JPluginHelper::importPlugin('eventbooking');
+				$dispatcher = JDispatcher::getInstance();
+				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
+				$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false);
+			}
+			else
+			{
+				EventbookingHelper::sendWaitinglistEmail($row, $config);
+				$url = JRoute::_('index.php?option=com_eventbooking&view=waitinglist&Itemid=' . (int) JRequest::getInt('Itemid'), false);
+			}
 			$app->redirect($url);
 		}
 	}
@@ -220,18 +252,34 @@ class EventBookingModelRegister extends JModelLegacy
 		}
 		$eventId = (int) $data['event_id'];
 		$query = $db->getQuery(true);
-		$query->select('*')
-			->from('#__eb_events')
-			->where('id=' . $eventId);
+		$query->select('a.*, IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
+		->from('#__eb_events AS a')
+		->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
+		->where('a.id=' . $eventId);
 		$db->setQuery($query);
 		$event = $db->loadObject();
+		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
+		{
+			$waitingList = true;
+		}
+		else
+		{
+			$waitingList = false;
+		}
 		$rowFields = EventbookingHelper::getFormFields($eventId, 1);
 		$memberFormFields = EventbookingHelper::getFormFields($eventId, 2);
 		$form = new RADForm($rowFields);
 		$form->bind($data);
 
 		$paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : '';
-		$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		if ($waitingList)
+		{
+			$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, null);
+		}
+		else
+		{
+			$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		}
 		//Calculate members fee
 		$membersForm = $fees['members_form'];
 		$membersTotalAmount = $fees['members_total_amount'];
@@ -318,6 +366,11 @@ class EventBookingModelRegister extends JModelLegacy
 			$row->coupon_id = $coupon->id;
 		}
 
+		if ($waitingList)
+		{
+			$row->published = 3;
+			$row->payment_method = 'os_offline';
+		}
 		//Clear the coupon session
 		$row->store();
 		$form->storeData($row->id, $data);
@@ -367,7 +420,7 @@ class EventBookingModelRegister extends JModelLegacy
 		//Store registration code in session, use it for registration complete page
 		$session->set('eb_registration_code', $row->registration_code);
 
-		if ($row->amount > 0)
+		if ($row->amount > 0 && !$waitingList)
 		{
 			require_once JPATH_COMPONENT . '/payments/' . $paymentMethod . '.php';
 			$query->clear();
@@ -381,18 +434,30 @@ class EventBookingModelRegister extends JModelLegacy
 		}
 		else
 		{
-			$row->payment_date = gmdate('Y-m-d H:i:s');
-			$row->published    = 1;
-			$row->store();
-			if ($row->is_group_billing)
+			if (!$waitingList)
 			{
-				EventbookingHelper::updateGroupRegistrationRecord($row->id);
+				$row->payment_date = gmdate('Y-m-d H:i:s');
+				$row->published    = 1;
+				$row->store();
+				if ($row->is_group_billing)
+				{
+					EventbookingHelper::updateGroupRegistrationRecord($row->id);
+				}
+				EventbookingHelper::sendEmails($row, $config);
+				JPluginHelper::importPlugin('eventbooking');
+				$dispatcher = JDispatcher::getInstance();
+				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
+				$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . (int) JRequest::getInt('Itemid'), false);
 			}
-			EventbookingHelper::sendEmails($row, $config);
-			JPluginHelper::importPlugin('eventbooking');
-			$dispatcher = JDispatcher::getInstance();
-			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-			$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . (int) JRequest::getInt('Itemid'), false);
+			else
+			{
+				if ($row->is_group_billing)
+				{
+					EventbookingHelper::updateGroupRegistrationRecord($row->id);
+					EventbookingHelper::sendWaitinglistEmail($row, $config);
+				}
+				$url = JRoute::_('index.php?option=com_eventbooking&view=waitinglist&Itemid=' . (int) JRequest::getInt('Itemid'), false);
+			}
 			$app->redirect($url);
 		}
 	}

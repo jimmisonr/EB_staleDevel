@@ -97,11 +97,6 @@ class EventbookingController extends JControllerLegacy
 				JRequest::setVar('view', 'event');
 				JRequest::setVar('layout', 'form');
 				break;
-			#Misc							
-			case 'waitinglist_complete':
-				JRequest::setVar('view', 'waitinglist');
-				JRequest::setVar('layout', 'complete');
-				break;
 			#Location management			
 			case 'edit_location':
 				JRequest::setVar('view', 'addlocation');
@@ -940,31 +935,6 @@ class EventbookingController extends JControllerLegacy
 			}
 		}
 		EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues, $groupNames);
-	}
-	/**
-	 * Store users into waitinglist database
-	 */
-	public function save_waitinglist()
-	{
-		$config = EventbookingHelper::getConfig();
-		$user = JFactory::getUser();
-		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
-		{
-			$input  = JFactory::getApplication()->input;
-			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			$res = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
-			if (!$res)
-			{
-				JError::raiseWarning('', JText::_('EB_INVALID_CAPTCHA_ENTERED'));
-				JRequest::setVar('view', 'waitinglist');
-				JRequest::setVar('layout', 'default');
-				$this->display();
-				return;
-			}
-		}
-		$data = JRequest::get('post');
-		$model = $this->getModel('waitinglist');
-		$model->store($data);
 	}
 	###########################Submitting events from front-end################################
 	public function save_event()

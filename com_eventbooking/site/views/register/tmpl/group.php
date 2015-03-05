@@ -23,14 +23,41 @@ else
 {
 	$msg = $this->message->registration_form_message_group;
 }
+
+if ($this->waitingList)
+{
+	$headerText = JText::_('EB_JOIN_WAITINGLIST');
+	if (strlen(strip_tags($this->message->{'waitinglist_form_message'.$this->fieldSuffix})))
+	{
+		$msg = $this->message->{'waitinglist_form_message'.$this->fieldSuffix};
+	}
+	else
+	{
+		$msg = $this->message->waitinglist_form_message;
+	}
+	$msg = str_replace('[EVENT_TITLE]', $this->event->title, $msg) ;
+}
+else
+{
+	$headerText = JText::_('EB_GROUP_REGISTRATION') ;
+	if (strlen(strip_tags($this->message->{'registration_form_message_group'.$this->fieldSuffix})))
+	{
+		$msg = $this->message->{'registration_form_message_group'.$this->fieldSuffix};
+	}
+	else
+	{
+		$msg = $this->message->registration_form_message_group;
+	}
+	$msg = str_replace('[EVENT_TITLE]', $this->event->title, $msg) ;
+	$msg = str_replace('[EVENT_DATE]', JHtml::_('date', $this->event->event_date, $this->config->event_date_format, null), $msg) ;
+}
+$headerText = str_replace('[EVENT_TITLE]', $this->event->title, $headerText);
 ?>
 <div id="eb-group-registration-form" class="eb-container row-fluid">
-	<h1 class="eb-page-title"><?php echo JText::_('EB_GROUP_REGISTRATION'); ?></h1>
+	<h1 class="eb-page-title"><?php echo $headerText; ?></h1>
 	<?php
 	if (strlen($msg)) 
 	{
-		$msg = str_replace('[EVENT_TITLE]', $this->event->title, $msg) ;
-		$msg = str_replace('[EVENT_DATE]', JHtml::_('date', $this->event->event_date, $this->config->event_date_format, null), $msg) ;		
 	?>
 		<div class="eb-message"><?php echo $msg ; ?></div>							 															
 	<?php	

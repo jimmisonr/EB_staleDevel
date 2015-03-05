@@ -195,7 +195,7 @@ defined('_JEXEC') or die;
             </tr>
         <?php
         }
-        if ($row->amount > 0)
+	    if ($row->amount > 0 && $row->published != 3)
         {
         ?>
             <tr>

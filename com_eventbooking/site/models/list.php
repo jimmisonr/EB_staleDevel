@@ -98,8 +98,10 @@ class EventBookingModelList extends RADModelList
 	 */
 	protected function _buildQueryColumns(JDatabaseQuery $query)
 	{
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
 		$query->select('tbl.*')
-			->select('DATEDIFF(tbl.early_bird_discount_date, NOW()) AS date_diff')
+			->select('DATEDIFF(tbl.early_bird_discount_date, "' . $currentDate . '") AS date_diff')
+			->select('DATEDIFF(tbl.event_date, "' . $currentDate . '") AS number_event_dates')
 			->select('c.name AS location_name, c.address AS location_address')
 			->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants');
 
@@ -112,7 +114,7 @@ class EventBookingModelList extends RADModelList
 	protected function _buildQueryJoins(JDatabaseQuery $query)
 	{
 		$query->leftJoin(
-			'#__eb_registrants AS b ON (tbl.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published != 2)))')->leftJoin(
+			'#__eb_registrants AS b ON (tbl.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')->leftJoin(
 				'#__eb_locations AS c ON tbl.location_id = c.id ');
 
 		return $this;
