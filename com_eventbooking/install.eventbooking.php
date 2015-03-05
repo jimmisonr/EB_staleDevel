@@ -70,6 +70,36 @@ class com_eventbookingInstallerScript
 			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/views/register/tmpl/group_member.php');
 		}
 
+		//Delete the the waiting list related files
+		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/views/waitinglist/tmpl/complete.php'))
+		{
+			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/views/register/tmpl/complete.php');
+		}
+
+		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/models/waitinglist.php'))
+		{
+			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/models/waitinglist.php');
+		}
+
+		if (JFolder::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waiting'))
+		{
+			JFolder::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waiting');
+		}
+
+		if (JFolder::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waitings'))
+		{
+			JFolder::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waitings');
+		}
+
+		if (JFile::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waitings.php'))
+		{
+			JFile::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waitings.php');
+		}
+
+		if (JFile::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waiting.php'))
+		{
+			JFile::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waiting.php');
+		}
 
 		//Delete the css files which are now moved to themes folder
 		$files = array('default.css', 'fire.css', 'leaf.css', 'ocean.css', 'sky.css', 'tree.css');

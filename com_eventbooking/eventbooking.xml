@@ -60,8 +60,7 @@
 		<menu link="option=com_eventbooking&amp;view=plugins">EB_PAYMENTS_PLUGIN</menu>
 		<menu link="option=com_eventbooking&amp;view=message">EB_EMAIL_MESSAGES</menu>  	  		     
 		<menu link="option=com_eventbooking&amp;view=language">EB_TRANSLATION</menu>      
-		<menu link="option=com_eventbooking&amp;task=csv_export">EB_EXPORT_REGISTRANTS</menu>
-		<menu link="option=com_eventbooking&amp;view=waitings">EB_WAITING_LIST</menu>	  	
+		<menu link="option=com_eventbooking&amp;task=csv_export">EB_EXPORT_REGISTRANTS</menu>			  
 		<menu link="option=com_eventbooking&amp;view=massmail">EB_MASS_MAIL</menu>
         <menu link="option=com_eventbooking&amp;view=countries">EB_COUNTRIES</menu>
         <menu link="option=com_eventbooking&amp;view=states">EB_STATES</menu>		
