@@ -77,6 +77,7 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		$options = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('Pending'));
 		$options[] = JHtml::_('select.option', 1, JText::_('Paid'));
+		$options[] = JHtml::_('select.option', 3, JText::_('EB_WAITING_LIST'));
 		$options[] = JHtml::_('select.option', 2, JText::_('Cancelled'));
 		$this->lists['published'] = JHtml::_('select.genericlist', $options, 'published', ' class="inputbox" ', 'value', 'text', 
 			$this->item->published);								
