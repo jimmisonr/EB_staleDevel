@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	1.7.0
- * @package            Joomla
- * @subpackage         Event Booking
- * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
- * @license            GNU/GPL, see LICENSE.php
+ * @version        	1.6.10
+ * @package        	Joomla
+ * @subpackage		Event Booking
+ * @author  		Tuan Pham Ngoc
+ * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
+ * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
@@ -77,9 +77,11 @@ class EventbookingHelper
 		if ($config->multiple_booking)
 		{
 			$db = JFactory::getDbo();
-			//Get summary total amount
-			$sql = 'SELECT SUM(total_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
+			$query = $db->getQuery(true);
+			$query->select('SUM(total_amount)')
+				->from('#__eb_registrants')
+				->where('id=' . $row->id . ' OR cart_id=' . $row->id);
+			$db->setQuery($query);
 			$totalAmount = $db->loadResult();
 			if ($totalAmount > 0)
 			{
