@@ -119,7 +119,7 @@ function updatePaymentMethod()
             }
             else
             {
-                $('#tr_card_holder_name').show();
+                $('#tr_card_holder_name').hide();
             }
         }
         else
