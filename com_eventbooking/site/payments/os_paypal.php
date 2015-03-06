@@ -110,24 +110,22 @@ class os_paypal extends os_payment
 		$Itemid = JRequest::getInt('Itemid', 0);
 		$siteUrl = JUri::base();
 		$db = JFactory::getDbo();
-		$sql = 'SELECT paypal_email FROM #__eb_events WHERE id=' . $row->event_id;
-		$db->setQuery($sql);
-		$paypalEmail = $db->loadResult();
-		if (strlen(trim($paypalEmail)))
+		$query = $db->getQuery(true);
+		$query->select('paypal_email, currency_code')
+			->from('#__eb_events')
+			->where('id = '. $row->event_id);
+		$db->setQuery($query);
+		$event = $db->loadObject();
+		if (strlen(trim($event->paypal_email)))
 		{
-			$this->setParam('business', $paypalEmail);
+			$this->setParam('business', $event->paypal_email);
 		}
 		$itemName = JText::_('EB_EVENT_REGISTRATION');
 		$itemName = str_replace('[EVENT_TITLE]', $data['event_title'], $itemName);
-		
-		$sql = 'SELECT currency_code FROM #__eb_events WHERE id=' . $row->event_id;
-		$db->setQuery($sql);
-		$currencyCode = $db->loadResult();
-		if ($currencyCode)
+		if ($event->currency_code)
 		{
-			$this->setParam('currency_code', $currencyCode);
+			$this->setParam('currency_code', $event->currency_code);
 		}
-		
 		$this->setParam('item_name', $itemName);
 		$this->setParam('amount', round($data['amount'], 2));
 		$this->setParam('custom', $row->id);
