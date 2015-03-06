@@ -423,16 +423,16 @@ class EventbookingHelper
 		$enableCancel = $db->loadResult();
 		if ($enableCancel)
 		{
-			$replaces['cancel_registration_link'] = '';
-		}
-		else
-		{
 			$Itemid = JRequest::getInt('Itemid', 0);
 			if (!$Itemid)
 			{
 				$Itemid = self::getItemid();
 			}
-			$replaces['cancel_registration_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=cancel_registration&registration_code=' . $row->registration_code.'&Itemid='.$Itemid;
+			$replaces['cancel_registration_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=cancel_registration&cancel_code=' . $row->registration_code.'&Itemid='.$Itemid;
+		}
+		else
+		{
+			$replaces['cancel_registration_link'] = '';
 		}
 
 		return $replaces;
@@ -2138,6 +2138,7 @@ class EventbookingHelper
 		$query->select('*')
 			->from('#__eb_registrants')
 			->where('event_id=' . (int) $row->event_id)
+			->where('group_id = 0')
 			->where('published = 3')
 			->order('id');
 		$db->setQuery($query);
@@ -2192,6 +2193,8 @@ class EventbookingHelper
 			{
 				$subject = $message->registrant_waitinglist_notification_subject;
 			}
+
+
 			if (empty($subject))
 			{
 				//Admin has not entered email subject and email message for notification yet, simply return

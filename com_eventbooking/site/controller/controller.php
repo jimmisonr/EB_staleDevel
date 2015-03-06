@@ -744,7 +744,7 @@ class EventbookingController extends JControllerLegacy
 		$user             = JFactory::getUser();
 		$Itemid           = JRequest::getInt('Itemid', 0);
 		$id               = JRequest::getInt('id');
-		$registrationCode = JRequest::getVar('registration_code', '');
+		$registrationCode = JRequest::getVar('cancel_code', '');
 		if ($id)
 		{
 			$query->select('a.id, a.title, b.user_id, cancel_before_date, DATEDIFF(cancel_before_date, NOW()) AS number_days')

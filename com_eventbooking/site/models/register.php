@@ -495,6 +495,11 @@ class EventBookingModelRegister extends JModelLegacy
 		{
 			return false;
 		}
+
+		if ($row->published == 2)
+		{
+			return false;
+		}
 		//Trigger the cancellation
 		JPluginHelper::importPlugin('eventbooking');
 		$dispatcher = JDispatcher::getInstance();
@@ -635,5 +640,9 @@ class EventBookingModelRegister extends JModelLegacy
 			$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
 			$mailer->ClearAllRecipients();
 		}
+
+		// Notify waiting list ?
+		EventbookingHelper::notifyWaitingList($row, $config);
+
 	}
 } 
