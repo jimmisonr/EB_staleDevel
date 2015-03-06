@@ -73,14 +73,12 @@ class EventBookingViewRegister extends JViewLegacy
 		}
 		else
 		{
-			$this->maxRegistrants = EventbookingHelper::getMaxNumberRegistrants($eventId);
+			$this->maxRegistrants = EventbookingHelper::getMaxNumberRegistrants($event);
 		}
+
 		$this->numberRegistrants = $numberRegistrants;
 		$this->message = EventbookingHelper::getMessages();
 		$this->fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$this->eventId = $eventId;
-		
-		$this->showBillingStep = EventbookingHelper::showBillingStep($eventId);
 		$this->Itemid = $input->getInt('Itemid', 0);
 		$this->event = $event;
 		$this->config = EventbookingHelper::getConfig();
