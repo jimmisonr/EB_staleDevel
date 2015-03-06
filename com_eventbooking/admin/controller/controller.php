@@ -48,7 +48,7 @@ class EventbookingController extends RADControllerAdmin
 		$config = EventbookingHelper::getConfig();
 		$eventId = JRequest::getInt('filter_event_id');		
 		$where = array();
-		$where[] = '(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published != 2))';
+		$where[] = '(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published NOT IN (2,3)))';
 		if ($eventId)
 		{
 			$where[] = ' a.event_id=' . $eventId;

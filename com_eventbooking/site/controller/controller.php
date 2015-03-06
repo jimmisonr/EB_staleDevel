@@ -552,7 +552,7 @@ class EventbookingController extends JControllerLegacy
 				->from('#__eb_registrants')
 				->where('event_id=' . $eventId)
 				->where('email="' . $email . '"')
-				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published != 2))');
+				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 			$db->setQuery($query);
 			$total = $db->loadResult();
 			if ($total)
@@ -853,7 +853,7 @@ class EventbookingController extends JControllerLegacy
 			JFactory::getApplication()->redirect('index.php', JText::_('EB_PLEASE_CHOOSE_AN_EVENT_TO_EXPORT_REGISTRANTS'));
 		}
 		$where = array();
-		$where[] = '(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published != 2))';
+		$where[] = '(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published NOT IN (2,3)))';
 		if ($eventId)
 		{
 			$where[] = ' a.event_id=' . $eventId;

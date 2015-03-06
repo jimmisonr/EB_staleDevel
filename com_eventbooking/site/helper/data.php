@@ -154,7 +154,7 @@ class EventbookingHelperData
             for ($i = 0 , $n = count($rows) ; $i < $n ; $i++)
             {
                 $row = $rows[$i] ;
-                $sql = 'SELECT COUNT(id) FROM #__eb_registrants WHERE user_id='.$userId.' AND event_id='.$row->id.' AND (published=1 OR (payment_method LIKE "os_offline%" AND published != 2))';
+                $sql = 'SELECT COUNT(id) FROM #__eb_registrants WHERE user_id='.$userId.' AND event_id='.$row->id.' AND (published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))';
                 $db->setQuery($sql) ;
                 $row->user_registered = $db->loadResult() ;
 	            // Calculate discount price

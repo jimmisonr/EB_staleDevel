@@ -1993,7 +1993,7 @@ class EventbookingHelper
 				->from('#__eb_registrants')
 				->where('event_id = '. $eventId)
 				->where('user_id = '. $userId)
-				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published != 2))');
+				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 			$db->setQuery($query);
 			$total = $db->loadResult();
 			if ($total)
@@ -2013,7 +2013,7 @@ class EventbookingHelper
 	{
 		$db  = JFactory::getDbo();
 		$sql = 'SELECT SUM(number_registrants) AS total_registrants FROM #__eb_registrants WHERE event_id=' . $eventId .
-			' AND group_id=0 AND (published=1 OR (payment_method LIKE "os_offline%" AND published != 2))';
+			' AND group_id=0 AND (published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))';
 		$db->setQuery($sql);
 		$numberRegistrants = (int) $db->loadResult();
 

@@ -68,7 +68,7 @@ class EventbookingModelEvents extends RADModelList
 	 */
 	protected function _buildQueryJoins(JDatabaseQuery $query)
 	{
-		$query->leftJoin('#__eb_registrants AS rgt ON (tbl.id = rgt.event_id AND rgt.group_id = 0 AND (rgt.published=1 OR (rgt.payment_method LIKE "os_offline%" AND rgt.published != 2)))');
+		$query->leftJoin('#__eb_registrants AS rgt ON (tbl.id = rgt.event_id AND rgt.group_id = 0 AND (rgt.published=1 OR (rgt.payment_method LIKE "os_offline%" AND rgt.published NOT IN (2,3))))');
 						
 		return $this;
 	}
