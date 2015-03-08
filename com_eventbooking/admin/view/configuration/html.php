@@ -179,29 +179,6 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 			$config->show_coupon_code_in_registrant_list);
 		$lists['show_multiple_days_event_in_calendar'] = JHtml::_('select.booleanlist', 'show_multiple_days_event_in_calendar', '', 
 			$config->show_multiple_days_event_in_calendar);
-		#Waitinglist fields configuration		
-		$lists['swt_lastname'] = JHtml::_('select.booleanlist', 'swt_lastname', '', $config->swt_lastname);
-		$lists['rwt_lastname'] = JHtml::_('select.booleanlist', 'rwt_lastname', '', $config->rwt_lastname);
-		$lists['swt_organization'] = JHtml::_('select.booleanlist', 'swt_organization', '', $config->swt_organization);
-		$lists['rwt_organization'] = JHtml::_('select.booleanlist', 'rwt_organization', '', $config->rwt_organization);
-		$lists['swt_address'] = JHtml::_('select.booleanlist', 'swt_address', '', $config->swt_address);
-		$lists['rwt_address'] = JHtml::_('select.booleanlist', 'rwt_address', '', $config->rwt_address);
-		$lists['swt_address2'] = JHtml::_('select.booleanlist', 'swt_address2', '', $config->swt_address2);
-		$lists['rwt_address2'] = JHtml::_('select.booleanlist', 'rwt_address2', '', $config->rwt_address2);
-		$lists['swt_city'] = JHtml::_('select.booleanlist', 'swt_city', '', $config->swt_city);
-		$lists['rwt_city'] = JHtml::_('select.booleanlist', 'rwt_city', '', $config->rwt_city);
-		$lists['swt_state'] = JHtml::_('select.booleanlist', 'swt_state', '', $config->swt_state);
-		$lists['rwt_state'] = JHtml::_('select.booleanlist', 'rwt_state', '', $config->rwt_state);
-		$lists['swt_zip'] = JHtml::_('select.booleanlist', 'swt_zip', '', $config->swt_zip);
-		$lists['rwt_zip'] = JHtml::_('select.booleanlist', 'rwt_zip', '', $config->rwt_zip);
-		$lists['swt_country'] = JHtml::_('select.booleanlist', 'swt_country', '', $config->swt_country);
-		$lists['rwt_country'] = JHtml::_('select.booleanlist', 'rwt_country', '', $config->rwt_country);
-		$lists['swt_phone'] = JHtml::_('select.booleanlist', 'swt_phone', '', $config->swt_phone);
-		$lists['rwt_phone'] = JHtml::_('select.booleanlist', 'rwt_phone', '', $config->rwt_phone);
-		$lists['swt_fax'] = JHtml::_('select.booleanlist', 'swt_fax', '', $config->swt_fax);
-		$lists['rwt_fax'] = JHtml::_('select.booleanlist', 'rwt_fax', '', $config->rwt_fax);
-		$lists['swt_comment'] = JHtml::_('select.booleanlist', 'swt_comment', '', $config->swt_comment);
-		$lists['rwt_comment'] = JHtml::_('select.booleanlist', 'rwt_comment', '', $config->rwt_comment);
 		$options = array();
 		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_POSITION'));
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_BEFORE_AMOUNT'));
