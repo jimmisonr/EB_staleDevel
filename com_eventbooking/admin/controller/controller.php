@@ -162,7 +162,6 @@ class EventbookingController extends RADControllerAdmin
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.folder');
 		$db = JFactory::getDbo();
-		$config = EventbookingHelper::getConfig();
 		//Setup menus
 		$menuSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/menus.eventbooking.sql';
 		$sql = JFile::read($menuSql);
@@ -210,6 +209,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
+		$config = EventbookingHelper::getConfig();
 		//Set up default payment plugins table
 		$sql = 'SELECT COUNT(*) FROM #__eb_payment_plugins';
 		$db->setQuery($sql);
@@ -294,8 +294,6 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery("UPDATE `#__eb_states` SET `published` = 1");
 			$db->execute();
 		}
-
-
 
 		$sql = "SELECT COUNT(*) FROM #__eb_currencies WHERE currency_code='RUB'";
 		$db->setQuery($sql);
@@ -1572,7 +1570,6 @@ class EventbookingController extends RADControllerAdmin
 					$db->execute();
 				}
 			}
-			$config = EventbookingHelper::getConfig();
 			if ($config->display_state_dropdown)
 			{
 				$sql = 'UPDATE #__eb_fields SET fieldtype="State" WHERE name="state"';
@@ -1796,7 +1793,6 @@ class EventbookingController extends RADControllerAdmin
 		{
 			require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/table/table.php';
-			$config = EventbookingHelper::getConfig();
 			$row = new RADTable('#__eb_messages', 'id', $db);
 			$keys = array(
 				'admin_email_subject', 
