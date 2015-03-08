@@ -308,7 +308,20 @@ defined( '_JEXEC' ) or die ;
                                     </td>
                                 </tr>								
                             <?php	
-                            }	
+                            }
+                            if ($event->attachment)
+                            {
+	                            ?>
+	                            <tr>
+		                            <td>
+			                            <strong><?php echo JText::_('EB_ATTACHMENT'); ?></strong>
+		                            </td>
+		                            <td>
+			                            <a href="<?php echo JUri::base().'/media/com_eventbooking/'.$event->attachment?>"><?php echo $event->attachment; ?></a>
+		                            </td>
+	                            </tr>
+                            <?php
+                            }
                             ?>
                         </table>
                   	</div>

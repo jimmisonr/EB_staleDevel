@@ -321,6 +321,19 @@ else
 							</tr>
 						<?php	
 						}
+						if ($item->attachment)
+						{
+						?>
+							<tr>
+								<td>
+									<strong><?php echo JText::_('EB_ATTACHMENT'); ?></strong>
+								</td>
+								<td>
+									<a href="<?php echo JUri::base().'/media/com_eventbooking/'.$item->attachment?>"><?php echo $item->attachment; ?></a>
+								</td>
+							</tr>
+						<?php
+						}
 					?>												
 			</tbody>
 		</table>
