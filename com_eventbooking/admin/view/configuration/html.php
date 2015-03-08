@@ -35,6 +35,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		{
 			$options[] = JHtml::_('select.option', 4, JText::_('EB_JOOMLA_PROFILE'));
 		}
+		$lists['show_attachment_in_frontend'] = JHtml::_('select.booleanlist', 'show_attachment_in_frontend', '', $config->show_attachment_in_frontend);
 		$lists['custom_field_by_category'] = JHtml::_('select.booleanlist', 'custom_field_by_category', '', $config->custom_field_by_category);
 		$lists['cb_integration'] = JHtml::_('select.genericlist', $options, 'cb_integration', ' class="inputbox" ', 'value', 'text', 
 			$config->cb_integration);

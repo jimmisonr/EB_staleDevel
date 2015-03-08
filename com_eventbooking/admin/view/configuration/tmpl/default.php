@@ -991,6 +991,17 @@ $editor = JFactory::getEditor();
 					</tr>
 					<tr>
 						<td width="30%" class="key">
+							<?php echo JText::_('EB_SHOW_ATTACHMENT'); ?>
+						</td>
+						<td>
+							<?php echo $this->lists['show_attachment_in_frontend'] ; ?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_SHOW_ATTACHMENT_EXPLAIN') ; ?>
+						</td>
+					</tr>
+					<tr>
+						<td width="30%" class="key">
 							<?php echo JText::_('EB_ACTIVATE_WEEKLY_CALENDAR_VIEW'); ?>
 						</td>
 						<td>

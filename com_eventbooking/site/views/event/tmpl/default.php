@@ -321,7 +321,7 @@ else
 							</tr>
 						<?php	
 						}
-						if ($item->attachment)
+						if ($item->attachment && !empty($this->config->show_attachment_in_frontend))
 						{
 						?>
 							<tr>

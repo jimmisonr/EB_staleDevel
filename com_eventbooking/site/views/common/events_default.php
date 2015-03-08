@@ -309,7 +309,7 @@ defined( '_JEXEC' ) or die ;
                                 </tr>								
                             <?php	
                             }
-                            if ($event->attachment)
+                            if ($event->attachment && !empty($config->show_attachment_in_frontend))
                             {
 	                            ?>
 	                            <tr>
