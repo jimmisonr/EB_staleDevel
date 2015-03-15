@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.6.10
+ * @version        	1.7.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -136,7 +136,7 @@ class EventBookingModelRegistrant extends JModelLegacy
 			//Change from pending to paid, send emails
 			EventbookingHelper::sendRegistrationApprovedEmail($row, $config);
 		}
-		elseif($row->published == 2 && $published != 2 && $config->activate)
+		elseif($row->published == 2 && $published != 2 && $config->activate_waitinglist_feature)
 		{
 			//Registration is cancelled, send notification emails to waiting list
 			EventbookingHelper::notifyWaitingList($row, $config);

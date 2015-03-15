@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.6.10
+ * @version        	1.7.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -12,6 +12,7 @@ defined('_JEXEC') or die();
 error_reporting(0);
 //Require the controller
 jimport('joomla.filesystem.file');
+
 //Basic ACL support
 if (!JFactory::getUser()->authorise('core.manage', 'com_eventbooking'))
 {

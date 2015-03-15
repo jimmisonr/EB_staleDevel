@@ -19,6 +19,13 @@ class RADFormFieldDate extends RADFormField
 	protected function getInput()
 	{
 		$attributes = $this->buildAttributes();
-		return JHtml::_('calendar', $this->value, $this->name, $this->name, '%Y-%m-%d',".$attributes.");
+		try
+		{
+			return JHtml::_('calendar', $this->value, $this->name, $this->name, '%Y-%m-%d',".$attributes.");
+		}
+		catch (Exception $e)
+		{
+			return JHtml::_('calendar', '', $this->name, $this->name, '%Y-%m-%d',".$attributes.").' Value <strong>'.$this->value.'</strong> is invalid. Please correct it with format YYYY-MM-DD';
+		}
 	}
 };

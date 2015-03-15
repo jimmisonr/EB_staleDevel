@@ -7,7 +7,7 @@
   <authorUrl>http://www.joomdonation.com</authorUrl>
   <copyright>Copyright (C) 2010 - 2015 Ossolution Team</copyright>
   <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
-  <version>1.6.10</version>
+  <version>1.7.0</version>
   <description>Event Booking is a simple, secure, extendable, intuititive event registration extension for Joomla 1.5, 1.6, 1.7, 2.5, 3.0.</description> 
   <scriptfile>install.eventbooking.php</scriptfile>
   <install>
@@ -60,8 +60,7 @@
 		<menu link="option=com_eventbooking&amp;view=plugins">EB_PAYMENTS_PLUGIN</menu>
 		<menu link="option=com_eventbooking&amp;view=message">EB_EMAIL_MESSAGES</menu>  	  		     
 		<menu link="option=com_eventbooking&amp;view=language">EB_TRANSLATION</menu>      
-		<menu link="option=com_eventbooking&amp;task=csv_export">EB_EXPORT_REGISTRANTS</menu>
-		<menu link="option=com_eventbooking&amp;view=waitings">EB_WAITING_LIST</menu>	  	
+		<menu link="option=com_eventbooking&amp;task=csv_export">EB_EXPORT_REGISTRANTS</menu>			  
 		<menu link="option=com_eventbooking&amp;view=massmail">EB_MASS_MAIL</menu>
         <menu link="option=com_eventbooking&amp;view=countries">EB_COUNTRIES</menu>
         <menu link="option=com_eventbooking&amp;view=states">EB_STATES</menu>		

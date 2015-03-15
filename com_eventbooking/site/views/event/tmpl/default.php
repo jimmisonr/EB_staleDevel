@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.6.10
+ * @version        	1.7.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -321,15 +321,27 @@ else
 							</tr>
 						<?php	
 						}
+						if ($item->attachment && !empty($this->config->show_attachment_in_frontend))
+						{
+						?>
+							<tr>
+								<td>
+									<strong><?php echo JText::_('EB_ATTACHMENT'); ?></strong>
+								</td>
+								<td>
+									<a href="<?php echo JUri::base().'/media/com_eventbooking/'.$item->attachment?>"><?php echo $item->attachment; ?></a>
+								</td>
+							</tr>
+						<?php
+						}
 					?>												
 			</tbody>
 		</table>
 		<?php			
 			$activateWaitingList = $this->config->activate_waitinglist_feature ;
-			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !$item->user_registered)
+			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !@$item->user_registered && $item->number_event_dates > 0)
             {
                 $waitingList = true ;
-                $waitinglistUrl = JRoute::_('index.php?option=com_eventbooking&view=waitinglist&event_id='.$item->id.'&Itemid='.$this->Itemid);
         	}
             else
             {
@@ -406,42 +418,56 @@ else
 		<div class="eb-taskbar clearfix">
 		    <ul>	
 		    	<?php
-		    		if ($canRegister || $waitingList) 
-					{
-		    			if ($item->registration_type == 0 || $item->registration_type == 1)
-                        {
-		    				if ($this->config->multiple_booking)
-                            {
-                                $url = 'index.php?option=com_eventbooking&task=add_cart&id='.(int)$item->id.'&Itemid='.(int)$this->Itemid;
-                                $extraClass = 'eb-colorbox-addcart';
-		    					$text = JText::_('EB_REGISTER');
-		    				}
-                            else
-                            {
-		    					$url = JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ;
-		    					$text = JText::_('EB_REGISTER_INDIVIDUAL') ;
-		    				}
-		    				if ($waitingList)
-                            {
-		    					$url = $waitinglistUrl ;
-		    					$extraClass = '';
-                            }
-		    				?>
-		    					<li>
-		    						<a class="btn <?php echo $extraClass;?>" href="<?php echo $url ; ?>"><?php echo $text ; ?></a>
-		    					</li>
-		    				<?php	
-		    				}					    
-		    				//Disable group registration when multiple booking is enabled	
-		    				if (($item->registration_type == 0 || $item->registration_type == 2) && !$this->config->multiple_booking)
-                            {
-		    				?>
-		    					<li>
-		    						<a class="btn" href="<?php echo $waitingList ? $waitinglistUrl : JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP'); ?></a>
-		    					</li>	
-		    				<?php	
-		    				}
-		    		}					    						    						    						    		
+			        if ($canRegister)
+			        {
+				        if ($item->registration_type == 0 || $item->registration_type == 1)
+				        {
+					        if ($this->config->multiple_booking)
+					        {
+						        $url = 'index.php?option=com_eventbooking&task=add_cart&id='.(int)$item->id.'&Itemid='.(int)$this->Itemid;
+						        $extraClass = 'eb-colorbox-addcart';
+						        $text = JText::_('EB_REGISTER');
+					        }
+					        else
+					        {
+						        $url = JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ;
+						        $text = JText::_('EB_REGISTER_INDIVIDUAL') ;
+						        $extraClass = '';
+					        }
+					        ?>
+						        <li>
+							        <a class="btn <?php echo $extraClass;?>" href="<?php echo $url ; ?>"><?php echo $text ; ?></a>
+						        </li>
+					        <?php
+					        if (($item->registration_type == 0 || $item->registration_type == 2) && !$this->config->multiple_booking)
+					        {
+							?>
+						        <li>
+							        <a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+						        </li>
+					        <?php
+					        }
+				        }
+			        }
+			        elseif ($waitingList)
+			        {
+				        if ($item->registration_type == 0 || $item->registration_type == 1)
+				        {
+					    ?>
+					        <li>
+					            <a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
+					        </li>
+					    <?php
+				        }
+				        if (($item->registration_type == 0 || $item->registration_type == 2) && !$this->config->multiple_booking)
+				        {
+					    ?>
+					        <li>
+						        <a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
+					        </li>
+					    <?php
+				        }
+			        }
 		    		if ($this->config->show_invite_friend) 
 					{						
 		    		?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.6.10
+ * @version        	1.7.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -56,7 +56,7 @@ class EventbookingModelMassmail extends RADModel
 	        $query->clear();
 	        $query->select('first_name, last_name, email')
 	        	->from('#__eb_registrants')
-	        	->where('event_id='.$data['event_id'].' AND (published=1 OR (payment_method LIKE "os_offline%" AND published != 2))');	        	       
+	        	->where('event_id='.$data['event_id'].' AND (published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 	        $db->setQuery($query) ;
 	        $rows = $db->loadObjectList() ;
 	        $emails = array() ;	        

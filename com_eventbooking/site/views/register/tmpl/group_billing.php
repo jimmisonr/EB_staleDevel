@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.6.10
+ * @version        	1.7.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -339,143 +339,162 @@ else
 			</div>	
 		</div>				
 		<?php	
-		}		
-		if (count($this->methods) > 1) 
-		{
-		?>
-		<div class="control-group payment_information" id="payment_method_container">
-			<label class="control-label" for="payment_method">
-				<?php echo JText::_('EB_PAYMENT_OPTION'); ?>
-				<span class="required">*</span>				
-			</label>
-			<div class="controls">      				
-				<?php
-				$method = null ;
-				for ($i = 0 , $n = count($this->methods); $i < $n; $i++) 
-				{
-					$paymentMethod = $this->methods[$i];
-					if ($paymentMethod->getName() == $this->paymentMethod) 
-					{
-						$checked = ' checked="checked" ';
-						$method = $paymentMethod ;
-					}										
-					else
-					{									 
-						$checked = '';
-					}		
-				?>
-					<label class="checkbox">
-							<input onclick="changePaymentMethod('group');" class="validate[required] radio" type="radio" name="payment_method" value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
-					</label>
-				<?php		
-				}	
-			?>
-			</div>	
-		</div>												
-		<?php					
-		} 
-		else 
-		{
-		$method = $this->methods[0] ;
-		?>				
-		<div class="control-group payment_information" id="payment_method_container">
-			<label class="control-label">
-				<?php echo JText::_('EB_PAYMENT_OPTION'); ?>				
-			</label>
-			<div class="controls">      				
-				<?php echo JText::_($method->getTitle()); ?>
-			</div>	
-		</div>														
-		<?php	
-		}																			
-		if ($method->getCreditCard()) 
-		{
-			$style = '' ;	
-		} 
-		else 
-		{
-			$style = 'style = "display:none"';
-		}			
-		?>							
-		<div class="control-group payment_information" id="tr_card_number" <?php echo $style; ?>>
-			<label class="control-label" for="x_card_num">
-				<?php echo  JText::_('AUTH_CARD_NUMBER'); ?><span class="required">*</span>				
-			</label>
-			<div class="controls">      				
-				<input type="text" id="x_card_num" name="x_card_num" class="input-large validate[required,creditCard]" value="<?php echo JRequest::getVar('x_card_num'); ?>" />
-			</div>	
-		</div>								
-		<div class="control-group payment_information" id="tr_exp_date" <?php echo $style; ?>>
-			<label class="control-label">
-				<?php echo JText::_('AUTH_CARD_EXPIRY_DATE'); ?><span class="required">*</span>				
-			</label>
-			<div class="controls">      				
-				<?php echo $this->lists['exp_month'] .'  /  '.$this->lists['exp_year'] ; ?>
-			</div>	
-		</div>	    		
-		<div class="control-group payment_information" id="tr_cvv_code" <?php echo $style; ?>>
-			<label class="control-label" for="x_card_code">
-				<?php echo JText::_('AUTH_CVV_CODE'); ?><span class="required">*</span>				
-			</label>
-			<div class="controls">      				
-				<input type="text" id="x_card_code" name="x_card_code" class="input-large validate[required,custom[number]]" value="<?php echo JRequest::getVar('x_card_code'); ?>" />
-			</div>	
-		</div>								
-		<?php
-		if ($method->getCardType()) 
-		{
-			$style = '' ;
-		} 
-		else 
-		{
-			$style = ' style = "display:none;" ' ;										
-		}															
-		?>				
-		<div class="control-group payment_information" id="tr_card_type" <?php echo $style; ?>>
-			<label class="control-label" for="card_type">
-				<?php echo JText::_('EB_CARD_TYPE'); ?><span class="required">*</span>				
-			</label>
-			<div class="controls">      				
-				<?php echo $this->lists['card_type'] ; ?>
-			</div>	
-		</div>											
-		<?php
-		if ($method->getCardHolderName()) 
-		{
-			$style = '' ;
-		} 
-		else 
-		{
-			$style = ' style = "display:none;" ' ;										
 		}
-		?>				
-		<div class="control-group payment_information" id="tr_card_holder_name" <?php echo $style; ?>>
-			<label class="control-label" for="card_holder_name">
-				<?php echo JText::_('EB_CARD_HOLDER_NAME'); ?><span class="required">*</span>				
-			</label>
-			<div class="controls">      				
-				<input type="text" id="card_holder_name" name="card_holder_name" class="input-large validate[required]"  value="<?php echo JRequest::getVar('card_holder_name'); ?>" />
-			</div>	
-    	</div>					
+		if (!$this->waitingList)
+		{
+			if (count($this->methods) > 1)
+			{
+				?>
+				<div class="control-group payment_information" id="payment_method_container">
+					<label class="control-label" for="payment_method">
+						<?php echo JText::_('EB_PAYMENT_OPTION'); ?>
+						<span class="required">*</span>
+					</label>
+
+					<div class="controls">
+						<?php
+						$method = null;
+						for ($i = 0, $n = count($this->methods); $i < $n; $i++)
+						{
+							$paymentMethod = $this->methods[$i];
+							if ($paymentMethod->getName() == $this->paymentMethod)
+							{
+								$checked = ' checked="checked" ';
+								$method  = $paymentMethod;
+							}
+							else
+							{
+								$checked = '';
+							}
+							?>
+							<label class="checkbox">
+								<input onclick="changePaymentMethod('group');" class="validate[required] radio"
+								       type="radio" name="payment_method"
+								       value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
+							</label>
+						<?php
+						}
+						?>
+					</div>
+				</div>
+			<?php
+			}
+			else
+			{
+				$method = $this->methods[0];
+				?>
+				<div class="control-group payment_information" id="payment_method_container">
+					<label class="control-label">
+						<?php echo JText::_('EB_PAYMENT_OPTION'); ?>
+					</label>
+
+					<div class="controls">
+						<?php echo JText::_($method->getTitle()); ?>
+					</div>
+				</div>
+			<?php
+			}
+			if ($method->getCreditCard())
+			{
+				$style = '';
+			}
+			else
+			{
+				$style = 'style = "display:none"';
+			}
+			?>
+			<div class="control-group payment_information" id="tr_card_number" <?php echo $style; ?>>
+				<label class="control-label" for="x_card_num">
+					<?php echo JText::_('AUTH_CARD_NUMBER'); ?><span class="required">*</span>
+				</label>
+
+				<div class="controls">
+					<input type="text" id="x_card_num" name="x_card_num"
+					       class="input-large validate[required,creditCard]"
+					       value="<?php echo JRequest::getVar('x_card_num'); ?>"/>
+				</div>
+			</div>
+			<div class="control-group payment_information" id="tr_exp_date" <?php echo $style; ?>>
+				<label class="control-label">
+					<?php echo JText::_('AUTH_CARD_EXPIRY_DATE'); ?><span class="required">*</span>
+				</label>
+
+				<div class="controls">
+					<?php echo $this->lists['exp_month'] . '  /  ' . $this->lists['exp_year']; ?>
+				</div>
+			</div>
+			<div class="control-group payment_information" id="tr_cvv_code" <?php echo $style; ?>>
+				<label class="control-label" for="x_card_code">
+					<?php echo JText::_('AUTH_CVV_CODE'); ?><span class="required">*</span>
+				</label>
+
+				<div class="controls">
+					<input type="text" id="x_card_code" name="x_card_code"
+					       class="input-large validate[required,custom[number]]"
+					       value="<?php echo JRequest::getVar('x_card_code'); ?>"/>
+				</div>
+			</div>
+			<?php
+			if ($method->getCardType())
+			{
+				$style = '';
+			}
+			else
+			{
+				$style = ' style = "display:none;" ';
+			}
+			?>
+			<div class="control-group payment_information" id="tr_card_type" <?php echo $style; ?>>
+				<label class="control-label" for="card_type">
+					<?php echo JText::_('EB_CARD_TYPE'); ?><span class="required">*</span>
+				</label>
+
+				<div class="controls">
+					<?php echo $this->lists['card_type']; ?>
+				</div>
+			</div>
+			<?php
+			if ($method->getCardHolderName())
+			{
+				$style = '';
+			}
+			else
+			{
+				$style = ' style = "display:none;" ';
+			}
+			?>
+			<div class="control-group payment_information" id="tr_card_holder_name" <?php echo $style; ?>>
+				<label class="control-label" for="card_holder_name">
+					<?php echo JText::_('EB_CARD_HOLDER_NAME'); ?><span class="required">*</span>
+				</label>
+
+				<div class="controls">
+					<input type="text" id="card_holder_name" name="card_holder_name"
+					       class="input-large validate[required]"
+					       value="<?php echo JRequest::getVar('card_holder_name'); ?>"/>
+				</div>
+			</div>
+			<?php
+			if ($method->getName() == 'os_ideal')
+			{
+				$style = '';
+			}
+			else
+			{
+				$style = ' style = "display:none;" ';
+			}
+			?>
+			<div class="control-group payment_information" id="tr_bank_list" <?php echo $style; ?>>
+				<label class="control-label" for="bank_id">
+					<?php echo JText::_('EB_BANK_LIST'); ?><span class="required">*</span>
+				</label>
+
+				<div class="controls">
+					<?php echo isset($this->lists['bank_id']) ? $this->lists['bank_id'] : ''; ?>
+				</div>
+			</div>
 		<?php
-		if ($method->getName() == 'os_ideal') 
-		{
-			$style = '' ;
-		} 
-		else 
-		{
-			$style = ' style = "display:none;" ' ;
-		}					
-		?>				
-		<div class="control-group payment_information" id="tr_bank_list" <?php echo $style; ?>>
-			<label class="control-label" for="bank_id">
-				<?php echo JText::_('EB_BANK_LIST'); ?><span class="required">*</span>				
-			</label>
-			<div class="controls">      				
-				<?php echo isset($this->lists['bank_id']) ? $this->lists['bank_id'] : ''; ?>
-			</div>	
-		</div>												
-	<?php		
+		}
 	}						
 	if ($this->showCaptcha)
 	{
@@ -490,9 +509,9 @@ else
 		</div>
 	<?php
 	}
-	if ($this->config->accept_term ==1)
+	$articleId  = $this->event->article_id ? $this->event->article_id : $this->config->article_id ;
+	if ($this->config->accept_term ==1 && $articleId)
 	{
-		$articleId  = $this->event->article_id ? $this->event->article_id : $this->config->article_id ;
 		$db =  JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('id, catid')
@@ -522,11 +541,19 @@ else
 			</label>
 		</div>
 	<?php
-	}            
+	}
+	if ($this->waitingList)
+	{
+		$buttonText = JText::_('EB_PROCESS');
+	}
+	else
+	{
+		$buttonText = JText::_('EB_PROCESS_REGISTRATION');
+	}
 	?>								
 	<div class="form-actions">
 		<input type="button" class="btn btn-primary" name="btn-group-billing-back" id="btn-group-billing-back" value="<?php echo  JText::_('EB_BACK') ;?>">
-		<input type="submit" class="btn btn-primary" name="btn-process-group-billing" id="btn-process-group-billing" value="<?php echo JText::_('EB_PROCESS_REGISTRATION');?>">
+		<input type="submit" class="btn btn-primary" name="btn-process-group-billing" id="btn-process-group-billing" value="<?php echo $buttonText;?>">
 		<img id="ajax-loading-animation" src="<?php echo JUri::base(true);?>/media/com_eventbooking/ajax-loadding-animation.gif" style="display: none;"/>
 	</div>																					
 	<?php

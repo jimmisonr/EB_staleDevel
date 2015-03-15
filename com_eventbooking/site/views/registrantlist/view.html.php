@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.6.10
+ * @version        	1.7.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -30,7 +30,7 @@ class EventBookingViewRegistrantList extends JViewLegacy
 				->from('#__eb_registrants AS tbl')
 				->where('tbl.event_id=' . $eventId)
 				->where('(tbl.published =1 OR tbl.payment_method LIKE "os_offline%")')
-				->where('tbl.published != 2');
+				->where('tbl.published NOT IN (2,3)');
 			if (isset($config->include_group_billing_in_registrants) && !$config->include_group_billing_in_registrants)
 			{
 				$query->where('tbl.is_group_billing = 0 ');

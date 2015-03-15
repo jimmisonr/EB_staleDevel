@@ -1,11 +1,11 @@
 <?php
 /**
- * @version            1.6.10
- * @package            Joomla
- * @subpackage         Event Booking
- * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
- * @license            GNU/GPL, see LICENSE.php
+ * @version        	1.6.10
+ * @package        	Joomla
+ * @subpackage		Event Booking
+ * @author  		Tuan Pham Ngoc
+ * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
+ * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
@@ -18,7 +18,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '1.6.10';
+		return '1.7.0';
 	}
 
 	/**
@@ -77,9 +77,11 @@ class EventbookingHelper
 		if ($config->multiple_booking)
 		{
 			$db = JFactory::getDbo();
-			//Get summary total amount
-			$sql = 'SELECT SUM(total_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
+			$query = $db->getQuery(true);
+			$query->select('SUM(total_amount)')
+				->from('#__eb_registrants')
+				->where('id=' . $row->id . ' OR cart_id=' . $row->id);
+			$db->setQuery($query);
 			$totalAmount = $db->loadResult();
 			if ($totalAmount > 0)
 			{
@@ -421,16 +423,16 @@ class EventbookingHelper
 		$enableCancel = $db->loadResult();
 		if ($enableCancel)
 		{
-			$replaces['cancel_registration_link'] = '';
-		}
-		else
-		{
 			$Itemid = JRequest::getInt('Itemid', 0);
 			if (!$Itemid)
 			{
 				$Itemid = self::getItemid();
 			}
-			$replaces['cancel_registration_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=cancel_registration&registration_code=' . $row->registration_code.'&Itemid='.$Itemid;
+			$replaces['cancel_registration_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=cancel_registration&cancel_code=' . $row->registration_code.'&Itemid='.$Itemid;
+		}
+		else
+		{
+			$replaces['cancel_registration_link'] = '';
 		}
 
 		return $replaces;
@@ -1935,55 +1937,64 @@ class EventbookingHelper
 	 */
 	public static function acceptRegistration($eventId)
 	{
-		$db   = JFactory::getDbo();
 		$user = JFactory::getUser();
-		$gid  = $user->get('aid');
+		$db   = JFactory::getDbo();
+		$query = $db->getQuery(true);
 		if (!$eventId)
+		{
 			return false;
-		$sql = 'SELECT * FROM #__eb_events WHERE id=' . $eventId . ' AND published=1 ';
-		$db->setQuery($sql);
+		}
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
+		$query->select('a.*')
+			->select('DATEDIFF(event_date, "'.$currentDate.'") AS number_event_dates')
+			->select('DATEDIFF(cut_off_date, "'.$currentDate.'") AS number_cut_off_dates')
+			->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
+			->from('#__eb_events AS a')
+			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
+			->where('a.id = '. $eventId)
+			->where('a.published = 1');
+		$db->setQuery($query);
 		$row = $db->loadObject();
 		if (!$row)
+		{
 			return false;
+		}
 		if ($row->registration_type == 3)
+		{
 			return false;
-
+		}
 		if (!in_array($row->registration_access, $user->getAuthorisedViewLevels()))
 		{
 			return false;
 		}
-
 		if ($row->cut_off_date == $db->getNullDate())
 		{
-			$sql = 'SELECT DATEDIFF(NOW(), event_date) AS number_days FROM #__eb_events WHERE id=' . $eventId;
+			$numberDays = $row->number_event_dates;
 		}
 		else
 		{
-			$sql = 'SELECT DATEDIFF(NOW(), cut_off_date) AS number_days FROM #__eb_events WHERE id=' . $eventId;
+			$numberDays = $row->number_cut_off_dates;
 		}
-		$db->setQuery($sql);
-		$numberDays = $db->loadResult();
-		if ($numberDays > 0)
+		if ($numberDays < 0)
 		{
 			return false;
 		}
-		if ($row->event_capacity)
+		if ($row->event_capacity && ($row->total_registrants >= $row->event_capacity))
 		{
-			//Get total registrants for this event
-			$sql = 'SELECT SUM(number_registrants) AS total_registrants FROM #__eb_registrants WHERE event_id=' . $eventId .
-				' AND group_id=0 AND (published=1 OR (payment_method LIKE "os_offline%" AND published != 2))';
-			$db->setQuery($sql);
-			$numberRegistrants = (int) $db->loadResult();
-			if ($numberRegistrants >= $row->event_capacity)
-				return false;
+			return false;
 		}
 		//Check to see whether the current user has registered for the event
 		$preventDuplicateRegistration = EventbookingHelper::getConfigValue('prevent_duplicate_registration');
-		if ($preventDuplicateRegistration && $user->get('id'))
+		$userId = $user->get('id');
+		if ($preventDuplicateRegistration && $userId)
 		{
-			$sql = 'SELECT COUNT(id) FROM #__eb_registrants WHERE event_id=' . $eventId . ' AND user_id=' . $user->get('id') .
-				' AND (published=1 OR (payment_method LIKE "os_offline%" AND published != 2))';
-			$db->setQuery($sql);
+			$query->clear();
+			$query->select('COUNT(id)')
+				->from('#__eb_registrants')
+				->where('event_id = '. $eventId)
+				->where('user_id = '. $userId)
+				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
+			$db->setQuery($query);
 			$total = $db->loadResult();
 			if ($total)
 			{
@@ -2002,7 +2013,7 @@ class EventbookingHelper
 	{
 		$db  = JFactory::getDbo();
 		$sql = 'SELECT SUM(number_registrants) AS total_registrants FROM #__eb_registrants WHERE event_id=' . $eventId .
-			' AND group_id=0 AND (published=1 OR (payment_method LIKE "os_offline%" AND published != 2))';
+			' AND group_id=0 AND (published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))';
 		$db->setQuery($sql);
 		$numberRegistrants = (int) $db->loadResult();
 
@@ -2015,21 +2026,13 @@ class EventbookingHelper
 	 * @param int    $eventId
 	 * @param object $config
 	 */
-	public static function getMaxNumberRegistrants($eventId, $config)
+	public static function getMaxNumberRegistrants($event)
 	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('*')
-			->from('#__eb_events')
-			->where('id=' . $eventId);
-		$db->setQuery($query);
-		$event            = $db->loadObject();
-		$totalRegistrants = EventbookingHelper::getTotalRegistrants($eventId);
 		$eventCapacity    = (int) $event->event_capacity;
 		$maxGroupNumber   = (int) $event->max_group_number;
 		if ($eventCapacity)
 		{
-			$maxRegistrants = $eventCapacity - $totalRegistrants;
+			$maxRegistrants = $eventCapacity - $event->total_registrants;
 		}
 		else
 		{
@@ -2133,8 +2136,11 @@ class EventbookingHelper
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('*')
-			->from('#__eb_waiting_lists')
-			->where('event_id=' . (int) $row->event_id);
+			->from('#__eb_registrants')
+			->where('event_id=' . (int) $row->event_id)
+			->where('group_id = 0')
+			->where('published = 3')
+			->order('id');
 		$db->setQuery($query);
 		$registrants = $db->loadObjectList();
 		if (count($registrants))
@@ -2187,6 +2193,8 @@ class EventbookingHelper
 			{
 				$subject = $message->registrant_waitinglist_notification_subject;
 			}
+
+
 			if (empty($subject))
 			{
 				//Admin has not entered email subject and email message for notification yet, simply return
@@ -2611,6 +2619,7 @@ class EventbookingHelper
 	{
 		$db          = JFactory::getDbo();
 		$mailer      = JFactory::getMailer();
+		$query       = $db->getQuery(true);
 		$message     = self::getMessages();
 		$fieldSuffix = self::getFieldSuffix($row->language);
 		if ($config->from_name)
@@ -2629,27 +2638,29 @@ class EventbookingHelper
 		{
 			$fromEmail = JFactory::getConfig()->get('mailfrom');
 		}
-		$sql = "SELECT * FROM #__eb_events WHERE id=" . $row->event_id;
-		$db->setQuery($sql);
-		$event = $db->loadObject();
-		//Supported tags
-		$replaces                       = array();
-		$replaces['event_title']        = $event->title;
-		$replaces['first_name']         = $row->first_name;
-		$replaces['last_name']          = $row->last_name;
-		$replaces['organization']       = $row->organization;
-		$replaces['address']            = $row->address;
-		$replaces['address2']           = $row->address;
-		$replaces['city']               = $row->city;
-		$replaces['state']              = $row->state;
-		$replaces['zip']                = $row->zip;
-		$replaces['country']            = $row->country;
-		$replaces['phone']              = $row->phone;
-		$replaces['fax']                = $row->phone;
-		$replaces['email']              = $row->email;
-		$replaces['comment']            = $row->comment;
-		$replaces['number_registrants'] = $row->number_registrants;
 
+		$query->select('*')
+			->from('#__eb_events')
+			->where('id=' . $row->event_id);
+		$db->setQuery($query);
+		$event = $db->loadObject();
+		if ($config->multiple_booking)
+		{
+			$rowFields = self::getFormFields($row->id, 4);
+		}
+		elseif ($row->is_group_billing)
+		{
+			$rowFields = self::getFormFields($row->event_id, 1);
+		}
+		else
+		{
+			$rowFields = self::getFormFields($row->event_id, 0);
+		}
+		$form = new RADForm($rowFields);
+		$data = self::getRegistrantData($row, $rowFields);
+		$form->bind($data);
+		$form->buildFieldsDependency();
+		$replaces = self::buildTags($row, $form, $event, $config);
 		//Notification email send to user
 		if (strlen($message->{'watinglist_confirmation_subject' . $fieldSuffix}))
 		{
@@ -2676,14 +2687,19 @@ class EventbookingHelper
 		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
 		//Send emails to notification emails
 		if (strlen(trim($event->notification_emails)) > 0)
+		{
 			$config->notification_emails = $event->notification_emails;
+		}
 		if ($config->notification_emails == '')
+		{
 			$notificationEmails = $fromEmail;
+		}
 		else
+		{
 			$notificationEmails = $config->notification_emails;
+		}
 		$notificationEmails = str_replace(' ', '', $notificationEmails);
 		$emails             = explode(',', $notificationEmails);
-
 		if (strlen($message->{'watinglist_notification_subject' . $fieldSuffix}))
 		{
 			$subject = $message->{'watinglist_notification_subject' . $fieldSuffix};
@@ -3661,7 +3677,7 @@ class EventbookingHelper
 		if (!$userId)
 			return false;
 		$sql = 'SELECT id FROM #__eb_registrants WHERE event_id=' . $eventId . ' AND (user_id=' . $userId . ' OR email="' . $email .
-			'") AND (published=1 OR (payment_method LIKE "os_offline%" AND published!=2))';
+			'") AND (published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))';
 		$db->setQuery($sql);
 		$registrantId = $db->loadResult();
 		if (!$registrantId)

@@ -1,6 +1,6 @@
 <?php 
 /**
- * @version        	1.6.10
+ * @version        	1.7.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -17,10 +17,9 @@ defined( '_JEXEC' ) or die ;
         	$event = $events[$i] ;
         	$canRegister = EventbookingHelper::acceptRegistration($event->id) ;
             $detailUrl = JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, @$category->id, $Itemid));
-        	if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants) && $activateWaitingList && !@$event->user_registered)
+        	if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants) && $activateWaitingList && !@$event->user_registered && $event->number_event_dates > 0)
             {
         	    $waitingList = true ;
-        	    $waitinglistUrl = JRoute::_('index.php?option=com_eventbooking&view=waitinglist&event_id='.$event->id.'&Itemid='.$Itemid);
         	}
             else
             {
@@ -298,7 +297,7 @@ defined( '_JEXEC' ) or die ;
                                     		if ($event->location_address)
                                     		{                                    			                                    			
                                     		?>
-                                    			<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$event->location_id); ?>&tmpl=component" class="eb-colorbox-map"><?php echo $event->location_name ; ?></a>
+                                    			<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$event->location_id.'&tmpl=component'); ?>" class="eb-colorbox-map"><?php echo $event->location_name ; ?></a>
                                     		<?php	
                                     		}
                                     		else 
@@ -309,7 +308,20 @@ defined( '_JEXEC' ) or die ;
                                     </td>
                                 </tr>								
                             <?php	
-                            }	
+                            }
+                            if ($event->attachment && !empty($config->show_attachment_in_frontend))
+                            {
+	                            ?>
+	                            <tr>
+		                            <td>
+			                            <strong><?php echo JText::_('EB_ATTACHMENT'); ?></strong>
+		                            </td>
+		                            <td>
+			                            <a href="<?php echo JUri::base().'/media/com_eventbooking/'.$event->attachment?>"><?php echo $event->attachment; ?></a>
+		                            </td>
+	                            </tr>
+                            <?php
+                            }
                             ?>
                         </table>
                   	</div>
@@ -318,48 +330,55 @@ defined( '_JEXEC' ) or die ;
 				<div class="eb-taskbar clearfix">
 					<ul>	
 						<?php
-							if ($canRegister || $waitingList)
-                            {
+							if ($canRegister)
+							{
 								if ($event->registration_type == 0 || $event->registration_type == 1)
-                                {
+								{
 									if ($config->multiple_booking)
-                                    {
-                                        $url = 'index.php?option=com_eventbooking&task=add_cart&id='.(int)$event->id.'&Itemid='.(int)$Itemid;
-                                		$extraClass = 'eb-colorbox-addcart';
+									{
+										$url = 'index.php?option=com_eventbooking&task=add_cart&id='.(int)$event->id.'&Itemid='.(int)$Itemid;
+										$extraClass = 'eb-colorbox-addcart';
 										$text = JText::_('EB_REGISTER');
 									}
-                                    else
-                                    {
+									else
+									{
 										$url = JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ;
 										$text = JText::_('EB_REGISTER_INDIVIDUAL') ;
-									}
-									if ($waitingList)
-                                    {
-										$url = $waitinglistUrl ;
 										$extraClass = '';
 									}
-								?>
+									?>
 									<li>
-										<a class="btn <?php echo $extraClass;?>" href="<?php echo $url ; ?>"><?php echo $text; ?></a>
-									</li>	
-								<?php	
-								}				    		
+										<a class="btn <?php echo $extraClass;?>" href="<?php echo $url ; ?>"><?php echo $text ; ?></a>
+									</li>
+									<?php
+									if (($event->registration_type == 0 || $event->registration_type == 2) && !$config->multiple_booking)
+									{
+										?>
+										<li>
+											<a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+										</li>
+									<?php
+									}
+								}
+							}
+							elseif ($waitingList)
+							{
+								if ($event->registration_type == 0 || $event->registration_type == 1)
+								{
+									?>
+									<li>
+										<a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
+									</li>
+								<?php
+								}
 								if (($event->registration_type == 0 || $event->registration_type == 2) && !$config->multiple_booking)
-                                {
-									if ($waitingList)
-                                    {
-                                        $url = $waitinglistUrl ;
-                                    }
-									else
-                                    {
-										$url = JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ;
-                                    }
-								?>
-									<li>				    		
-										<a class="btn" href="<?php echo $url ; ?>"><?php echo JText::_('EB_REGISTER_GROUP'); ?></a>
-									</li>	
-								<?php	
-								}						    	
+								{
+									?>
+									<li>
+										<a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
+									</li>
+								<?php
+								}
 							}
 							$registrantId = EventbookingHelper::canCancelRegistration($event->id) ; 
 							if ($registrantId !== false)

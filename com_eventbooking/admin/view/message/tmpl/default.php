@@ -327,19 +327,7 @@ $editor = JFactory::getEditor();
 						<td>
 							<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> :[REGISTRATION_DETAIL], [FIRST_NAME], [LAST_NAME], [ORGANIZATION], [ADDRESS], [ADDRESS2], [CITY], [STATE], [CITY], [ZIP], [COUNTRY], [PHONE], [FAX], [EMAIL], [COMMENT], [AMOUNT]</strong>
 						</td>
-					</tr>		
-								
-					<tr>
-						<td class="key">
-							<?php echo JText::_('EB_WAITINGLIST_FORM_MESSAGE'); ?>														
-						</td>
-						<td>			
-							<?php echo $editor->display( 'waitinglist_form_message',  $this->message->waitinglist_form_message , '100%', '250', '75', '8' ) ;?>							
-						</td>
-						<td>
-							<strong><?php echo JText::_('EB_WAITINGLIST_FORM_MESSAGE_EXPLAIN'); ?> <?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: [EVENT_TITLE]</strong>
-						</td>
-					</tr>																
+					</tr>
 					<tr>
 						<td class="key">
 							<?php echo JText::_('EB_WAITINGLIST_COMPLETE_MESSAGE'); ?>														

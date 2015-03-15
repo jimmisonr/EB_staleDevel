@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.6.10
+ * @version        	1.7.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -28,18 +28,25 @@ class EventBookingViewRegister extends JViewLegacy
 		}
 		$input = JFactory::getApplication()->input;
 		$eventId = $input->getInt('event_id', 0);
-		if (!EventbookingHelper::acceptRegistration($eventId))
-		{
-			JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_eventbooking&Itemid=' . $input->getInt('Itemid', 0), false), 
-				JText::_('EB_ERROR_REGISTRATION'));
-		}
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('*')
-			->from('#__eb_events')
-			->where('id=' . $eventId);
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
+		$query->select('a.*, IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
+			->select('DATEDIFF(a.event_date, "' . $currentDate . '") AS number_event_dates')
+			->from('#__eb_events AS a')
+			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
+			->where('a.id=' . $eventId);
 		$db->setQuery($query);
 		$event = $db->loadObject();
+		if (!EventbookingHelper::acceptRegistration($eventId))
+		{
+			$waitingList = EventbookingHelper::getConfigValue('activate_waitinglist_feature');
+			if (!$waitingList || !$event->number_event_dates)
+			{
+				JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_eventbooking&Itemid=' . $input->getInt('Itemid', 0), false),
+					JText::_('EB_ERROR_REGISTRATION'));
+			}
+		}
 		if ($event->event_password)
 		{
 			$passwordPassed = JFactory::getSession()->get('eb_passowrd_'.$event->id, 0);
@@ -70,13 +77,21 @@ class EventBookingViewRegister extends JViewLegacy
 	 * @param string $tpl
 	 */
 	private function _displayIndividualRegistrationForm($event, $input, $tpl)
-	{		
+	{
 		JFactory::getDocument()->addScript(JUri::base(true) . '/components/com_eventbooking/assets/js/paymentmethods.js');
-		$config = EventbookingHelper::getConfig();
-		$user = JFactory::getUser();
-		$userId = $user->get('id');
-		$eventId = $event->id;
+		$config    = EventbookingHelper::getConfig();
+		$user      = JFactory::getUser();
+		$userId    = $user->get('id');
+		$eventId   = $event->id;
 		$rowFields = EventbookingHelper::getFormFields($eventId, 0);
+		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
+		{
+			$waitingList = true;
+		}
+		else
+		{
+			$waitingList = false;
+		}
 		$captchaInvalid = $input->getInt('captcha_invalid', 0);
 		if ($captchaInvalid)
 		{
@@ -126,13 +141,21 @@ class EventBookingViewRegister extends JViewLegacy
 		$form->bind($data, $useDefault);
 		$form->prepareFormFields('calculateIndividualRegistrationFee();');
 		$paymentMethod = $input->post->getString('payment_method', os_payments::getDefautPaymentMethod(trim($event->payment_methods)));
+		if ($waitingList)
+		{
+			$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, null);
+		}
+		else
+		{
+			$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		}
 		$expMonth = $input->post->getInt('exp_month', date('m'));
 		$expYear = $input->post->getInt('exp_year', date('Y'));
 		$lists['exp_month'] = JHtml::_('select.integerlist', 1, 12, 1, 'exp_month', ' class="input-small" ', $expMonth, '%02d');
 		$currentYear = date('Y');
 		$lists['exp_year'] = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
 		$data['coupon_code'] =  $input->post->getString('coupon_code', '');
-		$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+
 		$methods = os_payments::getPaymentMethods(trim($event->payment_methods));
 		$options = array();
 		$options[] = JHtml::_('select.option', 'Visa', 'Visa');
@@ -148,6 +171,7 @@ class EventBookingViewRegister extends JViewLegacy
 		{
 			$enableCoupon = 0;
 		}
+
 		$idealEnabled = EventbookingHelper::idealEnabled();
 		if ($idealEnabled)
 		{
@@ -157,7 +181,7 @@ class EventBookingViewRegister extends JViewLegacy
 			{
 				$options[] = JHtml::_('select.option', $bankId, $bankName);
 			}
-			$lists['bank_id'] = JHtml::_('select.genericlist', $options, 'bank_id', ' class="inputbox" ', 'value', 'text', 
+			$lists['bank_id'] = JHtml::_('select.genericlist', $options, 'bank_id', ' class="inputbox" ', 'value', 'text',
 				$input->post->getInt('bank_id'));
 		}
 
@@ -202,8 +226,17 @@ class EventBookingViewRegister extends JViewLegacy
 			{
 				JFactory::getApplication()->enqueueMessage(JText::_('EB_CAPTCHA_NOT_ACTIVATED_IN_YOUR_SITE'), 'error');
 			}
-		}		
+		}
 
+		// Reset some values if waiting list is activated
+		if ($waitingList)
+		{
+			$enableCoupon = false;
+			$idealEnabled = false;
+			$depositPayment = false;
+			$paymentType = false;
+			$showPaymentFee = false;
+		}
 		// Assign these parameters
 		$this->paymentMethod = $paymentMethod;
 		$this->Itemid = $input->getInt('Itemid', 0);
@@ -228,6 +261,7 @@ class EventBookingViewRegister extends JViewLegacy
 		$this->paymentProcessingFee = $fees['payment_processing_fee'];
 		$this->showPaymentFee = $showPaymentFee;
 		$this->discountRate = $fees['discount_rate'];
+		$this->waitingList = $waitingList;
 
 		parent::display($tpl);
 	}
@@ -262,7 +296,18 @@ class EventBookingViewRegister extends JViewLegacy
 			{
 				JFactory::getApplication()->enqueueMessage(JText::_('EB_CAPTCHA_NOT_ACTIVATED_IN_YOUR_SITE'), 'error');
 			}
-		}					
+		}
+
+		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
+		{
+			$waitingList = true;
+		}
+		else
+		{
+			$waitingList = false;
+		}
+		$this->waitingList = $waitingList;
+
 		EventbookingHelperJquery::colorbox('eb-colorbox-term');
 		parent::display($tpl);
 	}

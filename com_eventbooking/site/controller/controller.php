@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.6.10
+ * @version        	1.7.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -96,11 +96,6 @@ class EventbookingController extends JControllerLegacy
 			case 'edit_event':
 				JRequest::setVar('view', 'event');
 				JRequest::setVar('layout', 'form');
-				break;
-			#Misc							
-			case 'waitinglist_complete':
-				JRequest::setVar('view', 'waitinglist');
-				JRequest::setVar('layout', 'complete');
 				break;
 			#Location management			
 			case 'edit_location':
@@ -557,7 +552,7 @@ class EventbookingController extends JControllerLegacy
 				->from('#__eb_registrants')
 				->where('event_id=' . $eventId)
 				->where('email="' . $email . '"')
-				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published != 2))');
+				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 			$db->setQuery($query);
 			$total = $db->loadResult();
 			if ($total)
@@ -749,7 +744,7 @@ class EventbookingController extends JControllerLegacy
 		$user             = JFactory::getUser();
 		$Itemid           = JRequest::getInt('Itemid', 0);
 		$id               = JRequest::getInt('id');
-		$registrationCode = JRequest::getVar('registration_code', '');
+		$registrationCode = JRequest::getVar('cancel_code', '');
 		if ($id)
 		{
 			$query->select('a.id, a.title, b.user_id, cancel_before_date, DATEDIFF(cancel_before_date, NOW()) AS number_days')
@@ -858,7 +853,7 @@ class EventbookingController extends JControllerLegacy
 			JFactory::getApplication()->redirect('index.php', JText::_('EB_PLEASE_CHOOSE_AN_EVENT_TO_EXPORT_REGISTRANTS'));
 		}
 		$where = array();
-		$where[] = '(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published != 2))';
+		$where[] = '(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published NOT IN (2,3)))';
 		if ($eventId)
 		{
 			$where[] = ' a.event_id=' . $eventId;
@@ -940,31 +935,6 @@ class EventbookingController extends JControllerLegacy
 			}
 		}
 		EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues, $groupNames);
-	}
-	/**
-	 * Store users into waitinglist database
-	 */
-	public function save_waitinglist()
-	{
-		$config = EventbookingHelper::getConfig();
-		$user = JFactory::getUser();
-		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
-		{
-			$input  = JFactory::getApplication()->input;
-			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			$res = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
-			if (!$res)
-			{
-				JError::raiseWarning('', JText::_('EB_INVALID_CAPTCHA_ENTERED'));
-				JRequest::setVar('view', 'waitinglist');
-				JRequest::setVar('layout', 'default');
-				$this->display();
-				return;
-			}
-		}
-		$data = JRequest::get('post');
-		$model = $this->getModel('waitinglist');
-		$model->store($data);
 	}
 	###########################Submitting events from front-end################################
 	public function save_event()

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.6.10
+ * @version        	1.7.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -59,22 +59,18 @@ class EventBookingModelEvent extends JModelLegacy
 			$db = $this->getDbo();
 			$query = $db->getQuery(true);
 			$id = JRequest::getInt('id', 0);
-			$query->select('*, DATEDIFF(early_bird_discount_date, NOW()) AS date_diff')
-				->from('#__eb_events')
-				->where('id = '. $id);
+			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
+			$query->select('a.*')
+				->select('DATEDIFF(event_date, "'.$currentDate.'") AS number_event_dates')
+				->select('DATEDIFF(cut_off_date, "'.$currentDate.'") AS number_cut_off_dates')
+				->select('DATEDIFF(early_bird_discount_date, "'.$currentDate.'") AS date_diff')
+				->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
+				->from('#__eb_events AS a')
+				->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
+				->where('a.id = '. $id)
+				->where('a.published = 1');
 			$db->setQuery($query);
 			$row = $db->loadObject();
-
-			//Get total registered user
-			$query->clear();
-			$query->select('SUM(number_registrants)')
-				->from('#__eb_registrants')
-				->where('event_id = '. $id)
-				->where('group_id = 0')
-				->where('(published = 1 OR (payment_method LIKE "os_offline%" AND published != 2))');
-			$db->setQuery($query);
-			$row->total_registrants = (int) $db->loadResult();
-
 			// Get the main category of this event
 			$query->clear();
 			$query->select('category_id')

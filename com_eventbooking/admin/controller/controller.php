@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.6.10
+ * @version        	1.7.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -48,7 +48,7 @@ class EventbookingController extends RADControllerAdmin
 		$config = EventbookingHelper::getConfig();
 		$eventId = JRequest::getInt('filter_event_id');		
 		$where = array();
-		$where[] = '(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published != 2))';
+		$where[] = '(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published NOT IN (2,3)))';
 		if ($eventId)
 		{
 			$where[] = ' a.event_id=' . $eventId;
@@ -162,7 +162,6 @@ class EventbookingController extends RADControllerAdmin
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.folder');
 		$db = JFactory::getDbo();
-		$config = EventbookingHelper::getConfig();
 		//Setup menus
 		$menuSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/menus.eventbooking.sql';
 		$sql = JFile::read($menuSql);
@@ -210,6 +209,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
+		$config = EventbookingHelper::getConfig();
 		//Set up default payment plugins table
 		$sql = 'SELECT COUNT(*) FROM #__eb_payment_plugins';
 		$db->setQuery($sql);
@@ -294,8 +294,6 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery("UPDATE `#__eb_states` SET `published` = 1");
 			$db->execute();
 		}
-
-
 
 		$sql = "SELECT COUNT(*) FROM #__eb_currencies WHERE currency_code='RUB'";
 		$db->setQuery($sql);
@@ -1011,6 +1009,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
+
+		if (!in_array('notified', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `notified`  TINYINT NOT NULL DEFAULT  '0' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
 		
 		if (!in_array('deposit_amount', $fields))
 		{
@@ -1565,7 +1570,6 @@ class EventbookingController extends RADControllerAdmin
 					$db->execute();
 				}
 			}
-			$config = EventbookingHelper::getConfig();
 			if ($config->display_state_dropdown)
 			{
 				$sql = 'UPDATE #__eb_fields SET fieldtype="State" WHERE name="state"';
@@ -1789,7 +1793,6 @@ class EventbookingController extends RADControllerAdmin
 		{
 			require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/table/table.php';
-			$config = EventbookingHelper::getConfig();
 			$row = new RADTable('#__eb_messages', 'id', $db);
 			$keys = array(
 				'admin_email_subject', 
@@ -1870,6 +1873,25 @@ class EventbookingController extends RADControllerAdmin
 		$db->setQuery($sql);
 		$db->execute();
 		$db->truncateTable('#__eb_urls');
+
+		// Migrate waiting list data
+		$sql = 'SELECT COUNT(*) FROM #__eb_waiting_lists';
+		$db->setQuery($sql);
+		$total = $db->loadResult();
+		if ($total)
+		{
+			$sql = "INSERT INTO #__eb_registrants(
+				user_id, event_id, first_name, last_name, organization, address, address2, city,
+		 		state, country, zip, phone, fax, email, number_registrants, register_date, notified, published
+			)
+		 	SELECT user_id, event_id, first_name, last_name, organization, address, address2, city,
+		 	state, country, zip, phone, fax, email, number_registrants, register_date, notified, 3
+		 	FROM #__eb_waiting_lists ORDER BY id
+		 	";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+		$db->truncateTable('#__eb_waiting_lists');
 		$installType = JRequest::getVar('install_type');
 		if ($installType == 'install')
 		{
