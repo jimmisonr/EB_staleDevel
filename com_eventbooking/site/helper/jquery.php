@@ -79,7 +79,7 @@ abstract class EventbookingHelperJquery
 				                    "alertText": "' . JText::_('EB_VALIDATION_FIELD_REQUIRED') . '",
 				                    "alertTextCheckboxMultiple": "' .
 					 JText::_('EB_VALIDATION__SELECT_AN_OPTION') . '",
-				                    "alertTextCheckboxe": "' . JText::_('EB_VALIDATION__CHECKBOX_REQUIRED') . '",
+				                    "alertTextCheckboxe": "' . JText::_('EB_VALIDATION_CHECKBOX_REQUIRED') . '",
 				                    "alertTextDateRange": "' . JText::_('EB_VALIDATION_BOTH_DATE_RANGE_FIELD_REQUIRED') . '"
 				                },
 				                "requiredInFunction": {
