@@ -30,7 +30,7 @@ if (strlen($msg))
 	    	<?php echo  JText::_('EB_NUMBER_REGISTRANTS') ?><span class="required">*</span>
 	    </label>
 		<div class="controls">      				
-	      	<input type="text" class="input-mini validate[required,custom[number],min[2],max[<?php echo $this->maxRegistrants; ?>]" id="number_registrants" name="number_registrants" data-errormessage-range-underflow="<?php echo JText::_('EB_NUMBER_REGISTRANTS_IN_VALID'); ?>" data-errormessage-range-overflow="<?php echo JText::sprintf('EB_MAX_REGISTRANTS_REACH', $this->maxRegistrants);?>" value="<?php echo $this->numberRegistrants;?>" />		
+	      	<input type="text" class="input-mini validate[required,custom[number],min[<?php echo $this->minNumberRegistrants; ?>],max[<?php echo $this->maxRegistrants; ?>]" id="number_registrants" name="number_registrants" data-errormessage-range-underflow="<?php echo JText::sprintf('EB_NUMBER_REGISTRANTS_IN_VALID', $this->minNumberRegistrants); ?>" data-errormessage-range-overflow="<?php echo JText::sprintf('EB_MAX_REGISTRANTS_REACH', $this->maxRegistrants);?>" value="<?php echo $this->numberRegistrants;?>" />
 		</div>	
 	</div>
 	<div class="form-actions">

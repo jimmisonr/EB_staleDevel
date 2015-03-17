@@ -290,6 +290,14 @@ $format = 'Y-m-d' ;
 						</tr>
 						<tr>
 							<td class="key">
+								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_MIN_NUMBER_REGISTRANTS' );?>::<?php echo JText::_('EB_MIN_NUMBER_REGISTRANTS_EXPLAIN'); ?>"><?php echo JText::_('EB_MIN_NUMBER_REGISTRANTS'); ?></span>
+							</td>
+							<td>
+								<input type="text" name="min_group_number" id="min_group_number" class="input-small" size="10" value="<?php echo $this->item->min_group_number; ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
 								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_MAX_NUMBER_REGISTRANTS' );?>::<?php echo JText::_('EB_MAX_NUMBER_REGISTRANTS_EXPLAIN'); ?>"><?php echo JText::_('EB_MAX_NUMBER_REGISTRANT_GROUP'); ?></span>
 							</td>
 							<td>

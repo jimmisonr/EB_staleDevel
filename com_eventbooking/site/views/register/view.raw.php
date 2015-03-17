@@ -75,6 +75,15 @@ class EventBookingViewRegister extends JViewLegacy
 			$this->maxRegistrants = EventbookingHelper::getMaxNumberRegistrants($event);
 		}
 
+		if ($event->min_group_number > 0)
+		{
+			$this->minNumberRegistrants = $event->min_group_number;
+		}
+		else
+		{
+			$this->minNumberRegistrants = 2;
+		}
+
 		$this->numberRegistrants = $numberRegistrants;
 		$this->message = EventbookingHelper::getMessages();
 		$this->fieldSuffix = EventbookingHelper::getFieldSuffix();

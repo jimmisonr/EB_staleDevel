@@ -541,6 +541,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
+
+		if (!in_array('min_group_number', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `min_group_number` TINYINT NOT NULL DEFAULT  '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
 		
 		if (!in_array('paypal_email', $fields))
 		{
@@ -1069,7 +1076,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('is_group_billing', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `is_group_billing` TINYINT NOT NULL DEFAULT  '0';";
