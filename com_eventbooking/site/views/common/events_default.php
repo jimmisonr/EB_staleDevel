@@ -336,29 +336,30 @@ defined( '_JEXEC' ) or die ;
 								{
 									if ($config->multiple_booking)
 									{
-										$url = 'index.php?option=com_eventbooking&task=add_cart&id='.(int)$event->id.'&Itemid='.(int)$Itemid;
+										$url        = 'index.php?option=com_eventbooking&task=add_cart&id=' . (int) $event->id . '&Itemid=' . (int) $Itemid;
 										$extraClass = 'eb-colorbox-addcart';
-										$text = JText::_('EB_REGISTER');
+										$text       = JText::_('EB_REGISTER');
 									}
 									else
 									{
-										$url = JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ;
-										$text = JText::_('EB_REGISTER_INDIVIDUAL') ;
+										$url        = JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id=' . $event->id . '&Itemid=' . $Itemid, false, $ssl);
+										$text       = JText::_('EB_REGISTER_INDIVIDUAL');
 										$extraClass = '';
 									}
 									?>
 									<li>
-										<a class="btn <?php echo $extraClass;?>" href="<?php echo $url ; ?>"><?php echo $text ; ?></a>
+										<a class="btn <?php echo $extraClass;?>"
+										   href="<?php echo $url; ?>"><?php echo $text; ?></a>
 									</li>
-									<?php
-									if (($event->registration_type == 0 || $event->registration_type == 2) && !$config->multiple_booking)
-									{
-										?>
-										<li>
-											<a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
-										</li>
-									<?php
-									}
+								<?php
+								}
+								if (($event->registration_type == 0 || $event->registration_type == 2) && !$config->multiple_booking)
+								{
+									?>
+									<li>
+										<a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+									</li>
+								<?php
 								}
 							}
 							elseif ($waitingList)
