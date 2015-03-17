@@ -50,7 +50,6 @@ class EventBookingViewRegister extends JViewLegacy
 	{
 		$session = JFactory::getSession();
 		$numberRegistrants = $session->get('eb_number_registrants', '');
-		$eventId = $event->id;
 		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
 		{
 			$waitingList = true;
