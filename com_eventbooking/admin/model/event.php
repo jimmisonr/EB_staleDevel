@@ -170,6 +170,11 @@ class EventbookingModelEvent extends RADModelItem
 			$row->event_date .= ' ' . $eventDateHour . ':' . $data['event_date_minute'] . ':00';
 			$eventDateHour = $data['event_end_date_hour'];
 			$row->event_end_date .= ' ' . $eventDateHour . ':' . $data['event_end_date_minute'] . ':00';
+
+			$row->registration_start_date .= ' ' . $data['registration_start_hour'] . ':' . $data['registration_start_minute'] . ':00';
+			$row->cut_off_date .= ' ' . $data['cut_off_hour'] . ':' . $data['cut_off_minute'] . ':00';
+
+
 			$eventCustomField = EventbookingHelper::getConfigValue('event_custom_field');
 			if ($eventCustomField)
 			{
@@ -311,6 +316,8 @@ class EventbookingModelEvent extends RADModelItem
 		$eventDateHour = $data['event_end_date_hour'];
 		$row->weekdays = implode(',', $data['weekdays']);
 		$row->event_end_date .= ' ' . $eventDateHour . ':' . $data['event_end_date_minute'] . ':00';
+		$row->registration_start_date .= ' ' . $data['registration_start_hour'] . ':' . $data['registration_start_minute'] . ':00';
+		$row->cut_off_date .= ' ' . $data['cut_off_hour'] . ':' . $data['cut_off_minute'] . ':00';
 		//Adjust event start date and event end date				
 		if ($data['recurring_type'] == 1)
 		{
@@ -364,6 +371,16 @@ class EventbookingModelEvent extends RADModelItem
 		{
 			$earlyBirdDuration = 0;
 		}
+
+		if (strlen(trim($row->registration_start_date)) && $row->registration_start_date != $nullDate)
+		{
+			$registrationStartDuration = abs(strtotime($row->registration_start_date) - strtotime($row->event_date));
+		}
+		else
+		{
+			$registrationStartDuration = 0;
+		}
+
 		if (count($eventDates) == 0)
 		{
 			JFactory::getApplication()->redirect('index.php?option=com_eventbooking&view=events', JText::_('Invalid recurring setting'));
@@ -500,7 +517,11 @@ class EventbookingModelEvent extends RADModelItem
 				if ($earlyBirdDuration)
 				{
 					$rowChildEvent->early_bird_discount_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($rowChildEvent->event_date) - $earlyBirdDuration);
-				}				 
+				}
+				if ($registrationStartDuration)
+				{
+					$rowChildEvent->registration_start_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($rowChildEvent->event_date) - $registrationStartDuration);
+				}
 				$rowChildEvent->event_type = 2;
 				$rowChildEvent->parent_id = $row->id;
 				$rowChildEvent->recurring_type = 0;
@@ -635,6 +656,15 @@ class EventbookingModelEvent extends RADModelItem
 						$rowChildEvent->early_bird_discount_date = '';
 					}
 
+					if ($registrationStartDuration)
+					{
+						$rowChildEvent->registration_start_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($rowChildEvent->event_date) - $registrationStartDuration);
+					}
+					else
+					{
+						$rowChildEvent->registration_start_date = '';
+					}
+
 					$rowChildEvent->store();
 					$query->clear();
 					$query->delete('#__eb_event_group_prices')->where('event_id=' . $rowChildEvent->id);
@@ -686,6 +716,7 @@ class EventbookingModelEvent extends RADModelItem
 		$config = EventbookingHelper::getConfig();
 		$this->data->event_date = $db->getNullDate();
 		$this->data->event_end_date = $db->getNullDate();
+		$this->data->registration_start_date = $db->getNullDate();
 		$this->data->cut_off_date = $db->getNullDate();
 		$this->data->registration_type = isset($config->registration_type) ? $config->registration_type : 0;
 		$this->data->access = isset($config->access) ? $config->access : 1;
@@ -732,6 +763,11 @@ class EventbookingModelEvent extends RADModelItem
 				$this->data->number_days = 0;
 				$this->data->number_weeks = 0;
 			}
+		}
+
+		if (empty($this->data->registration_start_date))
+		{
+			$this->data->registration_start_date = $this->getDbo()->getNullDate();
 		}
 	}
 

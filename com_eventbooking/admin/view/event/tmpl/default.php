@@ -125,10 +125,20 @@ $format = 'Y-m-d' ;
 						</tr>
 						<tr>
 							<td class="key">
+								<?php echo JText::_('EB_REGISTRATION_START_DATE'); ?>
+							</td>
+							<td>
+								<?php echo JHtml::_('calendar', ($this->item->registration_start_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->registration_start_date, $format, null), 'registration_start_date', 'registration_start_date') ; ?>
+								<?php echo $this->lists['registration_start_hour'].' '.$this->lists['registration_start_minute']; ?>
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
 								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_CUT_OFF_DATE' );?>::<?php echo JText::_('EB_CUT_OFF_DATE_EXPLAIN'); ?>"><?php echo JText::_('EB_CUT_OFF_DATE') ; ?></span>
 							</td>
 							<td>
 								<?php echo JHtml::_('calendar', ($this->item->cut_off_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->cut_off_date, $format, null), 'cut_off_date', 'cut_off_date') ; ?>
+								<?php echo $this->lists['cut_off_hour'].' '.$this->lists['cut_off_minute']; ?>
 							</td>
 						</tr>
 						<tr>
