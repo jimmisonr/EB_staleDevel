@@ -1931,68 +1931,54 @@ class EventbookingHelper
 	/**
 	 * Check to see whether this event still accept registration
 	 *
-	 * @param int $eventId
+	 * @param object $event
 	 *
 	 * @return Boolean
 	 */
-	public static function acceptRegistration($eventId)
+	public static function acceptRegistration($event)
 	{
-		$user = JFactory::getUser();
 		$db   = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		if (!$eventId)
+		$user = JFactory::getUser();
+		if ($event->registration_type == 3)
 		{
 			return false;
 		}
-		$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
-		$query->select('a.*')
-			->select('DATEDIFF(event_date, "'.$currentDate.'") AS number_event_dates')
-			->select('DATEDIFF(cut_off_date, "'.$currentDate.'") AS number_cut_off_dates')
-			->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
-			->from('#__eb_events AS a')
-			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
-			->where('a.id = '. $eventId)
-			->where('a.published = 1');
-		$db->setQuery($query);
-		$row = $db->loadObject();
-		if (!$row)
+
+		if (!in_array($event->registration_access, $user->getAuthorisedViewLevels()))
 		{
 			return false;
 		}
-		if ($row->registration_type == 3)
+
+		if ($event->registration_start_minutes < 0)
 		{
 			return false;
 		}
-		if (!in_array($row->registration_access, $user->getAuthorisedViewLevels()))
+
+		if ($event->cut_off_date != $db->getNullDate() && $event->cut_off_minutes > 0)
 		{
 			return false;
 		}
-		if ($row->cut_off_date == $db->getNullDate())
-		{
-			$numberDays = $row->number_event_dates;
-		}
-		else
-		{
-			$numberDays = $row->number_cut_off_dates;
-		}
-		if ($numberDays < 0)
+
+		if ($event->number_event_dates < 0)
 		{
 			return false;
 		}
-		if ($row->event_capacity && ($row->total_registrants >= $row->event_capacity))
+
+		if ($event->event_capacity && ($event->total_registrants >= $event->event_capacity))
 		{
 			return false;
 		}
+
 		//Check to see whether the current user has registered for the event
 		$preventDuplicateRegistration = EventbookingHelper::getConfigValue('prevent_duplicate_registration');
-		$userId = $user->get('id');
-		if ($preventDuplicateRegistration && $userId)
+		if ($preventDuplicateRegistration && $user->id)
 		{
+			$query = $db->getQuery(true);
 			$query->clear();
 			$query->select('COUNT(id)')
 				->from('#__eb_registrants')
-				->where('event_id = '. $eventId)
-				->where('user_id = '. $userId)
+				->where('event_id = '. $event->id)
+				->where('user_id = '. $user->id)
 				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 			$db->setQuery($query);
 			$total = $db->loadResult();

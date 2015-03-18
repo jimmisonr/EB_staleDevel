@@ -12,7 +12,7 @@ defined( '_JEXEC' ) or die ;
 
 $item = $this->item ;	
 $url = JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, 0, $this->Itemid), false);
-$canRegister = EventbookingHelper::acceptRegistration($item->id) ;
+$canRegister = EventbookingHelper::acceptRegistration($item) ;
 $socialUrl = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')).JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, 0, $this->Itemid));
 if ($this->config->use_https)
 {
@@ -118,6 +118,21 @@ else
 							</tr>
 						<?php	
 						}
+
+						if ($item->registration_start_date != $this->nullDate)
+						{
+							?>
+							<tr>
+								<td>
+									<strong><?php echo JText::_('EB_REGISTRATION_START_DATE'); ?></strong>
+								</td>
+								<td>
+									<?php echo JHtml::_('date', $item->registration_start_date, $this->config->event_date_format, null);?>
+								</td>
+							</tr>
+						<?php
+						}
+
 						if ($this->config->show_capacity)
                         {
 						?>
@@ -337,7 +352,7 @@ else
 					?>												
 			</tbody>
 		</table>
-		<?php			
+		<?php
 			$activateWaitingList = $this->config->activate_waitinglist_feature ;
 			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !@$item->user_registered && $item->number_event_dates > 0)
             {
@@ -347,7 +362,7 @@ else
             {
         	    $waitingList = false ;
         	} 
-			if (!$canRegister && $item->registration_type != 3 && $this->config->display_message_for_full_event && !$waitingList)
+			if (!$canRegister && $item->registration_type != 3 && $this->config->display_message_for_full_event && !$waitingList && $item->registration_start_minutes > 0)
             {
 			    if (@$item->user_registered)
                 {

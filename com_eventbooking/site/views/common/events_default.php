@@ -15,7 +15,7 @@ defined( '_JEXEC' ) or die ;
         $activateWaitingList = $config->activate_waitinglist_feature ;                                
         for ($i = 0 , $n = count($events) ;  $i < $n ; $i++) {		        	
         	$event = $events[$i] ;
-        	$canRegister = EventbookingHelper::acceptRegistration($event->id) ;
+        	$canRegister = EventbookingHelper::acceptRegistration($event);
             $detailUrl = JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, @$category->id, $Itemid));
         	if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants) && $activateWaitingList && !@$event->user_registered && $event->number_event_dates > 0)
             {
@@ -49,7 +49,7 @@ defined( '_JEXEC' ) or die ;
                                 $event->short_description = $event->description;
                             }
                             echo $event->short_description;
-                            if (!$canRegister && $event->registration_type != 3 && $config->display_message_for_full_event && !$waitingList)
+                            if (!$canRegister && $event->registration_type != 3 && $config->display_message_for_full_event && !$waitingList && $event->registration_start_minutes >= 0)
                             {
                                 if (@$event->user_registered)
                                 {
@@ -102,6 +102,19 @@ defined( '_JEXEC' ) or die ;
                                     </td>
                                 </tr>
                             <?php	
+                            }
+                            if ($event->registration_start_date != $nullDate)
+                            {
+	                            ?>
+	                            <tr class="eb-event-property">
+		                            <td class="eb-event-property-label">
+			                            <?php echo JText::_('EB_REGISTRATION_START_DATE'); ?>
+		                            </td>
+		                            <td class="eb-event-property-value">
+			                            <?php echo JHtml::_('date', $event->registration_start_date, $config->event_date_format, null) ; ?>
+		                            </td>
+	                            </tr>
+                            <?php
                             }
                             if ($event->cut_off_date != $nullDate)
                             {

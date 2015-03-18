@@ -59,10 +59,11 @@ class EventBookingModelEvent extends JModelLegacy
 			$db = $this->getDbo();
 			$query = $db->getQuery(true);
 			$id = JRequest::getInt('id', 0);
-			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
+			$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
 			$query->select('a.*')
-				->select('DATEDIFF(event_date, "'.$currentDate.'") AS number_event_dates')
-				->select('DATEDIFF(cut_off_date, "'.$currentDate.'") AS number_cut_off_dates')
+				->select("DATEDIFF(event_date, '$currentDate') AS number_event_dates")
+				->select("TIMESTAMPDIFF(MINUTE, registration_start_date, '$currentDate') AS registration_start_minutes")
+				->select("TIMESTAMPDIFF(MINUTE, cut_off_date, '$currentDate') AS cut_off_minutes")
 				->select('DATEDIFF(early_bird_discount_date, "'.$currentDate.'") AS date_diff')
 				->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
 				->from('#__eb_events AS a')
