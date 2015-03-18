@@ -764,11 +764,6 @@ class EventbookingModelEvent extends RADModelItem
 				$this->data->number_weeks = 0;
 			}
 		}
-
-		if (empty($this->data->registration_start_date))
-		{
-			$this->data->registration_start_date = $this->getDbo()->getNullDate();
-		}
 	}
 
 	/**

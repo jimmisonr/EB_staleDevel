@@ -521,9 +521,10 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+
 		if (!in_array('registration_start_date', $fields))
 		{
-			$sql = "ALTER TABLE  `#__eb_events` ADD  `registration_start_date` DATETIME NULL;";
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `registration_start_date` DATETIME NULL DEFAULT '0000-00-00 00:00:00';";
 			$db->setQuery($sql);
 			$db->execute();
 		}
