@@ -19,12 +19,12 @@ class EventBookingViewComplete extends JViewLegacy
 		$this->setLayout('default');
 		$db               = JFactory::getDbo();
 		$query            = $db->getQuery(true);
-		$config           = EventbookingHelper::getConfig();
-		$registrationCode = JRequest::getVar('registration_code');
+		$config           = EventbookingHelper::getConfig();			
+		// Try to get it from session
+		$registrationCode = JFactory::getSession()->get('eb_registration_code', '');		
 		if (empty($registrationCode))
 		{
-			// Try to get it from session
-			$registrationCode = JFactory::getSession()->get('eb_registration_code', '');
+			$registrationCode = JRequest::getVar('registration_code');
 		}
 		if ($registrationCode)
 		{
