@@ -3,7 +3,7 @@
 	JHtml::_('script', JUri::root().'components/com_eventbooking/assets/js/noconflict.js', false, false);	
 	$item = $this->item ;	
    	$url = JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, 0, $this->Itemid));
-   	$canRegister = EventBookingHelper::acceptRegistration($item->id) ;
+   	$canRegister = EventBookingHelper::acceptRegistration($item);
 	$socialUrl = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')).JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, 0, $this->Itemid));
     if ($this->config->multiple_booking)
     {
