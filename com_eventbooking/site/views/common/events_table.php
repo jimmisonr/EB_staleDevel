@@ -82,7 +82,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 		for ($i = 0 , $n = count($items) ; $i < $n; $i++) 
 		{
 			$item = $items[$i] ;
-			$canRegister = EventbookingHelper::acceptRegistration($item->id) ;				
+			$canRegister = EventbookingHelper::acceptRegistration($item) ;				
 		    if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !$item->user_registered && $item->number_event_dates > 0)
 			{
         	    $waitingList = true ;
