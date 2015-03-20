@@ -35,7 +35,7 @@ class EventBookingViewRegister extends JViewLegacy
 			->select("DATEDIFF(event_date, '$currentDate') AS number_event_dates")
 			->select("TIMESTAMPDIFF(MINUTE, registration_start_date, '$currentDate') AS registration_start_minutes")
 			->select("TIMESTAMPDIFF(MINUTE, cut_off_date, '$currentDate') AS cut_off_minutes")
-			->select('DATEDIFF(early_bird_discount_date, "'.$currentDate.'") AS date_diff')
+			->select("DATEDIFF(early_bird_discount_date, '$currentDate') AS date_diff")
 			->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
