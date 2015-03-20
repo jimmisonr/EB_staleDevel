@@ -30,15 +30,21 @@ class EventBookingViewRegister extends JViewLegacy
 		$eventId = $input->getInt('event_id', 0);
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
-		$query->select('a.*, IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
-			->select('DATEDIFF(a.event_date, "' . $currentDate . '") AS number_event_dates')
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$query->select('a.*')
+			->select("DATEDIFF(event_date, '$currentDate') AS number_event_dates")
+			->select("TIMESTAMPDIFF(MINUTE, registration_start_date, '$currentDate') AS registration_start_minutes")
+			->select("TIMESTAMPDIFF(MINUTE, cut_off_date, '$currentDate') AS cut_off_minutes")
+			->select('DATEDIFF(early_bird_discount_date, "'.$currentDate.'") AS date_diff')
+			->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
-			->where('a.id=' . $eventId);
+			->where('a.id = '. $eventId)
+			->where('a.published = 1')
+			->group('a.id');
 		$db->setQuery($query);
 		$event = $db->loadObject();
-		if (!EventbookingHelper::acceptRegistration($eventId))
+		if (!EventbookingHelper::acceptRegistration($event))
 		{
 			$waitingList = EventbookingHelper::getConfigValue('activate_waitinglist_feature');
 			if (!$waitingList || !$event->number_event_dates)
