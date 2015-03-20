@@ -56,8 +56,10 @@ class plgContentEBEvent extends JPlugin
 	function _replaceEBEvent(&$matches)
 	{
 		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
 		$Itemid = JRequest::getInt('Itemid');
 		require_once(JPATH_ROOT . '/components/com_eventbooking/helper/helper.php');
+		require_once(JPATH_ROOT . '/components/com_eventbooking/helper/data.php');
 		require_once(JPATH_ROOT . '/components/com_eventbooking/helper/route.php');
 		require_once(JPATH_ROOT . '/components/com_eventbooking/payments/os_payment.php');
 		require_once(JPATH_ROOT . '/components/com_eventbooking/payments/os_payments.php');
@@ -91,11 +93,6 @@ class plgContentEBEvent extends JPlugin
 		$db = JFactory::getDBO();
 		$query = $db->getQuery(true);
 		$id = $matches[1];
-		if ($id)
-		{
-			EventBookingHelper::checkEventAccess($id);
-		}
-
 		// Get event information
 		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
 		$query->select('a.*')
@@ -107,13 +104,20 @@ class plgContentEBEvent extends JPlugin
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
 			->where('a.id = '. $id)
-			->where('a.published = 1');
+			->where('a.published = 1')
+			->group('a.id');
 		$db->setQuery($query);
 		$item = $db->loadObject();
 		if (!$item)
 		{
 			$app->redirect('index.php?option=com_eventbooking&Itemid=' . $Itemid, JText::_('EB_INVALID_EVENT'));
 		}
+
+		if (!in_array($item->access, $user->getAuthorisedViewLevels()))
+		{
+			JFactory::getApplication()->redirect('index.php', JText::_('NOT_AUTHORIZED'));
+		}
+
 		if (strlen(trim(strip_tags($item->description))) == 0)
 		{
 			$item->description = $item->short_description;
@@ -126,8 +130,6 @@ class plgContentEBEvent extends JPlugin
 
 		EventbookingHelperData::calculateDiscount(array($item));
 
-		$user   = JFactory::getUser();
-		$userId = $user->get('id', 0);
 		if ($item->location_id)
 		{
 			$query->clear();
@@ -171,7 +173,7 @@ class plgContentEBEvent extends JPlugin
 		$view->item          = $item;
 		$view->Itemid        = $Itemid;
 		$view->config        = $config;
-		$view->userId        = $userId;
+		$view->userId        = $user->id;
 		$view->nullDate      = $nullDate;
 		$view->rowGroupRates = $rowGroupRates;
 		$view->showTaskBar   = 1;
