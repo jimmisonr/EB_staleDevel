@@ -21,46 +21,43 @@ class EventBookingViewEvent extends JViewLegacy
 			return;
 		}
 		$app = JFactory::getApplication();
-		$input = $app->input;
 		$document = JFactory::getDocument();
+		$user = JFactory::getUser();
+		$input = $app->input;
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$config = EventbookingHelper::getConfig();
 		$Itemid = $input->getInt('Itemid', 0);
-		$id = $input->getInt('id', 0);
-		if ($id)
-		{
-			EventbookingHelper::checkEventAccess($id);
-		}
-		$query->select('COUNT(*)')
-			->from('#__eb_events')
-			->where('id=' . $id . ' AND published=1');
-		$db->setQuery($query);
-		$totalEvent = $db->loadResult();
-		if (!$totalEvent)
+		$item = $this->get('Data');
+
+		// Make sure the event is valid
+		if (!$item)
 		{
 			$app->redirect('index.php?option=com_eventbooking&Itemid=' . $Itemid, JText::_('EB_INVALID_EVENT'));
 		}
-		$pathway = $app->getPathway();
-		$item = $this->get('Data');
+
+		// Check access level
+		if (!in_array($item->access, $user->getAuthorisedViewLevels()))
+		{
+			JFactory::getApplication()->redirect('index.php', JText::_('NOT_AUTHORIZED'));
+		}
 		//Use short description in case user don't enter long description
 		if (strlen(trim(strip_tags($item->description))) == 0)
 		{
 			$item->description = $item->short_description;
 		}
-		
-		$app = JFactory::getApplication();
+
 		$menu = $app->getMenu();
 		$menuItem = $menu->getActive();
 		$categoryId = JRequest::getInt('catid', 0);
 		if ($menuItem)
 		{
+			$pathway = $app->getPathway();
 			if (isset($menuItem->query['view']) && ($menuItem->query['view'] == 'categories' || $menuItem->query['view'] == 'category'))
 			{
 				$parentId = (int) $menuItem->query['id'];
 				if ($categoryId)
 				{
-					$pathway = $app->getPathway();
 					$paths = EventbookingHelperData::getCategoriesBreadcrumb($categoryId, $parentId);
 					for ($i = count($paths) - 1; $i >= 0; $i--)
 					{
@@ -76,9 +73,10 @@ class EventBookingViewEvent extends JViewLegacy
 				$pathway->addItem($item->title);
 			}
 		}
-		$tmpl = $input->get('tmpl', '');
+
 		$item->description = JHtml::_('content.prepare', $item->description);
-		if ($tmpl == 'component')
+
+		if ($input->get('tmpl', '') == 'component')
 		{
 			$showTaskBar = false;
 		}
@@ -86,8 +84,7 @@ class EventBookingViewEvent extends JViewLegacy
 		{
 			$showTaskBar = true;
 		}
-		$user = JFactory::getUser();
-		$userId = $user->get('id', 0);
+
 		if ($item->location_id)
 		{
 			$query->clear();
@@ -176,7 +173,7 @@ class EventBookingViewEvent extends JViewLegacy
 		$this->Itemid = $Itemid;
 		$this->config = $config;
 		$this->showTaskBar = $showTaskBar;
-		$this->userId = $userId;
+		$this->userId = $user->id;
 		$this->nullDate = $nullDate;
 		$this->rowGroupRates = $rowGroupRates;
 		$this->plugins = $plugins;

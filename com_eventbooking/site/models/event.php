@@ -69,21 +69,29 @@ class EventBookingModelEvent extends JModelLegacy
 				->from('#__eb_events AS a')
 				->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
 				->where('a.id = '. $id)
-				->where('a.published = 1');
+				->where('a.published = 1')
+				->group('a.id');
 			$db->setQuery($query);
 			$row = $db->loadObject();
-			// Get the main category of this event
-			$query->clear();
-			$query->select('category_id')
-				->from('#__eb_event_categories')
-				->where('event_id = '. $id)
-				->where('main_category = 1');
-			$db->setQuery($query);
-			$row->category_id = (int)$db->loadResult();
-			$rows = array();
-			$rows[] = $row;
-			EventbookingHelperData::calculateDiscount($rows);
-			$this->_data = $rows[0];
+			if ($row)
+			{
+				// Get the main category of this event
+				$query->clear();
+				$query->select('category_id')
+					->from('#__eb_event_categories')
+					->where('event_id = '. $id)
+					->where('main_category = 1');
+				$db->setQuery($query);
+				$row->category_id = (int)$db->loadResult();
+				$rows = array();
+				$rows[] = $row;
+				EventbookingHelperData::calculateDiscount($rows);
+				$this->_data = $rows[0];
+			}
+			else
+			{
+				$this->_data = null;
+			}
 		}
 		return $this->_data;
 	}
