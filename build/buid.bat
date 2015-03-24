@@ -20,6 +20,8 @@ cd E:\www\eventbooking\modules\mod_eb_minicalendar\
 7z a -tzip E:\www\eventbooking\build/packages/mod_eb_minicalendar.zip *
 cd E:\www\eventbooking\modules\mod_eb_search\
 7z a -tzip E:\www\eventbooking\build/packages/mod_eb_search.zip *
+cd E:\www\eventbooking\modules\mod_eb_googlemap\
+7z a -tzip E:\www\eventbooking\build/packages/mod_eb_googlemap.zip *
 REM Plugins
 cd E:\www\eventbooking\plugins\content\ebevent\
 7z a -tzip E:\www\eventbooking\build/packages/plug_content_ebevent.zip *

@@ -15,7 +15,8 @@
 	   <file type="module" id="eventbooking" client="site">mod_eb_categories.zip</file>
 	   <file type="module" id="eventbooking" client="site">mod_eb_events.zip</file>   
 	   <file type="module" id="eventbooking" client="site">mod_eb_locations.zip</file>   
-	   <file type="module" id="eventbooking" client="site">mod_eb_minicalendar.zip</file>   
+	   <file type="module" id="eventbooking" client="site">mod_eb_minicalendar.zip</file>
+	   <file type="module" id="eventbooking" client="site">mod_eb_googlemap.zip</file>	   
 	   <file type="module" id="eventbooking" client="site">mod_eb_search.zip</file>   
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_acajoom.zip</file>   	   
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_acymailing.zip</file>
