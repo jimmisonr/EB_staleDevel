@@ -1,21 +1,23 @@
 /*--------Global style-------------*/
 .title_cell {
-    font-weight: bold ;
+    font-weight: bold;
     padding-left: 5px;
 }
 
 .field_cell {
 
 }
+
 #extcalendar .tablea {
     background-color: #F9F9F9;
     border-top: 1px solid #FFFFFF;
     color: #999;
-	font-size: 20px;
-	font-weight: bold;
+    font-size: 20px;
+    font-weight: bold;
     padding: 15px;
-	text-align: center;
+    text-align: center;
 }
+
 .eb-container {
     text-align: left;
 }
@@ -56,15 +58,17 @@ img.eb-thumb-right {
     margin: 0 0 0 15px !important;
     float: right !important;
 }
-form#adminForm label.control-label
-{
+
+form#adminForm label.control-label {
     text-align: left;
     font-weight: bold;
 }
+
 /* ---------- Categories styles ------------------------------------- */
 body .eb-topmenu-calendar ul li {
-	margin: 0
+    margin: 0
 }
+
 #eb-categories h2.eb-category-title {
     margin: 14px 0 !important;
 }
@@ -106,98 +110,99 @@ body .eb-topmenu-calendar ul li {
     padding: 10px;
 }
 
-#eb-categories .eb-category img
-{
+#eb-categories .eb-category img {
     margin: 0 10px 0 0 !important;
     padding: 0 !important;
 }
 
 /* Mini Calendar */
 
-.eb_minicalendar_monthyear{
-	color:#F0F0F0;
-	cursor:pointer;
-	font-weight:bold;
-	height:21px !important;
-	line-height:21px;
-	text-align:center !important;
-	width:100% !important;
+.eb_minicalendar_monthyear {
+    color: #F0F0F0;
+    cursor: pointer;
+    font-weight: bold;
+    height: 21px !important;
+    line-height: 21px;
+    text-align: center !important;
+    width: 100% !important;
 }
 
 a.mod_eb_minicalendar_link:link {
-	color:white;
+    color: white;
 }
+
 a.mod_eb_minicalendar_link:hover {
-	color:yellow;
+    color: yellow;
 }
 
 .eb_minicalendar_monthyear a.mod_eb_minicalendar_link {
-	color:#F0F0F0;
-	font-weight:bold !important;
-	text-decoration:none;
+    color: #F0F0F0;
+    font-weight: bold !important;
+    text-decoration: none;
 }
 
-.mod_eb_mincalendar_table{
-	font-family:Arial;
-	font-size:12px;
-	font-style:normal;
-	margin-bottom:0.25em;
-	text-align:center;
-	text-decoration:none;
-	width:100% !important;	
+.mod_eb_mincalendar_table {
+    font-family: Arial;
+    font-size: 12px;
+    font-style: normal;
+    margin-bottom: 0.25em;
+    text-align: center;
+    text-decoration: none;
+    width: 100% !important;
 }
 
-.mod_eb_mincalendar_dayname{
-	font-family:Arial;
-	font-size:12px;
-	font-style:normal;
-	text-align:center;
-	text-decoration:none;
+.mod_eb_mincalendar_dayname {
+    font-family: Arial;
+    font-size: 12px;
+    font-style: normal;
+    text-align: center;
+    text-decoration: none;
 }
 
 .mod_eb_mincalendar_td_dayname {
-	color:#F0F0F0;
-	font-weight:bold;
-	line-height:15px;
-	text-align:center !important;
-	padding: 5px;
+    color: #F0F0F0;
+    font-weight: bold;
+    line-height: 15px;
+    text-align: center !important;
+    padding: 5px;
 }
 
 .mod_eb_mincalendar_td_dayname .sunday {
-	color:#99AAAA;
+    color: #99AAAA;
 }
 
 .mod_eb_mincalendar_td_dayname .saturday {
-	color:#99AAAA;
+    color: #99AAAA;
 }
 
 td.mod_eb_mincalendar_today {
     color: #000000;
-	padding:0 !important;
+    padding: 0 !important;
 }
-td.mod_eb_mincalendar_not_today,td.mod_eb_mincalendar_no_event a {
-	font-size: 11px;
+
+td.mod_eb_mincalendar_not_today, td.mod_eb_mincalendar_no_event a {
+    font-size: 11px;
     font-style: normal;
     font-weight: bold;
     padding: 3px 2px;
-	color: #fff;
+    color: #fff;
 }
 
-a.eb_minical_link:hover{
-	color:yellow;
-	text-decoration:none;
+a.eb_minical_link:hover {
+    color: yellow;
+    text-decoration: none;
 }
 
 a.eb_minical_link SPAN.sunday {
-	color:#99AAAA;
+    color: #99AAAA;
 }
 
 a.eb_minical_link SPAN.saturday {
-	color:#99AAAA;
+    color: #99AAAA;
 }
 
 td.mod_eb_mincalendar_event a, td.mod_eb_mincalendar_event a.eb_minical_link span.sunday, td.mod_eb_mincalendar_event a.eb_minical_link SPAN.saturday {
-	color: #fff;
+    color: #fff;
 }
 
 .extcal_minical .extcal_navbar {
@@ -206,8 +211,9 @@ td.mod_eb_mincalendar_event a, td.mod_eb_mincalendar_event a.eb_minical_link spa
 }
 
 .extcal_navbar td {
-	padding:5px;
+    padding: 5px;
 }
+
 .extcal_minical .extcal_month_label a {
     color: #FFFFFF;
     font-weight: bold;
@@ -276,9 +282,14 @@ td.eb-event-property-label {
 
 /* ---------- Taskbar styles ---------------------------------------- */
 .eb-taskbar {
-    padding: 0 0 6px 0;
-    margin: 0 0 6px 0;
-    list-style-type: none;
+    padding: 25px 0;
+    border-bottom: 1px dotted #a5a5a5;
+    margin: 0;
+    list-style: none;
+}
+
+.eb-event-detail-container:last-child .eb-taskbar {
+    border-bottom: none;
 }
 
 .eb-taskbar ul {
@@ -335,55 +346,60 @@ td.eb-event-property-label {
 
 /**Registration Form style**/
 
-form.form-horizontal .control-label, form.form-horizontal .control-label label{
-	text-align: left;
-	font-weight: bold;
+form.form-horizontal .control-label, form.form-horizontal .control-label label {
+    text-align: left;
+    font-weight: bold;
 }
 
 /**Form CSSS**/
 .eb-form-heading {
-	background: none repeat scroll 0 0 #F8F8F8;
-	border: 1px solid #DBDEE1;
-	color: #555555;
-	font-size: 13px;
-	font-weight: bold;
-	margin-bottom: 15px;
-	padding: 8px;
+    background: none repeat scroll 0 0 #F8F8F8;
+    border: 1px solid #DBDEE1;
+    color: #555555;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding: 8px;
 }
+
 .eb-form-heading a {
-	float: right;
-	font-weight: normal;
-	margin-top: 1px;
-	text-decoration: none;
-	cursor: pointer;
+    float: right;
+    font-weight: normal;
+    margin-top: 1px;
+    text-decoration: none;
+    cursor: pointer;
 }
+
 .eb-form-content {
-	display: none;
-	overflow: auto;
-	padding: 0 0 15px;
+    display: none;
+    overflow: auto;
+    padding: 0 0 15px;
 }
+
 .eb-form-content .left {
-	float: left;
-	width: 48%;
+    float: left;
+    width: 48%;
 }
+
 .eb-form-content .right {
-	float: right;
-	width: 48%;
+    float: right;
+    width: 48%;
 }
+
 .eb-form-content .buttons {
-	clear: both;
+    clear: both;
 }
-form.form-horizontal ul, form.form-horizontal ul
-{
-	list-style: none;
+
+form.form-horizontal ul, form.form-horizontal ul {
+    list-style: none;
 }
-form.form-horizontal ul li label, form.form-horizontal ul li label
-{
-	display: inline;
+
+form.form-horizontal ul li label, form.form-horizontal ul li label {
+    display: inline;
 }
-.star
-{
-	color: red;
+
+.star {
+    color: red;
 }
 
 span.required {
@@ -555,7 +571,7 @@ li.getdirection a {
 
 /**CSS for supporting responsive calendar*/
 
-@media only screen and (max-width:1024px) {
+@media only screen and (max-width: 1024px) {
     .navbar-static .navbar-inner {
         padding-right: 10px;
         padding-left: 10px;
@@ -563,9 +579,10 @@ li.getdirection a {
 }
 
 .eb-topmenu-calendar .eb-menu-calendar {
-	float: right;
-	width: auto;
+    float: right;
+    width: auto;
 }
+
 .nav {
     width: 100%;
 }
@@ -581,20 +598,21 @@ li.getdirection a {
 }
 
 .eb-calendar ul.eb-month-browser li.eb-calendar-nav {
-	margin: 13px 0 0;
+    margin: 13px 0 0;
 }
 
 .eb-calendar ul.eb-month-browser li#eb-current-month {
-	margin: 8px 0 0;
-	width: 40%;
+    margin: 8px 0 0;
+    width: 40%;
 }
 
 #eb-current-month #month, #eb-current-month #year {
-	margin: 0!important;
-	float: left;
+    margin: 0 !important;
+    float: left;
 }
+
 #eb-current-month #month {
-	margin-right: 5px;
+    margin-right: 5px;
 }
 
 .eb-calendar ul.eb-month-browser li .input-medium,
@@ -628,17 +646,17 @@ li.getdirection a {
 }
 
 body .eb-calendar li {
-	background-image: none;
-    -webkit-box-sizing:border-box;
-	-moz-box-sizing:border-box;
-	-ms-box-sizing:border-box;
-	box-sizing:border-box;
-    padding: 5px!important;
-	margin: 0!important;
+    background-image: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 5px !important;
+    margin: 0 !important;
     display: block;
     float: left;
     overflow: visible !important;
-	width: 14.2823%;
+    width: 14.2823%;
 }
 
 .eb-calendar .eb-days:last-child li {
@@ -655,19 +673,19 @@ body .eb-calendar li {
 }
 
 [class^="icon-"], [class*=" icon-"] {
-	display: inline-block!important;
+    display: inline-block !important;
 }
 
 .left_calendar strong, .left_calendar .input-append, .left_calendar .btn {
-	float: left;
+    float: left;
 }
 
 .left_calendar #date_img.btn {
-	float: none;
+    float: none;
 }
 
 .left_calendar strong, .left_calendar .input-append {
-	margin: 0 5px 0 0;
+    margin: 0 5px 0 0;
 }
 
 .show-info {
@@ -712,42 +730,46 @@ body .eb-calendar li {
 }
 
 #extcalendar .eventdesc .cat-name, #extcalendar .eventdesc .location-name {
-	margin: 0 0 5px;
-	line-height: normal;
-	font-size: 13px;
+    margin: 0 0 5px;
+    line-height: normal;
+    font-size: 13px;
 }
 
 #extcalendar .today {
-	padding: 15px;
+    padding: 15px;
 }
 
 #extcalendar .eventdesc .location-name {
-	padding: 3px 0 3px 25px;
+    padding: 3px 0 3px 25px;
 }
 
 #extcalendar .eventdesc .cat-name {
-	background: url(../images/cat.png) no-repeat left center;
-	padding: 3px 0 3px 25px;
+    background: url(../images/cat.png) no-repeat left center;
+    padding: 3px 0 3px 25px;
 }
 
 .admintable label {
-	display: inline-block;
+    display: inline-block;
 }
 
 .tab-content {
-	text-align: left;
+    text-align: left;
 }
 
 .form-horizontal .admintable .controls {
-	margin: 0;
+    margin: 0;
 }
 
-#eb-calendar-legend ul{ margin: 20px 0 0 0;}
-#eb-calendar-legend ul li{
+#eb-calendar-legend ul {
+    margin: 20px 0 0 0;
+}
+
+#eb-calendar-legend ul li {
     float: left;
     width: auto;
 }
-#eb-calendar-legend span{
+
+#eb-calendar-legend span {
     display: block;
     width: 25px;
     height: 25px;
@@ -755,23 +777,29 @@ body .eb-calendar li {
     margin-right: 5px;
     margin-left: 5px;
 }
-#eb-calendar-legend a{
+
+#eb-calendar-legend a {
     font-size: 12px;
     font-weight: bold;
     height: 25px;
     line-height: 25px;
 }
-#eb-calendar-legend ul li {list-style: none;content: "";}
 
-@media screen and (max-width:767px) {
+#eb-calendar-legend ul li {
+    list-style: none;
+    content: "";
+}
+
+@media screen and (max-width: 767px) {
     body .eb-calendar ul.eb-month-browser li {
         font-size: 12px;
         width: auto;
         float: none;
     }
-	body .eb-calendar ul.eb-month-browser li#eb-current-month {
-		width: auto;
-	}
+
+    body .eb-calendar ul.eb-month-browser li#eb-current-month {
+        width: auto;
+    }
 
     body .eb-calendar ul {
         width: 100%;
@@ -820,8 +848,101 @@ body .eb-calendar li {
     }
 }
 
-@media only screen and (device-width:768px) and (device-height:1024px) and (orientation:landscape) {
+@media only screen and (device-width: 768px) and (device-height: 1024px) and (orientation: landscape) {
     .show-info .venue, .show-info .show-time, .show-info:hover .venue, .show-info:hover .show-time {
         display: inline;
     }
+}
+
+/**Timeline layout**/
+.eb-event-container {
+    background-image: url("../images/dot-ver.png");
+    background-position: 42px 85px;
+    background-repeat: repeat-y;
+    margin-top: 0;
+    padding: 0 0 0 100px;
+}
+
+.eb-event-date-container {
+    background: #fff;
+    border: 1px #eee solid;
+    margin: 0 15px 0 -100px;
+    padding: 5px;
+    width: auto;
+    border-radius: 100%;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    display: block;
+    float: left;
+    position: relative;
+}
+
+.eb-event-date {
+    background-image: none !important;
+    border-radius: 100%;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    font-family: inherit;
+    height: 60px;
+    padding: 5px;
+    width: 60px;
+    text-align: center;
+}
+
+.eb-event-date-day {
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 20px;
+    padding-top: 4px;
+}
+
+.eb-event-date-month {
+    color: #fff;
+    font-size: 14px;
+    line-height: 14px;
+}
+
+.eb-event-date-year {
+    color: #fff;
+    font-size: 14px;
+    line-height: 14px;
+}
+
+.eb-even-title-container {
+    line-height: normal;
+    margin: 0;
+}
+
+.eb-event-information {
+    padding: 0 0 10px;
+    margin-bottom: 12px;
+}
+
+.eb-event-date-info {
+    font-size: 130%;
+    line-height: 150%;
+    display: inline-block;
+}
+
+.eb-event-start-end-date {
+    margin: 0 8px 0 0;
+}
+
+.eb-event-price-container {
+    display: inline-block;
+    float: right;
+    font-size: 140%;
+    background-image: none !important;
+}
+
+.eb-event-price-container .eb-individual-price {
+    color: #fff;
+    display: inline-block;
+    padding: 10px;
+}
+
+span.eb-time
+{
+    padding-left: 5px;
 }
