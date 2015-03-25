@@ -48,7 +48,7 @@ $dateFormat = $config->date_format;
 		        <div class="span8">
 			        <div class="clearfix">
 						<span class="eb-event-date-info">
-							<i class="icon-clock">&nbsp;</i>
+							<i class="icon-calendar">&nbsp;</i>
 							<?php echo JHtml::_('date', $event->event_date, $dateFormat, null); ?><span class="eb-time"><?php echo JHtml::_('date', $event->event_date, $timeFormat, null) ?></span>
 							<?php
 								if ($event->event_end_date != $nullDate)
@@ -58,7 +58,7 @@ $dateFormat = $config->date_format;
 									if ($startDate == $endDate)
 									{
 									?>
-										- <span class="eb-time"><?php echo JHtml::_('date', $event->event_end_date, $timeFormat, null) ?></span>
+										-<span class="eb-time"><?php echo JHtml::_('date', $event->event_end_date, $timeFormat, null) ?></span>
 									<?php
 									}
 									else
