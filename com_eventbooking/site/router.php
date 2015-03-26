@@ -61,7 +61,7 @@ function EventbookingBuildRoute(&$query)
 	}
 	
 	//Dealing with the catid parameter in the link to event.
-	if (($menuItem instanceof stdClass) && ($menuItem->query['view'] == 'category') && isset($query['catid']) && isset($menuItem->query['id']) &&
+	if (($menuItem instanceof stdClass) && ($menuItem->query['view'] == 'category') && isset($query['catid']) &&
 		 $menuItem->query['id'] == intval($query['catid']))
 	{
 		if (isset($query['catid']))
