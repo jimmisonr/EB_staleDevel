@@ -362,9 +362,9 @@ else
             else
             {
         	    $waitingList = false ;
-        	} 
-			if (!$canRegister && $item->registration_type != 3 && $this->config->display_message_for_full_event && !$waitingList && $item->registration_start_minutes > 0)
-            {
+        	}         	        
+			if (!$canRegister && $item->registration_type != 3 && $this->config->display_message_for_full_event && !$waitingList && $item->registration_start_minutes >= 0)
+            {            	
 			    if (@$item->user_registered)
                 {
 			    	$msg = JText::_('EB_YOU_REGISTERED_ALREADY');
@@ -378,7 +378,7 @@ else
 			    	$msg = JText::_('EB_NO_LONGER_ACCEPT_REGISTRATION') ;
 			    }			
 			?>
-				<div class="eb-notice-table" style="margin-top: 10px;"><?php echo $msg ; ?></div>
+				<div class="text-info eb-notice-message"><?php echo $msg ; ?></div>
 			<?php	
 			}
 		?>

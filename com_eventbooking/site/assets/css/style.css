@@ -344,6 +344,12 @@ td.eb-event-property-label {
     margin-top: 10px;
 }
 
+.eb-notice-message
+{
+	font-size: 130%;
+	font-weight: bold;
+	margin-top: 8px;
+}
 /**Registration Form style**/
 
 form.form-horizontal .control-label, form.form-horizontal .control-label label {

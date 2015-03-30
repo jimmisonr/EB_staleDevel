@@ -49,27 +49,8 @@ defined( '_JEXEC' ) or die ;
                                 $event->short_description = $event->description;
                             }
                             echo $event->short_description;
-                            if (!$canRegister && $event->registration_type != 3 && $config->display_message_for_full_event && !$waitingList && $event->registration_start_minutes >= 0)
-                            {
-                                if (@$event->user_registered)
-                                {
-                                    $msg = JText::_('EB_YOU_REGISTERED_ALREADY');
-                                }
-                                elseif (!in_array($event->registration_access, $viewLevels))
-                                {
-                                    $msg = JText::_('EB_LOGIN_TO_REGISTER') ;
-                                }
-                                else
-                                {
-                                    $msg = JText::_('EB_NO_LONGER_ACCEPT_REGISTRATION') ;
-                                }
-                            ?>
-                                <p class="eb_notice"><?php echo $msg ; ?></p>
-                            <?php
-                            }
                         ?>						
                     </div>
-                
                     <div class="span5">
                         <table class="table table-bordered table-striped">
                             <tr class="eb-event-property">
@@ -339,7 +320,28 @@ defined( '_JEXEC' ) or die ;
                         </table>
                   	</div>
 				</div>
-				
+				<?php
+				if (!$canRegister && $event->registration_type != 3 && $config->display_message_for_full_event && !$waitingList && $event->registration_start_minutes >= 0)
+				{
+					if (@$event->user_registered)
+					{
+						$msg = JText::_('EB_YOU_REGISTERED_ALREADY');
+					}
+					elseif (!in_array($event->registration_access, $viewLevels))
+					{
+						$msg = JText::_('EB_LOGIN_TO_REGISTER') ;
+					}
+					else
+					{
+						$msg = JText::_('EB_NO_LONGER_ACCEPT_REGISTRATION') ;
+					}
+				?>
+					<div class="clearfix">
+						<p class="text-info eb-notice-message"><?php echo $msg; ?></p>
+					</div>
+				<?php
+				}
+				?>
 				<div class="eb-taskbar clearfix">
 					<ul>	
 						<?php
