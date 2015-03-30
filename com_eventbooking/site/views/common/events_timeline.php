@@ -97,11 +97,19 @@ $dateFormat = $config->date_format;
 		        <div class="span4">
 			        <div class="eb-event-price-container btn-primary">
 				        <?php
-				            if ($event->individual_price > 0)
+				            if ($config->show_discounted_price)
+				            {
+					            $price = $event->discounted_price;
+				            }
+				            else
+				            {
+					            $price = $event->individual_price;
+				            }
+				            if ($price > 0)
 				            {
 					            $symbol        = $event->currency_symbol ? $event->currency_symbol : $config->currency_symbol;
 					        ?>
-					            <span class="eb-individual-price"><?php echo EventbookingHelper::formatAmount($event->individual_price, $config);?><span class="currency"><?php echo $symbol; ?></span></span>
+					            <span class="eb-individual-price"><?php echo EventbookingHelper::formatCurrency($price, $config, $symbol);?></span>
 				            <?php
 				            }
 				            elseif ($config->show_price_for_free_event)
