@@ -28,7 +28,7 @@ class RADSynchronizerMembershippro
 					}
 					elseif (isset($fieldValues[$mappingFieldName]))
 					{
-						$data[$fieldName] = $fieldValues[$mappingFieldName];
+						$data[$fieldName] = $fieldValues[$mappingFieldName]->field_value;
 					}
 				}								
 			}									
