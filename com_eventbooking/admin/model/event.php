@@ -347,7 +347,7 @@ class EventbookingModelEvent extends RADModelItem
 		{
 			$eventDuration = 0;
 		}
-		if (strlen(trim($row->cut_off_date)) && $row->cut_off_date != $nullDate)
+		if (strlen(trim($data['cut_off_date'])) && $row->cut_off_date != $nullDate)
 		{
 			$cutOffDuration = abs(strtotime($row->cut_off_date) - strtotime($row->event_date));
 		}
@@ -372,7 +372,7 @@ class EventbookingModelEvent extends RADModelItem
 			$earlyBirdDuration = 0;
 		}
 
-		if (strlen(trim($row->registration_start_date)) && $row->registration_start_date != $nullDate)
+		if (strlen(trim($data['registration_start_date'])) && $row->registration_start_date != $nullDate)
 		{
 			$registrationStartDuration = abs(strtotime($row->registration_start_date) - strtotime($row->event_date));
 		}
