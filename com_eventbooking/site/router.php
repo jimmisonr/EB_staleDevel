@@ -124,9 +124,9 @@ function EventbookingBuildRoute(&$query)
 			unset($query['id']);
 			break;
 		case 'password':
-			if ($id)
+			if ($eventId)
 			{
-				$segments[] = EventbookingHelperRoute::getEventTitle($id);
+				$segments[] = EventbookingHelperRoute::getEventTitle($eventId);
 			}
 			$segments[] = 'password validation';
 			unset($query['id']);
