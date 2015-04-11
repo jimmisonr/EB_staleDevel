@@ -12,15 +12,16 @@ defined( '_JEXEC' ) or die ;
 $editor = JFactory::getEditor() ;
 JHtml::_('behavior.tooltip');
 JHtml::_('behavior.modal');
-$format = 'Y-m-d' ;	    
+$format = 'Y-m-d';
+$translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 ?>
 <style>
 	.calendar {
 		vertical-align: bottom;
 	}
 </style>
-<form action="index.php?option=com_eventbooking&view=event" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data" class="form form-horizontal">	
 <div class="row-fuid">
+<form action="index.php?option=com_eventbooking&view=event" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data" class="form form-horizontal">
 <ul class="nav nav-tabs">
 	<li class="active"><a href="#basic-information-page" data-toggle="tab"><?php echo JText::_('EB_BASIC_INFORMATION');?></a></li>
 	<li><a href="#discount-page" data-toggle="tab"><?php echo JText::_('EB_DISCOUNT_SETTING');?></a></li>				
@@ -30,10 +31,16 @@ $format = 'Y-m-d' ;
 			<li><a href="#extra-information-page" data-toggle="tab"><?php echo JText::_('EB_EXTRA_INFORMATION');?></a></li>
 		<?php	
 		}
-	?>	
-	<li><a href="#advance-settings-page" data-toggle="tab"><?php echo JText::_('EB_ADVANCED_SETTINGS');?></a></li>	
-	<!-- Plugin support -->
-	<?php 
+	    if ($translatable)
+	    {
+		?>
+		    <li><a href="#translation-page" data-toggle="tab"><?php echo JText::_('EB_TRANSLATION'); ?></a></li>
+		<?php
+	    }
+	?>
+	<li><a href="#advance-settings-page" data-toggle="tab"><?php echo JText::_('EB_ADVANCED_SETTINGS');?></a></li>
+	<?php
+		// Plugins
 		if (count($this->plugins)) {
 			$count = 0 ;
 			foreach ($this->plugins as $plugin) {
@@ -44,6 +51,8 @@ $format = 'Y-m-d' ;
 			<?php							
 			}
 		}
+
+
 	?>			
 </ul>
 <div class="tab-content">			
@@ -549,7 +558,92 @@ $format = 'Y-m-d' ;
 			</div>
 		<?php	
 		}
-	?>	
+	if ($translatable)
+	{
+	?>
+	<div class="tab-pane" id="translation-page">
+		<ul class="nav nav-tabs">
+			<?php
+			$i = 0;
+			foreach ($this->languages as $language) {
+				$sef = $language->sef;
+				?>
+				<li <?php echo $i == 0 ? 'class="active"' : ''; ?>><a href="#translation-page-<?php echo $sef; ?>" data-toggle="tab"><?php echo $language->title; ?>
+						<img src="<?php echo JUri::root(); ?>media/com_eventbooking/flags/<?php echo $sef.'.png'; ?>" /></a></li>
+				<?php
+				$i++;
+			}
+			?>
+		</ul>
+		<div class="tab-content">
+			<?php
+			$i = 0;
+			foreach ($this->languages as $language)
+			{
+				$sef = $language->sef;
+				?>
+				<div class="tab-pane<?php echo $i == 0 ? ' active' : ''; ?>" id="translation-page-<?php echo $sef; ?>">
+					<table class="admintable adminform" style="width: 100%;">
+						<tr>
+							<td class="key">
+								<?php echo  JText::_('EB_TITLE'); ?>
+							</td>
+							<td>
+								<input class="input-xlarge" type="text" name="title_<?php echo $sef; ?>" id="title_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'title_'.$sef}; ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
+								<?php echo  JText::_('EB_ALIAS'); ?>
+							</td>
+							<td>
+								<input class="input-xlarge" type="text" name="alias_<?php echo $sef; ?>" id="alias_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'alias_'.$sef}; ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
+								<?php echo JText::_('EB_SHORT_DESCRIPTION'); ?>
+							</td>
+							<td>
+								<?php echo $editor->display( 'short_description_'.$sef,  $this->item->{'short_description_'.$sef} , '100%', '250', '75', '10' ) ; ?>
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
+								<?php echo JText::_('EB_DESCRIPTION'); ?>
+							</td>
+							<td>
+								<?php echo $editor->display( 'description_'.$sef,  $this->item->{'description_'.$sef} , '100%', '250', '75', '10' ) ; ?>
+							</td>
+						</tr>
+
+						<tr>
+							<td width="100" class="key">
+								<?php echo  JText::_('EB_META_KEYWORDS'); ?>
+							</td>
+							<td>
+								<textarea rows="5" cols="30" class="input-lage" name="meta_keywords_<?php echo $sef; ?>"><?php echo $this->item->{'meta_keywords_'.$sef}; ?></textarea>
+							</td>
+						</tr>
+						<tr>
+							<td width="100" class="key">
+								<?php echo  JText::_('EB_META_DESCRIPTION'); ?>
+							</td>
+							<td>
+								<textarea rows="5" cols="30" class="input-lage" name="meta_description_<?php echo $sef; ?>"><?php echo $this->item->{'meta_description_'.$sef}; ?></textarea>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<?php
+				$i++;
+			}
+			?>
+		</div>
+	</div>
+	<?php
+	}
+	?>
 	<div class="tab-pane" id="advance-settings-page">
 		<table class="admintable">
 			<tr>
@@ -848,5 +942,5 @@ $format = 'Y-m-d' ;
 			}
 		}	
 	</script>
-	</div>
 </form>
+</div>

@@ -192,6 +192,28 @@ class EventbookingModelEvent extends RADModelItem
 			{
 				$row->alias = JApplication::stringURLSafe($row->title);
 			}
+
+			// Build alias for other languages
+			if (JLanguageMultilang::isEnabled())
+			{
+				$languages = EventbookingHelper::getLanguages();
+				if (count($languages))
+				{
+					foreach($languages as $language)
+					{
+						$sef = $language->sef;
+						if (!$row->{'alias_'.$sef})
+						{
+							$row->{'alias_'.$sef} = JApplication::stringURLSafe($row->{'title_'.$sef});
+						}
+						else
+						{
+							$row->{'alias_'.$sef} = JApplication::stringURLSafe($row->{'alias_'.$sef});
+						}
+					}
+				}
+			}
+
 			if (!$row->store())
 			{
 				throw new Exception($db->getErrorMsg());
@@ -303,7 +325,30 @@ class EventbookingModelEvent extends RADModelItem
 			throw new Exception($db->getErrorMsg());
 			return false;
 		}
-		
+
+
+		// Build alias for other languages
+		if (JLanguageMultilang::isEnabled())
+		{
+			$languages = EventbookingHelper::getLanguages();
+			if (count($languages))
+			{
+				foreach($languages as $language)
+				{
+					$sef = $language->sef;
+					if (!$row->{'alias_'.$sef})
+					{
+						$row->{'alias_'.$sef} = JApplication::stringURLSafe($row->{'title_'.$sef});
+					}
+					else
+					{
+						$row->{'alias_'.$sef} = JApplication::stringURLSafe($row->{'alias_'.$sef});
+					}
+				}
+			}
+		}
+
+
 		if (!$row->created_by)
 		{
 			$user = JFactory::getUser();
@@ -533,6 +578,21 @@ class EventbookingModelEvent extends RADModelItem
 				$rowChildEvent->created_by = $row->created_by;
 				$rowChildEvent->alias = JApplication::stringURLSafe(
 					$rowChildEvent->title . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null));
+
+				// Build alias for other languages
+				if (JLanguageMultilang::isEnabled())
+				{
+					if (count($languages))
+					{
+						foreach($languages as $language)
+						{
+							$sef = $language->sef;
+							$rowChildEvent->{'alias_'.$sef} = JApplication::stringURLSafe(
+								$rowChildEvent->{'alias_'.$sef} . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null));
+						}
+					}
+				}
+
 				$rowChildEvent->store();
 				//Generate alias
 				$query->clear();
@@ -552,6 +612,7 @@ class EventbookingModelEvent extends RADModelItem
 					$db->setQuery($query);
 					$db->execute();
 				}
+
 				//Event Price
 				for ($j = 0, $m = count($prices); $j < $m; $j++)
 				{
