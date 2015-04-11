@@ -30,9 +30,10 @@ class EventbookingViewEventsHtml extends RADViewList
 			'id', 'name', $this->state->filter_location_id);
 		
 		$options = array();
+		$options[] = JHtml::_('select.option', -1, JText::_('EB_PAST_EVENTS'));
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_HIDE'));
 		$options[] = JHtml::_('select.option', 1, JText::_('EB_SHOW'));
-		$this->lists['filter_past_events'] = JHtml::_('select.genericlist', $options, 'filter_past_events', ' class="input-small" onchange="submit();" ',
+		$this->lists['filter_past_events'] = JHtml::_('select.genericlist', $options, 'filter_past_events', ' class="input-medium" onchange="submit();" ',
 			'value', 'text', $this->state->filter_past_events);
 							
 		$this->config = $config;

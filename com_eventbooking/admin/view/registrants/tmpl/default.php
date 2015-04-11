@@ -8,7 +8,11 @@
  * @license		GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;		
+defined( '_JEXEC' ) or die ;
+if (version_compare(JVERSION, '3.0', 'ge'))
+{
+	JHtml::_('formbehavior.chosen', 'select');
+}
 $colspan = 11;
 if ($this->config->show_event_date)
 {
@@ -42,9 +46,15 @@ if ($this->config->activate_invoice_feature)
 		<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'Go' ); ?></button>
 		<button onclick="document.getElementById('filter_search').value='';this.form.submit();" class="btn"><?php echo JText::_( 'Reset' ); ?></button>		
 	</td >	
-	<td style="text-align: right;">
-		<?php echo $this->lists['filter_event_id']; ?>
-		<?php echo $this->lists['filter_published'] ; ?>
+	<td style="float:right;">
+		<?php
+		echo $this->lists['filter_published'];
+		echo $this->lists['filter_event_id'];
+		if (version_compare(JVERSION, '3.0', 'ge'))
+		{
+			echo $this->pagination->getLimitBox();
+		}
+		?>
 	</td>
 </tr>
 </table>

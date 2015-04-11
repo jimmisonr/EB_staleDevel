@@ -10,28 +10,36 @@
 // no direct access
 defined( '_JEXEC' ) or die ;				
 $ordering = ($this->state->filter_order == 'tbl.ordering');
+if (version_compare(JVERSION, '3.0', 'ge'))
+{
+	JHtml::_('formbehavior.chosen', 'select');
+}
 ?>
 <form action="index.php?option=com_eventbooking&view=events" method="post" name="adminForm" id="adminForm">
 <table width="100%">
 <tr>
-	<td align="left" style="text-align: left; width:30%; vertical-align: top;">
+	<td align="left" style="text-align: left; width:27%; vertical-align: top;">
 		<?php echo JText::_( 'Filter' ); ?>:
-		<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->state->filter_search;?>" class="text_area search-query" onchange="document.adminForm.submit();" />
+		<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->state->filter_search;?>" class="input-medium search-query" onchange="document.adminForm.submit();" />
 		<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'Go' ); ?></button>
 		<button onclick="document.getElementById('filter_search').value='';this.form.submit();" class="btn"><?php echo JText::_( 'Reset' ); ?></button>
 	</td>
-	<td style="text-align: right;">
-		<strong><?php echo JText::_('EB_CATEGORY'); ?></strong>:&nbsp;&nbsp;&nbsp;
-		<?php echo $this->lists['filter_category_id'] ; ?>
-		<?php echo $this->lists['filter_location_id'] ; ?>
-		<?php echo $this->lists['filter_state'] ; ?>
+	<td style="float:right;">
+		<strong><?php echo JText::_('EB_CATEGORY'); ?></strong>:&nbsp;
 		<?php
+			echo $this->lists['filter_category_id'] ;
+			echo $this->lists['filter_location_id'] ;
+			echo $this->lists['filter_state'] ;
 			if (JLanguageMultilang::isEnabled())
 			{
 				echo $this->lists['filter_language'];
 			}
+			echo $this->lists['filter_past_events'];
+			if (version_compare(JVERSION, '3.0', 'ge'))
+			{
+				echo $this->pagination->getLimitBox();
+			}
 		?>
-        <strong><?php echo JText::_('EB_PAST_EVENTS'); ?></strong>:&nbsp;&nbsp;&nbsp;<?php echo $this->lists['filter_past_events']; ?>
 	</td>
 </tr>
 </table>

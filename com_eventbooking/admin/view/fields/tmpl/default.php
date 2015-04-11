@@ -8,7 +8,11 @@
  * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;	
+defined( '_JEXEC' ) or die ;
+if (version_compare(JVERSION, '3.0', 'ge'))
+{
+	JHtml::_('formbehavior.chosen', 'select');
+}
 ?>
 <form action="index.php?option=com_eventbooking&view=fields" method="post" name="adminForm" id="adminForm">
 <table width="100%">
@@ -34,6 +38,10 @@ defined( '_JEXEC' ) or die ;
 			if (JLanguageMultilang::isEnabled())
 			{
 				echo $this->lists['filter_language'];
+			}
+			if (version_compare(JVERSION, '3.0', 'ge'))
+			{
+				echo $this->pagination->getLimitBox();
 			}
 		?>				
 	</td>

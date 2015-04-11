@@ -10,6 +10,10 @@
 // no direct access
 defined( '_JEXEC' ) or die ;		
 $ordering = ($this->state->filter_order == 'tbl.ordering');
+if (version_compare(JVERSION, '3.0', 'ge'))
+{
+	JHtml::_('formbehavior.chosen', 'select');
+}
 ?>
 <form action="index.php?option=com_eventbooking&view=categories" method="post" name="adminForm" id="adminForm">
 <table width="100%">
@@ -21,11 +25,16 @@ $ordering = ($this->state->filter_order == 'tbl.ordering');
 		<button onclick="document.getElementById('filter_search').value='';this.form.submit();" class="btn"><?php echo JText::_( 'Reset' ); ?></button>
 	</td>
 	<td style="text-align: right;">
-		<?php echo $this->lists['filter_state'] ; ?>
+		<?php ?>
 		<?php
+			echo $this->lists['filter_state'];
 			if (JLanguageMultilang::isEnabled())
 			{
 				echo $this->lists['filter_language'];
+			}
+			if (version_compare(JVERSION, '3.0', 'ge'))
+			{
+				echo $this->pagination->getLimitBox();
 			}
 		?>
 	</td>
