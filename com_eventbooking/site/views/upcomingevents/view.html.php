@@ -73,7 +73,7 @@ class EventBookingViewUpcomingEvents extends JViewLegacy
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
 		}
-		if ($config->show_location_in_category_view)
+		if ($config->show_location_in_category_view || ($this->getLayout() == 'timeline'))
 		{
 			$width = (int) $config->map_width ;
 			if (!$width)
