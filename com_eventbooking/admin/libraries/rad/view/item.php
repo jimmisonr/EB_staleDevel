@@ -59,6 +59,8 @@ class RADViewItem extends RADViewHtml
 			$this->lists['language'] = JHtml::_('select.genericlist', JHtml::_('contentlanguage.existing', true, true), 'language', 
 				' class="inputbox" ', 'value', 'text', $this->item->language);
 		}
+
+		$this->languages = EventbookingHelper::getLanguages();
 		
 		$this->addToolbar();
 	}

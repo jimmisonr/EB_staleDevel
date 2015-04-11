@@ -114,6 +114,36 @@ class RADModelItem extends RADModel
 		{			
 			$data['alias'] = JApplication::stringURLSafe($data['alias']);
 		}
+
+
+		if (JLanguageMultilang::isEnabled())
+		{
+			// Build alias alias for other languages
+			$languages = EventbookingHelper::getLanguages();
+			if (count($languages))
+			{
+				foreach($languages as $language)
+				{
+					$sef = $language->sef;
+					if (!$data['alias_'.$sef])
+					{
+						if (isset($data['title_'.$sef]))
+						{
+							$data['alias_'.$sef] = JApplication::stringURLSafe($data['title_'.$sef]);
+						}
+						elseif (isset($data['name_'.$sef]))
+						{
+							$data['alias_'.$sef] = JApplication::stringURLSafe($data['name_'.$sef]);
+						}
+					}
+					else
+					{
+						$data['alias_'.$sef] = JApplication::stringURLSafe($data['alias_'.$sef]);
+					}
+				}
+			}
+		}
+
 		if (!$row->bind($data, $ignore))
 		{
 			throw new Exception($db->getErrorMsg());
