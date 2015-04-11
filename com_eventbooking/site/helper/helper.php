@@ -223,6 +223,147 @@ class EventbookingHelper
 	}
 
 	/**
+	 * This function is used to check to see whether we need to update the database to support multilingual or not
+	 *
+	 * @return boolean
+	 */
+	public static function isSynchronized()
+	{
+		$db             = JFactory::getDbo();
+		$fields         = array_keys($db->getTableColumns('#__eb_categories'));
+		$extraLanguages = self::getLanguages();
+		if (count($extraLanguages))
+		{
+			foreach ($extraLanguages as $extraLanguage)
+			{
+				$prefix = $extraLanguage->sef;
+				if (!in_array('title_' . $prefix, $fields))
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Synchronize Events Booking database to support multilingual
+	 */
+	public static function setupMultilingual()
+	{
+		$db        = JFactory::getDbo();
+		$languages = self::getLanguages();
+		if (count($languages))
+		{
+			$categoryTableFields = array_keys($db->getTableColumns('#__eb_categories'));
+			$eventTableFields    = array_keys($db->getTableColumns('#__eb_events'));
+			$fieldTableFields    = array_keys($db->getTableColumns('#__eb_fields'));
+			foreach ($languages as $language)
+			{
+				$prefix = $language->sef;
+				if (!in_array('title_' . $prefix, $categoryTableFields))
+				{
+					$fieldName = 'title_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_categories` ADD  `$fieldName` VARCHAR( 255 );";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'alias_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_categories` ADD  `$fieldName` VARCHAR( 255 );";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'description_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_categories` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				if (!in_array('title_' . $prefix, $eventTableFields))
+				{
+					$fieldName = 'title_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'alias_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'short_description_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'description_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'meta_keywords_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'meta_description_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'user_email_body_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'user_email_body_offline_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'thanks_message_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'thanks_message_offline_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'registration_approved_email_body_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				if (!in_array('title_' . $prefix, $fieldTableFields))
+				{
+					$fieldName = 'title_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` VARCHAR( 255 );";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'description_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'values_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+
+					$fieldName = 'default_values_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+			}
+		}
+	}
+	/**
 	 * Get language use for re-captcha
 	 *
 	 * @return string

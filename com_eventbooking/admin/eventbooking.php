@@ -19,6 +19,12 @@ if (!JFactory::getUser()->authorise('core.manage', 'com_eventbooking'))
 	return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
 }
 require_once JPATH_ADMINISTRATOR.'/components/com_eventbooking/libraries/rad/bootstrap.php';
+
+if (JLanguageMultilang::isEnabled() && !EventbookingHelper::isSynchronized())
+{
+	EventbookingHelper::setupMultilingual();
+}
+
 $config = array(
 	'table_prefix'	=>	'#__eb_',
 	'language_prefix'	=>	'EB',
