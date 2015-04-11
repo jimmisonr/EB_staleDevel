@@ -8,7 +8,8 @@
  * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;	
+defined( '_JEXEC' ) or die ;
+$translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function(pressbutton) {
@@ -38,7 +39,20 @@ defined( '_JEXEC' ) or die ;
 	}
 </script>
 <form action="index.php?option=com_eventbooking&view=field" method="post" name="adminForm" id="adminForm">
-<div class="row-fluid">			
+<div class="row-fluid">
+<?php
+if ($translatable)
+{
+?>
+<ul class="nav nav-tabs">
+	<li class="active"><a href="#general-page" data-toggle="tab"><?php echo JText::_('EB_GENERAL'); ?></a></li>
+	<li><a href="#translation-page" data-toggle="tab"><?php echo JText::_('EB_TRANSLATION'); ?></a></li>
+</ul>
+<div class="tab-content">
+	<div class="tab-pane active" id="general-page">
+		<?php
+		}
+		?>
 	<table class="admintable adminform">		
 		<?php 
 			if ($this->config->custom_field_by_category)
@@ -427,8 +441,88 @@ defined( '_JEXEC' ) or die ;
                 ?>
             </td>
         </tr>
-        
-	</table>			
+	</table>
+
+		<?php
+		if ($translatable)
+		{
+		?>
+	</div>
+	<div class="tab-pane" id="translation-page">
+		<ul class="nav nav-tabs">
+			<?php
+			$i = 0;
+			foreach ($this->languages as $language) {
+				$sef = $language->sef;
+				?>
+				<li <?php echo $i == 0 ? 'class="active"' : ''; ?>><a href="#translation-page-<?php echo $sef; ?>" data-toggle="tab"><?php echo $language->title; ?>
+						<img src="<?php echo JUri::root(); ?>media/com_osmembership/flags/<?php echo $sef.'.png'; ?>" /></a></li>
+				<?php
+				$i++;
+			}
+			?>
+		</ul>
+		<div class="tab-content">
+			<?php
+			$i = 0;
+			foreach ($this->languages as $language)
+			{
+				$sef = $language->sef;
+				?>
+				<div class="tab-pane<?php echo $i == 0 ? ' active' : ''; ?>" id="translation-page-<?php echo $sef; ?>">
+					<table class="admintable adminform" style="width: 100%;">
+						<tr>
+							<td class="key">
+								<?php echo  JText::_('EB_TITLE'); ?>
+							</td>
+							<td>
+								<input class="input-xlarge" type="text" name="title_<?php echo $sef; ?>" id="title_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'title_'.$sef}; ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
+								<?php echo JText::_('EB_DESCRIPTION'); ?>
+							</td>
+							<td>
+								<textarea rows="5" cols="50" name="description_<?php echo $sef; ?>"><?php echo $this->item->{'description_'.$sef};?></textarea>
+							</td>
+							<td>
+								&nbsp;
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
+								<?php echo JText::_('EB_VALUES'); ?>
+							</td>
+							<td>
+								<textarea rows="5" cols="50" name="values_<?php echo $sef; ?>"><?php echo $this->item->{'values_'.$sef}; ?></textarea>
+							</td>
+							<td>
+								<?php echo JText::_('EB_EACH_ITEM_LINE'); ?>
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
+								<?php echo JText::_('EB_DEFAULT_VALUES'); ?>
+							</td>
+							<td>
+								<textarea rows="5" cols="50" name="default_values_<?php echo $sef; ?>"><?php echo $this->item->{'default_values_'.$sef}; ?></textarea>
+							</td>
+							<td>
+								<?php echo JText::_('EB_EACH_ITEM_LINE'); ?>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<?php
+				$i++;
+			}
+			?>
+		</div>
+	</div>
+	<?php
+	}
+	?>
 </div>		
 <div class="clearfix"></div>	
 	<input type="hidden" name="cid[]" value="<?php echo $this->item->id; ?>" />
