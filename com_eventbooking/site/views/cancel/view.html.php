@@ -37,7 +37,7 @@ class EventBookingViewCancel extends JViewLegacy
 		if ($id > 0)
 		{
 			$db = JFactory::getDbo();
-			$sql = 'SELECT b.title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ' . ' ON a.event_id = b.id ' . ' WHERE a.id = ' . $id;
+			$sql = 'SELECT b.title' . $fieldSuffix . ' AS title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ' . ' ON a.event_id = b.id ' . ' WHERE a.id = ' . $id;
 			$db->setQuery($sql);
 			$title = $db->loadResult();
 			$cancelMessage = str_replace('[EVENT_TITLE]', $title, $cancelMessage);
