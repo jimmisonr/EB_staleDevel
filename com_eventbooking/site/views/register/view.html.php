@@ -31,7 +31,8 @@ class EventBookingViewRegister extends JViewLegacy
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
-		$query->select('a.*')
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$query->select('a.*, a.title' . $fieldSuffix . ' AS title')
 			->select("DATEDIFF(event_date, '$currentDate') AS number_event_dates")
 			->select("TIMESTAMPDIFF(MINUTE, registration_start_date, '$currentDate') AS registration_start_minutes")
 			->select("TIMESTAMPDIFF(MINUTE, cut_off_date, '$currentDate') AS cut_off_minutes")
@@ -466,7 +467,7 @@ class EventBookingViewRegister extends JViewLegacy
 			}
 		}		
 		$query->clear();
-		$query->select('title')
+		$query->select('title'.$fieldSuffix.' AS title')
 			->from('#__eb_events')
 			->where('id IN (' . implode(',', $items) . ')')
 			->order('FIND_IN_SET(id, "' . implode(',', $items) . '")');
