@@ -54,7 +54,27 @@ class EventBookingModelReminder extends JModelLegacy
 		{
 			$fromEmail = JFactory::getConfig()->get('mailfrom');
 		}
-		$sql = 'SELECT a.id, a.first_name, a.last_name, a.email, a.register_date, a.transaction_id, a.language, b.id as event_id, b.title AS event_title, b.event_date ' .
+		$eventFields = array('b.id as event_id', 'b.event_date');
+		if (JLanguageMultilang::isEnabled())
+		{
+			$languages = EventbookingHelper::getLanguages();
+			if (count($languages))
+			{
+				foreach($languages as $language)
+				{
+					$eventFields[] = 'b.title_' . $language->sef;
+				}
+			}
+			else
+			{
+				$eventFields[] = 'b.title';
+			}
+		}
+		else
+		{
+			$eventFields[] = 'b.title';
+		}
+		$sql = 'SELECT a.id, a.first_name, a.last_name, a.email, a.register_date, a.transaction_id, a.language, ' . implode(',', $eventFields) .
 			 ' FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ' . ' ON a.event_id = b.id ' .
 			 ' WHERE a.published=1 AND a.is_reminder_sent = 0 AND b.enable_auto_reminder=1 AND (DATEDIFF(b.event_date, NOW()) <= b.remind_before_x_days) AND (DATEDIFF(b.event_date, NOW()) >=0) ORDER BY b.event_date, a.register_date ' .
 			 ' LIMIT ' . $numberEmailSendEachTime;
@@ -74,7 +94,7 @@ class EventBookingModelReminder extends JModelLegacy
 			{
 				$emailSubject = $message->reminder_email_subject;
 			}
-			$emailSubject = str_replace('[EVENT_TITLE]', $row->event_title, $emailSubject);
+			$emailSubject = str_replace('[EVENT_TITLE]', $row->title . $fieldSuffix, $emailSubject);
 			if (strlen($message->{'reminder_email_body' . $fieldSuffix}))
 			{
 				$emailBody = $message->{'reminder_email_body' . $fieldSuffix};
