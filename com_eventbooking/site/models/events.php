@@ -49,7 +49,8 @@ class EventBookingModelEvents extends RADModelList
 			$rows  = parent::getData();
 			$db    = $this->getDbo();
 			$query = $db->getQuery(true);
-			$query->select('a.name FROM #__eb_categories AS a')->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id');
+			$fieldSuffix = EventbookingHelper::getFieldSuffix();
+			$query->select('a.name'.$fieldSuffix.' AS name FROM #__eb_categories AS a')->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id');
 			for ($i = 0, $n = count($rows); $i < $n; $i++)
 			{
 				$row = $rows[$i];
