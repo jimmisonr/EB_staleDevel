@@ -52,7 +52,7 @@ class EventBookingViewInvite extends JViewLegacy
 				}
 			}			
 			$eventId = JRequest::getInt('id', 0);
-			$query->select('*')
+			$query->select('*, title' . $fieldSuffix . ' AS title')
 				->from('#__eb_events')
 				->where('id=' . $eventId);
 			$db->setQuery($query);
