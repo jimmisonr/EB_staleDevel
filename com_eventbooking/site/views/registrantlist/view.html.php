@@ -55,8 +55,9 @@ class EventBookingViewRegistrantList extends JViewLegacy
 				$fields      = explode(',', $customFieldIds);
 				$fieldTitles = array();
 				$fieldValues = array();
+				$fieldSuffix = EventbookingHelper::getFieldSuffix();
 				$query->clear();
-				$query->select('id, name,title, is_core')
+				$query->select('id, name,title' . $fieldSuffix . ' AS title, is_core')
 					->from('#__eb_fields')
 					->where('id IN (' . $customFieldIds . ')');
 				$rowFields = $db->loadObjectList();
