@@ -223,6 +223,34 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Get sef of current language
+	 *
+	 * @return mixed
+	 */
+	public static function addLangLinkForAjax()
+	{
+		if (JLanguageMultilang::isEnabled())
+		{
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$tag   = JFactory::getLanguage()->getTag();
+			$query->select('`sef`')
+				->from('#__languages')
+				->where('published = 1')
+				->where('lang_code=' . $db->quote($tag));
+			$db->setQuery($query, 0, 1);
+			$langLink = '&lang='.$db->loadResult();
+		}
+		else
+		{
+			$langLink = '';
+		}
+
+		JFactory::getDocument()->addScriptDeclaration(
+			'var langLinkForAjax="'.$langLink.'";'
+		);
+	}
+	/**
 	 * This function is used to check to see whether we need to update the database to support multilingual or not
 	 *
 	 * @return boolean
@@ -1277,7 +1305,7 @@ class EventbookingHelper
 		$query->select('*')
 			->select('title'.$fieldSuffix.' AS title')
 			->select('description'.$fieldSuffix.' AS description')
-			->select('values'.$fieldSuffix.' AS values')
+			->select('values'.$fieldSuffix.' AS `values`')
 			->select('default_values'.$fieldSuffix.' AS default_values')
 			->select('depend_on_options'.$fieldSuffix.' AS depend_on_options')
 			->from('#__eb_fields')
