@@ -1305,7 +1305,7 @@ class EventbookingHelper
 		$query->select('*')
 			->select('title'.$fieldSuffix.' AS title')
 			->select('description'.$fieldSuffix.' AS description')
-			->select('values'.$fieldSuffix.' AS `values`')
+			->select('`values'.$fieldSuffix.'` AS `values`')
 			->select('default_values'.$fieldSuffix.' AS default_values')
 			->select('depend_on_options'.$fieldSuffix.' AS depend_on_options')
 			->from('#__eb_fields')
