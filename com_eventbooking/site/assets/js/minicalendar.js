@@ -10,7 +10,7 @@
 		   		}
 			   	month --;
 				$.ajax({
-					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&Itemid=' + itemId,
+					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&Itemid=' + itemId + langLinkForAjax,
 					dataType: 'html',
 					success: function(html) {
 						$('#calendar_result').html(html);
@@ -34,7 +34,7 @@
 		   		}
 		   		month ++;
 				$.ajax({
-					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&Itemid=' + itemId,
+					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&Itemid=' + itemId + langLinkForAjax,
 					dataType: 'html',
 					success: function(html) {
 						$('#calendar_result').html(html);
@@ -54,7 +54,7 @@
 		   		var year  = $('.year_ajax').val();
 		   		year ++;
 				$.ajax({
-					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&Itemid=' + itemId,
+					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&Itemid=' + itemId + langLinkForAjax,
 					dataType: 'html',
 					success: function(html) {
 						$('#calendar_result').html(html);
