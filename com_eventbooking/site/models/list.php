@@ -84,8 +84,9 @@ class EventBookingModelList extends RADModelList
 	{
 		$db         = $this->getDbo();
 		$query      = $db->getQuery(true);
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$categoryId = $this->state->id ? $this->state->id : $this->state->category_id;
-		$query->select('*')
+		$query->select('*, name' . $fieldSuffix . ' AS name')
 			->from('#__eb_categories')
 			->where('id=' . $categoryId);
 		$db->setQuery($query);
