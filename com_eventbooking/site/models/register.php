@@ -569,8 +569,9 @@ class EventBookingModelRegister extends JModelLegacy
 
 		// Need to over-ridde some config options
 		$emailContent = EventbookingHelper::getEmailContent($config, $row, true, $form);
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->clear();
-		$query->select('title')
+		$query->select('title' . $fieldSuffix . ' AS title')
 			->from('#__eb_events')
 			->where('id=' . $row->event_id);
 		$db->setQuery($query);
@@ -594,7 +595,6 @@ class EventBookingModelRegister extends JModelLegacy
 		$replaces['amount'] = EventbookingHelper::formatAmount($row->amount, $config);
 		//Notification email send to user
 		$message = EventbookingHelper::getMessages();
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		if (strlen(trim($message->{'registration_cancel_email_subject' . $fieldSuffix})))
 		{
 			$subject = $message->{'registration_cancel_email_subject' . $fieldSuffix};
