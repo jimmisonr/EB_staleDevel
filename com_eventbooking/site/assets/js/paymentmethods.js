@@ -177,7 +177,7 @@ function calculateIndividualRegistrationFee()
         }
 		$.ajax({
 			type: 'POST',
-			url: siteUrl + 'index.php?option=com_eventbooking&task=calculate_individual_registration_fee&payment_method=' + paymentMethod,
+			url: siteUrl + 'index.php?option=com_eventbooking&task=calculate_individual_registration_fee&payment_method=' + paymentMethod + langLinkForAjax,
 			data: $('#adminForm input[name=\'event_id\'], #adminForm input[name=\'coupon_code\'], #adminForm .payment-calculation input[type=\'text\'], #adminForm .payment-calculation input[type=\'checkbox\']:checked, #adminForm .payment-calculation input[type=\'radio\']:checked, #adminForm .payment-calculation select'),
 			dataType: 'json',
 			success: function(msg, textStatus, xhr) {
@@ -249,7 +249,7 @@ function calculateGroupRegistrationFee()
         }
 		$.ajax({
 			type: 'POST',
-			url: siteUrl + 'index.php?option=com_eventbooking&task=calculate_group_registration_fee&payment_method=' + paymentMethod,
+			url: siteUrl + 'index.php?option=com_eventbooking&task=calculate_group_registration_fee&payment_method=' + paymentMethod + langLinkForAjax,
 			data: $('#adminForm input[name=\'event_id\'], #adminForm input[name=\'coupon_code\'], #adminForm .payment-calculation input[type=\'text\'], #adminForm .payment-calculation input[type=\'checkbox\']:checked, #adminForm .payment-calculation input[type=\'radio\']:checked, #adminForm .payment-calculation select'),
 			dataType: 'json',
 			success: function(msg, textStatus, xhr) {
@@ -320,7 +320,7 @@ function calculateCartRegistrationFee()
         }
 		$.ajax({
 			type: 'POST',
-			url: siteUrl + 'index.php?option=com_eventbooking&task=calculate_cart_registration_fee&payment_method=' + paymentMethod,
+			url: siteUrl + 'index.php?option=com_eventbooking&task=calculate_cart_registration_fee&payment_method=' + paymentMethod + langLinkForAjax,
 			data: $('#adminForm input[name=\'coupon_code\'], #adminForm .payment-calculation input[type=\'text\'], #adminForm .payment-calculation input[type=\'checkbox\']:checked, #adminForm .payment-calculation input[type=\'radio\']:checked, #adminForm .payment-calculation select'),
 			dataType: 'json',
 			success: function(msg, textStatus, xhr) {
@@ -411,7 +411,7 @@ function showHideDependFields(fieldId, fieldName, fieldType, fieldSuffix)
         $('#ajax-loading-animation').show();
         $.ajax({
             type: 'POST',
-            url: siteUrl + 'index.php?option=com_eventbooking',
+            url: siteUrl + 'index.php?option=com_eventbooking' + langLinkForAjax,
             data: data,
             dataType: 'json',
             success: function(msg, textStatus, xhr) {
