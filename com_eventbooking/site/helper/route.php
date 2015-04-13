@@ -32,7 +32,7 @@ class EventbookingHelperRoute
 		$link = 'index.php?option=com_eventbooking&view=event&id=' . $id;
 		if (!$catId)
 		{
-			//Find the first category which has lowest ordering of this event
+			//Find the main category of this event
 			$db = JFactory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('category_id')
@@ -115,7 +115,8 @@ class EventbookingHelperRoute
 		{
 			$db = JFactory::getDbo();
 			$query = $db->getQuery(true);
-			$query->select('id, event_type, parent_id,  alias')
+			$fieldSuffix = EventbookingHelper::getFieldSuffix();
+			$query->select('id, event_type, parent_id,  alias'.$fieldSuffix.' AS alias')
 				->from('#__eb_events')
 				->where('id=' . $id);
 			$db->setQuery($query);
@@ -143,8 +144,9 @@ class EventbookingHelperRoute
 		$db = JFactory::getDbo();
 		if (empty($categories))
 		{
+			$fieldSuffix = EventbookingHelper::getFieldSuffix();
 			$query = $db->getQuery(true);
-			$query->select('id, alias, parent')->from('#__eb_categories');
+			$query->select('id, alias'.$fieldSuffix.' AS alias, parent')->from('#__eb_categories');
 			$db->setQuery($query);
 			$categories = $db->loadObjectList('id');
 		}
