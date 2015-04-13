@@ -22,9 +22,9 @@ class EventBookingViewRegistrant extends JViewLegacy
 		$user = JFactory::getUser();
 		$item = $this->get('Data');
 		$config = EventbookingHelper::getConfig();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$userId = $user->get('id');
-		
-		$query->select('*')
+		$query->select('*, title'.$fieldSuffix.' AS title')
 			->from('#__eb_events')
 			->where('id=' . $item->event_id);
 		$db->setQuery($query);
