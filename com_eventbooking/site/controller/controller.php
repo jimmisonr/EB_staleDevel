@@ -689,9 +689,10 @@ class EventbookingController extends JControllerLegacy
 		$fieldValues = JRequest::getVar('field_values', '', 'post');
 		$fieldSuffix = JRequest::getVar('field_suffix', '', 'post');
 		$fieldValues = explode(',', $fieldValues);
+		$languageSuffix = EventbookingHelper::getFieldSuffix();
 		//Get list of depend fields
 		$query = $db->getQuery(true);
-		$query->select('*')
+		$query->select('name, depend_on_options'.$languageSuffix.' AS depend_on_options')
 			->from('#__eb_fields')
 			->where('depend_on_field_id=' . $fieldId);
 		$db->setQuery($query);
