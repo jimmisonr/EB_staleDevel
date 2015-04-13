@@ -843,6 +843,7 @@ class EventbookingController extends JControllerLegacy
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$config = EventbookingHelper::getConfig();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$eventId = JRequest::getInt('event_id');
 		if (!EventbookingHelper::canExportRegistrants($eventId))
 		{
@@ -868,13 +869,13 @@ class EventbookingController extends JControllerLegacy
 		}
 		if ($config->show_coupon_code_in_registrant_list)
 		{
-			$sql = 'SELECT a.*, b.event_date, b.title AS event_title, c.code AS coupon_code FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id = b.id LEFT JOIN #__eb_coupons AS c ON a.coupon_id=c.id WHERE ' .
+			$sql = 'SELECT a.*, b.event_date, b.title' . $fieldSuffix . ' AS event_title, c.code AS coupon_code FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id = b.id LEFT JOIN #__eb_coupons AS c ON a.coupon_id=c.id WHERE ' .
 				 implode(' AND ', $where) . ' ORDER BY a.id ';
 		}
 		else
 		{
-			$sql = 'SELECT a.*, b.event_date, b.title AS event_title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id = b.id WHERE ' .
-				 implode(' AND ', $where) . ' ORDER BY a.id ';
+			$sql = 'SELECT a.*, b.event_date, b.title' . $fieldSuffix . ' AS event_title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id = b.id WHERE ' .
+				implode(' AND ', $where) . ' ORDER BY a.id ';
 		}
 		$db->setQuery($sql);
 		$rows = $db->loadObjectList();
