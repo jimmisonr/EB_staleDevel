@@ -50,11 +50,11 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		{
 			if (EventbookingHelper::isGroupRegistration($this->item->id))
 			{
-				$rowFields = EventbookingHelper::getFormFields($this->item->event_id, 1);
+				$rowFields = EventbookingHelper::getFormFields($this->item->event_id, 1, $this->item->language);
 			}	
 			else 
 			{
-				$rowFields = EventbookingHelper::getFormFields($this->item->event_id, 0);
+				$rowFields = EventbookingHelper::getFormFields($this->item->event_id, 0, $this->item->language);
 			}					
 		}
 		else 
@@ -116,7 +116,7 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 
 		if (count($rowMembers))
 		{
-			$this->memberFormFields = EventbookingHelper::getFormFields($this->item->event_id, 2);			
+			$this->memberFormFields = EventbookingHelper::getFormFields($this->item->event_id, 2, $this->item->language);
 		}
 				
 		$this->config = $config;
