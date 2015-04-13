@@ -1262,24 +1262,27 @@ class EventbookingHelper
 	 *
 	 * @param int $eventId (ID of the event or ID of the registration record in case the system use shopping cart)
 	 * @param int $registrationType
+	 * @param string $activeLanguage
 	 *
 	 * @return array
 	 */
-	public static function getFormFields($eventId = 0, $registrationType = 0)
+	public static function getFormFields($eventId = 0, $registrationType = 0, $activeLanguage = null)
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
 		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
 		$config = EventbookingHelper::getConfig();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix($activeLanguage);
 		$query->select('*')
+			->select('title'.$fieldSuffix.' AS title')
+			->select('description'.$fieldSuffix.' AS description')
+			->select('values'.$fieldSuffix.' AS values')
+			->select('default_values'.$fieldSuffix.' AS default_values')
+			->select('depend_on_options'.$fieldSuffix.' AS depend_on_options')
 			->from('#__eb_fields')
 			->where('published=1')
 			->where(' `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
-		if (!$app->isAdmin() && $app->getLanguageFilter())
-		{
-			$query->where(' language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')');
-		}
 		switch ($registrationType)
 		{
 			case 0:
