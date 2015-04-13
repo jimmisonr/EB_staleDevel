@@ -359,6 +359,11 @@ class EventbookingHelper
 					$sql       = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
 					$db->setQuery($sql);
 					$db->execute();
+
+					$fieldName = 'depend_on_options_' . $prefix;
+					$sql       = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
 				}
 			}
 		}

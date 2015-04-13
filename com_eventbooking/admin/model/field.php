@@ -50,6 +50,7 @@ class EventbookingModelField extends RADModelItem
 				$input->set('event_id', 1);
 			}
 		}
+
 		parent::store($input, $ignore);
 		if (!$config->custom_field_by_category)
 		{
@@ -73,6 +74,51 @@ class EventbookingModelField extends RADModelItem
 				$db->query();
 			}
 		}
+
+		// Calculate depend on options in different languages
+		// Build alias for other languages
+		if (JLanguageMultilang::isEnabled())
+		{
+			$languages = EventbookingHelper::getLanguages();
+			if (count($languages))
+			{
+				$fieldId = $input->getInt('id', 0);
+				$row = $this->getTable();
+				$row->load($fieldId);
+				if ($row->depend_on_field_id > 0)
+				{
+					$masterField = $this->getTable();
+					$masterField->load($row->depend_on_field_id);
+					$masterFieldValues = explode("\r\n", $masterField->values);
+					$dependOnOptions = explode(',', $row->depend_on_options);
+					$dependOnIndexes = array();
+					foreach($dependOnOptions as $option)
+					{
+						$index = array_search($option, $masterFieldValues);
+						if ($index !== FALSE)
+						{
+							$dependOnIndexes[] = $index;
+						}
+					}
+					foreach($languages as $language)
+					{
+						$sef = $language->sef;
+						$dependOnOptionsWithThisLanguage = array();
+						$values = explode("\r\n", $masterField->{'values_'.$sef});
+						foreach($dependOnIndexes as $index)
+						{
+							if (isset($values[$index]))
+							{
+								$dependOnOptionsWithThisLanguage[] = $values[$index];
+							}
+						}
+						$row->{'depend_on_options_'.$sef} = implode(',', $dependOnOptionsWithThisLanguage);
+					}
+					$row->store();
+				}
+			}
+		}
+
 		return true;
 	}
 
