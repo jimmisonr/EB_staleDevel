@@ -107,7 +107,7 @@ if ($this->showCaptcha)
 								if (formValid)
 								{							
 									$.ajax({							    	
-										url: siteUrl + 'index.php?option=com_eventbooking&task=store_group_members_data&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw',
+										url: siteUrl + 'index.php?option=com_eventbooking&task=store_group_members_data&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
 										type: 'post',
 										data: $('#eb-form-group-members').serialize(),
 										dataType: 'html',
@@ -141,7 +141,7 @@ if ($this->showCaptcha)
 				
 				$('#btn-group-members-back').click(function(){
 					$.ajax({
-						url: siteUrl + 'index.php?option=com_eventbooking&view=register&layout=number_members&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw',
+						url: siteUrl + 'index.php?option=com_eventbooking&view=register&layout=number_members&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
 						type: 'post',				
 						dataType: 'html',
 						beforeSend: function() {

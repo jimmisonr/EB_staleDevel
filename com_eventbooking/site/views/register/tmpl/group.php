@@ -124,7 +124,7 @@ $headerText = str_replace('[EVENT_TITLE]', $this->event->title, $headerText);
 			if (step == 'group_billing')
 			{
 				$.ajax({
-					url: siteUrl + 'index.php?option=com_eventbooking&view=register&layout=group_billing&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw',
+					url: siteUrl + 'index.php?option=com_eventbooking&view=register&layout=group_billing&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
 					dataType: 'html',										
 					success: function(html) {
 						$('#eb-group-billing .eb-form-content').html(html);
@@ -142,7 +142,7 @@ $headerText = str_replace('[EVENT_TITLE]', $this->event->title, $headerText);
 			else if (step == 'group_members')
 			{
 				$.ajax({
-					url: siteUrl + 'index.php?option=com_eventbooking&view=register&layout=group_members&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw',
+					url: siteUrl + 'index.php?option=com_eventbooking&view=register&layout=group_members&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
 					dataType: 'html',										
 					success: function(html) {							
 						$('#eb-group-members-information .eb-form-content').html(html);
@@ -156,7 +156,7 @@ $headerText = str_replace('[EVENT_TITLE]', $this->event->title, $headerText);
 			else 
 			{
 				$.ajax({
-					url: siteUrl + 'index.php?option=com_eventbooking&view=register&layout=number_members&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw',
+					url: siteUrl + 'index.php?option=com_eventbooking&view=register&layout=number_members&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
 					dataType: 'html',																		
 					success: function(html) {
 						$('#eb-number-group-members .eb-form-content').html(html);

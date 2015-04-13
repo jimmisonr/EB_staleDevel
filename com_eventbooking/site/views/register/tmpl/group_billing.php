@@ -620,7 +620,7 @@ else
 
 				$('#btn-group-billing-back').click(function(){
 					$.ajax({
-						url: siteUrl + 'index.php?option=com_eventbooking&view=register&layout=group_members&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw',
+						url: siteUrl + 'index.php?option=com_eventbooking&view=register&layout=group_members&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
 						type: 'post',				
 						dataType: 'html',
 						beforeSend: function() {
