@@ -71,7 +71,8 @@ abstract class EventbookingHelperHtml
 	{
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('id, parent, parent AS parent_id, name, name AS title')
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$query->select('id, parent, parent AS parent_id, name' . $fieldSuffix . ' AS name, name' . $fieldSuffix . ' AS title')
 			->from('#__eb_categories')
 			->where('published=1');
 		$db->setQuery($query);
