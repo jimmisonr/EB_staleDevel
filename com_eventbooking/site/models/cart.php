@@ -87,6 +87,7 @@ class EventBookingModelCart extends JModelLegacy
 		$items                  = $cart->getItems();
 		$quantities             = $cart->getQuantities();
 		$paymentMethod          = isset($data['payment_method']) ? $data['payment_method'] : '';
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		if (!$user->id && $config->user_registration)
 		{
 			$userId          = EventbookingHelper::saveRegistration($data);
@@ -184,7 +185,7 @@ class EventBookingModelCart extends JModelLegacy
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('onAfterStoreRegistrant', array($row));
 		}
-		$sql = 'SELECT title FROM #__eb_events WHERE id IN (' . implode(',', $items) . ') ORDER BY FIND_IN_SET(id, "' . implode(',', $items) . '")';
+		$sql = 'SELECT title' . $fieldSuffix . ' AS title FROM #__eb_events WHERE id IN (' . implode(',', $items) . ') ORDER BY FIND_IN_SET(id, "' . implode(',', $items) . '")';
 		$db->setQuery($sql);
 		$eventTitltes        = $db->loadColumn();
 		$data['event_title'] = implode(', ', $eventTitltes);

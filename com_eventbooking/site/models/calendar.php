@@ -99,11 +99,6 @@ class EventBookingModelCalendar extends JModelLegacy
 			$where[] = 'DATE(event_date) >= "' . $currentDate . '"';
 		}
 		$where[] = "a.access IN (" . implode(',', $user->getAuthorisedViewLevels()) . ")";
-		if ($app->getLanguageFilter())
-		{
-			$where[] = ' a.language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')';
-		}
-
 		$query = 'SELECT a.*,title' . $fieldSuffix . ' AS title, SUM(b.number_registrants) AS total_registrants FROM #__eb_events AS a ' . 'LEFT JOIN #__eb_registrants AS b ' .
 			'ON (a.id = b.event_id ) AND b.group_id = 0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))) ' . 'WHERE ' .
 			implode(' AND ', $where) . ' GROUP BY a.id ' . ' ORDER BY a.event_date ASC, a.ordering ASC';
@@ -152,16 +147,9 @@ class EventBookingModelCalendar extends JModelLegacy
 	{
 		$app = JFactory::getApplication();
 		$hidePastEvents = EventbookingHelper::getConfigValue('hide_past_events');
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$db = JFactory::getDbo();
 		$user = JFactory::getUser();
-		if ($app->getLanguageFilter())
-		{
-			$extraWhere = ' AND a.language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')';
-		}
-		else
-		{
-			$extraWhere = '';
-		}
 		// get first day of week of today
 		$day = 0;
 		$week_number = date('W', time());
@@ -174,15 +162,15 @@ class EventBookingModelCalendar extends JModelLegacy
 		
 		if ($hidePastEvents)
 		{
-			$query = " SELECT a.*,b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON a.location_id = b.id " .
+			$query = " SELECT a.*, a.title" . $fieldSuffix . " AS title,b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON a.location_id = b.id " .
 				 " WHERE (a.published = 1) AND (a.event_date BETWEEN '$startDate' AND '$endDate') AND DATE(a.event_date) >= '".JHtml::_('date', 'Now', 'Y-m-d')."' AND a.access IN(" .
-				 implode(',', $user->getAuthorisedViewLevels()) . ") " . $extraWhere . " ORDER BY a.event_date ASC, a.ordering ASC";
+				 implode(',', $user->getAuthorisedViewLevels()) . ")  ORDER BY a.event_date ASC, a.ordering ASC";
 		}
 		else
 		{
-			$query = " SELECT a.*,b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON a.location_id = b.id " .
+			$query = " SELECT a.*,a.title" . $fieldSuffix . " AS title, b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON a.location_id = b.id " .
 				 " WHERE (a.published = 1) AND (a.event_date BETWEEN '$startDate' AND '$endDate') AND a.access IN (" .
-				 implode(',', $user->getAuthorisedViewLevels()) . ") " . $extraWhere . " ORDER BY a.event_date ASC, a.ordering ASC";
+				 implode(',', $user->getAuthorisedViewLevels()) . ") ORDER BY a.event_date ASC, a.ordering ASC";
 		}
 		
 		$db->setQuery($query);
@@ -203,31 +191,24 @@ class EventBookingModelCalendar extends JModelLegacy
 	function getEventsByDaily()
 	{
 		$hidePastEvents = EventbookingHelper::getConfigValue('hide_past_events');
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$app = JFactory::getApplication();
 		$db = JFactory::getDbo();
 		$user = JFactory::getUser();
 		$day = JRequest::getVar('day', date('Y-m-d', time()));
 		$startDate = $day . " 00:00:00";
 		$endDate = $day . " 23:59:59";
-		if ($app->getLanguageFilter())
-		{
-			$extraWhere = ' AND a.language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')';
-		}
-		else
-		{
-			$extraWhere = '';
-		}
 		if ($hidePastEvents)
 		{
-			$query = " SELECT a.*,b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON b.id = a.location_id " .
+			$query = " SELECT a.*, a.title " . $fieldSuffix . " AS title,b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON b.id = a.location_id " .
 				 " WHERE (a.published = 1) AND (a.event_date BETWEEN '$startDate' AND '$endDate') AND DATE(event_date) >= '".JHtml::_('date', 'Now', 'Y-m-d')."' AND a.access IN (" .
-				 implode(',', $user->getAuthorisedViewLevels()) . ") " . $extraWhere . " ORDER BY a.event_date ASC, a.ordering ASC";
+				 implode(',', $user->getAuthorisedViewLevels()) . ") ORDER BY a.event_date ASC, a.ordering ASC";
 		}
 		else
 		{
-			$query = " SELECT a.*,b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON b.id = a.location_id " .
+			$query = " SELECT a.*, a,title" . $fieldSuffix . " AS title ,b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON b.id = a.location_id " .
 				 " WHERE (a.published = 1) AND (a.event_date BETWEEN '$startDate' AND '$endDate') AND a.access IN (" .
-				 implode(',', $user->getAuthorisedViewLevels()) . ") " . $extraWhere . " ORDER BY a.event_date ASC, a.ordering ASC";
+				 implode(',', $user->getAuthorisedViewLevels()) . ") ORDER BY a.event_date ASC, a.ordering ASC";
 		}
 		$db->setQuery($query);
 		$events = $db->loadObjectList();
