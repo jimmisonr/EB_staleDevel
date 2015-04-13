@@ -31,7 +31,7 @@ class EventBookingViewRegistrant extends JViewLegacy
 		$event = $db->loadObject();
 		if (EventbookingHelper::isGroupRegistration($item->id))
 		{
-			$rowFields = EventbookingHelper::getFormFields($item->event_id, 1);
+			$rowFields = EventbookingHelper::getFormFields($item->event_id, 1, $item->language);
 			$query->clear();
 			$query->select('*')
 				->from('#__eb_registrants')
@@ -41,7 +41,7 @@ class EventBookingViewRegistrant extends JViewLegacy
 		}
 		else
 		{
-			$rowFields = EventbookingHelper::getFormFields($item->event_id, 0);
+			$rowFields = EventbookingHelper::getFormFields($item->event_id, 0, $item->language);
 			$rowMembers = array();
 		}
 		$form = new RADForm($rowFields);
@@ -64,7 +64,7 @@ class EventBookingViewRegistrant extends JViewLegacy
 		}
 		if (count($rowMembers))
 		{
-			$this->memberFormFields = EventbookingHelper::getFormFields($item->event_id, 2);
+			$this->memberFormFields = EventbookingHelper::getFormFields($item->event_id, 2, $item->language);
 		}
 		$this->item = $item;
 		$this->event = $event;
