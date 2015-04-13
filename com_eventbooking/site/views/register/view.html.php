@@ -21,6 +21,7 @@ class EventBookingViewRegister extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$layout = $this->getLayout();
+		EventbookingHelper::addLangLinkForAjax();
 		if ($layout == 'cart')
 		{
 			$this->_displayCart($tpl);
