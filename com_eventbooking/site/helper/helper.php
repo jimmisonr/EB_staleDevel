@@ -408,7 +408,8 @@ class EventbookingHelper
 			$sql = 'SELECT event_id FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id . ' ORDER BY id';
 			$db->setQuery($sql);
 			$eventIds             = $db->loadColumn();
-			$sql                  = 'SELECT title FROM #__eb_events WHERE id IN (' . implode(',', $eventIds) . ') ORDER BY FIND_IN_SET(id, "' . implode(',', $eventIds) .
+			$fieldSuffix = EventbookingHelper::getFieldSuffix();
+			$sql                  = 'SELECT title'.$fieldSuffix.' AS title FROM #__eb_events WHERE id IN (' . implode(',', $eventIds) . ') ORDER BY FIND_IN_SET(id, "' . implode(',', $eventIds) .
 				'")';
 			$db->setQuery($sql);
 			$eventTitles = $db->loadColumn();
@@ -1821,12 +1822,13 @@ class EventbookingHelper
 				}
 			}
 		}
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		if ($config->multiple_booking)
 		{
 			$data['row']    = $row;
 			$data['config'] = $config;
 			$data['Itemid'] = $Itemid;
-			$sql            = 'SELECT a.*, b.event_date, b.title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id=b.id WHERE a.id=' .
+			$sql = 'SELECT a.*, b.event_date, b.title' . $fieldSuffix . ' AS title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id=b.id WHERE a.id=' .
 				$row->id . ' OR a.cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$rows = $db->loadObjectList();
@@ -1864,7 +1866,7 @@ class EventbookingHelper
 		else
 		{
 			$query = $db->getQuery(true);
-			$query->select('*')
+			$query->select('*, title'.$fieldSuffix.' AS title')
 				->from('#__eb_events')
 				->where('id=' . $row->event_id);
 			$db->setQuery($query);
@@ -2063,11 +2065,6 @@ class EventbookingHelper
 		else
 			$sql = 'SELECT COUNT(a.id) FROM #__eb_events AS a INNER JOIN #__eb_event_categories AS b ON a.id = b.event_id WHERE b.category_id IN(' .
 				implode(',', $cats) . ') AND `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ') AND published = 1 ';
-
-		if ($app->getLanguageFilter())
-		{
-			$sql .= ' AND `language` IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')';
-		}
 
 		$db->setQuery($sql);
 
@@ -2308,7 +2305,7 @@ class EventbookingHelper
 				$replaces['event_url'] = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')) . EventbookingHelperRoute::getEventRoute($row->event_id, 0, EventbookingHelper::getItemid());
 			}
 			$query->clear();
-			$query->select('*')
+			$query->select('*, title' . $fieldSuffix . ' AS title')
 				->from('#__eb_events')
 				->where('id = ' . (int) $row->event_id);
 			$db->setQuery($query);
@@ -2387,7 +2384,7 @@ class EventbookingHelper
 		{
 			$fromEmail = JFactory::getConfig()->get('mailfrom');
 		}
-		$query->select('*')
+		$query->select('*, title' . $fieldSuffix . ' AS title')
 			->from('#__eb_events')
 			->where('id=' . $row->event_id);
 		$db->setQuery($query);
@@ -2700,7 +2697,7 @@ class EventbookingHelper
 		$data = self::getRegistrantData($row, $rowFields);
 		$form->bind($data);
 		$form->buildFieldsDependency();
-		$query->select('*')
+		$query->select('*, title' . $fieldSuffix . ' AS title')
 			->from('#__eb_events')
 			->where('id=' . $row->event_id);
 		$db->setQuery($query);
@@ -2771,7 +2768,7 @@ class EventbookingHelper
 			$fromEmail = JFactory::getConfig()->get('mailfrom');
 		}
 
-		$query->select('*')
+		$query->select('*, title'.$fieldSuffix.' AS title')
 			->from('#__eb_events')
 			->where('id=' . $row->event_id);
 		$db->setQuery($query);
@@ -3344,8 +3341,9 @@ class EventbookingHelper
 		$db       = JFactory::getDbo();
 		$query    = $db->getQuery(true);
 		$config   = self::getConfig();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 		$sitename = JFactory::getConfig()->get("sitename");
-		$query->select('*')
+		$query->select('*, title'.$fieldSuffix.' AS title')
 			->from('#__eb_events')
 			->where('id = ' . (int) $row->event_id);
 		$db->setQuery($query);
@@ -3420,7 +3418,7 @@ class EventbookingHelper
 		unset($replaces['tax_amount']);
 		if ($config->multiple_booking)
 		{
-			$sql = 'SELECT a.title, a.event_date, b.* FROM #__eb_events AS a INNER JOIN #__eb_registrants AS b ' . ' ON a.id = b.event_id ' .
+			$sql = 'SELECT a.title'.$fieldSuffix.' AS title, a.event_date, b.* FROM #__eb_events AS a INNER JOIN #__eb_registrants AS b ' . ' ON a.id = b.event_id ' .
 				' WHERE b.id=' . $row->id . ' OR b.cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$rowEvents                   = $db->loadObjectList();
