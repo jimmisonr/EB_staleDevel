@@ -224,9 +224,10 @@ class EventbookingHelperData
     {
         $db = JFactory::getDbo();
         $parents = array();
+	    $fieldSuffix = EventbookingHelper::getFieldSuffix();
         while ( true )
         {
-            $sql = "SELECT id, name, parent FROM #__eb_categories WHERE id = ".$categoryId." AND published=1";
+	        $sql = "SELECT id, name'.$fieldSuffix.' AS name, parent FROM #__eb_categories WHERE id = " . $categoryId . " AND published=1";
             $db->setQuery( $sql );
             $row = $db->loadObject();
             if ($row)
@@ -247,7 +248,8 @@ class EventbookingHelperData
     {
         $db = JFactory::getDbo();
         $query = $db->getQuery(true);
-        $query->select('id, name, parent')->from('#__eb_categories')->where('published=1');
+	    $fieldSuffix = EventbookingHelper::getFieldSuffix();
+	    $query->select('id, name' . $fieldSuffix . ' AS name, parent')->from('#__eb_categories')->where('published=1');
         $db->setQuery($query);
         $categories = $db->loadObjectList('id');
         $paths = array();
