@@ -29,7 +29,8 @@ class EventBookingViewCategories extends JViewLegacy
 		{
 			$db = JFactory::getDbo();
 			$query = $db->getQuery(true);
-			$query->select('*')
+			$fieldSuffix = EventbookingHelper::getFieldSuffix();
+			$query->select('*, name' . $fieldSuffix . ' AS name')
 				->from('#__eb_categories')
 				->where('id=' . $categoryId);
 			$db->setQuery($query);
