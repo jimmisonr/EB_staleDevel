@@ -262,9 +262,9 @@ class EventbookingHelper
 			foreach ($languages as $language)
 			{
 				$prefix = $language->sef;
-				if (!in_array('title_' . $prefix, $categoryTableFields))
+				if (!in_array('name_' . $prefix, $categoryTableFields))
 				{
-					$fieldName = 'title_' . $prefix;
+					$fieldName = 'name_' . $prefix;
 					$sql       = "ALTER TABLE  `#__eb_categories` ADD  `$fieldName` VARCHAR( 255 );";
 					$db->setQuery($sql);
 					$db->execute();

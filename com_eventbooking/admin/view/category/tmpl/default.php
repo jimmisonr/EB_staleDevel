@@ -156,10 +156,10 @@ if ($translatable)
 						<table class="admintable adminform" style="width: 100%;">
 							<tr>
 								<td class="key">
-									<?php echo  JText::_('EB_TITLE'); ?>
+									<?php echo  JText::_('EB_NAME'); ?>
 								</td>
 								<td>
-									<input class="input-xlarge" type="text" name="title_<?php echo $sef; ?>" id="title_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'title_'.$sef}; ?>" />
+									<input class="input-xlarge" type="text" name="name_<?php echo $sef; ?>" id="name_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'name_'.$sef}; ?>" />
 								</td>
 							</tr>
 							<tr>
