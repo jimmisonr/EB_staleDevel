@@ -15,6 +15,7 @@ class EventBookingViewRegistrants extends JViewLegacy
 	function display($tpl = null)
 	{
 		EventbookingHelper::checkRegistrantsAccess();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$user = JFactory::getUser();
 		$db = JFactory::getDbo();
 		$config = EventbookingHelper::getConfig();
@@ -23,11 +24,11 @@ class EventBookingViewRegistrants extends JViewLegacy
 		//Get list of events				
 		if (EB_ONLY_SHOW_REGISTRANTS_OF_EVENT_OWNER)
 		{
-			$sql = 'SELECT id, title, event_date FROM #__eb_events WHERE published = 1 AND created_by=' . $user->id . ' ORDER BY title';
+			$sql = 'SELECT id, title' . $fieldSuffix . ' AS title, event_date FROM #__eb_events WHERE published = 1 AND created_by=' . $user->id . ' ORDER BY title' . $fieldSuffix;
 		}
 		else
 		{
-			$sql = 'SELECT id, title, event_date FROM #__eb_events WHERE published = 1 ORDER BY title';
+			$sql = 'SELECT id, title' . $fieldSuffix . ' AS title, event_date FROM #__eb_events WHERE published = 1 ORDER BY title' . $fieldSuffix;
 		}
 		$db->setQuery($sql);
 		$options = array();
