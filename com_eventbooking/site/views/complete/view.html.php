@@ -40,14 +40,14 @@ class EventBookingViewComplete extends JViewLegacy
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('EB_INVALID_REGISTRATION_CODE'));
 		}
-		$query->select('a.*, b.payment_method')
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$query->select('a.*, a.title' . $fieldSuffix . ' AS title, b.payment_method')
 			->from('#__eb_events  AS a ')
 			->innerJoin('#__eb_registrants AS b ON a.id = b.event_id')
 			->where('b.id=' . $id);
 		$db->setQuery($query);
 		$rowEvent    = $db->loadObject();
 		$message     = EventbookingHelper::getMessages();
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		//Override thanks message
 		if (strlen(trim(strip_tags($rowEvent->thanks_message))))
 		{
