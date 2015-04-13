@@ -35,10 +35,6 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 				echo $this->lists['filter_event_id'];
 			}
 			echo $this->lists['filter_state'];
-			if (JLanguageMultilang::isEnabled())
-			{
-				echo $this->lists['filter_language'];
-			}
 			if (version_compare(JVERSION, '3.0', 'ge'))
 			{
 				echo $this->pagination->getLimitBox();
