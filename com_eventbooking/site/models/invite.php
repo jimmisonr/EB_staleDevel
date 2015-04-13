@@ -47,7 +47,7 @@ class EventBookingModelInvite extends JModelLegacy
 		{
 			$fromEmail = $app->getCfg('mailfrom');
 		}
-		$sql = "SELECT * FROM #__eb_events WHERE id=" . $eventId;
+		$sql = "SELECT *,title" . $fieldSuffix . " AS title FROM #__eb_events WHERE id=" . $eventId;
 		$db->setQuery($sql);
 		$event = $db->loadObject();
 		$link = JUri::getInstance()->toString(array('scheme', 'host', 'port')) .
