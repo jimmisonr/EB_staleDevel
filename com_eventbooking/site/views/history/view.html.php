@@ -23,13 +23,14 @@ class EventBookingViewHistory extends JViewLegacy
 		$model = $this->getModel();
 		$state = $model->getState();
 		$config = EventbookingHelper::getConfig();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$lists['search'] = JString::strtolower($state->search);
 		$lists['order_Dir'] = $state->filter_order_Dir;
 		$lists['order'] = $state->filter_order;
 		//Get list of document		
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('id, title, event_date')
+		$query->select('id, title' . $fieldSuffix . ' AS title, event_date')
 			->from('#__eb_events')
 			->where('published = 1')
 			->where('id IN (SELECT event_id FROM #__eb_registrants AS tbl WHERE (tbl.published=1 OR tbl.payment_method LIKE "os_offline%") AND (tbl.user_id =' . $user->get('id') . ' OR tbl.email="' . $user->get('email') . '"))')
