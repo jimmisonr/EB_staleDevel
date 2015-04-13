@@ -75,8 +75,7 @@ class EventbookingModelField extends RADModelItem
 			}
 		}
 
-		// Calculate depend on options in different languages
-		// Build alias for other languages
+		// Calculate depend on options in different languages		
 		if (JLanguageMultilang::isEnabled())
 		{
 			$languages = EventbookingHelper::getLanguages();
