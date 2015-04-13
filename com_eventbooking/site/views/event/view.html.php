@@ -95,7 +95,8 @@ class EventBookingViewEvent extends JViewLegacy
 			$this->location = $db->loadObject();
 		}
 		$query->clear();
-		$query->select('name')
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$query->select('name' . $fieldSuffix . ' AS name')
 			->from('#__eb_categories')
 			->where('id=' . $item->category_id);
 		$db->setQuery($query);
@@ -252,8 +253,9 @@ class EventBookingViewEvent extends JViewLegacy
 		$options[] = JHtml::_('select.option', 0, JText::_('Select Location'), 'id', 'name');
 		$options = array_merge($options, $db->loadObjectList());
 		$lists['location_id'] = JHtml::_('select.genericlist', $options, 'location_id', ' class="inputbox" ', 'id', 'name', $item->location_id);
-		
-		$sql = "SELECT id, parent, parent AS parent_id, name, name AS title FROM #__eb_categories";
+
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$sql = "SELECT id, parent, parent AS parent_id, name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title FROM #__eb_categories";
 		$db->setQuery($sql);
 		$rows = $db->loadObjectList();
 		$children = array();
