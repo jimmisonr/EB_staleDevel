@@ -52,7 +52,7 @@ class EventBookingViewRegistrationCancel extends JViewLegacy
 			}
 		}
 		$query->clear();
-		$query->select('a.title')
+		$query->select('a.title'.$fieldSuffix)
 			->from('#__eb_events AS a')
 			->innerJoin('#__eb_registrants AS b ON a.id = b.event_id')
 			->where('b.id=' . $id);
