@@ -24,7 +24,7 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 		<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'Go' ); ?></button>
 		<button onclick="document.getElementById('filter_search').value='';this.form.submit();" class="btn"><?php echo JText::_( 'Reset' ); ?></button>
 	</td>
-	<td style="text-align: right;">
+	<td style="float: right;">
 		<?php ?>
 		<?php
 			echo $this->lists['filter_state'];
