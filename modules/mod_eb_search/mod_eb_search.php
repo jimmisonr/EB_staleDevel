@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        1.6.8
+ * @version        1.7.2
  * @package        Joomla
  * @subpackage     Event Booking
  * @author         Tuan Pham Ngoc
@@ -9,7 +9,6 @@
  */
 defined('_JEXEC') or die ('');
 error_reporting(0);
-$app      = JFactory::getApplication();
 $document = JFactory::getDocument();
 $styleUrl = JURI::base(true) . '/components/com_eventbooking/assets/css/style.css';
 $document->addStylesheet($styleUrl, 'text/css', null, null);
@@ -28,23 +27,12 @@ if (empty($text))
 {
 	$text = JText::_('EB_SEARCH_WORD');
 }
-
 $text = htmlspecialchars($text, ENT_COMPAT, 'UTF-8');
-
-if ($app->getLanguageFilter())
-{
-	$extraWhere = ' AND `language` IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')';
-}
-else
-{
-	$extraWhere = '';
-}
-
 //Build Category Drodown
 if ($showCategory)
 {
-
-	$sql = "SELECT id, parent, parent AS parent_id, name, name AS title FROM #__eb_categories WHERE published = 1 AND (`access` = 0 OR `access` IN (" . implode(',', $user->getAuthorisedViewLevels()) . "))" . $extraWhere . ' ORDER BY ordering ';
+	$fieldSuffix = EventbookingHelper::getFieldSuffix();
+	$sql = "SELECT id, parent, parent AS parent_id, name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title FROM #__eb_categories WHERE published = 1 AND (`access` = 0 OR `access` IN (" . implode(',', $user->getAuthorisedViewLevels()) . "))" . $extraWhere . ' ORDER BY ordering ';
 	$db->setQuery($sql);
 	$rows     = $db->loadObjectList();
 	$children = array();
@@ -79,21 +67,16 @@ if ($showCategory)
 if ($showLocation)
 {
 	$options = array();
-	if ($extraWhere)
-	{
-		$sql = 'SELECT id, name FROM #__eb_locations  WHERE published=1 ' . $extraWhere . ' ORDER BY name ';
-	}
-	else
-	{
-		$sql = 'SELECT id, name FROM #__eb_locations  WHERE published=1 ORDER BY name';
-	}
+	$sql = 'SELECT id, name FROM #__eb_locations  WHERE published=1 ORDER BY name';
 	$db->setQuery($sql);
-	$options[]            = JHTML::_('select.option', 0, JText::_('EB_SELECT_LOCATION'), 'id', 'name');
+	$options[]            = JHtml::_('select.option', 0, JText::_('EB_SELECT_LOCATION'), 'id', 'name');
 	$options              = array_merge($options, $db->loadObjectList());
-	$lists['location_id'] = JHTML::_('select.genericlist', $options, 'location_id', ' class="inputbox location_box" ', 'id', 'name', $locationId);
+	$lists['location_id'] = JHtml::_('select.genericlist', $options, 'location_id', ' class="inputbox location_box" ', 'id', 'name', $locationId);
 }
 $itemId = (int) $params->get('item_id');
 if (!$itemId)
-	$itemId = EventBookingHelper::getItemid();
+{
+	$itemId = EventbookingHelper::getItemid();
+}
 
 require(JModuleHelper::getLayoutPath('mod_eb_search', 'default'));
