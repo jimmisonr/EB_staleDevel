@@ -265,7 +265,8 @@ class EventbookingHelperCart
 			$config   = EventbookingHelper::getConfig();
 			$user     = JFactory::getUser();
 			$nullDate = $db->getNullDate();
-			$sql      = 'SELECT a.*, DATEDIFF(a.early_bird_discount_date, NOW()) AS date_diff, SUM(b.number_registrants) AS total_registrants  FROM #__eb_events AS a LEFT JOIN #__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3)))) WHERE a.id IN (' .
+			$fieldSuffix = EventbookingHelper::getFieldSuffix();
+			$sql = 'SELECT a.*, a.title' . $fieldSuffix . ' AS title , DATEDIFF(a.early_bird_discount_date, NOW()) AS date_diff, SUM(b.number_registrants) AS total_registrants  FROM #__eb_events AS a LEFT JOIN #__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3)))) WHERE a.id IN (' .
 				implode(',', $items) . ') GROUP BY a.id';
 			$db->setQuery($sql);
 			$events = $db->loadObjectList();
