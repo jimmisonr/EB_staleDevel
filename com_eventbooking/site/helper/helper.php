@@ -1918,7 +1918,8 @@ class EventbookingHelper
 	public static function buildCategoryDropdown($selected, $name = "parent", $onChange = true)
 	{
 		$db  = JFactory::getDbo();
-		$sql = "SELECT id, parent, parent AS parent_id, name, name AS title FROM #__eb_categories";
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$sql = "SELECT id, parent, parent AS parent_id, name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title FROM #__eb_categories";
 		$db->setQuery($sql);
 		$rows     = $db->loadObjectList();
 		$children = array();
@@ -1969,7 +1970,8 @@ class EventbookingHelper
 	public static function parentCategories($row)
 	{
 		$db  = JFactory::getDbo();
-		$sql = "SELECT id, parent, parent AS parent_id, name, name AS title FROM #__eb_categories";
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$sql = "SELECT id, parent, parent AS parent_id, name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title FROM #__eb_categories";
 		if ($row->id)
 			$sql .= ' WHERE id != ' . $row->id;
 		if (!$row->parent)
@@ -2918,7 +2920,8 @@ class EventbookingHelper
 		{
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
-			$query->select('a.id, a.name, a.color_code')
+			$fieldSuffix = EventbookingHelper::getFieldSuffix();
+			$query->select('a.id, a.name' . $fieldSuffix . ' AS name, a.color_code')
 				->from('#__eb_categories AS a')
 				->where('published = 1')
 				->where('id IN (SELECT category_id FROM #__eb_event_categories WHERE event_id IN (' . implode(',', $eventIds) . ') AND main_category = 1)');
