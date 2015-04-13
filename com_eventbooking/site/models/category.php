@@ -62,6 +62,7 @@ class EventBookingModelCategory extends EventBookingModelList
 		$app = JFactory::getApplication();
 		$db = JFactory::getDbo();
 		$user = JFactory::getUser();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$hidePastEvents = EventbookingHelper::getConfigValue('hide_past_events');
 		$showMultipleDayEventInCalendar = EventbookingHelper::getConfigValue('show_multiple_days_event_in_calendar');
 		$categoryId = JRequest::getInt('id', 0);
@@ -96,9 +97,9 @@ class EventBookingModelCategory extends EventBookingModelList
 		{
 			$where[] = 'a.language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')';
 		}
-		$query = 'SELECT a.*, SUM(b.number_registrants) AS total_registrants FROM #__eb_events AS a ' . 'LEFT JOIN #__eb_registrants AS b ' .
-			 'ON (a.id = b.event_id ) AND b.group_id = 0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))) ' . 'WHERE ' .
-			 implode(' AND ', $where) . ' GROUP BY a.id ' . ' ORDER BY a.event_date ASC, a.ordering ASC';
+		$query = 'SELECT a.*, title' . $fieldSuffix . ' AS title, SUM(b.number_registrants) AS total_registrants FROM #__eb_events AS a ' . 'LEFT JOIN #__eb_registrants AS b ' .
+			'ON (a.id = b.event_id ) AND b.group_id = 0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))) ' . 'WHERE ' .
+			implode(' AND ', $where) . ' GROUP BY a.id ' . ' ORDER BY a.event_date ASC, a.ordering ASC';
 		$db->setQuery($query);
 		
 		if ($showMultipleDayEventInCalendar)

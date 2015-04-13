@@ -63,17 +63,21 @@ class EventbookingModelCategories extends RADModelList
 
 	protected function _buildQueryWhere(JDatabaseQuery $query)
 	{
-		$app = JFactory::getApplication();
-		$user = JFactory::getUser();
-		$db = JFactory::getDbo();
 		$query->where('tbl.published=1')
 			->where('tbl.parent=' . $this->state->id)
-			->where('tbl.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
-		if ($app->getLanguageFilter())
-		{
-			$query->where('tbl.language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')');
-		}
-		
+			->where('tbl.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
+
+		return $this;
+	}
+
+	/**
+	 * Builds SELECT columns list for the query
+	 */
+	protected function _buildQueryColumns(JDatabaseQuery $query)
+	{
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$query->select('tbl.id, tbl.name' . $fieldSuffix . ' AS name, tbl.description' . $fieldSuffix . ' AS description');
+
 		return $this;
 	}
 }

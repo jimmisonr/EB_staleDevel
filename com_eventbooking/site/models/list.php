@@ -99,7 +99,9 @@ class EventBookingModelList extends RADModelList
 	protected function _buildQueryColumns(JDatabaseQuery $query)
 	{
 		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->select('tbl.*')
+			->select('title' . $fieldSuffix . ' AS title, short_description' . $fieldSuffix . ' AS short_description_description, description' . $fieldSuffix . ' AS description')
 			->select("DATEDIFF(tbl.early_bird_discount_date, '$currentDate') AS date_diff")
 			->select("DATEDIFF(tbl.event_date, '$currentDate') AS number_event_dates")
 			->select("TIMESTAMPDIFF(MINUTE, tbl.registration_start_date, '$currentDate') AS registration_start_minutes")
