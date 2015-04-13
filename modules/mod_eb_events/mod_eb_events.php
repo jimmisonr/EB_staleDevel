@@ -1,19 +1,26 @@
 <?php
-/** * @version		1.6.6 * @package		Joomla * @subpackage	Event Booking * @author  Tuan Pham Ngoc * @copyright	Copyright (C) 2010 - 2015 Ossolution Team * @license		GNU/GPL, see LICENSE.php */
+/**
+ * @version        1.7.2
+ * @package        Joomla
+ * @subpackage     Event Booking
+ * @author         Tuan Pham Ngoc
+ * @copyright      Copyright (C) 2010 - 2015 Ossolution Team
+ * @license        GNU/GPL, see LICENSE.php
+ */
 defined('_JEXEC') or die();
 error_reporting(0);
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/route.php';
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/jquery.php';
 EventbookingHelper::loadLanguage();
-$app = JFactory::getApplication();
-$db = JFactory::getDBO();
+$db = JFactory::getDbo();
 $itemId = (int) $params->get('item_id', 0);
 if (!$itemId)
 {
-	$itemId = EventBookingHelper::getItemid();
+	$itemId = EventbookingHelper::getItemid();
 }
-$user = & JFactory::getUser();
+$user = JFactory::getUser();
+$fieldSuffix = EventbookingHelper::getFieldSuffix();
 $numberEvents = $params->get('number_events', 6);
 $categoryIds = $params->get('category_ids', '');
 $showCategory = $params->get('show_category', 1);
@@ -27,12 +34,8 @@ if ($categoryIds != '')
 	$where[] = ' a.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id IN (' . $categoryIds . '))';
 }
 $where[] = ' a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')';
-if ($app->getLanguageFilter())
-{
-	$where[] = ' a.language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')';
-}
-$sql = 'SELECT a.*, c.name AS location_name FROM #__eb_events AS a ' . ' LEFT JOIN #__eb_locations AS c ' . ' ON a.location_id = c.id ' . ' WHERE ' .
-	 implode(' AND ', $where) . ' ORDER BY a.event_date ' . ' LIMIT ' . $numberEvents;
+$sql = 'SELECT a.*,a.title' . $fieldSuffix . ' AS title, c.name AS location_name FROM #__eb_events AS a ' . ' LEFT JOIN #__eb_locations AS c ' . ' ON a.location_id = c.id ' . ' WHERE ' .
+	implode(' AND ', $where) . ' ORDER BY a.event_date ' . ' LIMIT ' . $numberEvents;
 $db->setQuery($sql);
 $rows = $db->loadObjectList();
 for ($i = 0, $n = count($rows); $i < $n; $i++)
@@ -53,7 +56,7 @@ for ($i = 0, $n = count($rows); $i < $n; $i++)
 		$row->categories = implode('&nbsp;|&nbsp;', $itemCategories);
 	}
 }
-$config = EventBookingHelper::getConfig();
+$config = EventbookingHelper::getConfig();
 $layout = $params->get('layout', 'default');
 $document = JFactory::getDocument();
 if ($layout == 'default')
