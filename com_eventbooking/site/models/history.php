@@ -54,7 +54,8 @@ class EventBookingModelHistory extends RADModelList
 	 */
 	protected function _buildQueryColumns(JDatabaseQuery $query)
 	{
-		$query->select('tbl.*')->select('b.title, b.event_date');
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$query->select('tbl.*')->select('b.title' . $fieldSuffix . ' AS title, b.event_date');
 		return $this;
 	}
 
