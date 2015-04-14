@@ -82,10 +82,10 @@ class EventBookingModelList extends RADModelList
 	 */
 	public function getCategory()
 	{
-		$db         = $this->getDbo();
-		$query      = $db->getQuery(true);
+		$db          = $this->getDbo();
+		$query       = $db->getQuery(true);
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$categoryId = $this->state->id ? $this->state->id : $this->state->category_id;
+		$categoryId  = $this->state->id ? $this->state->id : $this->state->category_id;
 		$query->select('*, name' . $fieldSuffix . ' AS name')
 			->from('#__eb_categories')
 			->where('id=' . $categoryId);
@@ -120,7 +120,7 @@ class EventBookingModelList extends RADModelList
 	{
 		$query->leftJoin(
 			'#__eb_registrants AS b ON (tbl.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')->leftJoin(
-				'#__eb_locations AS c ON tbl.location_id = c.id ');
+			'#__eb_locations AS c ON tbl.location_id = c.id ');
 
 		return $this;
 	}
@@ -159,10 +159,6 @@ class EventBookingModelList extends RADModelList
 		{
 			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
 			$query->where('DATE(tbl.event_date) >= "' . $currentDate . '"');
-		}
-		if (JFactory::getApplication()->getLanguageFilter())
-		{
-			$query->where('tbl.language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')');
 		}
 
 		return $this;
