@@ -127,7 +127,7 @@ if ($this->config->activate_invoice_feature)
 			{				
 			?>
 				<th width="8%">
-					<?php echo JHtml::_('grid.sort',  JText::_('EB_INVOICE_NUMBER'), 'tbl.invoice_number', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					<?php echo JHtml::_('grid.sort',  JText::_('EB_INVOICE_NUMBER'), 'tbl.invoice_number', $this->state->filter_order_Dir, $this->state->filter_order); ?>
 				</th>
 			<?php	
 			}   
