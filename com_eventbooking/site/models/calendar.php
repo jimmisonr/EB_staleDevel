@@ -77,37 +77,36 @@ class EventBookingModelCalendar extends JModelLegacy
 	 */
 	function getEventsByMonth($year, $month)
 	{
-		$fieldSuffix                    = EventbookingHelper::getFieldSuffix();
-		$hidePastEvents                 = EventbookingHelper::getConfigValue('hide_past_events');
-		$showMultipleDayEventInCalendar = EventbookingHelper::getConfigValue('show_multiple_days_event_in_calendar');
-		$db                             = JFactory::getDbo();
-		$user                           = JFactory::getUser();
-		$startDate                      = mktime(0, 0, 0, $month, 1, $year);
-		$endDate                        = mktime(23, 59, 59, $month, date('t', $startDate), $year);
-		$startDate                      = date('Y-m-d', $startDate) . " 00:00:00";
-		$endDate                        = date('Y-m-d', $endDate) . " 23:59:59";
-		$where                          = array();
-		$where[]                        = 'a.`published` = 1';
-		if ($showMultipleDayEventInCalendar)
+		$config      = EventbookingHelper::getConfig();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
+		$startDate   = mktime(0, 0, 0, $month, 1, $year);
+		$endDate     = mktime(23, 59, 59, $month, date('t', $startDate), $year);
+		$startDate   = date('Y-m-d', $startDate) . " 00:00:00";
+		$endDate     = date('Y-m-d', $endDate) . " 23:59:59";
+		$query->select('a.*,title' . $fieldSuffix . ' AS title, SUM(b.number_registrants) AS total_registrants')
+			->from('#__eb_events AS a')
+			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id ) AND b.group_id = 0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3)))')
+			->where('a.published = 1')
+			->where('a.access in (' . implode(',' ,JFactory::getUser()->getAuthorisedViewLevels()) . ')')
+			->group('a.id')
+			->order('a.event_date ASC, a.ordering ASC');
+		if ($config->show_multiple_days_event_in_calendar)
 		{
-			$where[] = "((`event_date` BETWEEN '$startDate' AND '$endDate') OR (MONTH(event_end_date) = $month AND YEAR(event_end_date) = $year ))";
+			$query->where("((`event_date` BETWEEN '$startDate' AND '$endDate') OR (MONTH(event_end_date) = $month AND YEAR(event_end_date) = $year ))");
 		}
 		else
 		{
-			$where[] = "`event_date` BETWEEN '$startDate' AND '$endDate'";
+			$query->where("`event_date` BETWEEN '$startDate' AND '$endDate'");
 		}
-		if ($hidePastEvents)
+		if ($config->hide_past_events)
 		{
 			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
-			$where[]     = 'DATE(event_date) >= "' . $currentDate . '"';
+			$query->where('DATE(event_date) >= ' . $db->quote($currentDate));
 		}
-		$where[] = "a.access IN (" . implode(',', $user->getAuthorisedViewLevels()) . ")";
-		$query   = 'SELECT a.*,title' . $fieldSuffix . ' AS title, SUM(b.number_registrants) AS total_registrants FROM #__eb_events AS a ' . 'LEFT JOIN #__eb_registrants AS b ' .
-			'ON (a.id = b.event_id ) AND b.group_id = 0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))) ' . 'WHERE ' .
-			implode(' AND ', $where) . ' GROUP BY a.id ' . ' ORDER BY a.event_date ASC, a.ordering ASC';
 		$db->setQuery($query);
-
-		if ($showMultipleDayEventInCalendar)
+		if ($config->show_multiple_days_event_in_calendar)
 		{
 			$rows      = $db->loadObjectList();
 			$rowEvents = array();
@@ -149,10 +148,11 @@ class EventBookingModelCalendar extends JModelLegacy
 
 	function getEventsByWeek()
 	{
-		$hidePastEvents = EventbookingHelper::getConfigValue('hide_past_events');
-		$fieldSuffix    = EventbookingHelper::getFieldSuffix();
-		$db             = JFactory::getDbo();
-		$user           = JFactory::getUser();
+		$config      = EventbookingHelper::getConfig();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
+
 		// get first day of week of today
 		$day               = 0;
 		$week_number       = date('W', time());
@@ -163,18 +163,20 @@ class EventBookingModelCalendar extends JModelLegacy
 		$startDate         = $first_day_of_week . " 00:00:00";
 		$endDate           = $last_day_of_week . " 23:59:59";
 
-		if ($hidePastEvents)
+
+		$query->select('a.*')
+			->select('a.title' . $fieldSuffix . ' AS title')
+			->select('b.name AS location_name')
+			->from('#__eb_events AS a')
+			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')
+			->where('a.published = 1')
+			->where("(a.event_date BETWEEN '$startDate' AND '$endDate')")
+			->where('a.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
+		if ($config->hide_past_events)
 		{
-			$query = " SELECT a.*, a.title" . $fieldSuffix . " AS title,b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON a.location_id = b.id " .
-				" WHERE (a.published = 1) AND (a.event_date BETWEEN '$startDate' AND '$endDate') AND DATE(a.event_date) >= '" . JHtml::_('date', 'Now', 'Y-m-d') . "' AND a.access IN(" .
-				implode(',', $user->getAuthorisedViewLevels()) . ")  ORDER BY a.event_date ASC, a.ordering ASC";
+			$query->where('DATE(event_date) >=' . JHtml::_('date', 'Now', 'Y-m-d'));
 		}
-		else
-		{
-			$query = " SELECT a.*,a.title" . $fieldSuffix . " AS title, b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON a.location_id = b.id " .
-				" WHERE (a.published = 1) AND (a.event_date BETWEEN '$startDate' AND '$endDate') AND a.access IN (" .
-				implode(',', $user->getAuthorisedViewLevels()) . ") ORDER BY a.event_date ASC, a.ordering ASC";
-		}
+		$query->order('a.event_date ASC, a.ordering ASC');
 
 		$db->setQuery($query);
 		$events   = $db->loadObjectList();
@@ -193,30 +195,29 @@ class EventBookingModelCalendar extends JModelLegacy
 	 */
 	function getEventsByDaily()
 	{
-		$hidePastEvents = EventbookingHelper::getConfigValue('hide_past_events');
-		$fieldSuffix    = EventbookingHelper::getFieldSuffix();
-		$db             = JFactory::getDbo();
-		$user           = JFactory::getUser();
-		$day            = JRequest::getVar('day', date('Y-m-d', time()));
-		$startDate      = $day . " 00:00:00";
-		$endDate        = $day . " 23:59:59";
-		if ($hidePastEvents)
+		$config      = EventbookingHelper::getConfig();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
+		$day         = JRequest::getVar('day', JHtml::_('date', 'Now', 'Y-m-d'));
+		$startDate   = $day . " 00:00:00";
+		$endDate     = $day . " 23:59:59";
+		$query->select('a.*')
+			->select('a.title' . $fieldSuffix . ' AS title')
+			->select('b.name AS location_name')
+			->from('#__eb_events AS a')
+			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')
+			->where('a.published = 1')
+			->where("(a.event_date BETWEEN '$startDate' AND '$endDate')")
+			->where('a.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
+		if ($config->hide_past_events)
 		{
-			$query = " SELECT a.*, a.title " . $fieldSuffix . " AS title,b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON b.id = a.location_id " .
-				" WHERE (a.published = 1) AND (a.event_date BETWEEN '$startDate' AND '$endDate') AND DATE(event_date) >= '" . JHtml::_('date', 'Now', 'Y-m-d') . "' AND a.access IN (" .
-				implode(',', $user->getAuthorisedViewLevels()) . ") ORDER BY a.event_date ASC, a.ordering ASC";
+			$query->where('DATE(event_date) >=' . JHtml::_('date', 'Now', 'Y-m-d'));
 		}
-		else
-		{
-			$query = " SELECT a.*, a,title" . $fieldSuffix . " AS title ,b.name AS location_name FROM #__eb_events AS a " . " LEFT JOIN #__eb_locations AS b ON b.id = a.location_id " .
-				" WHERE (a.published = 1) AND (a.event_date BETWEEN '$startDate' AND '$endDate') AND a.access IN (" .
-				implode(',', $user->getAuthorisedViewLevels()) . ") ORDER BY a.event_date ASC, a.ordering ASC";
-		}
-		$db->setQuery($query);
-		$events = $db->loadObjectList();
+		$query->order('a.event_date ASC, a.ordering ASC');
 
-		return $events;
+		$db->setQuery($query);
+
+		return $db->loadObjectList();
 	}
 }
-
-?>
