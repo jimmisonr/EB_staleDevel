@@ -60,45 +60,43 @@ class EventBookingModelCategory extends EventBookingModelList
 
 	function getEventsByMonth($year, $month)
 	{
-		$db                             = JFactory::getDbo();
-		$user                           = JFactory::getUser();
-		$fieldSuffix                    = EventbookingHelper::getFieldSuffix();
-		$hidePastEvents                 = EventbookingHelper::getConfigValue('hide_past_events');
-		$showMultipleDayEventInCalendar = EventbookingHelper::getConfigValue('show_multiple_days_event_in_calendar');
-		$categoryId                     = JRequest::getInt('id', 0);
-		$startdate                      = mktime(0, 0, 0, $month, 1, $year);
-		$enddate                        = mktime(23, 59, 59, $month, date('t', $startdate), $year);
-		$startdate                      = date('Y-m-d', $startdate) . " 00:00:00";
-		$enddate                        = date('Y-m-d', $enddate) . " 23:59:59";
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
+		$config      = EventbookingHelper::getConfig();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$categoryId  = JRequest::getInt('id', 0);
+		$startDate   = mktime(0, 0, 0, $month, 1, $year);
+		$endDate     = mktime(23, 59, 59, $month, date('t', $startDate), $year);
+		$startDate   = date('Y-m-d', $startDate) . " 00:00:00";
+		$endDate     = date('Y-m-d', $endDate) . " 23:59:59";
 
-		$where = array();
+		$query->select('a.*,title' . $fieldSuffix . ' AS title, SUM(b.number_registrants) AS total_registrants')
+			->from('#__eb_events AS a')
+			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id ) AND b.group_id = 0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3)))')
+			->where('a.published = 1')
+			->where('a.access in (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
+			->group('a.id')
+			->order('a.event_date ASC, a.ordering ASC');
 
-		$where[] = 'a.`published` = 1';
-		if ($categoryId)
+		if ($categoryId > 0)
 		{
-			$where[] = "a.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id=$categoryId )";
+			$query->where("a.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id=$categoryId)");
 		}
-		if ($showMultipleDayEventInCalendar)
+		if ($config->show_multiple_days_event_in_calendar)
 		{
-			$where[] = "((`event_date` BETWEEN '$startdate' AND '$enddate') OR (MONTH(event_end_date) = $month AND YEAR(event_end_date) = $year ))";
+			$query->where("((`event_date` BETWEEN '$startDate' AND '$endDate') OR (MONTH(event_end_date) = $month AND YEAR(event_end_date) = $year ))");
 		}
 		else
 		{
-			$where[] = "`event_date` BETWEEN '$startdate' AND '$enddate'";
+			$query->where("`event_date` BETWEEN '$startDate' AND '$endDate'");
 		}
-
-		if ($hidePastEvents)
+		if ($config->hide_past_events)
 		{
 			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
-			$where[]     = 'DATE(event_date) >= "' . $currentDate . '"';
+			$query->where('DATE(event_date) >= ' . $db->quote($currentDate));
 		}
-		$where[] = "a.access IN (" . implode(',', $user->getAuthorisedViewLevels()) . ")";
-		$query = 'SELECT a.*, title' . $fieldSuffix . ' AS title, SUM(b.number_registrants) AS total_registrants FROM #__eb_events AS a ' . 'LEFT JOIN #__eb_registrants AS b ' .
-			'ON (a.id = b.event_id ) AND b.group_id = 0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))) ' . 'WHERE ' .
-			implode(' AND ', $where) . ' GROUP BY a.id ' . ' ORDER BY a.event_date ASC, a.ordering ASC';
 		$db->setQuery($query);
-
-		if ($showMultipleDayEventInCalendar)
+		if ($config->show_multiple_days_event_in_calendar)
 		{
 			$rows      = $db->loadObjectList();
 			$rowEvents = array();
