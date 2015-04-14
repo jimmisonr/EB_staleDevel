@@ -87,7 +87,7 @@ class EventbookingViewFieldHtml extends RADViewItem
 				{
 					$row = $rows[$i];
 					$options[] = JHtml::_('select.option', $row->id, 
-						$row->title . ' (' . JHtml::_('date', $row->event_date, $config->date_format) . ')' . '', 'id', 'title');
+						$row->title . ' (' . JHtml::_('date', $row->event_date, $config->date_format, null) . ')' . '', 'id', 'title');
 				}
 			}
 			else
