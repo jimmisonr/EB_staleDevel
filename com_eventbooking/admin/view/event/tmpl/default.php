@@ -189,21 +189,6 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 								?>
 							</td>
 						</tr>
-						<?php
-							if (JLanguageMultilang::isEnabled())
-							{
-							?>
-								<tr>
-									<td class="key">
-										<?php echo JText::_('EB_LANGUAGE'); ?>
-									</td>
-									<td>
-										<?php echo $this->lists['language']; ?>
-									</td>
-								</tr>
-							<?php
-							}
-						?>
 						<tr>
 							<td class="key">
 								<?php echo  JText::_('EB_SHORT_DESCRIPTION'); ?>

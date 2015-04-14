@@ -369,22 +369,6 @@ if ($translatable)
 				</tr>
 			<?php	
 			}
-			if (JLanguageMultilang::isEnabled())
-			{
-			?>
-				<tr>
-					<td class="key">
-						<?php echo JText::_('EB_LANGUAGE'); ?>
-					</td>
-					<td>
-						<?php echo $this->lists['language'] ; ?>
-					</td>
-					<td>
-						&nbsp;
-					</td>
-				</tr>
-			<?php
-			}
 		?>
         <tr>
             <td class="key">
