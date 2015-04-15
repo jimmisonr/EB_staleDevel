@@ -63,13 +63,18 @@ class modMiniCalendarHelper
 	public static function _listIcalEventsByMonth($year, $month)
 	{
 		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$startdate   = mktime(0, 0, 0, $month, 1, $year);
-		$enddate     = mktime(23, 59, 59, $month, date('t', $startdate), $year);
-		$startdate   = date('Y-m-d', $startdate) . " 00:00:00";
-		$enddate     = date('Y-m-d', $enddate) . " 23:59:59";
-		$query       = " SELECT *, title" . $fieldSuffix . " AS title FROM #__eb_events " . " WHERE (`published` = 1) AND (`event_date` BETWEEN '$startdate' AND '$enddate') AND `access` IN (" . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ") "
-			. " ORDER BY event_date ASC, ordering ASC";
+		$startDate   = mktime(0, 0, 0, $month, 1, $year);
+		$endDate     = mktime(23, 59, 59, $month, date('t', $startDate), $year);
+		$startDate   = date('Y-m-d', $startDate) . " 00:00:00";
+		$endDate     = date('Y-m-d', $endDate) . " 23:59:59";
+		$query->select("*, title" . $fieldSuffix . " AS title")
+			->from('#__eb_events')
+			->where('published = 1')
+			->where("(`event_date` BETWEEN '$startDate' AND '$endDate')")
+			->where("`access` IN (" . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ")")
+			->order('event_date ASC, ordering ASC');
 		$db->setQuery($query);
 
 		return $db->loadObjectList();
