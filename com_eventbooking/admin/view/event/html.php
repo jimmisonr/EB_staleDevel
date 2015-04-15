@@ -99,14 +99,14 @@ class EventbookingViewEventHtml extends RADViewItem
 			'option.text.toHtml' => false ,
 			'option.text' => 'text' ,
 			'option.value' => 'value',
-			'list.attr' => 'class="inputbox chosen"',
+			'list.attr' => '',
 			'list.select' => $mainCategoryId
 		));		
 		$this->lists['category_id'] = JHtml::_('select.genericlist', $options, 'category_id[]', array(
 				'option.text.toHtml' => false ,
 				'option.text' => 'text' ,
 				'option.value' => 'value',
-				'list.attr' => 'class="input-xlarge chosen"  size="5" multiple="multiple"',
+				'list.attr' => 'class="inputbox"  size="5" multiple="multiple"',
 				'list.select' => $additionalCategories
 		));								
 		$options = array();		

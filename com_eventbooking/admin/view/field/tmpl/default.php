@@ -10,10 +10,6 @@
 // no direct access
 defined( '_JEXEC' ) or die ;
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
-if (version_compare(JVERSION, '3.0', 'ge'))
-{
-	JHtml::_('formbehavior.chosen', 'select.chosen');
-}
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function(pressbutton) {

@@ -14,10 +14,6 @@ JHtml::_('behavior.tooltip');
 JHtml::_('behavior.modal');
 $format = 'Y-m-d';
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
-if (version_compare(JVERSION, '3.0', 'ge'))
-{
-	JHtml::_('formbehavior.chosen', 'select.chosen');
-}
 ?>
 <style>
 	.calendar {
@@ -86,14 +82,15 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 						</tr>
 						<tr>
 							<td class="key" valign="top"><?php echo JText::_('EB_MAIN_EVENT_CATEGORY') ; ?></td>
-							<td style="padding-bottom: 10px; padding-top: 5px;">
-								<div style="float: left;"><?php echo $this->lists['main_category_id'] ; ?></div>
+							<td>
+								<div style="float: left;"><?php echo $this->lists['main_category_id'] ; ?></div>								
 							</td>
 						</tr>
 						<tr>
 							<td class="key" valign="top"><?php echo JText::_('EB_ADDITIONAL_CATEGORIES') ; ?></td>
-							<td style="padding-bottom: 10px;">
+							<td>
 								<div style="float: left;"><?php echo $this->lists['category_id'] ; ?></div>
+								<div style="float: left; padding-top: 25px; padding-left: 10px;">Press <strong>Ctrl</strong> to select multiple categories</div>
 							</td>
 						</tr>
 						<tr>
