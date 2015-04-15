@@ -101,7 +101,7 @@ abstract class EventbookingHelperHtml
 				'option.text.toHtml' => false, 
 				'option.text' => 'text', 
 				'option.value' => 'value', 
-				'list.attr' => 'class="inputbox" ' . $attr, 
+				'list.attr' => 'class="inputbox chosen" ' . $attr,
 				'list.select' => $selected));
 	}
 

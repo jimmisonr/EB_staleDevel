@@ -10,6 +10,10 @@
 // no direct access
 defined( '_JEXEC' ) or die ;
 $editor = JFactory::getEditor();
+if (version_compare(JVERSION, '3.0', 'ge'))
+{
+	JHtml::_('formbehavior.chosen', 'select.chosen');
+}
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 ?>
 <script type="text/javascript">
@@ -64,7 +68,7 @@ if ($translatable)
 			<td class="key">
 				<?php echo  JText::_('EB_PARENT'); ?>
 			</td>
-			<td>
+			<td style="padding-bottom: 10px;">
 				<?php echo $this->lists['parent']; ?>	
 			</td>				
 		</tr>
