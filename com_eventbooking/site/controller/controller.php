@@ -253,7 +253,20 @@ class EventbookingController extends JControllerLegacy
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 		{
 			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			$res = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
+			if(!$captchaPlugin)
+			{
+				// Hardcode to recaptcha, reduce support request
+				$captchaPlugin = 'recaptcha';
+			}
+			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+			if ($plugin)
+			{
+				$res = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
+			}
+			else
+			{
+				$res = true;
+			}
 			if (!$res)
 			{
 				JError::raiseWarning('', JText::_('EB_INVALID_CAPTCHA_ENTERED'));
@@ -356,7 +369,20 @@ class EventbookingController extends JControllerLegacy
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 		{
 			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			$res = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
+			if(!$captchaPlugin)
+			{
+				// Hardcode to recaptcha, reduce support request
+				$captchaPlugin = 'recaptcha';
+			}
+			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+			if ($plugin)
+			{
+				$res = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
+			}
+			else
+			{
+				$res = true;
+			}
 			if (!$res)
 			{
 				JError::raiseWarning('', JText::_('EB_INVALID_CAPTCHA_ENTERED'));
@@ -480,7 +506,22 @@ class EventbookingController extends JControllerLegacy
 		if (($config->enable_captcha != 0) && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 		{
 			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			$res = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
+			if(!$captchaPlugin)
+			{
+				// Hardcode to recaptcha, reduce support request
+				$captchaPlugin = 'recaptcha';
+			}
+
+			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+			if ($plugin)
+			{
+				$res = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
+			}
+			else
+			{
+				$res = true;
+			}
+
 			if (!$res)
 			{
 				$input->set('captcha_invalid', 1);

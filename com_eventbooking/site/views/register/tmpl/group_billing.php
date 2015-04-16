@@ -608,16 +608,36 @@ else
 				<?php
 					if ($this->showCaptcha && $this->captchaPlugin == 'recaptcha')
 					{						
-						$recaptchaPlugin = JPluginHelper::getPlugin('captcha', 'recaptcha');
-						$params = $recaptchaPlugin->params;
-						$pubkey = $params->get('public_key', '');						
-						$theme  = $params->get('theme', 'clean');
-					?>
-						Recaptcha.create("<?php echo $pubkey; ?>", "dynamic_recaptcha_1", {theme: "<?php echo $theme; ?>"});
-					<?php	
-					} 
-				?>	
-
+						$captchaPlugin = JPluginHelper::getPlugin('captcha', 'recaptcha');
+						$params = $captchaPlugin->params;
+						$version    = $params->get('version', '1.0');
+						$pubkey = $params->get('public_key', '');
+						if ($version == '1.0')
+						{
+							$theme  = $params->get('theme', 'clean');
+						?>
+							Recaptcha.create("<?php echo $pubkey; ?>", "dynamic_recaptcha_1", {theme: "<?php echo $theme; ?>"});
+						<?php
+						}
+						else
+						{
+							$theme = $params->get('theme2', 'light');
+							$langTag = JFactory::getLanguage()->getTag();
+							if (JFactory::getApplication()->isSSLConnection())
+							{
+								$file = 'https://www.google.com/recaptcha/api.js?hl=' . $langTag . '&onload=onloadCallback&render=explicit';
+							}
+							else
+							{
+								$file = 'http://www.google.com/recaptcha/api.js?hl=' . $langTag . '&onload=onloadCallback&render=explicit';
+							}
+							JHtml::_('script', $file, true, true);
+							?>
+								grecaptcha.render("dynamic_recaptcha_1", {sitekey: "' . <?php echo $pubkey;?> . '", theme: "' . <?php echo $theme; ?> . '"});
+							<?php
+						}
+					}
+				?>
 				$('#btn-group-billing-back').click(function(){
 					$.ajax({
 						url: siteUrl + 'index.php?option=com_eventbooking&view=register&layout=group_members&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
