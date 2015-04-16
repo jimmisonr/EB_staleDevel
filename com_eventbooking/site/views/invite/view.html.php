@@ -40,7 +40,13 @@ class EventBookingViewInvite extends JViewLegacy
 			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 			{
 				$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-				if ($captchaPlugin)
+				if(!$captchaPlugin)
+				{
+					// Hardcode to recaptcha, reduce support request
+					$captchaPlugin = 'recaptcha';
+				}
+				$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+				if ($plugin)
 				{
 					$showCaptcha = 1;									
 					$this->captcha = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
