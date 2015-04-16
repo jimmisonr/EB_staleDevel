@@ -87,58 +87,76 @@ if ($this->showCaptcha)
 					<?php	
 					}
 					if ($this->showCaptcha && $this->captchaPlugin == 'recaptcha')
-					{						
-						$recaptchaPlugin = JPluginHelper::getPlugin('captcha', 'recaptcha');
-						$params = $recaptchaPlugin->params;
-						$pubkey = $params->get('public_key', '');						
-						$theme  = $params->get('theme', 'clean');
+					{
+						$captchaPlugin = JPluginHelper::getPlugin('captcha', 'recaptcha');
+						$params = $captchaPlugin->params;
+						$version    = $params->get('version', '1.0');
+						$pubkey = $params->get('public_key', '');
+						if ($version == '1.0')
+						{
+							$theme  = $params->get('theme', 'clean');
+						?>
+							Recaptcha.create("<?php echo $pubkey; ?>", "dynamic_recaptcha_1", {theme: "<?php echo $theme; ?>"});
+						<?php
+						}
+						else
+						{
+							$theme = $params->get('theme2', 'light');
+							$langTag = JFactory::getLanguage()->getTag();
+							if (JFactory::getApplication()->isSSLConnection())
+							{
+								$file = 'https://www.google.com/recaptcha/api.js?hl=' . $langTag . '&onload=onloadCallback&render=explicit';
+							}
+							else
+							{
+								$file = 'http://www.google.com/recaptcha/api.js?hl=' . $langTag . '&onload=onloadCallback&render=explicit';
+							}
+							JHtml::_('script', $file, true, true);
+						?>
+							grecaptcha.render("dynamic_recaptcha_1", {sitekey: "' . <?php echo $pubkey;?> . '", theme: "' . <?php echo $theme; ?> . '"});
+						<?php
+						}
+					}
+					if ($this->showBillingStep)
+					{
 					?>
-						Recaptcha.create("<?php echo $pubkey; ?>", "dynamic_recaptcha_1", {theme: "<?php echo $theme; ?>"});
-					<?php	
-					} 
+						$('#btn-process-group-members').click(function(){
+							var formValid = $('#eb-form-group-members').validationEngine('validate');
+							if (formValid)
+							{
+								$.ajax({
+									url: siteUrl + 'index.php?option=com_eventbooking&task=store_group_members_data&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
+									type: 'post',
+									data: $('#eb-form-group-members').serialize(),
+									dataType: 'html',
+									beforeSend: function() {
+										$('#btn-process-group-members').attr('disabled', true);
+										$('#btn-process-group-members').after('<span class="wait">&nbsp;<img src="<?php echo JUri::base(true);?>/media/com_eventbooking/ajax-loadding-animation.gif" alt="" /></span>');
+									},
+									complete: function() {
+										$('#btn-process-group-members').attr('disabled', false);
+										$('.wait').remove();
+									},
+									success: function(html) {
+										$('#eb-group-billing .eb-form-content').html(html);
+										$('#eb-group-members-information .eb-form-content').slideUp('slow');
+										$('#eb-group-billing .eb-form-content').slideDown('slow');
+										if ($('#email').val())
+										{
+											$('#email').validationEngine('validate');
+										}
+										$('#return_url').val(returnUrl);
+									},
+									error: function(xhr, ajaxOptions, thrownError) {
+										alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+									}
+								});
+							}
+						});
+					<?php
+					}
 				?>
 
-				<?php
-						if ($this->showBillingStep)
-						{
-						?>
-							$('#btn-process-group-members').click(function(){
-								var formValid = $('#eb-form-group-members').validationEngine('validate');
-								if (formValid)
-								{							
-									$.ajax({							    	
-										url: siteUrl + 'index.php?option=com_eventbooking&task=store_group_members_data&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
-										type: 'post',
-										data: $('#eb-form-group-members').serialize(),
-										dataType: 'html',
-										beforeSend: function() {
-											$('#btn-process-group-members').attr('disabled', true);
-											$('#btn-process-group-members').after('<span class="wait">&nbsp;<img src="<?php echo JUri::base(true);?>/media/com_eventbooking/ajax-loadding-animation.gif" alt="" /></span>');
-										},	
-										complete: function() {
-											$('#btn-process-group-members').attr('disabled', false);
-											$('.wait').remove();
-										},				
-										success: function(html) {						
-											$('#eb-group-billing .eb-form-content').html(html);
-											$('#eb-group-members-information .eb-form-content').slideUp('slow');
-											$('#eb-group-billing .eb-form-content').slideDown('slow');
-											if ($('#email').val())
-											{												
-												$('#email').validationEngine('validate'); 
-											}															
-											$('#return_url').val(returnUrl);																															
-										},
-										error: function(xhr, ajaxOptions, thrownError) {
-											alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
-										}
-									});
-								}					
-							});		
-						<?php	
-						}				
-					?>
-				
 				$('#btn-group-members-back').click(function(){
 					$.ajax({
 						url: siteUrl + 'index.php?option=com_eventbooking&view=register&layout=number_members&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
