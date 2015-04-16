@@ -322,10 +322,26 @@ class RADForm
 	{
 		jimport('joomla.filesystem.folder');	
 		JTable::addIncludePath(JPATH_ROOT.'/administrator/components/com_eventbooking/tables');	
-		$rowFieldValue = JTable::getInstance('EventBooking', 'Fieldvalue');					
-		$db = JFactory::getDbo();
+		$rowFieldValue = JTable::getInstance('EventBooking', 'Fieldvalue');
+		$fieldIds     = array(0);
+		$fileFieldIds = array(0);
+		foreach ($this->fields as $field)
+		{
+			$fieldType = strtolower($field->type);
+			if ($fieldType != 'file')
+			{
+				$fieldIds[] = $field->id;
+			}
+			else
+			{
+				$fileFieldIds[] = $field->id;
+			}
+		}
+
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->delete('#__eb_field_values')->where('registrant_id=' . (int) $registrantId);
+		$query->delete('#__eb_field_values')->where('registrant_id=' . (int) $registrantId)
+			->where('field_id IN (' . implode(',', $fieldIds) . ')');
 		$db->setQuery($query);
 		$db->execute();
 		foreach ($this->fields as $field)
@@ -377,6 +393,15 @@ class RADForm
 			$fieldValue = isset($data[$field->name]) ? $data[$field->name] : '';
 			if ($fieldValue != '')
 			{
+				if (in_array($field->id, $fileFieldIds))
+				{
+					$query->clear();
+					$query->delete('#__eb_field_values')
+						->where('registrant_id=' . (int) $registrantId)
+						->where('field_id = ' . $field->id);
+					$db->setQuery($query);
+					$db->execute();
+				}
 				$rowFieldValue->id = 0;
 				$rowFieldValue->field_id = $field->row->id;
 				$rowFieldValue->registrant_id = $registrantId;
