@@ -115,7 +115,7 @@ $format = 'Y-m-d' ;
 </div>
 <div class="clearfix"></div>
 <form action="index.php" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data" class="form form-horizontal">
-<div class="row-fluid">
+<div class="row-fluid eb-container">
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="#basic-information-page" data-toggle="tab"><?php echo JText::_('EB_BASIC_INFORMATION');?></a></li>
 		<?php
