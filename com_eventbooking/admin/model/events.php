@@ -23,7 +23,7 @@ class EventbookingModelEvents extends RADModelList
 		$context = $this->option . '.' . $this->name . '.';
 		$this->state->insert('filter_category_id', 'int', $app->getUserStateFromRequest($context . 'filter_category_id', 'filter_category_id', 0))
 			->insert('filter_location_id', 'int', $app->getUserStateFromRequest($context . 'filter_location_id', 'filter_location_id', 0))
-			->insert('filter_past_events', 'int', $app->getUserStateFromRequest($context . 'filter_past_events', 'filter_past_events', -1))
+			->insert('filter_past_events', 'int', $app->getUserStateFromRequest($context . 'filter_past_events', 'filter_past_events', 0))
             ->insert('filter_order_Dir', 'word', $app->getUserStateFromRequest($context . 'filter_order_Dir', 'filter_order_Dir', 'DESC'));
 	}
 
