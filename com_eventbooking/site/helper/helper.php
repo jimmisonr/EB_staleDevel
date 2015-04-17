@@ -3026,9 +3026,20 @@ class EventbookingHelper
 	public static function loadBootstrap($loadJs = true)
 	{
 		$app = JFactory::getApplication();
+		$document = JFactory::getDocument();
+		$document->addStyleSheet(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/css/bootstrap.css');
+
+		// Load bootstrap tabs css
+		if ($app->isAdmin())
+		{
+			$document->addStyleSheet(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/css/bootstrap-tabs-backend.css');
+		}
+		else
+		{
+			$document->addStyleSheet(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/css/bootstrap-tabs.css');
+		}
 		if (version_compare(JVERSION, '3.0', 'ge'))
 		{
-			JHtml::_('bootstrap.loadCss');
 			if ($loadJs && $app->isAdmin())
 			{
 				JHtml::_('bootstrap.framework');
@@ -3040,8 +3051,6 @@ class EventbookingHelper
 		}
 		else
 		{
-			$document = JFactory::getDocument();
-			$document->addStyleSheet(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/css/bootstrap.css');
 			if ($loadJs && $app->isAdmin())
 			{
 				$document->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/jquery.min.js');
