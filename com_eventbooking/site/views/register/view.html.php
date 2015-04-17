@@ -468,8 +468,7 @@ class EventBookingViewRegister extends JViewLegacy
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$showCaptcha = 0;
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
-		{
-			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+		{			
 			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
 			if(!$captchaPlugin)
 			{
