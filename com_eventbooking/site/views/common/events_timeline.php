@@ -9,8 +9,19 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
-$timeFormat = $config->event_time_format ? $config->event_time_format : 'g:i a';
-$dateFormat = $config->date_format;
+$timeFormat        = $config->event_time_format ? $config->event_time_format : 'g:i a';
+$dateFormat        = $config->date_format;
+$rowFluidClass     = $bootstrapHelper->getClassMapping('row-fluid');
+$span8Class        = $bootstrapHelper->getClassMapping('span8');
+$span4Class        = $bootstrapHelper->getClassMapping('span4');
+$btnClass          = $bootstrapHelper->getClassMapping('btn');
+$btnInverseClass   = $bootstrapHelper->getClassMapping('btn-inverse');
+$iconOkClass       = $bootstrapHelper->getClassMapping('icon-ok');
+$iconRemoveClass   = $bootstrapHelper->getClassMapping('icon-remove');
+$iconPencilClass   = $bootstrapHelper->getClassMapping('icon-pencil');
+$iconDownloadClass = $bootstrapHelper->getClassMapping('icon-download');
+$iconCalendarClass = $bootstrapHelper->getClassMapping('icon-calendar');
+$iconMapMakerClass = $bootstrapHelper->getClassMapping('icon-map-marker');
 ?>
 <div id="eb-events" class="eb-events-timeline">
     <?php		    	
@@ -31,7 +42,7 @@ $dateFormat = $config->date_format;
         ?>
         <div class="eb-event-container">
 	        <div class="eb-event-date-container">
-		        <div class="eb-event-date btn-inverse">
+		        <div class="eb-event-date <?php echo $btnInverseClass; ?>">
 			        <div class="eb-event-date-day">
 				        <?php echo JHtml::_('date', $event->event_date, 'd', null); ?>
 			        </div>
@@ -44,11 +55,11 @@ $dateFormat = $config->date_format;
 		        </div>
 	        </div>
 	        <h2 class="eb-even-title-container"><a class="eb-event-title" href="<?php echo $detailUrl; ?>"><?php echo $event->title; ?></a></h2>
-	        <div class="eb-event-information row-fluid">
-		        <div class="span8">
+	        <div class="eb-event-information <?php echo $rowFluidClass; ?>">
+		        <div class="<?php echo $span8Class; ?>">
 			        <div class="clearfix">
 						<span class="eb-event-date-info">
-							<i class="icon-calendar">&nbsp;</i>
+							<i class="<?php echo $iconCalendarClass; ?>"></i>
 							<?php echo JHtml::_('date', $event->event_date, $dateFormat, null); ?><span class="eb-time"><?php echo JHtml::_('date', $event->event_date, $timeFormat, null) ?></span>
 							<?php
 								if ($event->event_end_date != $nullDate)
@@ -76,7 +87,7 @@ $dateFormat = $config->date_format;
 			            {
 				        ?>
 			            <div class="clearfix">
-								<i class="icon-map-marker"></i>
+								<i class="<?php echo $iconMapMakerClass; ?>"></i>
 						        <?php
 						            if ($event->location_address)
 						            {
@@ -94,7 +105,7 @@ $dateFormat = $config->date_format;
 			            }
 			        ?>
 		        </div>
-		        <div class="span4">
+		        <div class="<?php echo $span4Class; ?>">
 			        <div class="eb-event-price-container btn-primary">
 				        <?php
 				            if ($config->show_discounted_price)
@@ -159,7 +170,7 @@ $dateFormat = $config->date_format;
 					        }
 					        ?>
 					        <li>
-						        <a class="btn <?php echo $extraClass;?>"
+						        <a class="<?php echo $btnClass.' '.$extraClass;?>"
 						           href="<?php echo $url; ?>"><?php echo $text; ?></a>
 					        </li>
 				        <?php
@@ -168,7 +179,7 @@ $dateFormat = $config->date_format;
 				        {
 					        ?>
 					        <li>
-						        <a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+						        <a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
 					        </li>
 				        <?php
 				        }
@@ -179,7 +190,7 @@ $dateFormat = $config->date_format;
 				        {
 					        ?>
 					        <li>
-						        <a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
+						        <a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
 					        </li>
 				        <?php
 				        }
@@ -187,7 +198,7 @@ $dateFormat = $config->date_format;
 				        {
 					        ?>
 					        <li>
-						        <a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
+						        <a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
 					        </li>
 				        <?php
 				        }
@@ -197,7 +208,7 @@ $dateFormat = $config->date_format;
 			        {
 				        ?>
 				        <li>
-					        <a class="btn" href="javascript:cancelRegistration(<?php echo $registrantId; ?>)"><?php echo JText::_('EB_CANCEL_REGISTRATION'); ?></a>
+					        <a class="<?php echo $btnClass; ?>" href="javascript:cancelRegistration(<?php echo $registrantId; ?>)"><?php echo JText::_('EB_CANCEL_REGISTRATION'); ?></a>
 				        </li>
 			        <?php
 			        }
@@ -206,8 +217,8 @@ $dateFormat = $config->date_format;
 			        {
 				        ?>
 				        <li>
-					        <a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=edit_event&id='.$event->id.'&Itemid='.$Itemid); ?>">
-						        <i class="icon-pencil"></i>
+					        <a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=edit_event&id='.$event->id.'&Itemid='.$Itemid); ?>">
+						        <i class="<?php echo $iconPencilClass; ?>"></i>
 						        <?php echo JText::_('EB_EDIT'); ?>
 					        </a>
 				        </li>
@@ -219,17 +230,17 @@ $dateFormat = $config->date_format;
 				        {
 					        $link = JRoute::_('index.php?option=com_eventbooking&task=unpublish_event&id='.$event->id.'&Itemid='.$Itemid);
 					        $text = JText::_('EB_UNPUBLISH');
-					        $class = 'icon-unpublish';
+					        $class = $iconRemoveClass;
 				        }
 				        else
 				        {
 					        $link = JRoute::_('index.php?option=com_eventbooking&task=publish_event&id='.$event->id.'&Itemid='.$Itemid);
 					        $text = JText::_('EB_PUBLISH');
-					        $class = 'icon-publish';
+					        $class = $iconOkClass;
 				        }
 				        ?>
 				        <li>
-					        <a class="btn" href="<?php echo $link; ?>">
+					        <a class="<?php echo $btnClass; ?>" href="<?php echo $link; ?>">
 						        <i class="<?php echo $class; ?>"></i>
 						        <?php echo $text; ?>
 					        </a>
@@ -241,13 +252,16 @@ $dateFormat = $config->date_format;
 			        {
 				        ?>
 				        <li>
-					        <a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=csv_export&event_id='.$event->id.'&Itemid='.$Itemid); ?>"><?php echo JText::_('EB_EXPORT_REGISTRANTS'); ?></a>
+					        <a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=csv_export&event_id='.$event->id.'&Itemid='.$Itemid); ?>">
+						        <i class="<?php echo $iconDownloadClass; ?>"></i>
+						        <?php echo JText::_('EB_EXPORT_REGISTRANTS'); ?>
+					        </a>
 				        </li>
 			        <?php
 			        }
 			        ?>
 			        <li>
-				        <a class="btn btn-primary" href="<?php echo $detailUrl; ?>">
+				        <a class="<?php echo $btnClass; ?> btn-primary" href="<?php echo $detailUrl; ?>">
 					        <?php echo JText::_('EB_DETAILS'); ?>
 				        </a>
 			        </li>
