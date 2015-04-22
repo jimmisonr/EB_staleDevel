@@ -10,7 +10,7 @@
 // no direct access
 defined( '_JEXEC' ) or die ;
 ?>
-<div id="eb-categories-page" class="eb-container row-fluid">
+<div id="eb-categories-page" class="eb-container">
 	<?php 
 		if (!$this->categoryId)
 		{
