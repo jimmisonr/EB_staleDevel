@@ -130,6 +130,18 @@ class plgContentEBEvent extends JPlugin
 
 		EventbookingHelperData::calculateDiscount(array($item));
 
+		// Apply tax to price if needed
+		if ($config->enable_tax && $config->show_price_including_tax)
+		{
+			$taxRate = $config->tax_rate;
+			$item->individual_price  = round($item->individual_price * (1 + $taxRate / 100), 2);
+			$item->fixed_group_price = round($item->fixed_group_price * (1 + $taxRate / 100), 2);
+			if ($config->show_discounted_price)
+			{
+				$item->discounted_price = round($item->discounted_price * (1 + $taxRate / 100), 2);
+			}
+		}
+
 		if ($item->location_id)
 		{
 			$query->clear();
