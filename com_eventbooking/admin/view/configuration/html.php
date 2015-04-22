@@ -186,6 +186,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options[] = JHtml::_('select.option', 1, JText::_('EB_AFTER_AMOUNT'));
 		$lists['currency_position'] = JHtml::_('select.genericlist', $options, 'currency_position', ' class="inputbox"', 'value', 'text', 
 			$config->currency_position);
+		$lists['show_price_including_tax'] = JHtml::_('select.booleanlist', 'show_price_including_tax', '', $config->show_price_including_tax);
 		//Default settings when creating new events
 		$options = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_INDIVIDUAL_GROUP'));

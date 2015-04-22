@@ -405,15 +405,24 @@ else
 						<tbody>						
 						<?php
 							$i = 0 ;
+							if ($this->config->enable_tax && $this->config->show_price_including_tax)
+							{
+								$taxRate = $this->config->tax_rate;
+							}
+							else
+							{
+								$taxRate = 0;
+							}
 							foreach ($this->rowGroupRates as $rowRate)
                             {
+								$groupRate = round($rowRate->price * (1 + $taxRate / 100), 2);
 							?>
 							<tr>								
 								<td class="eb_number_registrant_column">
 									<?php echo $rowRate->registrant_number ; ?>
 								</td>
 								<td class="eb_rate_column">
-									<?php echo number_format($rowRate->price, 2); ?>
+									<?php echo EventbookingHelper::formatAmount($groupRate, $this->config); ?>
 								</td>
 							</tr>	
 							<?php	

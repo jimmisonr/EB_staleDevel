@@ -265,6 +265,17 @@ $editor = JFactory::getEditor();
 						</td>					
 					</tr>
 					<tr>
+						<td class="key">
+							<?php echo JText::_('EB_SHOW_PRICE_INCLUDING_TAX'); ?>
+						</td>
+						<td>
+							<?php echo $this->lists['show_price_including_tax']; ?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_SHOW_PRICE_INCLUDING_TAX_EXPLAIN'); ?>
+						</td>
+					</tr>
+					<tr>
 						<td  class="key">
 							<?php echo JText::_('EB_COLLECT_MEMBER_INFORMATION'); ?>
 						</td>
