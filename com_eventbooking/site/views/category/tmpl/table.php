@@ -11,7 +11,7 @@
 defined( '_JEXEC' ) or die ;	
 JHtml::_('behavior.modal', 'a.eb-modal');
 ?>
-<div id="eb-category-page-table" class="eb-container row-fluid">	
+<div id="eb-category-page-table" class="eb-container">
 <?php
 if ($this->config->show_cat_decription_in_calendar_layout && $this->category) 
 {
@@ -52,7 +52,7 @@ if (count($this->categories))
 	<?php 
 		if (count($this->items))
 		{
-			echo EventbookingHelperHtml::loadCommonLayout('common/events_table.php', array('items' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate, 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'categoryId' => $this->category->id));
+			echo EventbookingHelperHtml::loadCommonLayout('common/events_table.php', array('items' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate, 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'categoryId' => $this->category->id, 'bootstrapHelper' => $this->bootstrapHelper));
 		}	
 		if ($this->pagination->total > $this->pagination->limit)
 		{
