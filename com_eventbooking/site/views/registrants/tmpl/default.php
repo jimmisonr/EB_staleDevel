@@ -11,7 +11,7 @@
 defined( '_JEXEC' ) or die ;
 $cols = 8;
 ?>
-<div id="eb-registrants-management-page" class="eb-container row-fluid">
+<div id="eb-registrants-management-page" class="eb-container">
 <h1 class="eb_title"><?php echo JText::_('EB_REGISTRANT_LIST'); ?></h1>
 <form action="<?php JRoute::_('index.php?option=com_eventbooking&view=registrants&Itemid='.$this->Itemid );?>" method="post" name="adminForm" id="adminForm">
 	<table width="100%">

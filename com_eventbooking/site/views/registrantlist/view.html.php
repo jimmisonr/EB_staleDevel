@@ -104,6 +104,7 @@ class EventBookingViewRegistrantList extends JViewLegacy
 			$this->items              = $rows;
 			$this->config             = $config;
 			$this->displayCustomField = $displayCustomField;
+			$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
 			parent::display($tpl);
 		}

@@ -9,8 +9,9 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
+$hiddenPhoneClass = $this->bootstrapHelper->getClassMapping('hidden-phone');
 ?>
-<div id="eb-registrants-list-page" class="eb-container row-fluid">
+<div id="eb-registrants-list-page" class="eb-container">
 <h1 class="eb_title"><?php echo JText::_('EB_REGISTRANT_LIST'); ?></h1>	
 <?php    
 if (count($this->items)) 
@@ -19,7 +20,7 @@ if (count($this->items))
 	<table class="table table-striped table-bordered table-condensed">
 	<thead>
 		<tr>
-			<th width="5" class="hidden-phone">
+			<th width="5" class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo JText::_( 'NUM' ); ?>
 			</th>				
 			<th>
@@ -28,10 +29,10 @@ if (count($this->items))
 			<th>						
 				<?php echo JText::_('EB_LAST_NAME'); ?>
 			</th>								
-			<th class="hidden-phone">
+			<th class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo JText::_('EB_REGISTRANTS'); ?>
 			</th>																
-			<th class="hidden-phone">
+			<th class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo JText::_('EB_REGISTRATION_DATE'); ?>
 			</th>
 			<?php
@@ -57,7 +58,7 @@ if (count($this->items))
 		$row = &$this->items[$i];											
 		?>
 		<tr>
-			<td class="hidden-phone">
+			<td class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo $i+1 ; ?>
 			</td>					
 			<td>					
@@ -66,10 +67,10 @@ if (count($this->items))
 			<td>
 				<?php echo $row->last_name ; ?>
 			</td>
-			<td class="hidden-phone">
+			<td class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo $row->number_registrants ; ?>
 			</td>				
-			<td class="hidden-phone">
+			<td class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo JHtml::_('date', $row->register_date, $this->config->date_format) ; ?>
 			</td>	
 			<?php
@@ -86,7 +87,7 @@ if (count($this->items))
 							$fieldValue = '';
 						}
 					?>
-						<td class="hidden-phone">
+						<td class="<?php echo $hiddenPhoneClass; ?>">
 							<?php echo $fieldValue ?>
 						</td>
 					<?php	

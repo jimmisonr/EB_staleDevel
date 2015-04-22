@@ -10,7 +10,7 @@
 // no direct access
 defined( '_JEXEC' ) or die ;
 ?>
-<div id="eb-event-page" class="eb-container row-fluid">
+<div id="eb-event-page" class="eb-container">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_REGISTRATION_FAILURE'); ?></h1>
 <table width="100%">	
 	<tr>

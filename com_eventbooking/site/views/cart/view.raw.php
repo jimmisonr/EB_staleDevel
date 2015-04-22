@@ -65,6 +65,7 @@ class EventBookingViewCart extends JViewLegacy
 		$this->categoryId = $categoryId;
 		$this->Itemid = $Itemid;
 		$this->jsString = $jsString;
+		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 		
 		parent::display($tpl);
 	}

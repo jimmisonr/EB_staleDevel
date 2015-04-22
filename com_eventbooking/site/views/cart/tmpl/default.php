@@ -27,8 +27,9 @@ else
 {
 	$url = JRoute::_('index.php?option=com_eventbooking&Itemid='.$this->Itemid, false);
 }
+$btnClass = $this->bootstrapHelper->getClassMapping('btn');
 ?>
-<div id="eb-cart-page" class="eb-container row-fluid">	
+<div id="eb-cart-page" class="eb-container">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_ADDED_EVENTS'); ?></h1>	
 <?php
 if (count($this->items)) 
@@ -42,7 +43,8 @@ if (count($this->items))
 						<?php echo JText::_('EB_EVENT'); ?>
 					</th>
 					<?php
-						if ($this->config->show_event_date) {
+						if ($this->config->show_event_date)
+						{
 						?>
 							<th class="col_event_date">
 								<?php echo JText::_('EB_EVENT_DATE'); ?>
@@ -68,7 +70,8 @@ if (count($this->items))
 			<?php				
 				$total = 0 ;
 				$k = 0 ;			
-				for ($i = 0 , $n = count($this->items) ; $i < $n; $i++) {
+				for ($i = 0 , $n = count($this->items) ; $i < $n; $i++)
+				{
 					$item = $this->items[$i];
 					if ($this->config->show_discounted_price)
 					{
@@ -135,9 +138,9 @@ if (count($this->items))
 			</tbody>			
 		</table>					
 		<div class="form-actions">
-			<input type="button" class="btn btn-primary" value="<?php echo JText::_('EB_ADD_MORE_EVENTS'); ?>" onclick="continueShopping();" />
-			<input type="button" class="btn btn-primary" value="<?php echo JText::_('EB_UPDATE'); ?>" onclick="updateCart();" />																										
-			<input type="button" class="btn btn-primary" value="<?php echo JText::_('EB_CHECKOUT'); ?>" onclick="checkout();" />
+			<input type="button" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_ADD_MORE_EVENTS'); ?>" onclick="continueShopping();" />
+			<input type="button" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_UPDATE'); ?>" onclick="updateCart();" />
+			<input type="button" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_CHECKOUT'); ?>" onclick="checkout();" />
 		</div>				
 		<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
 		<input type="hidden" name="category_id" value="<?php echo $this->categoryId; ?>" />	

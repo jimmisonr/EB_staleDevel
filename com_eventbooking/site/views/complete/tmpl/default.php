@@ -10,7 +10,7 @@
 // no direct access
 defined( '_JEXEC' ) or die ;
 ?>
-<div id="eb-registration-complete-page" class="eb-container row-fluid">
+<div id="eb-registration-complete-page" class="eb-container">
 	<h1 class="eb-page-heading"><?php echo JText::_('EB_REGISTRATION_COMPLETE'); ?></h1>
 	<?php
 		if (!$this->tmpl)

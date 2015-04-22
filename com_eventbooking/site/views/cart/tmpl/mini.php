@@ -17,8 +17,9 @@ else
 {
 	$readOnly = '' ;
 }
+$btnClass = $this->bootstrapHelper->getClassMapping('btn');
 ?>
-<div id="eb-mini-cart-page" class="eb-container row-fluid">
+<div id="eb-mini-cart-page" class="eb-container">
 <?php
 if (count($this->items)) {
 ?>
@@ -124,13 +125,13 @@ if (count($this->items)) {
 				?>
 				<tr>
 					<td colspan="<?php echo $cols ; ?>" style="text-align: right;">
-						<button onclick="javascript:colorbox();" id="add_more_item" class="btn btn-primary" type="button">
+						<button onclick="javascript:colorbox();" id="add_more_item" class="<?php echo $btnClass; ?> btn-primary" type="button">
 							<?php echo JText::_('EB_ADD_MORE_EVENTS'); ?>
 						</button>
-						<button onclick="javascript:updateCart();" id="update_cart" class="btn btn-primary" type="button">
+						<button onclick="javascript:updateCart();" id="update_cart" class="<?php echo $btnClass; ?> btn-primary" type="button">
 							<?php echo JText::_('EB_UPDATE'); ?>
 						</button>
-						<button onclick="javascript:checkOut();" id="check_out" class="btn btn-primary" type="button">
+						<button onclick="javascript:checkOut();" id="check_out" class="<?php echo $btnClass; ?> btn-primary" type="button">
 							<?php echo JText::_('EB_CHECKOUT'); ?>
 						</button>
 					</td>
