@@ -9,9 +9,7 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
-
-$param = null ;
-$timeFormat = $this->config->event_time_format ? $this->config->event_time_format : 'g:i a' ;     
+$timeFormat = $this->config->event_time_format ? $this->config->event_time_format : 'g:i a' ;
 $daysInWeek = array(
 		0 => JText::_('EB_SUNDAY'),
 		1 => JText::_('EB_MONDAY'),
@@ -39,86 +37,91 @@ $monthsInYear = array(
 ?>
 <h1 class="eb-page-heading"><?php echo JText::_('EB_CALENDAR') ; ?></h1>
 <div id="extcalendar">
-<div style="width: 100%;" class="topmenu_calendar">	
+<div style="width: 100%;" class="topmenu_calendar">
 	<div class="left_calendar">
-        <strong><?php echo JText::_('EB_CHOOSE_DATE'); ?>:</strong>
-        <?php echo JHtml::_('calendar', JRequest::getVar('day', ''),'date', 'date', '%Y-%m-%d'); ?>
-        <input type="button" class="btn" value="<?php echo JText::_('Go'); ?>" onclick="gotoDate();" />
+		<strong><?php echo JText::_('EB_CHOOSE_DATE'); ?>:</strong>
+		<?php echo JHtml::_('calendar', JRequest::getVar('day', ''),'date', 'date', '%Y-%m-%d'); ?>
+		<input type="button" class="btn" value="<?php echo JText::_('Go'); ?>" onclick="gotoDate();" />
 	</div>
-    <?php
-	    if ($this->showCalendarMenu)
-        {
-            echo EventbookingHelperHtml::loadCommonLayout('common/calendar_navigation.php', array('Itemid' => $this->Itemid, 'config' => $this->config, 'layout' => 'daily'));
-        }
+	<?php
+		if ($this->showCalendarMenu)
+		{
+			echo EventbookingHelperHtml::loadCommonLayout('common/calendar_navigation.php', array('Itemid' => $this->Itemid, 'config' => $this->config, 'layout' => 'daily'));
+		}
 	?>
 </div>
 <div class="wraptable_calendar">
-<table cellpadding="0" cellspacing="0" border="0" width="100%">	        
-    <tr class="tablec">
-        <td class="previousday">
-            <a href="<?php echo JRoute::_("index.php?option=com_eventbooking&view=calendar&layout=daily&day=".date('Y-m-d',strtotime("-1 day", strtotime($this->day)))."&Itemid=$this->Itemid");?>" rel="nofollow">
-				<?php //echo JText::_('EB_PREVIOUS_DAY')?>
-                <img src="<?php echo JUri::root()?>components/com_eventbooking/assets/images/calendar_previous.png" alt="<?php echo JText::_('EB_PREVIOUS_DAY')?>">
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+	<tr class="tablec">
+		<td class="previousday">
+			<a href="<?php echo JRoute::_("index.php?option=com_eventbooking&view=calendar&layout=daily&day=".date('Y-m-d',strtotime("-1 day", strtotime($this->day)))."&Itemid=$this->Itemid");?>" rel="nofollow">
+				<img src="<?php echo JUri::root()?>components/com_eventbooking/assets/images/calendar_previous.png" alt="<?php echo JText::_('EB_PREVIOUS_DAY')?>">
 			</a>
-        </td>
-        <td class="currentday currentdaytoday">
-        	<?php
+		</td>
+		<td class="currentday currentdaytoday">
+			<?php
 				$time = strtotime($this->day) ;
 				echo $daysInWeek[date('w', $time)].', '.$monthsInYear[date('n', $time)].' '.date('d', $time).', '.date('Y', $time);
-        	?>            
-        </td>
-        <td class="nextday">
-            <a href="<?php echo JRoute::_("index.php?option=com_eventbooking&view=calendar&layout=daily&day=".date('Y-m-d',strtotime("+1 day", strtotime($this->day)))."&Itemid=$this->Itemid");?>" rel="nofollow">
-				<?php //echo JText::_('EB_NEXT_DAY')?>
-                <img src="<?php echo JUri::root()?>components/com_eventbooking/assets/images/calendar_next.png" alt="<?php echo JText::_('EB_NEXT_DAY')?>">
+			?>
+		</td>
+		<td class="nextday">
+			<a href="<?php echo JRoute::_("index.php?option=com_eventbooking&view=calendar&layout=daily&day=".date('Y-m-d',strtotime("+1 day", strtotime($this->day)))."&Itemid=$this->Itemid");?>" rel="nofollow">
+				<img src="<?php echo JUri::root()?>components/com_eventbooking/assets/images/calendar_next.png" alt="<?php echo JText::_('EB_NEXT_DAY')?>">
 			</a>
-        </td>
-    </tr>
-    
-    <tr>
-    	<td colspan="3">
-        	<?php 
+		</td>
+	</tr>
 
-			if (count($this->events)){
-			?>	
+	<tr>
+		<td colspan="3">
+			<?php
+			if (count($this->events))
+			{
+			?>
 			<table cellpadding="0" cellspacing="0" width="100%" border="0">
-				<?php 
-					foreach ($this->events AS $key => $event) {
-                        $url = JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, 0, $this->Itemid));
+				<?php
+					foreach ($this->events AS $key => $event)
+					{
+						$url = JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, 0, $this->Itemid));
 				?>
 					<tr>
-                    	<td class="tablea">
-                        	<a href="<?php echo $url; ?>"><?php echo JHtml::_('date', $event->event_date, $timeFormat, $param);?></a>
+						<td class="tablea">
+							<a href="<?php echo $url; ?>"><?php echo JHtml::_('date', $event->event_date, $timeFormat, null);?></a>
 						</td>
 						<td class="tableb">
-                        	<div class="eventdesc">
+							<div class="eventdesc">
 								<h4><a href="<?php echo $url; ?>"><?php echo $event->title?></a></h4>
 								<p class="location-name">
 									<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$event->location_id.'&tmpl=component&format=html'); ?>" rel="gb_page_center[500,450]" title="<?php echo $event->location_name ; ?>" class="location_link" rel="nofollow"><?php echo $event->location_name; ?></a>
-				              </p>
-                           	<?php echo $event->short_description; ?>
-                            </div>
+							     </p>
+								<?php echo $event->short_description; ?>
+							</div>
 						</td>
 					</tr>
-				<?php }?>	
+				<?php }?>
 			</table>
-			<?php } else {
-			    echo '<span class="eb_no_events">'.JText::_('EB_NO_EVENTS')."</span>";
-			}			
+			<?php
+			}
+			else
+			{
+				echo '<span class="eb_no_events">'.JText::_('EB_NO_EVENTS')."</span>";
+			}
 			?>
-        </td>
-    </tr>
-    
+		</td>
+	</tr>
 </table>
 </div>
 </div>
-<script language="javascript">
-    var url = "<?php echo JRoute::_('index.php?option=com_eventbooking&view=calendar&layout=daily&Itemid='.$this->Itemid.'&day=', false); ?>";
-	function gotoDate() {
+<script type="text/javascript">
+	var url = "<?php echo JRoute::_('index.php?option=com_eventbooking&view=calendar&layout=daily&Itemid='.$this->Itemid.'&day=', false); ?>";
+	function gotoDate()
+	{
 		date = document.getElementById('date');
-		if (date.value) {
+		if (date.value)
+		{
 			location.href = url + date.value;
-		} else {
+		}
+		else
+		{
 			alert("<?php echo JText::_('EB_PLEASE_CHOOSE_DATE'); ?>");
 		}
 	}

@@ -32,7 +32,7 @@ else
 	$previousYear = $this->year ;
 }
 ?>
-<div id="eb-calendar-page" class="eb-container row-fluid">	
+<div id="eb-calendar-page" class="eb-container">
 	<h1 class="eb-page-heading"><?php echo JText::_('EB_CALENDAR') ; ?></h1>
     <form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=calendar&Itemid='.$this->Itemid);?>">
         <div id="eb-calendarwrap">
