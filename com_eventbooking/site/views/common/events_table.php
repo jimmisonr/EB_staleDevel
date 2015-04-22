@@ -9,7 +9,9 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
-$activateWaitingList = $config->activate_waitinglist_feature ;
+$activateWaitingList = $config->activate_waitinglist_feature;
+$hiddenPhoneClass    = $bootstrapHelper->getClassMapping('hidden-phone');
+$btnClass            = $bootstrapHelper->getClassMapping('btn');
 ?>
 <table class="table table-striped table-bordered table-condensed">
 	<thead>
@@ -34,7 +36,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 			if ($config->show_location_in_category_view) 
 			{				
 			?>
-				<th class="location_col hidden-phone">
+				<th class="location_col <?php echo $hiddenPhoneClass; ?>">
 					<?php echo JText::_('EB_LOCATION'); ?>
 				</th>
 			<?php	
@@ -42,7 +44,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 			if ($config->show_price_in_table_layout) 
 			{
 			?>
-				<th class="table_price_col hidden-phone">
+				<th class="table_price_col <?php echo $hiddenPhoneClass; ?>">
 					<?php echo JText::_('EB_INDIVIDUAL_PRICE'); ?>
 				</th>
 			<?php    				    
@@ -50,7 +52,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 			if ($config->show_capacity) 
 			{					
 			?>
-				<th class="capacity_col hidden-phone">
+				<th class="capacity_col <?php echo $hiddenPhoneClass; ?>">
 					<?php echo JText::_('EB_CAPACITY'); ?>
 				</th>	
 			<?php	
@@ -58,7 +60,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 			if ($config->show_registered) 
 			{					
 			?>
-				<th class="registered_col hidden-phone">
+				<th class="registered_col <?php echo $hiddenPhoneClass; ?>">
 					<?php echo JText::_('EB_REGISTERED'); ?>
 				</th>	
 			<?php	
@@ -66,13 +68,13 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 			if ($config->show_available_place)
 			{
 			?>
-				<th class="center available-place-col hidden-phone">
+				<th class="center available-place-col <?php echo $hiddenPhoneClass; ?>">
 					<?php echo JText::_('EB_AVAILABLE_PLACE'); ?>
 				</th>
 			<?php
 			}
 			?>		
-			<th class="center actions-col hidden-phone">
+			<th class="center actions-col <?php echo $hiddenPhoneClass; ?>">
 				<?php echo JText::_('EB_REGISTER'); ?>
 			</th>								
 		</tr>
@@ -97,7 +99,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 					if ($config->show_image_in_table_layout) 
 					{
 					?>
-					<td class="eb-image-column hidden-phone">
+					<td class="eb-image-column <?php echo $hiddenPhoneClass; ?>">
 						<?php
 							if ($item->thumb) 
 							{
@@ -133,7 +135,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 					if ($config->show_location_in_category_view) 
 					{
 					?>
-					<td class="hidden-phone">
+					<td class="<?php echo $hiddenPhoneClass; ?>">
 						<?php
 							if ($item->location_id) 
 							{
@@ -169,7 +171,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 					        $price = $item->individual_price ;
 					    }      						     
 					?>
-						<td class="hidden-phone">
+						<td class="<?php echo $hiddenPhoneClass; ?>">
 							<?php echo EventbookingHelper::formatCurrency($price, $config, $item->currency_symbol); ?>
 						</td>
 					<?php    
@@ -177,7 +179,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 					if ($config->show_capacity) 
 					{
 					?>
-						<td class="center hidden-phone">
+						<td class="center <?php echo $hiddenPhoneClass; ?>">
 							<?php
 								if ($item->event_capacity)
 								{	
@@ -194,7 +196,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 					if ($config->show_registered)
 					{
 					?>
-						<td class="center hidden-phone">
+						<td class="center <?php echo $hiddenPhoneClass; ?>">
 							<?php
                                 if ($item->registration_type != 3)
                                 {
@@ -212,7 +214,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 					if ($config->show_available_place)
 					{
 					?>
-						<td class="center hidden-phone">
+						<td class="center <?php echo $hiddenPhoneClass; ?>">
 							<?php
 								if ($item->event_capacity)
 								{
@@ -223,7 +225,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 					<?php
 					}
 				?>
-					<td class="center hidden-phone">
+					<td class="center <?php echo $hiddenPhoneClass; ?>">
 						<?php 
 							if ($waitingList || $canRegister || ($item->registration_type != 3 && $config->display_message_for_full_event)) 
 							{
@@ -249,7 +251,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 												}
 												?>
 												<li>
-													<a class="btn <?php echo $extraClass;?>"
+													<a class="<?php echo $btnClass . ' ' . $extraClass;?>"
 													   href="<?php echo $url; ?>"><?php echo $text; ?></a>
 												</li>
 											<?php
@@ -258,7 +260,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 											{
 												?>
 												<li>
-													<a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+													<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
 												</li>
 											<?php
 											}
@@ -277,7 +279,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 										{
 											?>
 											<li>
-												<a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
+												<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
 											</li>
 										<?php
 										}
@@ -285,7 +287,7 @@ $activateWaitingList = $config->activate_waitinglist_feature ;
 										{
 											?>
 											<li>
-												<a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
+												<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
 											</li>
 										<?php
 										}
