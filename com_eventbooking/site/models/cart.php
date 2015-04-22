@@ -243,13 +243,29 @@ class EventBookingModelCart extends JModelLegacy
 	}
 
 	/**
+	 * Get information of events which user added to cart
 	 *
-	 * Enter description here ...
+	 * @return array|mixed
 	 */
 	function getData()
 	{
-		$cart = new EventbookingHelperCart();
+		$config = EventbookingHelper::getConfig();
+		$cart   = new EventbookingHelperCart();
+		$rows   = $cart->getEvents();
+		if ($config->enable_tax && $config->show_price_including_tax)
+		{
+			$taxRate = $config->tax_rate;
+			for ($i = 0, $n = count($rows); $i < $n; $i++)
+			{
+				$row       = $rows[$i];
+				$row->rate = round($row->rate * (1 + $taxRate / 100), 2);
+				if ($config->show_discounted_price)
+				{
+					$row->discounted_price = round($row->discounted_price * (1 + $taxRate / 100), 2);
+				}
+			}
+		}
 
-		return $cart->getEvents();
+		return $rows;
 	}
 } 
