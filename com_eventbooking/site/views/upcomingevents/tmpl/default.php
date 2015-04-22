@@ -20,13 +20,13 @@ else
 
 JHtml::_('behavior.modal', 'a.eb-modal');
 ?>
-<div id="eb-upcoming-events-page-default" class="eb-container row-fluid">
+<div id="eb-upcoming-events-page-default" class="eb-container">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_UPCOMING_EVENTS'); ?></h1>	
 <form method="post" name="adminForm" id="adminForm" action="index.php">		
 	<?php 
 		if (count($this->items))
 		{
-			echo EventbookingHelperHtml::loadCommonLayout('common/events_default.php', array('events' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'category' => $this->category));
+			echo EventbookingHelperHtml::loadCommonLayout('common/events_default.php', array('events' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'category' => $this->category, 'bootstrapHelper' => $this->bootstrapHelper));
 		}
         if ($this->pagination->total > $this->pagination->limit)
         {

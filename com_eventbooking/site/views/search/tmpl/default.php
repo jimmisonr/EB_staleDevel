@@ -19,13 +19,13 @@ else
 }
 JHtml::_('behavior.modal', 'a.eb-modal');    
 ?>
-<div id="eb-search-result-page" class="eb-container row-fluid">
+<div id="eb-search-result-page" class="eb-container">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_SEARCH_RESULT'); ?></h1>	
 <form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=search&Itemid='.$this->Itemid); ?>">
 	<?php 
 	if (count($this->items))
 	{
-		echo EventbookingHelperHtml::loadCommonLayout('common/events_default.php', array('events' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'ssl' => $ssl, 'viewLevels' => $this->viewLevels));
+		echo EventbookingHelperHtml::loadCommonLayout('common/events_default.php', array('events' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'bootstrapHelper' => $this->bootstrapHelper));
 	}		
 	if ($this->pagination->total > $this->pagination->limit)
 	{

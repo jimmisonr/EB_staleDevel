@@ -178,6 +178,7 @@ class EventBookingViewEvent extends JViewLegacy
 		$this->nullDate = $nullDate;
 		$this->rowGroupRates = $rowGroupRates;
 		$this->plugins = $plugins;
+		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 		
 		parent::display($tpl);
 	}

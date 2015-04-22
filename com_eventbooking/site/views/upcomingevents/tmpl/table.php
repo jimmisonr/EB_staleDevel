@@ -11,7 +11,7 @@
 defined( '_JEXEC' ) or die ;
 JHtml::_('behavior.modal', 'a.eb-modal');
 ?>
-<div id="eb-upcoming-events-page-default" class="eb-container row-fluid">
+<div id="eb-upcoming-events-page-default" class="eb-container">
 	<h1 class="eb-page-heading"><?php echo JText::_('EB_UPCOMING_EVENTS') ; ?></h1>	
 <?php	
 if ($this->config->use_https)
@@ -27,7 +27,7 @@ else
 	<?php 
 		if (count($this->items))
 		{
-			echo EventbookingHelperHtml::loadCommonLayout('common/events_table.php', array('items' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'ssl' => $ssl , 'viewLevels' => $this->viewLevels, 'categoryId' => @$this->category->id));
+			echo EventbookingHelperHtml::loadCommonLayout('common/events_table.php', array('items' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'ssl' => $ssl , 'viewLevels' => $this->viewLevels, 'categoryId' => @$this->category->id, 'bootstrapHelper' => $this->bootstrapHelper));
 		}
         if ($this->pagination->total > $this->pagination->limit)
         {

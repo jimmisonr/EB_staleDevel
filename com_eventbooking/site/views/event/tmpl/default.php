@@ -23,8 +23,15 @@ else
 {
     $ssl = 0 ;
 }
+
+$bootstrapHelper   = $this->bootstrapHelper;
+$iconPencilClass   = $bootstrapHelper->getClassMapping('icon-pencil');
+$iconOkClass       = $bootstrapHelper->getClassMapping('icon-ok');
+$iconRemoveClass   = $bootstrapHelper->getClassMapping('icon-remove');
+$iconDownloadClass = $bootstrapHelper->getClassMapping('icon-download');
+$btnClass          = $bootstrapHelper->getClassMapping('btn');
 ?>
-<div id="eb-event-page" class="eb-container row-fluid eb-event">
+<div id="eb-event-page" class="eb-container eb-event">
 	<div class="eb-box-heading clearfix">    	
     	<h1 class="eb-page-heading">
 			<?php echo $item->title; ?>
@@ -81,8 +88,8 @@ else
 				echo $item->description ;
 			?>																
 		</div>
-		<div id="eb-event-info" class="clearfix">
-		<div id="eb-event-info-left" class="span8">
+		<div id="eb-event-info" class="clearfix <?php echo $bootstrapHelper->getClassMapping('row-fluid'); ?>">
+		<div id="eb-event-info-left" class="<?php echo $bootstrapHelper->getClassMapping('span8'); ?>">
 			<h3 id="eb-event-properties-heading">
 				<?php echo JText::_('EB_EVENT_PROPERTIES'); ?>
 			</h3>
@@ -383,7 +390,7 @@ else
 			}
 		?>
 		</div>		
-		<div id="eb-event-info-right" class="span4">
+		<div id="eb-event-info-right" class="<?php echo $bootstrapHelper->getClassMapping('span4'); ?>">
 			<?php
 				if (count($this->rowGroupRates))
                 {
@@ -461,7 +468,7 @@ else
 					        }
 					        ?>
 					        <li>
-						        <a class="btn <?php echo $extraClass;?>"
+						        <a class="<?php echo $btnClass.' '.$extraClass;?>"
 						           href="<?php echo $url; ?>"><?php echo $text; ?></a>
 					        </li>
 				        <?php
@@ -470,7 +477,7 @@ else
 				        {
 						?>
 					        <li>
-						        <a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+						        <a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
 					        </li>
 				        <?php
 				        }
@@ -481,7 +488,7 @@ else
 				        {
 					    ?>
 					        <li>
-					            <a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
+					            <a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
 					        </li>
 					    <?php
 				        }
@@ -489,7 +496,7 @@ else
 				        {
 					    ?>
 					        <li>
-						        <a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
+						        <a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
 					        </li>
 					    <?php
 				        }
@@ -498,7 +505,7 @@ else
 					{						
 		    		?>
 		    			<li>
-						    <a class="btn eb-colorbox-invite" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=invite&tmpl=component&id='.$item->id.'&Itemid='.$this->Itemid, false) ; ?>"><?php echo JText::_('EB_INVITE_FRIEND'); ?></a>
+						    <a class="<?php echo $btnClass; ?> eb-colorbox-invite" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=invite&tmpl=component&id='.$item->id.'&Itemid='.$this->Itemid, false) ; ?>"><?php echo JText::_('EB_INVITE_FRIEND'); ?></a>
 						</li>	
 		    		<?php
 					}
@@ -508,7 +515,7 @@ else
 					{
     				?>
     					<li>
-    				    	<a class="btn" href="javascript:cancelRegistration(<?php echo $registrantId; ?>)"><?php echo JText::_('EB_CANCEL_REGISTRATION'); ?></a>
+    				    	<a class="<?php echo $btnClass; ?>" href="javascript:cancelRegistration(<?php echo $registrantId; ?>)"><?php echo JText::_('EB_CANCEL_REGISTRATION'); ?></a>
     				 	</li>
     				<?php    
     				}
@@ -516,8 +523,8 @@ else
                     {
                     ?>
                         <li>
-                            <a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=edit_event&id='.$item->id.'&Itemid='.$this->Itemid); ?>">
-                                <i class="icon-pencil"></i>
+                            <a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=edit_event&id='.$item->id.'&Itemid='.$this->Itemid); ?>">
+                                <i class="<?php echo $iconPencilClass; ?>"></i>
                                 <?php echo JText::_('EB_EDIT'); ?>
                             </a>
                         </li>
@@ -529,17 +536,17 @@ else
                         {
                             $link = JRoute::_('index.php?option=com_eventbooking&task=unpublish_event&id='.$item->id.'&Itemid='.$this->Itemid);
                             $text = JText::_('EB_UNPUBLISH');
-                            $class = 'icon-unpublish';
+                            $class = $iconRemoveClass;
                         }
                         else
                         {
                             $link = JRoute::_('index.php?option=com_eventbooking&task=publish_event&id='.$item->id.'&Itemid='.$this->Itemid);
                             $text = JText::_('EB_PUBLISH');
-                            $class = 'icon-publish';
+                            $class = $iconOkClass;
                         }
                     ?>
                         <li>
-                            <a class="btn" href="<?php echo $link; ?>">
+                            <a class="<?php echo $btnClass; ?>" href="<?php echo $link; ?>">
                                 <i class="<?php echo $class; ?>"></i>
                                 <?php echo $text; ?>
                             </a>
@@ -550,7 +557,10 @@ else
 					{
     				?>
     				   <li>
-    				    	<a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=csv_export&event_id='.$item->id.'&Itemid='.$this->Itemid); ?>"><?php echo JText::_('EB_EXPORT_REGISTRANTS'); ?></a>
+    				    	<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=csv_export&event_id='.$item->id.'&Itemid='.$this->Itemid); ?>">
+						         <i class="<?php echo $iconDownloadClass; ?>"></i>
+						        <?php echo JText::_('EB_EXPORT_REGISTRANTS'); ?>
+					        </a>
     				   </li>
     				<?php	
     				}

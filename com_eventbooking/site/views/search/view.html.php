@@ -99,6 +99,8 @@ class EventBookingViewSearch extends JViewLegacy
 		$this->Itemid = JRequest::getInt('Itemid', 0);
 		$this->config = $config;
 		$this->nullDate = $db->getNullDate();
+		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+
 		parent::display($tpl);
 	}
 }
