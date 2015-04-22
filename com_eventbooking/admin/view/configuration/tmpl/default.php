@@ -54,7 +54,18 @@ $editor = JFactory::getEditor();
                         <td>
                             <?php echo JText::_('EB_LOAD_BOOTSTRAP_CSS_IN_FRONTEND_EXPLAIN'); ?>
                         </td>
-                    </tr>                    
+                    </tr>
+					<tr>
+						<td class="key" width="15%">
+							<?php echo JText::_('EB_TWITTER_BOOTSTRAP_VERSION') ; ?>
+						</td>
+						<td width="40%">
+							<?php echo $this->lists['twitter_bootstrap_version'];?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_TWITTER_BOOTSTRAP_VERSION_EXPLAIN'); ?>
+						</td>
+					</tr>
 					<tr>
 						<td class="key" style="width: 18%;">
 							<?php echo JText::_('EB_FROM_NAME'); ?> <br />					
