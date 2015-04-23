@@ -15,14 +15,14 @@ defined( '_JEXEC' ) or die ;
 		var form = document.adminForm;
 		if (pressbutton == 'cancel_location') {
 			form.task.value = pressbutton;
-			form.submit();			
-			return;				
-		} else {			
+			form.submit();
+			return;
+		} else {
 			if (form.name.value == '') {
 				alert("<?php echo JText::_('EN_ENTER_LOCATION_NAME'); ?>");
 				form.name.focus();
 				return ;
-			}															
+			}
 			if (form.address.value == '') {
 				alert("<?php echo JText::_('EN_ENTER_LOCATION_ADDRESS'); ?>");
 				form.address.focus();
@@ -39,7 +39,7 @@ defined( '_JEXEC' ) or die ;
 				return ;
 			}
 			form.task.value = pressbutton;
-			form.submit();									
+			form.submit();
 		}
 	}
 
@@ -48,46 +48,46 @@ defined( '_JEXEC' ) or die ;
 			var form = document.adminForm ;
 			form.task.value = 'delete_location';
 			form.submit();
-		}		
+		}
 	}
 </script>
 <div class="eb_form_header" style="width:100%;">
 	<div style="float: left; width: 50%;"><?php echo JText::_('EB_ADD_EDIT_LOCATION'); ?></div>
 	<div style="float: left; width: 50%; text-align: left;">
 		<input type="button" class="btn btn-primary" name="btnSave" value="<?php echo JText::_('EB_SAVE'); ?>" onclick="checkData('save_location');" />
-		<?php 
+		<?php
 			if ($this->item->id) {
 			?>
-				<input type="button" class="btn btn-primary" name="btnSave" value="<?php echo JText::_('EB_DELETE_LOCATION'); ?>" onclick="deleteLocation();" />				
-			<?php	
+				<input type="button" class="btn btn-primary" name="btnSave" value="<?php echo JText::_('EB_DELETE_LOCATION'); ?>" onclick="deleteLocation();" />
+			<?php
 			}
 		?>
 		<input type="button" class="btn btn-primary" name="btnCancel" value="<?php echo JText::_('EB_CANCEL_LOCATION'); ?>" onclick="checkData('cancel_location');" />
-	</div>	
+	</div>
 </div>
 <div class="clearfix"></div>
-<form action="index.php" method="post" name="adminForm" id="adminForm">			
+<form action="index.php" method="post" name="adminForm" id="adminForm">
 	<table class="admintable clearfix" width="100%">
 		<tr>
-			<td> 
+			<td>
 				<?php echo JText::_('EB_NAME'); ?>
 				<span class="required">(*)</span>
 			</td>
 			<td>
 				<input class="text_area" type="text" name="name" id="name" size="50" maxlength="250" value="<?php echo $this->item->name;?>" />
 			</td>
-		</tr>			
+		</tr>
 		<tr>
-			<td> 
+			<td>
 				<?php echo JText::_('EB_ADDRESS'); ?>
 				<span class="required">(*)</span>
 			</td>
 			<td>
 				<input class="text_area input-xlarge" type="text" name="address" id="address" size="70" maxlength="250" value="<?php echo $this->item->address;?>" />
 			</td>
-		</tr>		
+		</tr>
 		<tr>
-			<td> 
+			<td>
 				<?php echo JText::_('EB_CITY'); ?>
 				<span class="required">(*)</span>
 			</td>
@@ -96,7 +96,7 @@ defined( '_JEXEC' ) or die ;
 			</td>
 		</tr>
 		<tr>
-			<td> 
+			<td>
 				<?php echo JText::_('EB_STATE'); ?>
 				<span class="required">(*)</span>
 			</td>
@@ -105,25 +105,25 @@ defined( '_JEXEC' ) or die ;
 			</td>
 		</tr>
 		<tr>
-			<td> 
+			<td>
 				<?php echo JText::_('EB_ZIP'); ?>
 				<span class="required">(*)</span>
 			</td>
 			<td>
 				<input class="text_area" type="text" name="zip" id="zip" size="20" maxlength="250" value="<?php echo $this->item->zip;?>" />
 			</td>
-		</tr>		
+		</tr>
 		<tr>
-			<td> 
+			<td>
 				<?php echo JText::_('EB_COUNTRY'); ?>
 				<span class="required">(*)</span>
 			</td>
 			<td>
 				<?php echo $this->lists['country'] ; ?>
 			</td>
-		</tr>		
+		</tr>
 		<tr>
-			<td> 
+			<td>
 				<?php echo JText::_('EB_LATITUDE'); ?>
 			</td>
 			<td>
@@ -131,7 +131,7 @@ defined( '_JEXEC' ) or die ;
 			</td>
 		</tr>
 		<tr>
-			<td> 
+			<td>
 				<?php echo JText::_('EB_LONGITUDE'); ?>
 			</td>
 			<td>
@@ -144,14 +144,14 @@ defined( '_JEXEC' ) or die ;
 			</td>
 			<td>
 				<?php echo $this->lists['published']; ?>
-			</td>	
+			</td>
 		</tr>
-	</table>			
+	</table>
 	<div class="clr"></div>
 	<input type="hidden" name="option" value="com_eventbooking" />
 	<input type="hidden" name="cid[]" value="<?php echo $this->item->id; ?>" />
 	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
-	<input type="hidden" name="task" value="" />	
+	<input type="hidden" name="task" value="" />
 	<?php echo JHtml::_( 'form.token' ); ?>
-	
+
 </form>

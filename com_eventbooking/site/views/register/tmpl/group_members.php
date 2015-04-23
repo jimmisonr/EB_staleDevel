@@ -19,34 +19,34 @@ $btnClass          = $bootstrapHelper->getClassMapping('btn');
 $dateFields = array();
 for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 {
-	$headerText = JText::_('EB_MEMBER_REGISTRATION') ;	
+	$headerText = JText::_('EB_MEMBER_REGISTRATION') ;
 	$headerText = str_replace('[ATTENDER_NUMBER]', $i, $headerText) ;
 ?>
 	<h3 class="eb-heading">
 		<?php echo $headerText; ?>
 	</h3>
-<?php	
+<?php
 	$form = new RADForm($this->rowFields);
 	$form->setFieldSuffix($i);
-	//Bill form data	
+	//Bill form data
 	if (count($this->membersData))
 	{
 		$form->bind($this->membersData);
 	}
-	else 
+	else
 	{
 		$form->bind(array('country_'.$i => $this->defaultCountry), true);
-	}		
+	}
 	$form->buildFieldsDependency();
-	$fields = $form->getFields();	
-	//We don't need to use ajax validation for email field for group members	
+	$fields = $form->getFields();
+	//We don't need to use ajax validation for email field for group members
 	if (isset($fields['email']))
 	{
 		$emailField = $fields['email'];
 		$cssClass = $emailField->getAttribute('class');
 		$cssClass = str_replace(',ajax[ajaxEmailCall]', '', $cssClass);
 		$emailField->setAttribute('class', $cssClass);
-	}	
+	}
 	foreach ($fields as $field)
 	{
 		echo $field->getControlGroup($bootstrapHelper);
@@ -64,33 +64,33 @@ if ($this->showCaptcha)
 			<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
 		</label>
 		<div class="<?php echo $controlsClass; ?>">
-			<?php echo $this->captcha; ?>						
+			<?php echo $this->captcha; ?>
 		</div>
 	</div>
-<?php	
+<?php
 }
 ?>
 	<div class="form-actions">
-  		<input type="button" id="btn-group-members-back" name="btn-group-members-back" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_BACK'); ?>"/>
-	    <input type="<?php echo $this->showBillingStep ? "button" : "submit";?>" id="btn-process-group-members" name="btn-process-group-members" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_NEXT'); ?>" />
+		<input type="button" id="btn-group-members-back" name="btn-group-members-back" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_BACK'); ?>"/>
+		<input type="<?php echo $this->showBillingStep ? "button" : "submit";?>" id="btn-process-group-members" name="btn-process-group-members" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_NEXT'); ?>" />
 	</div>
 	<input type="hidden" name="task" value="store_group_members_data" />
-	<input type="hidden" name="event_id" value="<?php echo $this->eventId; ?>" />	
-	<script type="text/javascript">			
+	<input type="hidden" name="event_id" value="<?php echo $this->eventId; ?>" />
+	<script type="text/javascript">
 			Eb.jQuery(document).ready(function($){
 				<?php
 					if (count($dateFields))
 					{
 						echo EventbookingHelperHtml::getCalendarSetupJs($dateFields);
-					}	
-				?>	
+					}
+				?>
 				$("#eb-form-group-members").validationEngine();
 				<?php
 					for($i = 1; $i <= $this->numberRegistrants; $i++)
 					{
 					?>
 						buildStateField('state_<?php echo $i; ?>', 'country_<?php echo $i; ?>', '');
-					<?php	
+					<?php
 					}
 					if ($this->showCaptcha && $this->captchaPlugin == 'recaptcha')
 					{
@@ -166,25 +166,25 @@ if ($this->showCaptcha)
 				$('#btn-group-members-back').click(function(){
 					$.ajax({
 						url: siteUrl + 'index.php?option=com_eventbooking&view=register&layout=number_members&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
-						type: 'post',				
+						type: 'post',
 						dataType: 'html',
 						beforeSend: function() {
-							$('#btn-group-members-back').attr('disabled', true);					
-						},	
+							$('#btn-group-members-back').attr('disabled', true);
+						},
 						complete: function() {
-							$('#btn-group-members-back').attr('disabled', false);					
-						},				
-						success: function(html) {						
+							$('#btn-group-members-back').attr('disabled', false);
+						},
+						success: function(html) {
 							$('#eb-number-group-members .eb-form-content').html(html);
 							$('#eb-group-members-information .eb-form-content').slideUp('slow');
-							$('#eb-number-group-members .eb-form-content').slideDown('slow');	
+							$('#eb-number-group-members .eb-form-content').slideDown('slow');
 						},
 						error: function(xhr, ajaxOptions, thrownError) {
 							alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
 						}
 					});
-				});	
-																			
+				});
+
 			})
 	</script>
-</form>	
+</form>

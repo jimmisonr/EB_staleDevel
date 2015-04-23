@@ -39,11 +39,11 @@ else
 	$msg = str_replace('[AMOUNT]', EventbookingHelper::formatCurrency($this->amount, $this->config, $this->event->currency_symbol), $msg) ;
 }
 $headerText = str_replace('[EVENT_TITLE]', $this->event->title, $headerText) ;
-if ($this->config->use_https) 
+if ($this->config->use_https)
 {
 	$url = JRoute::_('index.php?option=com_eventbooking&task=process_individual_registration&Itemid='.$this->Itemid, false, 1);
-} 
-else 
+}
+else
 {
 	$url = JRoute::_('index.php?option=com_eventbooking&task=process_individual_registration&Itemid='.$this->Itemid, false);
 }
@@ -59,102 +59,102 @@ $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
 $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 ?>
 <div id="eb-individual-registration-page" class="eb-container">
-	<h1 class="eb-page-heading"><?php echo $headerText; ?></h1>	
+	<h1 class="eb-page-heading"><?php echo $headerText; ?></h1>
 	<?php
-	if (strlen($msg)) 
+	if (strlen($msg))
 	{
-	?>								
-	<div class="eb-message"><?php echo $msg ; ?></div>							 															
-	<?php	
+	?>
+	<div class="eb-message"><?php echo $msg ; ?></div>
+	<?php
 	}
 	if (!$this->userId && $this->config->user_registration)
 	{
 		$actionUrl = JRoute::_('index.php?option=com_users&task=user.login');
-		$validateLoginForm = true;		
+		$validateLoginForm = true;
 	?>
-	<form method="post" action="<?php echo $actionUrl ; ?>" name="eb-login-form" id="eb-login-form" autocomplete="off" class="form form-horizontal">			
-		<h3 class="eb-heading"><?php echo JText::_('EB_EXISTING_USER_LOGIN'); ?></h3>			
+	<form method="post" action="<?php echo $actionUrl ; ?>" name="eb-login-form" id="eb-login-form" autocomplete="off" class="form form-horizontal">
+		<h3 class="eb-heading"><?php echo JText::_('EB_EXISTING_USER_LOGIN'); ?></h3>
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>" for="username">
 				<?php echo  JText::_('EB_USERNAME') ?><span class="required">*</span>
 			</label>
-			<div class="<?php echo $controlsClass; ?>">      				
-				<input type="text" name="username" id="username" class="input-large validate[required]" value=""/>		
-			</div>	
-		</div>		
+			<div class="<?php echo $controlsClass; ?>">
+				<input type="text" name="username" id="username" class="input-large validate[required]" value=""/>
+			</div>
+		</div>
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>" for="password">
 				<?php echo  JText::_('EB_PASSWORD') ?><span class="required">*</span>
 			</label>
-			<div class="<?php echo $controlsClass; ?>">      				
-				<input type="password" id="password" name="password" class="input-large validate[required]" value="" />		
-			</div>	
+			<div class="<?php echo $controlsClass; ?>">
+				<input type="password" id="password" name="password" class="input-large validate[required]" value="" />
+			</div>
 		</div>
 		<div class="<?php echo $controlGroupClass;  ?>">
-			<div class="<?php echo $controlsClass; ?>">      				
-				<input type="submit" value="<?php echo JText::_('EB_LOGIN'); ?>" class="button btn btn-primary" />		
-			</div>	
-		</div>    								
+			<div class="<?php echo $controlsClass; ?>">
+				<input type="submit" value="<?php echo JText::_('EB_LOGIN'); ?>" class="button btn btn-primary" />
+			</div>
+		</div>
 		<h3 class="eb-heading"><?php echo JText::_('EB_NEW_USER_REGISTER'); ?></h3>
-		<?php 
+		<?php
 			if (JPluginHelper::isEnabled('system', 'remember'))
 			{
 			?>
 				<input type="hidden" name="remember" value="1" />
-			<?php	
+			<?php
 			}
-		?>		
+		?>
 		<input type="hidden" name="return" value="<?php echo base64_encode(JFactory::getURI()->toString()); ?>" />
-		<?php echo JHtml::_( 'form.token' ); ?>			
-	</form>	
-	<?php	
+		<?php echo JHtml::_( 'form.token' ); ?>
+	</form>
+	<?php
 	}
-	else 
+	else
 	{
 		$validateLoginForm = false;
 	}
-	?>		
+	?>
 	<form method="post" name="adminForm" id="adminForm" action="<?php echo $url; ?>" autocomplete="off" class="form form-horizontal" enctype="multipart/form-data">
-	<?php	 									
-		if (!$this->userId && $this->config->user_registration) 
+	<?php
+		if (!$this->userId && $this->config->user_registration)
 		{
 			$params = JComponentHelper::getParams('com_users');
 			$minimumLength = $params->get('minimum_length', 4);
 			($minimumLength) ? $minSize = "minSize[4]" : $minSize = "";
-		?>						
+		?>
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>" for="username1">
 				<?php echo  JText::_('EB_USERNAME') ?><span class="required">*</span>
 			</label>
-			<div class="<?php echo $controlsClass; ?>">      				
-				<input type="text" name="username" id="username1" class="input-large validate[required,ajax[ajaxUserCall],<?php echo $minSize;?>]" value="<?php echo JRequest::getVar('username'); ?>" />						
-			</div>	
-		</div>					
+			<div class="<?php echo $controlsClass; ?>">
+				<input type="text" name="username" id="username1" class="input-large validate[required,ajax[ajaxUserCall],<?php echo $minSize;?>]" value="<?php echo JRequest::getVar('username'); ?>" />
+			</div>
+		</div>
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>" for="password1">
-				<?php echo  JText::_('EB_PASSWORD') ?><span class="required">*</span>						
-			</label>				
+				<?php echo  JText::_('EB_PASSWORD') ?><span class="required">*</span>
+			</label>
 			<div class="<?php echo $controlsClass; ?>">
-				<input type="password" name="password1" id="password1" class="input-large validate[required,<?php echo $minSize;?>]" value=""/>					
+				<input type="password" name="password1" id="password1" class="input-large validate[required,<?php echo $minSize;?>]" value=""/>
 			</div>
 		</div>
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>" for="password2">
-				<?php echo  JText::_('EB_RETYPE_PASSWORD') ?><span class="required">*</span>					
-			</label>				
+				<?php echo  JText::_('EB_RETYPE_PASSWORD') ?><span class="required">*</span>
+			</label>
 			<div class="<?php echo $controlsClass; ?>">
-				<input type="password" name="password2" id="password2" class="input-large validate[required,equals[password1]]" value="" />					
+				<input type="password" name="password2" id="password2" class="input-large validate[required,equals[password1]]" value="" />
 			</div>
-		</div>											
-		<?php	
-		}		
+		</div>
+		<?php
+		}
 		$fields = $this->form->getFields();
 		if (isset($fields['state']))
 		{
 			$selectedState = $fields['state']->value;
 		}
 		foreach ($fields as $field)
-		{						
+		{
 			echo $field->getControlGroup($bootstrapHelper);
 		}
 
@@ -168,7 +168,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 		}
 		if (($this->totalAmount > 0) || $this->form->containFeeFields())
 		{
-            $showPaymentInformation = true;
+			$showPaymentInformation = true;
 		?>
 		<h3 class="eb-heading"><?php echo JText::_('EB_PAYMENT_INFORMATION'); ?></h3>
 		<div class="<?php echo $controlGroupClass;  ?>">
@@ -416,8 +416,8 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 							?>
 							<label class="checkbox">
 								<input onclick="changePaymentMethod('individual');" class="validate[required] radio"
-								       type="radio" name="payment_method"
-								       value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
+									   type="radio" name="payment_method"
+									   value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
 							</label>
 						<?php
 						}
@@ -457,8 +457,8 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 
 				<div class="<?php echo $controlsClass; ?>">
 					<input type="text" id="x_card_num" name="x_card_num"
-					       class="input-large validate[required,creditCard]"
-					       value="<?php echo JRequest::getVar('x_card_num'); ?>"/>
+						   class="input-large validate[required,creditCard]"
+						   value="<?php echo JRequest::getVar('x_card_num'); ?>"/>
 				</div>
 			</div>
 			<div class="<?php echo $controlGroupClass;  ?> payment_information" id="tr_exp_date" <?php echo $style; ?>>
@@ -477,8 +477,8 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 
 				<div class="<?php echo $controlsClass; ?>">
 					<input type="text" id="x_card_code" name="x_card_code"
-					       class="input-large validate[required,custom[number]]"
-					       value="<?php echo JRequest::getVar('x_card_code'); ?>"/>
+						   class="input-large validate[required,custom[number]]"
+						   value="<?php echo JRequest::getVar('x_card_code'); ?>"/>
 				</div>
 			</div>
 			<?php
@@ -517,8 +517,8 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 
 				<div class="<?php echo $controlsClass; ?>">
 					<input type="text" id="card_holder_name" name="card_holder_name"
-					       class="input-large validate[required]"
-					       value="<?php echo JRequest::getVar('card_holder_name'); ?>"/>
+						   class="input-large validate[required]"
+						   value="<?php echo JRequest::getVar('card_holder_name'); ?>"/>
 				</div>
 			</div>
 			<?php
@@ -551,7 +551,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
 		</label>
 		<div class="<?php echo $controlsClass; ?>">
-			<?php echo $this->captcha; ?>						
+			<?php echo $this->captcha; ?>
 		</div>
 	</div>
 	<?php
@@ -567,12 +567,12 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 		$db->setQuery($query);
 		$article = $db->loadObject();
 		require_once JPATH_ROOT.'/components/com_content/helpers/route.php' ;
-		if ($this->config->fix_term_and_condition_popup) 
+		if ($this->config->fix_term_and_condition_popup)
 		{
 			$termLink = ContentHelperRoute::getArticleRoute($article->id, $article->catid).'&format=html' ;
 			$extra = ' target="_blank" ';
-		} 
-		else 
+		}
+		else
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-term');
 			$termLink = ContentHelperRoute::getArticleRoute($article->id, $article->catid).'&tmpl=component&format=html' ;
@@ -584,7 +584,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				<input type="checkbox" name="accept_term" value="1" class="validate[required]" data-errormessage="<?php echo JText::_('EB_ACCEPT_TERMS');?>" />
 				<?php echo JText::_('EB_ACCEPT'); ?>&nbsp;
 				<?php
-					echo "<a $extra href=\"".JRoute::_($termLink)."\">"."<strong>".JText::_('EB_TERM_AND_CONDITION')."</strong>"."</a>\n"; 
+					echo "<a $extra href=\"".JRoute::_($termLink)."\">"."<strong>".JText::_('EB_TERM_AND_CONDITION')."</strong>"."</a>\n";
 				?>
 			</label>
 		</div>
@@ -598,40 +598,40 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	{
 		$buttonText = JText::_('EB_PROCESS_REGISTRATION');
 	}
-	?>								
+	?>
 	<div class="form-actions">
 		<input type="button" class="btn btn-primary" name="btnBack" value="<?php echo  JText::_('EB_BACK') ;?>" onclick="window.history.go(-1);">
 		<input type="submit" class="btn btn-primary" name="btn-submit" id="btn-submit" value="<?php echo $buttonText;?>">
 		<img id="ajax-loading-animation" src="<?php echo JUri::base(true);?>/media/com_eventbooking/ajax-loadding-animation.gif" style="display: none;"/>
-	</div>																					
+	</div>
 	<?php
-		if (count($this->methods) == 1) 
+		if (count($this->methods) == 1)
 		{
 		?>
 			<input type="hidden" name="payment_method" value="<?php echo $this->methods[0]->getName(); ?>" />
-		<?php	
-		}		
+		<?php
+		}
 	?>
 	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
 	<input type="hidden" name="event_id" id="event_id" value="<?php echo $this->event->id ; ?>" />
-	<input type="hidden" name="option" value="com_eventbooking" />	
+	<input type="hidden" name="option" value="com_eventbooking" />
 	<input type="hidden" name="task" value="process_individual_registration" />
 	<input type="hidden" name="show_payment_fee" value="<?php echo (int)$this->showPaymentFee ; ?>" />
 	<input type="hidden" id="eb_ajax_async" value="<?php echo $ajaxAsync; ?>" />
-		<script type="text/javascript">	
-			var eb_current_page = 'default';	
+		<script type="text/javascript">
+			var eb_current_page = 'default';
 			Eb.jQuery(document).ready(function($){
 				<?php
 					if ($this->amount == 0)
 					{
 					?>
 						$('.payment_information').css('display', 'none');
-					<?php	
-					}	
-				?>	
-				$("#adminForm").validationEngine('attach', { 
+					<?php
+					}
+				?>
+				$("#adminForm").validationEngine('attach', {
 					onValidationComplete: function(form, status){
-						if (status == true) {						        
+						if (status == true) {
 							form.on('submit', function(e) {
 								e.preventDefault();
 							});
@@ -644,30 +644,30 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 					if ($validateLoginForm)
 					{
 					?>
-						$("#eb-login-form").validationEngine();	
-					<?php	
-					}	
+						$("#eb-login-form").validationEngine();
+					<?php
+					}
 				?>
 				buildStateField('state', 'country', '<?php echo $selectedState; ?>');
 				if ($('#email').val())
 				{
-					$('#email').validationEngine('validate'); 
+					$('#email').validationEngine('validate');
 				}
-                <?php
-                if ($this->amount == 0 && !empty($showPaymentInformation))
-                {
-                //The event is free because of discount, so we need to hide payment information
-                ?>
-                    $('.payment_information').css('display', 'none');
-                <?php
-                }
-                ?>
+				<?php
+				if ($this->amount == 0 && !empty($showPaymentInformation))
+				{
+				//The event is free because of discount, so we need to hide payment information
+				?>
+					$('.payment_information').css('display', 'none');
+				<?php
+				}
+				?>
 			})
-			var siteUrl = "<?php echo EventbookingHelper::getSiteUrl(); ?>";			
+			var siteUrl = "<?php echo EventbookingHelper::getSiteUrl(); ?>";
 			<?php
-				echo os_payments::writeJavascriptObjects();					 		 
-			?>										
-		</script>	
+				echo os_payments::writeJavascriptObjects();
+			?>
+		</script>
 		<?php echo JHtml::_( 'form.token' ); ?>
-	</form>					
+	</form>
 </div>

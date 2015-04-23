@@ -12,12 +12,12 @@ defined( '_JEXEC' ) or die ;
 ?>
 <div id="eb-event-page" class="eb-container">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_REGISTRATION_FAILURE'); ?></h1>
-<table width="100%">	
+<table width="100%">
 	<tr>
 		<td colspan="2" align="left">
 			<?php echo  JText::_('EB_FAILURE_MESSAGE'); ?>
 		</td>
-	</tr>	
+	</tr>
 	<tr>
 		<td valign="top">
 			<?php echo JText::_('EB_REASON'); ?>
@@ -30,6 +30,6 @@ defined( '_JEXEC' ) or die ;
 		<td colspan="2">
 			<input type="button" class="btn btn-primary" value="<?php echo JText::_('EB_BACK'); ?>" onclick="window.history.go(-1);" />
 		</td>
-	</tr>	
+	</tr>
 </table>
 </div>

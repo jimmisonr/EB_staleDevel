@@ -22,7 +22,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	<?php echo str_replace('[EVENT_TITLE]', $this->event->title, $this->inviteMessage) ; ?>
 </div>
 <div class="clearfix"></div>
-<form name="adminForm" id="adminForm" method="post" action="index.php?tmpl=component" class="form form-horizontal">	    			
+<form name="adminForm" id="adminForm" method="post" action="index.php?tmpl=component" class="form form-horizontal">
 	<div class="<?php echo $controlGroupClass; ?>">
 		<label class="<?php echo $controlLabelClass; ?>">
 			<?php echo JText::_('EB_NAME'); ?>
@@ -53,13 +53,13 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	</div>
 	<div class="<?php echo $controlGroupClass; ?>">
 		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_MESSAGE'); ?>				
+			<?php echo JText::_('EB_MESSAGE'); ?>
 		</label>
 		<div class="<?php echo $controlsClass; ?>">
 			<textarea rows="10" cols="80" name="message" class="inputbox"><?php echo JRequest::getVar('message'); ?></textarea>
 		</div>
 	</div>
-	<?php 
+	<?php
 	if ($this->showCaptcha)
 	{
 	?>
@@ -68,27 +68,27 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
 			</label>
 			<div class="<?php echo $controlsClass; ?>">
-				<?php echo $this->captcha; ?>					
+				<?php echo $this->captcha; ?>
 			</div>
 		</div>
 	<?php
 	}
 	?>
-	<div class="form-actions">		
-		<input type="submit" value="<?php echo JText::_('EB_INVITE'); ?>" class="btn btn-primary" />			
+	<div class="form-actions">
+		<input type="submit" value="<?php echo JText::_('EB_INVITE'); ?>" class="btn btn-primary" />
 	</div>
 	<script type="text/javascript">
 			Eb.jQuery(document).ready(function($){
-				$("#adminForm").validationEngine('attach', { 
-				    onValidationComplete: function(form, status){
-				        if (status == true) {						        
-				            form.on('submit', function(e) {
-				                e.preventDefault();
-				            });
-				            return true;
-				        }
-				        return false;
-				    }
+				$("#adminForm").validationEngine('attach', {
+					onValidationComplete: function(form, status){
+						if (status == true) {
+							form.on('submit', function(e) {
+								e.preventDefault();
+							});
+							return true;
+						}
+						return false;
+					}
 				});
 			})
 	</script>
@@ -97,4 +97,4 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	<input type="hidden" name="event_id" value="<?php echo $this->event->id; ?>" />
 	<input type="hidden" name="Itemid" value="<?php echo JRequest::getInt('Itemid', 0); ?>" />
 </form>
-</div>	
+</div>

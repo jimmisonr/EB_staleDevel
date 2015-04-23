@@ -12,26 +12,26 @@ defined( '_JEXEC' ) or die ;
 $hiddenPhoneClass = $this->bootstrapHelper->getClassMapping('hidden-phone');
 ?>
 <div id="eb-registrants-list-page" class="eb-container">
-<h1 class="eb_title"><?php echo JText::_('EB_REGISTRANT_LIST'); ?></h1>	
-<?php    
-if (count($this->items)) 
+<h1 class="eb_title"><?php echo JText::_('EB_REGISTRANT_LIST'); ?></h1>
+<?php
+if (count($this->items))
 {
-?>		
+?>
 	<table class="table table-striped table-bordered table-condensed">
 	<thead>
 		<tr>
 			<th width="5" class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo JText::_( 'NUM' ); ?>
-			</th>				
+			</th>
 			<th>
 				<?php echo JText::_('EB_FIRST_NAME'); ?>
 			</th>
-			<th>						
+			<th>
 				<?php echo JText::_('EB_LAST_NAME'); ?>
-			</th>								
+			</th>
 			<th class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo JText::_('EB_REGISTRANTS'); ?>
-			</th>																
+			</th>
 			<th class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo JText::_('EB_REGISTRATION_DATE'); ?>
 			</th>
@@ -44,35 +44,35 @@ if (count($this->items))
 						<th class="hidden-phone">
 							<?php echo $this->fieldTitles[$fieldId] ; ?>
 						</th>
-					<?php	
-					}	
+					<?php
+					}
 				}
 			?>
 		</tr>
-	</thead>		
+	</thead>
 	<tbody>
 	<?php
-	$k = 0;	
+	$k = 0;
 	for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 	{
-		$row = &$this->items[$i];											
+		$row = &$this->items[$i];
 		?>
 		<tr>
 			<td class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo $i+1 ; ?>
-			</td>					
-			<td>					
-					<?php echo $row->first_name ?>					
-			</td>			
+			</td>
+			<td>
+					<?php echo $row->first_name ?>
+			</td>
 			<td>
 				<?php echo $row->last_name ; ?>
 			</td>
 			<td class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo $row->number_registrants ; ?>
-			</td>				
+			</td>
 			<td class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo JHtml::_('date', $row->register_date, $this->config->date_format) ; ?>
-			</td>	
+			</td>
 			<?php
 				if ($this->displayCustomField)
 				{
@@ -90,24 +90,24 @@ if (count($this->items))
 						<td class="<?php echo $hiddenPhoneClass; ?>">
 							<?php echo $fieldValue ?>
 						</td>
-					<?php	
-					}	
+					<?php
+					}
 				}
-			?>							
+			?>
 		</tr>
 		<?php
 		$k = 1 - $k;
 	}
 	?>
 	</tbody>
-</table>		
-<?php	
-} 
-else 
+</table>
+<?php
+}
+else
 {
 ?>
 	<div class="eb-message"><?php echo JText::_('EB_NO_REGISTRATION_RECORDS');?></div>
-<?php	
+<?php
 }
 ?>
 </div>

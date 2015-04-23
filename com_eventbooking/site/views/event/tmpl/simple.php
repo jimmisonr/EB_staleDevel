@@ -23,7 +23,7 @@ $format = 'Y-m-d' ;
 		var form = document.adminForm;
 		if (pressbutton == 'cancel_event') {
 			Joomla.submitform( pressbutton );
-			return;				
+			return;
 		} else {
 			//Should have some validations rule here
 			//Check something here
@@ -31,19 +31,19 @@ $format = 'Y-m-d' ;
 				alert("<?php echo JText::_('EB_PLEASE_ENTER_TITLE'); ?>");
 				form.title.focus();
 				return ;
-			}				
+			}
 			if (form.event_date.value == '') {
 				alert("<?php echo JText::_('EB_ENTER_EVENT_DATE'); ?>");
 				form.event_date.focus();
 				return ;
 			}
 			//Check the event price
-			if (form.main_category_id.value == 0) 
+			if (form.main_category_id.value == 0)
 			{
 				alert("<?php echo JText::_("EB_CHOOSE_CATEGORY");  ?>");
 				return ;
 			}
-			//Check the price						
+			//Check the price
 			Joomla.submitform( pressbutton );
 		}
 	}
@@ -53,7 +53,7 @@ $format = 'Y-m-d' ;
 	<div style="float: right; width: 50%; text-align: right;">
 		<input type="button" name="btnSave" value="<?php echo JText::_('EB_SAVE'); ?>" onclick="checkData('save_event');" class="btn btn-primary" />
 		<input type="button" name="btnSave" value="<?php echo JText::_('EB_CANCEL_EVENT'); ?>" onclick="checkData('cancel_event');" class="btn btn-primary" />
-	</div>	
+	</div>
 </div>
 <div class="clearfix"></div>
 <form action="index.php" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data" class="form form-horizontal">
@@ -62,34 +62,34 @@ $format = 'Y-m-d' ;
 		<li class="active"><a href="#basic-information-page" data-toggle="tab"><?php echo JText::_('EB_BASIC_INFORMATION');?></a></li>
 		<li><a href="#group-registration-rates-page" data-toggle="tab"><?php echo JText::_('EB_GROUP_REGISTRATION_RATES');?></a></li>
 		<li><a href="#misc-page" data-toggle="tab"><?php echo JText::_('EB_MISC');?></a></li>
-		<li><a href="#discount-page" data-toggle="tab"><?php echo JText::_('EB_DISCOUNT_SETTING');?></a></li>					
-		<?php 
+		<li><a href="#discount-page" data-toggle="tab"><?php echo JText::_('EB_DISCOUNT_SETTING');?></a></li>
+		<?php
 			if ($this->config->event_custom_field) {
 			?>
 				<li><a href="#extra-information-page" data-toggle="tab"><?php echo JText::_('EB_EXTRA_INFORMATION');?></a></li>
-			<?php	
+			<?php
 			}
-		?>			
+		?>
 	</ul>
-	<div class="tab-content">			
-		<div class="tab-pane active" id="basic-information-page">			
+	<div class="tab-content">
+		<div class="tab-pane active" id="basic-information-page">
 			<table class="admintable" width="100%">
 				<tr>
 					<td class="key" width="30%"><?php echo JText::_('EB_TITLE') ; ?></td>
 					<td>
 						<input type="text" name="title" value="<?php echo $this->item->title; ?>" class="input-xlarge" size="70" />
 					</td>
-				</tr>	
+				</tr>
 				<tr>
 					<td class="key" width="30%"><?php echo JText::_('EB_ALIAS') ; ?></td>
 					<td>
 						<input type="text" name="alias" value="<?php echo $this->item->alias; ?>" class="input-xlarge" size="70" />
 					</td>
-				</tr>					
+				</tr>
 				<tr>
 					<td class="key" valign="top"><?php echo JText::_('EB_MAIN_EVENT_CATEGORY') ; ?></td>
 					<td>
-						<div style="float: left;"><?php echo $this->lists['main_category_id'] ; ?></div>								
+						<div style="float: left;"><?php echo $this->lists['main_category_id'] ; ?></div>
 					</td>
 				</tr>
 				<tr>
@@ -98,52 +98,52 @@ $format = 'Y-m-d' ;
 						<div style="float: left;"><?php echo $this->lists['category_id'] ; ?></div>
 						<div style="float: left; padding-top: 25px; padding-left: 10px;">Press <strong>Ctrl</strong> to select multiple categories</div>
 					</td>
-				</tr>				
-                <tr>
-                    <td class="key"><?php echo JText::_('EB_THUMB_IMAGE') ; ?></td>
-                    <td>
-                        <input type="file" class="inputbox" name="thumb" size="60" />
-                        <?php
-                        if ($this->item->thumb) 
+				</tr>
+				<tr>
+					<td class="key"><?php echo JText::_('EB_THUMB_IMAGE') ; ?></td>
+					<td>
+						<input type="file" class="inputbox" name="thumb" size="60" />
+						<?php
+						if ($this->item->thumb)
 						{
-                        ?>
-                            <a href="<?php echo JURI::root().'media/com_eventbooking/images/'.$this->item->thumb; ?>" class="modal"><img src="<?php echo JURI::root().'media/com_eventbooking/images/thumbs/'.$this->item->thumb; ?>" class="img_preview" /></a>
-                            <input type="checkbox" name="del_thumb" value="1" /><?php echo JText::_('EB_DELETE_CURRENT_THUMB'); ?>
-                        <?php
-                        }
-                        ?>
-                    </td>
-                </tr>
-                <tr>
+						?>
+							<a href="<?php echo JURI::root().'media/com_eventbooking/images/'.$this->item->thumb; ?>" class="modal"><img src="<?php echo JURI::root().'media/com_eventbooking/images/thumbs/'.$this->item->thumb; ?>" class="img_preview" /></a>
+							<input type="checkbox" name="del_thumb" value="1" /><?php echo JText::_('EB_DELETE_CURRENT_THUMB'); ?>
+						<?php
+						}
+						?>
+					</td>
+				</tr>
+				<tr>
 					<td class="key"><?php echo JText::_('EB_LOCATION') ; ?></td>
 					<td>
 						<?php echo $this->lists['location_id'] ; ?>
 					</td>
-				</tr>					
+				</tr>
 				<tr>
 					<td class="key">
 						<?php echo JText::_('EB_EVENT_START_DATE'); ?>
-					</td>				
-					<td>					
-						<?php echo JHtml::_('calendar', ($this->item->event_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_date, $format, null), 'event_date', 'event_date') ; ?>
-						<?php echo $this->lists['event_date_hour'].' '.$this->lists['event_date_minute']; ?>					
 					</td>
-				</tr>		
+					<td>
+						<?php echo JHtml::_('calendar', ($this->item->event_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_date, $format, null), 'event_date', 'event_date') ; ?>
+						<?php echo $this->lists['event_date_hour'].' '.$this->lists['event_date_minute']; ?>
+					</td>
+				</tr>
 				<tr>
 					<td class="key">
 						<?php echo JText::_('EB_EVENT_END_DATE'); ?>
-					</td>				
-					<td>					
-						<?php echo JHtml::_('calendar', ($this->item->event_end_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_end_date, $format, null), 'event_end_date', 'event_end_date') ; ?>
-						<?php echo $this->lists['event_end_date_hour'].' '.$this->lists['event_end_date_minute'] ; ?>					
 					</td>
-				</tr>				
+					<td>
+						<?php echo JHtml::_('calendar', ($this->item->event_end_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_end_date, $format, null), 'event_end_date', 'event_end_date') ; ?>
+						<?php echo $this->lists['event_end_date_hour'].' '.$this->lists['event_end_date_minute'] ; ?>
+					</td>
+				</tr>
 				<tr>
 					<td class="key">
 						<?php echo JText::_('EB_PRICE'); ?>
-					</td>				
+					</td>
 					<td>
-						<input type="text" name="individual_price" id="individual_price" class="input-mini" size="10" value="<?php echo $this->item->individual_price; ?>" />					
+						<input type="text" name="individual_price" id="individual_price" class="input-mini" size="10" value="<?php echo $this->item->individual_price; ?>" />
 					</td>
 				</tr>
 				<tr>
@@ -175,15 +175,15 @@ $format = 'Y-m-d' ;
 					<td>
 						<input type="text" name="max_group_number" id="max_group_number" class="input-mini" size="10" value="<?php echo $this->item->max_group_number; ?>" />
 					</td>
-				</tr>				
+				</tr>
 				<tr>
 					<td width="30%" class="key">
 						<?php echo JText::_('EB_PAYPAL_EMAIL'); ?>
-					</td>				
+					</td>
 					<td width="50%">
 						<input type="text" name="paypal_email" class="inputbox" size="50" value="<?php echo $this->item->paypal_email ; ?>" />
-					</td>					
-				</tr>									
+					</td>
+				</tr>
 				<tr>
 					<td class="key">
 						<?php echo JText::_('EB_PUBLISHED'); ?>
@@ -191,31 +191,31 @@ $format = 'Y-m-d' ;
 					<td>
 						<?php echo $this->lists['published']; ?>
 					</td>
-				</tr>															
+				</tr>
 				<tr>
 					<td class="key">
 						<?php echo  JText::_('EB_SHORT_DESCRIPTION'); ?>
 					</td>
 					<td>
-						<?php echo $editor->display( 'short_description',  $this->item->short_description , '100%', '180', '90', '6' ) ; ?>					
+						<?php echo $editor->display( 'short_description',  $this->item->short_description , '100%', '180', '90', '6' ) ; ?>
 					</td>
-				</tr>					
+				</tr>
 				<tr>
 					<td class="key">
 						<?php echo  JText::_('EB_DESCRIPTION'); ?>
 					</td>
 					<td>
-						<?php echo $editor->display( 'description',  $this->item->description , '100%', '250', '90', '10' ) ; ?>					
+						<?php echo $editor->display( 'description',  $this->item->description , '100%', '250', '90', '10' ) ; ?>
 					</td>
-				</tr>																						
-			</table>			
+				</tr>
+			</table>
 		</div>
 		<div class="tab-pane" id="group-registration-rates-page">
 			<table  id="price_list" width="100%">
 				<tr>
 					<th width="20%">
 						<?php echo JText::_('EB_REGISTRANT_NUMBER'); ?>
-					</th>				
+					</th>
 					<th>
 						<?php echo JText::_('EB_RATE'); ?>
 					</th>
@@ -235,12 +235,12 @@ $format = 'Y-m-d' ;
 						<tr>
 							<td>
 								<input type="text" class="input-small" name="registrant_number[]" size="10" value="<?php echo $registrantNumber; ?>" />
-							</td>						
+							</td>
 							<td>
 								<input type="text" class="input-small" name="price[]" size="10" value="<?php echo $price; ?>" />
 							</td>
 						</tr>
-					<?php				 									
+					<?php
 					}
 				?>
 				<tr>
@@ -250,17 +250,17 @@ $format = 'Y-m-d' ;
 						<input type="button" class="btn button" value="<?php echo JText::_('EB_REMOVE'); ?>" onclick="removeRow();" />
 					</td>
 				</tr>
-			</table>			
+			</table>
 		</div>
 		<div class="tab-pane" id="misc-page">
 			<table class="admintable" width="100%">
 				<tr>
 					<td width="30%" class="key">
 						<?php echo JText::_('EB_NOTIFICATION_EMAILS'); ?>
-					</td>				
+					</td>
 					<td>
 						<input type="text" name="notification_emails" class="inputbox" size="70" value="<?php echo $this->item->notification_emails ; ?>" />
-					</td>					
+					</td>
 				</tr>
 				<tr>
 					<td class="key">
@@ -285,7 +285,7 @@ $format = 'Y-m-d' ;
 					<td>
 						<?php echo $this->lists['enable_cancel_registration'] ; ?>
 					</td>
-				</tr>		
+				</tr>
 				<tr>
 					<td class="key">
 						<?php echo JText::_('EB_CANCEL_BEFORE_DATE'); ?>
@@ -301,7 +301,7 @@ $format = 'Y-m-d' ;
 					<td>
 						<?php echo $this->lists['enable_auto_reminder']; ?>
 					</td>
-				</tr>			
+				</tr>
 				<tr>
 					<td class="key">
 						<?php echo JText::_('EB_REMIND_BEFORE'); ?>
@@ -309,9 +309,9 @@ $format = 'Y-m-d' ;
 					<td>
 						<input type="text" name="remind_before_x_days" class="input-mini" size="5" value="<?php echo $this->item->remind_before_x_days; ?>" /> days
 					</td>
-				</tr>	
+				</tr>
 				<?php
-					if ($this->config->term_condition_by_event) {					
+					if ($this->config->term_condition_by_event) {
 					?>
 						<tr>
 							<td class="key">
@@ -319,29 +319,29 @@ $format = 'Y-m-d' ;
 							</td>
 							<td>
 								<?php echo $this->lists['article_id'] ; ?>
-							</td>	
+							</td>
 						</tr>
-					<?php	
+					<?php
 					}
 				?>
-                <tr>
-                    <td width="100" class="key">
-                        <?php echo  JText::_('EB_META_KEYWORDS'); ?>
-                    </td>
-                    <td>
-                        <textarea rows="5" cols="30" class="input-lage" name="meta_keywords"><?php echo $this->item->meta_keywords; ?></textarea>
-                    </td>
-                </tr>
-                <tr>
-                    <td width="100" class="key">
-                        <?php echo  JText::_('EB_META_DESCRIPTION'); ?>
-                    </td>
-                    <td>
-                        <textarea rows="5" cols="30" class="input-lage" name="meta_description"><?php echo $this->item->meta_description; ?></textarea>
-                    </td>
-                </tr>
-			</table>		
-		</div>			
+				<tr>
+					<td width="100" class="key">
+						<?php echo  JText::_('EB_META_KEYWORDS'); ?>
+					</td>
+					<td>
+						<textarea rows="5" cols="30" class="input-lage" name="meta_keywords"><?php echo $this->item->meta_keywords; ?></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td width="100" class="key">
+						<?php echo  JText::_('EB_META_DESCRIPTION'); ?>
+					</td>
+					<td>
+						<textarea rows="5" cols="30" class="input-lage" name="meta_description"><?php echo $this->item->meta_description; ?></textarea>
+					</td>
+				</tr>
+			</table>
+		</div>
 		<div class="tab-pane" id="discount-page">
 			<table class="admintable" width="100%">
 				<tr>
@@ -364,53 +364,53 @@ $format = 'Y-m-d' ;
 					<td class="key" width="30%">
 						<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_EARLY_BIRD_DISCOUNT_DATE' );?>::<?php echo JText::_('EB_EARLY_BIRD_DISCOUNT_DATE_EXPLAIN'); ?>"><?php echo JText::_('EB_EARLY_BIRD_DISCOUNT_DATE'); ?></span>
 					</td>
-					<td>				
+					<td>
 						<?php echo JHtml::_('calendar', $this->item->early_bird_discount_date != $this->nullDate ? JHtml::_('date', $this->item->early_bird_discount_date, $format, null) : '', 'early_bird_discount_date', 'early_bird_discount_date'); ?>
 					</td>
 				</tr>
 			</table>
-		</div>		
-		<?php 
+		</div>
+		<?php
 			if ($this->config->event_custom_field) {
 			?>
 				<div class="tab-pane" id="extra-information-page">
-					<table class="admintable">				
+					<table class="admintable">
 					<?php
 						foreach ($this->form->getFieldset('basic') as $field) {
 						?>
 							<tr>
 								<td class="key" width="30%">
 									<?php echo $field->label ;?>
-								</td>					
+								</td>
 								<td>
 									<?php echo  $field->input ; ?>
 								</td>
 							</tr>
 					<?php
-						}					
+						}
 					?>
-					</table>								
+					</table>
 				</div>
-			<?php	
+			<?php
 			}
-		?>				
-	</div>	
+		?>
+	</div>
 </div>
-	<input type="hidden" name="option" value="com_eventbooking" />	
+	<input type="hidden" name="option" value="com_eventbooking" />
 	<input type="hidden" name="cid[]" value="<?php echo $this->item->id; ?>" />
-	<input type="hidden" name="task" value="" />	
+	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
-	<?php echo JHtml::_( 'form.token' ); ?>	
+	<?php echo JHtml::_( 'form.token' ); ?>
 	<script type="text/javascript" language="javascript">
 		function addRow() {
 			var table = document.getElementById('price_list');
 			var newRowIndex = table.rows.length - 1 ;
-			var row = table.insertRow(newRowIndex);			
-			var registrantNumber = row.insertCell(0);							
-			var price = row.insertCell(1);						
-			registrantNumber.innerHTML = '<input type="text" class="inputbox" name="registrant_number[]" size="10" />';			
-			price.innerHTML = '<input type="text" class="inputbox" name="price[]" size="10" />';		
-			
+			var row = table.insertRow(newRowIndex);
+			var registrantNumber = row.insertCell(0);
+			var price = row.insertCell(1);
+			registrantNumber.innerHTML = '<input type="text" class="inputbox" name="registrant_number[]" size="10" />';
+			price.innerHTML = '<input type="text" class="inputbox" name="price[]" size="10" />';
+
 		}
 		function removeRow() {
 			var table = document.getElementById('price_list');
@@ -420,6 +420,6 @@ $format = 'Y-m-d' ;
 			} else {
 				alert("<?php echo JText::_('EB_NO_ROW_TO_DELETE'); ?>");
 			}
-		}		
+		}
 	</script>
 </form>
