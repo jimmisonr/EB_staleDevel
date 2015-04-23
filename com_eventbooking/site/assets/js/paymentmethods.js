@@ -466,12 +466,19 @@ function buildStateField(stateFieldId, countryFieldId, defaultState)
 			else 
 			{
 				var countryName = '';
-			}			
+			}
 			$.ajax({
 				type: 'POST',
 				url: siteUrl + 'index.php?option=com_eventbooking&task=get_states&country_name='+ countryName+'&field_name='+stateFieldId + '&state_name=' + defaultState + langLinkForAjax,
 				success: function(data) {
-					$('#field_' + stateFieldId + ' .controls').html(data);
+                    if ($('#field_' + stateFieldId + ' .controls').length)
+                    {
+                        $('#field_' + stateFieldId + ' .controls').html(data);
+                    }
+                    else
+                    {
+                        $('#field_' + stateFieldId + ' .col-sm-9').html(data);
+                    }
 				},
 				error: function(jqXHR, textStatus, errorThrown) {						
 					alert(textStatus);
@@ -485,7 +492,14 @@ function buildStateField(stateFieldId, countryFieldId, defaultState)
 						type: 'POST',
 						url: siteUrl + 'index.php?option=com_eventbooking&task=get_states&country_name='+ $(this).val()+'&field_name=' + stateFieldId + '&state_name=' + defaultState + langLinkForAjax,
 						success: function(data) {
-							$('#field_' + stateFieldId + ' .controls').html(data);
+                            if ($('#field_' + stateFieldId + ' .controls').length)
+                            {
+                                $('#field_' + stateFieldId + ' .controls').html(data);
+                            }
+                            else
+                            {
+                                $('#field_' + stateFieldId + ' .col-sm-9').html(data);
+                            }
 						},
 						error: function(jqXHR, textStatus, errorThrown) {						
 							alert(textStatus);
