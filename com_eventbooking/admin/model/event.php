@@ -647,6 +647,7 @@ class EventbookingModelEvent extends RADModelItem
 				$fieldsToUpdate = array(
 					'category_id',
 					'location_id',
+					'registration_type',
 					'title',
 					'short_description',
 					'description',
