@@ -45,7 +45,7 @@ class RADFormFieldTextarea extends RADFormField
 	 * @return  string  The field input markup.
 	 *
 	 */
-	public function getInput()
+	public function getInput($bootstrapHelper = null)
 	{
 		$attributes = $this->buildAttributes();
 		return '<textarea name="' . $this->name . '" id="' . $this->name . '"' . $attributes . $this->row->extra_attributes . ' >' .

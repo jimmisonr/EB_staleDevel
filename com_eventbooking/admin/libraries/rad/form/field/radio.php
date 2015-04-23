@@ -24,7 +24,7 @@ class RADFormFieldRadio extends RADFormField
 	 * @return string The field input markup.
 	 *        
 	 */
-	protected function getInput()
+	protected function getInput($bootstrapHelper = null)
 	{
 		$html = array();
 		$options = (array) $this->getOptions();

@@ -236,7 +236,7 @@ abstract class RADFormField
 	 * @return  string  The field input markup.
 	 *	 
 	 */
-	abstract protected function getInput();
+	abstract protected function getInput($bootstrapHelper = null);
 	/**
 	 * Method to get the field label markup.
 	 *
@@ -278,7 +278,7 @@ abstract class RADFormField
 	 * @return  string  A string containing the html for the control goup
 	 *
 	 */
-	public function getControlGroup()
+	public function getControlGroup($bootstrapHelper = null)
 	{
 		if ($this->type == 'hidden')
 		{
@@ -286,23 +286,31 @@ abstract class RADFormField
 		}
 		else
 		{
-			$controlGroupAttributes = 'id="field_'.$this->name.'" ';
-			
-			if($this->hideOnDisplay)
+			if (!$bootstrapHelper)
+			{
+				$config          = EventbookingHelper::getConfig();
+				$bootstrapHelper = new OSMembershipHelperBootstrap($config->twitter_bootstrap_version);
+			}
+			$controlGroupClass      = $bootstrapHelper ? $bootstrapHelper->getClassMapping('control-group') : 'control-group';
+			$controlLabelClass      = $bootstrapHelper ? $bootstrapHelper->getClassMapping('control-label') : 'control-label';
+			$controlsClass          = $bootstrapHelper ? $bootstrapHelper->getClassMapping('controls') : 'controls';
+			$controlGroupAttributes = 'id="field_' . $this->name . '" ';
+
+			if ($this->hideOnDisplay)
 			{
 				$controlGroupAttributes .= ' style="display:none;" ';
-			}			
+			}
 			$class = $this->feeCalculation ? ' payment-calculation' : '';
 			if (version_compare(JVERSION, '3.0', 'ge'))
 			{
-				return '<div class="control-group'.$class.'" '.$controlGroupAttributes.'>' . '<div class="control-label">' . $this->getLabel() . '</div>' . '<div class="controls">' .
-					 $this->getInput() . '</div>' . '</div>';
+				return '<div class="' . $controlGroupClass . $class . '" ' . $controlGroupAttributes . '>' . '<div class="' . $controlLabelClass . '">' . $this->getLabel() . '</div>' . '<div class="' . $controlsClass . '">' .
+				$this->getInput() . '</div>' . '</div>';
 			}
 			else
 			{
-				return '<div class="control-group'.$class.'" '.$controlGroupAttributes.'>' . '<div class="control-label">' . $this->title .
-					 ($this->row->required ? '<span class="star">&#160;*</span>' : '') . '</div>' . '<div class="controls">' . $this->getInput() . '</div>' .
-					 '</div>';
+				return '<div class="' . $controlGroupClass . $class . '" ' . $controlGroupAttributes . '>' . '<div class="' . $controlLabelClass . '">' . $this->title .
+				($this->row->required ? '<span class="star">&#160;*</span>' : '') . '</div>' . '<div class="' . $controlsClass . '">' . $this->getInput($bootstrapHelper) . '</div>' .
+				'</div>';
 			}
 		}
 	}
@@ -310,10 +318,10 @@ abstract class RADFormField
 	 * Get output of the field using for sending email and display on the registration complete page
 	 * @param bool $tableless
 	 * @return string
-	 */			
-	public function getOutput($tableLess = true)
+	 */
+	public function getOutput($tableLess = true, $bootstrapHelper = null)
 	{
-		
+
 		if (is_string($this->value) && is_array(json_decode($this->value)))
 		{
 			$fieldValue = implode(', ', json_decode($this->value));
@@ -324,13 +332,23 @@ abstract class RADFormField
 		}
 		if ($tableLess)
 		{
-			return '<div class="control-group">' . '<div class="control-label">' . $this->title . '</div>' . '<div class="controls">' .
-				$fieldValue . '</div>' . '</div>';
-		}	
-		else 
+			if (!$bootstrapHelper)
+			{
+				$config          = EventbookingHelper::getConfig();
+				$bootstrapHelper = new OSMembershipHelperBootstrap($config->twitter_bootstrap_version);
+			}
+			
+			$controlGroupClass      = $bootstrapHelper ? $bootstrapHelper->getClassMapping('control-group') : 'control-group';
+			$controlLabelClass      = $bootstrapHelper ? $bootstrapHelper->getClassMapping('control-label') : 'control-label';
+			$controlsClass          = $bootstrapHelper ? $bootstrapHelper->getClassMapping('controls') : 'controls';
+
+			return '<div class="' . $controlGroupClass . '">' . '<div class="' . $controlLabelClass . '">' . $this->title . '</div>' . '<div class="' . $controlsClass . '">' .
+			$fieldValue . '</div>' . '</div>';
+		}
+		else
 		{
 			return '<tr>' . '<td class="title_cell">' . $this->title . '</td>' . '<td class="field_cell">' .
-				$fieldValue . '</td>' . '</tr>';
+			$fieldValue . '</td>' . '</tr>';
 		}
 	}
 	/**
