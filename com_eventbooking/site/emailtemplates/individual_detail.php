@@ -9,13 +9,16 @@
  */
 // no direct access
 defined('_JEXEC') or die;
+$controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
+$controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
+$controlsClass     = $bootstrapHelper->getClassMapping('controls');
 ?>
 <form id="adminForm" class="form form-horizontal">
-    <div class="control-group">
-        <label class="control-label">
+    <div class="<?php echo $controlGroupClass; ?>">
+        <label class="<?php echo $controlLabelClass; ?>">
             <?php echo  JText::_('EB_EVENT_TITLE') ?>
         </label>
-        <div class="controls">
+        <div class="<?php echo $controlsClass; ?>">
             <?php echo $rowEvent->title ; ?>
         </div>
     </div>
@@ -23,11 +26,11 @@ defined('_JEXEC') or die;
         if ($config->show_event_date)
         {
         ?>
-        <div class="control-group">
-            <label class="control-label">
+        <div class="<?php echo $controlGroupClass; ?>">
+            <label class="<?php echo $controlLabelClass; ?>">
                 <?php echo  JText::_('EB_EVENT_DATE') ?>
             </label>
-            <div class="controls">
+            <div class="<?php echo $controlsClass; ?>">
                 <?php
                     if ($rowEvent->event_date == EB_TBC_DATE)
                     {
@@ -67,11 +70,11 @@ defined('_JEXEC') or die;
             	$locationInformation[] = $location->country;
             }
         ?>
-            <div class="control-group">
-                <label class="control-label">
+            <div class="<?php echo $controlGroupClass; ?>">
+                <label class="<?php echo $controlLabelClass; ?>">
                     <?php echo  JText::_('EB_LOCATION') ?>
                 </label>
-                <div class="controls">
+                <div class="<?php echo $controlsClass; ?>">
                     <?php echo $location->name.' ('.implode(', ', $locationInformation).')' ; ?>
                 </div>
             </div>
@@ -85,16 +88,16 @@ defined('_JEXEC') or die;
 	        {
 		        continue;
 	        }
-        	echo $field->getOutput();						
+        	echo $field->getOutput(true, $bootstrapHelper);
 		}		    
         if ($row->total_amount > 0)
         {
         ?>
-        <div class="control-group">
-			<label class="control-label">
+        <div class="<?php echo $controlGroupClass; ?>">
+			<label class="<?php echo $controlLabelClass; ?>">
 				<?php echo JText::_('EB_AMOUNT'); ?>
 			</label>
-			<div class="controls">
+			<div class="<?php echo $controlsClass; ?>">
 				<?php echo EventbookingHelper::formatCurrency($row->total_amount, $config, $rowEvent->currency_symbol); ?>
 			</div>
         </div>
@@ -102,11 +105,11 @@ defined('_JEXEC') or die;
 			if ($row->discount_amount > 0)
 			{
 			?>
-				<div class="control-group">
-					<label class="control-label">
+				<div class="<?php echo $controlGroupClass; ?>">
+					<label class="<?php echo $controlLabelClass; ?>">
 						<?php echo  JText::_('EB_DISCOUNT_AMOUNT'); ?>
 					</label>
-					<div class="controls">
+					<div class="<?php echo $controlsClass; ?>">
 						<?php echo EventbookingHelper::formatCurrency($row->discount_amount, $config, $rowEvent->currency_symbol); ?>
 					</div>
 				</div>
@@ -115,11 +118,11 @@ defined('_JEXEC') or die;
 			if ($row->tax_amount > 0)
 			{
 			?>
-				<div class="control-group">
-					<label class="control-label">
+				<div class="<?php echo $controlGroupClass; ?>">
+					<label class="<?php echo $controlLabelClass; ?>">
 						<?php echo  JText::_('EB_TAX'); ?>
 					</label>
-					<div class="controls">
+					<div class="<?php echo $controlsClass; ?>">
 						<?php echo EventbookingHelper::formatCurrency($row->tax_amount, $config, $rowEvent->currency_symbol); ?>
 					</div>
 				</div>
@@ -128,11 +131,11 @@ defined('_JEXEC') or die;
 	        if ($row->payment_processing_fee > 0)
 	        {
 		    ?>
-		        <div class="control-group">
-			        <label class="control-label">
+		        <div class="<?php echo $controlGroupClass; ?>">
+			        <label class="<?php echo $controlLabelClass; ?>">
 				        <?php echo  JText::_('EB_PAYMENT_FEE'); ?>
 			        </label>
-			        <div class="controls">
+			        <div class="<?php echo $controlsClass; ?>">
 				        <?php echo EventbookingHelper::formatCurrency($row->payment_processing_fee, $config, $rowEvent->currency_symbol); ?>
 			        </div>
 		        </div>
@@ -141,11 +144,11 @@ defined('_JEXEC') or die;
 			if ($row->discount_amount > 0 || $row->tax_amount > 0 || $row->payment_processing_fee > 0)
 			{
 			?>                
-				<div class="control-group">
-					<label class="control-label">
+				<div class="<?php echo $controlGroupClass; ?>">
+					<label class="<?php echo $controlLabelClass; ?>">
 						<?php echo  JText::_('EB_GROSS_AMOUNT'); ?>
 					</label>
-					<div class="controls">
+					<div class="<?php echo $controlsClass; ?>">
 						<?php echo EventbookingHelper::formatCurrency($row->amount, $config, $rowEvent->currency_symbol) ; ?>
 					</div>
 				</div>
@@ -155,19 +158,19 @@ defined('_JEXEC') or die;
         if ($row->deposit_amount > 0)
         {
         ?>
-        <div class="control-group">
-            <label class="control-label">
+        <div class="<?php echo $controlGroupClass; ?>">
+            <label class="<?php echo $controlLabelClass; ?>">
                 <?php echo JText::_('EB_DEPOSIT_AMOUNT'); ?>
             </label>
-            <div class="controls">
+            <div class="<?php echo $controlsClass; ?>">
                 <?php echo EventbookingHelper::formatCurrency($row->deposit_amount, $config, $rowEvent->currency_symbol); ?>
             </div>
         </div>
-        <div class="control-group">
-            <label class="control-label">
+        <div class="<?php echo $controlGroupClass; ?>">
+            <label class="<?php echo $controlLabelClass; ?>">
                 <?php echo JText::_('EB_DUE_AMOUNT'); ?>
             </label>
-            <div class="controls">
+            <div class="<?php echo $controlsClass; ?>">
                 <?php echo EventbookingHelper::formatCurrency($row->amount - $row->deposit_amount, $config, $rowEvent->currency_symbol); ?>
             </div>
         </div>
@@ -176,11 +179,11 @@ defined('_JEXEC') or die;
         if ($row->amount > 0 && $row->published != 3)
         {
         ?>
-		<div class="control-group">
-			<label class="control-label">
+		<div class="<?php echo $controlGroupClass; ?>">
+			<label class="<?php echo $controlLabelClass; ?>">
 				<?php echo  JText::_('EB_PAYMEMNT_METHOD'); ?>
 			</label>
-			<div class="controls">
+			<div class="<?php echo $controlsClass; ?>">
 			<?php
 				$method = os_payments::loadPaymentMethod($row->payment_method);
 				if ($method)
@@ -190,11 +193,11 @@ defined('_JEXEC') or die;
 			?>
 			</div>
 		</div>
-		<div class="control-group">
-			<label class="control-label">
+		<div class="<?php echo $controlGroupClass; ?>">
+			<label class="<?php echo $controlLabelClass; ?>">
 				<?php echo JText::_('EB_TRANSACTION_ID'); ?>
 			</label>
-			<div class="controls">
+			<div class="<?php echo $controlsClass; ?>">
 				<?php echo $row->transaction_id ; ?>
 			</div>
 		</div>

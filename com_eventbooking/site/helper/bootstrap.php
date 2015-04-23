@@ -68,7 +68,9 @@ class EventbookingHelperBootstrap
 				'input-prepend'   => 'input-prepend',
 				'input-append '   => 'input-append',
 				'add-on'          => 'add-on',
-				'img-polaroid'    => 'img-polaroid'
+				'img-polaroid'    => 'img-polaroid',
+				'control-label'   => 'control-label',
+				'controls'        => 'controls'
 			);
 		}
 		else
@@ -102,7 +104,9 @@ class EventbookingHelperBootstrap
 				'input-prepend'   => 'input-group',
 				'input-append '   => 'input-group',
 				'add-on'          => 'input-group-addon',
-				'img-polaroid'    => 'img-thumbnail'
+				'img-polaroid'    => 'img-thumbnail',
+				'control-label'   => 'col-sm-3 control-label',
+				'controls'        => 'col-sm-9'
 			);
 		}
 	}

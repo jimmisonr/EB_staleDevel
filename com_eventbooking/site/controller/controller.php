@@ -35,8 +35,8 @@ class EventbookingController extends JControllerLegacy
 		{
 			EventbookingHelper::loadBootstrap();
 		}
-		$styleUrl = JUri::root(true) . '/components/com_eventbooking/assets/css/style.css';
-		$document->addStylesheet($styleUrl);
+		$rootUrl = JUri::root(true);
+		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/style.css');
 		JHtml::_('script', EventbookingHelper::getURL() . 'components/com_eventbooking/assets/js/noconflict.js', false, false);
 		if ($config->calendar_theme)
 		{
@@ -46,10 +46,8 @@ class EventbookingController extends JControllerLegacy
 		{
 			$theme = 'default';
 		}
-		$styleUrl = JUri::root(true) . '/components/com_eventbooking/assets/css/themes/' . $theme . '.css';
-		$document->addStylesheet($styleUrl);
-		$styleUrl = JUri::root(true) . '/components/com_eventbooking/assets/css/custom.css';
-		$document->addStylesheet($styleUrl);
+		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/themes/' . $theme . '.css');
+		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/custom.css');
 		switch ($task)
 		{
 			case 'view_category':

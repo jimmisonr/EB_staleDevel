@@ -53,7 +53,7 @@ else
 }
 $headerText = str_replace('[EVENT_TITLE]', $this->event->title, $headerText);
 ?>
-<div id="eb-group-registration-form" class="eb-container row-fluid">
+<div id="eb-group-registration-form" class="eb-container">
 	<h1 class="eb-page-title"><?php echo $headerText; ?></h1>
 	<?php
 	if (strlen($msg)) 

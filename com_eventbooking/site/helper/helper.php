@@ -424,7 +424,7 @@ class EventbookingHelper
 	 *
 	 * @return array
 	 */
-	public static function buildTags($row, $form, $event, $config)
+	public static function buildTags($row, $form, $event, $config, $loadCss = true)
 	{
 		$db       = JFactory::getDbo();
 		$query    = $db->getQuery(true);
@@ -587,7 +587,7 @@ class EventbookingHelper
 
 
 		// Registration detail tags
-		$replaces['registration_detail'] = self::getEmailContent($config, $row, true, $form);
+		$replaces['registration_detail'] = self::getEmailContent($config, $row, $loadCss, $form);
 
 		// Cancel link
 		$query->clear();
@@ -1852,6 +1852,11 @@ class EventbookingHelper
 					$layout = 'individual_detail.php';
 				}
 			}
+		}
+		if (!$loadCss)
+		{
+			// Need to pass bootstrap helper
+			$data['bootstrapHelper'] = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 		}
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		if ($config->multiple_booking)

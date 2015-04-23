@@ -97,7 +97,7 @@ EventbookingHelperJquery::equalHeights();
 	{
 		$categories = EventbookingHelper::getCategories($eventIds);
 	?>
-		<div id="eb-calendar-legend" class="clearfix row-fluid">
+		<div id="eb-calendar-legend" class="clearfix">
 			<ul>
 				<?php
 					foreach ($categories as $category)

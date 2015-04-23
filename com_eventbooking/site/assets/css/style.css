@@ -952,3 +952,30 @@ span.eb-time
 {
     padding-left: 5px;
 }
+.form-horizontal .radio, .form-horizontal .checkbox
+{
+    min-height: 1px !important;
+}
+
+input.radio, input.checkbox {
+    display: inline-block !important;
+}
+
+.eb-container .form-group .input-mini {
+    width: 60px !important;
+}
+.eb-container .form-group .input-small {
+    width: 90px !important;
+}
+.eb-container .form-group .input-medium {
+    width: 150px !important;
+}
+.eb-container .form-group .input-large {
+    width: 210px !important;
+}
+.eb-container .form-group .input-xlarge {
+    width: 270px !important;
+}
+.eb-container .form-group .input-xxlarge {
+    width: 530px !important;
+}

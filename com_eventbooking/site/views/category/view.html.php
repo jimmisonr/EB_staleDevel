@@ -168,6 +168,7 @@ class EventBookingViewCategory extends JViewLegacy
 		$this->nullDate = $nullDate;
 		$this->Itemid = $Itemid;
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+
 		
 		parent::display($tpl);
 	}

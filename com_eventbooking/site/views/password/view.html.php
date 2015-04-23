@@ -19,6 +19,9 @@ class EventBookingViewPassword extends JViewLegacy
 		$this->return = JRequest::getVar('return', '', 'none');
 		$this->eventId = JRequest::getInt('event_id');
 		$this->eventUrl = EventbookingHelperRoute::getEventRoute($this->eventId, 0, $this->Itemid);
+		$config = EventbookingHelper::getConfig();
+		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+
 		parent::display($tpl);
 	}
 }

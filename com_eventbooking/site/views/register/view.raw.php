@@ -17,6 +17,8 @@ class EventBookingViewRegister extends JViewLegacy
 	 */
 	function display($tpl = null)
 	{
+		$config = EventbookingHelper::getConfig();
+		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 		$input = JFactory::getApplication()->input;
 		$eventId = $input->getInt('event_id', 0);
 		$db = JFactory::getDbo();

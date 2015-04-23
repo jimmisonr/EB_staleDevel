@@ -22,6 +22,8 @@ class EventBookingViewRegister extends JViewLegacy
 	{
 		$layout = $this->getLayout();
 		EventbookingHelper::addLangLinkForAjax();
+		$config = EventbookingHelper::getConfig();
+		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 		if ($layout == 'cart')
 		{
 			$this->_displayCart($tpl);

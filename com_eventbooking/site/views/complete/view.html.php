@@ -109,7 +109,7 @@ class EventBookingViewComplete extends JViewLegacy
 		$data = EventbookingHelper::getRegistrantData($rowRegistrant, $rowFields);
 		$form->bind($data);
 		$form->buildFieldsDependency();
-		$replaces = EventbookingHelper::buildTags($rowRegistrant, $form, $rowEvent, $config);
+		$replaces = EventbookingHelper::buildTags($rowRegistrant, $form, $rowEvent, $config, false);
 		foreach ($replaces as $key => $value)
 		{
 			$key          = strtoupper($key);

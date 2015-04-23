@@ -66,6 +66,8 @@ class EventBookingViewInvite extends JViewLegacy
 			$this->user = $user;
 			$this->inviteMessage = $inviteMessage;
 			$this->showCaptcha = $showCaptcha;
+			$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+
 			parent::display($tpl);
 		}
 	}

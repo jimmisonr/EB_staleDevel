@@ -332,12 +332,6 @@ abstract class RADFormField
 		}
 		if ($tableLess)
 		{
-			if (!$bootstrapHelper)
-			{
-				$config          = EventbookingHelper::getConfig();
-				$bootstrapHelper = new OSMembershipHelperBootstrap($config->twitter_bootstrap_version);
-			}
-			
 			$controlGroupClass      = $bootstrapHelper ? $bootstrapHelper->getClassMapping('control-group') : 'control-group';
 			$controlLabelClass      = $bootstrapHelper ? $bootstrapHelper->getClassMapping('control-label') : 'control-label';
 			$controlsClass          = $bootstrapHelper ? $bootstrapHelper->getClassMapping('controls') : 'controls';

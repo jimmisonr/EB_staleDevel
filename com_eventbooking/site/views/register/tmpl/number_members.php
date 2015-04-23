@@ -17,6 +17,11 @@ else
 {
 	$msg = $this->message->number_members_form_message;
 }
+$bootstrapHelper   = $this->bootstrapHelper;
+$controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
+$controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
+$controlsClass     = $bootstrapHelper->getClassMapping('controls');
+$btnClass          = $bootstrapHelper->getClassMapping('btn');
 if (strlen($msg)) 
 {
 ?>
@@ -25,17 +30,17 @@ if (strlen($msg))
 }	
 ?>
 <form name="eb-form-number-group-members" id="eb-form-number-group-members" autocomplete="off" class="form form-horizontal">
-	<div class="control-group">
-	    <label class="control-label" for="number_registrants">
+	<div class="<?php echo $controlGroupClass; ?>">
+	    <label class="<?php echo $controlLabelClass; ?>" for="number_registrants">
 	    	<?php echo  JText::_('EB_NUMBER_REGISTRANTS') ?><span class="required">*</span>
 	    </label>
-		<div class="controls">      				
+		<div class="<?php echo $controlsClass; ?>">
 	      	<input type="text" class="input-mini validate[required,custom[number],min[<?php echo $this->minNumberRegistrants; ?>],max[<?php echo $this->maxRegistrants; ?>]" id="number_registrants" name="number_registrants" data-errormessage-range-underflow="<?php echo JText::sprintf('EB_NUMBER_REGISTRANTS_IN_VALID', $this->minNumberRegistrants); ?>" data-errormessage-range-overflow="<?php echo JText::sprintf('EB_MAX_REGISTRANTS_REACH', $this->maxRegistrants);?>" value="<?php echo $this->numberRegistrants;?>" />
 		</div>	
 	</div>
 	<div class="form-actions">
-	  	<input type="button" name="btn-number-members-back" id="btn-number-members-back" class="btn btn-primary" value="<?php echo JText::_('EB_BACK'); ?>" onclick="window.history.go(-1) ;" />
-	    <input type="button" name="btn-process-number-members" id="btn-process-number-members" class="btn btn-primary" value="<?php echo JText::_('EB_NEXT'); ?>" />
+	  	<input type="button" name="btn-number-members-back" id="btn-number-members-back" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_BACK'); ?>" onclick="window.history.go(-1) ;" />
+	    <input type="button" name="btn-process-number-members" id="btn-process-number-members" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_NEXT'); ?>" />
 	</div>
 </form>		
 <script type="text/javascript">	

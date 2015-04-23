@@ -7,6 +7,12 @@
  * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
+
+$bootstrapHelper   = $this->bootstrapHelper;
+$controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
+$controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
+$controlsClass     = $bootstrapHelper->getClassMapping('controls');
+$btnClass          = $bootstrapHelper->getClassMapping('btn');
 ?>
 <form name="eb-form-group-members" id="eb-form-group-members" action="<?php echo JRoute::_('index.php?option=com_eventbooking&Itemid='.$this->Itemid); ?>" autocomplete="off" class="form form-horizontal" method="post">
 <?php
@@ -43,7 +49,7 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 	}	
 	foreach ($fields as $field)
 	{
-		echo $field->getControlGroup();
+		echo $field->getControlGroup($bootstrapHelper);
 		if ($field->type == 'Date')
 		{
 			$dateFields[] = $field->name;
@@ -53,11 +59,11 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 if ($this->showCaptcha)
 {
 ?>
-	<div class="control-group">
-		<label class="control-label">
+	<div class="<?php echo $controlGroupClass; ?>">
+		<label class="<?php echo $controlLabelClass; ?>">
 			<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
 		</label>
-		<div class="controls">
+		<div class="<?php echo $controlsClass; ?>">
 			<?php echo $this->captcha; ?>						
 		</div>
 	</div>
@@ -65,8 +71,8 @@ if ($this->showCaptcha)
 }
 ?>
 	<div class="form-actions">
-  		<input type="button" id="btn-group-members-back" name="btn-group-members-back" class="btn btn-primary" value="<?php echo JText::_('EB_BACK'); ?>"/>
-	    <input type="<?php echo $this->showBillingStep ? "button" : "submit";?>" id="btn-process-group-members" name="btn-process-group-members" class="btn btn-primary" value="<?php echo JText::_('EB_NEXT'); ?>" />					
+  		<input type="button" id="btn-group-members-back" name="btn-group-members-back" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_BACK'); ?>"/>
+	    <input type="<?php echo $this->showBillingStep ? "button" : "submit";?>" id="btn-process-group-members" name="btn-process-group-members" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_NEXT'); ?>" />
 	</div>
 	<input type="hidden" name="task" value="store_group_members_data" />
 	<input type="hidden" name="event_id" value="<?php echo $this->eventId; ?>" />	
