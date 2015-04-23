@@ -951,12 +951,11 @@ span.eb-time
 {
     padding-left: 5px;
 }
-.form-horizontal .radio, .form-horizontal .checkbox
-{
+.eb-container .form-group .radio, .eb-container .form-group .checkbox {
     min-height: 1px !important;
 }
 
-input.radio, input.checkbox {
+.eb-container .form-group input.radio, .eb-container .form-group input.checkbox, .eb-container .form-group select {
     display: inline-block !important;
 }
 
@@ -980,21 +979,42 @@ input.radio, input.checkbox {
 	width: 210px !important;
 }
 
-.eb-container .form-group .input-mini {
+.eb-container .form-group input[type="text"].input-mini,
+.eb-container .form-group select.input-mini,
+.eb-container .form-group textarea.input-mini {
     width: 60px !important;
 }
-.eb-container .form-group .input-small {
+
+.eb-container .form-group input[type="text"].input-small,
+.eb-container .form-group select.input-small,
+.eb-container .form-group textarea.input-small {
     width: 90px !important;
 }
-.eb-container .form-group .input-medium {
+
+.eb-container .form-group input[type="text"].input-medium,
+.eb-container .form-group select.input-medium,
+.eb-container .form-group textarea.input-medium
+{
     width: 150px !important;
 }
-.eb-container .form-group .input-large {
+
+.eb-container .form-group input[type="text"].input-large,
+.eb-container .form-group select.input-large,
+.eb-container .form-group textarea.input-large
+{
     width: 210px !important;
 }
-.eb-container .form-group .input-xlarge {
+
+.eb-container .form-group input[type="text"].input-xlarge,
+.eb-container .form-group select.input-xlarge,
+.eb-container .form-group textarea.input-xlarge
+{
     width: 270px !important;
 }
-.eb-container .form-group .input-xxlarge {
+
+.eb-container .form-group input[type="text"].input-xxlarge,
+.eb-container .form-group select.input-xxlarge,
+.eb-container .form-group textarea.input-xxlarge
+{
     width: 530px !important;
 }
