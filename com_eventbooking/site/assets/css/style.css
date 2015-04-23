@@ -378,7 +378,6 @@ form.form-horizontal .control-label, form.form-horizontal .control-label label {
 
 .eb-form-content {
     display: none;
-    overflow: auto;
     padding: 0 0 15px;
 }
 
@@ -959,6 +958,26 @@ span.eb-time
 
 input.radio, input.checkbox {
     display: inline-block !important;
+}
+
+.eb-container .form-group select,
+.eb-container .form-group textarea,
+.eb-container .form-group input[type="text"],
+.eb-container .form-group input[type="password"],
+.eb-container .form-group input[type="datetime"],
+.eb-container .form-group input[type="datetime-local"],
+.eb-container .form-group input[type="date"],
+.eb-container .form-group input[type="month"],
+.eb-container .form-group input[type="time"],
+.eb-container .form-group input[type="week"],
+.eb-container .form-group input[type="number"],
+.eb-container .form-group input[type="email"],
+.eb-container .form-group input[type="url"],
+.eb-container .form-group input[type="search"],
+.eb-container .form-group input[type="tel"],
+.eb-container .form-group input[type="color"]
+{
+	width: 210px !important;
 }
 
 .eb-container .form-group .input-mini {
