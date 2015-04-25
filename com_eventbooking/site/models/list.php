@@ -101,7 +101,7 @@ class EventBookingModelList extends RADModelList
 		$query       = $db->getQuery(true);
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$categoryId  = $this->state->id ? $this->state->id : $this->state->category_id;
-		$query->select('*, name' . $fieldSuffix . ' AS name')
+		$query->select('*, name' . $fieldSuffix . ' AS name, description' . $fieldSuffix . ' AS description')
 			->from('#__eb_categories')
 			->where('id=' . $categoryId);
 		$db->setQuery($query);
@@ -117,7 +117,7 @@ class EventBookingModelList extends RADModelList
 		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->select('tbl.*')
-			->select('title' . $fieldSuffix . ' AS title, short_description' . $fieldSuffix . ' AS short_description_description, description' . $fieldSuffix . ' AS description')
+			->select('title' . $fieldSuffix . ' AS title, short_description' . $fieldSuffix . ' AS short_description, description' . $fieldSuffix . ' AS description')
 			->select("DATEDIFF(tbl.early_bird_discount_date, '$currentDate') AS date_diff")
 			->select("DATEDIFF(tbl.event_date, '$currentDate') AS number_event_dates")
 			->select("TIMESTAMPDIFF(MINUTE, tbl.registration_start_date, '$currentDate') AS registration_start_minutes")
