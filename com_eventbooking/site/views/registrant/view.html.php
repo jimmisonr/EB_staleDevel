@@ -17,6 +17,7 @@ class EventBookingViewRegistrant extends JViewLegacy
 		JFactory::getDocument()->addScript(JUri::base(true) . '/components/com_eventbooking/assets/js/paymentmethods.js');
 		$this->setLayout('default');
 		EventbookingHelper::checkEditRegistrant();
+		EventbookingHelper::addLangLinkForAjax();
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$user = JFactory::getUser();
