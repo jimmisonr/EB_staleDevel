@@ -89,7 +89,12 @@ class EventBookingViewRegistrantList extends JViewLegacy
 				$rowFieldValues = $db->loadObjectList();
 				foreach ($rowFieldValues as $rowFieldValue)
 				{
-					$fieldValues[$rowFieldValue->registrant_id][$rowFieldValue->field_id] = $rowFieldValue->field_value;
+					$fieldValue = $rowFieldValue->field_value;
+					if (is_string($fieldValue) && is_array(json_decode($fieldValue)))
+					{
+						$fieldValue = implode(', ', json_decode($fieldValue));
+					}
+					$fieldValues[$rowFieldValue->registrant_id][$rowFieldValue->field_id] = $fieldValue;
 				}
 
 				$this->fieldTitles  = $fieldTitles;
