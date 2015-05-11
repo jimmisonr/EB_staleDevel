@@ -154,6 +154,9 @@ function EventbookingBuildRoute(&$query)
 		case 'registrationcancel':
 			$segments[] = JText::_('EB_SEF_REGISTRATION_CANCELLED');
 			break;
+		case 'search':
+			$segments[] = 'search result';
+			break;	
 	}
 	
 	switch ($task)

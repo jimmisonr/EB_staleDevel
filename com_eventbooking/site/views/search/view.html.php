@@ -13,8 +13,7 @@ class EventBookingViewSearch extends JViewLegacy
 {
 
 	function display($tpl = null)
-	{
-		$this->setLayout('default');
+	{		
 		$db = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		$model = $this->getModel();
@@ -81,7 +80,7 @@ class EventBookingViewSearch extends JViewLegacy
 			}
 			for ($i = 0, $n = count($items); $i < $n; $i++)
 			{
-				$item = & $items[$i];
+				$item = $items[$i];
 				$params->loadString($item->custom_fields, 'JSON');
 				$paramData = array();
 				foreach ($customFields as $name => $label)
