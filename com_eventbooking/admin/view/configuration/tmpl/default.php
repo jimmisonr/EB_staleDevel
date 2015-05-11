@@ -352,7 +352,29 @@ $editor = JFactory::getEditor();
 						<td>
 							<?php echo JText::_('EB_INCLUDE_GROUP_MEMBERS_IN_REGISTRANTS_MANAGEMENT_EXPLAIN'); ?>
 						</td>
-					</tr>												
+					</tr>
+					<tr>
+						<td  class="key">
+							<?php echo JText::_('EB_ONLY_SHOW_REGISTRANTS_OF_EVENT_OWNER')?>
+						</td>
+						<td>
+							<?php echo $this->lists['only_show_registrants_of_event_owner']; ?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_ONLY_SHOW_REGISTRANTS_OF_EVENT_OWNER_EXPLAIN'); ?>
+						</td>
+					</tr>
+					<tr>
+						<td  class="key">
+							<?php echo JText::_('EB_SHOW_ALL_LOCATIONS_IN_EVENT_SUBMISSION_FORM')?>
+						</td>
+						<td>
+							<?php echo $this->lists['show_all_locations_in_event_submission_form']; ?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_SHOW_ALL_LOCATIONS_IN_EVENT_SUBMISSION_FORM_EXPLAIN'); ?>
+						</td>
+					</tr>
 					<tr>				
 						<td class="key">
 							<?php echo JText::_('EB_ZOOM_LEVEL'); ?>

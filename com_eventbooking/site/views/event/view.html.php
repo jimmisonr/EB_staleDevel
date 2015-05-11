@@ -242,7 +242,7 @@ class EventBookingViewEvent extends JViewLegacy
 		$params = new JRegistry($item->params);
 		//Get list of location
 		$options = array();
-		if ($user->authorise('core.admin', 'com_eventbooking'))
+		if ($config->show_all_locations_in_event_submission_form)
 		{
 			$sql = 'SELECT id, name FROM #__eb_locations  WHERE published=1 ORDER BY name';
 		}

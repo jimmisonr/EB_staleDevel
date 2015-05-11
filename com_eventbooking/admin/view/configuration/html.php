@@ -186,6 +186,13 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 			$config->show_coupon_code_in_registrant_list);
 		$lists['show_multiple_days_event_in_calendar'] = JHtml::_('select.booleanlist', 'show_multiple_days_event_in_calendar', '', 
 			$config->show_multiple_days_event_in_calendar);
+
+		$lists['only_show_registrants_of_event_owner'] = JHtml::_('select.booleanlist', 'only_show_registrants_of_event_owner', '',
+			$config->only_show_registrants_of_event_owner);
+
+		$lists['show_all_locations_in_event_submission_form'] = JHtml::_('select.booleanlist', 'show_all_locations_in_event_submission_form', '',
+			$config->show_all_locations_in_event_submission_form);
+
 		$options = array();
 		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_POSITION'));
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_BEFORE_AMOUNT'));
