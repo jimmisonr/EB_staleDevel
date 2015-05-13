@@ -19,7 +19,7 @@ else
 }
 JHtml::_('behavior.modal', 'a.eb-modal');
 ?>
-<div id="eb-category-page-default" class="eb-container">
+<div id="eb-category-page-timeline" class="eb-container eb-timeline-layout">
 	<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=category&layout=timeline&id='.$this->category->id.'&Itemid='.$this->Itemid); ?>">
 		<?php
 		if ($this->category)

@@ -858,15 +858,6 @@ body .eb-calendar li {
         display: inline;
     }
 }
-
-#eb-category-page-table .eb-taskbar 
-{
-    border: none;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
 /**Timeline layout**/
 .eb-event-container {
     background-image: url("../images/dot-ver.png");
