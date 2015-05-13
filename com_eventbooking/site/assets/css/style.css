@@ -863,7 +863,7 @@ body .eb-calendar li {
 }
 /**Timeline layout**/
 
-. eb-events-timeline .eb-taskbar {
+.eb-events-timeline .eb-taskbar {
     padding: 25px 0;
     border-bottom: 1px dotted #a5a5a5;
     margin: 0;
