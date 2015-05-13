@@ -62,7 +62,7 @@ class EventBookingModelEvent extends JModelLegacy
 			$fieldSuffix = EventbookingHelper::getFieldSuffix();
 			$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
 			$query->select('a.*')
-				->select('title' . $fieldSuffix . ' AS title, short_description' . $fieldSuffix . ' AS short_description_description, description' . $fieldSuffix . ' AS description')
+				->select('title' . $fieldSuffix . ' AS title, short_description' . $fieldSuffix . ' AS short_description, description' . $fieldSuffix . ' AS description')
 				->select('meta_keywords' . $fieldSuffix . ' AS meta_keywords, meta_description' . $fieldSuffix . ' AS meta_description')
 				->select("DATEDIFF(event_date, '$currentDate') AS number_event_dates")
 				->select("TIMESTAMPDIFF(MINUTE, registration_start_date, '$currentDate') AS registration_start_minutes")

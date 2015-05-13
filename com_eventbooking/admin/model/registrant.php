@@ -42,6 +42,37 @@ class EventbookingModelRegistrant extends RADModelItem
 	}
 
 	/**
+	 * Resend confirmation email to registrant
+	 * @param $id
+	 *
+	 * @return bool True if email is successfully delivered
+	 */
+	public function resendEmail($id)
+	{
+		$row = $this->getTable();
+		$row->load($id);
+		if ($row->group_id > 0)
+		{
+			// We don't send email to group members, return false
+			return false;
+		}
+
+		// Load the default frontend language
+		$lang = JFactory::getLanguage();
+		$tag  = $row->language;
+		if (!$tag)
+		{
+			$tag = JComponentHelper::getParams('com_languages')->get('site', 'en-GB');
+		}
+		$lang->load('com_eventbooking', JPATH_ROOT, $tag);
+
+		$config = EventbookingHelper::getConfig();
+		EventbookingHelper::sendEmails($row, $config);
+
+		return true;
+	}
+
+	/**
 	 * Method to store a registrant
 	 *
 	 * @access	public
