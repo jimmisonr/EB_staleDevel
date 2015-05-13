@@ -20,7 +20,7 @@ else
 
 JHtml::_('behavior.modal', 'a.eb-modal');
 ?>
-<div id="eb-upcoming-events-page-default" class="eb-container eb-timeline-layout">
+<div id="eb-upcoming-events-page-default" class="eb-container">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_UPCOMING_EVENTS'); ?></h1>
 <form method="post" name="adminForm" id="adminForm" action="index.php">
 	<?php

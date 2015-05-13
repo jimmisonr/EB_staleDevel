@@ -281,9 +281,7 @@ td.eb-event-property-label {
 }
 
 /* ---------- Taskbar styles ---------------------------------------- */
-.eb-taskbar {
-    padding: 25px 0;
-    border-bottom: 1px dotted #a5a5a5;
+.eb-taskbar {    
     margin: 0;
     list-style: none;
 }
@@ -574,6 +572,11 @@ li.getdirection a {
     font-weight: bold;
 }
 
+.eb-container .input-append .add-on, .eb-container .input-prepend .add-on 
+{    
+  height: auto !important;  
+}
+
 /**CSS for supporting responsive calendar*/
 
 @media only screen and (max-width: 1024px) {
@@ -859,6 +862,14 @@ body .eb-calendar li {
     }
 }
 /**Timeline layout**/
+
+. eb-events-timeline .eb-taskbar {
+    padding: 25px 0;
+    border-bottom: 1px dotted #a5a5a5;
+    margin: 0;
+    list-style: none;
+}
+
 .eb-event-container {
     background-image: url("../images/dot-ver.png");
     background-position: 42px 85px;
