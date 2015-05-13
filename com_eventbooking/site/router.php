@@ -59,6 +59,12 @@ function EventbookingBuildRoute(&$query)
 	{
 		unset($query['view']);
 	}
+
+	if (($menuItem instanceof stdClass) && isset($query['view']) && ($menuItem->query['view'] == 'events') &&
+		$menuItem->query['view'] == $query['view'])
+	{
+		unset($query['view']);
+	}
 	
 	//Dealing with the catid parameter in the link to event.
 	if (($menuItem instanceof stdClass) && ($menuItem->query['view'] == 'category') && isset($query['catid']) &&
@@ -156,7 +162,10 @@ function EventbookingBuildRoute(&$query)
 			break;
 		case 'search':
 			$segments[] = 'search result';
-			break;	
+			break;
+		case 'events':
+			$segments[] = 'my events';
+			break;
 	}
 	
 	switch ($task)

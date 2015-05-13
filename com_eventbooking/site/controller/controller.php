@@ -994,7 +994,8 @@ class EventbookingController extends JControllerLegacy
 		{
 			$msg = JText::_('Error while saving event');
 		}
-		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', JRequest::getInt('Itemid', 0)), false), $msg);
+
+		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', JRequest::getInt('Itemid')), false), $msg);
 	}
 
 	/**
