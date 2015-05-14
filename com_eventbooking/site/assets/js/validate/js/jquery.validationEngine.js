@@ -593,11 +593,14 @@ Eb.jQuery(function($) {
 						options.showArrow = false;
 						break;
 					case "ajax":
-						// AJAX defaults to returning it's loading message
-						errorMsg = methods._ajax(field, rules, i, options);
-						if (errorMsg) {
-							promptType = "load";
-						}
+						if (field.attr('id') != 'email' || options.eventTrigger != 'submit')
+						{
+							// AJAX defaults to returning it's loading message
+							errorMsg = methods._ajax(field, rules, i, options);
+							if (errorMsg) {
+								promptType = "load";
+							}
+						}						
 						break;
 					case "minSize":
 						errorMsg = methods._getErrorMessage(form, field, rules[i], rules, i, options, methods._minSize);
@@ -1350,7 +1353,7 @@ Eb.jQuery(function($) {
 		* @return nothing! the ajax validator handles the prompts itself
 		*/
 		 _ajax: function(field, rules, i, options) {
-
+					
 			 var errorSelector = rules[i + 1];
 			 var rule = options.allrules[errorSelector];
 			 var extraData = rule.extraData;
@@ -1389,20 +1392,7 @@ Eb.jQuery(function($) {
 			 if (options.eventTrigger == "field") {
 				delete(options.ajaxValidCache[field.attr("id")]);
 			 }
-             var async = true;
-             if ($('#eb_ajax_async').val() == 0)
-             {
-                 if (options.eventTrigger == 'submit'){
-                     async = false;
-                 }
-             }
-             else
-             {
-                 if (options.eventTrigger == 'submit')
-                 {
-                     options.isError = !options.ajaxValidCache[field.attr("id")];
-                 }
-             }
+             
 			 // If there is an error or if the the field is already validated, do not re-execute AJAX
 			 if (!options.isError && !methods._checkAjaxFieldStatus(field.attr("id"), options)) {
 				 $.ajax({
@@ -1414,8 +1404,7 @@ Eb.jQuery(function($) {
 					 field: field,
 					 rule: rule,
 					 methods: methods,
-					 options: options,
-                     async : async,
+					 options: options,                    
 					 beforeSend: function() {},
 					 error: function(data, transport) {
 						 methods._ajaxError(data, transport);
