@@ -234,14 +234,6 @@ if (!$this->userId && $this->config->user_registration)
 		{
 			echo $field->getControlGroup($bootstrapHelper);
 		}
-		if ($field->name == 'email')
-		{
-			$ajaxAsync = 0;
-		}
-		else
-		{
-			$ajaxAsync = 1;
-		}
 		if (($this->totalAmount > 0) || $this->form->containFeeFields()) 
 		{
             $showPaymentInformation = true;
@@ -665,7 +657,6 @@ if (!$this->userId && $this->config->user_registration)
 	<input type="hidden" name="option" value="com_eventbooking" />	
 	<input type="hidden" name="task" value="process_checkout" />
 	<input type="hidden" name="show_payment_fee" value="<?php echo (int)$this->showPaymentFee ; ?>" />
-	<input type="hidden" id="eb_ajax_async" value="<?php echo $ajaxAsync; ?>" />
 		<script type="text/javascript">		
 			var eb_current_page = 'cart';
 			Eb.jQuery(function($){
