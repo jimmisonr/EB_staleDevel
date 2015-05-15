@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -10,21 +10,25 @@
 // no direct access
 defined( '_JEXEC' ) or die ;
 EventbookingHelperJquery::validateForm();
+$bootstrapHelper   = $this->bootstrapHelper;
+$controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
+$controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
+$controlsClass     = $bootstrapHelper->getClassMapping('controls');
 ?>
-<div id="eb-event-password-page" class="eb-container row-fluid">
+<div id="eb-event-password-page" class="eb-container">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_PRIVATE_EVENT_VALIDATION'); ?></h1>
 <form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&task=check_event_password&Itemid='.$this->Itemid); ?>" autocomplete="off" class="form form-horizontal">
 	<p><?php echo JText::_('EB_PRIVATE_EVENT_VALIDATION_MSG'); ?></p>
-	<div class="control-group">
-		<label class="control-label" for="password">
+	<div class="<?php echo $controlGroupClass; ?>">
+		<label class="<?php echo $controlLabelClass; ?>" for="password">
 			<?php echo  JText::_('EB_PASSWORD') ?><span class="required">*</span>
 		</label>
-		<div class="controls">
+		<div class="<?php echo $controlsClass; ?>">
 			<input type="text" id="password" name="password" class="input-large validate[required]" value="" />
 		</div>
 	</div>
-	<div class="control-group">
-		<div class="controls">
+	<div class="<?php echo $controlGroupClass; ?>">
+		<div class="<?php echo $controlsClass; ?>">
 			<input type="button" value="<?php echo JText::_('EB_CANCEL'); ?>" class="button btn" onclick="cancel();" />
 			<input type="submit" value="<?php echo JText::_('EB_CONTINUE'); ?>" class="button btn btn-primary" />
 		</div>

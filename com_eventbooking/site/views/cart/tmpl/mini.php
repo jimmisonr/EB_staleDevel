@@ -17,12 +17,13 @@ else
 {
 	$readOnly = '' ;
 }
+$btnClass = $this->bootstrapHelper->getClassMapping('btn');
 ?>
-<div id="eb-mini-cart-page" class="eb-container row-fluid">
+<div id="eb-mini-cart-page" class="eb-container">
 <?php
 if (count($this->items)) {
 ?>
-    <h1 class="eb-page-heading"><?php echo JText::_('EB_ADDED_EVENTS'); ?></h1>
+	<h1 class="eb-page-heading"><?php echo JText::_('EB_ADDED_EVENTS'); ?></h1>
 	<form method="post" name="adminForm" id="adminForm" action="index.php">
 		<table class="table table-striped table-bordered table-condensed">
 			<thead>
@@ -63,7 +64,7 @@ if (count($this->items)) {
 					$item = $this->items[$i] ;
 					$rate = $this->config->show_discounted_price ? $item->discounted_rate : $item->rate;
 					$total += $item->quantity*$rate;
-		        	$url = JRoute::_('index.php?option=com_eventbooking&view=event&id='.$item->id.'&tmpl=component&Itemid='.$this->Itemid);
+					$url = JRoute::_('index.php?option=com_eventbooking&view=event&id='.$item->id.'&tmpl=component&Itemid='.$this->Itemid);
 				?>
 					<tr>
 						<td class="col_event">
@@ -74,14 +75,14 @@ if (count($this->items)) {
 							?>
 								<td class="col_event_date">
 									<?php
-                                        if ($item->event_date == EB_TBC_DATE)
-                                        {
-                                            echo JText::_('EB_TBC');
-                                        }
-                                        else
-                                        {
-                                            echo JHtml::_('date', $item->event_date, $this->config->event_date_format, null);
-                                        }
+										if ($item->event_date == EB_TBC_DATE)
+										{
+											echo JText::_('EB_TBC');
+										}
+										else
+										{
+											echo JHtml::_('date', $item->event_date, $this->config->event_date_format, null);
+										}
 									?>
 								</td>
 							<?php
@@ -124,13 +125,13 @@ if (count($this->items)) {
 				?>
 				<tr>
 					<td colspan="<?php echo $cols ; ?>" style="text-align: right;">
-						<button onclick="javascript:colorbox();" id="add_more_item" class="btn btn-primary" type="button">
+						<button onclick="javascript:colorbox();" id="add_more_item" class="<?php echo $btnClass; ?> btn-primary" type="button">
 							<?php echo JText::_('EB_ADD_MORE_EVENTS'); ?>
 						</button>
-						<button onclick="javascript:updateCart();" id="update_cart" class="btn btn-primary" type="button">
+						<button onclick="javascript:updateCart();" id="update_cart" class="<?php echo $btnClass; ?> btn-primary" type="button">
 							<?php echo JText::_('EB_UPDATE'); ?>
 						</button>
-						<button onclick="javascript:checkOut();" id="check_out" class="btn btn-primary" type="button">
+						<button onclick="javascript:checkOut();" id="check_out" class="<?php echo $btnClass; ?> btn-primary" type="button">
 							<?php echo JText::_('EB_CHECKOUT'); ?>
 						</button>
 					</td>
@@ -149,9 +150,9 @@ if (count($this->items)) {
 
 if ($this->config->use_https)
 {
-	$checkoutUrl = JRoute::_('index.php?option=com_eventbooking&task=view_checkout&Itemid='.$this->Itemid, false, 1);	
+	$checkoutUrl = JRoute::_('index.php?option=com_eventbooking&task=view_checkout&Itemid='.$this->Itemid, false, 1);
 }
-else 
+else
 {
 	$checkoutUrl = JRoute::_('index.php?option=com_eventbooking&task=view_checkout&Itemid='.$this->Itemid, false, 0);
 }
@@ -178,20 +179,20 @@ else
 				$.ajax({
 					type : 'POST',
 					url  : 'index.php?option=com_eventbooking&task=update_cart&redirect=0&event_id=' + eventId + '&quantity=' + quantity,
-	                dataType: 'html',
+					dataType: 'html',
 					beforeSend: function() {
 					$('#add_more_item').before('<span class="wait"><img src="<?php echo JUri::base(true); ?>/media/com_eventbooking/ajax-loadding-animation.gif" alt="" /></span>');
 					},
 					success : function(html) {
-	                    $('#cboxLoadedContent').html(html);
-	                    $('.wait').remove();
+						$('#cboxLoadedContent').html(html);
+						$('.wait').remove();
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
 					}
 				});
-			}	
-		})	
+			}
+		})
 	}
 
 	function removeCart(id)
@@ -200,7 +201,7 @@ else
 			$.ajax({
 				type :'POST',
 				url  : 'index.php?option=com_eventbooking&task=remove_cart&id=' +  id + '&redirect=0',
-	            dataType: 'html',
+				dataType: 'html',
 				beforeSend: function() {
 					$('#add_more_item').before('<span class="wait"><img src="<?php echo JUri::base(true); ?>/media/com_eventbooking/ajax-loadding-animation.gif" alt="" /></span>');
 				},
@@ -233,10 +234,10 @@ else
 					alert("<?php echo JText::_("EB_INVALID_QUANTITY"); ?>" + availableQuantity);
 					a.push(jQuery('input[name="event_id[]"]')[i].focus());
 					return false ;
-				}							
+				}
 			}
 		} else {
-			//There is only one event						
+			//There is only one event
 			enteredQuantity = jQuery('input[name="quantity[]"]').value ;
 			availableQuantity = arrQuantities[0] ;
 			if ((availableQuantity != -1) && (enteredQuantity >availableQuantity)) {
@@ -244,11 +245,11 @@ else
 				jQuery('input[name="event_id[]"]').focus();
 				return false ;
 			}
-		}					
+		}
 		return true ;
 	}
 
-	
+
 	function findIndex(eventId, eventIds) {
 		for (var i = 0 ; i < eventIds.length ; i++) {
 			if (eventIds[i] == eventId) {
@@ -257,5 +258,5 @@ else
 		}
 		return -1 ;
 	}
-	
+
 </script>

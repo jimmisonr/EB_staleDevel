@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -71,6 +71,7 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 	public function addToolbar()
 	{
 		parent::addToolbar();
+		JToolBarHelper::custom('resend_email', 'envelope', 'envelope', 'Resend Email', true);
 		JToolBarHelper::custom('csv_export', 'download', 'download', 'Export Registration', false);
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -14,22 +14,22 @@ defined( '_JEXEC' ) or die ;
 <h1 class="eb_title"><?php echo JText::_('EB_LOCATIONS_MANAGEMENT'); ?>
 	<span class="add_location_link" style="padding-left:25px; font-size: 16px;"><a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=add_location&Itemid='.JRequest::getInt('Itemid', 0)) ; ?>"><?php echo JText::_('EB_SUBMIT_LOCATION') ; ?></a></span>
 </h1>
-<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=locationlist&Itemid='.JRequest::getInt('Itemid', 0));; ?>">		  	
+<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=locationlist&Itemid='.JRequest::getInt('Itemid', 0));; ?>">
 	<table class="table table-striped table-bordered table-condensed" style="margin-top: 10px;">
 		<thead>
-			<tr>						
+			<tr>
 				<th>
 					<?php echo JText::_('EB_NAME'); ?>
 				</th>
 				<th>
 					<?php echo JText::_('EB_ADDRESS'); ?>
 				</th>
-				<th>						
+				<th>
 					<?php echo JText::_('EB_CITY'); ?>
-				</th>								
+				</th>
 				<th>
 					<?php echo JText::_('EB_STATE'); ?>
-				</th>																
+				</th>
 				<th>
 					<?php echo JText::_('EB_ZIP'); ?>
 				</th>
@@ -38,47 +38,47 @@ defined( '_JEXEC' ) or die ;
 				</th>
 				<th>
 					<?php echo JText::_('EB_LATITUDE'); ?>
-				</th>																
+				</th>
 				<th>
 					<?php echo JText::_('EB_LONGITUDE'); ?>
 				</th>
 			</tr>
-		</thead>		
+		</thead>
 	<tbody>
 		<?php
-		$k = 0;	
+		$k = 0;
 		for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 		{
-			$item = &$this->items[$i];					
-			$url = JRoute::_('index.php?option=com_eventbooking&task=edit_location&id='.$item->id.'&Itemid='.$this->Itemid);	        	
+			$item = &$this->items[$i];
+			$url = JRoute::_('index.php?option=com_eventbooking&task=edit_location&id='.$item->id.'&Itemid='.$this->Itemid);
 			?>
-			<tr>							
-				<td>																														
+			<tr>
+				<td>
 					<a href="<?php echo $url; ?>" title="<?php echo $item->name; ?>">
 						<?php echo $item->name; ?>
-					</a>						
-				</td>			
+					</a>
+				</td>
 				<td>
 					<?php echo $item->address ; ?>
 				</td>
 				<td>
 					<?php echo $item->city ; ?>
-				</td>				
+				</td>
 				<td>
 					<?php echo $item->state ; ?>
-				</td>	
+				</td>
 				<td>
 					<?php echo $item->zip ; ?>
-				</td>	
+				</td>
 				<td>
 					<?php echo $item->country ; ?>
-				</td>	
+				</td>
 				<td>
 					<?php echo $item->lat ; ?>
-				</td>	
+				</td>
 				<td>
 					<?php echo $item->long ; ?>
-				</td>	
+				</td>
 			</tr>
 			<?php
 			$k = 1 - $k;
@@ -90,24 +90,24 @@ defined( '_JEXEC' ) or die ;
 					<div class="info"><?php echo JText::_('EB_NO_LOCATION_RECORDS');?></div>
 				</td>
 			</tr>
-		<?php	
+		<?php
 		}
 		?>
 	</tbody>
-	<?php 	
+	<?php
 	if ($this->pagination->total > $this->pagination->limit) {
 	?>
 	<tfoot>
 		<tr>
 			<td colspan="8">
 				<div class="pagination">
-    	 			<?php echo $this->pagination->getListFooter(); ?>
-    	 		</div>
+					<?php echo $this->pagination->getListFooter(); ?>
+				</div>
 			</td>
-		</tr>		
-	</tfoot>    	 
-   	<?php	
-    }
-    ?>	
-</table>			    		   		
+		</tr>
+	</tfoot>
+	<?php
+	}
+	?>
+</table>
 </form>

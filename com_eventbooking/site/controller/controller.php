@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -35,8 +35,8 @@ class EventbookingController extends JControllerLegacy
 		{
 			EventbookingHelper::loadBootstrap();
 		}
-		$styleUrl = JUri::root(true) . '/components/com_eventbooking/assets/css/style.css';
-		$document->addStylesheet($styleUrl);
+		$rootUrl = JUri::root(true);
+		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/style.css');
 		JHtml::_('script', EventbookingHelper::getURL() . 'components/com_eventbooking/assets/js/noconflict.js', false, false);
 		if ($config->calendar_theme)
 		{
@@ -46,10 +46,8 @@ class EventbookingController extends JControllerLegacy
 		{
 			$theme = 'default';
 		}
-		$styleUrl = JUri::root(true) . '/components/com_eventbooking/assets/css/themes/' . $theme . '.css';
-		$document->addStylesheet($styleUrl);
-		$styleUrl = JUri::root(true) . '/components/com_eventbooking/assets/css/custom.css';
-		$document->addStylesheet($styleUrl);
+		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/themes/' . $theme . '.css');
+		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/custom.css');
 		switch ($task)
 		{
 			case 'view_category':
@@ -231,13 +229,15 @@ class EventbookingController extends JControllerLegacy
 	 */
 	public function process_individual_registration()
 	{
-		$input = JFactory::getApplication()->input;
+		$app     = JFactory::getApplication();
+		$session = JFactory::getSession();
+		$input   = $app->input;
 		$eventId = $input->getInt('event_id', 0);
 		if (!$eventId)
 		{
 			return;
 		}
-		$db = JFactory::getDbo();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('*')
 			->from('#__eb_events')
@@ -248,53 +248,69 @@ class EventbookingController extends JControllerLegacy
 		{
 			return;
 		}
-		$user = JFactory::getUser();
+
+		$user   = JFactory::getUser();
 		$config = EventbookingHelper::getConfig();
-		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
+		$emailValid   = true;
+		$captchaValid = true;
+
+		// Check email
+		$result = $this->_validateEmail($eventId, $input->get('email', '', 'none'));
+
+		if (!$result['success'])
 		{
-			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			if(!$captchaPlugin)
+			$emailValid = false;
+		}
+		else
+		{
+			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 			{
-				// Hardcode to recaptcha, reduce support request
-				$captchaPlugin = 'recaptcha';
-			}
-			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
-			if ($plugin)
-			{
-				$res = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
-			}
-			else
-			{
-				$res = true;
-			}
-			if (!$res)
-			{
-				JError::raiseWarning('', JText::_('EB_INVALID_CAPTCHA_ENTERED'));
-				$fromArticle = $input->post->getInt('from_article', 0);
-				if ($fromArticle)
+				$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+				if (!$captchaPlugin)
 				{
-					$sesion = JFactory::getSession();
-					$formData = JRequest::get('post');
-					$sesion->set('eb_form_data', serialize($formData));
-					$sesion->set('eb_catpcha_invalid', 1);
-					JFactory::getApplication()->redirect($sesion->get('eb_artcile_url'));
-					return;
-					return;
+					// Hardcode to recaptcha, reduce support request
+					$captchaPlugin = 'recaptcha';
 				}
-				else
+				$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+				if ($plugin)
 				{
-					$input->set('captcha_invalid', 1);
-					$this->execute('individual_registration');
-					return;
+					$captchaValid = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
 				}
-			}
-			else
-			{
-				$sesion = JFactory::getSession();
-				$sesion->clear('eb_catpcha_invalid');
 			}
 		}
-		$post = JRequest::get('post', JREQUEST_ALLOWHTML);
+
+		if (!$emailValid || !$captchaValid)
+		{
+			// Enqueue the error message
+			if (!$emailValid)
+			{
+				$app->enqueueMessage($result['message'], 'warning');
+			}
+			else
+			{
+				$app->enqueueMessage(JText::_('EB_INVALID_CAPTCHA_ENTERED'), 'warning');
+			}
+
+			$fromArticle = $input->post->getInt('from_article', 0);
+			if ($fromArticle)
+			{
+				$formData = JRequest::get('post');
+				$session->set('eb_form_data', serialize($formData));
+				$session->set('eb_catpcha_invalid', 1);
+				$app->redirect($session->get('eb_artcile_url'));
+
+				return;
+			}
+			else
+			{
+				$input->set('captcha_invalid', 1);
+				$this->execute('individual_registration');
+
+				return;
+			}
+		}
+		$session->clear('eb_catpcha_invalid');
+		$post  = JRequest::get('post', JREQUEST_ALLOWHTML);
 		$model = $this->getModel('Register');
 		$model->processIndividualRegistration($post);
 	}
@@ -346,7 +362,9 @@ class EventbookingController extends JControllerLegacy
 	 */
 	public function process_group_registration()
 	{
-		$input = JFactory::getApplication()->input;
+		$app     = JFactory::getApplication();
+		$session = JFactory::getSession();
+		$input   = $app->input;
 		$eventId = $input->getInt('event_id');
 		if (!$eventId)
 		{
@@ -365,35 +383,54 @@ class EventbookingController extends JControllerLegacy
 		}
 		$config = EventbookingHelper::getConfig();
 		$user = JFactory::getUser();
-		$session = JFactory::getSession();
-		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
+
+		$emailValid   = true;
+		$captchaValid = true;
+
+		// Check email
+		$result = $this->_validateEmail($eventId, $input->get('email', '', 'none'));
+
+		if (!$result['success'])
 		{
-			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			if(!$captchaPlugin)
+			$emailValid = false;
+		}
+		else
+		{
+			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 			{
-				// Hardcode to recaptcha, reduce support request
-				$captchaPlugin = 'recaptcha';
+				$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+				if (!$captchaPlugin)
+				{
+					// Hardcode to recaptcha, reduce support request
+					$captchaPlugin = 'recaptcha';
+				}
+				$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+				if ($plugin)
+				{
+					$captchaValid = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
+				}
 			}
-			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
-			if ($plugin)
+		}
+
+		if (!$emailValid || !$captchaValid)
+		{
+			// Enqueue the error message
+			if (!$emailValid)
 			{
-				$res = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
+				$app->enqueueMessage($result['message'], 'warning');
 			}
 			else
 			{
-				$res = true;
+				$app->enqueueMessage(JText::_('EB_INVALID_CAPTCHA_ENTERED'), 'warning');
 			}
-			if (!$res)
-			{
-				JError::raiseWarning('', JText::_('EB_INVALID_CAPTCHA_ENTERED'));
-				$data = JRequest::get('post', JREQUEST_ALLOWHTML);
-				$session->set('eb_group_billing_data', serialize($data));
-				$input->set('captcha_invalid', 1);
-				JRequest::setVar('view', 'register');
-				JRequest::setVar('layout', 'group');
-				$this->display();
-				return;
-			}
+
+			$data = JRequest::get('post', JREQUEST_ALLOWHTML);
+			$session->set('eb_group_billing_data', serialize($data));
+			$input->set('captcha_invalid', 1);
+			JRequest::setVar('view', 'register');
+			JRequest::setVar('layout', 'group');
+			$this->display();
+			return;
 		}
 
 		// Check to see if there is a valid number registrants
@@ -411,7 +448,7 @@ class EventbookingController extends JControllerLegacy
 			}
 			$Itemid    = $input->getInt('Itemid', 0);
 			$signupUrl = JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id=' . $eventId . '&Itemid=' . $Itemid, false, $ssl);
-			JFactory::getApplication()->redirect($signupUrl, JText::_('Sorry, your session was expired. Please try again!'));
+			$app->redirect($signupUrl, JText::_('Sorry, your session was expired. Please try again!'));
 		}
 
 		$post = JRequest::get('post', JREQUEST_ALLOWHTML);
@@ -500,37 +537,55 @@ class EventbookingController extends JControllerLegacy
 	 */
 	public function process_checkout()
 	{
-		$input = JFactory::getApplication()->input;
-		$config = EventbookingHelper::getConfig();
-		$user = JFactory::getUser();
-		if (($config->enable_captcha != 0) && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
-		{
-			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			if(!$captchaPlugin)
-			{
-				// Hardcode to recaptcha, reduce support request
-				$captchaPlugin = 'recaptcha';
-			}
+		$app     = JFactory::getApplication();
+		$input   = $app->input;
+		$emailValid   = true;
+		$captchaValid = true;
 
-			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
-			if ($plugin)
+		// Check email
+		$result = $this->_validateEmail(0, $input->get('email', '', 'none'));
+
+		if (!$result['success'])
+		{
+			$emailValid = false;
+		}
+		else
+		{
+			$config = EventbookingHelper::getConfig();
+			$user = JFactory::getUser();
+			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 			{
-				$res = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
+				$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+				if (!$captchaPlugin)
+				{
+					// Hardcode to recaptcha, reduce support request
+					$captchaPlugin = 'recaptcha';
+				}
+				$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+				if ($plugin)
+				{
+					$captchaValid = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
+				}
+			}
+		}
+
+		if (!$emailValid || !$captchaValid)
+		{
+			// Enqueue the error message
+			if (!$emailValid)
+			{
+				$app->enqueueMessage($result['message'], 'warning');
 			}
 			else
 			{
-				$res = true;
+				$app->enqueueMessage(JText::_('EB_INVALID_CAPTCHA_ENTERED'), 'warning');
 			}
+			$input->set('captcha_invalid', 1);
+			JRequest::setVar('view', 'register');
+			JRequest::setVar('layout', 'cart');
+			$this->display();
+			return;
 
-			if (!$res)
-			{
-				$input->set('captcha_invalid', 1);
-				JError::raiseWarning('', JText::_('EB_INVALID_CAPTCHA_ENTERED'));
-				JRequest::setVar('view', 'register');
-				JRequest::setVar('layout', 'cart');
-				$this->display();
-				return;
-			}
 		}
 
 		$cart                   = new EventbookingHelperCart();
@@ -624,6 +679,59 @@ class EventbookingController extends JControllerLegacy
 		JFactory::getApplication()->close();
 	}
 
+	/**
+	 * Validate to see whether this email can be used to register for this event or not
+	 *
+	 * @param $eventId
+	 * @param $email
+	 *
+	 * @return array
+	 */
+	protected function _validateEmail($eventId, $email)
+	{
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+		$config = EventbookingHelper::getConfig();
+		$result = array(
+			'success' => true,
+			'message' => ''
+		);
+
+		if ($config->prevent_duplicate_registration && !$config->multiple_booking)
+		{
+			$query->clear();
+			$query->select('COUNT(id)')
+				->from('#__eb_registrants')
+				->where('event_id=' . $eventId)
+				->where('email="' . $email . '"')
+				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
+			$db->setQuery($query);
+			$total = $db->loadResult();
+			if ($total)
+			{
+				$result['success'] = false;
+				$result['message'] = JText::_('EB_EMAIL_REGISTER_FOR_EVENT_ALREADY');
+			}
+		}
+
+		if ($result['success'] && $config->user_registration && !$user->id)
+		{
+			$query->clear();
+			$query->select('COUNT(*)')
+				->from('#__users')
+				->where('email="' . $email . '"');
+			$db->setQuery($query);
+			$total = $db->loadResult();
+			if ($total)
+			{
+				$result['success'] = false;
+				$result['message'] = JText::_('EB_EMAIL_REGISTER_FOR_EVENT_ALREADY');
+			}
+		}
+
+		return $result;
+	}
 	/**
 	 * Calculate registration fee, then update the information on registration form
 	 */
@@ -996,7 +1104,8 @@ class EventbookingController extends JControllerLegacy
 		{
 			$msg = JText::_('Error while saving event');
 		}
-		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', JRequest::getInt('Itemid', 0)), false), $msg);
+
+		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', JRequest::getInt('Itemid')), false), $msg);
 	}
 
 	/**

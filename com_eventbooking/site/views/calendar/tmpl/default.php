@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -8,23 +8,23 @@
  * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;	
+defined( '_JEXEC' ) or die ;
 //Calculate next and previous month, year
-if ($this->month == 12) 
+if ($this->month == 12)
 {
 	$nextMonth = 1 ;
 	$nextYear = $this->year + 1 ;
 	$previousMonth = 11 ;
 	$previousYear = $this->year ;
-} 
-elseif ($this->month == 1) 
+}
+elseif ($this->month == 1)
 {
 	$nextMonth = 2 ;
 	$nextYear = $this->year ;
 	$previousMonth = 12 ;
 	$previousYear = $this->year - 1 ;
-} 
-else 
+}
+else
 {
 	$nextMonth = $this->month + 1 ;
 	$nextYear = $this->year ;
@@ -32,29 +32,29 @@ else
 	$previousYear = $this->year ;
 }
 ?>
-<div id="eb-calendar-page" class="eb-container row-fluid">	
+<div id="eb-calendar-page" class="eb-container">
 	<h1 class="eb-page-heading"><?php echo JText::_('EB_CALENDAR') ; ?></h1>
-    <form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=calendar&Itemid='.$this->Itemid);?>">
-        <div id="eb-calendarwrap">
-                <?php
-                    if ($this->showCalendarMenu)
-                    {
-                        echo EventbookingHelperHtml::loadCommonLayout('common/calendar_navigation.php', array('Itemid' => $this->Itemid, 'config' => $this->config, 'layout' => 'default'));
-                    }
-                    echo EventbookingHelperHtml::loadCommonLayout('common/calendar.php',
-                                                                  array(
-                                                                      'Itemid' => $this->Itemid,
-                                                                      'config' => $this->config,
-                                                                      'previousMonth' => $previousMonth,
-                                                                      'nextMonth' => $nextMonth,
-                                                                      'previousMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$previousMonth.'&year='.$previousYear.'&Itemid='.$this->Itemid),
-                                                                      'nextMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$nextMonth.'&year='.$nextYear.'&Itemid='.$this->Itemid),
-                                                                      'listMonth' => $this->listMonth,
-                                                                      'searchMonth' => $this->searchMonth,
-                                                                      'searchYear' => $this->searchYear,
-                                                                      'data'    => $this->data
-                                                                  ));
-                ?>
-        </div>
-    </form>
+		<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=calendar&Itemid='.$this->Itemid);?>">
+				<div id="eb-calendarwrap">
+								<?php
+										if ($this->showCalendarMenu)
+										{
+												echo EventbookingHelperHtml::loadCommonLayout('common/calendar_navigation.php', array('Itemid' => $this->Itemid, 'config' => $this->config, 'layout' => 'default'));
+										}
+										echo EventbookingHelperHtml::loadCommonLayout('common/calendar.php',
+																																	array(
+																																			'Itemid' => $this->Itemid,
+																																			'config' => $this->config,
+																																			'previousMonth' => $previousMonth,
+																																			'nextMonth' => $nextMonth,
+																																			'previousMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$previousMonth.'&year='.$previousYear.'&Itemid='.$this->Itemid),
+																																			'nextMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$nextMonth.'&year='.$nextYear.'&Itemid='.$this->Itemid),
+																																			'listMonth' => $this->listMonth,
+																																			'searchMonth' => $this->searchMonth,
+																																			'searchYear' => $this->searchYear,
+																																			'data'    => $this->data
+																																	));
+								?>
+				</div>
+		</form>
 </div>

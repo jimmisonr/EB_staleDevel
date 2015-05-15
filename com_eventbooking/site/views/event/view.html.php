@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -178,6 +178,7 @@ class EventBookingViewEvent extends JViewLegacy
 		$this->nullDate = $nullDate;
 		$this->rowGroupRates = $rowGroupRates;
 		$this->plugins = $plugins;
+		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 		
 		parent::display($tpl);
 	}
@@ -241,7 +242,7 @@ class EventBookingViewEvent extends JViewLegacy
 		$params = new JRegistry($item->params);
 		//Get list of location
 		$options = array();
-		if ($user->authorise('core.admin', 'com_eventbooking'))
+		if ($config->show_all_locations_in_event_submission_form)
 		{
 			$sql = 'SELECT id, name FROM #__eb_locations  WHERE published=1 ORDER BY name';
 		}
@@ -250,9 +251,9 @@ class EventBookingViewEvent extends JViewLegacy
 			$sql = 'SELECT id, name FROM #__eb_locations  WHERE published=1 AND user_id=' . $user->id . ' ORDER BY name ';
 		}
 		$db->setQuery($sql);
-		$options[] = JHtml::_('select.option', 0, JText::_('Select Location'), 'id', 'name');
+		$options[] = JHtml::_('select.option', '', JText::_('Select Location'), 'id', 'name');
 		$options = array_merge($options, $db->loadObjectList());
-		$lists['location_id'] = JHtml::_('select.genericlist', $options, 'location_id', ' class="inputbox" ', 'id', 'name', $item->location_id);
+		$lists['location_id'] = JHtml::_('select.genericlist', $options, 'location_id', '', 'id', 'name', $item->location_id);
 
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$sql = "SELECT id, parent, parent AS parent_id, name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title FROM #__eb_categories";

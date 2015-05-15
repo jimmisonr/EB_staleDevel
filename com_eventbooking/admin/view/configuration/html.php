@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -48,6 +48,12 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['event_custom_field'] = JHtml::_('select.booleanlist', 'event_custom_field', '', $config->event_custom_field);
 		$lists['load_bootstrap_css_in_frontend'] = JHtml::_('select.booleanlist', 'load_bootstrap_css_in_frontend', '', 
 			isset($config->load_bootstrap_css_in_frontend) ? $config->load_bootstrap_css_in_frontend : 1);
+
+		$options = array();
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_VERSION_2'));
+		$options[] = JHtml::_('select.option', 3, JText::_('EB_VERSION_3'));
+		$lists['twitter_bootstrap_version'] = JHtml::_('select.genericlist', $options, 'twitter_bootstrap_version', '', 'value', 'text', $config->twitter_bootstrap_version ? $config->twitter_bootstrap_version : 2);
+
 		$lists['load_jquery'] = JHtml::_('select.booleanlist', 'load_jquery', '', isset($config->load_jquery) ? $config->load_jquery : 1);
 		$lists['multiple_booking'] = JHtml::_('select.booleanlist', 'multiple_booking', '', $config->multiple_booking);
 		$lists['prevent_duplicate_registration'] = JHtml::_('select.booleanlist', 'prevent_duplicate_registration', '', 
@@ -180,6 +186,13 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 			$config->show_coupon_code_in_registrant_list);
 		$lists['show_multiple_days_event_in_calendar'] = JHtml::_('select.booleanlist', 'show_multiple_days_event_in_calendar', '', 
 			$config->show_multiple_days_event_in_calendar);
+
+		$lists['only_show_registrants_of_event_owner'] = JHtml::_('select.booleanlist', 'only_show_registrants_of_event_owner', '',
+			$config->only_show_registrants_of_event_owner);
+
+		$lists['show_all_locations_in_event_submission_form'] = JHtml::_('select.booleanlist', 'show_all_locations_in_event_submission_form', '',
+			$config->show_all_locations_in_event_submission_form);
+
 		$options = array();
 		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_POSITION'));
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_BEFORE_AMOUNT'));

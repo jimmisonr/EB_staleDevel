@@ -10,7 +10,7 @@
 defined('_JEXEC') or die ;
 $output = '<input name="search" id="search_eb_box" maxlength="50"  class="inputbox" type="text" size="20" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';		
 ?>					
-<form method="post" name="eb_search_form" id="eb_search_form" action="index.php?option=com_eventbooking&Itemid=<?php echo $itemId ; ?>">
+<form method="post" name="eb_search_form" id="eb_search_form" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=search&layout='.$layout.'&Itemid='.$itemId);  ?>">
     <table width="100%" class="search_table">
     	<tr>
     		<td>
@@ -18,7 +18,8 @@ $output = '<input name="search" id="search_eb_box" maxlength="50"  class="inputb
     		</td>
     	</tr>
     	<?php
-    	    if ($showCategory) {
+    	    if ($showCategory)
+	        {
     	    ?>
     	    	<tr>
     	    		<td>
@@ -27,7 +28,8 @@ $output = '<input name="search" id="search_eb_box" maxlength="50"  class="inputb
     	    	</tr>
     	    <?php    
     	    }
-    	    if ($showLocation) {
+    	    if ($showLocation)
+	        {
     	    ?>
     	    	<tr>
     	    		<td>
@@ -43,18 +45,15 @@ $output = '<input name="search" id="search_eb_box" maxlength="50"  class="inputb
     		</td>
     	</tr>
     </table>
-    <input type="hidden" name="option" value="com_eventbooking" />
-    <input type="hidden" name="Itemid" value="<?php echo $itemId ; ?>" />
-    <input type="hidden" name="view" value="search" />
-    
     <script language="javascript">
-    	function searchData() {
+    	function searchData()
+	    {
         	var form = document.eb_search_form ;
-        	if (form.search.value == '<?php echo $text ?>') {
+        	if (form.search.value == '<?php echo $text ?>')
+	        {
             	form.search.value = '' ;
         	}
         	form.submit();
     	}
     </script>
-    
 </form>

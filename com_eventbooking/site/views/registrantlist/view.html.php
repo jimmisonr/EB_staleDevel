@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -89,7 +89,12 @@ class EventBookingViewRegistrantList extends JViewLegacy
 				$rowFieldValues = $db->loadObjectList();
 				foreach ($rowFieldValues as $rowFieldValue)
 				{
-					$fieldValues[$rowFieldValue->registrant_id][$rowFieldValue->field_id] = $rowFieldValue->field_value;
+					$fieldValue = $rowFieldValue->field_value;
+					if (is_string($fieldValue) && is_array(json_decode($fieldValue)))
+					{
+						$fieldValue = implode(', ', json_decode($fieldValue));
+					}
+					$fieldValues[$rowFieldValue->registrant_id][$rowFieldValue->field_id] = $fieldValue;
 				}
 
 				$this->fieldTitles  = $fieldTitles;
@@ -104,6 +109,7 @@ class EventBookingViewRegistrantList extends JViewLegacy
 			$this->items              = $rows;
 			$this->config             = $config;
 			$this->displayCustomField = $displayCustomField;
+			$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
 			parent::display($tpl);
 		}

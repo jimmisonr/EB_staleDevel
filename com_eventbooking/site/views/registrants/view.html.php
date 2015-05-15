@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -22,7 +22,7 @@ class EventBookingViewRegistrants extends JViewLegacy
 		$model = $this->getModel();
 		$state = $model->getState();
 		//Get list of events				
-		if (EB_ONLY_SHOW_REGISTRANTS_OF_EVENT_OWNER)
+		if ($config->only_show_registrants_of_event_owner)
 		{
 			$sql = 'SELECT id, title' . $fieldSuffix . ' AS title, event_date FROM #__eb_events WHERE published = 1 AND created_by=' . $user->id . ' ORDER BY title' . $fieldSuffix;
 		}

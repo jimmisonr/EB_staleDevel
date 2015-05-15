@@ -76,9 +76,10 @@ if (count($rows))
                             if ($showLocation && strlen($row->location_name))
                             {
                             ?>
-                                <p><small title="<?php echo JText::_('EB_LOCATION'); ?>" class="location"><a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$row->location_id.'&tmpl=component&format=html&Itemid='.$itemId); ?>" class="eb-colorbox-map">
-								<i class="icon-location"></i>
-								<?php echo $row->location_name ; ?>
+                                <p><small title="<?php echo JText::_('EB_LOCATION'); ?>" class="location">
+								<i class="icon-map-marker"></i>
+								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$row->location_id.'&tmpl=component&format=html&Itemid='.$itemId); ?>" class="eb-colorbox-map"								
+								<strong><?php echo $row->location_name ; ?></strong>
                                 </a></small></p>
                             <?php
                             }

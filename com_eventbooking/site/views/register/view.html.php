@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -22,6 +22,8 @@ class EventBookingViewRegister extends JViewLegacy
 	{
 		$layout = $this->getLayout();
 		EventbookingHelper::addLangLinkForAjax();
+		$config = EventbookingHelper::getConfig();
+		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 		if ($layout == 'cart')
 		{
 			$this->_displayCart($tpl);

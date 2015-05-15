@@ -38,7 +38,7 @@ class RADFormFieldList extends RADFormField
 	 * @return  string  The field input markup.
 	 *
 	 */
-	protected function getInput()
+	protected function getInput($bootstrapHelper = null)
 	{
 		// Get the field options.
 		$options = (array) $this->getOptions();

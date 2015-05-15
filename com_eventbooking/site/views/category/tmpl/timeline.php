@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -19,7 +19,7 @@ else
 }
 JHtml::_('behavior.modal', 'a.eb-modal');
 ?>
-<div id="eb-category-page-default" class="eb-container row-fluid">
+<div id="eb-category-page-timeline" class="eb-container">
 	<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=category&layout=timeline&id='.$this->category->id.'&Itemid='.$this->Itemid); ?>">
 		<?php
 		if ($this->category)
@@ -46,7 +46,7 @@ JHtml::_('behavior.modal', 'a.eb-modal');
 		}
 		if (count($this->items))
 		{
-			echo EventbookingHelperHtml::loadCommonLayout('common/events_timeline.php', array('events' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'category' => $this->category, 'Itemid' => $this->Itemid));
+			echo EventbookingHelperHtml::loadCommonLayout('common/events_timeline.php', array('events' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'category' => $this->category, 'Itemid' => $this->Itemid, 'bootstrapHelper' => $this->bootstrapHelper));
 		}
 		if ($this->pagination->total > $this->pagination->limit)
 		{

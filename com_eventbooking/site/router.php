@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -56,6 +56,12 @@ function EventbookingBuildRoute(&$query)
 	
 	if (($menuItem instanceof stdClass) && isset($query['view']) && ($menuItem->query['view'] == 'calendar') &&
 		 $menuItem->query['view'] == $query['view'])
+	{
+		unset($query['view']);
+	}
+
+	if (($menuItem instanceof stdClass) && isset($query['view']) && ($menuItem->query['view'] == 'events') &&
+		$menuItem->query['view'] == $query['view'])
 	{
 		unset($query['view']);
 	}
@@ -153,6 +159,12 @@ function EventbookingBuildRoute(&$query)
 			break;
 		case 'registrationcancel':
 			$segments[] = JText::_('EB_SEF_REGISTRATION_CANCELLED');
+			break;
+		case 'search':
+			$segments[] = 'search result';
+			break;
+		case 'events':
+			$segments[] = 'my events';
 			break;
 	}
 	

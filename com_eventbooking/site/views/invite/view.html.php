@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -66,6 +66,8 @@ class EventBookingViewInvite extends JViewLegacy
 			$this->user = $user;
 			$this->inviteMessage = $inviteMessage;
 			$this->showCaptcha = $showCaptcha;
+			$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+
 			parent::display($tpl);
 		}
 	}

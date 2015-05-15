@@ -79,4 +79,6 @@ if (!$itemId)
 	$itemId = EventbookingHelper::getItemid();
 }
 
+$layout = $params->get('layout_type', 'default');
+
 require(JModuleHelper::getLayoutPath('mod_eb_search', 'default'));

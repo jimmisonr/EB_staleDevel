@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -38,9 +38,29 @@ class EventbookingController extends RADControllerAdmin
 	}
 
 	/**
+	 * Resend confirmation email to registrants in case they didn't receive it
+	 */
+	public function resend_email()
+	{
+		$cid = $this->input->get('cid', array(), 'array');
+		$id = (int) $cid[0];
+		$model = $this->getModel('Registrant');
+		$ret = $model->resendEmail($id);
+		if ($ret)
+		{
+			$this->setMessage(JText::_('EB_EMAIL_SUCCESSFULLY_RESENT'));
+		}
+		else
+		{
+			$this->setMessage(JText::_('EB_COULD_NOT_RESEND_EMAIL_TO_GROUP_MEMBER'), 'notice');
+		}
+
+		$this->setRedirect('index.php?option=com_eventbooking&view=registrants');
+	}
+	/**
      * Export registrants into a CSV file
      */
-	function csv_export()
+	public function csv_export()
 	{
 		set_time_limit(0);
 		require_once JPATH_ROOT . '/components/com_eventbooking/helper/data.php';

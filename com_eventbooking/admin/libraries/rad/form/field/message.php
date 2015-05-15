@@ -23,7 +23,7 @@ class RADFormFieldMessage extends RADFormField
 	 * @return string The field input markup.
 	 *        
 	 */
-	public function getInput()
+	public function getInput($bootstrapHelper = null)
 	{
 		$controlGroupAttributes = 'id="field_' . $this->name . '" ';
 		if ($this->hideOnDisplay)
@@ -39,9 +39,9 @@ class RADFormFieldMessage extends RADFormField
 	 *
 	 * @see RADFormField::getControlGroup()
 	 */
-	public function getControlGroup()
+	public function getControlGroup($bootstrapHelper = null)
 	{
-		return $this->getInput();
+		return $this->getInput($bootstrapHelper);
 	}
 
 	/**
@@ -49,11 +49,11 @@ class RADFormFieldMessage extends RADFormField
 	 *
 	 * @see RADFormField::getOutput()
 	 */
-	public function getOutput($tableLess)
+	public function getOutput($tableLess = true, $bootstrapHelper = null)
 	{
 		if ($tableLess)
 		{
-			return $this->getInput();
+			return $this->getInput($bootstrapHelper);
 		}
 		else
 		{

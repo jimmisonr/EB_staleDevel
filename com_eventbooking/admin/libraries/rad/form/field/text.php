@@ -46,7 +46,7 @@ class RADFormFieldText extends RADFormField
 	 * @return  string  The field input markup.
 	 *
 	 */
-	public function getInput()
+	public function getInput($bootstrapHelper = null)
 	{
 		$attributes = $this->buildAttributes();
 		return '<input type="text" name="' . $this->name . '" id="' . $this->name . '" value="' . htmlspecialchars($this->value, ENT_COMPAT, 'UTF-8') .

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -647,6 +647,7 @@ class EventbookingModelEvent extends RADModelItem
 				$fieldsToUpdate = array(
 					'category_id',
 					'location_id',
+					'registration_type',
 					'title',
 					'short_description',
 					'description',

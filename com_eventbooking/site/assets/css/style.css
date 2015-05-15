@@ -281,9 +281,7 @@ td.eb-event-property-label {
 }
 
 /* ---------- Taskbar styles ---------------------------------------- */
-.eb-taskbar {
-    padding: 25px 0;
-    border-bottom: 1px dotted #a5a5a5;
+.eb-taskbar {    
     margin: 0;
     list-style: none;
 }
@@ -378,7 +376,6 @@ form.form-horizontal .control-label, form.form-horizontal .control-label label {
 
 .eb-form-content {
     display: none;
-    overflow: auto;
     padding: 0 0 15px;
 }
 
@@ -573,6 +570,11 @@ span.view_list {
 
 li.getdirection a {
     font-weight: bold;
+}
+
+.eb-container .input-append .add-on, .eb-container .input-prepend .add-on 
+{    
+  height: auto !important;  
 }
 
 /**CSS for supporting responsive calendar*/
@@ -859,8 +861,15 @@ body .eb-calendar li {
         display: inline;
     }
 }
-
 /**Timeline layout**/
+
+.eb-events-timeline .eb-taskbar {
+    padding: 25px 0;
+    border-bottom: 1px dotted #a5a5a5;
+    margin: 0;
+    list-style: none;
+}
+
 .eb-event-container {
     background-image: url("../images/dot-ver.png");
     background-position: 42px 85px;
@@ -951,4 +960,71 @@ body .eb-calendar li {
 span.eb-time
 {
     padding-left: 5px;
+}
+.eb-container .form-group .radio, .eb-container .form-group .checkbox {
+    min-height: 1px !important;
+}
+
+.eb-container .form-group input.radio, .eb-container .form-group input.checkbox, .eb-container .form-group select {
+    display: inline-block !important;
+}
+
+.eb-container .form-group select,
+.eb-container .form-group textarea,
+.eb-container .form-group input[type="text"],
+.eb-container .form-group input[type="password"],
+.eb-container .form-group input[type="datetime"],
+.eb-container .form-group input[type="datetime-local"],
+.eb-container .form-group input[type="date"],
+.eb-container .form-group input[type="month"],
+.eb-container .form-group input[type="time"],
+.eb-container .form-group input[type="week"],
+.eb-container .form-group input[type="number"],
+.eb-container .form-group input[type="email"],
+.eb-container .form-group input[type="url"],
+.eb-container .form-group input[type="search"],
+.eb-container .form-group input[type="tel"],
+.eb-container .form-group input[type="color"]
+{
+	width: 210px !important;
+}
+
+.eb-container .form-group input[type="text"].input-mini,
+.eb-container .form-group select.input-mini,
+.eb-container .form-group textarea.input-mini {
+    width: 60px !important;
+}
+
+.eb-container .form-group input[type="text"].input-small,
+.eb-container .form-group select.input-small,
+.eb-container .form-group textarea.input-small {
+    width: 90px !important;
+}
+
+.eb-container .form-group input[type="text"].input-medium,
+.eb-container .form-group select.input-medium,
+.eb-container .form-group textarea.input-medium
+{
+    width: 150px !important;
+}
+
+.eb-container .form-group input[type="text"].input-large,
+.eb-container .form-group select.input-large,
+.eb-container .form-group textarea.input-large
+{
+    width: 210px !important;
+}
+
+.eb-container .form-group input[type="text"].input-xlarge,
+.eb-container .form-group select.input-xlarge,
+.eb-container .form-group textarea.input-xlarge
+{
+    width: 270px !important;
+}
+
+.eb-container .form-group input[type="text"].input-xxlarge,
+.eb-container .form-group select.input-xxlarge,
+.eb-container .form-group textarea.input-xxlarge
+{
+    width: 530px !important;
 }

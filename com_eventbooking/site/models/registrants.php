@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -119,7 +119,7 @@ class EventBookingModelRegistrants extends RADModelList
 		{
 			$query->where('tbl.group_id = 0');
 		}
-		if (EB_ONLY_SHOW_REGISTRANTS_OF_EVENT_OWNER)
+		if ($config->only_show_registrants_of_event_owner)
 		{
 			$query->where('tbl.event_id IN (SELECT id FROM #__eb_events WHERE created_by =' . JFactory::getUser()->id . ')');
 		}

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.2
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -13,8 +13,7 @@ class EventBookingViewSearch extends JViewLegacy
 {
 
 	function display($tpl = null)
-	{
-		$this->setLayout('default');
+	{		
 		$db = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		$model = $this->getModel();
@@ -81,7 +80,7 @@ class EventBookingViewSearch extends JViewLegacy
 			}
 			for ($i = 0, $n = count($items); $i < $n; $i++)
 			{
-				$item = & $items[$i];
+				$item = $items[$i];
 				$params->loadString($item->custom_fields, 'JSON');
 				$paramData = array();
 				foreach ($customFields as $name => $label)
@@ -99,6 +98,8 @@ class EventBookingViewSearch extends JViewLegacy
 		$this->Itemid = JRequest::getInt('Itemid', 0);
 		$this->config = $config;
 		$this->nullDate = $db->getNullDate();
+		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+
 		parent::display($tpl);
 	}
 }
