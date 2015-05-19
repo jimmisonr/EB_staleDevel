@@ -31,10 +31,18 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		{
 			$options[] = JHtml::_('select.option', 3, JText::_('EB_MEMBERSHIP_PRO'));
 		}
+
 		if (JPluginHelper::isEnabled('user', 'profile'))
 		{
 			$options[] = JHtml::_('select.option', 4, JText::_('EB_JOOMLA_PROFILE'));
 		}
+
+		if (file_exists(JPATH_ROOT . '/components/com_contactenhanced/contactenhanced.php'))
+		{
+			$options[] = JHtml::_('select.option', 5, JText::_('EB_CONTACT_ENHANCED'));
+		}
+
+		
 		$lists['show_attachment_in_frontend'] = JHtml::_('select.booleanlist', 'show_attachment_in_frontend', '', $config->show_attachment_in_frontend);
 		$lists['custom_field_by_category'] = JHtml::_('select.booleanlist', 'custom_field_by_category', '', $config->custom_field_by_category);
 		$lists['cb_integration'] = JHtml::_('select.genericlist', $options, 'cb_integration', ' class="inputbox" ', 'value', 'text', 

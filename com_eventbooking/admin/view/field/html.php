@@ -170,6 +170,19 @@ class EventbookingViewFieldHtml extends RADViewItem
 				$this->lists['field_mapping'] = JHtml::_('select.genericlist', $options, 'field_mapping', ' class="inputbox" ', 'value', 'text', 
 					$this->item->field_mapping);
 			}
+			elseif($integration == 5)
+			{
+				$fields = array_keys($db->getTableColumns('#__ce_details'));
+
+				// Remove some system fields
+				$fields = array_diff($fields, array('id', 'alias', 'ordering', 'checked_out', 'checked_out_time', 'user_id', 'catid', 'hits', 'params'));
+				foreach ($fields as $field)
+				{
+					$options[] = JHtml::_('select.option', $field, $field);
+				}
+				$this->lists['field_mapping'] = JHtml::_('select.genericlist', $options, 'field_mapping', ' class="inputbox" ', 'value', 'text',
+					$this->item->field_mapping);
+			}
 		}
 		
 		$options = array();

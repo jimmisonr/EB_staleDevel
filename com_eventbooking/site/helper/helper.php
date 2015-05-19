@@ -265,7 +265,7 @@ class EventbookingHelper
 			foreach ($extraLanguages as $extraLanguage)
 			{
 				$prefix = $extraLanguage->sef;
-				if (!in_array('title_' . $prefix, $fields))
+				if (!in_array('name_' . $prefix, $fields))
 				{
 					return false;
 				}
@@ -1437,6 +1437,19 @@ class EventbookingHelper
 			elseif ($config->cb_integration == 4)
 			{
 				$syncronizer = new RADSynchronizerJoomla();
+				$mappings    = array();
+				foreach ($rowFields as $rowField)
+				{
+					if ($rowField->field_mapping)
+					{
+						$mappings[$rowField->name] = $rowField->field_mapping;
+					}
+				}
+				$data = $syncronizer->getData($userId, $mappings);
+			}
+			elseif ($config->cb_integration == 5)
+			{
+				$syncronizer = new RADSynchronizerContactenhanced();
 				$mappings    = array();
 				foreach ($rowFields as $rowField)
 				{
