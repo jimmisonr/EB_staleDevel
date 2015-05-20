@@ -50,7 +50,12 @@ class EventBookingViewRegistrantList extends JViewLegacy
 				->where('id = ' . $eventId);
 			$db->setQuery($query);
 			$customFieldIds = $db->loadResult();
-			if (strlen(trim($customFieldIds)))
+			$customFieldIds = trim($customFieldIds);
+			if (!$customFieldIds)
+			{
+				$customFieldIds = trim($config->registrant_list_custom_field_ids);
+			}
+			if ($customFieldIds)
 			{
 				$fields      = explode(',', $customFieldIds);
 				$fieldTitles = array();

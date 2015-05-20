@@ -186,7 +186,18 @@ $editor = JFactory::getEditor();
 						<td>
 							<?php echo JText::_('EB_EVENT_CUSTOM_FIELD_EXPLAIN'); ?> 
 						</td>
-					</tr>								
+					</tr>
+					<tr>
+						<td  class="key">
+							<?php echo JText::_('EB_REGISTRANT_LIST_CUSTOM_FIELD_IDS'); ?>
+						</td>
+						<td>
+							<input type="text" name="registrant_list_custom_field_ids" class="input-xxlarge" value="<?php echo $this->config->registrant_list_custom_field_ids ; ?>" />
+						</td>
+						<td>
+							<?php echo JText::_('EB_REGISTRANT_LIST_CUSTOM_FIELD_IDS_EXPLAIN'); ?>
+						</td>
+					</tr>
 					<tr>
 						<td  class="key">
 							<?php echo JText::_('EB_MULTIPLE_BOOKING'); ?>
