@@ -360,6 +360,21 @@ class EventBookingViewEvent extends JViewLegacy
 		$lists['event_end_date_hour'] = JHtml::_('select.integerlist', 0, 23, 1, 'event_end_date_hour', ' class="input-mini" ', $selectedHour);
 		$lists['event_end_date_minute'] = JHtml::_('select.integerlist', 0, 60, 5, 'event_end_date_minute', ' class="input-mini" ', $selectedMinute, 
 			'%02d');
+
+		// Registration start time
+		if ($item->registration_start_date != $db->getNullDate())
+		{
+			$selectedHour = date('G', strtotime($item->registration_start_date)) ;
+			$selectedMinute = date('i', strtotime($item->registration_start_date));
+		}
+		else
+		{
+			$selectedHour = 0 ;
+			$selectedMinute = 0 ;
+		}
+		$lists['registration_start_hour'] = JHtml::_('select.integerlist', 0, 23, 1, 'registration_start_hour', ' class="inputbox input-mini" ', $selectedHour) ;
+		$lists['registration_start_minute'] = JHtml::_('select.integerlist', 0, 60, 5, 'registration_start_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d') ;
+
 		//Terms and condition article
 		$sql = 'SELECT id, title FROM #__content';
 		$db->setQuery($sql);

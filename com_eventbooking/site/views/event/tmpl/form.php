@@ -204,6 +204,15 @@ $format = 'Y-m-d' ;
 				</tr>
 				<tr>
 					<td class="key">
+						<?php echo JText::_('EB_REGISTRATION_START_DATE'); ?>
+					</td>
+					<td>
+						<?php echo JHtml::_('calendar', ($this->item->registration_start_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->registration_start_date, $format, null), 'registration_start_date', 'registration_start_date') ; ?>
+						<?php echo $this->lists['registration_start_hour'].' '.$this->lists['registration_start_minute'] ; ?>
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
 						<?php echo JText::_('EB_PRICE'); ?>
 					</td>
 					<td>

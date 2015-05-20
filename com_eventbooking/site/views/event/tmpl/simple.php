@@ -97,6 +97,17 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				<?php echo $this->lists['event_end_date_hour'].' '.$this->lists['event_end_date_minute'] ; ?>
 			</div>
 		</div>
+
+		<div class="<?php echo $controlGroupClass;  ?>">
+			<label class="<?php echo $controlLabelClass; ?>">
+				<?php echo JText::_('EB_REGISTRATION_START_DATE'); ?>
+			</label>
+			<div class="<?php echo $controlsClass; ?>">
+				<?php echo JHtml::_('calendar', ($this->item->registration_start_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->registration_start_date, $format, null), 'registration_start_date', 'registration_start_date') ; ?>
+				<?php echo $this->lists['registration_start_hour'].' '.$this->lists['registration_start_minute'] ; ?>
+			</div>
+		</div>
+
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>">
 				<?php echo JText::_('EB_PRICE'); ?>

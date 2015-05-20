@@ -265,6 +265,14 @@ class EventBookingModelEvent extends JModelLegacy
 			
 			$eventDateHour = $data['event_end_date_hour'];
 			$row->event_end_date .= ' ' . $eventDateHour . ':' . $data['event_end_date_minute'] . ':00';
+
+
+			if (isset($data['registration_start_hour']))
+			{
+				$row->registration_start_date .= ' ' . $data['registration_start_hour'] . ':' . $data['registration_start_minute'] . ':00';
+			}
+
+
 			$eventCustomField = EventbookingHelper::getConfigValue('event_custom_field');
 			if ($eventCustomField)
 			{

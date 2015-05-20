@@ -192,7 +192,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_REGISTRANT_LIST_CUSTOM_FIELD_IDS'); ?>
 						</td>
 						<td>
-							<input type="text" name="registrant_list_custom_field_ids" class="input-xxlarge" value="<?php echo $this->config->registrant_list_custom_field_ids ; ?>" />
+							<input type="text" name="registrant_list_custom_field_ids" value="<?php echo $this->config->registrant_list_custom_field_ids ; ?>" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_REGISTRANT_LIST_CUSTOM_FIELD_IDS_EXPLAIN'); ?>
