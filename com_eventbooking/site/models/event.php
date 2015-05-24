@@ -689,6 +689,7 @@ class EventBookingModelEvent extends JModelLegacy
 		$row->title = null;
 		$row->event_date = $db->getNullDate();
 		$row->event_end_date = $db->getNullDate();
+		$row->registration_start_date = $db->getNullDate();
 		$row->short_description = null;
 		$row->description = null;
 		$row->individual_price = null;

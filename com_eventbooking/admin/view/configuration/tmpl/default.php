@@ -386,6 +386,17 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_SHOW_ALL_LOCATIONS_IN_EVENT_SUBMISSION_FORM_EXPLAIN'); ?>
 						</td>
 					</tr>
+					<tr>
+						<td  class="key">
+							<?php echo JText::_('EB_SHOW_BILLING_STEP_FOR_FREE_EVENTS')?>
+						</td>
+						<td>
+							<?php echo $this->lists['show_billing_step_for_free_events']; ?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_SHOW_BILLING_STEP_FOR_FREE_EVENTS_EXPLAIN'); ?>
+						</td>
+					</tr>
 					<tr>				
 						<td class="key">
 							<?php echo JText::_('EB_ZOOM_LEVEL'); ?>

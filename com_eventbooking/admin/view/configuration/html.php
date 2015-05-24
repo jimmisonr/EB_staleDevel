@@ -201,6 +201,9 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['show_all_locations_in_event_submission_form'] = JHtml::_('select.booleanlist', 'show_all_locations_in_event_submission_form', '',
 			$config->show_all_locations_in_event_submission_form);
 
+		$lists['show_billing_step_for_free_events'] = JHtml::_('select.booleanlist', 'show_billing_step_for_free_events', '',
+			$config->show_billing_step_for_free_events);
+
 		$options = array();
 		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_POSITION'));
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_BEFORE_AMOUNT'));

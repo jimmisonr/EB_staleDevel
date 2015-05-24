@@ -501,7 +501,7 @@ $btnClass          = $bootstrapHelper->getClassMapping('btn');
 						<?php
 						}
 					}
-					if ($this->config->show_invite_friend)
+					if ($this->config->show_invite_friend && $item->number_event_dates > 0)
 					{
 					?>
 						<li>

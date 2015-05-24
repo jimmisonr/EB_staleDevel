@@ -1533,7 +1533,7 @@ class EventbookingHelper
 	public static function showBillingStep($eventId)
 	{
 		$config = self::getConfig();
-		if (!$config->collect_member_information)
+		if (!$config->collect_member_information || $config->show_billing_step_for_free_events)
 		{
 			return true;
 		}
