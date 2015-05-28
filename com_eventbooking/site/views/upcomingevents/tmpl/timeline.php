@@ -28,6 +28,12 @@ JHtml::_('behavior.modal', 'a.eb-modal');
 		{
 			echo EventbookingHelperHtml::loadCommonLayout('common/events_timeline.php', array('events' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'category' => $this->category, 'bootstrapHelper' => $this->bootstrapHelper));
 		}
+		else
+		{
+		?>
+			<p class="text-info"><?php echo JText::_('EB_NO_UPCOMING_EVENTS') ?></p>
+		<?php
+		}
 		if ($this->pagination->total > $this->pagination->limit)
 		{
 		?>

@@ -29,6 +29,12 @@ else
 		{
 			echo EventbookingHelperHtml::loadCommonLayout('common/events_table.php', array('items' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'ssl' => $ssl , 'viewLevels' => $this->viewLevels, 'categoryId' => @$this->category->id, 'bootstrapHelper' => $this->bootstrapHelper));
 		}
+		else
+		{
+		?>
+			<p class="text-info"><?php echo JText::_('EB_NO_UPCOMING_EVENTS') ?></p>
+		<?php
+		}
 		if ($this->pagination->total > $this->pagination->limit)
 		{
 		?>

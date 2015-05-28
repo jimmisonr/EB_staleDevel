@@ -48,6 +48,15 @@ JHtml::_('behavior.modal', 'a.eb-modal');
 			{
 				echo EventbookingHelperHtml::loadCommonLayout('common/events_default.php', array('events' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'category' => $this->category, 'Itemid' => $this->Itemid, 'bootstrapHelper' => $this->bootstrapHelper));
 			}
+			else
+			{
+				if (count($this->categories) == 0)
+				{
+				?>
+					<p class="text-info"><?php echo JText::_('EB_NO_EVENTS') ?></p>
+				<?php
+				}
+			}
 			if ($this->pagination->total > $this->pagination->limit)
 			{
 			?>

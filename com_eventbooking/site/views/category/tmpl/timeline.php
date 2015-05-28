@@ -24,13 +24,13 @@ JHtml::_('behavior.modal', 'a.eb-modal');
 		<?php
 		if ($this->category)
 		{
-			?>
+		?>
 			<div id="eb-category">
 				<h1 class="eb-page-heading"><?php echo $this->category->name;?></h1>
 				<?php
 				if($this->category->description != '')
 				{
-					?>
+				?>
 					<div class="eb-description"><?php echo $this->category->description;?></div>
 				<?php
 				}
@@ -47,6 +47,15 @@ JHtml::_('behavior.modal', 'a.eb-modal');
 		if (count($this->items))
 		{
 			echo EventbookingHelperHtml::loadCommonLayout('common/events_timeline.php', array('events' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'category' => $this->category, 'Itemid' => $this->Itemid, 'bootstrapHelper' => $this->bootstrapHelper));
+		}
+		else
+		{
+			if (count($this->categories) == 0)
+			{
+			?>
+				<p class="text-info"><?php echo JText::_('EB_NO_EVENTS') ?></p>
+			<?php
+			}
 		}
 		if ($this->pagination->total > $this->pagination->limit)
 		{

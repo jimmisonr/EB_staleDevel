@@ -35,6 +35,12 @@ JHtml::_('behavior.modal', 'a.eb-modal');
 			</div>
 		<?php
 		}
+		else
+		{
+		?>
+			<p class="text-info"><?php echo JText::_('EB_NO_EVENTS_FOUND') ?></p>
+		<?php
+		}
 		?>
 		<script type="text/javascript">
 			function cancelRegistration(registrantId)
