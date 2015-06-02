@@ -14,6 +14,7 @@ class EventBookingViewUpcomingEvents extends JViewLegacy
 
 	function display($tpl = null)
 	{
+		$app = JFactory::getDocument();
 		$document = JFactory::getDocument();
 		$db = JFactory::getDbo();
 		$model = $this->getModel();
@@ -29,7 +30,22 @@ class EventBookingViewUpcomingEvents extends JViewLegacy
 		{
 			$pageTitle = str_replace('[CATEGORY_NAME]', $category->name, $pageTitle);
 		}
+
+		$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
+		if ($siteNamePosition == 0)
+		{
+			$document->setTitle($pageTitle);
+		}
+		elseif ($siteNamePosition == 1)
+		{
+			$document->setTitle($app->get('sitename') . ' - ' . $pageTitle);
+		}
+		else
+		{
+			$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
+		}
 		$document->setTitle($pageTitle);
+
 		$config = EventbookingHelper::getConfig();
 		if ($config->process_plugin)
 		{
