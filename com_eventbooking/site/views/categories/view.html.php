@@ -14,6 +14,7 @@ class EventBookingViewCategories extends JViewLegacy
 
 	function display($tpl = null)
 	{
+		$app = JFactory::getApplication();
 		$document = JFactory::getDocument();
 		$config = EventbookingHelper::getConfig();
 		$model = $this->getModel();
@@ -37,7 +38,6 @@ class EventBookingViewCategories extends JViewLegacy
 			$category = $db->loadObject();
 			$pageTitle = JText::_('EB_SUB_CATEGORIES_PAGE_TITLE');
 			$pageTitle = str_replace('[CATEGORY_NAME]', $category->name, $pageTitle);
-			$document->setTitle($pageTitle);
 			if ($category->meta_keywords)
 			{
 				$document->setMetaData('keywords', $category->meta_keywords);
@@ -50,8 +50,23 @@ class EventBookingViewCategories extends JViewLegacy
 		}
 		else
 		{
-			$document->setTitle(JText::_('EB_CATEGORIES_PAGE_TITLE'));
+			$pageTitle = JText::_('EB_CATEGORIES_PAGE_TITLE');
 		}
+
+		$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
+		if ($siteNamePosition == 0)
+		{
+			$document->setTitle($pageTitle);
+		}
+		elseif ($siteNamePosition == 1)
+		{
+			$document->setTitle($app->get('sitename') . ' - ' . $pageTitle);
+		}
+		else
+		{
+			$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
+		}
+
 		$this->categoryId = $categoryId;
 		$this->config = $config;
 		$this->items = $items;

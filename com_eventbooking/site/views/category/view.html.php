@@ -20,7 +20,6 @@ class EventBookingViewCategory extends JViewLegacy
 		$nullDate = $db->getNullDate();
 		$config = EventbookingHelper::getConfig();
 		$document = JFactory::getDocument();
-		$pathway = $app->getPathway();
 		$model = $this->getModel();
 		$state = $model->getState();
 		$categoryId = $state->id;
@@ -34,7 +33,20 @@ class EventBookingViewCategory extends JViewLegacy
 		$category = $model->getCategory();
 		$pageTitle = JText::_('EB_CATEGORY_PAGE_TITLE');
 		$pageTitle = str_replace('[CATEGORY_NAME]', $category->name, $pageTitle);
-		$document->setTitle($pageTitle);
+
+		$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
+		if ($siteNamePosition == 0)
+		{
+			$document->setTitle($pageTitle);
+		}
+		elseif ($siteNamePosition == 1)
+		{
+			$document->setTitle($app->get('sitename') . ' - ' . $pageTitle);
+		}
+		else
+		{
+			$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
+		}
 		
 		if ($category->meta_keywords)
 		{

@@ -62,6 +62,8 @@ class plgEventBookingMap extends JPlugin
 		{
 			$https = false;
 		}
+		$config = EventbookingHelper::getConfig();
+		$zoomLevel = $config->zoom_level ? (int) $config->zoom_level : 10;
 		$mapWidth = $this->params->def('map_width', 700);
 		$mapHeight = $this->params->def('map_height', 500);
 		$bubbleText = "<ul class=\"bubble\">";
@@ -80,7 +82,7 @@ class plgEventBookingMap extends JPlugin
 	      function initialize() 
 	        {     
 	            var latlng = new google.maps.LatLng(<?php echo $event->lat ?>, <?php echo $event->long; ?>);  
-	            var myOptions = {       zoom: 10,       center: latlng,       mapTypeId: google.maps.MapTypeId.ROADMAP     };     
+	            var myOptions = {       zoom: <?php echo $zoomLevel; ?>,       center: latlng,       mapTypeId: google.maps.MapTypeId.ROADMAP     };     
 	            var map = new google.maps.Map(document.getElementById("map_canvas"),         myOptions);
 	
 	

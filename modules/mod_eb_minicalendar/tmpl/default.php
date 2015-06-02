@@ -107,7 +107,7 @@
 			                    		if ($numberEvents)
 			                    		{		                    		
 			                    	?>	
-			                    		<a class="eb_minical_link" href="<?php echo $link; ?>" title="<?php echo  ($numberEvents > 1 ? $numberEvents.JText::_('EB_EVENTS') :  $currentDay["events"][0]->title) ; ?>" rel="nofollow">
+			                    		<a class="eb_minical_link" href="<?php echo $link; ?>" title="<?php echo  ($numberEvents > 1 ? $numberEvents.' '.JText::_('EB_EVENTS') :  $currentDay["events"][0]->title) ; ?>" rel="nofollow">
 			                    			<span class="<?php echo $class?>"><?php echo $currentDay['d'];?></span> 
 			                    		</a>
 			                   		<?php 

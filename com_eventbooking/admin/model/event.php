@@ -791,7 +791,7 @@ class EventbookingModelEvent extends RADModelItem
 		$this->data->number_weeks = '';
 		$this->data->number_months = '';
 		$this->data->recurring_frequency = 0;
-		$this->data->recurring_end_date = $db->getNullDate();
+		$this->data->recurring_end_date = $db->getNullDate();	
 		$this->data->ordering = 0;
 		$this->data->published = isset($config->default_event_status) ? $config->default_event_status : 0;
 	}

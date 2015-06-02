@@ -47,13 +47,14 @@ class modEventBookingGoogleMapHelper
 	 * get all event published
 	 *
 	 */
-	protected function loadAllEventBooking(){
+	protected function loadAllEventBooking($locationId = 0)
+	{
 		$hidePastEvents = $this->_params->get('hide_past_events',0);
 		$categoryIds 	= $this->_params->get('category_ids');
 		$user = JFactory::getUser();
 		$this	->_query	
 				->clear()
-				->select('a.*')
+				->select('a.id,a.title,a.location_id')
 				->from('#__eb_events AS a')
 				->select('b.name, b.lat, b.long, b.address, b.city, b.state, b.zip, b.country')
 				->innerJoin('#__eb_locations AS b ON a.location_id = b.id')
@@ -64,16 +65,28 @@ class modEventBookingGoogleMapHelper
 				->where('a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
 				->order('a.event_date ASC')
 		;
-		if ($hidePastEvents) {
+		if ($hidePastEvents) 
+		{
 			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
 			$this->_query->where('DATE(a.event_date) >= "' . $currentDate . '"');
 		}
-		if (count($categoryIds)) {
-			$this->_query->where('c.category_id IN ('.implode(',', $categoryIds).')');
+		if (count($categoryIds))
+		{
+			$this->_query->where('c.main_category = 1 AND c.category_id IN ('.implode(',', $categoryIds).')');
 		}
-		if (JLanguageMultilang::isEnabled()){
+		if (JLanguageMultilang::isEnabled())
+		{
 			$this->_query->where('a.language IN (' . $this->_db->Quote(JFactory::getLanguage()->getTag()) . ',' . $this->_db->Quote('*') . ')');
 		}
+		if ($locationId) 
+		{
+			$this->_query->where('a.location_id='.(int)$locationId);
+		}
+		else
+		{
+			$this->_query->group('a.location_id');
+		}
+		$this->_query->group('a.id');
 		$this->_db->setQuery($this->_query);
 		$this->_rows = $this->_db->loadObjectList();
 		
@@ -84,7 +97,8 @@ class modEventBookingGoogleMapHelper
 	 *
 	 */
 	protected function loadMapInListing(){
-		if (!count($this->_rows)) 
+		$locationGroups = $this->loadAllEventBooking();
+		if (!count($locationGroups)) 
 		{
 			echo JText::_('EB_NO_EVENTS');
 			return ;
@@ -102,9 +116,9 @@ class modEventBookingGoogleMapHelper
 			      var cityCircle;
 			  	  var myHome = new google.maps.LatLng(<?php echo $this->_rows[0]->lat; ?>, <?php echo $this->_rows[0]->long; ?>);
 				  <?php
-					  for($i=0; $i<count($this->_rows); $i++)
+					  for($i=0; $i<count($locationGroups); $i++)
 					  {
-					  	 $row = $this->_rows[$i];
+					  	 $row = $locationGroups[$i];
 					  	 if(($row->lat != "") and ($row->long != ""))
 					  	 {
 					  	 ?>
@@ -140,31 +154,22 @@ class modEventBookingGoogleMapHelper
 					   infoWindow.close();
 					 });
 				  <?php
-				  		$samelocations = array();
-					  	for($i=0;$i<count($this->_rows);$i++){
-					  	$row = $this->_rows[$i];
-					  	?>
-					  	var contentStr<?php echo $row->id?> = '<li><h4><?php echo JHtml::link(EventbookingHelperRoute::getEventRoute($row->id,$row->catid,$this->_itemId), addslashes($row->title)); ?></h4></li>';
-						    <?php
-						    if (isset($samelocations[$row->location_id])) {
-						    	foreach ($samelocations[$row->location_id] as $samelocation){
-							?>
-								contentStr<?php echo $row->id?> = contentStr<?php echo $samelocation->id?> + contentStr<?php echo $row->id?>;
-							<?php 		
-								}
-						    }
-						    if(($row->lat != "") and ($row->long != "")){
+					  	for($i=0;$i<count($locationGroups);$i++)
+						{
+						  	$row = $locationGroups[$i];
+						  	$samelocations = $this->loadAllEventBooking($row->location_id);
+						    if(($row->lat != "") and ($row->long != ""))
+							{
 						    ?>
 						       makeMarker({
 								   position: eventListing<?php echo $row->id?>,
 								   title: "<?php echo addslashes($row->title);?>",
-								   content: '<div class="row-fluid"><ul>' + contentStr<?php echo $row->id?> + '</ul></div>',
+								   content: '<div class="row-fluid"><ul><?php foreach ($samelocations as $samelocation){ echo '<li><h4>'. JHtml::link(EventbookingHelperRoute::getEventRoute($samelocation->id,$samelocation->catid,$this->_itemId), addslashes($samelocation->title)).'</h4></li>'; }?></ul></div>',
 								   icon:new google.maps.MarkerImage('<?php echo JURI::root()?>modules/mod_eb_googlemap/asset/marker/marker.png')
 							   });
 						  	 <?php
 						    }
-						    $samelocations[$row->location_id][] = $row;
-					  }
+					  	}
 					  ?>
 				 });
 		</script>

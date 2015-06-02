@@ -104,7 +104,21 @@ class EventBookingViewEvent extends JViewLegacy
 		$pageTitle = JText::_('EB_EVENT_PAGE_TITLE');
 		$pageTitle = str_replace('[EVENT_TITLE]', $item->title, $pageTitle);
 		$pageTitle = str_replace('[CATEGORY_NAME]', $categoryName, $pageTitle);
-		$document->setTitle($pageTitle);
+
+		$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
+		if ($siteNamePosition == 0)
+		{
+			$document->setTitle($pageTitle);
+		}
+		elseif ($siteNamePosition == 1)
+		{
+			$document->setTitle($app->get('sitename') . ' - ' . $pageTitle);
+		}
+		else
+		{
+			$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
+		}
+
 		$nullDate = $db->getNullDate();
 		$query->clear();
 		$query->select('*')
