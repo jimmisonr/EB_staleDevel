@@ -14,7 +14,7 @@ class EventBookingViewUpcomingEvents extends JViewLegacy
 
 	function display($tpl = null)
 	{
-		$app = JFactory::getDocument();
+		$app = JFactory::getApplication();
 		$document = JFactory::getDocument();
 		$db = JFactory::getDbo();
 		$model = $this->getModel();
@@ -43,8 +43,7 @@ class EventBookingViewUpcomingEvents extends JViewLegacy
 		else
 		{
 			$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
-		}
-		$document->setTitle($pageTitle);
+		}		
 
 		$config = EventbookingHelper::getConfig();
 		if ($config->process_plugin)

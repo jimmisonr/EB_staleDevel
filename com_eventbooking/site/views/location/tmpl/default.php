@@ -40,6 +40,12 @@ JHtml::_('behavior.modal', 'a.eb-modal');
 	{
 		echo EventbookingHelperHtml::loadCommonLayout('common/events_default.php', array('events' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'param' => $param, 'ssl' => $ssl, 'width' => $width, 'height' => $height , 'viewLevels' => $this->viewLevels, 'bootstrapHelper' => $this->bootstrapHelper));
 	}
+	else 
+	{
+	?>
+		<p class="text-info"><?php echo JText::_('EB_NO_EVENTS_FOUND') ?></p>
+	<?php	
+	}
 	if ($this->pagination->total > $this->pagination->limit)
 	{
 	?>
