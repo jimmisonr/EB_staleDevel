@@ -360,7 +360,7 @@ class EventBookingViewEvent extends JViewLegacy
 			$selectedMinute = 0;
 		}
 		$lists['event_date_hour'] = JHtml::_('select.integerlist', 0, 23, 1, 'event_date_hour', ' class="input-mini" ', $selectedHour);
-		$lists['event_date_minute'] = JHtml::_('select.integerlist', 0, 60, 5, 'event_date_minute', ' class="input-mini" ', $selectedMinute, '%02d');
+		$lists['event_date_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'event_date_minute', ' class="input-mini" ', $selectedMinute, '%02d');
 		if ($item->event_end_date != $db->getNullDate())
 		{
 			$selectedHour = date('G', strtotime($item->event_end_date));
@@ -372,7 +372,7 @@ class EventBookingViewEvent extends JViewLegacy
 			$selectedMinute = 0;
 		}
 		$lists['event_end_date_hour'] = JHtml::_('select.integerlist', 0, 23, 1, 'event_end_date_hour', ' class="input-mini" ', $selectedHour);
-		$lists['event_end_date_minute'] = JHtml::_('select.integerlist', 0, 60, 5, 'event_end_date_minute', ' class="input-mini" ', $selectedMinute, 
+		$lists['event_end_date_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'event_end_date_minute', ' class="input-mini" ', $selectedMinute,
 			'%02d');
 
 		// Registration start time
@@ -387,7 +387,7 @@ class EventBookingViewEvent extends JViewLegacy
 			$selectedMinute = 0 ;
 		}
 		$lists['registration_start_hour'] = JHtml::_('select.integerlist', 0, 23, 1, 'registration_start_hour', ' class="inputbox input-mini" ', $selectedHour) ;
-		$lists['registration_start_minute'] = JHtml::_('select.integerlist', 0, 60, 5, 'registration_start_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d') ;
+		$lists['registration_start_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d') ;
 
 		//Terms and condition article
 		$sql = 'SELECT id, title FROM #__content';

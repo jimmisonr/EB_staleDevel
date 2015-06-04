@@ -152,7 +152,7 @@ class EventbookingViewEventHtml extends RADViewItem
 			$selectedMinute = 0 ;			
 		}
 		$this->lists['event_date_hour'] = JHtml::_('select.integerlist', 0, 23, 1, 'event_date_hour', ' class="inputbox input-mini" ', $selectedHour) ;
-		$this->lists['event_date_minute'] = JHtml::_('select.integerlist', 0, 60, 5, 'event_date_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d') ;			
+		$this->lists['event_date_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'event_date_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d') ;
 		if ($item->event_end_date != $db->getNullDate())
 		{
 			$selectedHour = date('G', strtotime($item->event_end_date)) ;
@@ -164,7 +164,7 @@ class EventbookingViewEventHtml extends RADViewItem
 			$selectedMinute = 0 ;			
 		}
 		$this->lists['event_end_date_hour'] = JHtml::_('select.integerlist', 0, 23, 1, 'event_end_date_hour', ' class="inputbox input-mini" ', $selectedHour) ;
-		$this->lists['event_end_date_minute'] = JHtml::_('select.integerlist', 0, 60, 5, 'event_end_date_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d') ;
+		$this->lists['event_end_date_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'event_end_date_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d') ;
 
 		// Cut off time
 		if ($item->cut_off_date != $db->getNullDate())
@@ -178,7 +178,7 @@ class EventbookingViewEventHtml extends RADViewItem
 			$selectedMinute = 0 ;
 		}
 		$this->lists['cut_off_hour'] = JHtml::_('select.integerlist', 0, 23, 1, 'cut_off_hour', ' class="inputbox input-mini" ', $selectedHour) ;
-		$this->lists['cut_off_minute'] = JHtml::_('select.integerlist', 0, 60, 5, 'cut_off_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d') ;
+		$this->lists['cut_off_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'cut_off_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d') ;
 
 		// Registration start time
 		if ($item->registration_start_date != $db->getNullDate())
@@ -192,7 +192,7 @@ class EventbookingViewEventHtml extends RADViewItem
 			$selectedMinute = 0 ;
 		}
 		$this->lists['registration_start_hour'] = JHtml::_('select.integerlist', 0, 23, 1, 'registration_start_hour', ' class="inputbox input-mini" ', $selectedHour) ;
-		$this->lists['registration_start_minute'] = JHtml::_('select.integerlist', 0, 60, 5, 'registration_start_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d') ;
+		$this->lists['registration_start_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d') ;
 		//Terms and condition article
 		
 		$query->clear();
