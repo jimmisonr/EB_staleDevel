@@ -199,6 +199,12 @@ class com_eventbookingInstallerScript
 				JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css');
 			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/assets/css/bak.custom.css');
 		}
+
+		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/views/register/metadata.xml'))
+		{
+			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/views/register/metadata.xml');
+		}
+		
 		JFactory::getApplication()->redirect(
 			JRoute::_('index.php?option=com_eventbooking&task=update_db_schema&install_type=' . $this->installType, false));
 	}
