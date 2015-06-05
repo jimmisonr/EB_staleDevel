@@ -52,11 +52,12 @@ class plgContentEBRegister extends JPlugin
 	 */
 	function _replaceEBRegister(&$matches)
 	{
-		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
+		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';		
 		$input = JFactory::getApplication()->input;
 		$db = JFactory::getDbo();
 		$config = EventbookingHelper::getConfig();		
 		EventbookingHelper::loadLanguage();		
+		EventbookingHelper::addLangLinkForAjax();
 		$document = JFactory::getDocument();
 		$document->addScript(JUri::base(true) . '/components/com_eventbooking/assets/js/paymentmethods.js');		
 		$document->addStyleSheet(JURI::base(true) . '/components/com_eventbooking/assets/css/style.css');
