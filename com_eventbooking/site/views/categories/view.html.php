@@ -67,6 +67,20 @@ class EventBookingViewCategories extends JViewLegacy
 			$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
 		}
 
+		// Process content plugin  for categories
+		if ($config->process_plugin)
+		{
+			for ($i = 0, $n = count($items); $i < $n; $i++)
+			{
+				$item = $items[$i];
+				$item->description = JHtml::_('content.prepare', $item->description);
+			}
+			if (!empty($this->category))
+			{
+				$this->category->description = JHtml::_('content.prepare', $this->category->description);
+			}
+		}
+
 		$this->categoryId = $categoryId;
 		$this->config = $config;
 		$this->items = $items;
