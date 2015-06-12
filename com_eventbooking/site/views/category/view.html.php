@@ -17,7 +17,7 @@ class EventBookingViewCategory extends JViewLegacy
 		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
 		$active   = $app->getMenu()->getActive();
-		$params   = EventbookingHelper::getViewParams($active, array('categories', 'category'));
+
 
 		$user = JFactory::getUser();
 		$db = JFactory::getDbo();
@@ -150,6 +150,7 @@ class EventBookingViewCategory extends JViewLegacy
 		}
 
 		// Process page meta data
+		$params   = EventbookingHelper::getViewParams($active, array('categories', 'category'));
 		if ($params->get('page_title'))
 		{
 			$pageTitle = $params->get('page_title');

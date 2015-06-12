@@ -20,8 +20,10 @@ class EventBookingViewEvent extends JViewLegacy
 			$this->_displayForm($tpl);
 			return;
 		}
-		$app = JFactory::getApplication();
+		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
+		$active   = $app->getMenu()->getActive();
+
 		$user = JFactory::getUser();
 		$input = $app->input;
 		$db = JFactory::getDbo();
@@ -46,16 +48,13 @@ class EventBookingViewEvent extends JViewLegacy
 		{
 			$item->description = $item->short_description;
 		}
-
-		$menu = $app->getMenu();
-		$menuItem = $menu->getActive();
 		$categoryId = JRequest::getInt('catid', 0);
-		if ($menuItem)
+		if ($active)
 		{
 			$pathway = $app->getPathway();
-			if (isset($menuItem->query['view']) && ($menuItem->query['view'] == 'categories' || $menuItem->query['view'] == 'category'))
+			if (isset($active->query['view']) && ($active->query['view'] == 'categories' || $active->query['view'] == 'category'))
 			{
-				$parentId = (int) $menuItem->query['id'];
+				$parentId = (int) $active->query['id'];
 				if ($categoryId)
 				{
 					$paths = EventbookingHelperData::getCategoriesBreadcrumb($categoryId, $parentId);
@@ -68,7 +67,7 @@ class EventBookingViewEvent extends JViewLegacy
 					$pathway->addItem($item->title);
 				}
 			}
-			elseif (isset($menuItem->query['view']) && ($menuItem->query['view'] == 'calendar'))
+			elseif (isset($active->query['view']) && ($active->query['view'] == 'calendar'))
 			{
 				$pathway->addItem($item->title);
 			}
@@ -101,23 +100,6 @@ class EventBookingViewEvent extends JViewLegacy
 			->where('id=' . $item->category_id);
 		$db->setQuery($query);
 		$categoryName = $db->loadResult();
-		$pageTitle = JText::_('EB_EVENT_PAGE_TITLE');
-		$pageTitle = str_replace('[EVENT_TITLE]', $item->title, $pageTitle);
-		$pageTitle = str_replace('[CATEGORY_NAME]', $categoryName, $pageTitle);
-
-		$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
-		if ($siteNamePosition == 0)
-		{
-			$document->setTitle($pageTitle);
-		}
-		elseif ($siteNamePosition == 1)
-		{
-			$document->setTitle($app->get('sitename') . ' - ' . $pageTitle);
-		}
-		else
-		{
-			$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
-		}
 
 		$nullDate = $db->getNullDate();
 		$query->clear();
@@ -148,14 +130,58 @@ class EventBookingViewEvent extends JViewLegacy
 			}
 			$this->paramData = $paramData;
 		}
+
+		$params   = EventbookingHelper::getViewParams($active, array('calendar', 'upcomingevents', 'categories', 'category', 'event'));
+
+		// Process page meta data
+		if ($params->get('page_title'))
+		{
+			$pageTitle = $params->get('page_title');
+		}
+		else
+		{
+			$pageTitle = JText::_('EB_EVENT_PAGE_TITLE');
+			$pageTitle = str_replace('[EVENT_TITLE]', $item->title, $pageTitle);
+			$pageTitle = str_replace('[CATEGORY_NAME]', $categoryName, $pageTitle);
+		}
+
+		$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
+		if ($siteNamePosition == 0)
+		{
+			$document->setTitle($pageTitle);
+		}
+		elseif ($siteNamePosition == 1)
+		{
+			$document->setTitle($app->get('sitename') . ' - ' . $pageTitle);
+		}
+		else
+		{
+			$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
+		}
+
+
 		if ($item->meta_keywords)
 		{
 			$document->setMetaData('keywords', $item->meta_keywords);
+		}
+		elseif ($params->get('menu-meta_keywords'))
+		{
+			$document->setMetadata('keywords', $params->get('menu-meta_keywords'));
 		}
 		if ($item->meta_description)
 		{
 			$document->setMetaData('description', $item->meta_description);
 		}
+		elseif ($params->get('menu-meta_description'))
+		{
+			$document->setDescription($params->get('menu-meta_description'));
+		}
+
+		if ($params->get('robots'))
+		{
+			$document->setMetadata('robots', $params->get('robots'));
+		}
+
 		if ($config->multiple_booking)
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
