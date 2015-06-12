@@ -12,7 +12,7 @@ defined( '_JEXEC' ) or die ;
 JHtml::_('behavior.modal', 'a.eb-modal');
 ?>
 <div id="eb-upcoming-events-page-default" class="eb-container">
-	<h1 class="eb-page-heading"><?php echo JText::_('EB_UPCOMING_EVENTS') ; ?></h1>
+	<h1 class="eb-page-heading"><?php echo $this->params->get('page_heading') ? $this->params->get('page_heading') : JText::_('EB_UPCOMING_EVENTS'); ?></h1>
 <?php
 if ($this->config->use_https)
 {
