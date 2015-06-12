@@ -93,8 +93,49 @@ class EventbookingViewCalendar extends JViewLegacy
 			$options[] = JHtml::_('select.option', $i, $i);
 		}
 		$this->searchYear = JHtml::_('select.genericlist', $options, 'year', 'class="input-small" onchange="submit();" ', 'value', 'text', $year);
+
+		// Process page meta data
+		$app = JFactory::getApplication();
+		$document = JFactory::getDocument();
+		$active = $app->getMenu()->getActive();
+		$params = EventbookingHelper::getViewParams($active, array('calendar'));
+
+		if ($params->get('page_title'))
+		{
+			$pageTitle = $params->get('page_title');
+			$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
+			if ($siteNamePosition == 0)
+			{
+				$document->setTitle($pageTitle);
+			}
+			elseif ($siteNamePosition == 1)
+			{
+				$document->setTitle($app->get('sitename') . ' - ' . $pageTitle);
+			}
+			else
+			{
+				$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
+			}
+		}
+		
+		if ($params->get('menu-meta_description'))
+		{
+			$document->setDescription($params->get('menu-meta_description'));
+		}
+
+		if ($params->get('menu-meta_keywords'))
+		{
+			$document->setMetadata('keywords', $params->get('menu-meta_keywords'));
+		}
+
+		if ($params->get('robots'))
+		{
+			$document->setMetadata('robots', $params->get('robots'));
+		}
+
 		$this->Itemid     = $Itemid;
 		$this->listMonth  = $listMonth;
+		$this->params     = $params;
 
 		parent::display($tpl);
 	}

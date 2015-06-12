@@ -105,6 +105,24 @@ class EventbookingHelper
 		}
 	}
 
+
+	/**
+	 * Get page params of the givem view
+	 *
+	 * @param $active
+	 * @param $views
+	 *
+	 * @return JRegistry
+	 */
+	public static function getViewParams($active, $views)
+	{
+		if ($active && isset($active->query['view']) && in_array($active->query['view'], $views))
+		{
+			return $active->params;
+		}
+
+		return new JRegistry();
+	}
 	/**
 	 * Get request data, used for RADList model
 	 *

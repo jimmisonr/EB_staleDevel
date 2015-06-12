@@ -33,28 +33,31 @@ else
 }
 ?>
 <div id="eb-calendar-page" class="eb-container">
-	<h1 class="eb-page-heading"><?php echo JText::_('EB_CALENDAR') ; ?></h1>
-		<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=calendar&Itemid='.$this->Itemid);?>">
-				<div id="eb-calendarwrap">
-								<?php
-										if ($this->showCalendarMenu)
-										{
-												echo EventbookingHelperHtml::loadCommonLayout('common/calendar_navigation.php', array('Itemid' => $this->Itemid, 'config' => $this->config, 'layout' => 'default'));
-										}
-										echo EventbookingHelperHtml::loadCommonLayout('common/calendar.php',
-																																	array(
-																																			'Itemid' => $this->Itemid,
-																																			'config' => $this->config,
-																																			'previousMonth' => $previousMonth,
-																																			'nextMonth' => $nextMonth,
-																																			'previousMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$previousMonth.'&year='.$previousYear.'&Itemid='.$this->Itemid),
-																																			'nextMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$nextMonth.'&year='.$nextYear.'&Itemid='.$this->Itemid),
-																																			'listMonth' => $this->listMonth,
-																																			'searchMonth' => $this->searchMonth,
-																																			'searchYear' => $this->searchYear,
-																																			'data'    => $this->data
-																																	));
-								?>
-				</div>
-		</form>
+	<?php
+		$pageHeading = $this->params->get('page_heading') ? $this->params->get('page_heading') : JText::_('EB_CALENDAR');
+	?>
+	<h1 class="eb-page-heading"><?php echo $pageHeading; ?></h1>
+	<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=calendar&Itemid='.$this->Itemid);?>">
+			<div id="eb-calendarwrap">
+				<?php
+						if ($this->showCalendarMenu)
+						{
+								echo EventbookingHelperHtml::loadCommonLayout('common/calendar_navigation.php', array('Itemid' => $this->Itemid, 'config' => $this->config, 'layout' => 'default'));
+						}
+						echo EventbookingHelperHtml::loadCommonLayout('common/calendar.php',
+							array(
+									'Itemid' => $this->Itemid,
+									'config' => $this->config,
+									'previousMonth' => $previousMonth,
+									'nextMonth' => $nextMonth,
+									'previousMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$previousMonth.'&year='.$previousYear.'&Itemid='.$this->Itemid),
+									'nextMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$nextMonth.'&year='.$nextYear.'&Itemid='.$this->Itemid),
+									'listMonth' => $this->listMonth,
+									'searchMonth' => $this->searchMonth,
+									'searchYear' => $this->searchYear,
+									'data'    => $this->data
+							));
+				?>
+			</div>
+	</form>
 </div>
