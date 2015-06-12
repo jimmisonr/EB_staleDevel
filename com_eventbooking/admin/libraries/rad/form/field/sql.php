@@ -32,7 +32,7 @@ class RADFormFieldSQL extends RADFormFieldList
 	public function __construct($row, $value)
 	{
 		parent::__construct($row, $value);
-		$this->query = $row->values;
+		$this->query = $row->default_values;
 	}
 
 	/**

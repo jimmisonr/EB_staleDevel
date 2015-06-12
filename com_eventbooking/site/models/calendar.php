@@ -166,6 +166,7 @@ class EventBookingModelCalendar extends JModelLegacy
 
 		$query->select('a.*')
 			->select('a.title' . $fieldSuffix . ' AS title')
+			->select('short_description' . $fieldSuffix . ' AS short_description')
 			->select('b.name AS location_name')
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')
@@ -204,6 +205,7 @@ class EventBookingModelCalendar extends JModelLegacy
 		$endDate     = $day . " 23:59:59";
 		$query->select('a.*')
 			->select('a.title' . $fieldSuffix . ' AS title')
+			->select('short_description' . $fieldSuffix . ' AS short_description')
 			->select('b.name AS location_name')
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')

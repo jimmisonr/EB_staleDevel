@@ -146,10 +146,14 @@ class EventBookingModelList extends RADModelList
 	protected function _buildQueryWhere(JDatabaseQuery $query)
 	{
 		$db             = $this->getDbo();
+		$user           = JFactory::getUser();
 		$state          = $this->getState();
 		$hidePastEvents = EventbookingHelper::getConfigValue('hide_past_events');
-		$query->where('tbl.published=1')->where('tbl.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
-
+		if (!$user->authorise('core.admin', 'com_eventbooking'))
+		{
+			$query->where('tbl.published=1')->where('tbl.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
+		}
+		
 		if ($state->id || $state->category_id)
 		{
 			$categoryId = $state->id ? $state->id : $state->category_id;
