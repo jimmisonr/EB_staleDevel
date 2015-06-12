@@ -14,8 +14,11 @@ class EventBookingViewCategories extends JViewLegacy
 
 	function display($tpl = null)
 	{
-		$app = JFactory::getApplication();
+		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
+		$active   = $app->getMenu()->getActive();
+		$params   = EventbookingHelper::getViewParams($active, array('categories', 'category'));
+
 		$config = EventbookingHelper::getConfig();
 		$model = $this->getModel();
 		$items = $model->getData();
@@ -36,23 +39,23 @@ class EventBookingViewCategories extends JViewLegacy
 				->where('id=' . $categoryId);
 			$db->setQuery($query);
 			$category = $db->loadObject();
+			$this->category = $category;
+		}
+
+		// Process page meta data
+		if ($params->get('page_title'))
+		{
+			$pageTitle = $params->get('page_title');
+		}
+		elseif($categoryId && !empty($category))
+		{
 			$pageTitle = JText::_('EB_SUB_CATEGORIES_PAGE_TITLE');
 			$pageTitle = str_replace('[CATEGORY_NAME]', $category->name, $pageTitle);
-			if ($category->meta_keywords)
-			{
-				$document->setMetaData('keywords', $category->meta_keywords);
-			}
-			if ($category->meta_description)
-			{
-				$document->setMetaData('description', $category->meta_description);
-			}
-			$this->category = $category;
 		}
 		else
 		{
 			$pageTitle = JText::_('EB_CATEGORIES_PAGE_TITLE');
 		}
-
 		$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
 		if ($siteNamePosition == 0)
 		{
@@ -65,6 +68,28 @@ class EventBookingViewCategories extends JViewLegacy
 		else
 		{
 			$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
+		}
+
+		if ($category->meta_keywords)
+		{
+			$document->setMetaData('keywords', $category->meta_keywords);
+		}
+		elseif ($params->get('menu-meta_keywords'))
+		{
+			$document->setMetadata('keywords', $params->get('menu-meta_keywords'));
+		}
+		if ($category->meta_description)
+		{
+			$document->setMetaData('description', $category->meta_description);
+		}
+		elseif ($params->get('menu-meta_description'))
+		{
+			$document->setDescription($params->get('menu-meta_description'));
+		}
+
+		if ($params->get('robots'))
+		{
+			$document->setMetadata('robots', $params->get('robots'));
 		}
 
 		// Process content plugin  for categories
@@ -86,6 +111,7 @@ class EventBookingViewCategories extends JViewLegacy
 		$this->items = $items;
 		$this->pagination = $pagination;
 		$this->Itemid = JFactory::getApplication()->input->getInt('Itemid', 0);
+		$this->params = $params;
 		
 		parent::display($tpl);
 	}

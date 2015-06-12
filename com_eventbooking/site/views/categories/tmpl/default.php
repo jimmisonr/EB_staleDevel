@@ -14,8 +14,9 @@ defined( '_JEXEC' ) or die ;
 	<?php
 		if (!$this->categoryId)
 		{
+			$pageHeading = $this->params->get('page_heading') ? $this->params->get('page_heading') : JText::_('EB_CATEGORIES');
 		?>
-			<h1 class="eb-page-heading"><?php echo JText::_('EB_CATEGORIES') ;?></h1>
+			<h1 class="eb-page-heading"><?php echo $pageHeading;?></h1>
 		<?php
 		}
 		else
