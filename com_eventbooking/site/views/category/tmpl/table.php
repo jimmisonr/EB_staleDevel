@@ -32,7 +32,7 @@ if ($this->config->show_cat_decription_in_calendar_layout && $this->category)
 } else
 {
 ?>
-	<h1 class="eb-page-heading"><?php echo JText::_('EB_EVENT_LIST') ; ?></h1>
+	<h1 class="eb-page-heading"><?php echo $this->params->get('page_heading')? $this->params->get('page_heading') : JText::_('EB_EVENT_LIST') ; ?></h1>
 	<p class="eb-message">
 		<?php echo JText::_('EB_EVENT_GUIDE') ; ?>
 	</p>

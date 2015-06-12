@@ -14,12 +14,15 @@ class EventBookingViewCategory extends JViewLegacy
 
 	function display($tpl = null)
 	{
-		$app = JFactory::getApplication();
+		$app      = JFactory::getApplication();
+		$document = JFactory::getDocument();
+		$active   = $app->getMenu()->getActive();
+		$params   = EventbookingHelper::getViewParams($active, array('categories', 'category'));
+
 		$user = JFactory::getUser();
 		$db = JFactory::getDbo();
 		$nullDate = $db->getNullDate();
 		$config = EventbookingHelper::getConfig();
-		$document = JFactory::getDocument();
 		$model = $this->getModel();
 		$state = $model->getState();
 		$categoryId = $state->id;
@@ -31,31 +34,8 @@ class EventBookingViewCategory extends JViewLegacy
 		$items = $model->getData();
 		$pagination = $model->getPagination();
 		$category = $model->getCategory();
-		$pageTitle = JText::_('EB_CATEGORY_PAGE_TITLE');
-		$pageTitle = str_replace('[CATEGORY_NAME]', $category->name, $pageTitle);
 
-		$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
-		if ($siteNamePosition == 0)
-		{
-			$document->setTitle($pageTitle);
-		}
-		elseif ($siteNamePosition == 1)
-		{
-			$document->setTitle($app->get('sitename') . ' - ' . $pageTitle);
-		}
-		else
-		{
-			$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
-		}
-		
-		if ($category->meta_keywords)
-		{
-			$document->setMetaData('keywords', $category->meta_keywords);
-		}
-		if ($category->meta_description)
-		{
-			$document->setMetaData('description', $category->meta_description);
-		}
+
 		if ($config->process_plugin)
 		{
 			for ($i = 0, $n = count($items); $i < $n; $i++)
@@ -95,15 +75,12 @@ class EventBookingViewCategory extends JViewLegacy
 			}
 		}
 		
-		//Handle breadcrump
-		$app = JFactory::getApplication();
-		$menu = $app->getMenu();
-		$menuItem = $menu->getActive();
-		if ($menuItem)
+		//Handle breadcrumb
+		if ($active)
 		{
-			if (isset($menuItem->query['view']) && ($menuItem->query['view'] == 'categories' || $menuItem->query['view'] == 'category'))
+			if (isset($active->query['view']) && ($active->query['view'] == 'categories' || $active->query['view'] == 'category'))
 			{
-				$parentId = (int) $menuItem->query['id'];
+				$parentId = (int) $active->query['id'];
 				if ($state->id)
 				{
 					$pathway = $app->getPathway();
@@ -171,6 +148,61 @@ class EventBookingViewCategory extends JViewLegacy
 			}			
 			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width.'px', $height.'px', 'true', 'false');
 		}
+
+		// Process page meta data
+		if ($params->get('page_title'))
+		{
+			$pageTitle = $params->get('page_title');
+		}
+		elseif($categoryId && !empty($category))
+		{
+			$pageTitle = JText::_('EB_CATEGORY_PAGE_TITLE');
+			$pageTitle = str_replace('[CATEGORY_NAME]', $category->name, $pageTitle);
+		}
+		else
+		{
+			$pageTitle = '';
+		}
+
+		if ($pageTitle)
+		{
+			$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
+			if ($siteNamePosition == 0)
+			{
+				$document->setTitle($pageTitle);
+			}
+			elseif ($siteNamePosition == 1)
+			{
+				$document->setTitle($app->get('sitename') . ' - ' . $pageTitle);
+			}
+			else
+			{
+				$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
+			}
+		}
+
+		if (!empty($category) && $category->meta_keywords)
+		{
+			$document->setMetaData('keywords', $category->meta_keywords);
+		}
+		elseif ($params->get('menu-meta_keywords'))
+		{
+			$document->setMetadata('keywords', $params->get('menu-meta_keywords'));
+		}
+		if (!empty($category) && $category->meta_description)
+		{
+			$document->setMetaData('description', $category->meta_description);
+		}
+		elseif ($params->get('menu-meta_description'))
+		{
+			$document->setDescription($params->get('menu-meta_description'));
+		}
+
+		if ($params->get('robots'))
+		{
+			$document->setMetadata('robots', $params->get('robots'));
+		}
+
 		$this->viewLevels = $viewLevels;
 		$this->userId = $userId;
 		$this->items = $items;
@@ -179,6 +211,7 @@ class EventBookingViewCategory extends JViewLegacy
 		$this->category = $category;
 		$this->nullDate = $nullDate;
 		$this->Itemid = $Itemid;
+		$this->params = $params;
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
 		

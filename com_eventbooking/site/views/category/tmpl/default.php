@@ -39,6 +39,12 @@ JHtml::_('behavior.modal', 'a.eb-modal');
 				<div class="clearfix"></div>
 			<?php
 			}
+			elseif ($this->params->get('page_heading'))
+			{
+			?>
+				<h1 class="eb-page-heading"><?php echo $this->params->get('page_heading');?></h1>
+			<?php
+			}
 
 			if (count($this->categories))
 			{

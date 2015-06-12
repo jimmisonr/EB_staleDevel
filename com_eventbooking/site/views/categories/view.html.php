@@ -17,7 +17,7 @@ class EventBookingViewCategories extends JViewLegacy
 		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
 		$active   = $app->getMenu()->getActive();
-		$params   = EventbookingHelper::getViewParams($active, array('categories', 'category'));
+		$params   = EventbookingHelper::getViewParams($active, array('categories'));
 
 		$config = EventbookingHelper::getConfig();
 		$model = $this->getModel();
@@ -70,7 +70,7 @@ class EventBookingViewCategories extends JViewLegacy
 			$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
 		}
 
-		if ($category->meta_keywords)
+		if (!empty($category) && $category->meta_keywords)
 		{
 			$document->setMetaData('keywords', $category->meta_keywords);
 		}
@@ -78,7 +78,7 @@ class EventBookingViewCategories extends JViewLegacy
 		{
 			$document->setMetadata('keywords', $params->get('menu-meta_keywords'));
 		}
-		if ($category->meta_description)
+		if (!empty($category) && $category->meta_description)
 		{
 			$document->setMetaData('description', $category->meta_description);
 		}
