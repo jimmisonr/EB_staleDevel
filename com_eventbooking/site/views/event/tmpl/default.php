@@ -41,6 +41,15 @@ $btnClass          = $bootstrapHelper->getClassMapping('btn');
 		<?php
 			if ($this->config->show_fb_like_button)
 			{
+				$document = JFactory::getDocument();
+				$document->addCustomTag('<meta property="og:title" content="'.$item->title.'"/>');
+				if ($item->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$item->thumb))
+				{
+					$document->addCustomTag('<meta property="og:image" content="'.JUri::base().'media/com_eventbooking/images/thumbs/'.$item->thumb.'"/>');
+				}
+				$document->addCustomTag('<meta property="og:url" content="'.JUri::getInstance()->toString().'"/>');
+				$document->addCustomTag('<meta property="og:description" content="'.$item->title.'"/>');
+				$document->addCustomTag('<meta property="og:site_name" content="'.JFactory::getConfig()->get('sitename').'"/>');
 			?>
 				<div class="sharing clearfix" >
 					<!-- FB -->

@@ -14,8 +14,10 @@ class EventBookingViewUpcomingEvents extends JViewLegacy
 
 	function display($tpl = null)
 	{
-		$app = JFactory::getApplication();
+		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
+		$active   = $app->getMenu()->getActive();
+
 		$db = JFactory::getDbo();
 		$model = $this->getModel();
 		$state = $model->getState();
@@ -25,25 +27,6 @@ class EventBookingViewUpcomingEvents extends JViewLegacy
 		{
 			EventbookingHelper::checkCategoryAccess($state->id);
 		}
-		$pageTitle = JText::_('EB_UPCOMING_EVENTS_PAGE_TITLE');
-		if ($category)
-		{
-			$pageTitle = str_replace('[CATEGORY_NAME]', $category->name, $pageTitle);
-		}
-
-		$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
-		if ($siteNamePosition == 0)
-		{
-			$document->setTitle($pageTitle);
-		}
-		elseif ($siteNamePosition == 1)
-		{
-			$document->setTitle($app->get('sitename') . ' - ' . $pageTitle);
-		}
-		else
-		{
-			$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
-		}		
 
 		$config = EventbookingHelper::getConfig();
 		if ($config->process_plugin)
@@ -80,6 +63,57 @@ class EventBookingViewUpcomingEvents extends JViewLegacy
 				$item->paramData = $paramData;
 			}
 		}
+
+		$params   = EventbookingHelper::getViewParams($active, array('upcomingevents'));
+		if ($params->get('page_title'))
+		{
+			$pageTitle = $params->get('page_title');
+		}
+		else
+		{
+			$pageTitle = JText::_('EB_UPCOMING_EVENTS_PAGE_TITLE');
+			if ($category)
+			{
+				$pageTitle = str_replace('[CATEGORY_NAME]', $category->name, $pageTitle);
+			}
+		}
+
+		$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
+		if ($siteNamePosition == 0)
+		{
+			$document->setTitle($pageTitle);
+		}
+		elseif ($siteNamePosition == 1)
+		{
+			$document->setTitle($app->get('sitename') . ' - ' . $pageTitle);
+		}
+		else
+		{
+			$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
+		}
+
+		if (!empty($category) && $category->meta_keywords)
+		{
+			$document->setMetaData('keywords', $category->meta_keywords);
+		}
+		elseif ($params->get('menu-meta_keywords'))
+		{
+			$document->setMetadata('keywords', $params->get('menu-meta_keywords'));
+		}
+		if (!empty($category) && $category->meta_description)
+		{
+			$document->setMetaData('description', $category->meta_description);
+		}
+		elseif ($params->get('menu-meta_description'))
+		{
+			$document->setDescription($params->get('menu-meta_description'));
+		}
+
+		if ($params->get('robots'))
+		{
+			$document->setMetadata('robots', $params->get('robots'));
+		}
+
 		if ($config->multiple_booking)
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
@@ -114,6 +148,7 @@ class EventBookingViewUpcomingEvents extends JViewLegacy
 		$this->category = $category;
 		$this->pagination = $model->getPagination();
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+		$this->params = $params;
 		
 		parent::display($tpl);
 	}
