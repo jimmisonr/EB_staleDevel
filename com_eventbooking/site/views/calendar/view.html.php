@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.7.2
+ * @version            1.7.3
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -15,7 +15,11 @@ class EventbookingViewCalendar extends JViewLegacy
 
 	function display($tpl = null)
 	{
-		//Add nofolow for calendar page
+		$app      = JFactory::getApplication();
+		$document = JFactory::getDocument();
+		$active   = $app->getMenu()->getActive();
+		$params   = EventbookingHelper::getViewParams($active, array('calendar'));
+
 		$config                 = EventbookingHelper::getConfig();
 		$showCalendarMenu       = $config->activate_weekly_calendar_view || $config->activate_daily_calendar_view;
 		$this->showCalendarMenu = $showCalendarMenu;
@@ -95,14 +99,9 @@ class EventbookingViewCalendar extends JViewLegacy
 		$this->searchYear = JHtml::_('select.genericlist', $options, 'year', 'class="input-small" onchange="submit();" ', 'value', 'text', $year);
 
 		// Process page meta data
-		$app = JFactory::getApplication();
-		$document = JFactory::getDocument();
-		$active = $app->getMenu()->getActive();
-		$params = EventbookingHelper::getViewParams($active, array('calendar'));
-
 		if ($params->get('page_title'))
 		{
-			$pageTitle = $params->get('page_title');
+			$pageTitle        = $params->get('page_title');
 			$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
 			if ($siteNamePosition == 0)
 			{
@@ -117,7 +116,7 @@ class EventbookingViewCalendar extends JViewLegacy
 				$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
 			}
 		}
-		
+
 		if ($params->get('menu-meta_description'))
 		{
 			$document->setDescription($params->get('menu-meta_description'));
@@ -133,9 +132,9 @@ class EventbookingViewCalendar extends JViewLegacy
 			$document->setMetadata('robots', $params->get('robots'));
 		}
 
-		$this->Itemid     = $Itemid;
-		$this->listMonth  = $listMonth;
-		$this->params     = $params;
+		$this->Itemid    = $Itemid;
+		$this->listMonth = $listMonth;
+		$this->params    = $params;
 
 		parent::display($tpl);
 	}
