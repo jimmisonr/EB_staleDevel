@@ -204,6 +204,32 @@ class com_eventbookingInstallerScript
 		{
 			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/views/register/metadata.xml');
 		}
+
+		if ($this->installType == 'install')
+		{
+			$db = JFactory::getDbo();
+			$sql = 'SELECT COUNT(*) FROM #__eb_messages';
+			$db->setQuery($sql);
+			$total = $db->loadResult();
+			if (!$total)
+			{
+				$configSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/messages.eventbooking.sql';
+				$sql       = JFile::read($configSql);
+				$queries   = $db->splitSql($sql);
+				if (count($queries))
+				{
+					foreach ($queries as $query)
+					{
+						$query = trim($query);
+						if ($query != '' && $query{0} != '#')
+						{
+							$db->setQuery($query);
+							$db->execute();
+						}
+					}
+				}
+			}
+		}
 		
 		JFactory::getApplication()->redirect(
 			JRoute::_('index.php?option=com_eventbooking&task=update_db_schema&install_type=' . $this->installType, false));
