@@ -978,3 +978,8 @@ CREATE TABLE IF NOT EXISTS `#__eb_waiting_lists` (
   `notified` tinyint(3) unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) CHARACTER SET `utf8`;
+CREATE TABLE IF NOT EXISTS `#__eb_messages` (
+  `id` int(11) NOT NULL,
+  `message_key` varchar(50) DEFAULT NULL,
+  `message` text
+) CHARACTER SET `utf8`;
