@@ -27,7 +27,8 @@ $showCategory = $params->get('show_category', 1);
 $showLocation = $params->get('show_location');
 $where = array();
 $where[] = 'a.published =1 ';
-$where[] = 'DATE(event_date) >= CURDATE()';
+$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+$where[] = 'DATE(a.event_date) >= "' . $currentDate . '"';
 // $where[] = '(cut_off_date = "'.$db->getNullDate().'" OR DATE(cut_off_date) >= CURDATE())' ;
 if ($categoryIds != '')
 {
