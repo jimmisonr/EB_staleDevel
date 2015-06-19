@@ -109,11 +109,11 @@ class EventbookingViewCalendar extends JViewLegacy
 			}
 			elseif ($siteNamePosition == 1)
 			{
-				$document->setTitle($app->get('sitename') . ' - ' . $pageTitle);
+				$document->setTitle(JFactory::getConfig()->get('sitename') . ' - ' . $pageTitle);
 			}
 			else
 			{
-				$document->setTitle($pageTitle . ' - ' . $app->get('sitename'));
+				$document->setTitle($pageTitle . ' - ' . JFactory::getConfig()->get('sitename'));
 			}
 		}
 

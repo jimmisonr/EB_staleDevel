@@ -22,7 +22,7 @@ if (!$itemId)
 $user = JFactory::getUser();
 $fieldSuffix = EventbookingHelper::getFieldSuffix();
 $numberEvents = $params->get('number_events', 6);
-$categoryIds = $params->get('category_ids', '');
+$categoryIds = trim($params->get('category_ids', ''));
 $showCategory = $params->get('show_category', 1);
 $showLocation = $params->get('show_location');
 $where = array();
