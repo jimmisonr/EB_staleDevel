@@ -259,12 +259,18 @@ $iconMapMakerClass = $bootstrapHelper->getClassMapping('icon-map-marker');
 						</li>
 					<?php
 					}
+
+					if ($config->hide_detail_button !== '1')
+					{
 					?>
-					<li>
-						<a class="<?php echo $btnClass; ?> btn-primary" href="<?php echo $detailUrl; ?>">
-							<?php echo JText::_('EB_DETAILS'); ?>
-						</a>
-					</li>
+						<li>
+							<a class="<?php echo $btnClass; ?> btn-primary" href="<?php echo $detailUrl; ?>">
+								<?php echo JText::_('EB_DETAILS'); ?>
+							</a>
+						</li>
+					<?php
+					}
+					?>
 				</ul>
 			</div>
 		</div>

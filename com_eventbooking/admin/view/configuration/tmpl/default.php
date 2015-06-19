@@ -922,7 +922,18 @@ $editor = JFactory::getEditor();
 						<td>
 							&nbsp;
 						</td>
-					</tr>	
+					</tr>
+					<tr>
+						<td width="30%" class="key">
+							<?php echo JText::_('EB_HIDE_DETAIL_BUTTON'); ?>
+						</td>
+						<td>
+							<?php echo $this->lists['hide_detail_button']; ?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_HIDE_DETAIL_BUTTON_EXPLAIN'); ?>
+						</td>
+					</tr>
 					<tr>
 						<td width="30%" class="key">
 							<?php echo JText::_('EB_PROCESS_CONTENT_PLUGIN'); ?>
