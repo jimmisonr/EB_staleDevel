@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.6.5
+ * @version        	1.7.3
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -10,6 +10,10 @@
 // no direct access
 defined( '_JEXEC' ) or die ;
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
+if (version_compare(JVERSION, '3.0', 'ge'))
+{
+	JHtml::_('formbehavior.chosen', 'select#event_id');
+}
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function(pressbutton) {
@@ -62,7 +66,7 @@ if ($translatable)
 					<td class="key" valign="top" width="20%"> 
 						<?php echo JText::_('EB_CATEGORY'); ?>
 					</td>
-					<td>
+					<td style="margin-bottom: 10px;">
 						<?php echo $this->lists['category_id'] ; ?>
 					</td>
 					<td>

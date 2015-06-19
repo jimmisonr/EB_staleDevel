@@ -67,7 +67,7 @@ class EventbookingViewFieldHtml extends RADViewItem
 					'option.text.toHtml' => false, 
 					'option.text' => 'text', 
 					'option.value' => 'value', 
-					'list.attr' => '', 
+					'list.attr' => ' class="input-xlarge" ',
 					'list.select' => $this->item->category_id));
 		}
 		else
@@ -111,7 +111,7 @@ class EventbookingViewFieldHtml extends RADViewItem
 					$selecteds = $db->loadColumn();					
 				}
 			}			
-			$this->lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id[]', 'class="inputbox" multiple="multiple" size="5" ', 'id', 
+			$this->lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id[]', 'class="input-xlarge" multiple="multiple" size="5" ', 'id',
 				'title', $selecteds);
 		}
 		$this->lists['required'] = JHtml::_('select.booleanlist', 'required', ' class="inputbox" ', $this->item->required);
