@@ -205,6 +205,10 @@ class EventBookingViewEvent extends JViewLegacy
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-invite');
 		}
+
+		// Load bootstrap js
+		EventbookingHelper::loadBootstrapJs();
+
 		$viewLevels = $user->getAuthorisedViewLevels();
 		JPluginHelper::importPlugin('eventbooking');
 		$dispatcher = JDispatcher::getInstance();

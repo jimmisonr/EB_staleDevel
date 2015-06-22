@@ -1288,6 +1288,61 @@ class EventbookingController extends JControllerLegacy
 		}
 	}
 
+	public function download_ical()
+	{
+		$eventId = $this->input->getInt('event_id');
+		if ($eventId)
+		{
+			$config = EventbookingHelper::getConfig();
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('*')
+				->from('#__eb_events')
+				->where('id = '. $eventId);
+			$event = $db->loadObjectList();
+
+			$query->clear();
+			$query->select('a.*')
+				->from('#__eb_locations AS a')
+				->innerJoin('#__eb_events AS b ON a.id=b.location_id')
+				->where('b.id=' . $eventId);
+
+			$db->setQuery($query);
+			$rowLocation = $db->loadObject();
+
+			if ($config->from_name)
+			{
+				$fromName = $config->from_name;
+			}
+			else
+			{
+				$fromName = JFactory::getConfig()->get('from_name');
+			}
+			if ($config->from_email)
+			{
+				$fromEmail = $config->from_email;
+			}
+			else
+			{
+				$fromEmail = JFactory::getConfig()->get('mailfrom');
+			}
+
+			$ics = new EventbookingHelperIcs();
+			$ics->setName($event->title)
+				->setDescription($event->short_description)
+				->setOrganizer($fromEmail, $fromName)
+				->setStart($event->event_date)
+				->setEnd($event->event_end_date);
+
+			if ($rowLocation)
+			{
+				$ics->setLocation($rowLocation->name);
+			}
+
+			$ics->download();
+		}
+	}
+
 	/**
 	 * Get list of states for the selected country, using in AJAX request 
 	 */

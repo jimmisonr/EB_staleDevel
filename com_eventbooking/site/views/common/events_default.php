@@ -417,6 +417,14 @@ defined( '_JEXEC' ) or die ;
 								<?php
 								}
 							}
+							if ($config->show_save_to_personal_calendar)
+							{
+							?>
+								<li>
+									<?php echo EventbookingHelperHtml::loadCommonLayout('common/save_calendar.php', array('item' => $event, 'Itemid' => $Itemid)); ?>
+								</li>
+							<?php
+							}
 							$registrantId = EventbookingHelper::canCancelRegistration($event->id) ;
 							if ($registrantId !== false)
 							{
@@ -426,7 +434,6 @@ defined( '_JEXEC' ) or die ;
 								</li>
 							<?php
 							}
-
 							if (EventbookingHelper::checkEditEvent($event->id))
 							{
 								?>

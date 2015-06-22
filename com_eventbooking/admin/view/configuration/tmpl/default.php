@@ -1046,6 +1046,17 @@ $editor = JFactory::getEditor();
 					</tr>
 					<tr>
 						<td width="30%" class="key">
+							<?php echo JText::_('EB_SHOW_SAVE_TO_PERSONAL_CALENDAR'); ?>
+						</td>
+						<td>
+							<?php echo $this->lists['show_save_to_personal_calendar']; ?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_SHOW_SAVE_TO_PERSONAL_CALENDAR_EXPLAIN'); ?>
+						</td>
+					</tr>
+					<tr>
+						<td width="30%" class="key">
 							<?php echo JText::_('EB_SHOW_SOCIAL_BOOKMARK'); ?>					
 						</td>
 						<td>

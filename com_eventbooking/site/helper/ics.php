@@ -277,6 +277,24 @@ class EventbookingHelperIcs
 	}
 
 	/**
+	 * Method to download ics file
+	 */
+	public function download()
+	{
+		while (@ob_end_clean()) ;
+		$data = $this->generate();
+		header("Pragma: public");
+		header("Expires: 0");
+		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+		header("Cache-Control: public");
+		header("Content-Description: File Transfer");
+		header("Content-type: application/octet-stream");
+		header("Content-Disposition: attachment; filename=\"calendar.ics\"");
+		header("Content-Transfer-Encoding: binary");
+		header("Content-Length: " . strlen($data));
+		print $data;
+	}
+	/**
 	 *
 	 * The function generates the actual content of the ICS
 	 * file and returns it.

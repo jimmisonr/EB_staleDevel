@@ -522,6 +522,14 @@ $btnClass          = $bootstrapHelper->getClassMapping('btn');
 						<?php
 						}
 					}
+					if ($this->config->show_save_to_personal_calendar)
+					{
+					?>
+						<li>
+							<?php echo EventbookingHelperHtml::loadCommonLayout('common/save_calendar.php', array('item' => $item, 'Itemid' => $this->Itemid)); ?>
+						</li>
+					<?php
+					}
 					if ($this->config->show_invite_friend && $item->number_event_dates > 0)
 					{
 					?>
@@ -540,6 +548,7 @@ $btnClass          = $bootstrapHelper->getClassMapping('btn');
 						</li>
 					<?php
 					}
+
 					if (EventbookingHelper::checkEditEvent($item->id))
 					{
 					?>

@@ -172,6 +172,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['show_location_in_category_view'] = JHtml::_('select.booleanlist', 'show_location_in_category_view', '', 
 			$config->show_location_in_category_view);
 		$lists['show_fb_like_button'] = JHtml::_('select.booleanlist', 'show_fb_like_button', '', $config->show_fb_like_button);
+		$lists['show_save_to_personal_calendar'] = JHtml::_('select.booleanlist', 'show_save_to_personal_calendar', '', $config->show_save_to_personal_calendar);
 		$lists['show_social_bookmark'] = JHtml::_('select.booleanlist', 'show_social_bookmark', '', $config->show_social_bookmark);
 		$lists['show_invite_friend'] = JHtml::_('select.booleanlist', 'show_invite_friend', '', $config->show_invite_friend);
 		$lists['show_price_for_free_event'] = JHtml::_('select.booleanlist', 'show_price_for_free_event', '', $config->show_price_for_free_event);

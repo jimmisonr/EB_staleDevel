@@ -3101,6 +3101,20 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Helper method to load bootstrap js using for bootstrap dropdown
+	 */
+	public static function loadBootstrapJs()
+	{
+		if (version_compare(JVERSION, '3.0.0', 'ge'))
+		{
+			JHtml::_('script', 'jui/bootstrap.min.js', false, true, false, false, false);
+		}
+		else
+		{
+			JFactory::getDbo()->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
+		}
+	}
+	/**
 	 * Get version number of GD version installed
 	 * Enter description here ...
 	 *
