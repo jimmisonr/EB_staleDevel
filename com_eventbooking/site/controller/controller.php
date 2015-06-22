@@ -38,6 +38,13 @@ class EventbookingController extends JControllerLegacy
 		$rootUrl = JUri::root(true);
 		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/style.css');
 		JHtml::_('script', EventbookingHelper::getURL() . 'components/com_eventbooking/assets/js/noconflict.js', false, false);
+
+		// Load bootstrap js
+		if ($config->show_save_to_personal_calendar)
+		{
+			EventbookingHelper::loadBootstrapJs();
+		}
+
 		if ($config->calendar_theme)
 		{
 			$theme = $config->calendar_theme;
