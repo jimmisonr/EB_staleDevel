@@ -461,34 +461,46 @@ $btnClass          = $bootstrapHelper->getClassMapping('btn');
 				<?php
 					if ($canRegister)
 					{
-						if ($item->registration_type == 0 || $item->registration_type == 1)
-						{
-							if ($this->config->multiple_booking)
-							{
-								$url        = 'index.php?option=com_eventbooking&task=add_cart&id=' . (int) $item->id . '&Itemid=' . (int) $this->Itemid;
-								$extraClass = 'eb-colorbox-addcart';
-								$text       = JText::_('EB_REGISTER');
-							}
-							else
-							{
-								$url        = JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id=' . $item->id . '&Itemid=' . $this->Itemid, false, $ssl);
-								$text       = JText::_('EB_REGISTER_INDIVIDUAL');
-								$extraClass = '';
-							}
-							?>
-							<li>
-								<a class="<?php echo $btnClass.' '.$extraClass;?>"
-								   href="<?php echo $url; ?>"><?php echo $text; ?></a>
-							</li>
-						<?php
-						}
-						if (($item->registration_type == 0 || $item->registration_type == 2) && !$this->config->multiple_booking)
+						$registrationUrl = trim($item->registration_handle_url);
+						if ($registrationUrl)
 						{
 						?>
 							<li>
-								<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+								<a class="<?php echo $btnClass; ?>" href="<?php echo $registrationUrl; ?>" target="_blank"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
 							</li>
 						<?php
+						}
+						else
+						{
+							if ($item->registration_type == 0 || $item->registration_type == 1)
+							{
+								if ($this->config->multiple_booking)
+								{
+									$url        = 'index.php?option=com_eventbooking&task=add_cart&id=' . (int) $item->id . '&Itemid=' . (int) $this->Itemid;
+									$extraClass = 'eb-colorbox-addcart';
+									$text       = JText::_('EB_REGISTER');
+								}
+								else
+								{
+									$url        = JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id=' . $item->id . '&Itemid=' . $this->Itemid, false, $ssl);
+									$text       = JText::_('EB_REGISTER_INDIVIDUAL');
+									$extraClass = '';
+								}
+								?>
+								<li>
+									<a class="<?php echo $btnClass.' '.$extraClass;?>"
+									   href="<?php echo $url; ?>"><?php echo $text; ?></a>
+								</li>
+							<?php
+							}
+							if (($item->registration_type == 0 || $item->registration_type == 2) && !$this->config->multiple_booking)
+							{
+							?>
+								<li>
+									<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+								</li>
+							<?php
+							}
 						}
 					}
 					elseif ($waitingList)
