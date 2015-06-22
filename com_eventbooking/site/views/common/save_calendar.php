@@ -8,13 +8,13 @@
  * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;
+defined( '_JEXEC' ) or die;
 ?>
 <div class="btn-group">
-	<button class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-plus"></i><?php echo JText::_('EB_SAVE_TO'); ?> <span class="caret"></span></button>
+	<button class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-plus"></i> <?php echo JText::_('EB_SAVE_TO'); ?> <span class="caret"></span></button>
 	<ul class="dropdown-menu">
-		<li><i class="icon-google"></i><a href="<?php echo EventbookingHelperHtml::getAddToGoogleCalendarUrl($item); ?>" target="_blank">Google Calendar<a/></li>
-		<li><i class="icon-yahoo"></i><a href="<?php echo EventbookingHelperHtml::getAddToYahooCalendarUrl($item);?>" target="_blank">Yahoo Calendar</a></li>
-		<li><i class="icon-download"></i><a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=download_ical&event_id='.$item->id.'&Itemid='.$Itemid); ?>"><?php echo JText::_('EB_DOWNLOAD_ICAL'); ?></a></li>
+		<li><a class="google" href="<?php echo EventbookingHelperHtml::getAddToGoogleCalendarUrl($item); ?>" target="_blank">Google Calendar</a></li>
+		<li><a class="yahoo" href="<?php echo EventbookingHelperHtml::getAddToYahooCalendarUrl($item);?>" target="_blank">Yahoo Calendar</a></li>
+		<li><a class="download" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=download_ical&event_id='.$item->id.'&Itemid='.$Itemid); ?>"><i class="icon-download"></i> <?php echo JText::_('EB_DOWNLOAD_ICAL'); ?></a></li>
 	</ul>
 </div>

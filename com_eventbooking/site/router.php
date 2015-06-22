@@ -183,6 +183,14 @@ function EventbookingBuildRoute(&$query)
 			$segments[] = JText::_('EB_SEF_GROUP_BILLING');
 			unset($query['task']);
 			break;
+		case 'download_ical':
+			if ($eventId)
+			{
+				$segments[] = EventbookingHelperRoute::getEventTitle($eventId);
+			}
+			$segments[] = 'download_ical';
+			unset($query['task']);
+			break;	
 		case 'edit_registrant':
 			$segments[] = JText::_('EB_SEF_EDIT_REGISTRANT');
 			unset($query['task']);

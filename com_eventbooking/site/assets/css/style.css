@@ -798,6 +798,32 @@ body .eb-calendar li {
     content: "";
 }
 
+.eb-taskbar .dropdown-menu li {
+	margin: 0!important;
+}
+
+.eb-taskbar .dropdown-menu li a {
+	padding-left: 25px;
+	position: relative;
+}
+
+.eb-taskbar .dropdown-menu li a.google, .eb-taskbar .dropdown-menu li a.yahoo {
+	background-position: 8px 8px;
+	background-repeat: no-repeat;
+}
+
+.eb-taskbar .dropdown-menu li a.google {
+	background-image: url(../images/google.png);
+}
+.eb-taskbar .dropdown-menu li a.yahoo {
+	background-image: url(../images/yahoo.png);
+}
+.eb-taskbar .dropdown-menu li a.download i {
+	left: 8px;
+    position: absolute;
+    top: 5px;
+}
+
 @media screen and (max-width: 767px) {
     body .eb-calendar ul.eb-month-browser li {
         font-size: 12px;
