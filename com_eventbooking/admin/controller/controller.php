@@ -1927,6 +1927,32 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 		$db->truncateTable('#__eb_waiting_lists');
+
+		// Try to delete the file com_eventbooking.zip from tmp folder
+		$tmpFolder = JFactory::getConfig()->get('tmp_path');
+		if (!JFolder::exists($tmpFolder))
+		{
+			$tmpFolder = JPATH_ROOT . '/tmp';
+		}
+		if (file_exists($tmpFolder . '/com_eventbooking.zip'))
+		{
+			JFile::delete($tmpFolder . '/com_eventbooking.zip');
+		}
+
+		// Try to clean tmp folders
+		$folders = JFolder::folders($tmpFolder);
+		if (count($folders))
+		{
+			foreach ($folders as $installFolder)
+			{
+				if (strpos($installFolder, 'install_') !== false)
+				{
+					JFolder::delete($tmpFolder . '/' . $installFolder);
+				}
+			}
+		}
+
+
 		$installType = JRequest::getVar('install_type');
 		if ($installType == 'install')
 		{

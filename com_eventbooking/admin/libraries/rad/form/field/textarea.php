@@ -29,11 +29,11 @@ class RADFormFieldTextarea extends RADFormField
 		{
 			$this->attributes['maxlength'] = $row->max_length;
 		}
-		if ($row->rows)
+		if ($row->rows > 0)
 		{
 			$this->attributes['rows'] = $row->rows;
 		}
-		if ($row->cols)
+		if ($row->cols > 0)
 		{
 			$this->attributes['cols'] = $row->cols;
 		}
