@@ -10,7 +10,6 @@
 // no direct access
 defined('_JEXEC') or die();
 error_reporting(0);
-jimport('joomla.filesystem.file');
 // Require the controller
 define('EB_TBC_DATE', '2099-12-31 00:00:00');
 define('VIEW_LIST_WIDTH', 800);

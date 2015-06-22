@@ -10,9 +10,6 @@
 // no direct access
 defined('_JEXEC') or die();
 error_reporting(0);
-//Require the controller
-jimport('joomla.filesystem.file');
-
 //Basic ACL support
 if (!JFactory::getUser()->authorise('core.manage', 'com_eventbooking'))
 {

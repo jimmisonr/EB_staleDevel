@@ -21,5 +21,8 @@ else
 }
 JLoader::register('os_payments', JPATH_ROOT . '/components/com_eventbooking/payments/os_payments.php');
 JLoader::register('os_payment', JPATH_ROOT . '/components/com_eventbooking/payments/os_payment.php');
+JLoader::register('JFile', JPATH_LIBRARIES . '/joomla/filesystem/file.php');
+
+
 
 
