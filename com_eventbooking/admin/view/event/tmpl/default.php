@@ -174,6 +174,14 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 						</tr>
 						<tr>
 							<td class="key">
+								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_CUSTOM_REGISTRATION_HANDLE_URL' );?>::<?php echo JText::_('EB_CUSTOM_REGISTRATION_HANDLE_URL_EXPLAIN'); ?>"><?php echo JText::_('EB_CUSTOM_REGISTRATION_HANDLE_URL'); ?></span>
+							</td>
+							<td>
+								<input type="text" name="registration_handle_url" id="registration_handle_url" class="input-xxlarge" size="10" value="<?php echo $this->item->registration_handle_url; ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
 								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_ATTACHMENT' );?>::<?php echo JText::_('EB_ATTACHMENT_EXPLAIN'); ?>"><?php echo JText::_('EB_ATTACHMENT'); ?></span>
 							</td>
 							<td>
