@@ -79,7 +79,7 @@ class EventbookingHelperIcs
 	 */
 	public function setStart($start)
 	{
-		$this->eventDate = new DateTime($start, new DateTimeZone(JFactory::getConfig()->get('offset')));
+		$this->eventDate = JFactory::getDate($start, new DateTimeZone(JFactory::getConfig()->get('offset')));
 
 		return $this;
 	}
@@ -93,7 +93,7 @@ class EventbookingHelperIcs
 	 */
 	public function setEnd($end)
 	{
-		$this->eventEndDate = new DateTime($end, new DateTimeZone(JFactory::getConfig()->get('offset')));;
+		$this->eventEndDate = JFactory::getDate($end, new DateTimeZone(JFactory::getConfig()->get('offset')));;
 
 		return $this;
 	}
@@ -221,7 +221,7 @@ class EventbookingHelperIcs
 	 */
 	public function getStart()
 	{
-		return $this->eventDate->format("Ymd\THis");
+		return $this->eventDate->format("Ymd\THis\Z");
 	}
 
 	/**
@@ -230,7 +230,7 @@ class EventbookingHelperIcs
 	 */
 	public function getEnd()
 	{
-		return $this->eventEndDate->format("Ymd\THis");
+		return $this->eventEndDate->format("Ymd\THis\Z");
 	}
 
 	/**
@@ -240,9 +240,9 @@ class EventbookingHelperIcs
 	 */
 	public function getCreatedDate()
 	{
-		$createdDate = new DateTime('Now', new DateTimeZone(JFactory::getConfig()->get('offset')));
+		$createdDate = JFactory::getDate('Now', new DateTimeZone(JFactory::getConfig()->get('offset')));
 
-		return $createdDate->format("Ymd\THis");
+		return $createdDate->format("Ymd\THis\Z");
 	}
 
 	/**

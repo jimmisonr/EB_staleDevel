@@ -208,8 +208,8 @@ abstract class EventbookingHelperHtml
 		$query        = $db->getQuery(true);
 		$config       = JFactory::getConfig();
 		$dateFormat   = "Ymd\THis\Z";
-		$eventDate    = new DateTime($row->event_date, new DateTimeZone($config->get('offset')));
-		$eventEndDate = new DateTime($row->event_end_date, new DateTimeZone($config->get('offset')));
+		$eventDate    =  JFactory::getDate($row->event_date, new DateTimeZone($config->get('offset')));
+		$eventEndDate = JFactory::getDate($row->event_end_date, new DateTimeZone($config->get('offset')));
 
 		$data['title']    = urlencode($row->title);
 		$data['dates']    = $eventDate->format($dateFormat) . "/" . $eventEndDate->format($dateFormat);
