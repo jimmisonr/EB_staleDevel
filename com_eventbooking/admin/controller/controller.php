@@ -266,6 +266,11 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		// Update author email to tuanpn@joomdoantion.com as contact@joomdonation.com is not available anymore
+		$sql = 'UPDATE #__eb_payment_plugins SET author_email="tuanpn@joomdonation.com" WHERE author_email="contact@joomdonation.com"';
+		$db->setQuery($sql);
+		$db->execute();
+
 		// Countries and states management
 		$fields = array_keys($db->getTableColumns('#__eb_countries'));
 		if (!in_array('id', $fields))
