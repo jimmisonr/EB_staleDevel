@@ -3,11 +3,11 @@
 	<name>ebreminder</name>
 	<author>Tuan Pham Ngoc</author>
 	<creationDate>Feb 2012</creationDate>
-	<copyright>Copyright (C) 2005 - 2012 Open Source Matters. All rights reserved.</copyright>
+	<copyright>Copyright (C) 2010 - 2015 Ossolution Team. All rights reserved.</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<authorEmail>admin@joomla.org</authorEmail>
-	<authorUrl>www.joomla.org</authorUrl>
-	<version>1.5.0</version>
+	<authorEmail>tuanpn@joomdonation.com</authorEmail>
+	<authorUrl>www.joomdonation.com</authorUrl>
+	<version>1.7.4</version>
 	<description>This plugin check and send reminder emails to registrants automatically</description>
 	<files>
 		<filename plugin="ebreminder">ebreminder.php</filename>
