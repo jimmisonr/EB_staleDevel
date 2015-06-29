@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Abstract Form Field class for the RAD framework
  *
@@ -11,20 +12,20 @@ abstract class RADFormField
 	/**
 	 * The form field type.
 	 *
-	 * @var    string	 
+	 * @var    string
 	 */
 	protected $type;
 
 	/**
 	 * The name (and id) for the form field.
 	 *
-	 * @var    string	 
+	 * @var    string
 	 */
 	protected $name;
 
 	/**
 	 * Title of the form field
-	 * 
+	 *
 	 * @var string
 	 */
 	protected $title;
@@ -44,14 +45,14 @@ abstract class RADFormField
 
 	/**
 	 * The object store form field definition
-	 * 
+	 *
 	 * @var JTable
 	 */
 	protected $row;
 
 	/**
 	 * The html attributes of the field
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $attributes = array();
@@ -59,46 +60,60 @@ abstract class RADFormField
 	/**
 	 * The label for the form field.
 	 *
-	 * @var    string	 
+	 * @var    string
 	 */
 	protected $label;
 
 	/**
 	 * The input for the form field.
 	 *
-	 * @var    string	
+	 * @var    string
 	 */
 	protected $input;
-	
+
 	/**
 	 * This field is used in fee calculation or not
-	 * 
+	 *
 	 * @var bool
 	 */
 	protected $feeCalculation;
-		
+
 	/**
 	 * This field will be hided on first display or not
-	 * 
+	 *
 	 * @var bool
 	 */
 	protected $hideOnDisplay = false;
 
 	/**
+	 * This field is a master field or not
+	 *
+	 * @var bool
+	 */
+	protected $isMasterField = false;
+
+	/**
+	 * Field suffix
+	 *
+	 * @var string
+	 */
+	protected $suffix = null;
+
+	/**
 	 * Method to instantiate the form field object.
 	 *
-	 * @param   JTable  $row  the table object store form field definitions
-	 * @param	mixed	$value the initial value of the form field
+	 * @param   JTable $row   the table object store form field definitions
+	 * @param    mixed $value the initial value of the form field
 	 *
 	 */
 	public function __construct($row, $value = null)
 	{
-		$this->name = $row->name;
-		$this->title = JText::_($row->title);
+		$this->name        = $row->name;
+		$this->title       = JText::_($row->title);
 		$this->description = $row->description;
-		$this->row = $row;
-		$this->value = $value;		
-		$cssClasses = array();
+		$this->row         = $row;
+		$this->value       = $value;
+		$cssClasses        = array();
 		if ($row->css_class)
 		{
 			$cssClasses[] = $row->css_class;
@@ -114,16 +129,16 @@ abstract class RADFormField
 		if ($row->validation_error_message)
 		{
 			$this->attributes['data-errormessage'] = $row->validation_error_message;
-		}		
+		}
 	}
 
 	/**
 	 * Method to get certain otherwise inaccessible properties from the form field object.
 	 *
-	 * @param   string  $name  The property name for which to the the value.
+	 * @param   string $name The property name for which to the the value.
 	 *
 	 * @return  mixed  The property value or null.
-	 *	 
+	 *
 	 */
 	public function __get($name)
 	{
@@ -135,22 +150,24 @@ abstract class RADFormField
 			case 'description':
 			case 'value':
 			case 'row':
-			case 'hideOnDisplay':					
+			case 'hideOnDisplay':
+			case 'isMaterField':
 				return $this->{$name};
-				break;	
-			case 'fee_field':	
+				break;
+			case 'fee_field':
 			case 'fee_formula':
 			case 'id':
-			case 'depend_on_field_id':	
-			case 'depend_on_options':		
+			case 'depend_on_field_id':
+			case 'depend_on_options':
 				return $this->row->{$name};
-				break;			
+				break;
 			case 'input':
 				// If the input hasn't yet been generated, generate it.
 				if (empty($this->input))
 				{
 					$this->input = $this->getInput();
-				}				
+				}
+
 				return $this->input;
 				break;
 			case 'label':
@@ -159,18 +176,19 @@ abstract class RADFormField
 				{
 					$this->label = $this->getLabel();
 				}
+
 				return $this->label;
-				break;							
+				break;
 		}
-		
+
 		return null;
 	}
 
 	/**
 	 * Simple method to set the value for the form field
 	 *
-	 * @param   mixed  $value  Value to set
-	 *	 	
+	 * @param   mixed $value Value to set
+	 *
 	 */
 	public function setValue($value)
 	{
@@ -179,16 +197,17 @@ abstract class RADFormField
 
 	/**
 	 * Set suffix for the form field
+	 *
 	 * @param string $suffix
 	 */
 	public function setFieldSuffix($suffix)
 	{
+		$this->suffix = $suffix;
 		$this->name = $this->name . '_' . $suffix;
 	}
-	
+
 	/**
 	 * Remove the suffix from name of the field
-	 * @param string $suffix
 	 */
 	public function removeFieldSuffix()
 	{
@@ -196,47 +215,64 @@ abstract class RADFormField
 		if ($pos !== false)
 		{
 			$this->name = substr($this->name, 0, $pos);
-		}					
-	}		
+		}
+
+		$this->suffix = null;
+	}
+
 	/**
 	 * Add attribute to the form field
+	 *
 	 * @param string $name
 	 */
 	public function setAttribute($name, $value)
 	{
 		$this->attributes[$name] = $value;
 	}
+
 	/**
 	 * Get data of the given attribute
+	 *
 	 * @param string $name
+	 *
 	 * @return string
-	 */	
+	 */
 	public function getAttribute($name)
 	{
 		return $this->attributes[$name];
 	}
+
 	/**
-	 * 
+	 *
 	 * @param unknown $feeCalculation
 	 */
 	public function setFeeCalculation($feeCalculation)
 	{
-		$this->feeCalculation = $feeCalculation;							
-	}		
+		$this->feeCalculation = $feeCalculation;
+	}
+
+
+	public function setMasterField($isMasterField)
+	{
+		$this->isMasterField = $isMasterField;
+	}
+
 	/**
-	 * 
+	 *
 	 */
 	public function hideOnDisplay()
 	{
 		$this->hideOnDisplay = true;
 	}
+
 	/**
 	 * Method to get the field input markup.
 	 *
 	 * @return  string  The field input markup.
-	 *	 
+	 *
 	 */
 	abstract protected function getInput($bootstrapHelper = null);
+
 	/**
 	 * Method to get the field label markup.
 	 *
@@ -246,7 +282,7 @@ abstract class RADFormField
 	protected function getLabel()
 	{
 		$label = '';
-		$text = $this->title;
+		$text  = $this->title;
 		// Build the class for the label.
 		$class = !empty($this->description) ? 'hasTooltip hasTip' : '';
 		// Add the opening label tag and main attributes attributes.
@@ -254,11 +290,11 @@ abstract class RADFormField
 		// If a description is specified, use it to build a tooltip.
 		if (!empty($this->description))
 		{
-			JHtml::_('bootstrap.tooltip');			
+			JHtml::_('bootstrap.tooltip');
 			JFactory::getDocument()->addStyleDeclaration(".hasTip{display:block !important}");
 			$label .= ' title="' . JHtml::tooltipText(trim($text, ':'), $this->description, 0) . '"';
 		}
-		
+
 		// Add the label text and closing tag.
 		if ($this->row->required)
 		{
@@ -268,7 +304,7 @@ abstract class RADFormField
 		{
 			$label .= '>' . $text . '</label>';
 		}
-		
+
 		return $label;
 	}
 
@@ -285,7 +321,7 @@ abstract class RADFormField
 			return $this->getInput();
 		}
 		else
-		{			
+		{
 			$controlGroupClass      = $bootstrapHelper ? $bootstrapHelper->getClassMapping('control-group') : 'control-group';
 			$controlLabelClass      = $bootstrapHelper ? $bootstrapHelper->getClassMapping('control-label') : 'control-label';
 			$controlsClass          = $bootstrapHelper ? $bootstrapHelper->getClassMapping('controls') : 'controls';
@@ -295,7 +331,29 @@ abstract class RADFormField
 			{
 				$controlGroupAttributes .= ' style="display:none;" ';
 			}
-			$class = $this->feeCalculation ? ' payment-calculation' : '';
+			$classes = array();
+			if ($this->feeCalculation)
+			{
+				$classes[] = 'payment-calculation';
+			}
+
+			if ($this->isMasterField)
+			{
+				if ($this->suffix)
+				{
+					$classes[] = 'master-field-'.$this->suffix;
+				}
+				else
+				{
+					$classes[] = 'master-field';
+				}
+			}
+
+			$class = implode(' ', $classes);
+			if (!empty($class))
+			{
+				$class = ' ' . $class;
+			}
 			if (version_compare(JVERSION, '3.0', 'ge'))
 			{
 				return '<div class="' . $controlGroupClass . $class . '" ' . $controlGroupAttributes . '>' . '<div class="' . $controlLabelClass . '">' . $this->getLabel() . '</div>' . '<div class="' . $controlsClass . '">' .
@@ -309,9 +367,14 @@ abstract class RADFormField
 			}
 		}
 	}
+
 	/**
 	 * Get output of the field using for sending email and display on the registration complete page
-	 * @param bool $tableless
+	 *
+	 * @param bool                        $tableLess
+	 *
+	 * @param EventBookingHelperBootstrap $bootstrapHelper
+	 *
 	 * @return string
 	 */
 	public function getOutput($tableLess = true, $bootstrapHelper = null)
@@ -327,9 +390,9 @@ abstract class RADFormField
 		}
 		if ($tableLess)
 		{
-			$controlGroupClass      = $bootstrapHelper ? $bootstrapHelper->getClassMapping('control-group') : 'control-group';
-			$controlLabelClass      = $bootstrapHelper ? $bootstrapHelper->getClassMapping('control-label') : 'control-label';
-			$controlsClass          = $bootstrapHelper ? $bootstrapHelper->getClassMapping('controls') : 'controls';
+			$controlGroupClass = $bootstrapHelper ? $bootstrapHelper->getClassMapping('control-group') : 'control-group';
+			$controlLabelClass = $bootstrapHelper ? $bootstrapHelper->getClassMapping('control-label') : 'control-label';
+			$controlsClass     = $bootstrapHelper ? $bootstrapHelper->getClassMapping('controls') : 'controls';
 
 			return '<div class="' . $controlGroupClass . '">' . '<div class="' . $controlLabelClass . '">' . $this->title . '</div>' . '<div class="' . $controlsClass . '">' .
 			$fieldValue . '</div>' . '</div>';
@@ -340,10 +403,10 @@ abstract class RADFormField
 			$fieldValue . '</td>' . '</tr>';
 		}
 	}
+
 	/**
 	 * Build an HTML attribute string from an array.
 	 *
-	 * @param  array  $attributes
 	 * @return string
 	 */
 	public function buildAttributes()
@@ -357,11 +420,11 @@ abstract class RADFormField
 			}
 			else
 			{
-				
+
 				$html[] = $key . '="' . htmlentities($value, ENT_QUOTES, 'UTF-8', false) . '"';
 			}
 		}
-		
+
 		return count($html) > 0 ? ' ' . implode(' ', $html) : '';
 	}
 }

@@ -2141,6 +2141,44 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Get all dependencies custom fields
+	 *
+	 * @param $id
+	 *
+	 * @return array
+	 */
+	public static function getAllDependencyFields($id)
+	{
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
+
+		$queue        = array($id);
+		$fields       = array($id);
+
+		while (count($queue))
+		{
+			$masterFieldId = array_pop($queue);
+
+			//Get list of dependency fields of this master field
+			$query->clear();
+			$query->select('id')
+				->from('#__eb_fields')
+				->where('depend_on_field_id=' . $masterFieldId);
+			$db->setQuery($query);
+			$rows = $db->loadObjectList();
+			if (count($rows))
+			{
+				foreach($rows as $row)
+				{
+					$queue[] = $row->id;
+					$fields[] = $row->id;
+				}
+			}
+		}
+
+		return $fields;
+	}
+	/**
 	 * Check to see whether this event still accept registration
 	 *
 	 * @param object $event

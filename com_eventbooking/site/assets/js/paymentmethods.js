@@ -380,39 +380,20 @@ function calculateCartRegistrationFee()
 function showHideDependFields(fieldId, fieldName, fieldType, fieldSuffix)
 {
 	Eb.jQuery(function($) {
-        if (fieldType == 'Checkboxes')
+        $('#ajax-loading-animation').show();
+        var masterFieldsSelector;
+        if (fieldSuffix)
         {
-            var fieldValues = '';
-            $('input[name="'+ fieldName +'[]"]:checked').each(function() {
-                if (fieldValues)
-                {
-                    fieldValues += ',' + $(this).val();
-                }
-                else
-                {
-                    fieldValues += $(this).val();
-                }
-            });
-        }
-        else if (fieldType == 'Radio')
-        {
-            var fieldValues = $('input:radio[name="'+ fieldName +'"]:checked').val();
+            masterFieldsSelector = '.master-field-' + fieldSuffix + ' input[type=\'checkbox\']:checked,' + ' .master-field-' + fieldSuffix + ' input[type=\'radio\']:checked,' + ' .master-field-' + fieldSuffix + ' select';
         }
         else
         {
-            var fieldValues = $('#' + fieldName).val();
+            masterFieldsSelector = '.master-field input[type=\'checkbox\']:checked, .master-field input[type=\'radio\']:checked, .master-field select';
         }
-        var data = {
-            'task'	:	'get_depend_fields_status',
-            'field_id' : fieldId,
-            'field_values': fieldValues,
-            'field_suffix' : fieldSuffix
-        };
-        $('#ajax-loading-animation').show();
         $.ajax({
             type: 'POST',
-            url: siteUrl + 'index.php?option=com_eventbooking' + langLinkForAjax,
-            data: data,
+            url: siteUrl + 'index.php?option=com_eventbooking&task=get_depend_fields_status&field_id=' + fieldId + '&field_suffix=' + fieldSuffix + langLinkForAjax,
+            data: $(masterFieldsSelector),
             dataType: 'json',
             success: function(msg, textStatus, xhr) {
                 $('#ajax-loading-animation').hide();
@@ -420,7 +401,6 @@ function showHideDependFields(fieldId, fieldName, fieldType, fieldSuffix)
                 var showFields = msg.show_fields.split(',');
                 for (var i = 0; i < hideFields.length ; i++)
                 {
-
                     $('#' + hideFields[i]).hide();
                 }
                 for (var i = 0; i < showFields.length ; i++)

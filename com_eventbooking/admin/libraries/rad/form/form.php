@@ -161,14 +161,17 @@ class RADForm
 				$masterFields[] = $field->depend_on_field_id;
 			}
 			$fieldsAssoc[$field->id] = $field;
-		}											
+		}
+		$masterFields = array_unique($masterFields);
 		if (count($masterFields))
 		{
+			$hiddenFields = array();
 			foreach ($this->fields as $field)
 			{
 				if (in_array($field->id, $masterFields))
 				{
 					$field->setFeeCalculation(true);
+					$field->setMasterField(true);
 					switch (strtolower($field->type))
 					{
 						case 'list':
@@ -180,29 +183,40 @@ class RADForm
 							break;
 					}
 				}
-				elseif ($field->depend_on_field_id && isset($fieldsAssoc[$field->depend_on_field_id]))				
+
+				if ($field->depend_on_field_id && isset($fieldsAssoc[$field->depend_on_field_id]))
 				{
-					$masterFieldValues = $fieldsAssoc[$field->depend_on_field_id]->value;
-					if (is_array($masterFieldValues))
+					// If master field is hided, then children field will be hided, too
+					if (in_array($field->depend_on_field_id, $hiddenFields))
 					{
-						$selectedOptions = $masterFieldValues;
-					}
-					elseif (strpos($masterFieldValues, "\r\n"))
-					{
-						$selectedOptions = explode("\r\n", $masterFieldValues);
-					}
-					elseif (is_string($masterFieldValues) && is_array(json_decode($masterFieldValues)))
-					{
-						$selectedOptions = json_decode($masterFieldValues);
+						$field->hideOnDisplay();
+						$hiddenFields[] = $field->id;
 					}
 					else
 					{
-						$selectedOptions = array($masterFieldValues);
-					}					
-					$dependOnOptions = explode(',', $field->depend_on_options);
-					if (!count(array_intersect($selectedOptions, $dependOnOptions)))
-					{
-						$field->hideOnDisplay();
+						$masterFieldValues = $fieldsAssoc[$field->depend_on_field_id]->value;
+						if (is_array($masterFieldValues))
+						{
+							$selectedOptions = $masterFieldValues;
+						}
+						elseif (strpos($masterFieldValues, "\r\n"))
+						{
+							$selectedOptions = explode("\r\n", $masterFieldValues);
+						}
+						elseif (is_string($masterFieldValues) && is_array(json_decode($masterFieldValues)))
+						{
+							$selectedOptions = json_decode($masterFieldValues);
+						}
+						else
+						{
+							$selectedOptions = array($masterFieldValues);
+						}
+						$dependOnOptions = explode(',', $field->depend_on_options);
+						if (!count(array_intersect($selectedOptions, $dependOnOptions)))
+						{
+							$field->hideOnDisplay();
+							$hiddenFields[] = $field->id;
+						}
 					}
 				}
 			}			

@@ -833,42 +833,103 @@ class EventbookingController extends JControllerLegacy
 		echo json_encode($response);
 		JFactory::getApplication()->close();
 	}
-	
+
 	/**
 	 * Get depend fields status
 	 *
 	 */
 	public function get_depend_fields_status()
 	{
-		$db = JFactory::getDbo();
-		$fieldId = JRequest::getInt('field_id');
-		$fieldValues = JRequest::getVar('field_values', '', 'post');
-		$fieldSuffix = JRequest::getVar('field_suffix', '', 'post');
-		$fieldValues = explode(',', $fieldValues);
+		$app            = JFactory::getApplication();
+		$input          = $app->input;
+		$db             = JFactory::getDbo();
+		$query          = $db->getQuery(true);
+		$fieldId        = $input->getInt('field_id', 0);
+		$fieldSuffix    = $input->getString('field_suffix', '');
 		$languageSuffix = EventbookingHelper::getFieldSuffix();
+
 		//Get list of depend fields
-		$query = $db->getQuery(true);
-		$query->select('name, depend_on_options'.$languageSuffix.' AS depend_on_options')
+		$allFieldIds = EventbookingHelper::getAllDependencyFields($fieldId);
+
+		$query->select('*')
+			->select('title' . $languageSuffix . ' AS title')
+			->select('depend_on_options' . $languageSuffix . ' AS depend_on_options')
 			->from('#__eb_fields')
-			->where('depend_on_field_id=' . $fieldId);
+			->where('published=1')
+			->where('id IN (' . implode(',', $allFieldIds) . ')')
+			->order('ordering');
 		$db->setQuery($query);
-		$rows = $db->loadObjectList();
+		$rowFields    = $db->loadObjectList();
+		$masterFields = array();
+		$fieldsAssoc  = array();
+		foreach ($rowFields as $rowField)
+		{
+			if ($rowField->depend_on_field_id)
+			{
+				$masterFields[] = $rowField->depend_on_field_id;
+			}
+			$fieldsAssoc[$rowField->id] = $rowField;
+		}
+		$masterFields = array_unique($masterFields);
+		if (count($masterFields))
+		{
+			$hiddenFields = array();
+			foreach ($rowFields as $rowField)
+			{
+				if ($rowField->depend_on_field_id && isset($fieldsAssoc[$rowField->depend_on_field_id]))
+				{
+					// If master field is hided, then children field should be hided, too
+					if (in_array($rowField->depend_on_field_id, $hiddenFields))
+					{
+						$hiddenFields[] = $rowField->id;
+					}
+					else
+					{
+						if ($fieldSuffix)
+						{
+							$fieldName = $fieldsAssoc[$rowField->depend_on_field_id]->name . '_' . $fieldSuffix;
+						}
+						else
+						{
+							$fieldName = $fieldsAssoc[$rowField->depend_on_field_id]->name;
+						}
+
+						$masterFieldValues = $input->get($fieldName, '', 'none');
+
+						if (is_array($masterFieldValues))
+						{
+							$selectedOptions = $masterFieldValues;
+						}
+						else
+						{
+							$selectedOptions = array($masterFieldValues);
+						}
+						$dependOnOptions = explode(',', $rowField->depend_on_options);
+						if (!count(array_intersect($selectedOptions, $dependOnOptions)))
+						{
+							$hiddenFields[] = $rowField->id;
+						}
+					}
+				}
+			}
+		}
+
 		$showFields = array();
 		$hideFields = array();
-		foreach ($rows as $row)
+		foreach ($rowFields as $rowField)
 		{
-			$dependOnOptions = explode(",", $row->depend_on_options);
-			if (count(array_intersect($fieldValues, $dependOnOptions)))
+			if (in_array($rowField->id, $hiddenFields))
 			{
-				$showFields[] = 'field_' . $row->name . ($fieldSuffix ? '_' . $fieldSuffix : '');
+				$hideFields[] = 'field_' . $rowField->name . ($fieldSuffix ? '_' . $fieldSuffix : '');
 			}
 			else
 			{
-				$hideFields[] = 'field_' . $row->name . ($fieldSuffix ? '_' . $fieldSuffix : '');
+				$showFields[] = 'field_' . $rowField->name . ($fieldSuffix ? '_' . $fieldSuffix : '');
 			}
 		}
 		echo json_encode(array('show_fields' => implode(',', $showFields), 'hide_fields' => implode(',', $hideFields)));
-		JFactory::getApplication()->close();
+
+		$app->close();
 	}
 	/**
 	 * Save the registration record and back to registration record list
