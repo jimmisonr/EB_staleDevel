@@ -145,9 +145,10 @@ class EventbookingHelperIcs
 	 */
 	public function setDescription($body)
 	{
-		$converter = new EventbookingHelperHtml2text($body);
-		$converter->setBaseUrl(JUri::base());
-		$this->description = $converter->getText();
+		$description = strip_tags($body);
+		$description = str_replace("\r\n", "", $description);
+		$description = str_replace("&nbsp;", "", $description);
+		$this->description = $description;
 
 		return $this;
 	}
@@ -281,7 +282,8 @@ class EventbookingHelperIcs
 	 */
 	public function download()
 	{
-		while (@ob_end_clean()) ;
+		while (@ob_end_clean());
+		$fileName = JApplication::stringURLSafe($this->name).'.ics';
 		$data = $this->generate();
 		header("Pragma: public");
 		header("Expires: 0");
@@ -289,7 +291,7 @@ class EventbookingHelperIcs
 		header("Cache-Control: public");
 		header("Content-Description: File Transfer");
 		header("Content-type: application/octet-stream");
-		header("Content-Disposition: attachment; filename=\"calendar.ics\"");
+		header("Content-Disposition: attachment; filename=\"$fileName\"");
 		header("Content-Transfer-Encoding: binary");
 		header("Content-Length: " . strlen($data));
 		print $data;
