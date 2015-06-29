@@ -338,7 +338,8 @@ class EventbookingHelperData
             }
             $fields[] = JText::_('EB_REGISTRATION_DATE');
             $fields[] = JText::_('EB_TRANSACTION_ID');
-            $fields[] = JText::_('EB_PAYMENT_STATUS');                        
+            $fields[] = JText::_('EB_PAYMENT_STATUS');
+			$fields[] = JText::_('EB_ID');			
             fputcsv($fp, $fields, $delimiter);
             foreach ($rows as $r)
             {
@@ -417,7 +418,8 @@ class EventbookingHelperData
                 else
                 {
                     $fields[] = 'Not Paid';
-                }                
+                }  
+				$fields[] = $r->id;		
                 fputcsv($fp, $fields, $delimiter);
             }
             fclose($fp);

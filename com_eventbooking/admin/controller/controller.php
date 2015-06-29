@@ -584,6 +584,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 		
+		if (!in_array('registration_handle_url', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `registration_handle_url` VARCHAR( 255 ) NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+		
 		if (!in_array('api_login', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `api_login` VARCHAR( 255 ) NULL;";

@@ -1301,12 +1301,15 @@ class EventbookingController extends JControllerLegacy
 		if ($eventId)
 		{
 			$config = EventbookingHelper::getConfig();
+			$fieldSuffix = EventbookingHelper::getFieldSuffix();
 			$db = JFactory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('*')
+				->select('title' . $fieldSuffix . ' AS title, short_description' . $fieldSuffix . ' AS short_description, description' . $fieldSuffix . ' AS description')
 				->from('#__eb_events')
 				->where('id = '. $eventId);
-			$event = $db->loadObjectList();
+			$db->setQuery($query);
+			$event = $db->loadObject();
 
 			$query->clear();
 			$query->select('a.*')

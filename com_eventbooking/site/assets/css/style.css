@@ -800,6 +800,8 @@ body .eb-calendar li {
 
 .eb-taskbar .dropdown-menu li {
 	margin: 0!important;
+	padding: 0!important;
+	float: none!important;
 }
 
 .eb-taskbar .dropdown-menu li a {
