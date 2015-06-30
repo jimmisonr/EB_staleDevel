@@ -509,6 +509,23 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
+
+
+		// Quantity field
+		if (!in_array('is_quantity_field', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_fields` ADD  `is_quantity_field` TINYINT NOT NULL DEFAULT  '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('quantity_values', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_fields` ADD  `quantity_values` TEXT NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		//Events table
 		$fields = array_keys($db->getTableColumns('#__eb_events'));
 
