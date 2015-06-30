@@ -1314,7 +1314,6 @@ class EventbookingHelper
 	 */
 	public static function getFormFields($eventId = 0, $registrationType = 0, $activeLanguage = null)
 	{
-		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
 		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
@@ -2188,6 +2187,7 @@ class EventbookingHelper
 	public static function acceptRegistration($event)
 	{
 		$db   = JFactory::getDbo();
+		$query = $db->getQuery(true);
 		$user = JFactory::getUser();
 		if ($event->registration_type == 3)
 		{
@@ -2219,11 +2219,12 @@ class EventbookingHelper
 			return false;
 		}
 
+		$config = self::getConfig();
+
 		//Check to see whether the current user has registered for the event
-		$preventDuplicateRegistration = EventbookingHelper::getConfigValue('prevent_duplicate_registration');
+		$preventDuplicateRegistration = $config->prevent_duplicate_registration;
 		if ($preventDuplicateRegistration && $user->id)
 		{
-			$query = $db->getQuery(true);
 			$query->clear();
 			$query->select('COUNT(id)')
 				->from('#__eb_registrants')
@@ -2237,6 +2238,51 @@ class EventbookingHelper
 				return false;
 			}
 		}
+
+		if (!$config->multiple_booking)
+		{
+			// Check for quantity fields
+			$query->clear();
+			$query->select('*')
+				->from('#__eb_fields')
+				->where('published=1')
+				->where('quantity_field = 1')
+				->where('quantity_values != ""')
+				->where(' `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
+
+			if ($config->custom_field_by_category)
+			{
+				//Get main category of the event
+				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $event->id . ' AND main_category = 1';
+				$db->setQuery($sql);
+				$categoryId = (int) $db->loadResult();
+				$query->where('(category_id = 0 OR category_id=' . $categoryId . ')');
+			}
+			else
+			{
+				$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $event->id . '))');
+			}
+
+			$db->setQuery($query);
+			$quantityFields = $db->loadObjectList();
+			if (count($quantityFields))
+			{
+				foreach($quantityFields as $field)
+				{
+					$values = explode("\r\n", $field->values);
+					$quantityValues = explode("\r\n", $field->quantity_values);
+					if (count($values) && count($quantityValues))
+					{
+						$values = EventbookingHelperHtml::getAvailableQuantityOptions($values, $quantityValues, $event->id, $field->id);
+						if (!count($values))
+						{
+							return false;
+						}
+					}
+				}
+			}
+		}
+
 
 		return true;
 	}

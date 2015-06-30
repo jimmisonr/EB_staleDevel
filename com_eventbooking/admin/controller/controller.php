@@ -512,9 +512,9 @@ class EventbookingController extends RADControllerAdmin
 
 
 		// Quantity field
-		if (!in_array('is_quantity_field', $fields))
+		if (!in_array('quantity_field', $fields))
 		{
-			$sql = "ALTER TABLE  `#__eb_fields` ADD  `is_quantity_field` TINYINT NOT NULL DEFAULT  '0';";
+			$sql = "ALTER TABLE  `#__eb_fields` ADD  `quantity_field` TINYINT NOT NULL DEFAULT  '0';";
 			$db->setQuery($sql);
 			$db->execute();
 		}

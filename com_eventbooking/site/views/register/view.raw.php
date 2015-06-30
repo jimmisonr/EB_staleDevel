@@ -144,12 +144,23 @@ class EventBookingViewRegister extends JViewLegacy
 				}				
 			}			
 		}
-		
+
+		// Waiting List
+		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
+		{
+			$waitingList = true;
+		}
+		else
+		{
+			$waitingList = false;
+		}
+
 		$this->Itemid = $input->getInt('Itemid', 0);
 		$this->event = $event;
 		$this->config = EventbookingHelper::getConfig();
 		$this->showCaptcha = $showCaptcha;
 		$this->defaultCountry = EventbookingHelper::getConfigValue('default_country');
+		$this->waitingList = $waitingList;
 		parent::display($tpl);
 	}
 
@@ -325,6 +336,10 @@ class EventBookingViewRegister extends JViewLegacy
 			$depositPayment = false;
 			$paymentType = false;
 			$showPaymentFee = false;
+		}
+		else
+		{
+			$form->setEventId($eventId);
 		}
 
 		// Assign these parameters

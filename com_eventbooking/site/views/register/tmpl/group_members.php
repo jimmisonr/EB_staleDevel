@@ -38,6 +38,10 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 		$form->bind(array('country_'.$i => $this->defaultCountry), true);
 	}
 	$form->buildFieldsDependency();
+	if (!$this->waitingList)
+	{
+		$form->setEventId($this->event->id);
+	}
 	$fields = $form->getFields();
 	//We don't need to use ajax validation for email field for group members
 	if (isset($fields['email']))

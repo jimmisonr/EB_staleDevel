@@ -93,6 +93,13 @@ abstract class RADFormField
 	protected $isMasterField = false;
 
 	/**
+	 * Id of the event this custom field belong to
+	 *
+	 * @var null
+	 */
+	protected $eventId = null;
+
+	/**
 	 * Field suffix
 	 *
 	 * @var string
@@ -152,6 +159,7 @@ abstract class RADFormField
 			case 'row':
 			case 'hideOnDisplay':
 			case 'isMaterField':
+			case 'eventId':
 				return $this->{$name};
 				break;
 			case 'fee_field':
@@ -159,6 +167,7 @@ abstract class RADFormField
 			case 'id':
 			case 'depend_on_field_id':
 			case 'depend_on_options':
+			case 'quantity_field':
 				return $this->row->{$name};
 				break;
 			case 'input':
@@ -243,8 +252,9 @@ abstract class RADFormField
 	}
 
 	/**
+	 * Mark this field as a fee-affected custom field
 	 *
-	 * @param unknown $feeCalculation
+	 * @param int $feeCalculation
 	 */
 	public function setFeeCalculation($feeCalculation)
 	{
@@ -257,6 +267,15 @@ abstract class RADFormField
 		$this->isMasterField = $isMasterField;
 	}
 
+	/**
+	 * Associate this custom field with an event for quantity control
+	 *
+	 * @param $eventId
+	 */
+	public function setEventId($eventId)
+	{
+		$this->eventId = $eventId;
+	}
 	/**
 	 *
 	 */

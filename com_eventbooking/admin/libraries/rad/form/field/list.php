@@ -92,6 +92,21 @@ class RADFormFieldList extends RADFormField
 		{
 			$values = explode(",", $this->row->values);
 		}
+		$quantityValues = explode("\r\n", $this->row->quantity_values);
+
+
+		if ($this->row->quantity_field && count($values) && count($quantityValues) && $this->eventId)
+		{
+			$values = EventbookingHelperHtml::getAvailableQuantityOptions($values, $quantityValues, $this->eventId, $this->row->id);
+		}
+
+		if (count($values) == 0)
+		{
+			JFactory::getApplication()->enqueueMessage('There is no available option left for the field '. $this->title, 'warning');
+
+			return $values;
+		}
+
 		foreach ($values as $value)
 		{
 			$options[] = JHtml::_('select.option', trim($value), $value);

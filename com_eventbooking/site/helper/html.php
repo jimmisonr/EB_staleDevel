@@ -271,6 +271,53 @@ abstract class EventbookingHelperHtml
 	}
 
 	/**
+	 * Filter and only return the available options for a quantity field
+	 *
+	 * @param array $values
+	 * @param array $quantityValues
+	 * @param int $eventId
+	 * @param int $fieldId
+	 *
+	 * @return array
+	 */
+	public static function getAvailableQuantityOptions(&$values, $quantityValues, $eventId, $fieldId)
+	{
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
+
+		// First, we need to get list of registration records of this event
+		$query->select('id')
+			->from('#__eb_registrants')
+			->where('event_id = '. $eventId)
+			->where('published = 1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3))');
+		$db->setQuery($query);
+		$registrantIds = $db->loadColumn();
+		if (count($registrantIds))
+		{
+			$registrantIds = implode(',', $registrantIds);
+			for ($i = 0, $n = count($values) ; $i < $n; $i++)
+			{
+				$value = trim($values[$i]);
+				$query->clear();
+				$query->select('COUNT(*)')
+					->from('#__eb_field_values')
+					->where('field_id = '. $fieldId)
+					->where('registrant_id IN ('.$registrantIds.')')
+					->where('field_value='.$db->quote($value));
+				$db->setQuery($query);
+				$total = $db->loadResult();
+
+				if ($total && !empty($quantityValues[$i]) && $quantityValues[$i] <= $total)
+				{
+					unset($values[$i]);
+				}
+			}
+		}
+
+		return $values;
+	}
+
+	/**
 	 * Function to add dropdown menu
 	 *
 	 * @param string $vName

@@ -254,6 +254,10 @@ class EventBookingViewRegister extends JViewLegacy
 			$paymentType = false;
 			$showPaymentFee = false;
 		}
+		else
+		{
+			$form->setEventId($eventId);
+		}
 		// Assign these parameters
 		$this->paymentMethod = $paymentMethod;
 		$this->Itemid = $input->getInt('Itemid', 0);
