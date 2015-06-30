@@ -12,7 +12,7 @@ defined('_JEXEC') or die();
 class EventbookingViewFieldHtml extends RADViewItem
 {
 
-	function display()
+	public function display()
 	{
 		$db = JFactory::getDBO();
 		$query = $db->getQuery(true);
@@ -94,28 +94,27 @@ class EventbookingViewFieldHtml extends RADViewItem
 			{
 				$options = array_merge($options, $db->loadObjectList());
 			}
-			$selecteds = array();
-			if ($this->item->id)
+
+			if (empty($this->item->id) || $this->item->event_id == -1)
 			{
-				if ($this->item->event_id == -1)
-				{
-					$selecteds[] = -1;
-				}
-				else
-				{
-					$query->clear();
-					$query->select('event_id')
-						->from('#__eb_field_events')
-						->where('field_id='.$this->item->id);											
-					$db->setQuery($query);
-					$selecteds = $db->loadColumn();					
-				}
-			}			
+				$selecteds[] = -1;
+			}
+			else
+			{
+				$query->clear();
+				$query->select('event_id')
+					->from('#__eb_field_events')
+					->where('field_id='.$this->item->id);
+				$db->setQuery($query);
+				$selecteds = $db->loadColumn();
+			}
+
 			$this->lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id[]', 'class="input-xlarge" multiple="multiple" size="5" ', 'id',
 				'title', $selecteds);
 		}
-		$this->lists['required'] = JHtml::_('select.booleanlist', 'required', ' class="inputbox" ', $this->item->required);
-		$this->lists['fee_field'] = JHtml::_('select.booleanlist', 'fee_field', ' class="inputbox" ', $this->item->fee_field);
+		$this->lists['required'] = JHtml::_('select.booleanlist', 'required', '', $this->item->required);
+		$this->lists['fee_field'] = JHtml::_('select.booleanlist', 'fee_field', '', $this->item->fee_field);
+		$this->lists['quantity_field'] = JHtml::_('select.booleanlist', 'quantity_field', '', $this->item->quantity_field);
 		$this->lists['multiple'] = JHtml::_('select.booleanlist', 'multiple', ' class="inputbox" ', $this->item->multiple);
 		$integration = $config->cb_integration;
 		if ($integration)
