@@ -3923,13 +3923,19 @@ class EventbookingHelper
 	 * Check to see whether this event can be cancelled
 	 *
 	 * @param int $eventId
+	 *
+	 * @return bool
 	 */
 	public static function canCancel($eventId)
 	{
 		$db  = JFactory::getDbo();
-		$sql = 'SELECT COUNT(*) FROM #__eb_events WHERE id=' . $eventId .
-			' AND enable_cancel_registration = 1 AND (DATEDIFF(cancel_before_date, NOW()) >=0) ';
-		$db->setQuery($sql);
+		$query = $db->getQuery(true);
+		$query->select('COUNT(*)')
+			->from('#__eb_events')
+			->where('id = '. $eventId)
+			->where(' enable_cancel_registration = 1')
+			->where('(DATEDIFF(cancel_before_date, NOW()) >=0)');
+		$db->setQuery($query);
 		$total = $db->loadResult();
 		if ($total)
 		{
