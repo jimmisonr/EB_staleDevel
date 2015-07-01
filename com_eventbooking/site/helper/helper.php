@@ -3946,12 +3946,23 @@ class EventbookingHelper
 		$user = JFactory::getUser();
 		if ($eventId)
 		{
+			$config = EventbookingHelper::getConfig();
 			$db  = JFactory::getDbo();
-			$sql = 'SELECT created_by FROM #__eb_events WHERE id=' . $eventId;
-			$db->setQuery($sql);
+			$query = $db->getQuery(true);
+			$query->select('created_by')
+				->from('#__eb_events')
+				->where('id = '. (int) $eventId);
+			$db->setQuery($query);
 			$createdBy = (int) $db->loadResult();
+			if ($config->only_show_registrants_of_event_owner)
+			{
+				return $createdBy > 0 && $createdBy == $user->id;
+			}
+			else
+			{
+				return (($createdBy > 0 && $createdBy == $user->id) || $user->authorise('eventbooking.registrants_management', 'com_eventbooking'));
+			}
 
-			return (($createdBy > 0 && $createdBy == $user->id) || $user->authorise('eventbooking.registrants_management', 'com_eventbooking'));
 		}
 		else
 		{
@@ -3963,12 +3974,15 @@ class EventbookingHelper
 	{
 		$user = JFactory::getUser();
 		$db   = JFactory::getDbo();
+		$query = $db->getQuery(true);
 		if (!$eventId)
 		{
 			return false;
 		}
-		$sql = 'SELECT * FROM #__eb_events WHERE id=' . $eventId;
-		$db->setQuery($sql);
+		$query->select('*')
+			->from('#__eb_events')
+			->where('id = '. $eventId);
+		$db->setQuery($query);
 		$rowEvent = $db->loadObject();
 		if (!$rowEvent)
 		{
