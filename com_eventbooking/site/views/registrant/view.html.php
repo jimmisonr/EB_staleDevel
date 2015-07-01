@@ -12,7 +12,7 @@ defined('_JEXEC') or die();
 class EventBookingViewRegistrant extends JViewLegacy
 {
 
-	function display($tpl = null)
+	public function display($tpl = null)
 	{
 		JFactory::getDocument()->addScript(JUri::base(true) . '/components/com_eventbooking/assets/js/paymentmethods.js');
 		$this->setLayout('default');
@@ -25,12 +25,18 @@ class EventBookingViewRegistrant extends JViewLegacy
 		$config = EventbookingHelper::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$userId = $user->get('id');
-		$query->select('*, title'.$fieldSuffix.' AS title')
-			->from('#__eb_events')
-			->where('id=' . $item->event_id);
-		$db->setQuery($query);
-		$event = $db->loadObject();
-		if (EventbookingHelper::isGroupRegistration($item->id))
+
+		if ($item->id)
+		{
+			$query->select('*, title'.$fieldSuffix.' AS title')
+				->from('#__eb_events')
+				->where('id=' . $item->event_id);
+			$db->setQuery($query);
+			$event = $db->loadObject();
+			$this->event = $event;
+		}
+
+		if ($item->id && EventbookingHelper::isGroupRegistration($item->id))
 		{
 			$rowFields = EventbookingHelper::getFormFields($item->event_id, 1, $item->language);
 			$query->clear();
@@ -46,7 +52,16 @@ class EventBookingViewRegistrant extends JViewLegacy
 			$rowMembers = array();
 		}
 		$form = new RADForm($rowFields);
-		$data = EventBookinghelper::getRegistrantData($item, $rowFields);
+		if($item->id)
+		{
+			$data = Eventbookinghelper::getRegistrantData($item, $rowFields);
+			$form->bind($data, false);
+		}
+		else
+		{
+			$data = array();
+			$form->bind($data, true);
+		}
 		$form->bind($data);
 		$from = JRequest::getVar('from', '');
 		if ($userId && $user->authorise('eventbooking.registrants_management', 'com_eventbooking'))
@@ -67,8 +82,49 @@ class EventBookingViewRegistrant extends JViewLegacy
 		{
 			$this->memberFormFields = EventbookingHelper::getFormFields($item->event_id, 2, $item->language);
 		}
+
+		if (empty($item->id))
+		{
+			//Build list of event dropdown
+			$options = array();
+			$query->clear();
+			$query->select('id, title'.$fieldSuffix.' AS title, event_date')
+				->from('#__eb_events')
+				->where('published=1')
+				->order('title');
+			$db->setQuery($query);
+			$options[] = JHtml::_('select.option', '', JText::_('Select Event'), 'id', 'title');
+			if ($config->show_event_date)
+			{
+				$rows = $db->loadObjectList();
+				for ($i = 0, $n = count($rows); $i < $n; $i++)
+				{
+					$row = $rows[$i];
+					$options[] = JHtml::_('select.option', $row->id, $row->title . ' (' . JHtml::_('date', $row->event_date, $config->date_format) . ')' .
+						'', 'id', 'title');
+				}
+			}
+			else
+			{
+				$options = array_merge($options, $db->loadObjectList());
+			}
+			$lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id', ' class="inputbox validate[required]" ', 'id', 'title', $item->event_id);
+		}
+
+		if ($config->collect_member_information && !$rowMembers && $item->number_registrants > 1)
+		{
+			$rowMembers = array();
+			for ($i = 0; $i < $item->number_registrants; $i++)
+			{
+				$rowMember = new RADTable('#__eb_registrants', 'id', $db);
+				$rowMember->event_id = $item->event_id;
+				$rowMember->group_id = $item->id;
+				$rowMember->store();
+				$rowMembers[] = $rowMember;
+			}
+		}
+
 		$this->item = $item;
-		$this->event = $event;
 		$this->config = $config;
 		$this->lists = $lists;
 		$this->from = $from;

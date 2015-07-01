@@ -21,15 +21,36 @@ $selectedState = '';
 				<?php echo  JText::_('EB_EVENT'); ?>
 			</td>
 			<td class="field_cell">
-				<?php echo $this->event->title ; ?>
+				<?php
+				if (!$this->item->id)
+				{
+					echo $this->lists['event_id'];
+				}
+				else
+				{
+					echo $this->event->title;
+				}
+				?>
 			</td>
 		</tr>
 		<tr>
 			<td class="title_cell">
 				<?php echo  JText::_('EB_NUMBER_REGISTRANTS'); ?>
 			</td>
-			<td class="field_cell">
-				<?php echo $this->item->number_registrants ;?>
+			<td>
+				<?php
+				if ($this->item->number_registrants)
+				{
+					echo $this->item->number_registrants ;
+				}
+				else
+				{
+				?>
+					<input class="text_area validate[required,custom[number]]" type="text" name="number_registrants" id="number_registrants" size="40"  maxlength="250" value="" />
+					<small><?php echo JText::_('EB_NUMBER_REGISTRANTS_EXPLAIN'); ?></small>
+				<?php
+				}
+				?>
 			</td>
 		</tr>
 		<?php
@@ -93,13 +114,14 @@ $selectedState = '';
 				<?php echo  JText::_('EB_TOTAL_AMOUNT'); ?>
 			</td>
 			<td>
-				<?php echo EventbookingHelper::formatCurrency($this->item->total_amount, $this->config) ; ?>
+				<?php echo $this->config->currency_symbol?><input type="text" name="total_amount" class="input-medium" value="<?php echo $this->item->total_amount > 0 ? round($this->item->total_amount , 2) : null;?>" />
 			</td>
 		</tr>
+
 		<?php
-			if ($this->item->discount_amount > 0 || $this->item->tax_amount > 0)
+			if ($this->item->discount_amount > 0 || $this->item->tax_amount > 0 || empty($this->item->id))
 			{
-				if ($this->item->discount_amount > 0)
+				if ($this->item->discount_amount > 0 || empty($this->item->id))
 				{
 				?>
 					<tr>
@@ -107,12 +129,12 @@ $selectedState = '';
 							<?php echo  JText::_('EB_DISCOUNT_AMOUNT'); ?>
 						</td>
 						<td>
-							<?php echo EventbookingHelper::formatCurrency($this->item->discount_amount, $this->config);?>
+							<?php echo $this->config->currency_symbol?><input type="text" name="discount_amount" class="input-medium" value="<?php echo $this->item->total_amount > 0 ? round($this->item->total_amount , 2) : null;?>" />
 						</td>
 					</tr>
 				<?php
 				}
-				if ($this->item->tax_amount > 0)
+				if ($this->item->tax_amount > 0 || empty($this->item->id))
 				{
 				?>
 					<tr>
@@ -120,7 +142,7 @@ $selectedState = '';
 							<?php echo  JText::_('EB_TAX'); ?>
 						</td>
 						<td>
-							<?php echo EventbookingHelper::formatCurrency($this->item->tax_amount, $this->config);?>
+							<?php echo $this->config->currency_symbol?><input type="text" name="tax_amount" class="input-medium" value="<?php echo $this->item->tax_amount > 0 ? round($this->item->tax_amount , 2) : null;?>" />
 						</td>
 					</tr>
 				<?php
@@ -131,7 +153,7 @@ $selectedState = '';
 					<?php echo  JText::_('EB_GROSS_AMOUNT'); ?>
 				</td>
 				<td>
-					<?php echo EventbookingHelper::formatCurrency($this->item->amount, $this->config) ; ?>
+					<?php echo $this->config->currency_symbol?><input type="text" name="amount" class="input-medium" value="<?php echo $this->item->amount > 0 ? round($this->item->amount , 2) : null;?>" />
 				</td>
 			</tr>
 			<?php

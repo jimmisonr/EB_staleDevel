@@ -54,7 +54,7 @@ class EventBookingViewRegistrants extends JViewLegacy
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
 		$options[] = JHtml::_('select.option', 1, JText::_('EB_PAID'));
 		$options[] = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
-		$lists['published'] = JHtml::_('select.genericlist', $options, 'published', ' class="input-small" onchange="submit()" ', 'value', 'text', 
+		$lists['published'] = JHtml::_('select.genericlist', $options, 'published', ' class="input-medium" onchange="submit()" ', 'value', 'text',
 			$state->published);
 		$lists['search'] = $state->search;
 		$lists['order_Dir'] = $state->filter_order_Dir;

@@ -84,6 +84,10 @@ class EventbookingController extends JControllerLegacy
 			case 'edit_registrant':
 				JRequest::setVar('view', 'registrant');
 				break;
+			case 'add_registrant':
+				JRequest::setVar('view', 'registrant');
+				JRequest::setVar('form', false);
+				break;
 			#Cart function					
 			case 'view_cart':
 				JRequest::setVar('view', 'cart');

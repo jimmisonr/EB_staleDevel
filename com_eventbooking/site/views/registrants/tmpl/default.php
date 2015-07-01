@@ -10,21 +10,40 @@
 // no direct access
 defined( '_JEXEC' ) or die ;
 $cols = 8;
+if (version_compare(JVERSION, '3.0', 'ge'))
+{
+	JHtml::_('formbehavior.chosen', 'select');
+}
 ?>
-<div id="eb-registrants-management-page" class="eb-container">
+<script type="text/javascript">
+	function checkData(pressbutton)
+	{
+		var form = document.adminForm;
+		if (form.event_id.value == 0)
+		{
+			alert("<?php echo JText::_('EB_SELECT_EVENT_TO_ADD_REGISTRANT'); ?>");
+			form.event_id.focus();
+			return ;
+		}
+		form.task.value == 'pressbutton';
+		Joomla.submitform( pressbutton );
+	}
+</script>
 <h1 class="eb_title"><?php echo JText::_('EB_REGISTRANT_LIST'); ?></h1>
+<div id="eb-registrants-management-page" class="eb-container">
 <form action="<?php JRoute::_('index.php?option=com_eventbooking&view=registrants&Itemid='.$this->Itemid );?>" method="post" name="adminForm" id="adminForm">
 	<table width="100%">
 		<tr>
-			<td align="left">
+			<td align="left" width="40%">
 				<?php echo JText::_( 'EB_FILTER' ); ?>:
-				<input type="text" name="search" id="search" value="<?php echo $this->lists['search'];?>" class="input-medium" onchange="document.adminForm.submit();" />
+				<input type="text" name="search" id="search" value="<?php echo $this->lists['search'];?>" class="input-medium text_area search-query" onchange="document.adminForm.submit();" />
 				<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'EB_GO' ); ?></button>
-				<button onclick="document.getElementById('search').value='';this.form.submit();" class="btn"><?php echo JText::_( 'EB_RESET' ); ?></button>
 			</td >
-			<td style="text-align: right;">
-				<?php echo $this->lists['event_id'] ; ?>
+			<td style="float: right;">
 				<?php echo $this->lists['published'] ; ?>
+				<?php echo $this->lists['event_id'] ; ?>
+				<button class="btn btn-small btn-success" onclick="checkData('add_registrant');" style="margin-top: 5px;">
+					<span class="icon-new icon-white"></span><?php echo JText::_('EB_NEW_REGISTRANTS'); ?></button>
 			</td>
 		</tr>
 	</table>
@@ -148,14 +167,14 @@ $cols = 8;
 					<?php
 					}
 				?>
-				<td class="center">
+				<td>
 					<?php echo $row->email; ?>
 				</td>
 				<td class="center" style="font-weight: bold;">
 					<?php echo $row->number_registrants; ?>
 				</td>
 				<td align="right">
-					<?php echo number_format($row->amount, 2) ; ?>
+					<?php echo EventBookingHelper::formatAmount($row->amount, $this->config); ?>
 				</td>
 				<?php
 				if ($this->config->activate_deposit_feature) {
@@ -177,17 +196,21 @@ $cols = 8;
 				?>
 				<td class="center">
 					<?php
-						switch($row->published) {
-							case 0 :
-								echo JText::_('EB_PENDING');
-								break ;
-							case 1 :
-								echo JText::_('EB_PAID');
-								break ;
-							case 2 :
-								echo JText::_('EB_CANCELLED');
-								break ;
-						}
+					switch ($row->published)
+					{
+						case 0 :
+							echo JText::_('EB_PENDING');
+							break;
+						case 1 :
+							echo JText::_('EB_PAID');
+							break;
+						case 2 :
+							echo JText::_('EB_CANCELLED');
+							break;
+						case 3:
+							echo JText::_('EB_WAITING_LIST');
+							break;
+					}
 					?>
 				</td>
 			</tr>

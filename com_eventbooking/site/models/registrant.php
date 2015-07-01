@@ -86,63 +86,99 @@ class EventBookingModelRegistrant extends JModelLegacy
 		$query = $db->getQuery(true);
 		$config = EventbookingHelper::getConfig();
 		$row = $this->getTable('EventBooking', 'Registrant');
-		$row->load($data['id']);
-		$published = $row->published;
-		if ($row->is_group_billing)
+		if ($data['id'])
 		{
-			$rowFields = EventbookingHelper::getFormFields($data['event_id'], 1);
+			$row->load($data['id']);
+			$published = $row->published;
+			if ($row->is_group_billing)
+			{
+				$rowFields = EventbookingHelper::getFormFields($data['event_id'], 1);
+			}
+			else
+			{
+				$rowFields = EventbookingHelper::getFormFields($data['event_id'], 0);
+			}
+			$row->bind($data);
+			$row->store();
+			$form = new RADForm($rowFields);
+			$form->storeData($row->id, $data);
+			if ($row->is_group_billing && (strpos($row->payment_method, 'os_offline') !== false))
+			{
+				$query->update('#__eb_registrants')
+					->set('published=' . (int) $row->published)
+					->where('group_id=' . $row->id);
+				$db->setQuery($query);
+				$db->execute();
+				$query->clear();
+			}
+			//Store group members data
+			if ($row->is_group_billing && $config->collect_member_information)
+			{
+				$ids = (array) $data['ids'];
+				$memberFormFields = EventbookingHelper::getFormFields($row->event_id, 2);
+				for ($i = 0, $n = count($ids); $i < $n; $i++)
+				{
+					$memberId = $ids[$i];
+					$rowMember = $this->getTable('EventBooking', 'Registrant');
+					$rowMember->load($memberId);
+					$memberForm = new RADForm($memberFormFields);
+					$memberForm->setFieldSuffix($i + 1);
+					$memberForm->bind($data);
+					$memberForm->removeFieldSuffix();
+					$memberData = $memberForm->getFormData();
+					$rowMember->bind($memberData);
+					$rowMember->store();
+					$memberForm->storeData($rowMember->id, $memberData);
+				}
+			}
+
+			//Sending reminders
+			if ($row->published == 1 && $published == 0)
+			{
+				//Change from pending to paid, send emails
+				EventbookingHelper::sendRegistrationApprovedEmail($row, $config);
+			}
+			elseif($row->published == 2 && $published != 2 && $config->activate_waitinglist_feature)
+			{
+				//Registration is cancelled, send notification emails to waiting list
+				EventbookingHelper::notifyWaitingList($row, $config);
+			}
+
+			return true;
 		}
 		else
 		{
+			$row->bind($data);
 			$rowFields = EventbookingHelper::getFormFields($data['event_id'], 0);
-		}
-		$row->bind($data);
-		$row->store();
-		$form = new RADForm($rowFields);
-		$form->storeData($row->id, $data);
-		if ($row->is_group_billing && (strpos($row->payment_method, 'os_offline') !== false))
-		{
-			$query->update('#__eb_registrants')
-				->set('published=' . (int) $row->published)
-				->where('group_id=' . $row->id);
-			$db->setQuery($query);
-			$db->execute();
-			$query->clear();
-		}
-		//Store group members data
-		if ($row->is_group_billing && $config->collect_member_information)
-		{
-			$ids = (array) $data['ids'];
-			$memberFormFields = EventbookingHelper::getFormFields($row->event_id, 2);
-			for ($i = 0, $n = count($ids); $i < $n; $i++)
+			$form = new RADForm($rowFields);
+			$form->bind($data);
+			$row->payment_method = 'os_offline';
+			$row->register_date = gmdate('Y-m-d');
+			$rate = EventbookingHelper::getRegistrationRate($data['event_id'], $data['number_registrants']);
+			if (empty($data['total_amount']))
 			{
-				$memberId = $ids[$i];
-				$rowMember = $this->getTable('EventBooking', 'Registrant');
-				$rowMember->load($memberId);
-				$memberForm = new RADForm($memberFormFields);
-				$memberForm->setFieldSuffix($i + 1);
-				$memberForm->bind($data);
-				$memberForm->removeFieldSuffix();
-				$memberData = $memberForm->getFormData();
-				$rowMember->bind($memberData);
-				$rowMember->store();
-				$memberForm->storeData($rowMember->id, $memberData);
+				$row->total_amount = $row->amount = $rate * $data['number_registrants'] + $form->calculateFee();
 			}
-		}
+			if ($row->number_registrants > 1)
+			{
+				$row->is_group_billing = 1;
+			}
+			else
+			{
+				$row->is_group_billing = 0;
+			}
+			$row->store();
+			$form->storeData($row->id, $data);
 
-		//Sending reminders
-		if ($row->published == 1 && $published == 0)
-		{
-			//Change from pending to paid, send emails
-			EventbookingHelper::sendRegistrationApprovedEmail($row, $config);
+			if ($row->published == 1)
+			{
+				// Trigger event and send emails
+				JPluginHelper::importPlugin('eventbooking');
+				$dispatcher = JDispatcher::getInstance();
+				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
+			}
+			return true;
 		}
-		elseif($row->published == 2 && $published != 2 && $config->activate_waitinglist_feature)
-		{
-			//Registration is cancelled, send notification emails to waiting list
-			EventbookingHelper::notifyWaitingList($row, $config);
-		}
-
-		return true;
 	}
 
 	/**
