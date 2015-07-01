@@ -24,8 +24,7 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 			alert("<?php echo JText::_('EB_SELECT_EVENT_TO_ADD_REGISTRANT'); ?>");
 			form.event_id.focus();
 			return ;
-		}
-		form.task.value == 'pressbutton';
+		}		
 		Joomla.submitform( pressbutton );
 	}
 </script>
