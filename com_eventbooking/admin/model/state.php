@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.6.6
+ * @version            1.7.4
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
