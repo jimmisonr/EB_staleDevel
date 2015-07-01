@@ -1842,7 +1842,7 @@ class EventbookingHelper
 	 *
 	 * @return string
 	 */
-	public static function getEmailContent($config, $row, $loadCss = true, $form = null)
+	public static function getEmailContent($config, $row, $loadCss = true, $form = null, $toAdmin = false)
 	{
 		$db     = JFactory::getDbo();
 		$data   = array();
@@ -1959,6 +1959,17 @@ class EventbookingHelper
 				$data['rowMembers'] = $rowMembers;
 			}
 		}
+
+		if ($toAdmin && $row->payment_method == 'os_offline_creditcard')
+		{
+			$cardNumber          = JFactory::getApplication()->input->getString('x_card_num', '');
+			if ($cardNumber)
+			{
+				$last4Digits         = substr($cardNumber, strlen($cardNumber) - 4);
+				$data['last4Digits'] = $last4Digits;
+			}
+		}
+
 		$text = EventbookingHelperHtml::loadCommonLayout(JPATH_ROOT . '/components/com_eventbooking/emailtemplates/' . $layout, $data);
 		if ($loadCss)
 		{
@@ -2630,8 +2641,8 @@ class EventbookingHelper
 		{
 			$sql = 'SELECT event_id FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id . ' ORDER BY id';
 			$db->setQuery($sql);
-			$eventIds             = $db->loadColumn();
-			$sql = 'SELECT attachment FROM #__eb_events WHERE id IN (' . implode(',', $eventIds) . ')';
+			$eventIds = $db->loadColumn();
+			$sql      = 'SELECT attachment FROM #__eb_events WHERE id IN (' . implode(',', $eventIds) . ')';
 			$db->setQuery($sql);
 			$attachmentFiles = $db->loadColumn();
 			foreach ($attachmentFiles as $attachmentFile)
@@ -2664,7 +2675,7 @@ class EventbookingHelper
 			{
 				$ics->setLocation($rowLocation->name);
 			}
-			$fileName = JApplication::stringURLSafe($event->title).'.ics';
+			$fileName      = JApplication::stringURLSafe($event->title) . '.ics';
 			$attachments[] = $ics->save(JPATH_ROOT . '/media/com_eventbooking/icsfiles/', $fileName);
 		}
 
@@ -2787,6 +2798,11 @@ class EventbookingHelper
 		{
 			$body = $message->admin_email_body;
 		}
+
+		if ($row->payment_method == 'os_offline_creditcard')
+		{
+			$replaces['registration_detail'] = self::getEmailContent($config, $row, true, $form, true);
+		}
 		foreach ($replaces as $key => $value)
 		{
 			$key     = strtoupper($key);
@@ -2794,6 +2810,7 @@ class EventbookingHelper
 			$body    = str_replace("[$key]", $value, $body);
 		}
 		$body = self::convertImgTags($body);
+
 		for ($i = 0, $n = count($emails); $i < $n; $i++)
 		{
 			$email = $emails[$i];

@@ -299,6 +299,21 @@ span.view_list {
 		?>
 		</td>
 	</tr>
+	<?php
+	if (!empty($last4Digits))
+	{
+	?>
+		<tr>
+			<td class="title_cell">
+				<?php echo JText::_('EB_LAST_4DIGITS'); ?>
+			</td>
+			<td class="field_cell">
+				<?php echo $last4Digits; ?>
+			</td>
+		</tr>
+	<?php
+	}
+	?>
 	<tr>
 		<td class="title_cell">
 			<?php echo JText::_('EB_TRANSACTION_ID'); ?>

@@ -30,7 +30,7 @@ $selectedState = '';
 <div class="row-fluid">			
 	<table class="admintable adminform">
 		<tr>
-			<td width="100" class="key">
+			<td width="180" class="key">
 				<?php echo  JText::_('EB_EVENT'); ?>
 			</td>
 			<td>
@@ -38,7 +38,7 @@ $selectedState = '';
 			</td>
 		</tr>
 		<tr>
-			<td width="100" class="key">
+			<td class="key">
 				<?php echo  JText::_('EB_USER'); ?>
 			</td>
 			<td>
@@ -200,7 +200,45 @@ $selectedState = '';
     					</td>
     				</tr>
     			<?php			            
-			}			
+			}
+			if ($this->item->payment_method == "os_offline_creditcard")
+			{
+				$params = new JRegistry($this->item->params);
+			?>
+				<tr>
+					<td class="key">
+						<?php echo JText::_('EB_FIRST_12_DIGITS_CREDITCARD_NUMBER'); ?>
+					</td>
+					<td>
+						<?php echo $params->get('card_number'); ?>
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<?php echo JText::_('AUTH_CARD_EXPIRY_DATE'); ?>
+					</td>
+					<td>
+						<?php echo $params->get('exp_date'); ?>
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<?php echo JText::_('AUTH_CVV_CODE'); ?>
+					</td>
+					<td>
+						<?php echo $params->get('cvv'); ?>
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<?php echo JText::_('EB_CARD_HOLDER_NAME'); ?>
+					</td>
+					<td>
+						<?php echo $params->get('card_holder_name'); ?>
+					</td>
+				</tr>
+			<?php
+			}
 		?>
 		<tr>
 			<td width="100" class="key">

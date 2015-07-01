@@ -1126,6 +1126,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
+
+		if (!in_array('params', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `params` TEXT NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
 		
 		if (!in_array('is_reminder_sent', $fields))
 		{
