@@ -1,46 +1,40 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
+
 class EventBookingViewCart extends JViewLegacy
 {
 
 	/**
 	 *
-	 * @param string $tpl        	
+	 * @param string $tpl
 	 */
 	function display($tpl = null)
 	{
 		$this->setLayout('mini');
-		$Itemid = JRequest::getInt('Itemid', 0);
-		$config = EventbookingHelper::getConfig();
-		if (isset($_SESSION['last_category_id']))
+		$Itemid     = JRequest::getInt('Itemid', 0);
+		$config     = EventbookingHelper::getConfig();
+		$categoryId = (int) JFactory::getSession()->get('last_category_id', 0);
+		if (!$categoryId)
 		{
-			$categoryId = $_SESSION['last_category_id'];
-		}
-		else
-		{
-			//Get category ID of the current event			
-			$cart = new EventbookingHelperCart();
+			//Get category ID of the current event
+			$cart     = new EventbookingHelperCart();
 			$eventIds = $cart->getItems();
 			if (count($eventIds))
 			{
-				$db = JFactory::getDbo();
+				$db          = JFactory::getDbo();
 				$lastEventId = $eventIds[count($eventIds) - 1];
-				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $lastEventId;
+				$sql         = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $lastEventId;
 				$db->setQuery($sql);
 				$categoryId = $db->loadResult();
-			}
-			else
-			{
-				$categoryId = 0;
 			}
 		}
 		$items = $this->get('Data');
@@ -60,13 +54,13 @@ class EventBookingViewCart extends JViewLegacy
 			$jsString .= "arrEventIds[$i] = $item->id ;\n";
 			$jsString .= "arrQuantities[$i] = $availbleQuantity ;\n";
 		}
-		$this->items = $items;
-		$this->config = $config;
-		$this->categoryId = $categoryId;
-		$this->Itemid = $Itemid;
-		$this->jsString = $jsString;
+		$this->items           = $items;
+		$this->config          = $config;
+		$this->categoryId      = $categoryId;
+		$this->Itemid          = $Itemid;
+		$this->jsString        = $jsString;
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
-		
+
 		parent::display($tpl);
 	}
 }

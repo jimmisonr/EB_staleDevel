@@ -30,11 +30,8 @@ class EventBookingViewCart extends JViewLegacy
 		}
 		$Itemid = JRequest::getInt('Itemid', 0);
 		$config = EventbookingHelper::getConfig();
-		if (isset($_SESSION['last_category_id']))
-		{
-			$categoryId = $_SESSION['last_category_id'];
-		}
-		else
+		$categoryId = (int) JFactory::getSession()->get('last_category_id', 0);
+		if (!$categoryId)
 		{
 			//Get category ID of the current event			
 			$cart = new EventbookingHelperCart();
@@ -46,10 +43,6 @@ class EventBookingViewCart extends JViewLegacy
 				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $lastEventId;
 				$db->setQuery($sql);
 				$categoryId = $db->loadResult();
-			}
-			else
-			{
-				$categoryId = 0;
 			}
 		}
 		$items = $this->get('Data');
