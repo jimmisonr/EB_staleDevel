@@ -1,128 +1,132 @@
 <?php
 /**
- * Form view class, used to render form allow users to add/edit a record
- * 
- * @package     Joomla.RAD
- * @subpackage  ViewForm
- * @author	Ossolution Team
+ * @package     RAD
+ * @subpackage  Controller
+ *
+ * @copyright   Copyright (C) 2015 Ossolution Team, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 defined('_JEXEC') or die();
 
+/**
+ * Joomla CMS Item View Class. This class is used to display details information of an item
+ * or display form allow add/editing items
+ *
+ * @package     RAD
+ * @subpackage  View
+ * @since       2.0
+ */
 class RADViewItem extends RADViewHtml
 {
 
 	/**
-	 * The model state
-	 * 
+	 * The model state.
+	 *
 	 * @var RADModelState
 	 */
 	protected $state;
 
 	/**
 	 * The record which is being added/edited
-	 * 
+	 *
 	 * @var Object
 	 */
 	protected $item;
 
 	/**
 	 * The array which keeps list of "list" options which will be displayed on the form
-	 * 
+	 *
 	 * @var Array
 	 */
 	protected $lists;
 
 	/**
-	 * Constructor function
-	 * 
-	 * @param array $config
+	 * Method to display the view
+	 *
+	 * @see RADViewHtml::display()
 	 */
-	public function __construct($config = array())
+	public function display()
 	{
-		parent::__construct($config);
-		
-		$this->state = $this->model->getState();
-		$this->item = $this->model->getData();
-		//Build common HTML select lists which will be used on the form
-		if (property_exists($this->item, 'published'))
-		{
-			$this->lists['published'] = JHtml::_('select.booleanlist', 'published', ' class="inputbox" ', $this->item->published);
-		}
-		if (property_exists($this->item, 'access'))
-		{
-			$this->lists['access'] = JHtml::_('access.level', 'access', $this->item->access, 'class="inputbox"', false);
-		}
-		
-		if (property_exists($this->item, 'language'))
-		{
-			$this->lists['language'] = JHtml::_('select.genericlist', JHtml::_('contentlanguage.existing', true, true), 'language', 
-				' class="inputbox" ', 'value', 'text', $this->item->language);
-		}
-
-		$this->languages = EventbookingHelper::getLanguages();
-		
-		$this->addToolbar();
+		$this->prepareView();
+		parent::display();
 	}
 
 	/**
-	 * Add the page title and toolbar.
+	 * Method to prepare all the data for the view before it is displayed
+	 */
+	protected function prepareView()
+	{
+		$this->state = $this->model->getState();
+		$this->item  = $this->model->getData();
+		if (property_exists($this->item, 'published'))
+		{
+			$this->lists['published'] = JHtml::_('select.booleanlist', 'published', ' ', $this->item->published);
+		}
+		if (property_exists($this->item, 'access'))
+		{
+			$this->lists['access'] = JHtml::_('access.level', 'access', $this->item->access, ' ', false);
+		}
+
+		if (property_exists($this->item, 'language'))
+		{
+			$this->lists['language'] = JHtml::_('select.genericlist', JHtml::_('contentlanguage.existing', true, true), 'language', ' ', 'value', 'text', $this->item->language);
+		}
+
+		if ($this->isAdminView)
+		{
+			$this->addToolbar();
+		}
+		
+		$this->languages = OSMembershipHelper::getLanguages();
+	}
+
+	/**
+	 * Add toolbar buttons for add/edit item form
 	 */
 	protected function addToolbar()
 	{
-		JFactory::getApplication()->input->set('hidemainmenu', true);
-		
-		$user = JFactory::getUser();
-		$isNew = ($this->item->id == 0);
-		
-		if (isset($this->item->checked_out))
-		{
-			$checkedOut = !($this->item->checked_out == 0 || $this->item->checked_out == $user->get('id'));
-		}
-		else
-		{
-			$checkedOut = false;
-		}
-		
-		$component = substr($this->option, 4);
-		$helperClass = ucfirst($component) . 'Helper';
+		$helperClass = $this->viewConfig['class_prefix'] . 'Helper';
 		if (is_callable($helperClass . '::getActions'))
 		{
-			$canDo = call_user_func(array($helperClass, 'getActions'), $this->option);
+			$canDo = call_user_func(array($helperClass, 'getActions'), $this->name, $this->state);
 		}
 		else
 		{
-			$canDo = call_user_func(array('RADHelper', 'getActions'), $this->option);
+			$canDo = call_user_func(array('RADHelper', 'getActions'), $this->viewConfig['option'], $this->name, $this->state);
 		}
 		if ($this->item->id)
 		{
-			$toolbarTitle = $this->languagePrefix.'_'.$this->name.'_EDIT'; 
-		}
-		else 
-		{
-			$toolbarTitle = $this->languagePrefix.'_'.$this->name.'_NEW';
-		}
-		JToolBarHelper::title(JText::_(strtoupper($toolbarTitle)));
-		// If not checked out, can save the item.
-		if (!$checkedOut && ($canDo->get('core.edit') || ($canDo->get('core.create'))))
-		{
-			
-			JToolBarHelper::apply('apply', 'JTOOLBAR_APPLY');
-			JToolBarHelper::save('save', 'JTOOLBAR_SAVE');
-		}
-		
-		if (!$checkedOut && ($canDo->get('core.create')))
-		{
-			JToolBarHelper::custom('save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
-		}
-		
-		if (empty($this->item->id))
-		{
-			JToolBarHelper::cancel('cancel', 'JTOOLBAR_CANCEL');
+			$toolbarTitle = $this->viewConfig['language_prefix'] . '_' . $this->name . '_EDIT';
 		}
 		else
 		{
+			$toolbarTitle = $this->viewConfig['language_prefix'] . '_' . $this->name . '_NEW';
+		}
+		JToolBarHelper::title(JText::_(strtoupper($toolbarTitle)));
+
+		if (($canDo->get('core.edit') || ($canDo->get('core.create'))) && !in_array('save', $this->hideButtons))
+		{
+			JToolBarHelper::apply('apply', 'JTOOLBAR_APPLY');
+			JToolBarHelper::save('save', 'JTOOLBAR_SAVE');
+		}
+
+		if ($canDo->get('core.create') && !in_array('save2new', $this->hideButtons))
+		{
+			JToolBarHelper::custom('save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
+		}
+
+		if ($this->item->id && $canDo->get('core.create') && !in_array('save2copy', $this->hideButtons))
+		{
+			JToolbarHelper::save2copy('save2copy');
+		}
+
+		if ($this->item->id)
+		{
 			JToolBarHelper::cancel('cancel', 'JTOOLBAR_CLOSE');
+		}
+		else
+		{
+			JToolBarHelper::cancel('cancel', 'JTOOLBAR_CANCEL');
 		}
 	}
 }

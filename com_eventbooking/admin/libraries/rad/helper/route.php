@@ -1,14 +1,19 @@
 <?php
 /**
- * @package     Joomla.RAD
- * @subpackage  Helper
- * @author		Ossolution Team
+ * @package     RAD
+ * @subpackage  Controller
+ *
+ * @copyright   Copyright (C) 2015 Ossolution Team, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE
  */
 defined('_JEXEC') or die();
+
 /**
- * This class provide some helpers method which helps building SEF router of a component easier
+ * Provide basic static methods which help building component router easier
  *
- * @author Ossolution Team
+ * @package		RAD
+ * @subpackage	HelperRoute
+ * @since		2.0
  */
 class RADHelperRoute
 {

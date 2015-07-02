@@ -1,42 +1,48 @@
 <?php
 /**
- * Admin Controller Class, implement basic tasks which is used when developing component from admin
- *
- * @author      Ossolution Team
  * @package     RAD
- * @subpackage  ControllerAdmin 
+ * @subpackage  Controller
+ *
+ * @copyright   Copyright (C) 2015 Ossolution Team, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE
  */
 defined('_JEXEC') or die();
 
+/**
+ * Base class for a Joomla Administrator Controller. It handles add, edit, delete, publish, unpublish records....
+ *
+ * @package       RAD
+ * @subpackage    Controller
+ * @since         2.0
+ */
 class RADControllerAdmin extends RADController
 {
 
 	/**
 	 * The URL view item variable.
 	 *
-	 * @var    string	 
+	 * @var string
 	 */
 	protected $viewItem;
 
 	/**
 	 * The URL view list variable.
 	 *
-	 * @var    string	 
+	 * @var string
 	 */
 	protected $viewList;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param   array  $config  An optional associative array of configuration settings.
+	 * @param array $config An optional associative array of configuration settings.
 	 *
-	 * @see     RADControllerAdmin	 
-	 * @throws  Exception
+	 * @see RADControlleAdmin
 	 */
-	public function __construct($config = array())
+	public function __construct(RADInput $input = null, array $config = array())
 	{
-		parent::__construct($config);
-		
+		parent::__construct($input, $config);
+
 		if (isset($config['view_item']))
 		{
 			$this->viewItem = $config['view_item'];
@@ -45,7 +51,7 @@ class RADControllerAdmin extends RADController
 		{
 			$this->viewItem = $this->name;
 		}
-		
+
 		if (isset($config['view_list']))
 		{
 			$this->viewList = $config['view_list'];
@@ -54,9 +60,11 @@ class RADControllerAdmin extends RADController
 		{
 			$this->viewList = RADInflector::pluralize($this->viewItem);
 		}
-		
+
+		// Register tasks mapping
 		$this->registerTask('apply', 'save');
 		$this->registerTask('save2new', 'save');
+		$this->registerTask('save2copy', 'save');
 		$this->registerTask('unpublish', 'publish');
 		$this->registerTask('orderup', 'reorder');
 		$this->registerTask('orderdown', 'reorder');
@@ -67,7 +75,7 @@ class RADControllerAdmin extends RADController
 	 */
 	public function add()
 	{
-		if ($this->allowAdd($this->input->getData()))
+		if ($this->allowAdd())
 		{
 			$this->input->set('view', $this->viewItem);
 			$this->input->set('edit', false);
@@ -75,7 +83,10 @@ class RADControllerAdmin extends RADController
 		}
 		else
 		{
-			$this->app->redirect('index.php', JText::_('You are not allowed to add new record'));
+			$this->setMessage(JText::_('JLIB_APPLICATION_ERROR_CREATE_RECORD_NOT_PERMITTED'), 'error');
+			$this->setRedirect(JRoute::_($this->getViewListUrl(), false));
+
+			return false;
 		}
 	}
 
@@ -84,12 +95,12 @@ class RADControllerAdmin extends RADController
 	 */
 	public function edit()
 	{
-		$data = $this->input->getData();
-		if (isset($data['cid']) && count($data['cid']))
+		$cid = $this->input->get('cid', array(), 'array');
+		if (count($cid))
 		{
-			$data['id'] = (int) $data['cid'];
+			$this->input->set('id', 0);
 		}
-		if ($this->allowEdit($data))
+		if ($this->allowEdit(array('id' => $this->input->getInt('id'))))
 		{
 			$this->input->set('view', $this->viewItem);
 			$this->input->set('edit', false);
@@ -97,72 +108,92 @@ class RADControllerAdmin extends RADController
 		}
 		else
 		{
-			$this->app->redirect('index.php', JText::_('You are not allowed to edit this record'));
+			$this->setMessage(JText::_('JLIB_APPLICATION_ERROR_EDIT_NOT_PERMITTED'), 'error');
+			$this->setRedirect(JRoute::_($this->getViewListUrl(), false));
 		}
 	}
 
 	/**
-	 * Generic save function
+	 * Method to save a record.
+	 *
+	 * @return boolean True if successful, false otherwise.
+	 *
 	 */
 	public function save()
 	{
-		$data = $this->input->getData();
-		$cid = $data['cid'];
-		if (count($cid))
+		$this->csrfProtection();
+		$input = $this->input;
+		$task  = $this->getTask();
+		if ($task == 'save2copy')
 		{
-			$data['id'] = (int) $cid[0];
-			$this->input->set('id', $data["id"]);
+			$input->set('id', 0);
+			$task = 'apply';
 		}
-				
-		if ($this->allowSave($data))
+		$id = $input->getInt('id', 0);
+		if ($this->allowSave(array('id' => $id)))
 		{
 			try
 			{
-				$model = $this->getModel($this->name, array('fallback_class' => 'RADModelItem'));
-				$ret = $model->store($this->input);
-				if ($ret)
+				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin'));
+				$model->store($this->input);
+				if ($this->app->isSite() && $id == 0)
 				{
-					$msg = JText::_($this->languagePrefix . '_' . strtoupper($this->name) . '_SAVED');
+					$langSuffix = '_SUBMIT_SAVE_SUCCESS';
 				}
 				else
 				{
-					$msg = JText::_($this->languagePrefix . '_' . strtoupper($this->name) . '_SAVING_ERROR');
+					$langSuffix = '_SAVE_SUCCESS';
 				}
-				$task = $this->getTask();
-					
-				if ($task == 'save')
+				$languagePrefix = $this->config['language_prefix'];
+				$msg            = JText::_((JFactory::getLanguage()->hasKey($languagePrefix . $langSuffix) ? $languagePrefix : 'JLIB_APPLICATION') . $langSuffix);
+				switch ($task)
 				{
-					$url = JRoute::_('index.php?option=' . $this->option . '&view=' . $this->viewList, false);
-				}
-				elseif ($task == 'apply')
-				{
-					$url = JRoute::_('index.php?option=' . $this->option . '&view=' . $this->viewItem . '&id=' . $this->input->getInt('id'), false);
-				}
-				else
-				{
-					$url = JRoute::_('index.php?option=' . $this->option . '&view=' . $this->viewItem, false);
+					case 'apply':
+						$url = JRoute::_($this->getViewItemUrl($input->getInt('id', 0)), false);
+						break;
+					case 'save2new':
+						$url = JRoute::_($this->getViewItemUrl(), false);
+						break;
+					default:
+						$url = JRoute::_($this->getViewListUrl(), false);
+						break;
 				}
 				$this->setRedirect($url, $msg);
 			}
 			catch (Exception $e)
-			{				
-				$this->app->enqueueMessage($e->getMessage(), 'error');				
-				$this->app->redirect(JRoute::_('index.php?option=' . $this->option . '&view=' . $this->viewItem . '&id=' . $this->input->getInt('id'), false));
-			}						
+			{
+				$this->setMessage($e->getMessage(), 'error');
+				$this->setRedirect(JRoute::_($this->getViewItemUrl($id), false));
+			}
 		}
 		else
 		{
-			$this->app->redirect('index.php', JText::_('You are not allowed to save the record'));
+			$this->setMessage(JText::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'), 'error');
+			$this->setRedirect(JRoute::_($this->getViewListUrl(), false));
 		}
 	}
 
 	/**
-	 * Save ordering of the records
+	 * Method to cancel an add/edit. We simply redirect users to view which display list of records
+	 *
 	 */
-	public function save_order()
+	public function cancel()
 	{
+		$this->setRedirect(JRoute::_($this->getViewListUrl(), false));
+	}
+
+	/**
+	 * Method to save the submitted ordering values for records.
+	 *
+	 * @return boolean True on success
+	 *
+	 */
+	public function saveorder()
+	{
+		// Check for request forgeries.
+		$this->csrfProtection();
 		$order = $this->input->get('order', array(), 'array');
-		$cid = $this->input->get('cid', array(), 'array');
+		$cid   = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($order);
 		JArrayHelper::toInteger($cid);
 		for ($i = 0, $n = count($cid); $i < $n; $i++)
@@ -174,74 +205,72 @@ class RADControllerAdmin extends RADController
 		}
 		if (count($cid))
 		{
-			try 
+			try
 			{
-				$model = $this->getModel($this->name, array('fallback_class' => 'RADModelItem'));
-				$ret = $model->saveOrder($cid, $order);
-				if ($ret)
-				{
-					$msg = JText::_($this->languagePrefix . '_ORDERING_SAVED');
-				}
-				else
-				{
-					$msg = JText::_($this->languagePrefix . '_ORDERING_SAVING_ERROR');
-				}				
+				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin', 'ignore_request' => true));
+				$model->saveorder($cid, $order);
+				$this->setMessage(JText::_('JLIB_APPLICATION_SUCCESS_ORDERING_SAVED'));
 			}
 			catch (Exception $e)
 			{
-				$msg = null;
-				$this->app->enqueueMessage($e->getMessage(), 'error');				
-			}													
+				$this->setMessage(JText::sprintf('JLIB_APPLICATION_ERROR_REORDER_FAILED', $e->getMessage()), 'error');
+			}
 		}
 		else
 		{
-			$msg = JText::_('No records selected or you are not allowed to change ordering of any selected records');			
-		}				
-		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=' . $this->viewList, false), $msg);
+			$languagePrefix = $this->config['language_prefix'];
+			$this->setMessage($languagePrefix . '_NO_ITEM_SELECTED', 'warning');
+		}
+
+		$this->setRedirect(JRoute::_($this->getViewListUrl(), false));
 	}
 
 	/**
-	 * Cancel an acction, redirect to view list
-	 */
-	
-	public function cancel()
-	{
-		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=' . $this->viewList, false));
-	}
-	/**
-	 * Method to change ordering of an record in the list
+	 * Changes the order of one or more records.
+	 *
+	 * @return boolean True on success
+	 *
 	 */
 	public function reorder()
 	{
-		$task = $this->getTask();
-		$cid = $this->input->get('cid', array(), 'array');
+		// Check for request forgeries.
+		$this->csrfProtection();
+		$cid = $this->input->post->get('cid', array(), 'array');
+		JArrayHelper::toInteger($cid);
 		if (count($cid) && $this->allowEditState($cid[0]))
 		{
-			try 
+			try
 			{
-				$inc = ($task == 'orderup' ? -1 : 1);
-				$model = $this->getModel($this->name, array('fallback_class' => 'RADModelItem'));
-				$model->move($inc);
-				$msg = JText::_($this->languagePrefix . '_ORDERING_UPDATED');
+				$task  = $this->getTask();
+				$inc   = ($task == 'orderup' ? -1 : 1);
+				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin', 'ignore_request' => true));
+				$model->reorder($cid, $inc);
+				$this->setMessage(JText::_('JLIB_APPLICATION_SUCCESS_ITEM_REORDERED'), 'message');
 			}
 			catch (Exception $e)
 			{
-				$this->app->enqueueMessage($e->getMessage(), 'error');
-				$msg = null;
-			}			
+				$this->setMessage(JText::sprintf('JLIB_APPLICATION_ERROR_REORDER_FAILED', $e->getMessage()), 'error');
+			}
 		}
 		else
 		{
-			$msg = JText::_('No record selected or you are not allowed to change ordering of the record');
+			$languagePrefix = $this->config['language_prefix'];
+			$this->setMessage($languagePrefix . '_NO_ITEM_SELECTED', 'warning');
 		}
-		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=' . $this->viewList, false), $msg);
+		$this->setRedirect(JRoute::_($this->getViewListUrl(), false));
 	}
 
 	/**
-	 * Remove selected records from database
+	 * Delete selected items
+	 *
+	 * @return void
+	 *
 	 */
-	public function remove()
+	public function delete()
 	{
+		// Check for request forgeries
+		$this->csrfProtection();
+		// Get items to remove from the request.
 		$cid = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid);
 		for ($i = 0, $n = count($cid); $i < $n; $i++)
@@ -251,34 +280,44 @@ class RADControllerAdmin extends RADController
 				unset($cid[$i]);
 			}
 		}
+
+		$languagePrefix = $this->config['language_prefix'];
 		if (count($cid))
 		{
-			try 
+			try
 			{
-				$model = $this->getModel($this->name, array('fallback_class' => 'RADModelItem'));
+				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin', 'ignore_request' => true));
 				$model->delete($cid);
-				$msg = JText::_($this->languagePrefix . '_' . strtoupper(RADInflector::pluralize($this->name)) . '_REMOVED');
+				$this->setMessage(JText::plural($languagePrefix . '_N_ITEMS_DELETED', count($cid)));
 			}
 			catch (Exception $e)
 			{
-				$msg = null;
-				$this->app->enqueueMessage($e->getMessage(), 'error');				
+				$this->setMessage($e->getMessage(), 'error');
 			}
 		}
 		else
 		{
-			$msg = JText::_('You are not allowed to delete any of the selected records');
+			$this->setMessage($languagePrefix . '_NO_ITEM_SELECTED', 'warning');
 		}
-		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=' . $this->viewList, false), $msg);
+
+		$this->setRedirect(JRoute::_($this->getViewListUrl(), false));
 	}
 
 	/**
-	 * Publish records
+	 * Method to publish a list of items
+	 *
+	 * @return void
 	 */
 	public function publish()
 	{
-		$task = $this->getTask();
-		$cid = $this->input->get('cid', array(), 'array');
+		// Check for request forgeries
+		$this->csrfProtection();
+		// Get items to publish from the request.
+		$cid       = $this->input->get('cid', array(), 'array');
+		$data      = array('publish' => 1, 'unpublish' => 0, 'archive' => 2);
+		$task      = $this->getTask();
+		$published = JArrayHelper::getValue($data, $task, 0, 'int');
+
 		JArrayHelper::toInteger($cid);
 		for ($i = 0, $n = count($cid); $i < $n; $i++)
 		{
@@ -287,70 +326,88 @@ class RADControllerAdmin extends RADController
 				unset($cid[$i]);
 			}
 		}
+
+		$languagePrefix = $this->config['language_prefix'];
+
 		if (count($cid))
 		{
-			try 
+			try
 			{
-				$model = $this->getModel($this->name, array('fallback_class' => 'RADModelItem'));
-				if ($task == 'publish')
-				{
-					$published = 1;
-					$msg = JText::_($this->languagePrefix . '_' . strtoupper(RADInflector::pluralize($this->name)) . '_PUBLISHED');
-				}
-				else
-				{
-					$published = 0;
-					$msg = JText::_($this->languagePrefix . '_' . strtoupper(RADInflector::pluralize($this->name)) . '_UNPUBLISHED');
-				}
+				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin', 'ignore_request' => true));
 				$model->publish($cid, $published);
-			}			
+				switch ($published)
+				{
+					case 0:
+						$ntext = $languagePrefix . '_N_ITEMS_UNPUBLISHED';
+						break;
+					case 1:
+						$ntext = $languagePrefix . '_N_ITEMS_PUBLISHED';
+						break;
+					case 2:
+						$ntext = $languagePrefix . '_N_ITEMS_ARCHIVED';
+						break;
+				}
+
+				$this->setMessage(JText::plural($ntext, count($cid)));
+			}
 			catch (Exception $e)
 			{
 				$msg = null;
-				$this->app->enqueueMessage($e->getMessage(), 'error');
+				$this->setMessage($e->getMessage(), 'error');
 			}
 		}
 		else
 		{
-			$msg = JText::_('You are not allowed to change state any of the selected records');
+			$this->setMessage($languagePrefix . '_NO_ITEM_SELECTED', 'warning');
 		}
-		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=' . $this->viewList, false), $msg);
+		$this->setRedirect(JRoute::_($this->getViewListUrl(), false));
 	}
 
 	/**
-	 * Copy record
+	 * Method to save the submitted ordering values for records via AJAX.
+	 *
+	 * @return  void
+	 *
+	 * @since   2.0
 	 */
-	public function copy()
+	public function save_order_ajax()
 	{
-		if ($this->allowAdd())
-		{
-			$cid = $this->input->get('cid', array(), 'array');
-			JArrayHelper::toInteger($cid);
-			$id = $cid[0];
-			$model = $this->getModel($this->name, array('fallback_class' => 'RADModelItem'));
-			$newId = $model->copy($id);
-			$msg = JText::_($this->languagePrefix . '_' . strtoupper($this->name) . '_COPIED');
-			$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=' . $this->viewItem . '&id=' . $newId, false), $msg);
-		}
-		else
-		{
-			JFactory::getApplication()->redirect('index.php', JText::_('You are not allowed to copy record'));
-		}
-	}
+		// Get the input
+		$pks = $this->input->post->get('cid', array(), 'array');
+		$order = $this->input->post->get('order', array(), 'array');
 
+		// Sanitize the input
+		JArrayHelper::toInteger($pks);
+		JArrayHelper::toInteger($order);
+
+		// Get the model
+		$model = $this->getModel();
+
+		// Save the ordering
+		$return = $model->saveorder($pks, $order);
+
+		if ($return)
+		{
+			echo "1";
+		}
+
+		// Close the application
+		$this->app->close();
+	}
 	/**
 	 * Method to check if you can add a new record.
 	 *
 	 * Extended classes can override this if necessary.
 	 *
-	 * @param   array  $data  An array of input data.
+	 * @param   array $data An array of input data.
 	 *
 	 * @return  boolean
-	 *	 
+	 *
 	 */
 	protected function allowAdd($data = array())
 	{
 		$user = JFactory::getUser();
+
 		return $user->authorise('core.create', $this->option);
 	}
 
@@ -359,10 +416,10 @@ class RADControllerAdmin extends RADController
 	 *
 	 * Extended classes can override this if necessary.
 	 *
-	 * @param   array   $data  An array of input data.
-	 * @param   string  $key   The name of the key for the primary key; default is id.
+	 * @param   array  $data An array of input data.
+	 * @param   string $key  The name of the key for the primary key; default is id.
 	 *
-	 * @return  boolean	 	
+	 * @return  boolean
 	 */
 	protected function allowEdit($data = array(), $key = 'id')
 	{
@@ -374,15 +431,15 @@ class RADControllerAdmin extends RADController
 	 *
 	 * Extended classes can override this if necessary.
 	 *
-	 * @param   array   $data  An array of input data.
-	 * @param   string  $key   The name of the key for the primary key.
+	 * @param   array  $data An array of input data.
+	 * @param   string $key  The name of the key for the primary key.
 	 *
-	 * @return  boolean		
+	 * @return  boolean
 	 */
 	protected function allowSave($data, $key = 'id')
 	{
 		$recordId = isset($data[$key]) ? $data[$key] : '0';
-		
+
 		if ($recordId)
 		{
 			return $this->allowEdit($data, $key);
@@ -399,25 +456,52 @@ class RADControllerAdmin extends RADController
 	 * @param   int  id  Record ID
 	 *
 	 * @return  boolean  True if allowed to delete the record. Defaults to the permission for the component.
-	 *	 
+	 *
 	 */
 	protected function allowDelete($id)
 	{
-		$user = JFactory::getUser();
-		return $user->authorise('core.delete', $this->option);
+		return JFactory::getUser()->authorise('core.delete', $this->option);
 	}
 
 	/**
 	 * Method to check whether the current user can change status (publish, unpublish of a record)
 	 *
-	 * @param   int  $id  Id of the record
+	 * @param   int $id Id of the record
 	 *
 	 * @return  boolean  True if allowed to change the state of the record. Defaults to the permission for the component.
-	 *	 
+	 *
 	 */
 	protected function allowEditState($id)
 	{
-		$user = JFactory::getUser();
-		return $user->authorise('core.edit.state', $this->option);
+		return JFactory::getUser()->authorise('core.edit.state', $this->option);
+	}
+
+	/**
+	 * Get url of the page which display list of records
+	 *
+	 * @return string
+	 */
+	protected function getViewListUrl()
+	{
+		return 'index.php?option=' . $this->option . '&view=' . $this->viewList;
+	}
+
+	/**
+	 * Get url of the page which allow adding/editing a record
+	 *
+	 * @param int    $recordId
+	 * @param string $urlVar
+	 *
+	 * @return string
+	 */
+	protected function getViewItemUrl($recordId = null)
+	{
+		$url = 'index.php?option=' . $this->option . '&view=' . $this->viewItem;
+		if ($recordId)
+		{
+			$url .= '&id=' . $recordId;
+		}
+
+		return $url;
 	}
 }

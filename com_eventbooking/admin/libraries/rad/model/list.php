@@ -1,22 +1,28 @@
 <?php
 /**
- * @package     Joomla.RAD
- * @subpackage  ModelList
+ * @package     RAD
+ * @subpackage  Model
  *
- * @author	Ossolution Team
+ * @copyright   Copyright (C) 2015 Ossolution Team, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE
  */
 defined('_JEXEC') or die();
 
+/**
+ * Model class for handling lists of items.
+ *
+ * @package     RAD
+ * @subpackage  Model
+ * @since       2.0
+ */
 class RADModelList extends RADModel
 {
-
 	/**
-	 * List of fields which will be used for searching data from database table
-	 * 
-	 * @var array
+	 * The query object of the model
+	 *
+	 * @var JDatabaseQuery
 	 */
-	protected $searchFields = array();
-
+	protected $query;
 	/**
 	 * List total
 	 *
@@ -33,55 +39,77 @@ class RADModelList extends RADModel
 
 	/**
 	 * Pagination object
-	 * 
+	 *
 	 * @var JPagination
 	 */
 	protected $pagination;
 
 	/**
+	 * Name of state field name, usually be tbl.state or tbl.published
+	 *
+	 * @var string
+	 */
+	protected $stateField;
+
+	/**
+	 * List of fields which will be used for searching data from database table
+	 *
+	 * @var array
+	 */
+	protected $searchFields = array();
+
+	/**
+	 * Remember model states, always set to true for model list
+	 * @var boolean
+	 */
+	public $rememberStates = true;
+
+	/**
 	 * Instantiate the model.
 	 *
-	 * @param   array	$config	The configuration data for the model	 
-	 *	 
+	 * @param array $config configuration data for the model
+	 *
 	 */
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
-		
-		$app = JFactory::getApplication();
-		$context = $this->option . '.' . $this->name . '.';
-        if (isset($config['ignore_session']))
-        {
-            $this->state->insert('limit', 'int', $app->getCfg('list_limit'))
-                ->insert('limitstart', 'int', 0)
-                ->insert('filter_order', 'cmd', 'tbl.id')
-                ->insert('filter_order_Dir', 'word', 'asc')
-                ->insert('filter_search', 'string')
-                ->insert('filter_state', 'string')
-                ->insert('filter_access', 'int', 0)
-                ->insert('filter_language', 'string');
-        }
-        else
-        {
-            $this->state->insert('limit', 'int', $app->getUserStateFromRequest($context . 'limit', 'limit', $app->getCfg('list_limit')))
-                ->insert('limitstart', 'int', $app->getUserStateFromRequest($context . 'limitstart', 'limitstart', 0))
-                ->insert('filter_order', 'cmd', $app->getUserStateFromRequest($context . 'filter_order', 'filter_order', 'tbl.id'))
-                ->insert('filter_order_Dir', 'word', $app->getUserStateFromRequest($context . 'filter_order_Dir', 'filter_order_Dir', 'asc'))
-                ->insert('filter_search', 'string', $app->getUserStateFromRequest($context . 'filter_search', 'filter_search'))
-                ->insert('filter_state', 'string', $app->getUserStateFromRequest($context . 'filter_state', 'filter_state'))
-                ->insert('filter_access', 'int', $app->getUserStateFromRequest($context . 'filter_access', 'filter_access'))
-                ->insert('filter_language', 'string', $app->getUserStateFromRequest($context . 'filter_language', 'filter_language'));
-        }
-		
+
+		$this->query = $this->db->getQuery(true);
+
+		$fields = array_keys($this->db->getTableColumns($this->table));
+
+		if (in_array('ordering', $fields))
+		{
+			$defaultOrdering = 'tbl.ordering';
+		}
+		else
+		{
+			$defaultOrdering = 'tbl.id';
+		}
+		if (in_array('published', $fields))
+		{
+			$this->stateField = 'tbl.published';
+		}
+		else
+		{
+			$this->stateField = 'tbl.state';
+		}
+		$this->state->insert('limit', 'int', JFactory::getConfig()->get('list_limit'))
+			->insert('limitstart', 'int', 0)
+			->insert('filter_order', 'cmd', $defaultOrdering)
+			->insert('filter_order_Dir', 'word', 'asc')
+			->insert('filter_search', 'string')
+			->insert('filter_state', 'string')
+			->insert('filter_access', 'int', 0)
+			->insert('filter_language', 'string');
+
 		if (isset($config['search_fields']))
 		{
 			$this->searchFields = (array) $config['search_fields'];
 		}
 		else
 		{
-			//Build the search field array automatically, basically, we should search based on name, title, description if these fields are available
-            $table = new RADTable($this->table, 'id', $this->db);
-            $fields = array_keys($table->getFields());
+			// Build the search field array automatically, basically, we should search based on name, title, description if these fields are available			
 			if (in_array('name', $fields))
 			{
 				$this->searchFields[] = 'tbl.name';
@@ -90,9 +118,9 @@ class RADModelList extends RADModel
 			{
 				$this->searchFields[] = 'tbl.title';
 			}
-			if (in_array('description', $fields))
+			if (in_array('alias', $fields))
 			{
-				$this->searchFields[] = 'tbl.description';
+				$this->searchFields[] = 'tbl.alias';
 			}
 		}
 	}
@@ -100,53 +128,83 @@ class RADModelList extends RADModel
 	/**
 	 * Get a list of items
 	 *
-	 * @return  array
+	 * @return array
 	 */
 	public function getData()
 	{
 		if (empty($this->data))
 		{
-			$db = $this->getDbo();
-			$query = $db->getQuery(true);
+			$db    = $this->getDbo();
+			$query = $this->query;
+
+			// In case the query was built before using getTotal method, we just clear the select clause
+			if ($query->type == 'select')
+			{
+				$query->clear('select');
+			}
+			else
+			{
+				$this->_buildQueryFrom($query)
+					->_buildQueryJoins($query)
+					->_buildQueryWhere($query);
+			}
+
 			$this->_buildQueryColumns($query)
-				->_buildQueryFrom($query)
-				->_buildQueryJoins($query)
-				->_buildQueryWhere($query)
 				->_buildQueryGroup($query)
 				->_buildQueryHaving($query)
-				->_buildQueryOrder($query);				
+				->_buildQueryOrder($query);
+
 			$db->setQuery($query, $this->state->limitstart, $this->state->limit);
 			$this->data = $db->loadObjectList();
+
+			// Store the query so that it can be used in getTotal method if needed
+			$this->query = $query;
 		}
-		
+
 		return $this->data;
 	}
 
 	/**
-	 * Get total record
-	 * 
+	 * Get total record. Child class should override this method if needed
+	 *
 	 * @return integer Number of records
-	 * 
+	 *
 	 */
 	public function getTotal()
 	{
 		if (empty($this->total))
 		{
-			$db = $this->getDbo();
-			$query = $db->getQuery(true);
+			$db    = $this->getDbo();
+			$query = $this->query;
+			if ($query->type == 'select')
+			{
+				$query->clear('select')
+					->clear('group')
+					->clear('having')
+					->clear('order')
+					->clear('limit')
+					->clear('offset');
+			}
+			else
+			{
+				$this->_buildQueryFrom($query)
+					->_buildQueryJoins($query)
+					->_buildQueryWhere($query);
+			}
 			$query->select('COUNT(*)');
-			$this->_buildQueryFrom($query)
-                ->_buildQueryWhere($query);
 			$db->setQuery($query);
 			$this->total = (int) $db->loadResult();
+
+			// Store the query object to used in getData method in case the getTotal method is called before that
+			$this->query = $query;
 		}
-		
+
 		return $this->total;
 	}
 
 	/**
 	 * Get pagination object
-	 * 
+	 *
 	 * @return JPagination
 	 */
 	function getPagination()
@@ -157,32 +215,44 @@ class RADModelList extends RADModel
 			jimport('joomla.html.pagination');
 			$this->pagination = new JPagination($this->getTotal(), $this->state->limitstart, $this->state->limit);
 		}
-		
+
 		return $this->pagination;
 	}
 
 	/**
 	 * Builds SELECT columns list for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function _buildQueryColumns(JDatabaseQuery $query)
 	{
 		$query->select(array('tbl.*'));
-		
+
 		return $this;
 	}
 
 	/**
 	 * Builds FROM tables list for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function _buildQueryFrom(JDatabaseQuery $query)
 	{
 		$query->from($this->table . ' AS tbl');
-		
+
 		return $this;
 	}
 
 	/**
-	 * Builds LEFT JOINS clauses for the query
+	 * Builds JOINS clauses for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function _buildQueryJoins(JDatabaseQuery $query)
 	{
@@ -191,21 +261,24 @@ class RADModelList extends RADModel
 
 	/**
 	 * Builds a WHERE clause for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function _buildQueryWhere(JDatabaseQuery $query)
 	{
-		$user = JFactory::getUser();
-		$db = $this->getDbo();
+		$user  = JFactory::getUser();
+		$db    = $this->getDbo();
 		$state = $this->state;
 		if ($state->filter_state == 'P')
 		{
-			$query->where('tbl.published = 1');
+			$query->where($this->stateField . ' = 1');
 		}
 		elseif ($state->filter_state == 'U')
 		{
-			$query->where('tbl.published = 0');
+			$query->where($this->stateField . ' = 0');
 		}
-		
 		if ($state->filter_access)
 		{
 			$query->where('tbl.access = ' . (int) $state->filter_access);
@@ -214,9 +287,10 @@ class RADModelList extends RADModel
 				$query->where('tbl.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
 			}
 		}
-		
 		if ($state->filter_search)
 		{
+			//Remove blank space from searching
+			$state->filter_search = trim($state->filter_search);
 			if (stripos($state->search, 'id:') === 0)
 			{
 				$query->where('tbl.id = ' . (int) substr($state->filter_search, 3));
@@ -235,17 +309,21 @@ class RADModelList extends RADModel
 				}
 			}
 		}
-		
+
 		if ($state->filter_language && $state->filter_language != '*')
 		{
-            $query->where('tbl.language IN (' . $db->Quote($state->filter_language) . ',' . $db->Quote('*') . ', "")');
+			$query->where('tbl.language IN (' . $db->Quote($state->filter_language) . ',' . $db->Quote('*') . ', "")');
 		}
-		
+
 		return $this;
 	}
 
 	/**
 	 * Builds a GROUP BY clause for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function _buildQueryGroup(JDatabaseQuery $query)
 	{
@@ -254,6 +332,10 @@ class RADModelList extends RADModel
 
 	/**
 	 * Builds a HAVING clause for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function _buildQueryHaving(JDatabaseQuery $query)
 	{
@@ -262,14 +344,16 @@ class RADModelList extends RADModel
 
 	/**
 	 * Builds a generic ORDER BY clasue based on the model's state
+	 *
+	 * @param JDatabaseQuery $query
 	 */
 	protected function _buildQueryOrder(JDatabaseQuery $query)
 	{
-		$sort = $this->state->filter_order;
+		$sort      = $this->state->filter_order;
 		$direction = strtoupper($this->state->filter_order_Dir);
 		if ($sort)
 		{
 			$query->order($sort . ' ' . $direction);
 		}
-	}	
+	}
 }
