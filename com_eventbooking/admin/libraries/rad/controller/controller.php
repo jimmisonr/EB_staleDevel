@@ -194,7 +194,6 @@ class RADController
 		$this->input  = $input;
 		$this->option = $input->getCmd('option');
 		$this->name   = $config['name'];
-
 		// Build default config data for the controller
 		if (empty($config['language_prefix']))
 		{
@@ -281,6 +280,7 @@ class RADController
 		$viewName   = $this->input->get('view', $this->config['default_view']);
 		$viewLayout = $this->input->get('layout', 'default');
 		$view       = $this->getView($viewName, $viewType, $viewLayout);
+
 
 		// If view has model, create the model, and assign it to the view
 		if ($view->hasModel)

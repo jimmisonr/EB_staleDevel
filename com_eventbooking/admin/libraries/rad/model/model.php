@@ -343,6 +343,16 @@ class RADModel
 	}
 
 	/**
+	 * Get name of the model
+	 *
+	 * @return string
+	 */
+	public function getName()
+	{
+		return $this->name;
+	}
+
+	/**
 	 * Clean the cache
 	 *
 	 * @param   string   $group      The cache group
