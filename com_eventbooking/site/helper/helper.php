@@ -592,6 +592,7 @@ class EventbookingHelper
 		// Registration record related tags
 		$replaces['number_registrants'] = $row->number_registrants;
 		$replaces['invoice_number']     = $row->invoice_number;
+		$replaces['invoice_number']     = EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config);
 		$replaces['transaction_id'] = $row->transaction_id;
 		$method = os_payments::loadPaymentMethod($row->payment_method);
 		if ($method)
