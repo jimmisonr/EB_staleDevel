@@ -15,14 +15,14 @@ defined('_JEXEC') or die();
  * @package		Joomla
  * @subpackage	Event Booking
  */
-class EventbookingController extends JControllerLegacy
+class EventbookingController extends RADController
 {
 
 	/**
 	 * Display information
 	 *
 	 */
-	public function display($cachable = false, $urlparams = array())
+	public function display($cachable = false, array $urlparams = array())
 	{
 		$task = $this->getTask();
 		$document = JFactory::getDocument();
@@ -55,7 +55,8 @@ class EventbookingController extends JControllerLegacy
 		}
 		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/themes/' . $theme . '.css');
 		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/custom.css');
-		switch ($task)
+
+		/*switch ($task)
 		{
 			case 'view_category':
 				JRequest::setVar('view', 'category');
@@ -124,7 +125,7 @@ class EventbookingController extends JControllerLegacy
 				}
 				break;
 		}
-		
+		*/
 		parent::display($cachable, $urlparams);
 	}
 	/**

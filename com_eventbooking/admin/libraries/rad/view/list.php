@@ -84,7 +84,7 @@ class RADViewList extends RADViewHtml
 			$this->lists['filter_access']   = JHtml::_('access.level', 'filter_access', $this->state->filter_access, 'onchange="submit();"', false);
 			$this->lists['filter_language'] = JHtml::_('select.genericlist', JHtml::_('contentlanguage.existing', true, true), 'filter_language',
 				' onchange="submit();" ', 'value', 'text', $this->state->filter_language);			
-			OSMembershipHelperHtml::renderSubmenu($this->name);			
+			EventbookingHelperHtml::renderSubmenu($this->name);
 			$this->addToolbar();
 		}
 	}
@@ -105,7 +105,7 @@ class RADViewList extends RADViewHtml
 			$canDo = call_user_func(array('RADHelper', 'getActions'), $this->viewConfig['option'], $this->name, $this->state);
 		}
 		$languagePrefix = $this->viewConfig['language_prefix'];
-		JToolBarHelper::title(JText::_(strtoupper($languagePrefix . '_' . $this->name . '_MANAGEMENT')), 'link ' . $this->name);
+		JToolBarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')), 'link ' . $this->name);
 		if ($canDo->get('core.create') && !in_array('add', $this->hideButtons))
 		{
 			JToolBarHelper::addNew('add', 'JTOOLBAR_NEW');

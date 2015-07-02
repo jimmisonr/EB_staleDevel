@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
@@ -26,24 +26,12 @@ class EventbookingHelper
 	 *
 	 * @return object
 	 */
-	public static function getConfig($nl2br = false, $language = null)
+	public static function getConfig()
 	{
 		static $config;
 		if (!$config)
 		{
-			$config = new stdClass();
-			$db     = JFactory::getDbo();
-			$query  = $db->getQuery(true);
-			$query->select('config_key, config_value')->from('#__eb_configs');
-			$db->setQuery($query);
-			$rows = $db->loadObjectList();
-			for ($i = 0, $n = count($rows); $i < $n; $i++)
-			{
-				$row          = $rows[$i];
-				$key          = $row->config_key;
-				$value        = stripslashes($row->config_value);
-				$config->$key = $value;
-			}
+			$config = new RADConfig('#__eb_configs');
 		}
 
 		return $config;
@@ -53,17 +41,28 @@ class EventbookingHelper
 	 * Get specify config value
 	 *
 	 * @param string $key
+	 *
+	 * @return string
 	 */
-	public static function getConfigValue($key)
+	public static function getConfigValue($key, $default = null)
 	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('config_value')
-			->from('#__eb_configs')
-			->where('config_key="' . $key . '"');
-		$db->setQuery($query);
+		$config = self::getConfig();
 
-		return $db->loadResult();
+		return $config->get($key, $default);
+	}
+
+	/**
+	 * Get component settings from json config file
+	 *
+	 * @param $appName
+	 *
+	 * @return array
+	 */
+	public static function getComponentSettings($appName)
+	{
+		$settings = json_decode(file_get_contents(JPATH_ADMINISTRATOR . '/components/com_eventbooking/config.json'), true);
+
+		return $settings[strtolower($appName)];
 	}
 
 	/**
@@ -76,7 +75,7 @@ class EventbookingHelper
 		$config = self::getConfig();
 		if ($config->multiple_booking)
 		{
-			$db = JFactory::getDbo();
+			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('SUM(total_amount)')
 				->from('#__eb_registrants')
@@ -122,6 +121,36 @@ class EventbookingHelper
 		}
 
 		return new JRegistry();
+	}
+
+	/**
+	 *
+	 * Apply some fixes for request data
+	 *
+	 * @return void
+	 */
+	public static function prepareRequestData()
+	{
+		//Remove cookie vars from request data
+		$cookieVars = array_keys($_COOKIE);
+		if (count($cookieVars))
+		{
+			foreach ($cookieVars as $key)
+			{
+				if (!isset($_POST[$key]) && !isset($_GET[$key]))
+				{
+					unset($_REQUEST[$key]);
+				}
+			}
+		}
+		if (isset($_REQUEST['start']) && !isset($_REQUEST['limitstart']))
+		{
+			$_REQUEST['limitstart'] = $_REQUEST['start'];
+		}
+		if (!isset($_REQUEST['limitstart']))
+		{
+			$_REQUEST['limitstart'] = 0;
+		}
 	}
 	/**
 	 * Get request data, used for RADList model
@@ -257,7 +286,7 @@ class EventbookingHelper
 				->where('published = 1')
 				->where('lang_code=' . $db->quote($tag));
 			$db->setQuery($query, 0, 1);
-			$langLink = '&lang='.$db->loadResult();
+			$langLink = '&lang=' . $db->loadResult();
 		}
 		else
 		{
@@ -265,9 +294,10 @@ class EventbookingHelper
 		}
 
 		JFactory::getDocument()->addScriptDeclaration(
-			'var langLinkForAjax="'.$langLink.'";'
+			'var langLinkForAjax="' . $langLink . '";'
 		);
 	}
+
 	/**
 	 * This function is used to check to see whether we need to update the database to support multilingual or not
 	 *
@@ -414,6 +444,7 @@ class EventbookingHelper
 			}
 		}
 	}
+
 	/**
 	 * Get language use for re-captcha
 	 *
@@ -453,9 +484,9 @@ class EventbookingHelper
 		{
 			$sql = 'SELECT event_id FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id . ' ORDER BY id';
 			$db->setQuery($sql);
-			$eventIds             = $db->loadColumn();
+			$eventIds    = $db->loadColumn();
 			$fieldSuffix = EventbookingHelper::getFieldSuffix();
-			$sql                  = 'SELECT title'.$fieldSuffix.' AS title FROM #__eb_events WHERE id IN (' . implode(',', $eventIds) . ') ORDER BY FIND_IN_SET(id, "' . implode(',', $eventIds) .
+			$sql         = 'SELECT title' . $fieldSuffix . ' AS title FROM #__eb_events WHERE id IN (' . implode(',', $eventIds) . ') ORDER BY FIND_IN_SET(id, "' . implode(',', $eventIds) .
 				'")';
 			$db->setQuery($sql);
 			$eventTitles = $db->loadColumn();
@@ -593,8 +624,8 @@ class EventbookingHelper
 		$replaces['number_registrants'] = $row->number_registrants;
 		$replaces['invoice_number']     = $row->invoice_number;
 		$replaces['invoice_number']     = EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config);
-		$replaces['transaction_id'] = $row->transaction_id;
-		$method = os_payments::loadPaymentMethod($row->payment_method);
+		$replaces['transaction_id']     = $row->transaction_id;
+		$method                         = os_payments::loadPaymentMethod($row->payment_method);
 		if ($method)
 		{
 			$replaces['payment_method'] = JText::_($method->title);
@@ -622,7 +653,7 @@ class EventbookingHelper
 			{
 				$Itemid = self::getItemid();
 			}
-			$replaces['cancel_registration_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=cancel_registration&cancel_code=' . $row->registration_code.'&Itemid='.$Itemid;
+			$replaces['cancel_registration_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=cancel_registration&cancel_code=' . $row->registration_code . '&Itemid=' . $Itemid;
 		}
 		else
 		{
@@ -1260,15 +1291,15 @@ class EventbookingHelper
 				$recordsData[$eventId]['tax_amount']             = $registrantTaxAmount;
 				$recordsData[$eventId]['payment_processing_fee'] = $registrantPaymentProcessingFee;
 				$recordsData[$eventId]['amount']                 = $registrantAmount;
-				$recordsData[$eventId]['deposit_amount']        = $registrantDepositAmount;
+				$recordsData[$eventId]['deposit_amount']         = $registrantDepositAmount;
 			}
 		}
 
-		$fees['total_amount'] = $totalAmount;
-		$fees['discount_amount'] = $discountAmount;
-		$fees['tax_amount'] = $taxAmount;
-		$fees['amount'] = $amount;
-		$fees['deposit_amount'] = $depositAmount;
+		$fees['total_amount']           = $totalAmount;
+		$fees['discount_amount']        = $discountAmount;
+		$fees['tax_amount']             = $taxAmount;
+		$fees['amount']                 = $amount;
+		$fees['deposit_amount']         = $depositAmount;
 		$fees['payment_processing_fee'] = $paymentProcessingFee;
 		if ($collectRecordsData)
 		{
@@ -1307,25 +1338,25 @@ class EventbookingHelper
 	/**
 	 * Get the form fields to display in registration form
 	 *
-	 * @param int $eventId (ID of the event or ID of the registration record in case the system use shopping cart)
-	 * @param int $registrationType
+	 * @param int    $eventId (ID of the event or ID of the registration record in case the system use shopping cart)
+	 * @param int    $registrationType
 	 * @param string $activeLanguage
 	 *
 	 * @return array
 	 */
 	public static function getFormFields($eventId = 0, $registrationType = 0, $activeLanguage = null)
 	{
-		$user   = JFactory::getUser();
-		$db     = JFactory::getDbo();
-		$query  = $db->getQuery(true);
-		$config = EventbookingHelper::getConfig();
+		$user        = JFactory::getUser();
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
+		$config      = EventbookingHelper::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix($activeLanguage);
 		$query->select('*')
-			->select('title'.$fieldSuffix.' AS title')
-			->select('description'.$fieldSuffix.' AS description')
-			->select('`values'.$fieldSuffix.'` AS `values`')
-			->select('default_values'.$fieldSuffix.' AS default_values')
-			->select('depend_on_options'.$fieldSuffix.' AS depend_on_options')
+			->select('title' . $fieldSuffix . ' AS title')
+			->select('description' . $fieldSuffix . ' AS description')
+			->select('`values' . $fieldSuffix . '` AS `values`')
+			->select('default_values' . $fieldSuffix . ' AS default_values')
+			->select('depend_on_options' . $fieldSuffix . ' AS depend_on_options')
 			->from('#__eb_fields')
 			->where('published=1')
 			->where(' `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
@@ -1895,7 +1926,7 @@ class EventbookingHelper
 			$data['row']    = $row;
 			$data['config'] = $config;
 			$data['Itemid'] = $Itemid;
-			$sql = 'SELECT a.*, b.event_date, b.title' . $fieldSuffix . ' AS title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id=b.id WHERE a.id=' .
+			$sql            = 'SELECT a.*, b.event_date, b.title' . $fieldSuffix . ' AS title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id=b.id WHERE a.id=' .
 				$row->id . ' OR a.cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$rows = $db->loadObjectList();
@@ -1933,7 +1964,7 @@ class EventbookingHelper
 		else
 		{
 			$query = $db->getQuery(true);
-			$query->select('*, title'.$fieldSuffix.' AS title')
+			$query->select('*, title' . $fieldSuffix . ' AS title')
 				->from('#__eb_events')
 				->where('id=' . $row->event_id);
 			$db->setQuery($query);
@@ -1963,7 +1994,7 @@ class EventbookingHelper
 
 		if ($toAdmin && $row->payment_method == 'os_offline_creditcard')
 		{
-			$cardNumber          = JFactory::getApplication()->input->getString('x_card_num', '');
+			$cardNumber = JFactory::getApplication()->input->getString('x_card_num', '');
 			if ($cardNumber)
 			{
 				$last4Digits         = substr($cardNumber, strlen($cardNumber) - 4);
@@ -1995,9 +2026,9 @@ class EventbookingHelper
 	 */
 	public static function buildCategoryDropdown($selected, $name = "parent", $onChange = true)
 	{
-		$db  = JFactory::getDbo();
+		$db          = JFactory::getDbo();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$sql = "SELECT id, parent, parent AS parent_id, name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title FROM #__eb_categories";
+		$sql         = "SELECT id, parent, parent AS parent_id, name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title FROM #__eb_categories";
 		$db->setQuery($sql);
 		$rows     = $db->loadObjectList();
 		$children = array();
@@ -2047,9 +2078,9 @@ class EventbookingHelper
 	 */
 	public static function parentCategories($row)
 	{
-		$db  = JFactory::getDbo();
+		$db          = JFactory::getDbo();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$sql = "SELECT id, parent, parent AS parent_id, name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title FROM #__eb_categories";
+		$sql         = "SELECT id, parent, parent AS parent_id, name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title FROM #__eb_categories";
 		if ($row->id)
 			$sql .= ' WHERE id != ' . $row->id;
 		if (!$row->parent)
@@ -2160,11 +2191,11 @@ class EventbookingHelper
 	 */
 	public static function getAllDependencyFields($id)
 	{
-		$db = JFactory::getDbo();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 
-		$queue        = array($id);
-		$fields       = array($id);
+		$queue  = array($id);
+		$fields = array($id);
 
 		while (count($queue))
 		{
@@ -2179,9 +2210,9 @@ class EventbookingHelper
 			$rows = $db->loadObjectList();
 			if (count($rows))
 			{
-				foreach($rows as $row)
+				foreach ($rows as $row)
 				{
-					$queue[] = $row->id;
+					$queue[]  = $row->id;
 					$fields[] = $row->id;
 				}
 			}
@@ -2189,6 +2220,7 @@ class EventbookingHelper
 
 		return $fields;
 	}
+
 	/**
 	 * Check to see whether this event still accept registration
 	 *
@@ -2198,9 +2230,9 @@ class EventbookingHelper
 	 */
 	public static function acceptRegistration($event)
 	{
-		$db   = JFactory::getDbo();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$user = JFactory::getUser();
+		$user  = JFactory::getUser();
 		if ($event->registration_type == 3)
 		{
 			return false;
@@ -2240,8 +2272,8 @@ class EventbookingHelper
 			$query->clear();
 			$query->select('COUNT(id)')
 				->from('#__eb_registrants')
-				->where('event_id = '. $event->id)
-				->where('user_id = '. $user->id)
+				->where('event_id = ' . $event->id)
+				->where('user_id = ' . $user->id)
 				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 			$db->setQuery($query);
 			$total = $db->loadResult();
@@ -2279,9 +2311,9 @@ class EventbookingHelper
 			$quantityFields = $db->loadObjectList();
 			if (count($quantityFields))
 			{
-				foreach($quantityFields as $field)
+				foreach ($quantityFields as $field)
 				{
-					$values = explode("\r\n", $field->values);
+					$values         = explode("\r\n", $field->values);
 					$quantityValues = explode("\r\n", $field->quantity_values);
 					if (count($values) && count($quantityValues))
 					{
@@ -2322,8 +2354,8 @@ class EventbookingHelper
 	 */
 	public static function getMaxNumberRegistrants($event)
 	{
-		$eventCapacity    = (int) $event->event_capacity;
-		$maxGroupNumber   = (int) $event->max_group_number;
+		$eventCapacity  = (int) $event->event_capacity;
+		$maxGroupNumber = (int) $event->max_group_number;
 		if ($eventCapacity)
 		{
 			$maxRegistrants = $eventCapacity - $event->total_registrants;
@@ -2940,7 +2972,7 @@ class EventbookingHelper
 			$fromEmail = JFactory::getConfig()->get('mailfrom');
 		}
 
-		$query->select('*, title'.$fieldSuffix.' AS title')
+		$query->select('*, title' . $fieldSuffix . ' AS title')
 			->from('#__eb_events')
 			->where('id=' . $row->event_id);
 		$db->setQuery($query);
@@ -3088,8 +3120,8 @@ class EventbookingHelper
 	{
 		if (count($eventIds))
 		{
-			$db    = JFactory::getDbo();
-			$query = $db->getQuery(true);
+			$db          = JFactory::getDbo();
+			$query       = $db->getQuery(true);
 			$fieldSuffix = EventbookingHelper::getFieldSuffix();
 			$query->select('a.id, a.name' . $fieldSuffix . ' AS name, a.color_code')
 				->from('#__eb_categories AS a')
@@ -3104,6 +3136,7 @@ class EventbookingHelper
 			return array();
 		}
 	}
+
 	/**
 	 * Get title of the given payment method
 	 *
@@ -3164,7 +3197,7 @@ class EventbookingHelper
 	 */
 	public static function loadBootstrap($loadJs = true)
 	{
-		$app = JFactory::getApplication();
+		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
 		$document->addStyleSheet(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/css/bootstrap.css');
 
@@ -3217,6 +3250,7 @@ class EventbookingHelper
 			JFactory::getDbo()->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
 		}
 	}
+
 	/**
 	 * Get version number of GD version installed
 	 * Enter description here ...
@@ -3534,12 +3568,12 @@ class EventbookingHelper
 	public static function generateInvoicePDF($row)
 	{
 		self::loadLanguage();
-		$db       = JFactory::getDbo();
-		$query    = $db->getQuery(true);
-		$config   = self::getConfig();
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
+		$config      = self::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
-		$sitename = JFactory::getConfig()->get("sitename");
-		$query->select('*, title'.$fieldSuffix.' AS title')
+		$sitename    = JFactory::getConfig()->get("sitename");
+		$query->select('*, title' . $fieldSuffix . ' AS title')
 			->from('#__eb_events')
 			->where('id = ' . (int) $row->event_id);
 		$db->setQuery($query);
@@ -3614,7 +3648,7 @@ class EventbookingHelper
 		unset($replaces['tax_amount']);
 		if ($config->multiple_booking)
 		{
-			$sql = 'SELECT a.title'.$fieldSuffix.' AS title, a.event_date, b.* FROM #__eb_events AS a INNER JOIN #__eb_registrants AS b ' . ' ON a.id = b.event_id ' .
+			$sql = 'SELECT a.title' . $fieldSuffix . ' AS title, a.event_date, b.* FROM #__eb_events AS a INNER JOIN #__eb_registrants AS b ' . ' ON a.id = b.event_id ' .
 				' WHERE b.id=' . $row->id . ' OR b.cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$rowEvents                   = $db->loadObjectList();
@@ -3929,11 +3963,11 @@ class EventbookingHelper
 	 */
 	public static function canCancel($eventId)
 	{
-		$db  = JFactory::getDbo();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('COUNT(*)')
 			->from('#__eb_events')
-			->where('id = '. $eventId)
+			->where('id = ' . $eventId)
 			->where(' enable_cancel_registration = 1')
 			->where('(DATEDIFF(cancel_before_date, NOW()) >=0)');
 		$db->setQuery($query);
@@ -3954,11 +3988,11 @@ class EventbookingHelper
 		if ($eventId)
 		{
 			$config = EventbookingHelper::getConfig();
-			$db  = JFactory::getDbo();
-			$query = $db->getQuery(true);
+			$db     = JFactory::getDbo();
+			$query  = $db->getQuery(true);
 			$query->select('created_by')
 				->from('#__eb_events')
-				->where('id = '. (int) $eventId);
+				->where('id = ' . (int) $eventId);
 			$db->setQuery($query);
 			$createdBy = (int) $db->loadResult();
 			if ($config->only_show_registrants_of_event_owner)
@@ -3979,8 +4013,8 @@ class EventbookingHelper
 
 	public static function canChangeEventStatus($eventId)
 	{
-		$user = JFactory::getUser();
-		$db   = JFactory::getDbo();
+		$user  = JFactory::getUser();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		if (!$eventId)
 		{
@@ -3988,7 +4022,7 @@ class EventbookingHelper
 		}
 		$query->select('*')
 			->from('#__eb_events')
-			->where('id = '. $eventId);
+			->where('id = ' . $eventId);
 		$db->setQuery($query);
 		$rowEvent = $db->loadObject();
 		if (!$rowEvent)

@@ -11,8 +11,9 @@
 defined('_JEXEC') or die();
 class EventbookingViewDashboardHtml extends RADViewHtml
 {
+	public $hasModel = false;
 
-	function display()
+	public function display()
 	{								
 		$this->latestRegistrants = RADModel::getInstance('Registrants', 'EventbookingModel', array('table_prefix' => '#__eb_'))
 			->limitstart(0)
@@ -31,7 +32,7 @@ class EventbookingViewDashboardHtml extends RADViewHtml
 	 * @param string $image path to image
 	 * @param string $text image description
 	 */
-	function quickiconButton($link, $image, $text, $id = null)
+	function quickIconButton($link, $image, $text, $id = null)
 	{
 		$language = JFactory::getLanguage();
 		?>

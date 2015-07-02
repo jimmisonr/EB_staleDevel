@@ -131,9 +131,9 @@ abstract class EventbookingHelperHtml
 		{
 			$path = JPATH_THEMES . '/' . $app->getTemplate() . '/html/com_eventbooking/' . $themeFile;
 		}
-		elseif (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/views/' . $layout))
+		elseif (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/view/' . $layout))
 		{
-			$path = JPATH_ROOT . '/components/com_eventbooking/views/' . $layout;
+			$path = JPATH_ROOT . '/components/com_eventbooking/view/' . $layout;
 		}
 		else
 		{
@@ -315,6 +315,55 @@ abstract class EventbookingHelperHtml
 		}
 
 		return $values;
+	}
+
+	/**
+	 * Helper method to prepare meta data for the document
+	 *
+	 * @param \Joomla\Registry\Registry $params
+	 *
+	 * @param null                      $item
+	 */
+	public static function prepareDocument($params, $item = null)
+	{
+		$document         = JFactory::getDocument();
+		$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
+		$pageTitle        = $params->get('page_title');
+		if ($siteNamePosition == 0)
+		{
+			$document->setTitle($pageTitle);
+		}
+		elseif ($siteNamePosition == 1)
+		{
+			$document->setTitle(JFactory::getConfig()->get('sitename') . ' - ' . $pageTitle);
+		}
+		else
+		{
+			$document->setTitle($pageTitle . ' - ' . JFactory::getConfig()->get('sitename'));
+		}
+
+		if (!empty($item->meta_keywords))
+		{
+			$document->setMetaData('keywords', $item->meta_keywords);
+		}
+		elseif ($params->get('menu-meta_keywords'))
+		{
+			$document->setMetadata('keywords', $params->get('menu-meta_keywords'));
+		}
+
+		if (!empty($item->meta_description))
+		{
+			$document->setMetaData('description', $item->meta_description);
+		}
+		elseif ($params->get('menu-meta_description'))
+		{
+			$document->setDescription($params->get('menu-meta_description'));
+		}
+
+		if ($params->get('robots'))
+		{
+			$document->setMetadata('robots', $params->get('robots'));
+		}
 	}
 
 	/**

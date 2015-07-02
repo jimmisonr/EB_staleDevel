@@ -9,7 +9,9 @@
  */
 // no direct access
 defined('_JEXEC') or die();
-error_reporting(0);
+
+error_reporting(E_ALL);
+
 //Basic ACL support
 if (!JFactory::getUser()->authorise('core.manage', 'com_eventbooking'))
 {
@@ -22,15 +24,13 @@ if (JLanguageMultilang::isEnabled() && !EventbookingHelper::isSynchronized())
 	EventbookingHelper::setupMultilingual();
 }
 
-$config = array(
-	'table_prefix'	=>	'#__eb_',
-	'language_prefix'	=>	'EB',
-	'fallback_class'	=>	'EventbookingController',
-	'default_view'	=>	'dashboard'
-);
 if (isset($_POST['language']))
 {
 	$_REQUEST['language'] = $_POST['language'];
 }
-$controller = RADController::getInstance($config)->execute();
-$controller->redirect();
+
+$config = EventbookingHelper::getComponentSettings('admin');
+$input = new RADInput();
+RADController::getInstance($input->getCmd('option'), $input, $config)
+	->execute()
+	->redirect();

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.7.4
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -16,27 +16,28 @@ defined('_JEXEC') or die();
  * @package        Joomla
  * @subpackage     EventBooking
  */
-class EventBookingModelList extends RADModelList
+class EventbookingModelList extends RADModelList
 {
 
 	function __construct($config = array())
 	{
-		$app             = JFactory::getApplication();
 		$config['table'] = '#__eb_events';
+
 		parent::__construct($config);
-		$ebConfig   = EventbookingHelper::getConfig();
-		$listLength = $ebConfig->number_events;
-		if (!$listLength)
-		{
-			$listLength = $app->getCfg('list_limit');
-		}
+
 		$this->state->insert('id', 'int', 0)
-			->insert('limit', 'int', $listLength)
 			->insert('category_id', 'int', 0)
 			->insert('location_id', 'int', '0')
 			->insert('search', 'string', '');
-		$request = EventbookingHelper::getRequestData();
-		$this->state->setData($request);
+
+		$ebConfig   = EventbookingHelper::getConfig();
+		$listLength = (int) $ebConfig->number_events;
+
+		if ($listLength)
+		{
+			$this->state->setDefault('limit', $listLength);
+		}
+
 		if ($ebConfig->order_events == 2)
 		{
 			$this->state->set('filter_order', 'tbl.event_date');
@@ -54,7 +55,6 @@ class EventBookingModelList extends RADModelList
 		{
 			$this->state->set('filter_order_Dir', 'ASC');
 		}
-		$app->setUserState('eventbooking.limit', $this->state->limit);
 	}
 
 	/**
@@ -153,7 +153,7 @@ class EventBookingModelList extends RADModelList
 		{
 			$query->where('tbl.published=1')->where('tbl.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
 		}
-		
+
 		if ($state->id || $state->category_id)
 		{
 			$categoryId = $state->id ? $state->id : $state->category_id;

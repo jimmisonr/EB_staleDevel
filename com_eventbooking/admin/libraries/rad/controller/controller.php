@@ -411,6 +411,7 @@ class RADController
 			{
 				$paths[] = JPATH_ROOT . '/components/' . $config['option'] . '/view/' . $name . '/tmpl';
 			}
+
 			$config['paths'] = $paths;
 		}
 

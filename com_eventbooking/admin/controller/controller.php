@@ -19,7 +19,7 @@ defined('_JEXEC') or die();
 class EventbookingController extends RADControllerAdmin
 {
 
-	public function display($cachable = false, $urlparams = array())
+	public function display($cachable = false, array $urlparams = array())
 	{
 		JFactory::getDocument()->addStyleSheet(JURI::base(true) . '/components/com_eventbooking/assets/css/style.css');
 		
@@ -179,7 +179,6 @@ class EventbookingController extends RADControllerAdmin
      */
 	function update_db_schema()
 	{
-		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.folder');
 		$db = JFactory::getDbo();
 		//Setup menus

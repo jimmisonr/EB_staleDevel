@@ -9,7 +9,6 @@
  */
 // no direct access
 defined('_JEXEC') or die();
-require_once dirname(__FILE__) . '/list.php';
 
 /**
  * EventBooking Component Up-coming events Model
@@ -17,10 +16,10 @@ require_once dirname(__FILE__) . '/list.php';
  * @package		Joomla
  * @subpackage	EventBooking
  */
-class EventBookingModelUpcomingevents extends EventBookingModelList
+class EventbookingModelUpcomingevents extends EventbookingModelList
 {
 
-	function __construct($config = array())
+	public function __construct($config = array())
 	{
 		parent::__construct($config);
 		

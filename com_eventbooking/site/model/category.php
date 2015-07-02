@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.7.1
+ * @version            1.7.2
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -9,7 +9,6 @@
  */
 // no direct access
 defined('_JEXEC') or die();
-require dirname(__FILE__) . '/list.php';
 
 /**
  * EventBooking Component Category Model
@@ -17,7 +16,7 @@ require dirname(__FILE__) . '/list.php';
  * @package        Joomla
  * @subpackage     EventBooking
  */
-class EventBookingModelCategory extends EventBookingModelList
+class EventbookingModelCategory extends EventbookingModelList
 {
 
 	function __construct($config = array())

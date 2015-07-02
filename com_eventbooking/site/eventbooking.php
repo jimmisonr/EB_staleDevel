@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
@@ -16,9 +16,20 @@ define('VIEW_LIST_WIDTH', 800);
 define('VIEW_LIST_HEIGHT', 600);
 define('TC_POPUP_WIDTH', 800);
 define('TC_POPUP_HEIGHT', 600);
+
+EventbookingHelper::prepareRequestData();
 require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
-// Init the controller
-$controller = new EventbookingController();
-// Perform the Request task
-$controller->execute(JFactory::getApplication()->input->get('task', 'display'));
-$controller->redirect();
+
+$input = new RADInput();
+$task  = $input->getCmd('task', '');
+//Handle BC for existing payment plugins
+if ($task == 'payment_confirm')
+{
+	//Lets Register controller handle these tasks
+	$input->set('task', 'register.' . $task);
+}
+$config = EventbookingHelper::getComponentSettings('site');
+
+RADController::getInstance($input->getCmd('option', null), $input, $config)
+	->execute()
+	->redirect();
