@@ -10,7 +10,7 @@
 // no direct access
 defined('_JEXEC') or die();
 
-class EventBookingViewArchive extends JViewLegacy
+class EventbookingViewArchiveHtml extends RADViewHtml
 {
 
 	function display($tpl = null)
