@@ -19,7 +19,7 @@ defined('_JEXEC') or die();
 class EventbookingModelList extends RADModelList
 {
 
-	function __construct($config = array())
+	public function __construct($config = array())
 	{
 		$config['table'] = '#__eb_events';
 

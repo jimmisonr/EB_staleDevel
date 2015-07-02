@@ -10,6 +10,7 @@
 // no direct access
 defined('_JEXEC') or die();
 JLoader::registerPrefix('Eventbooking', JPATH_ROOT . '/components/com_eventbooking');
+JLoader::register('RADConfig', JPATH_ADMINISTRATOR.'/components/com_eventbooking/libraries/rad/config/config.php');
 
 function EventbookingBuildRoute(&$query)
 {
@@ -282,6 +283,7 @@ function EventbookingParseRoute($segments)
 			parse_str(html_entity_decode($queryString), $vars);
 		}
 	}
+
 	$app = JFactory::getApplication();
 	$menu = $app->getMenu();
 	if ($item = $menu->getActive())
@@ -299,6 +301,6 @@ function EventbookingParseRoute($segments)
 	{
 			unset($vars['tmpl']);
 	}
-	
+
 	return $vars;
 }
