@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	2.0.0
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -19,34 +19,26 @@ class EventbookingViewCategoriesHtml extends RADViewHtml
 		$active = $app->getMenu()->getActive();
 		$params = EventbookingHelper::getViewParams($active, array('categories'));
 
-		$config      = EventbookingHelper::getConfig();
-		$model       = $this->getModel();
-		$items       = $model->getData();
-		$pagination  = $model->getPagination();
-		$this->state = $model->getState();
-		$categoryId  = $this->state->id;
+		$config     = EventbookingHelper::getConfig();
+		$model      = $this->getModel();
+		$items      = $model->getData();
+		$pagination = $model->getPagination();
+		$categoryId = (int) $model->getState('id');
+
+		// If category id is passed, make sure it is valid and the user is allowed to access
 		if ($categoryId)
 		{
-			EventbookingHelper::checkCategoryAccess($categoryId);
+			$category = EventbookingHelperDatabase::getCategory($categoryId);
+			if (empty($category) || !in_array($category->access, JFactory::getUser()->getAuthorisedViewLevels()))
+			{
+				$app->redirect('index.php', JText::_('EB_INVALID_CATEGORY_OR_NOT_AUTHORIZED'));
+			}
 		}
 
-		if ($categoryId)
-		{
-			$db          = JFactory::getDbo();
-			$query       = $db->getQuery(true);
-			$fieldSuffix = EventbookingHelper::getFieldSuffix();
-			$query->select('*, name' . $fieldSuffix . ' AS name')
-				->from('#__eb_categories')
-				->where('id=' . $categoryId);
-			$db->setQuery($query);
-			$category       = $db->loadObject();
-			$this->category = $category;
-		}
-
-		// Process page meta data
+		// Build page title if it has not been set from menu title
 		if (!$params->get('page_title'))
 		{
-			if ($categoryId && !empty($category))
+			if (!empty($category))
 			{
 				$pageTitle = JText::_('EB_SUB_CATEGORIES_PAGE_TITLE');
 				$pageTitle = str_replace('[CATEGORY_NAME]', $category->name, $pageTitle);
@@ -69,13 +61,14 @@ class EventbookingViewCategoriesHtml extends RADViewHtml
 				$item              = $items[$i];
 				$item->description = JHtml::_('content.prepare', $item->description);
 			}
-			if (!empty($this->category))
+			if (!empty($category))
 			{
-				$this->category->description = JHtml::_('content.prepare', $this->category->description);
+				$category->description = JHtml::_('content.prepare', $category->description);
 			}
 		}
 
 		$this->categoryId = $categoryId;
+		$this->category   = $category;
 		$this->config     = $config;
 		$this->items      = $items;
 		$this->pagination = $pagination;

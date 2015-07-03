@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	2.0.0
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -41,7 +41,7 @@ class EventbookingModelCategories extends RADModelList
 	 * @access public
 	 * @return array
 	 */
-	function getData()
+	public function getData()
 	{
 		// Lets load the content if it doesn't already exist
 		if (empty($this->data))
@@ -58,22 +58,34 @@ class EventbookingModelCategories extends RADModelList
 		return $this->data;
 	}
 
-	protected function _buildQueryWhere(JDatabaseQuery $query)
+	/**
+	 * Builds SELECT columns list for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
+	 */
+	protected function _buildQueryColumns(JDatabaseQuery $query)
 	{
-		$query->where('tbl.published=1')
-			->where('tbl.parent=' . $this->state->id)
-			->where('tbl.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$query->select('tbl.id');
+		EventbookingHelperDatabase::getMultilingualFields($query, array('name', 'description'), $fieldSuffix);
 
 		return $this;
 	}
 
 	/**
-	 * Builds SELECT columns list for the query
+	 * Builds a WHERE clause for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
-	protected function _buildQueryColumns(JDatabaseQuery $query)
+	protected function _buildQueryWhere(JDatabaseQuery $query)
 	{
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$query->select('tbl.id, tbl.name' . $fieldSuffix . ' AS name, tbl.description' . $fieldSuffix . ' AS description');
+		$query->where('tbl.published=1')
+			->where('tbl.parent=' . $this->state->id)
+			->where('tbl.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
 
 		return $this;
 	}
