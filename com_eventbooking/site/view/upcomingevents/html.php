@@ -1,14 +1,16 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
+
 // no direct access
 defined('_JEXEC') or die();
+
 class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 {
 
@@ -16,53 +18,34 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 	{
 		$app      = JFactory::getApplication();
 		$active   = $app->getMenu()->getActive();
-		
-		$model = $this->getModel();
-		$state = $model->getState();
-		$items = $model->getData();
+		$user     = JFactory::getUser();
+		$model    = $this->getModel();
+		$state    = $model->getState();
+		$items    = $model->getData();
 		$category = $model->getCategory();
+
+		// Check category access
 		if ($state->id)
 		{
 			EventbookingHelper::checkCategoryAccess($state->id);
 		}
-
+		
 		$config = EventbookingHelper::getConfig();
 		if ($config->process_plugin)
 		{
 			for ($i = 0, $n = count($items); $i < $n; $i++)
 			{
-				$item = $items[$i];
+				$item                    = $items[$i];
 				$item->short_description = JHtml::_('content.prepare', $item->short_description);
 			}
 		}
+
 		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)
 		{
-			$params = new JRegistry();
-			$xml = JFactory::getXML(JPATH_COMPONENT . '/fields.xml');
-			$fields = $xml->fields->fieldset->children();
-			$customFields = array();
-			foreach ($fields as $field)
-			{
-				$name = $field->attributes()->name;
-				$label = JText::_($field->attributes()->label);
-				$customFields["$name"] = $label;
-			}
-			for ($i = 0, $n = count($items); $i < $n; $i++)
-			{
-				$item = & $items[$i];
-				$params->loadString($item->custom_fields, 'JSON');
-				$paramData = array();
-				foreach ($customFields as $name => $label)
-				{
-					$paramData[$name]['title'] = $label;
-					$paramData[$name]['value'] = $params->get($name);
-				}
-				
-				$item->paramData = $paramData;
-			}
+			EventbookingHelperData::prepareCustomFieldsData($items);
 		}
 
-		$params   = EventbookingHelper::getViewParams($active, array('upcomingevents'));
+		$params = EventbookingHelper::getViewParams($active, array('upcomingevents'));
 		if (!$params->get('page_title'))
 		{
 			$pageTitle = JText::_('EB_UPCOMING_EVENTS_PAGE_TITLE');
@@ -86,31 +69,29 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 		}
 		if ($config->show_location_in_category_view || ($this->getLayout() == 'timeline'))
 		{
-			$width = (int) $config->map_width ;
+			$width = (int) $config->map_width;
 			if (!$width)
 			{
-				$width = 800 ;
+				$width = 800;
 			}
-			$height = (int) $config->map_height ;
+			$height = (int) $config->map_height;
 			if (!$height)
 			{
-				$height = 600 ;
+				$height = 600;
 			}
-			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width.'px', $height.'px', 'true', 'false');
+			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
 		}
-		$user = JFactory::getUser();
-		$userId = $user->get('id');
-		$viewLevels = $user->getAuthorisedViewLevels();
-		$this->viewLevels = $viewLevels;
-		$this->userId = $userId;
-		$this->items = $items;
-		$this->config = $config;
-		$this->nullDate = JFactory::getDbo()->getNullDate();
-		$this->category = $category;
-		$this->pagination = $model->getPagination();
+
+		$this->viewLevels      = $user->getAuthorisedViewLevels();
+		$this->userId          = $user->get('id');
+		$this->items           = $items;
+		$this->config          = $config;
+		$this->nullDate        = JFactory::getDbo()->getNullDate();
+		$this->category        = $category;
+		$this->pagination      = $model->getPagination();
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
-		$this->params = $params;
-		
+		$this->params          = $params;
+
 		parent::display();
 	}
 }
