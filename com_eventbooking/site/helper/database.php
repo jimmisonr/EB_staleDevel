@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @version            2.0.0
  * @package            Joomla
@@ -10,7 +9,6 @@
  */
 class EventbookingHelperDatabase
 {
-
 	/**
 	 * Get category data from database
 	 *
@@ -35,6 +33,45 @@ class EventbookingHelperDatabase
 		$db->setQuery($query);
 
 		return $db->loadObject();
+	}
+
+	/**
+	 * Method to load location object from database
+	 *
+	 * @param $id
+	 *
+	 * @return mixed
+	 */
+	public static function getLocation($id)
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('*')
+			->from('#__eb_locations')
+			->where('id=' . (int) $id);
+		$db->setQuery($query);
+
+		return $db->loadObject();
+	}
+
+	/**
+	 * Method to get group registration rates for an event
+	 *
+	 * @param $eventId
+	 *
+	 * @return array
+	 */
+	public static function getGroupRegistrationRates($eventId)
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('*')
+			->from('#__eb_event_group_prices')
+			->where('event_id=' . (int) $eventId)
+			->order('id');
+		$db->setQuery($query);
+
+		return $db->loadObjectList();
 	}
 
 	/**
