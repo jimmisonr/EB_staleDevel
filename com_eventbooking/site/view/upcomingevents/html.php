@@ -16,20 +16,27 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 
 	public function display()
 	{
-		$app      = JFactory::getApplication();
-		$active   = $app->getMenu()->getActive();
-		$user     = JFactory::getUser();
-		$model    = $this->getModel();
-		$state    = $model->getState();
-		$items    = $model->getData();
-		$category = $model->getCategory();
+		$app    = JFactory::getApplication();
+		$active = $app->getMenu()->getActive();
+		$user   = JFactory::getUser();
+		$model  = $this->getModel();
+		$state  = $model->getState();
+		$items  = $model->getData();
 
 		// Check category access
 		if ($state->id)
 		{
-			EventbookingHelper::checkCategoryAccess($state->id);
+			$category = EventbookingHelperDatabase::getCategory($state->id);
+			if (empty($category) || !in_array($category->access, JFactory::getUser()->getAuthorisedViewLevels()))
+			{
+				$app->redirect('index.php', JText::_('EB_INVALID_CATEGORY_OR_NOT_AUTHORIZED'));
+			}
 		}
-		
+		else
+		{
+			$category = null;
+		}
+
 		$config = EventbookingHelper::getConfig();
 		if ($config->process_plugin)
 		{

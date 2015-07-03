@@ -10,12 +10,6 @@
 // no direct access
 defined('_JEXEC') or die();
 
-/**
- * EventBooking Component List  Model, a generic model allows getting list of events in different cases
- *
- * @package        Joomla
- * @subpackage     EventBooking
- */
 class EventbookingModelList extends RADModelList
 {
 
@@ -95,17 +89,6 @@ class EventbookingModelList extends RADModelList
 		}
 
 		return $this->data;
-	}
-
-	/**
-	 * Get the category object
-	 *
-	 */
-	public function getCategory()
-	{
-		$categoryId = $this->state->id ? $this->state->id : $this->state->category_id;
-
-		return EventbookingHelperDatabase::getCategory($categoryId);
 	}
 
 	/**
