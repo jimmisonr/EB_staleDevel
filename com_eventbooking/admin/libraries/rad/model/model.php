@@ -10,10 +10,10 @@ defined('_JEXEC') or die();
 
 /**
  * Base class for a Joomla Model
- * 
- * @package 	RAD
- * @subpackage	Model
- * @since 		2.0
+ *
+ * @package       RAD
+ * @subpackage    Model
+ * @since         2.0
  */
 class RADModel
 {
@@ -61,23 +61,23 @@ class RADModel
 
 	/**
 	 * Remember model states value in session
-	 * 
+	 *
 	 * @var boolean
 	 */
 	public $rememberStates = false;
 
 	/**
-	 * @param string $name The name of model to instantiate
-	 *        	
+	 * @param string $name   The name of model to instantiate
+	 *
 	 * @param string $prefix Prefix for the model class name, ComponentnameModel
-	 *        	
-	 * @param array $config Configuration array for model
-	 *        	
+	 *
+	 * @param array  $config Configuration array for model
+	 *
 	 * @return RADModel A model object
 	 */
 	public static function getInstance($name, $prefix, $config = array())
 	{
-		$name = preg_replace('/[^A-Z0-9_\.-]/i', '', $name);
+		$name  = preg_replace('/[^A-Z0-9_\.-]/i', '', $name);
 		$class = ucfirst($prefix) . ucfirst($name);
 		if (!class_exists($class))
 		{
@@ -111,7 +111,7 @@ class RADModel
 		else
 		{
 			$className = get_class($this);
-			$pos = strpos($className, 'Model');
+			$pos       = strpos($className, 'Model');
 			if ($pos !== false)
 			{
 				$this->name = substr($className, $pos + 5);
@@ -121,7 +121,7 @@ class RADModel
 				throw new Exception(JText::_('JLIB_APPLICATION_ERROR_MODEL_GET_NAME'), 500);
 			}
 		}
-		
+
 		// Set the model state
 		if (isset($config['state']))
 		{
@@ -131,7 +131,7 @@ class RADModel
 		{
 			$this->state = new RADModelState();
 		}
-		
+
 		if (isset($config['db']))
 		{
 			$this->db = $config['db'];
@@ -145,7 +145,7 @@ class RADModel
 		if (empty($config['option']))
 		{
 			$className = get_class($this);
-			$pos = strpos($className, 'Model');
+			$pos       = strpos($className, 'Model');
 			if ($pos !== false)
 			{
 				$config['option'] = 'com_' . substr($className, 0, $pos);
@@ -158,19 +158,19 @@ class RADModel
 
 		if (empty($config['table_prefix']))
 		{
-			$component = substr($config['option'], 4);
+			$component              = substr($config['option'], 4);
 			$config['table_prefix'] = '#__' . strtolower($component) . '_';
 		}
 
 		if (empty($config['class_prefix']))
 		{
-			$component = substr($config['option'], 4);
+			$component              = substr($config['option'], 4);
 			$config['class_prefix'] = ucfirst($component);
 		}
 
 		if (empty($config['language_prefix']))
 		{
-			$component = substr($config['option'], 4);
+			$component                 = substr($config['option'], 4);
 			$config['language_prefix'] = strtoupper($component);
 		}
 
@@ -183,12 +183,12 @@ class RADModel
 			$this->table = $config['table_prefix'] . strtolower(RADInflector::pluralize($this->name));
 		}
 
-		
+
 		if (isset($config['ignore_request']))
 		{
 			$this->ignoreRequest = $config['ignore_request'];
 		}
-		
+
 		if (isset($config['remember_states']))
 		{
 			$this->rememberStates = $config['remember_states'];
@@ -203,7 +203,7 @@ class RADModel
 	/**
 	 * Get JTable object for the model
 	 *
-	 * @param string $name        	
+	 * @param string $name
 	 *
 	 * @return JTable
 	 */
@@ -213,16 +213,17 @@ class RADModel
 		{
 			$name = RADInflector::singularize($this->name);
 		}
+
 		return JTable::getInstance($name, $this->config['class_prefix'] . 'Table');
 	}
 
 	/**
 	 * Set the model state properties
 	 *
-	 * @param string|array The name of the property, an array
-	 *        	
-	 * @param mixed The value of the property
-	 *        	
+	 * @param string|array The   name of the property, an array
+	 *
+	 * @param              mixed The value of the property
+	 *
 	 * @return RADModel
 	 */
 	public function set($property, $value = null)
@@ -238,7 +239,7 @@ class RADModel
 					break;
 				}
 			}
-			
+
 			$this->state->setData($property);
 		}
 		else
@@ -247,32 +248,32 @@ class RADModel
 			{
 				$changed = true;
 			}
-			
+
 			$this->state->$property = $value;
 		}
-		
+
 		if ($changed)
 		{
 			$limit = $this->state->limit;
 			if ($limit)
 			{
 				$offset = $this->state->limitstart;
-				$total = $this->getTotal();
-				
+				$total  = $this->getTotal();
+
 				// If the offset is higher than the total recalculate the offset
 				if ($offset !== 0 && $total !== 0)
 				{
 					if ($offset >= $total)
 					{
-						$offset = floor(($total - 1) / $limit) * $limit;
+						$offset                  = floor(($total - 1) / $limit) * $limit;
 						$this->state->limitstart = $offset;
 					}
 				}
 			}
-			$this->data = null;
+			$this->data  = null;
 			$this->total = null;
 		}
-		
+
 		return $this;
 	}
 
@@ -282,15 +283,15 @@ class RADModel
 	 * If no property name is given then the function will return an associative array of all properties.
 	 *
 	 * @param string $property The name of the property
-	 *        	
-	 * @param string $default The default value
-	 *        	
+	 *
+	 * @param string $default  The default value
+	 *
 	 * @return mixed <string, RADModelState>
 	 */
 	public function get($property = null, $default = null)
 	{
 		$result = $default;
-		
+
 		if (is_null($property))
 		{
 			$result = $this->state;
@@ -302,7 +303,7 @@ class RADModel
 				$result = $this->state->$property;
 			}
 		}
-		
+
 		return $result;
 	}
 
@@ -310,25 +311,31 @@ class RADModel
 	 * Reset all cached data and reset the model state to it's default
 	 *
 	 * @param boolean If TRUE use defaults when resetting. Default is TRUE
-	 *        	
+	 *
 	 * @return RADModel
 	 */
 	public function reset($default = true)
 	{
-		$this->data = null;
+		$this->data  = null;
 		$this->total = null;
 		$this->state->reset($default);
 		$this->query = $this->db->getQuery(true);
+
 		return $this;
 	}
 
 	/**
-	 * Method to get state object
+	 * Method to get model state. If name is given, return data for that state, otherwise, return the state object
 	 *
-	 * @return RADModelState The state object
+	 * @return mixed
 	 */
-	public function getState()
+	public function getState($name = null)
 	{
+		if ($name)
+		{
+			return $this->state->get($name);
+		}
+
 		return $this->state;
 	}
 
@@ -355,18 +362,18 @@ class RADModel
 	/**
 	 * Clean the cache
 	 *
-	 * @param   string   $group      The cache group
-	 * @param   integer  $client_id  The ID of the client
+	 * @param   string  $group     The cache group
+	 * @param   integer $client_id The ID of the client
 	 *
 	 * @return  void
 	 *
 	 */
 	protected function cleanCache($group = null, $client_id = 0)
 	{
-		$conf = JFactory::getConfig();
+		$conf    = JFactory::getConfig();
 		$options = array(
 			'defaultgroup' => ($group) ? $group : $this->config['option'],
-			'cachebase' => ($client_id) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache'));
+			'cachebase'    => ($client_id) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache'));
 
 		$cache = JCache::getInstance('callback', $options);
 		$cache->clean();
@@ -382,7 +389,7 @@ class RADModel
 	 * Get a model state by name
 	 *
 	 * @param string The key name.
-	 *        	
+	 *
 	 * @return string The corresponding value.
 	 */
 	public function __get($key)
@@ -394,9 +401,9 @@ class RADModel
 	 * Set a model state by name
 	 *
 	 * @param string The key name.
-	 *        	
-	 * @param mixed The value for the key
-	 *        	
+	 *
+	 * @param mixed  The value for the key
+	 *
 	 * @return void
 	 */
 	public function __set($key, $value)
@@ -412,9 +419,9 @@ class RADModel
 	 * For example : $model->filter_order('name')->filter_order_Dir('DESC')->limit(10)->getData();
 	 *
 	 * @param string Method name
-	 *        	
-	 * @param array Array containing all the arguments for the original call
-	 *        	
+	 *
+	 * @param array  Array containing all the arguments for the original call
+	 *
 	 * @return RADModel
 	 */
 	public function __call($method, $args)
@@ -423,7 +430,7 @@ class RADModel
 		{
 			return $this->set($method, $args[0]);
 		}
-		
+
 		return null;
 	}
 }
