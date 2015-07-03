@@ -56,76 +56,71 @@ class EventbookingController extends RADController
 		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/themes/' . $theme . '.css');
 		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/custom.css');
 
-		/*switch ($task)
+		switch ($task)
 		{
 			case 'view_category':
-				JRequest::setVar('view', 'category');
+				$this->input->set('view', 'category');
 				break;
 			case 'individual_registration':
-				JRequest::setVar('view', 'register');
-				JRequest::setVar('layout', 'default');
+				$this->input->set('view', 'register');
+				$this->input->set('layout', 'default');
 				break;
 			case 'group_registration':
-				JRequest::setVar('view', 'register');
-				JRequest::setVar('layout', 'group');
-				break;
-			case 'view_calendar':
-				JRequest::setVar('view', 'calendar');
-				JRequest::setVar('layout', 'default');
-				break;
-			case 'return':
-				JRequest::setVar('view', 'complete');
-				JRequest::setVar('layout', 'default');
+				$this->input->set('view', 'register');
+				$this->input->set('layout', 'group');
 				break;
 			case 'cancel':
-				JRequest::setVar('view', 'cancel');
-				JRequest::setVar('layout', 'default');
+				$this->input->set('view', 'cancel');
+				$this->input->set('layout', 'default');
 				break;
-			#Registrants										
+
+			#Registrants
 			case 'edit_registrant':
-				JRequest::setVar('view', 'registrant');
+				$this->input->set('view', 'registrant');
 				break;
 			case 'add_registrant':
-				JRequest::setVar('view', 'registrant');
-				JRequest::setVar('form', false);
+				$this->input->set('view', 'registrant');
+				$this->input->set('form', false);
 				break;
-			#Cart function					
+
+			#Cart function
 			case 'view_cart':
-				JRequest::setVar('view', 'cart');
-				JRequest::setVar('layout', 'default');
+				$this->input->set('view', 'cart');
+				$this->input->set('layout', 'default');
 				break;
 			case 'view_checkout':
-				JRequest::setVar('view', 'register');
-				JRequest::setVar('layout', 'cart');
-				break;
 			case 'checkout':
-				JRequest::setVar('view', 'register');
-				JRequest::setVar('layout', 'cart');
+				$this->input->set('view', 'register');
+				$this->input->set('layout', 'cart');
 				break;
+
 			#Adding, managing events from front-end			
 			case 'edit_event':
-				JRequest::setVar('view', 'event');
-				JRequest::setVar('layout', 'form');
+				$this->input->set('view', 'event');
+				$this->input->set('layout', 'form');
 				break;
-			#Location management			
+
+			#Location management
 			case 'edit_location':
-				JRequest::setVar('view', 'addlocation');
-				JRequest::setVar('layout', 'default');
+				$this->input->set('view', 'addlocation');
+				$this->input->set('layout', 'default');
 				break;
+
 			case 'add_location':
-				JRequest::setVar('view', 'addlocation');
-				JRequest::setVar('edit', false);
+				$this->input->set('view', 'addlocation');
+				$this->input->set('edit', false);
 				break;
 			default:
-				$view = JRequest::getVar('view', '');
+
+				$view = $this->input->getCmd('view');
 				if (!$view)
 				{
-					JRequest::setVar('view', 'categories');
-					JRequest::setVar('layout', 'default');
+					$this->input->set('view', 'categories');
+					$this->input->set('layout', 'default');
 				}
 				break;
 		}
-		*/
+
 		parent::display($cachable, $urlparams);
 	}
 
@@ -136,7 +131,7 @@ class EventbookingController extends RADController
 	{
 		$model = $this->getModel('reminder');
 		$model->sendReminder();
-		exit();
+		JFactory::getApplication()->close();
 	}
 
 
@@ -145,18 +140,17 @@ class EventbookingController extends RADController
 	 */
 	public function download_file()
 	{
-		$Itemid   = JRequest::getInt('Itemid');
 		$filePath = JPATH_ROOT . '/media/com_eventbooking/files';
-		$fileName = JRequest::getVar('file_name', '');
+		$fileName = basename($this->input->getString('file_name'));
 		if (file_exists($filePath . '/' . $fileName))
 		{
 			while (@ob_end_clean()) ;
 			EventbookingHelper::processDownload($filePath . '/' . $fileName, $fileName, true);
-			JFactory::getApplication()->close();
+			$this->app->close();
 		}
 		else
 		{
-			JFactory::getApplication()->redirect('index.php?option=com_eventbooking&Itemid=' . $Itemid, JText::_('File does not exist'));
+			$this->app->redirect('index.php?option=com_eventbooking&Itemid=' . $this->input->getInt('Itemid'), JText::_('File does not exist'));
 		}
 	}
 
@@ -166,10 +160,9 @@ class EventbookingController extends RADController
 	 */
 	public function get_states()
 	{
-		$app         = JFactory::getApplication();
-		$countryName = $app->input->get('country_name', '', 'string');
-		$fieldName   = $app->input->get('field_name', 'state', 'string');
-		$stateName   = $app->input->get('state_name', '', 'string');
+		$countryName = $this->input->getString('country_name', '');
+		$fieldName   = $this->input->getString('field_name', 'state');
+		$stateName   = $this->input->getString('state_name', '');
 		if (!$countryName)
 		{
 			$countryName = EventbookingHelper::getConfigValue('default_country');
@@ -190,7 +183,8 @@ class EventbookingController extends RADController
 			->where('name=' . $db->quote($countryName));
 		$db->setQuery($query);
 		$countryId = $db->loadResult();
-		//get state
+
+		//get states
 		$query->clear();
 		$query->select('state_name AS value, state_name AS text')
 			->from('#__eb_states')
@@ -209,32 +203,6 @@ class EventbookingController extends RADController
 		}
 		echo JHtml::_('select.genericlist', $options, $fieldName, ' class="input-large ' . $class . '" id="' . $fieldName . '"', 'value', 'text',
 			$stateName);
-		$app->close();
-	}
-
-	/**
-	 * Helper method for debugging Paypal IPN
-	 *
-	 */
-	public function debug_paypal_ipn()
-	{
-		error_reporting(E_ALL);
-		$ipnMessage = '';
-		if ($ipnMessage)
-		{
-			$pairs = explode(", ", $ipnMessage);
-			foreach ($pairs as $pair)
-			{
-				$keyValue = explode('=', $pair);
-				if (count($keyValue) == 2 && $keyValue[1])
-				{
-					$_POST[$keyValue[0]] = $keyValue[1];
-				}
-			}
-
-			JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/table');
-			$method = os_payments::getPaymentMethod('os_paypal');
-			$method->verifyPayment();
-		}
+		$this->app->close();
 	}
 }
