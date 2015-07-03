@@ -18,7 +18,6 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		$app        = JFactory::getApplication();
 		$session    = JFactory::getSession();
 		$user       = JFactory::getUser();
-		$db         = JFactory::getDbo();
 		$active     = $app->getMenu()->getActive();
 		$config     = EventbookingHelper::getConfig();
 		$model      = $this->getModel();
@@ -26,11 +25,18 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		$categoryId = $state->id;
 		if ($categoryId)
 		{
-			EventbookingHelper::checkCategoryAccess($categoryId);
+			$category = EventbookingHelperDatabase::getCategory($categoryId);
+			if (empty($category) || !in_array($category->access, JFactory::getUser()->getAuthorisedViewLevels()))
+			{
+				$app->redirect('index.php', JText::_('EB_INVALID_CATEGORY_OR_NOT_AUTHORIZED'));
+			}
+		}
+		else
+		{
+			$category = null;
 		}
 		$items      = $model->getData();
 		$pagination = $model->getPagination();
-		$category   = $model->getCategory();
 		if ($config->process_plugin)
 		{
 			for ($i = 0, $n = count($items); $i < $n; $i++)
@@ -38,7 +44,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 				$item                    = $items[$i];
 				$item->short_description = JHtml::_('content.prepare', $item->short_description);
 			}
-			if ($category)
+			if (!empty($category))
 			{
 				$category->description = JHtml::_('content.prepare', $category->description);
 			}
@@ -68,17 +74,19 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 				}
 			}
 		}
+
 		$session->set('last_category_id', $categoryId);
 
 		//Override layout for this category
 		$layout = $this->getLayout();
 		if ($layout == '' || $layout == 'default')
 		{
-			if ($category->layout)
+			if (!empty($category->layout))
 			{
 				$this->setLayout($category->layout);
 			}
 		}
+
 		$layout = $this->getLayout();
 		if ($layout == 'calendar')
 		{
@@ -102,14 +110,17 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		{
 			$this->categories = array();
 		}
+
 		if ($config->multiple_booking)
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
 		}
+
 		if ($config->show_list_of_registrants)
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
 		}
+
 		if ($config->show_location_in_category_view || ($this->getLayout() == 'timeline'))
 		{
 			$width  = (int) $config->get('map_width', 800);
@@ -138,7 +149,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		$this->pagination      = $pagination;
 		$this->config          = $config;
 		$this->category        = $category;
-		$this->nullDate        = $db->getNullDate();
+		$this->nullDate        = JFactory::getDbo()->getNullDate();
 		$this->params          = $params;
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 

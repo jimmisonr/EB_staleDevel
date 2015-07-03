@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	2.0.0
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -19,6 +19,12 @@ defined('_JEXEC') or die();
 class EventbookingModelList extends RADModelList
 {
 
+	/**
+	 * Instantiate the model.
+	 *
+	 * @param array $config configuration data for the model
+	 *
+	 */
 	public function __construct($config = array())
 	{
 		$config['table'] = '#__eb_events';
@@ -97,27 +103,23 @@ class EventbookingModelList extends RADModelList
 	 */
 	public function getCategory()
 	{
-		$db          = $this->getDbo();
-		$query       = $db->getQuery(true);
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$categoryId  = $this->state->id ? $this->state->id : $this->state->category_id;
-		$query->select('*, name' . $fieldSuffix . ' AS name, description' . $fieldSuffix . ' AS description')
-			->from('#__eb_categories')
-			->where('id=' . $categoryId);
-		$db->setQuery($query);
+		$categoryId = $this->state->id ? $this->state->id : $this->state->category_id;
 
-		return $db->loadObject();
+		return EventbookingHelperDatabase::getCategory($categoryId);
 	}
 
 	/**
 	 * Builds SELECT columns list for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function _buildQueryColumns(JDatabaseQuery $query)
 	{
 		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->select('tbl.*')
-			->select('title' . $fieldSuffix . ' AS title, short_description' . $fieldSuffix . ' AS short_description, description' . $fieldSuffix . ' AS description')
 			->select("DATEDIFF(tbl.early_bird_discount_date, '$currentDate') AS date_diff")
 			->select("DATEDIFF(tbl.event_date, '$currentDate') AS number_event_dates")
 			->select("TIMESTAMPDIFF(MINUTE, tbl.registration_start_date, '$currentDate') AS registration_start_minutes")
@@ -125,11 +127,20 @@ class EventbookingModelList extends RADModelList
 			->select('c.name AS location_name, c.address AS location_address')
 			->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants');
 
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('title', 'short_description', 'description'), $fieldSuffix);
+		}
+
 		return $this;
 	}
 
 	/**
-	 * Builds LEFT JOINS clauses for the query
+	 * Builds JOINS clauses for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function _buildQueryJoins(JDatabaseQuery $query)
 	{
@@ -142,6 +153,10 @@ class EventbookingModelList extends RADModelList
 
 	/**
 	 * Builds a WHERE clause for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function _buildQueryWhere(JDatabaseQuery $query)
 	{
@@ -154,9 +169,9 @@ class EventbookingModelList extends RADModelList
 			$query->where('tbl.published=1')->where('tbl.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
 		}
 
-		if ($state->id || $state->category_id)
+		$categoryId = $this->state->id ? $this->state->id : $this->state->category_id;
+		if ($categoryId)
 		{
-			$categoryId = $state->id ? $state->id : $state->category_id;
 			$query->where(' tbl.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id=' . $categoryId . ')');
 		}
 		if ($state->location_id)
@@ -185,6 +200,10 @@ class EventbookingModelList extends RADModelList
 
 	/**
 	 * Builds a GROUP BY clause for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function _buildQueryGroup(JDatabaseQuery $query)
 	{
