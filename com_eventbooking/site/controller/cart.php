@@ -156,7 +156,7 @@ class EventbookingControllerCart extends EventbookingController
 	/**
 	 * Calculate registration fee, then update information on cart registration form
 	 */
-	function calculate_cart_registration_fee()
+	public function calculate_cart_registration_fee()
 	{
 		$input               = $this->input;
 		$config              = EventbookingHelper::getConfig();
