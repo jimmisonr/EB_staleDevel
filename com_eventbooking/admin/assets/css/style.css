@@ -260,3 +260,6 @@ div.cpanel-right {
 .nav-pills .dropdown-menu li > a {
     font-size: 12px;
 }
+#eb-dropdown-menu .dropdown .dropdown-menu li.active a {
+	color: #fff !important;
+}
