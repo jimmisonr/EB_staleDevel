@@ -1,56 +1,52 @@
 <?php
+
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 class EventbookingViewRegisterRaw extends RADViewHtml
 {
 
 	/**
-	 * Display interface to user
+	 * Display Group registration forms to user
 	 *
-	 * @param string $tpl
+	 * @throws Exception
 	 */
-	function display($tpl = null)
+	public function display()
 	{
-		$config = EventbookingHelper::getConfig();
+		$config                = EventbookingHelper::getConfig();
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
-		$input = JFactory::getApplication()->input;
-		$eventId = $input->getInt('event_id', 0);
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('a.*, IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
-			->from('#__eb_events AS a')
-			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
-			->where('a.id=' . $eventId);
-		$db->setQuery($query);
-		$event = $db->loadObject();
-		$layout = $this->getLayout();
+		$input                 = $this->input;
+		$eventId               = $input->getInt('event_id', 0);
+		$event                 = EventbookingHelperDatabase::getEvent($eventId);
+		$layout                = $this->getLayout();
 		switch ($layout)
 		{
 			case 'number_members':
-				$this->_displayNumberMembersForm($event, $input, $tpl);
+				$this->displayNumberMembersForm($event, $input);
 				break;
 			case 'group_members':
-				$this->_displayGroupMembersForm($event, $input, $tpl);
+				$this->displayGroupMembersForm($event);
 				break;
 			case 'group_billing':
-				$this->_displayGroupBillingForm($event, $input, $tpl);
+				$this->displayGroupBillingForm($event, $input);
 				break;
 		}
 	}
 
 	/**
 	 * Display form allow registrant to enter number of members for his group
-	 * @param string $tpl
+	 *
+	 * @param Object   $event
+	 * @param RADInput $input
 	 */
-	function _displayNumberMembersForm($event, $input, $tpl)
+	private function displayNumberMembersForm($event, $input)
 	{
-		$session = JFactory::getSession();
+		$session           = JFactory::getSession();
 		$numberRegistrants = $session->get('eb_number_registrants', '');
 		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
 		{
@@ -87,24 +83,29 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		}
 
 		$this->numberRegistrants = $numberRegistrants;
-		$this->message = EventbookingHelper::getMessages();
-		$this->fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$this->Itemid = $input->getInt('Itemid', 0);
-		$this->event = $event;
-		$this->config = EventbookingHelper::getConfig();
-		parent::display($tpl);
+		$this->message           = EventbookingHelper::getMessages();
+		$this->fieldSuffix       = EventbookingHelper::getFieldSuffix();
+		$this->Itemid            = $input->getInt('Itemid', 0);
+		$this->event             = $event;
+		$this->config            = EventbookingHelper::getConfig();
+		parent::display();
 	}
 
 	/**
 	 * Display form allow registrant to enter information of group members
-	 * @param string $tpl
+	 *
+	 * @param $event
+	 * @param $input
+	 *
+	 * @throws Exception
 	 */
-	function _displayGroupMembersForm($event, $input, $tpl)
+	function displayGroupMembersForm($event)
 	{
-		$session = JFactory::getSession();
+		$session           = JFactory::getSession();
+		$config            = EventbookingHelper::getConfig();
 		$numberRegistrants = (int) $session->get('eb_number_registrants', '');
-		$eventId = $input->getInt('event_id', 0);
-		//Get Group members form
+
+		//Get Group members form data
 		$membersData = $session->get('eb_group_members_data', null);
 		if ($membersData)
 		{
@@ -114,22 +115,15 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		{
 			$membersData = array();
 		}
-		$rowFields = EventbookingHelper::getFormFields($eventId, 2);
-		$this->numberRegistrants = $numberRegistrants;
-		$this->rowFields = $rowFields;
-		$this->membersData = $membersData;
-		$this->eventId = $eventId;
-		$this->showBillingStep = EventbookingHelper::showBillingStep($eventId);
-		$this->Itemid = $input->getInt('Itemid', 0);
+
 		$showCaptcha = 0;
 		if (!$this->showBillingStep)
 		{
 			$user = JFactory::getUser();
-			$config = EventbookingHelper::getConfig();
 			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 			{
 				$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-				if(!$captchaPlugin)
+				if (!$captchaPlugin)
 				{
 					// Hardcode to recaptcha, reduce support request
 					$captchaPlugin = 'recaptcha';
@@ -138,11 +132,11 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 				$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
 				if ($plugin)
 				{
-					$showCaptcha = 1;					
-					$this->captcha = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
+					$showCaptcha         = 1;
+					$this->captcha       = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
 					$this->captchaPlugin = $captchaPlugin;
-				}				
-			}			
+				}
+			}
 		}
 
 		// Waiting List
@@ -155,40 +149,46 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 			$waitingList = false;
 		}
 
-		$this->Itemid = $input->getInt('Itemid', 0);
-		$this->event = $event;
-		$this->config = EventbookingHelper::getConfig();
-		$this->showCaptcha = $showCaptcha;
-		$this->defaultCountry = EventbookingHelper::getConfigValue('default_country');
-		$this->waitingList = $waitingList;
-		parent::display($tpl);
+		$this->numberRegistrants = $numberRegistrants;
+		$this->membersData       = $membersData;
+		$this->eventId           = $event->id;
+		$this->event             = $event;
+		$this->config            = $config;
+		$this->showCaptcha       = $showCaptcha;
+		$this->defaultCountry    = $config->default_country;
+		$this->waitingList       = $waitingList;
+		$this->showBillingStep   = EventbookingHelper::showBillingStep($event->id);
+		$this->rowFields         = EventbookingHelper::getFormFields($event->id, 2);
+
+		parent::display();
 	}
 
 	/**
 	 * Display billing form allow registrant enter billing information for group registration
 	 *
-	 * @param $event
-	 * @param $input
-	 * @param $tpl
+	 * @param object   $event
+	 * @param RADInput $input
+	 *
+	 * @throws Exception
 	 */
-	function _displayGroupBillingForm($event, $input, $tpl)
+	function displayGroupBillingForm($event, $input)
 	{
-		$session = JFactory::getSession();
-		$user = JFactory::getUser();
-		$userId = $user->get('id');
-		$config = EventbookingHelper::getConfig();
-		$eventId = $input->getInt('event_id', 0);
-		$rowFields = EventbookingHelper::getFormFields($eventId, 1);
+		$session          = JFactory::getSession();
+		$user             = JFactory::getUser();
+		$userId           = $user->get('id');
+		$config           = EventbookingHelper::getConfig();
+		$eventId          = $event->id;
+		$rowFields        = EventbookingHelper::getFormFields($eventId, 1);
 		$groupBillingData = $session->get('eb_group_billing_data', null);
 		if ($groupBillingData)
 		{
-			$data = unserialize($groupBillingData);
+			$data           = unserialize($groupBillingData);
 			$captchaInvalid = 1;
 		}
 		else
 		{
 			$captchaInvalid = 0;
-			$data = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);
+			$data           = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);
 		}
 		if ($userId && !isset($data['first_name']))
 		{
@@ -200,12 +200,12 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 				if ($pos !== false)
 				{
 					$data['first_name'] = substr($name, 0, $pos);
-					$data['last_name'] = substr($name, $pos + 1);
+					$data['last_name']  = substr($name, $pos + 1);
 				}
 				else
 				{
 					$data['first_name'] = $name;
-					$data['last_name'] = '';
+					$data['last_name']  = '';
 				}
 			}
 		}
@@ -249,17 +249,17 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		{
 			$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
 		}
-		$expMonth = $input->post->getInt('exp_month', date('m'));
-		$expYear = $input->post->getInt('exp_year', date('Y'));
+		$expMonth           = $input->post->getInt('exp_month', date('m'));
+		$expYear            = $input->post->getInt('exp_year', date('Y'));
 		$lists['exp_month'] = JHtml::_('select.integerlist', 1, 12, 1, 'exp_month', ' class="input-small" ', $expMonth, '%02d');
-		$currentYear = date('Y');
-		$lists['exp_year'] = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
-		$methods = os_payments::getPaymentMethods(trim($event->payment_methods));
-		$options = array();
-		$options[] = JHtml::_('select.option', 'Visa', 'Visa');
-		$options[] = JHtml::_('select.option', 'MasterCard', 'MasterCard');
-		$options[] = JHtml::_('select.option', 'Discover', 'Discover');
-		$options[] = JHtml::_('select.option', 'Amex', 'American Express');
+		$currentYear        = date('Y');
+		$lists['exp_year']  = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
+		$methods            = os_payments::getPaymentMethods(trim($event->payment_methods));
+		$options            = array();
+		$options[]          = JHtml::_('select.option', 'Visa', 'Visa');
+		$options[]          = JHtml::_('select.option', 'MasterCard', 'MasterCard');
+		$options[]          = JHtml::_('select.option', 'Discover', 'Discover');
+		$options[]          = JHtml::_('select.option', 'Amex', 'American Express');
 		$lists['card_type'] = JHtml::_('select.genericlist', $options, 'card_type', ' class="inputbox" ', 'value', 'text');
 		if (($event->enable_coupon == 0 && $config->enable_coupon) || $event->enable_coupon == 2 || $event->enable_coupon == 3)
 		{
@@ -273,12 +273,12 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		if ($idealEnabled)
 		{
 			$bankLists = EventbookingHelper::getBankLists();
-			$options = array();
+			$options   = array();
 			foreach ($bankLists as $bankId => $bankName)
 			{
 				$options[] = JHtml::_('select.option', $bankId, $bankName);
 			}
-			$lists['bank_id'] = JHtml::_('select.genericlist', $options, 'bank_id', ' class="inputbox" ', 'value', 'text', 
+			$lists['bank_id'] = JHtml::_('select.genericlist', $options, 'bank_id', ' class="inputbox" ', 'value', 'text',
 				$input->post->getInt('bank_id'));
 		}
 
@@ -286,12 +286,12 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$paymentType = $input->post->getInt('payment_type', 0);
 		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
 		{
-			$options = array();
-			$options[] = JHtml::_('select.option', 0, JText::_('EB_FULL_PAYMENT'));
-			$options[] = JHtml::_('select.option', 1, JText::_('EB_DEPOSIT_PAYMENT'));
+			$options               = array();
+			$options[]             = JHtml::_('select.option', 0, JText::_('EB_FULL_PAYMENT'));
+			$options[]             = JHtml::_('select.option', 1, JText::_('EB_DEPOSIT_PAYMENT'));
 			$lists['payment_type'] = JHtml::_('select.genericlist', $options, 'payment_type', ' class="input-large" onchange="showDepositAmount(this);" ', 'value', 'text',
 				$input->post->getInt('payment_type', 0));
-			$depositPayment = 1;
+			$depositPayment        = 1;
 		}
 		else
 		{
@@ -302,7 +302,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 		{
 			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			if(!$captchaPlugin)
+			if (!$captchaPlugin)
 			{
 				// Hardcode to recaptcha, reduce support request
 				$captchaPlugin = 'recaptcha';
@@ -311,15 +311,15 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
 			if ($plugin)
 			{
-				$showCaptcha = 1;				
-				$this->captcha = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
+				$showCaptcha         = 1;
+				$this->captcha       = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
 				$this->captchaPlugin = $captchaPlugin;
 			}
 		}
 
 		// Check to see if there is payment processing fee or not
 		$showPaymentFee = false;
-		foreach($methods as $method)
+		foreach ($methods as $method)
 		{
 			if ($method->paymentFee)
 			{
@@ -331,10 +331,10 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		// Reset some values if waiting list is activated
 		if ($waitingList)
 		{
-			$enableCoupon = false;
-			$idealEnabled = false;
+			$enableCoupon   = false;
+			$idealEnabled   = false;
 			$depositPayment = false;
-			$paymentType = false;
+			$paymentType    = false;
 			$showPaymentFee = false;
 		}
 		else
@@ -343,31 +343,30 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		}
 
 		// Assign these parameters
-		$this->paymentMethod = $paymentMethod;
-		$this->lists = $lists;
-		$this->Itemid = $input->getInt('Itemid', 0);
-		$this->config = $config;
-		$this->event = $event;
-		$this->methods = $methods;
-		$this->enableCoupon = $enableCoupon;
-		$this->userId = $userId;
-		$this->lists = $lists;
-		$this->idealEnabled = $idealEnabled;
-		$this->depositPayment = $depositPayment;
-		$this->paymentType = $paymentType;
-		$this->showCaptcha = $showCaptcha;
-		$this->captchaInvalid = $captchaInvalid;
-		$this->form = $form;
-		$this->totalAmount = $fees['total_amount'];
-		$this->taxAmount = $fees['tax_amount'];
-		$this->discountAmount = $fees['discount_amount'];
-		$this->amount = $fees['amount'];
-		$this->depositAmount = $fees['deposit_amount'];
+		$this->paymentMethod        = $paymentMethod;
+		$this->lists                = $lists;
+		$this->config               = $config;
+		$this->event                = $event;
+		$this->methods              = $methods;
+		$this->enableCoupon         = $enableCoupon;
+		$this->userId               = $userId;
+		$this->lists                = $lists;
+		$this->idealEnabled         = $idealEnabled;
+		$this->depositPayment       = $depositPayment;
+		$this->paymentType          = $paymentType;
+		$this->showCaptcha          = $showCaptcha;
+		$this->captchaInvalid       = $captchaInvalid;
+		$this->form                 = $form;
+		$this->totalAmount          = $fees['total_amount'];
+		$this->taxAmount            = $fees['tax_amount'];
+		$this->discountAmount       = $fees['discount_amount'];
+		$this->amount               = $fees['amount'];
+		$this->depositAmount        = $fees['deposit_amount'];
 		$this->paymentProcessingFee = $fees['payment_processing_fee'];
-		$this->showPaymentFee = $showPaymentFee;
-		$this->waitingList = $waitingList;
+		$this->showPaymentFee       = $showPaymentFee;
+		$this->waitingList          = $waitingList;
 
-		parent::display($tpl);
+		parent::display();
 	}
 }
 

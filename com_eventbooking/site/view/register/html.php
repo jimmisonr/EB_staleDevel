@@ -289,7 +289,6 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$document = JFactory::getDocument();
 		$document->addScript(JUri::base(true) . '/components/com_eventbooking/assets/js/paymentmethods.js');
 		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
-		$this->Itemid          = $input->getInt('Itemid', 0);
 		$this->event           = $event;
 		$this->message         = EventbookingHelper::getMessages();
 		$this->fieldSuffix     = EventbookingHelper::getFieldSuffix();
@@ -525,7 +524,6 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$this->items                = $events;
 		$this->eventTitle           = $eventTitle;
 		$this->form                 = $form;
-		$this->Itemid               = $input->getInt('Itemid', 0);
 		$this->showPaymentFee       = $showPaymentFee;
 		$this->paymentType          = $paymentType;
 
