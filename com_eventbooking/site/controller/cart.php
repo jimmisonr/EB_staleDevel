@@ -10,38 +10,37 @@
 // no direct access
 defined('_JEXEC') or die();
 
-/**
- * Event Booking controller
- * @package        Joomla
- * @subpackage     Event Booking
- */
 class EventbookingControllerCart extends EventbookingController
 {
 	/**
+	 * Add the selected events to shopping cart
 	 *
-	 * Add an events and store it to
+	 * @throws Exception
 	 */
-	function add_cart()
+	public function add_cart()
 	{
-		$data  = JRequest::get();
+		$data  = $this->input->getData();
 		$model = $this->getModel('cart');
 		$model->processAddToCart($data);
-		JRequest::setVar('view', 'cart');
-		JRequest::setVar('layout', 'mini');
+
+		$this->input->set('view', 'cart');
+		$this->input->set('layout', 'mini');
+
 		$this->display();
-		JFactory::getApplication()->close();
+		$this->app->close();
 	}
 
 	/**
+	 * Update the cart with new updated quantities
 	 *
-	 * Update cart with new quantities
+	 * @throws Exception
 	 */
 	public function update_cart()
 	{
-		$Itemid     = JRequest::getInt('Itemid', 0);
-		$redirect   = JRequest::getInt('redirect', 1);
-		$eventIds   = JRequest::getVar('event_id');
-		$quantities = JRequest::getVar('quantity');
+		$Itemid     = $this->input->getInt('Itemid', 0);
+		$redirect   = $this->input->getInt('redirect', 1);
+		$eventIds   = $this->input->getString('event_id');
+		$quantities = $this->input->getString('quantity');
 		$model      = $this->getModel('cart');
 		if (!$redirect)
 		{
@@ -55,23 +54,22 @@ class EventbookingControllerCart extends EventbookingController
 		}
 		else
 		{
-			JRequest::setVar('view', 'cart');
-			JRequest::setVar('layout', 'mini');
+			$this->input->set('view', 'cart');
+			$this->input->set('layout', 'mini');
 			$this->display();
-			JFactory::getApplication()->close();
+			$this->app->close();
 		}
 	}
 
 	/**
-	 * Remove an event from shopping cart
-	 *
+	 * Remove the selected event from shopping cart
 	 */
 	public function remove_cart()
 	{
-		$redirect = JRequest::getInt('redirect', 1);
-		$Itemid   = JRequest::getInt('Itemid', 0);
-		$id       = JRequest::getInt('id', 0);
-		$model    = &$this->getModel('cart');
+		$redirect = $this->input->getInt('redirect', 1);
+		$Itemid   = $this->input->getInt('Itemid', 0);
+		$id       = $this->input->getInt('id', 0);
+		$model    = $this->getModel('cart');
 		$model->removeEvent($id);
 		if ($redirect)
 		{
@@ -79,25 +77,25 @@ class EventbookingControllerCart extends EventbookingController
 		}
 		else
 		{
-			JRequest::setVar('view', 'cart');
-			JRequest::setVar('layout', 'mini');
+			$this->input->set('view', 'cart');
+			$this->input->set('layout', 'mini');
 			$this->display();
-			JFactory::getApplication()->close();
+			$this->app->close();
 		}
 	}
 
-	/**
+	/***
 	 * Process checkout
+	 *
+	 * @throws Exception
 	 */
 	public function process_checkout()
 	{
-		$app          = JFactory::getApplication();
-		$input        = $app->input;
 		$emailValid   = true;
 		$captchaValid = true;
 
 		// Check email
-		$result = $this->_validateEmail(0, $input->get('email', '', 'none'));
+		$result = $this->validateEmail(0, $this->input->get('email', '', 'none'));
 
 		if (!$result['success'])
 		{
@@ -109,7 +107,7 @@ class EventbookingControllerCart extends EventbookingController
 			$user   = JFactory::getUser();
 			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 			{
-				$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+				$captchaPlugin = $this->app->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
 				if (!$captchaPlugin)
 				{
 					// Hardcode to recaptcha, reduce support request
@@ -118,7 +116,7 @@ class EventbookingControllerCart extends EventbookingController
 				$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
 				if ($plugin)
 				{
-					$captchaValid = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
+					$captchaValid = JCaptcha::getInstance($captchaPlugin)->checkAnswer($this->input->post->get('recaptcha_response_field', '', 'string'));
 				}
 			}
 		}
@@ -128,15 +126,15 @@ class EventbookingControllerCart extends EventbookingController
 			// Enqueue the error message
 			if (!$emailValid)
 			{
-				$app->enqueueMessage($result['message'], 'warning');
+				$this->app->enqueueMessage($result['message'], 'warning');
 			}
 			else
 			{
-				$app->enqueueMessage(JText::_('EB_INVALID_CAPTCHA_ENTERED'), 'warning');
+				$this->app->enqueueMessage(JText::_('EB_INVALID_CAPTCHA_ENTERED'), 'warning');
 			}
-			$input->set('captcha_invalid', 1);
-			JRequest::setVar('view', 'register');
-			JRequest::setVar('layout', 'cart');
+			$this->input->set('captcha_invalid', 1);
+			$this->input->set('view', 'register');
+			$this->input->set('layout', 'cart');
 			$this->display();
 
 			return;
@@ -147,12 +145,12 @@ class EventbookingControllerCart extends EventbookingController
 		$items = $cart->getItems();
 		if (!count($items))
 		{
-			JFactory::getApplication()->redirect('index.php', JText::_('Sorry, your session was expired. Please try again!'));
+			$this->app->redirect('index.php', JText::_('Sorry, your session was expired. Please try again!'));
 		}
 
-		$post  = JRequest::get('post');
+		$data  = $this->input->getData();
 		$model = $this->getModel('cart');
-		$model->processCheckout($post);
+		$model->processCheckout($data);
 	}
 
 	/**
@@ -160,10 +158,10 @@ class EventbookingControllerCart extends EventbookingController
 	 */
 	function calculate_cart_registration_fee()
 	{
-		$input               = JFactory::getApplication()->input;
+		$input               = $this->input;
 		$config              = EventbookingHelper::getConfig();
 		$paymentMethod       = $input->getString('payment_method', '');
-		$data                = JRequest::get('post', JREQUEST_ALLOWHTML);
+		$data                = $input->getData();
 		$data['coupon_code'] = $input->getString('coupon_code', '');
 		$cart                = new EventbookingHelperCart();
 		$response            = array();
@@ -180,6 +178,60 @@ class EventbookingControllerCart extends EventbookingController
 		$response['deposit_amount']         = EventbookingHelper::formatAmount($fees['deposit_amount'], $config);
 		$response['coupon_valid']           = $fees['coupon_valid'];
 		echo json_encode($response);
-		JFactory::getApplication()->close();
+		$this->app->close();
+	}
+
+	/**
+	 * Validate to see whether this email can be used to register for this event or not
+	 *
+	 * @param $eventId
+	 * @param $email
+	 *
+	 * @return array
+	 */
+	protected function validateEmail($eventId, $email)
+	{
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+		$config = EventbookingHelper::getConfig();
+		$result = array(
+			'success' => true,
+			'message' => ''
+		);
+
+		if ($config->prevent_duplicate_registration && !$config->multiple_booking)
+		{
+			$query->clear();
+			$query->select('COUNT(id)')
+				->from('#__eb_registrants')
+				->where('event_id=' . $eventId)
+				->where('email="' . $email . '"')
+				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
+			$db->setQuery($query);
+			$total = $db->loadResult();
+			if ($total)
+			{
+				$result['success'] = false;
+				$result['message'] = JText::_('EB_EMAIL_REGISTER_FOR_EVENT_ALREADY');
+			}
+		}
+
+		if ($result['success'] && $config->user_registration && !$user->id)
+		{
+			$query->clear();
+			$query->select('COUNT(*)')
+				->from('#__users')
+				->where('email="' . $email . '"');
+			$db->setQuery($query);
+			$total = $db->loadResult();
+			if ($total)
+			{
+				$result['success'] = false;
+				$result['message'] = JText::_('EB_EMAIL_REGISTER_FOR_EVENT_ALREADY');
+			}
+		}
+
+		return $result;
 	}
 }
