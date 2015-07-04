@@ -154,6 +154,86 @@ class EventbookingController extends RADController
 		}
 	}
 
+	/**
+	 * Validate the username, make sure it has not been registered by someone else
+	 */
+	public function validate_username()
+	{
+		$db         = JFactory::getDbo();
+		$query      = $db->getQuery(true);
+		$username   = JRequest::getVar('fieldValue');
+		$validateId = JRequest::getVar('fieldId');
+		$query->select('COUNT(*)')
+			->from('#__users')
+			->where('username="' . $username . '"');
+		$db->setQuery($query);
+		$total        = $db->loadResult();
+		$arrayToJs    = array();
+		$arrayToJs[0] = $validateId;
+		if ($total)
+		{
+			$arrayToJs[1] = false;
+		}
+		else
+		{
+			$arrayToJs[1] = true;
+		}
+		echo json_encode($arrayToJs);
+		JFactory::getApplication()->close();
+	}
+
+	/**
+	 * Validate the email
+	 */
+	public function validate_email()
+	{
+		$app          = JFactory::getApplication();
+		$db           = JFactory::getDbo();
+		$user         = JFactory::getUser();
+		$config       = EventbookingHelper::getConfig();
+		$query        = $db->getQuery(true);
+		$email        = $app->input->get('fieldValue', '', 'string');
+		$eventId      = $app->input->getInt('event_id', 0);
+		$validateId   = $app->input->get('fieldId', '');
+		$arrayToJs    = array();
+		$arrayToJs[0] = $validateId;
+		if ($config->prevent_duplicate_registration && !$config->multiple_booking)
+		{
+			$query->clear();
+			$query->select('COUNT(id)')
+				->from('#__eb_registrants')
+				->where('event_id=' . $eventId)
+				->where('email="' . $email . '"')
+				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
+			$db->setQuery($query);
+			$total = $db->loadResult();
+			if ($total)
+			{
+				$arrayToJs[1] = false;
+				$arrayToJs[2] = JText::_('EB_EMAIL_REGISTER_FOR_EVENT_ALREADY');
+			}
+		}
+		if (!isset($arrayToJs[1]))
+		{
+			$query->clear();
+			$query->select('COUNT(*)')
+				->from('#__users')
+				->where('email="' . $email . '"');
+			$db->setQuery($query);
+			$total = $db->loadResult();
+			if (!$total || $user->id || !$config->user_registration)
+			{
+				$arrayToJs[1] = true;
+			}
+			else
+			{
+				$arrayToJs[1] = false;
+				$arrayToJs[2] = JText::_('EB_EMAIL_USED_BY_OTHER_CUSTOMER');
+			}
+		}
+		echo json_encode($arrayToJs);
+		JFactory::getApplication()->close();
+	}
 
 	/**
 	 * Get list of states for the selected country, using in AJAX request
@@ -204,5 +284,112 @@ class EventbookingController extends RADController
 		echo JHtml::_('select.genericlist', $options, $fieldName, ' class="input-large ' . $class . '" id="' . $fieldName . '"', 'value', 'text',
 			$stateName);
 		$this->app->close();
+	}
+
+	/**
+	 * Get depend fields status
+	 *
+	 */
+	public function get_depend_fields_status()
+	{
+		$app            = JFactory::getApplication();
+		$input          = $app->input;
+		$db             = JFactory::getDbo();
+		$query          = $db->getQuery(true);
+		$fieldId        = $input->getInt('field_id', 0);
+		$fieldSuffix    = $input->getString('field_suffix', '');
+		$languageSuffix = EventbookingHelper::getFieldSuffix();
+
+		//Get list of depend fields
+		$allFieldIds = EventbookingHelper::getAllDependencyFields($fieldId);
+
+		$query->select('*')
+			->select('title' . $languageSuffix . ' AS title')
+			->select('depend_on_options' . $languageSuffix . ' AS depend_on_options')
+			->from('#__eb_fields')
+			->where('published=1')
+			->where('id IN (' . implode(',', $allFieldIds) . ')')
+			->order('ordering');
+		$db->setQuery($query);
+		$rowFields    = $db->loadObjectList();
+		$masterFields = array();
+		$fieldsAssoc  = array();
+		foreach ($rowFields as $rowField)
+		{
+			if ($rowField->depend_on_field_id)
+			{
+				$masterFields[] = $rowField->depend_on_field_id;
+			}
+			$fieldsAssoc[$rowField->id] = $rowField;
+		}
+		$masterFields = array_unique($masterFields);
+		if (count($masterFields))
+		{
+			$hiddenFields = array();
+			foreach ($rowFields as $rowField)
+			{
+				if ($rowField->depend_on_field_id && isset($fieldsAssoc[$rowField->depend_on_field_id]))
+				{
+					// If master field is hided, then children field should be hided, too
+					if (in_array($rowField->depend_on_field_id, $hiddenFields))
+					{
+						$hiddenFields[] = $rowField->id;
+					}
+					else
+					{
+						if ($fieldSuffix)
+						{
+							$fieldName = $fieldsAssoc[$rowField->depend_on_field_id]->name . '_' . $fieldSuffix;
+						}
+						else
+						{
+							$fieldName = $fieldsAssoc[$rowField->depend_on_field_id]->name;
+						}
+
+						$masterFieldValues = $input->get($fieldName, '', 'none');
+
+						if (is_array($masterFieldValues))
+						{
+							$selectedOptions = $masterFieldValues;
+						}
+						else
+						{
+							$selectedOptions = array($masterFieldValues);
+						}
+						$dependOnOptions = explode(',', $rowField->depend_on_options);
+						if (!count(array_intersect($selectedOptions, $dependOnOptions)))
+						{
+							$hiddenFields[] = $rowField->id;
+						}
+					}
+				}
+			}
+		}
+
+		$showFields = array();
+		$hideFields = array();
+		foreach ($rowFields as $rowField)
+		{
+			if (in_array($rowField->id, $hiddenFields))
+			{
+				$hideFields[] = 'field_' . $rowField->name . ($fieldSuffix ? '_' . $fieldSuffix : '');
+			}
+			else
+			{
+				$showFields[] = 'field_' . $rowField->name . ($fieldSuffix ? '_' . $fieldSuffix : '');
+			}
+		}
+		echo json_encode(array('show_fields' => implode(',', $showFields), 'hide_fields' => implode(',', $hideFields)));
+
+		$app->close();
+	}
+
+	/**
+	 * Confirm the payment . Used for Paypal base payment gateway
+	 */
+	public function payment_confirm()
+	{
+		$model = $this->getModel('Register');
+		$model->paymentConfirm();
 	}
 }

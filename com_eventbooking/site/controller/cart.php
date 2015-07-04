@@ -95,7 +95,7 @@ class EventbookingControllerCart extends EventbookingController
 		$captchaValid = true;
 
 		// Check email
-		$result = $this->validateEmail(0, $this->input->get('email', '', 'none'));
+		$result = $this->validateRegistrantEmail(0, $this->input->get('email', '', 'none'));
 
 		if (!$result['success'])
 		{
@@ -181,6 +181,7 @@ class EventbookingControllerCart extends EventbookingController
 		$this->app->close();
 	}
 
+
 	/**
 	 * Validate to see whether this email can be used to register for this event or not
 	 *
@@ -189,7 +190,7 @@ class EventbookingControllerCart extends EventbookingController
 	 *
 	 * @return array
 	 */
-	protected function validateEmail($eventId, $email)
+	protected function validateRegistrantEmail($eventId, $email)
 	{
 		$user   = JFactory::getUser();
 		$db     = JFactory::getDbo();
