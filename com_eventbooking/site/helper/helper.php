@@ -1205,7 +1205,7 @@ class EventbookingHelper
 
 			// Early Bird Discount
 			if (($event->early_bird_discount_amount > 0) && ($event->early_bird_discount_date != $nullDate) &&
-				(strtotime($event->early_bird_discount_date) >= mktime())
+				(strtotime($event->early_bird_discount_date) >= time())
 			)
 			{
 				if ($event->early_bird_discount_type == 1)

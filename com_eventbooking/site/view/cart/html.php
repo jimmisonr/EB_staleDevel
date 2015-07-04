@@ -1,23 +1,22 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
-class EventBookingViewCart extends JViewLegacy
+
+class EventbookingViewCartHtml extends RADViewHtml
 {
 
 	/**
 	 * Display interface to user
-	 *
-	 * @param string $tpl
 	 */
-	function display($tpl = null)
+	public function display()
 	{
 		$layout = $this->getLayout();
 		if ($layout == 'mini')
@@ -28,24 +27,26 @@ class EventBookingViewCart extends JViewLegacy
 		{
 			$this->setLayout('default');
 		}
-		$Itemid = JRequest::getInt('Itemid', 0);
-		$config = EventbookingHelper::getConfig();
+		$config     = EventbookingHelper::getConfig();
 		$categoryId = (int) JFactory::getSession()->get('last_category_id', 0);
 		if (!$categoryId)
 		{
 			//Get category ID of the current event			
-			$cart = new EventbookingHelperCart();
+			$cart     = new EventbookingHelperCart();
 			$eventIds = $cart->getItems();
 			if (count($eventIds))
 			{
-				$db = JFactory::getDbo();
+				$db          = JFactory::getDbo();
+				$query       = $db->getQuery(true);
 				$lastEventId = $eventIds[count($eventIds) - 1];
-				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $lastEventId;
-				$db->setQuery($sql);
+				$query->select('category_id')
+					->from('#__eb_event_categories')
+					->where('event_id = ' . (int) $lastEventId);
+				$db->setQuery($query);
 				$categoryId = $db->loadResult();
 			}
 		}
-		$items = $this->get('Data');
+		$items = $this->model->getData();
 		//Generate javascript string
 		$jsString = " var arrEventIds = new Array() \n; var arrQuantities = new Array();\n";
 		for ($i = 0, $n = count($items); $i < $n; $i++)
@@ -62,13 +63,12 @@ class EventBookingViewCart extends JViewLegacy
 			$jsString .= "arrEventIds[$i] = $item->id ;\n";
 			$jsString .= "arrQuantities[$i] = $availbleQuantity ;\n";
 		}
-		$this->items = $items;
-		$this->config = $config;
-		$this->categoryId = $categoryId;
-		$this->Itemid = $Itemid;
-		$this->jsString = $jsString;
+		$this->items           = $items;
+		$this->config          = $config;
+		$this->categoryId      = $categoryId;
+		$this->jsString        = $jsString;
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
-		
-		parent::display($tpl);
+
+		parent::display();
 	}
 }

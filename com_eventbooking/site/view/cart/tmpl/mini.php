@@ -139,7 +139,7 @@ if (count($this->items)) {
 			</tbody>
 		</table>
 		<input type="hidden" name="option" value="com_eventbooking" />
-		<input type="hidden" name="task" value="update_cart" />
+		<input type="hidden" name="task" value="cart.update_cart" />
 	</form>
 <?php
 } else {
@@ -178,7 +178,7 @@ else
 				var quantity = $("input[id='quantity']").map(function(){return $(this).val();}).get();
 				$.ajax({
 					type : 'POST',
-					url  : 'index.php?option=com_eventbooking&task=update_cart&redirect=0&event_id=' + eventId + '&quantity=' + quantity,
+					url  : 'index.php?option=com_eventbooking&task=cart.update_cart&redirect=0&event_id=' + eventId + '&quantity=' + quantity,
 					dataType: 'html',
 					beforeSend: function() {
 					$('#add_more_item').before('<span class="wait"><img src="<?php echo JUri::base(true); ?>/media/com_eventbooking/ajax-loadding-animation.gif" alt="" /></span>');
@@ -200,7 +200,7 @@ else
 		Eb.jQuery(function($) {
 			$.ajax({
 				type :'POST',
-				url  : 'index.php?option=com_eventbooking&task=remove_cart&id=' +  id + '&redirect=0',
+				url  : 'index.php?option=com_eventbooking&task=cart.remove_cart&id=' +  id + '&redirect=0',
 				dataType: 'html',
 				beforeSend: function() {
 					$('#add_more_item').before('<span class="wait"><img src="<?php echo JUri::base(true); ?>/media/com_eventbooking/ajax-loadding-animation.gif" alt="" /></span>');

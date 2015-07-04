@@ -150,7 +150,13 @@ class EventbookingControllerCart extends EventbookingController
 
 		$data  = $this->input->getData();
 		$model = $this->getModel('cart');
-		$model->processCheckout($data);
+		$return = $model->processCheckout($data);
+
+		if ($return == 1)
+		{
+			// Redirect to registration complete page
+			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->input->getInt('Itemid'), false, false));
+		}
 	}
 
 	/**

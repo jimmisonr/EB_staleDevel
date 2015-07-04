@@ -655,7 +655,7 @@ if (!$this->userId && $this->config->user_registration)
 	?>
 	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />	
 	<input type="hidden" name="option" value="com_eventbooking" />	
-	<input type="hidden" name="task" value="process_checkout" />
+	<input type="hidden" name="task" value="cart.process_checkout" />
 	<input type="hidden" name="show_payment_fee" value="<?php echo (int)$this->showPaymentFee ; ?>" />
 		<script type="text/javascript">		
 			var eb_current_page = 'cart';

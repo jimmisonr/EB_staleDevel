@@ -166,7 +166,7 @@ if (count($this->items))
 				var form = document.adminForm ;
 				var ret = checkQuantity();
 				if (ret) {
-					form.task.value = 'update_cart';
+					form.task.value = 'cart.update_cart';
 					form.submit();
 				}
 			}
@@ -174,7 +174,7 @@ if (count($this->items))
 				if (confirm("<?php echo JText::_('EB_REMOVE_CONFIRM'); ?>")) {
 					var form = document.adminForm ;
 					form.id.value = id ;
-					form.task.value = 'remove_cart' ;
+					form.task.value = 'cart.remove_cart' ;
 					form.submit() ;
 				}
 			}

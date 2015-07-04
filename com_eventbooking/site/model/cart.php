@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	2.0.0
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -10,20 +10,16 @@
 // no direct access
 defined('_JEXEC') or die();
 
-/**
- * Event Booking Component Cart Model
- *
- * @package        Joomla
- * @subpackage     Event Booking
- */
-class EventBookingModelCart extends JModelLegacy
+class EventbookingModelCart extends RADModel
 {
 	/**
 	 * Add one or multiple events to cart
 	 *
-	 * @param string
+	 * @param $data
+	 *
+	 * @return bool
 	 */
-	function processAddToCart($data)
+	public function processAddToCart($data)
 	{
 		if (is_array($data['id']))
 		{
@@ -44,8 +40,10 @@ class EventBookingModelCart extends JModelLegacy
 	 *
 	 * @param array $eventIds
 	 * @param array $quantities
+	 *
+	 * @return bool
 	 */
-	function processUpdateCart($eventIds, $quantities)
+	public function processUpdateCart($eventIds, $quantities)
 	{
 		$cart = new EventbookingHelperCart();
 		$cart->updateCart($eventIds, $quantities);
@@ -55,11 +53,12 @@ class EventBookingModelCart extends JModelLegacy
 
 	/**
 	 * Remove an event from cart
-	 * Enter description here ...
 	 *
-	 * @param int $id
+	 * @param $id
+	 *
+	 * @return bool
 	 */
-	function removeEvent($id)
+	public function removeEvent($id)
 	{
 		$cart = new EventbookingHelperCart();
 		$cart->remove($id);
@@ -70,13 +69,14 @@ class EventBookingModelCart extends JModelLegacy
 	/**
 	 * Process checkout in case customer using shopping cart feature
 	 *
-	 * @param array $data
+	 * @param $data
+	 *
+	 * @return int
+	 * @throws Exception
 	 */
-	function processCheckout(&$data)
+	public function processCheckout(&$data)
 	{
 		jimport('joomla.user.helper');
-		$app                    = JFactory::getApplication();
-		$Itemid                 = JRequest::getInt('Itemid');
 		$db                     = JFactory::getDbo();
 		$query                  = $db->getQuery(true);
 		$user                   = JFactory::getUser();
@@ -87,7 +87,7 @@ class EventBookingModelCart extends JModelLegacy
 		$items                  = $cart->getItems();
 		$quantities             = $cart->getQuantities();
 		$paymentMethod          = isset($data['payment_method']) ? $data['payment_method'] : '';
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$fieldSuffix            = EventbookingHelper::getFieldSuffix();
 		if (!$user->id && $config->user_registration)
 		{
 			$userId          = EventbookingHelper::saveRegistration($data);
@@ -99,7 +99,7 @@ class EventBookingModelCart extends JModelLegacy
 		$data['collect_records_data'] = true;
 		$fees                         = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
 		// Save the active language
-		if ($app->getLanguageFilter())
+		if (JFactory::getApplication()->getLanguageFilter())
 		{
 			$language = JFactory::getLanguage()->getTag();
 		}
@@ -185,10 +185,16 @@ class EventBookingModelCart extends JModelLegacy
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('onAfterStoreRegistrant', array($row));
 		}
-		$sql = 'SELECT title' . $fieldSuffix . ' AS title FROM #__eb_events WHERE id IN (' . implode(',', $items) . ') ORDER BY FIND_IN_SET(id, "' . implode(',', $items) . '")';
-		$db->setQuery($sql);
-		$eventTitltes        = $db->loadColumn();
-		$data['event_title'] = implode(', ', $eventTitltes);
+
+		$query->clear();
+		$query->select('title' . $fieldSuffix . ' AS title')
+			->from('#__eb_events')
+			->where('id IN (' . implode(',', $items) . ')')
+			->order('FIND_IN_SET(id, "' . implode(',', $items) . '")');
+
+		$db->setQuery($query);
+		$eventTitles         = $db->loadColumn();
+		$data['event_title'] = implode(', ', $eventTitles);
 		if ($couponId > 0)
 		{
 			$sql = 'UPDATE #__eb_coupons SET used = used + 1 WHERE id=' . (int) $couponId;
@@ -225,6 +231,7 @@ class EventBookingModelCart extends JModelLegacy
 			$row->payment_date = gmdate('Y-m-d H:i:s');
 			$row->published    = 1;
 			$row->store();
+
 			// Update status of all registrants
 			$query->clear();
 			$query->update('#__eb_registrants')
@@ -237,8 +244,8 @@ class EventBookingModelCart extends JModelLegacy
 			JPluginHelper::importPlugin('eventbooking');
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-			$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false);
-			$app->redirect($url);
+
+			return 1;
 		}
 	}
 

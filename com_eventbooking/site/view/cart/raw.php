@@ -10,17 +10,14 @@
 // no direct access
 defined('_JEXEC') or die();
 
-class EventBookingViewCart extends JViewLegacy
+class EventbookingViewCartRaw extends RADViewHtml
 {
-
 	/**
-	 *
-	 * @param string $tpl
+	 * Display shopping cart
 	 */
-	function display($tpl = null)
+	public function display()
 	{
 		$this->setLayout('mini');
-		$Itemid     = JRequest::getInt('Itemid', 0);
 		$config     = EventbookingHelper::getConfig();
 		$categoryId = (int) JFactory::getSession()->get('last_category_id', 0);
 		if (!$categoryId)
@@ -31,13 +28,16 @@ class EventBookingViewCart extends JViewLegacy
 			if (count($eventIds))
 			{
 				$db          = JFactory::getDbo();
+				$query       = $db->getQuery(true);
 				$lastEventId = $eventIds[count($eventIds) - 1];
-				$sql         = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $lastEventId;
-				$db->setQuery($sql);
+				$query->select('category_id')
+					->from('#__eb_event_categories')
+					->where('event_id = ' . (int) $lastEventId);
+				$db->setQuery($query);
 				$categoryId = $db->loadResult();
 			}
 		}
-		$items = $this->get('Data');
+		$items = $this->model->getData();
 		//Generate javascript string
 		$jsString = " var arrEventIds = new Array() \n; var arrQuantities = new Array();\n";
 		for ($i = 0, $n = count($items); $i < $n; $i++)
@@ -57,10 +57,9 @@ class EventBookingViewCart extends JViewLegacy
 		$this->items           = $items;
 		$this->config          = $config;
 		$this->categoryId      = $categoryId;
-		$this->Itemid          = $Itemid;
 		$this->jsString        = $jsString;
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
-		parent::display($tpl);
+		parent::display();
 	}
 }

@@ -169,7 +169,7 @@ $iconMapMakerClass = $bootstrapHelper->getClassMapping('icon-map-marker');
 							{
 								if ($config->multiple_booking)
 								{
-									$url        = 'index.php?option=com_eventbooking&task=add_cart&id=' . (int) $event->id . '&Itemid=' . (int) $Itemid;
+									$url        = 'index.php?option=com_eventbooking&task=cart.add_cart&id=' . (int) $event->id . '&Itemid=' . (int) $Itemid;
 									$extraClass = 'eb-colorbox-addcart';
 									$text       = JText::_('EB_REGISTER');
 								}
