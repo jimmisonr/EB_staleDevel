@@ -256,7 +256,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 													}
 													else
 													{
-														$url        = JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id=' . $item->id . '&Itemid=' . $Itemid, false, $ssl);
+														$url        = JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id=' . $item->id . '&Itemid=' . $Itemid, false, $ssl);
 														$text       = JText::_('EB_REGISTER_INDIVIDUAL');
 														$extraClass = '';
 													}
@@ -271,7 +271,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 												{
 												?>
 													<li>
-														<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+														<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
 													</li>
 												<?php
 												}
@@ -291,7 +291,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 										{
 											?>
 											<li>
-												<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
+												<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
 											</li>
 										<?php
 										}
@@ -299,7 +299,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 										{
 											?>
 											<li>
-												<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
+												<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
 											</li>
 										<?php
 										}

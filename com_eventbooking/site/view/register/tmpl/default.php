@@ -607,7 +607,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
 	<input type="hidden" name="event_id" id="event_id" value="<?php echo $this->event->id ; ?>" />
 	<input type="hidden" name="option" value="com_eventbooking" />
-	<input type="hidden" name="task" value="process_individual_registration" />
+	<input type="hidden" name="task" value="register.process_individual_registration" />
 	<input type="hidden" name="show_payment_fee" value="<?php echo (int)$this->showPaymentFee ; ?>" />
 		<script type="text/javascript">
 			var eb_current_page = 'default';

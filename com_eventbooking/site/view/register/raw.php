@@ -7,7 +7,7 @@
  * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
-class EventBookingViewRegister extends JViewLegacy
+class EventbookingViewRegisterRaw extends RADViewHtml
 {
 
 	/**

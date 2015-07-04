@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @version            2.0.0
  * @package            Joomla
@@ -30,6 +31,39 @@ class EventbookingHelperDatabase
 			self::getMultilingualFields($query, array('name'), $fieldSuffix);
 		}
 
+		$db->setQuery($query);
+
+		return $db->loadObject();
+	}
+
+	/**
+	 * Get event information from database
+	 *
+	 * @param $id
+	 *
+	 * @return mixed
+	 */
+	public static function getEvent($id)
+	{
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$query->select('a.*, IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
+			->from('#__eb_events AS a')
+			->select("DATEDIFF(event_date, '$currentDate') AS number_event_dates")
+			->select("TIMESTAMPDIFF(MINUTE, registration_start_date, '$currentDate') AS registration_start_minutes")
+			->select("TIMESTAMPDIFF(MINUTE, cut_off_date, '$currentDate') AS cut_off_minutes")
+			->select("DATEDIFF(early_bird_discount_date, '$currentDate') AS date_diff")
+			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
+			->where('a.id=' . (int) $id);
+
+		if ($fieldSuffix)
+		{
+			self::getMultilingualFields($query, array('a.title', 'a.short_description', 'a.description', 'a.meta_keywords', 'a.meta_description'), $fieldSuffix);
+		}
+
+		$query->group('a.id');
 		$db->setQuery($query);
 
 		return $db->loadObject();
@@ -85,7 +119,13 @@ class EventbookingHelperDatabase
 	{
 		foreach ($fields as $field)
 		{
-			$query->select($query->quoteName($field, $field . $fieldSuffix));
+			$alias  = $field;
+			$dotPos = strpos($field, '.');
+			if ($dotPos !== false)
+			{
+				$alias = substr($field, $dotPos + 1);
+			}
+			$query->select($query->quoteName($field . $fieldSuffix, $alias));
 		}
 	}
 }

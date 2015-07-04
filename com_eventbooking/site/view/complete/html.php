@@ -10,10 +10,10 @@
 // no direct access
 defined('_JEXEC') or die();
 
-class EventBookingViewComplete extends JViewLegacy
+class EventbookingViewCompleteHtml extends RADViewHtml
 {
-
-	function display($tpl = null)
+	public $hasModel = false;
+	function display()
 	{
 		//Hardcoded the layout, it happens with some clients. Maybe it is a bug of Joomla core code, will find out it later
 		$this->setLayout('default');
@@ -120,6 +120,6 @@ class EventBookingViewComplete extends JViewLegacy
 		$this->tmpl             = JRequest::getVar('tmpl', '');
 		$this->Itemid           = JRequest::getInt('Itemid', 0);
 
-		parent::display($tpl);
+		parent::display();
 	}
 }

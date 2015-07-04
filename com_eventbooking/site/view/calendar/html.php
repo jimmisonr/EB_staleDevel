@@ -10,10 +10,10 @@
 // no direct access
 defined('_JEXEC') or die();
 
-class EventbookingViewCalendar extends JViewLegacy
+class EventbookingViewCalendarHtml extends RADViewHtml
 {
 
-	function display($tpl = null)
+	public function display()
 	{
 		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
@@ -136,7 +136,7 @@ class EventbookingViewCalendar extends JViewLegacy
 		$this->listMonth = $listMonth;
 		$this->params    = $params;
 
-		parent::display($tpl);
+		parent::display();
 	}
 
 	/**
@@ -144,7 +144,7 @@ class EventbookingViewCalendar extends JViewLegacy
 	 *
 	 * @param string $tpl
 	 */
-	function _displayWeeklyView($tpl)
+	function _displayWeeklyView()
 	{
 		$this->events            = $this->get('EventsByWeek');
 		$day                     = 0;
@@ -154,7 +154,7 @@ class EventbookingViewCalendar extends JViewLegacy
 		$this->first_day_of_week = JRequest::getVar('date', $date);
 		$this->Itemid            = JRequest::getInt('Itemid', 0);
 
-		parent::display($tpl);
+		parent::display();
 	}
 
 	/**
@@ -163,12 +163,12 @@ class EventbookingViewCalendar extends JViewLegacy
 	 *
 	 * @param string $tpl
 	 */
-	function _displayDailyView($tpl)
+	function _displayDailyView()
 	{
 		$this->events = $this->get('EventsByDaily');
 		$this->day    = JRequest::getVar('day', date('Y-m-d', time()));
 		$this->Itemid = JRequest::getInt('Itemid', 0);
 
-		parent::display($tpl);
+		parent::display();
 	}
 }

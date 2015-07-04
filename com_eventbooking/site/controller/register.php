@@ -344,7 +344,7 @@ class EventbookingControllerRegister extends EventbookingController
 			{
 				$ssl = 0;
 			}
-			$signupUrl = JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id=' . $eventId . '&Itemid=' . $input->getInt('Itemid', 0), false, $ssl);
+			$signupUrl = JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id=' . $eventId . '&Itemid=' . $input->getInt('Itemid', 0), false, $ssl);
 			$app->redirect($signupUrl, JText::_('Sorry, your session was expired. Please try again!'));
 		}
 
@@ -372,7 +372,6 @@ class EventbookingControllerRegister extends EventbookingController
 		$eventId       = $this->input->getInt('event_id', 0);
 		$data          = $this->input->getData();
 		$paymentMethod = $this->input->getString('payment_method', '');
-
 		$event     = EventbookingHelperDatabase::getEvent($eventId);
 		$rowFields = EventbookingHelper::getFormFields($eventId, 0);
 		$form      = new RADForm($rowFields);

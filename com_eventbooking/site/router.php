@@ -1,22 +1,22 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
 JLoader::registerPrefix('Eventbooking', JPATH_ROOT . '/components/com_eventbooking');
-JLoader::register('RADConfig', JPATH_ADMINISTRATOR.'/components/com_eventbooking/libraries/rad/config/config.php');
+JLoader::register('RADConfig', JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/config/config.php');
 
 function EventbookingBuildRoute(&$query)
 {
 	$segments = array();
-	$db = JFactory::getDbo();
-	$q = $db->getQuery(true);
+	$db       = JFactory::getDbo();
+	$q        = $db->getQuery(true);
 	$queryArr = $query;
 	if (isset($queryArr['option']))
 	{
@@ -28,8 +28,8 @@ function EventbookingBuildRoute(&$query)
 	}
 	//Store the query string to use in the parseRouter method
 	$queryString = http_build_query($queryArr);
-	$app = JFactory::getApplication();
-	$menu = $app->getMenu();
+	$app         = JFactory::getApplication();
+	$menu        = $app->getMenu();
 	//We need a menu item.  Either the one specified in the query, or the current active one if none specified
 	if (empty($query['Itemid']))
 	{
@@ -45,7 +45,8 @@ function EventbookingBuildRoute(&$query)
 	}
 	//Are we dealing with the current view which is attached to a menu item?
 	if (($menuItem instanceof stdClass) && isset($query['view']) && isset($query['id']) && $menuItem->query['view'] == $query['view'] &&
-		 isset($query['id']) && $menuItem->query['id'] == intval($query['id']))
+		isset($query['id']) && $menuItem->query['id'] == intval($query['id'])
+	)
 	{
 		unset($query['view']);
 		if (isset($query['catid']))
@@ -54,33 +55,36 @@ function EventbookingBuildRoute(&$query)
 		}
 		unset($query['id']);
 	}
-	
+
 	if (($menuItem instanceof stdClass) && isset($query['view']) && ($menuItem->query['view'] == 'calendar') &&
-		 $menuItem->query['view'] == $query['view'])
+		$menuItem->query['view'] == $query['view']
+	)
 	{
 		unset($query['view']);
 	}
 
 	if (($menuItem instanceof stdClass) && isset($query['view']) && ($menuItem->query['view'] == 'events') &&
-		$menuItem->query['view'] == $query['view'])
+		$menuItem->query['view'] == $query['view']
+	)
 	{
 		unset($query['view']);
 	}
-	
+
 	//Dealing with the catid parameter in the link to event.
 	if (($menuItem instanceof stdClass) && ($menuItem->query['view'] == 'category') && isset($query['catid']) &&
-		 $menuItem->query['id'] == intval($query['catid']))
+		$menuItem->query['id'] == intval($query['catid'])
+	)
 	{
 		if (isset($query['catid']))
 		{
 			unset($query['catid']);
 		}
 	}
-	$view = isset($query['view']) ? $query['view'] : '';
-	$id = isset($query['id']) ? (int) $query['id'] : 0;
-	$catId = isset($query['catid']) ? (int) $query['catid'] : 0;
+	$view    = isset($query['view']) ? $query['view'] : '';
+	$id      = isset($query['id']) ? (int) $query['id'] : 0;
+	$catId   = isset($query['catid']) ? (int) $query['catid'] : 0;
 	$eventId = isset($query['event_id']) ? (int) $query['event_id'] : 0;
-	$task = isset($query['task']) ? $query['task'] : '';
+	$task    = isset($query['task']) ? $query['task'] : '';
 	switch ($view)
 	{
 		case 'calendar':
@@ -168,20 +172,27 @@ function EventbookingBuildRoute(&$query)
 			$segments[] = 'my events';
 			break;
 	}
-	
+
 	switch ($task)
 	{
-		case 'individual_registration':
-		case 'group_registration':
+		case 'register.individual_registration':
 			if ($eventId)
 			{
 				$segments[] = EventbookingHelperRoute::getEventTitle($eventId);
 			}
-			$segments[] = JText::_('EB_SEF_' . strtoupper($task));
+			$segments[] = 'Individual Registration';
+			unset($query['task']);
+			break;
+		case 'register.group_registration':
+			if ($eventId)
+			{
+				$segments[] = EventbookingHelperRoute::getEventTitle($eventId);
+			}
+			$segments[] = 'Group Registration';
 			unset($query['task']);
 			break;
 		case 'group_billing':
-			$segments[] = JText::_('EB_SEF_GROUP_BILLING');
+			$segments[] = 'Group Billing';
 			unset($query['task']);
 			break;
 		case 'download_ical':
@@ -191,19 +202,35 @@ function EventbookingBuildRoute(&$query)
 			}
 			$segments[] = 'download_ical';
 			unset($query['task']);
-			break;	
+			break;
 		case 'edit_registrant':
-			$segments[] = JText::_('EB_SEF_EDIT_REGISTRANT');
+			$segments[] = 'Edit Registrant';
 			unset($query['task']);
 			break;
 		case 'edit_event':
+			if ($id)
+			{
+				$segments[] = EventbookingHelperRoute::getEventTitle($id);
+			}
+			$segments[] = 'Edit';
+			unset($query['task']);
+			break;
+
 		case 'unpublish_event':
+			if ($id)
+			{
+				$segments[] = EventbookingHelperRoute::getEventTitle($id);
+			}
+			$segments[] = 'Unpublish';
+			unset($query['task']);
+			break;
+
 		case 'publish_event':
 			if ($id)
 			{
 				$segments[] = EventbookingHelperRoute::getEventTitle($id);
 			}
-			$segments[] = JText::_('EB_SEF_' . strtoupper($task));
+			$segments[] = 'Publish';
 			unset($query['task']);
 			break;
 		case 'csv_export':
@@ -238,8 +265,8 @@ function EventbookingBuildRoute(&$query)
 	if (count($segments))
 	{
 		$segments = array_map('JApplication::stringURLSafe', $segments);
-		$key = md5(implode('/', $segments));
-		$q = $db->getQuery(true);
+		$key      = md5(implode('/', $segments));
+		$q        = $db->getQuery(true);
 		$q->select('COUNT(*)')
 			->from('#__eb_urls')
 			->where('md5_key="' . $key . '"');
@@ -255,23 +282,25 @@ function EventbookingBuildRoute(&$query)
 			$db->execute();
 		}
 	}
-	
+
 	return $segments;
 }
 
 /**
- * 
+ *
  * Parse the segments of a URL.
- * @param	array	The segments of the URL to parse.
- * @return	array	The URL attributes to be used by the application.
+ *
+ * @param    array    The segments of the URL to parse.
+ *
+ * @return    array    The URL attributes to be used by the application.
  */
 function EventbookingParseRoute($segments)
 {
 	$vars = array();
 	if (count($segments))
 	{
-		$db = JFactory::getDbo();
-		$key = md5(str_replace(':', '-', implode('/', $segments)));
+		$db    = JFactory::getDbo();
+		$key   = md5(str_replace(':', '-', implode('/', $segments)));
 		$query = $db->getQuery(true);
 		$query->select('`query`')
 			->from('#__eb_urls')
@@ -284,7 +313,7 @@ function EventbookingParseRoute($segments)
 		}
 	}
 
-	$app = JFactory::getApplication();
+	$app  = JFactory::getApplication();
 	$menu = $app->getMenu();
 	if ($item = $menu->getActive())
 	{
@@ -296,10 +325,10 @@ function EventbookingParseRoute($segments)
 			}
 		}
 	}
-	
+
 	if (isset($vars['tmpl']) && !isset($_GET['tmpl']))
 	{
-			unset($vars['tmpl']);
+		unset($vars['tmpl']);
 	}
 
 	return $vars;

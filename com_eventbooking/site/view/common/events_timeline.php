@@ -175,7 +175,7 @@ $iconMapMakerClass = $bootstrapHelper->getClassMapping('icon-map-marker');
 								}
 								else
 								{
-									$url        = JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id=' . $event->id . '&Itemid=' . $Itemid, false, $ssl);
+									$url        = JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id=' . $event->id . '&Itemid=' . $Itemid, false, $ssl);
 									$text       = JText::_('EB_REGISTER_INDIVIDUAL');
 									$extraClass = '';
 								}
@@ -190,7 +190,7 @@ $iconMapMakerClass = $bootstrapHelper->getClassMapping('icon-map-marker');
 							{
 							?>
 								<li>
-									<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+									<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
 								</li>
 							<?php
 							}
@@ -202,7 +202,7 @@ $iconMapMakerClass = $bootstrapHelper->getClassMapping('icon-map-marker');
 						{
 							?>
 							<li>
-								<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=individual_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
+								<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
 							</li>
 						<?php
 						}
@@ -210,7 +210,7 @@ $iconMapMakerClass = $bootstrapHelper->getClassMapping('icon-map-marker');
 						{
 							?>
 							<li>
-								<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
+								<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
 							</li>
 						<?php
 						}

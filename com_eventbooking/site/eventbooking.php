@@ -20,6 +20,7 @@ EventbookingHelper::prepareRequestData();
 
 $input = new RADInput();
 $task  = $input->getCmd('task', '');
+
 //Handle BC for existing payment plugins
 if ($task == 'payment_confirm')
 {

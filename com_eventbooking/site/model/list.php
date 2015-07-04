@@ -112,7 +112,7 @@ class EventbookingModelList extends RADModelList
 
 		if ($fieldSuffix)
 		{
-			EventbookingHelperDatabase::getMultilingualFields($query, array('title', 'short_description', 'description'), $fieldSuffix);
+			EventbookingHelperDatabase::getMultilingualFields($query, array('tbl.title', 'tbl.short_description', 'tbl.description'), $fieldSuffix);
 		}
 
 		return $this;
@@ -167,12 +167,12 @@ class EventbookingModelList extends RADModelList
 			$search = $db->Quote('%' . $db->escape($state->search, true) . '%', false);
 			$query->where("(LOWER(tbl.title) LIKE $search OR LOWER(tbl.short_description) LIKE $search OR LOWER(tbl.description) LIKE $search)");
 		}
-		$name = $this->getName();
-		if ($name == 'Archive')
+		$name = strtolower($this->getName());
+		if ($name == 'archive')
 		{
 			$query->where('DATE(tbl.event_date) < CURDATE()');
 		}
-		elseif ($hidePastEvents || ($name == 'Upcomingevents'))
+		elseif ($hidePastEvents || ($name == 'upcomingevents'))
 		{
 			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
 			$query->where('DATE(tbl.event_date) >= "' . $currentDate . '"');

@@ -3846,27 +3846,6 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Check category access
-	 *
-	 * @param int $categoryId
-	 */
-	public static function checkCategoryAccess($categoryId)
-	{
-		$user  = JFactory::getUser();
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('`access`')
-			->from('#__eb_categories')
-			->where('id=' . $categoryId);
-		$db->setQuery($query);
-		$access = (int) $db->loadResult();
-		if (!in_array($access, $user->getAuthorisedViewLevels()))
-		{
-			JFactory::getApplication()->redirect('index.php', JText::_('NOT_AUTHORIZED'));
-		}
-	}
-
-	/**
 	 * Check to see whether the current user can
 	 *
 	 * @param int $eventId
