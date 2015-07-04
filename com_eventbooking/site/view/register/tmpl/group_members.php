@@ -78,7 +78,7 @@ if ($this->showCaptcha)
 		<input type="button" id="btn-group-members-back" name="btn-group-members-back" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_BACK'); ?>"/>
 		<input type="<?php echo $this->showBillingStep ? "button" : "submit";?>" id="btn-process-group-members" name="btn-process-group-members" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_NEXT'); ?>" />
 	</div>
-	<input type="hidden" name="task" value="store_group_members_data" />
+	<input type="hidden" name="task" value="register.store_group_members_data" />
 	<input type="hidden" name="event_id" value="<?php echo $this->eventId; ?>" />
 	<script type="text/javascript">
 			Eb.jQuery(document).ready(function($){
@@ -135,7 +135,7 @@ if ($this->showCaptcha)
 							if (formValid)
 							{
 								$.ajax({
-									url: siteUrl + 'index.php?option=com_eventbooking&task=store_group_members_data&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
+									url: siteUrl + 'index.php?option=com_eventbooking&task=register.store_group_members_data&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
 									type: 'post',
 									data: $('#eb-form-group-members').serialize(),
 									dataType: 'html',

@@ -11,11 +11,11 @@
 defined( '_JEXEC' ) or die ;
 if ($this->config->use_https)
 {
-	$url = JRoute::_('index.php?option=com_eventbooking&task=process_group_registration&Itemid='.$this->Itemid, false, 1);
+	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_group_registration&Itemid='.$this->Itemid, false, 1);
 }
 else
 {
-	$url = JRoute::_('index.php?option=com_eventbooking&task=process_group_registration&Itemid='.$this->Itemid, false);
+	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_group_registration&Itemid='.$this->Itemid, false);
 }
 $selectedState = '';
 

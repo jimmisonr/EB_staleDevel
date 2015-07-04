@@ -41,11 +41,11 @@ else
 $headerText = str_replace('[EVENT_TITLE]', $this->event->title, $headerText) ;
 if ($this->config->use_https)
 {
-	$url = JRoute::_('index.php?option=com_eventbooking&task=process_individual_registration&Itemid='.$this->Itemid, false, 1);
+	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_individual_registration&Itemid='.$this->Itemid, false, 1);
 }
 else
 {
-	$url = JRoute::_('index.php?option=com_eventbooking&task=process_individual_registration&Itemid='.$this->Itemid, false);
+	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_individual_registration&Itemid='.$this->Itemid, false);
 }
 $selectedState = '';
 

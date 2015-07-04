@@ -116,6 +116,8 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 			$membersData = array();
 		}
 
+		$this->showBillingStep   = EventbookingHelper::showBillingStep($event->id);
+
 		$showCaptcha = 0;
 		if (!$this->showBillingStep)
 		{
@@ -157,7 +159,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$this->showCaptcha       = $showCaptcha;
 		$this->defaultCountry    = $config->default_country;
 		$this->waitingList       = $waitingList;
-		$this->showBillingStep   = EventbookingHelper::showBillingStep($event->id);
+
 		$this->rowFields         = EventbookingHelper::getFormFields($event->id, 2);
 
 		parent::display();

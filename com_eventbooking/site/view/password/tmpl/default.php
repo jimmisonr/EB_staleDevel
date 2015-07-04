@@ -17,7 +17,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 ?>
 <div id="eb-event-password-page" class="eb-container">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_PRIVATE_EVENT_VALIDATION'); ?></h1>
-<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&task=check_event_password&Itemid='.$this->Itemid); ?>" autocomplete="off" class="form form-horizontal">
+<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.check_event_password&Itemid='.$this->Itemid); ?>" autocomplete="off" class="form form-horizontal">
 	<p><?php echo JText::_('EB_PRIVATE_EVENT_VALIDATION_MSG'); ?></p>
 	<div class="<?php echo $controlGroupClass; ?>">
 		<label class="<?php echo $controlLabelClass; ?>" for="password">

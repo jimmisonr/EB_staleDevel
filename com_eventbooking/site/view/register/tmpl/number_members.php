@@ -51,7 +51,7 @@ if (strlen($msg))
 			if (formValid)
 			{
 				$.ajax({
-					url: siteUrl + 'index.php?option=com_eventbooking&view=register&task=store_number_registrants&number_registrants=' + $('input[name=\'number_registrants\']').val() + '&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
+					url: siteUrl + 'index.php?option=com_eventbooking&view=register&task=register.store_number_registrants&number_registrants=' + $('input[name=\'number_registrants\']').val() + '&event_id=<?php echo $this->event->id; ?>&Itemid=<?php echo $this->Itemid; ?>&format=raw' + langLinkForAjax,
 					dataType: 'html',
 					beforeSend: function() {
 						$('#btn-process-number-members').attr('disabled', true);
