@@ -200,9 +200,20 @@ class EventbookingControllerRegister extends EventbookingController
 			}
 		}
 		$session->clear('eb_catpcha_invalid');
-		$data  = $input->getData();
-		$model = $this->getModel('Register');
-		$model->processIndividualRegistration($data);
+		$data   = $input->getData();
+		$model  = $this->getModel('Register');
+		$return = $model->processIndividualRegistration($data);
+
+		if ($return === 1)
+		{
+			// Redirect registrants to registration complete page
+			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->input->getInt('Itemid'), false, false));
+		}
+		elseif ($return === 2)
+		{
+			// Redirect to waiting list complete page
+			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=waitinglist&Itemid=' . $this->input->getInt('Itemid'), false, false));
+		}
 	}
 
 	/**
@@ -337,9 +348,19 @@ class EventbookingControllerRegister extends EventbookingController
 			$app->redirect($signupUrl, JText::_('Sorry, your session was expired. Please try again!'));
 		}
 
-		$data  = $input->getData();
-		$model = $this->getModel('Register');
-		$model->processGroupRegistration($data);
+		$data   = $input->getData();
+		$model  = $this->getModel('Register');
+		$return = $model->processGroupRegistration($data);
+		if ($return === 1)
+		{
+			// Redirect registrants to registration complete page
+			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->input->getInt('Itemid'), false, false));
+		}
+		elseif ($return === 2)
+		{
+			// Redirect to waiting list complete page
+			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=waitinglist&Itemid=' . $this->input->getInt('Itemid'), false, false));
+		}
 	}
 
 	/**

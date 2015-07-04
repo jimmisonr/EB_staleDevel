@@ -1,22 +1,16 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
 
-/**
- * Event Booking Component Register Model
- *
- * @package		Joomla
- * @subpackage	Event Booking
- */
-class EventBookingModelRegister extends JModelLegacy
+class EventBookingModelRegister extends RADModel
 {
 	/**
 	 * Check to see whether registrant entered correct password for private event
@@ -26,14 +20,14 @@ class EventBookingModelRegister extends JModelLegacy
 	 *
 	 * @return bool
 	 */
-	function checkPassword($eventId, $password)
+	public function checkPassword($eventId, $password)
 	{
-		$db = $this->getDbo();
+		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 		$query->select('COUNT(*)')
 			->from('#__eb_events')
-			->where('id = '. $eventId)
-			->where('event_password = '. $db->quote($password));
+			->where('id = ' . $eventId)
+			->where('event_password = ' . $db->quote($password));
 		$db->setQuery($query);
 		$total = $db->loadResult();
 		if ($total)
@@ -45,24 +39,27 @@ class EventBookingModelRegister extends JModelLegacy
 			return false;
 		}
 	}
+
 	/**
 	 * Process individual registration
 	 *
-	 * @param array $data
+	 * @param $data
+	 *
+	 * @return int
+	 * @throws Exception
 	 */
-	function processIndividualRegistration($data)
+	public function processIndividualRegistration($data)
 	{
 		jimport('joomla.user.helper');
-		$app = JFactory::getApplication();
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$user = JFactory::getUser();
-		$config = EventbookingHelper::getConfig();
-		$row = JTable::getInstance('EventBooking', 'Registrant');
+		$db                     = JFactory::getDbo();
+		$query                  = $db->getQuery(true);
+		$user                   = JFactory::getUser();
+		$config                 = EventbookingHelper::getConfig();
+		$row                    = JTable::getInstance('EventBooking', 'Registrant');
 		$data['transaction_id'] = strtoupper(JUserHelper::genRandomPassword());
 		if (!$user->id && $config->user_registration)
 		{
-			$userId = EventbookingHelper::saveRegistration($data);
+			$userId          = EventbookingHelper::saveRegistration($data);
 			$data['user_id'] = $userId;
 		}
 		while (true)
@@ -81,13 +78,7 @@ class EventBookingModelRegister extends JModelLegacy
 		$row->registration_code = $registrationCode;
 		// Calculate the payment amount
 		$eventId = (int) $data['event_id'];
-		$query->clear();
-		$query->select('a.*, IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
-			->from('#__eb_events AS a')
-			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
-			->where('a.id=' . $eventId);
-		$db->setQuery($query);
-		$event = $db->loadObject();
+		$event   = EventbookingHelperDatabase::getEvent($eventId);
 		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
 		{
 			$waitingList = true;
@@ -97,8 +88,8 @@ class EventBookingModelRegister extends JModelLegacy
 			$waitingList = false;
 		}
 		$paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : '';
-		$rowFields = EventbookingHelper::getFormFields($eventId, 0);
-		$form = new RADForm($rowFields);
+		$rowFields     = EventbookingHelper::getFormFields($eventId, 0);
+		$form          = new RADForm($rowFields);
 		$form->bind($data);
 		if ($waitingList == true)
 		{
@@ -109,22 +100,22 @@ class EventBookingModelRegister extends JModelLegacy
 			$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
 		}
 
-		$paymentType = JRequest::getInt('payment_type', 0);
+		$paymentType = isset($data['payment_type']) ? (int) $data['payment_type'] : 0;
 		if ($paymentType == 0)
 		{
 			$fees['deposit_amount'] = 0;
 		}
-		$data['total_amount'] = round($fees['total_amount'], 2);
-		$data['discount_amount'] = round($fees['discount_amount'], 2);
-		$data['tax_amount'] = round($fees['tax_amount'], 2);
-		$data['amount'] = round($fees['amount'], 2);
-		$data['deposit_amount'] = $fees['deposit_amount'];
+		$data['total_amount']           = round($fees['total_amount'], 2);
+		$data['discount_amount']        = round($fees['discount_amount'], 2);
+		$data['tax_amount']             = round($fees['tax_amount'], 2);
+		$data['amount']                 = round($fees['amount'], 2);
+		$data['deposit_amount']         = $fees['deposit_amount'];
 		$data['payment_processing_fee'] = $fees['payment_processing_fee'];
 
 		$row->bind($data);
-		$row->group_id = 0;
-		$row->published = 0;
-		$row->register_date = gmdate('Y-m-d H:i:s');
+		$row->group_id           = 0;
+		$row->published          = 0;
+		$row->register_date      = gmdate('Y-m-d H:i:s');
 		$row->number_registrants = 1;
 		if (isset($data['user_id']))
 		{
@@ -144,7 +135,7 @@ class EventBookingModelRegister extends JModelLegacy
 		}
 
 		//Save the active language
-		if ($app->getLanguageFilter())
+		if (JFactory::getApplication()->getLanguageFilter())
 		{
 			$row->language = JFactory::getLanguage()->getTag();
 		}
@@ -157,15 +148,18 @@ class EventBookingModelRegister extends JModelLegacy
 		if ($couponCode && $fees['coupon_valid'])
 		{
 			$coupon = $fees['coupon'];
-			$sql = 'UPDATE #__eb_coupons SET used = used + 1 WHERE id=' . $coupon->id;
-			$db->setQuery($sql);
+			$query->clear();
+			$query->update('#__eb_coupons')
+				->set('used = used + 1')
+				->where('id = ' . (int) $coupon->id);
+			$db->setQuery($query);
 			$db->execute();
 			$row->coupon_id = $coupon->id;
 		}
 
 		if ($waitingList)
 		{
-			$row->published = 3;
+			$row->published      = 3;
 			$row->payment_method = 'os_offline';
 		}
 
@@ -181,8 +175,7 @@ class EventBookingModelRegister extends JModelLegacy
 		}
 
 		// Store registration_code into session, use for registration complete code
-		$session = JFactory::getSession();
-		$session->set('eb_registration_code', $row->registration_code);
+		JFactory::getSession()->set('eb_registration_code', $row->registration_code);
 
 		if ($row->amount > 0 && !$waitingList)
 		{
@@ -198,7 +191,6 @@ class EventBookingModelRegister extends JModelLegacy
 		}
 		else
 		{
-			$Itemid            = JRequest::getInt('Itemid');
 			if (!$waitingList)
 			{
 				$row->payment_date = gmdate('Y-m-d H:i:s');
@@ -208,33 +200,37 @@ class EventBookingModelRegister extends JModelLegacy
 				JPluginHelper::importPlugin('eventbooking');
 				$dispatcher = JDispatcher::getInstance();
 				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-				$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false);
+
+				return 1;
 			}
 			else
 			{
 				EventbookingHelper::sendWaitinglistEmail($row, $config);
-				$url = JRoute::_('index.php?option=com_eventbooking&view=waitinglist&Itemid=' . (int) JRequest::getInt('Itemid'), false);
+
+				return 2;
 			}
-			$app->redirect($url);
 		}
 	}
 
 	/**
 	 * Process Group Registration
 	 *
-	 * @param array $data
+	 * @param $data
+	 *
+	 * @return int
+	 * @throws Exception
 	 */
-	function processGroupRegistration($data)
+	public function processGroupRegistration($data)
 	{
 		jimport('joomla.user.helper');
-		$app = JFactory::getApplication();
-		$session = JFactory::getSession();
-		$user = JFactory::getUser();
-		$db = JFactory::getDbo();
-		$config = EventbookingHelper::getConfig();
-		$row = JTable::getInstance('EventBooking', 'Registrant');
+		$session           = JFactory::getSession();
+		$user              = JFactory::getUser();
+		$db                = JFactory::getDbo();
+		$query             = $db->getQuery(true);
+		$config            = EventbookingHelper::getConfig();
+		$row               = JTable::getInstance('EventBooking', 'Registrant');
 		$numberRegistrants = (int) $session->get('eb_number_registrants', '');
-		$membersData = $session->get('eb_group_members_data', null);
+		$membersData       = $session->get('eb_group_members_data', null);
 		if ($membersData)
 		{
 			$membersData = unserialize($membersData);
@@ -244,20 +240,14 @@ class EventBookingModelRegister extends JModelLegacy
 			$membersData = array();
 		}
 		$data['number_registrants'] = $numberRegistrants;
-		$data['transaction_id'] = strtoupper(JUserHelper::genRandomPassword());
+		$data['transaction_id']     = strtoupper(JUserHelper::genRandomPassword());
 		if (!$user->id && $config->user_registration)
 		{
-			$userId = EventbookingHelper::saveRegistration($data);
+			$userId          = EventbookingHelper::saveRegistration($data);
 			$data['user_id'] = $userId;
 		}
 		$eventId = (int) $data['event_id'];
-		$query = $db->getQuery(true);
-		$query->select('a.*, IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
-		->from('#__eb_events AS a')
-		->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
-		->where('a.id=' . $eventId);
-		$db->setQuery($query);
-		$event = $db->loadObject();
+		$event   = EventbookingHelperDatabase::getEvent($eventId);
 		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
 		{
 			$waitingList = true;
@@ -266,9 +256,9 @@ class EventBookingModelRegister extends JModelLegacy
 		{
 			$waitingList = false;
 		}
-		$rowFields = EventbookingHelper::getFormFields($eventId, 1);
+		$rowFields        = EventbookingHelper::getFormFields($eventId, 1);
 		$memberFormFields = EventbookingHelper::getFormFields($eventId, 2);
-		$form = new RADForm($rowFields);
+		$form             = new RADForm($rowFields);
 		$form->bind($data);
 
 		$paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : '';
@@ -281,22 +271,22 @@ class EventBookingModelRegister extends JModelLegacy
 			$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
 		}
 		//Calculate members fee
-		$membersForm = $fees['members_form'];
-		$membersTotalAmount = $fees['members_total_amount'];
+		$membersForm           = $fees['members_form'];
+		$membersTotalAmount    = $fees['members_total_amount'];
 		$membersDiscountAmount = $fees['members_discount_amount'];
-		$membersTaxAmount = $fees['members_tax_amount'];
-		$paymentType = (int) @$data['payment_type'];
+		$membersTaxAmount      = $fees['members_tax_amount'];
+		$paymentType           = (int) @$data['payment_type'];
 		if ($paymentType == 0)
 		{
 			$fees['deposit_amount'] = 0;
 		}
 		//The data for group billing record		
-		$data['total_amount'] = $fees['total_amount'];
-		$data['discount_amount'] = $fees['discount_amount'];
-		$data['tax_amount'] = $fees['tax_amount'];
-		$data['deposit_amount'] = $fees['deposit_amount'];
+		$data['total_amount']           = $fees['total_amount'];
+		$data['discount_amount']        = $fees['discount_amount'];
+		$data['tax_amount']             = $fees['tax_amount'];
+		$data['deposit_amount']         = $fees['deposit_amount'];
 		$data['payment_processing_fee'] = $fees['payment_processing_fee'];
-		$data['amount'] = $fees['amount'];
+		$data['amount']                 = $fees['amount'];
 		if (!isset($data['first_name']))
 		{
 			//Get data from first member
@@ -307,9 +297,9 @@ class EventBookingModelRegister extends JModelLegacy
 			$data = array_merge($data, $firstMemberForm->getFormData());
 		}
 		$row->bind($data);
-		$row->group_id = 0;
-		$row->published = 0;
-		$row->register_date = gmdate('Y-m-d H:i:s');
+		$row->group_id         = 0;
+		$row->published        = 0;
+		$row->register_date    = gmdate('Y-m-d H:i:s');
 		$row->is_group_billing = 1;
 		if (isset($data['user_id']))
 		{
@@ -329,7 +319,7 @@ class EventBookingModelRegister extends JModelLegacy
 		}
 
 		// Save the active language
-		if ($app->getLanguageFilter())
+		if (JFactory::getApplication()->getLanguageFilter())
 		{
 			$row->language = JFactory::getLanguage()->getTag();
 		}
@@ -360,15 +350,18 @@ class EventBookingModelRegister extends JModelLegacy
 		if ($couponCode && $fees['coupon_valid'])
 		{
 			$coupon = $fees['coupon'];
-			$sql = 'UPDATE #__eb_coupons SET used = used + 1 WHERE id=' . $coupon->id;
-			$db->setQuery($sql);
+			$query->clear();
+			$query->update('#__eb_coupons')
+				->set('used = used + 1')
+				->where('id = ' . (int) $coupon->id);
+			$db->setQuery($query);
 			$db->execute();
 			$row->coupon_id = $coupon->id;
 		}
 
 		if ($waitingList)
 		{
-			$row->published = 3;
+			$row->published      = 3;
 			$row->payment_method = 'os_offline';
 		}
 		//Clear the coupon session
@@ -379,18 +372,18 @@ class EventBookingModelRegister extends JModelLegacy
 		{
 			for ($i = 0; $i < $numberRegistrants; $i++)
 			{
-				$rowMember = JTable::getInstance('EventBooking', 'Registrant');
-				$rowMember->group_id = $row->id;
-				$rowMember->transaction_id = $row->transaction_id;
-				$rowMember->event_id = $row->event_id;
-				$rowMember->payment_method = $row->payment_method;
-				$rowMember->user_id = $row->user_id;
-				$rowMember->register_date = $row->register_date;
-				$rowMember->total_amount = $membersTotalAmount[$i];
-				$rowMember->discount_amount = $membersDiscountAmount[$i];
-				$rowMember->tax_amount = $membersTaxAmount[$i];
-				$rowMember->amount = $rowMember->total_amount - $rowMember->discount_amount + $rowMember->tax_amount;
-				$rowMember->number_registrants = 1;				
+				$rowMember                     = JTable::getInstance('EventBooking', 'Registrant');
+				$rowMember->group_id           = $row->id;
+				$rowMember->transaction_id     = $row->transaction_id;
+				$rowMember->event_id           = $row->event_id;
+				$rowMember->payment_method     = $row->payment_method;
+				$rowMember->user_id            = $row->user_id;
+				$rowMember->register_date      = $row->register_date;
+				$rowMember->total_amount       = $membersTotalAmount[$i];
+				$rowMember->discount_amount    = $membersDiscountAmount[$i];
+				$rowMember->tax_amount         = $membersTaxAmount[$i];
+				$rowMember->amount             = $rowMember->total_amount - $rowMember->discount_amount + $rowMember->tax_amount;
+				$rowMember->number_registrants = 1;
 				$membersForm[$i]->removeFieldSuffix();
 				$memberData = $membersForm[$i]->getFormData();
 				$rowMember->bind($memberData);
@@ -447,7 +440,8 @@ class EventBookingModelRegister extends JModelLegacy
 				JPluginHelper::importPlugin('eventbooking');
 				$dispatcher = JDispatcher::getInstance();
 				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-				$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . (int) JRequest::getInt('Itemid'), false);
+
+				return 1;
 			}
 			else
 			{
@@ -456,19 +450,20 @@ class EventBookingModelRegister extends JModelLegacy
 					EventbookingHelper::updateGroupRegistrationRecord($row->id);
 					EventbookingHelper::sendWaitinglistEmail($row, $config);
 				}
-				$url = JRoute::_('index.php?option=com_eventbooking&view=waitinglist&Itemid=' . (int) JRequest::getInt('Itemid'), false);
+
+				return 2;
 			}
-			$app->redirect($url);
 		}
 	}
 
+
 	/**
-	 * Process payment confirmation
+	 * Process payment confirmation, update status of the registration records, sending emails...
 	 *
+	 * @param $paymentMethod
 	 */
-	function paymentConfirm()
+	public function paymentConfirm($paymentMethod)
 	{
-		$paymentMethod = JRequest::getVar('payment_method', '');
 		$method = os_payments::getPaymentMethod($paymentMethod);
 		if ($method)
 		{
@@ -478,18 +473,18 @@ class EventBookingModelRegister extends JModelLegacy
 
 	/**
 	 * Process registration cancellation
-	 * 
+	 *
 	 */
-	function cancelRegistration($id)
+	public function cancelRegistration($id)
 	{
 		if (!$id)
 		{
 			return false;
 		}
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
 		$config = EventbookingHelper::getConfig();
-		$row = JTable::getInstance('EventBooking', 'Registrant');
+		$row    = JTable::getInstance('EventBooking', 'Registrant');
 		$row->load($id);
 		if (!$row->id)
 		{
@@ -512,17 +507,17 @@ class EventBookingModelRegister extends JModelLegacy
 		{
 			// We will need to set group members records to be cancelled
 			$query->update('#__eb_registrants')
-			->set('published=2')
-			->where('group_id='.(int)$row->id);
+				->set('published=2')
+				->where('group_id=' . (int) $row->id);
 			$db->setQuery($query);
 			$db->execute();
 			$query->clear();
 		}
-		elseif($row->group_id > 0)
+		elseif ($row->group_id > 0)
 		{
 			$query->update('#__eb_registrants')
-			->set('published=2')
-			->where('group_id='.(int)$row->group_id.' OR id='.$row->group_id);
+				->set('published=2')
+				->where('group_id=' . (int) $row->group_id . ' OR id=' . $row->group_id);
 			$db->setQuery($query);
 			$db->execute();
 			$query->clear();
@@ -530,7 +525,7 @@ class EventBookingModelRegister extends JModelLegacy
 		$query->clear();
 		$query->select('*')
 			->from('#__eb_events')
-			->where('id = '. (int) $row->event_id);
+			->where('id = ' . (int) $row->event_id);
 		$db->setQuery($query);
 		$event = $db->loadObject();
 
@@ -569,14 +564,14 @@ class EventBookingModelRegister extends JModelLegacy
 
 		// Need to over-ridde some config options
 		$emailContent = EventbookingHelper::getEmailContent($config, $row, true, $form);
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$fieldSuffix  = EventbookingHelper::getFieldSuffix();
 		$query->clear();
 		$query->select('title' . $fieldSuffix . ' AS title')
 			->from('#__eb_events')
 			->where('id=' . $row->event_id);
 		$db->setQuery($query);
-		$eventTitle = $db->loadResult();
-		$replaces = array();
+		$eventTitle              = $db->loadResult();
+		$replaces                = array();
 		$replaces['event_title'] = $db->loadResult();
 		//Replace the custom fields
 		$fields = $form->getFields();
@@ -612,10 +607,10 @@ class EventBookingModelRegister extends JModelLegacy
 			$body = $message->registration_cancel_email_body;
 		}
 		$subject = str_replace('[EVENT_TITLE]', $eventTitle, $subject);
-		$body = str_replace('[REGISTRATION_DETAIL]', $emailContent, $body);
+		$body    = str_replace('[REGISTRATION_DETAIL]', $emailContent, $body);
 		foreach ($replaces as $key => $value)
 		{
-			$key = strtoupper($key);
+			$key  = strtoupper($key);
 			$body = str_replace("[$key]", $value, $body);
 		}
 		//Send emails to notification emails
@@ -632,8 +627,8 @@ class EventBookingModelRegister extends JModelLegacy
 			$notificationEmails = $config->notification_emails;
 		}
 		$notificationEmails = str_replace(' ', '', $notificationEmails);
-		$emails = explode(',', $notificationEmails);
-		$mailer = JFactory::getMailer();
+		$emails             = explode(',', $notificationEmails);
+		$mailer             = JFactory::getMailer();
 		for ($i = 0, $n = count($emails); $i < $n; $i++)
 		{
 			$email = $emails[$i];
@@ -643,6 +638,5 @@ class EventBookingModelRegister extends JModelLegacy
 
 		// Notify waiting list ?
 		EventbookingHelper::notifyWaitingList($row, $config);
-
 	}
 } 
