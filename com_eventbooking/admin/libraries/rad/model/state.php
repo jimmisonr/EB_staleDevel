@@ -30,6 +30,8 @@ class RADModelState
 	 *
 	 * @param string $name The name of state
 	 * @param fix    $value
+	 *
+	 * @return $this
 	 */
 	public function set($name, $value)
 	{
@@ -37,6 +39,8 @@ class RADModelState
 		{
 			$this->data[$name]->value = $value;
 		}
+
+		return $this;
 	}
 
 	/**
