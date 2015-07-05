@@ -21,7 +21,7 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 		var form = document.adminForm;
 		if (form.event_id.value == 0)
 		{
-			alert("<?php echo JText::_('EB_SELECT_EVENT_TO_ADD_REGISTRANT'); ?>");
+			alert("<?php echo JText::_('EB_SELECT_EVENT_TO_ADD_REGISTRANTS'); ?>");
 			form.event_id.focus();
 			return ;
 		}		
