@@ -1,26 +1,28 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
-class EventBookingViewFailure extends JViewLegacy
+
+class EventbookingViewFailureHtml extends RADViewHtml
 {
 
-	function display($tpl = null)
+	public function display()
 	{
 		$this->setLayout('default');
 		$reason = isset($_SESSION['reason']) ? $_SESSION['reason'] : '';
 		if (!$reason)
 		{
-			$reason = JRequest::getVar('failReason', '');
+			$reason = $this->input->getString('failReason', '');
 		}
-		$this->assignRef('reason', $reason);
-		parent::display($tpl);
+		$this->reason = $reason;
+
+		parent::display();
 	}
 }
