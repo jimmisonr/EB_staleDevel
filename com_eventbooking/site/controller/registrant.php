@@ -22,18 +22,19 @@ class EventbookingControllerRegistrant extends EventbookingController
 	 */
 	public function save()
 	{
-		$Itemid = JRequest::getInt('Itemid', 0);
-		$model  = &$this->getModel('registrant');
-		$post   = JRequest::get('post');
+		$this->csrfProtection();
+
+		$model = $this->getModel('registrant');
+		$post  = $this->input->post->getData();
 		$model->store($post);
-		$from = JRequest::getVar('from', '');
+		$from = $this->input->getString('from', '');
 		if ($from == 'history')
 		{
-			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('history', $Itemid), false));
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('history', $this->input->getInt('Itemid')), false));
 		}
 		else
 		{
-			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', $Itemid), false));
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', $this->input->getInt('Itemid')), false));
 		}
 	}
 
@@ -46,9 +47,9 @@ class EventbookingControllerRegistrant extends EventbookingController
 		$db               = JFactory::getDbo();
 		$query            = $db->getQuery(true);
 		$user             = JFactory::getUser();
-		$Itemid           = JRequest::getInt('Itemid', 0);
-		$id               = JRequest::getInt('id');
-		$registrationCode = JRequest::getVar('cancel_code', '');
+		$Itemid           = $this->input->getInt('Itemid', 0);
+		$id               = $this->input->getInt('id', 0);
+		$registrationCode = $this->input->getString('cancel_code', '');
 		$fieldSuffix      = EventbookingHelper::getFieldSuffix();
 		if ($id)
 		{
@@ -93,6 +94,11 @@ class EventbookingControllerRegistrant extends EventbookingController
 		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=registrationcancel&id=' . $id . '&Itemid=' . $Itemid, false));
 	}
 
+	/**
+	 * Download invoice associated to the registration record
+	 *
+	 * @throws Exception
+	 */
 	public function download_invoice()
 	{
 		$user = JFactory::getUser();
@@ -100,7 +106,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('You do not have permission to download the invoice'));
 		}
-		$id = JRequest::getInt('id');
+		$id = $this->input->getInt('id', 0);
 		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/tables');
 		$row = JTable::getInstance('eventbooking', 'Registrant');
 		$row->load($id);
@@ -108,6 +114,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('You do not have permission to download the invoice'));
 		}
+
 		EventbookingHelper::downloadInvoice($id);
 	}
 
@@ -120,45 +127,38 @@ class EventbookingControllerRegistrant extends EventbookingController
 		$query       = $db->getQuery(true);
 		$config      = EventbookingHelper::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$eventId     = JRequest::getInt('event_id');
+		$eventId     = $this->input->getInt('event_id', 0);
+
 		if (!EventbookingHelper::canExportRegistrants($eventId))
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('EB_NOT_ALLOWED_TO_EXPORT'));
 		}
+
 		if (!$eventId)
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('EB_PLEASE_CHOOSE_AN_EVENT_TO_EXPORT_REGISTRANTS'));
 		}
-		$where   = array();
-		$where[] = '(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published NOT IN (2,3)))';
-		if ($eventId)
-		{
-			$where[] = ' a.event_id=' . $eventId;
-		}
-		if (isset($config->include_group_billing_in_csv_export) && !$config->include_group_billing_in_csv_export)
-		{
-			$where[] = ' a.is_group_billing = 0 ';
-		}
-		if (!$config->include_group_members_in_csv_export)
-		{
-			$where[] = ' a.group_id = 0 ';
-		}
+
+		$query->select('a.*, b.event_date')
+			->select(' b.title' . $fieldSuffix . ' AS event_title')
+			->from('#__eb_registrants AS a')
+			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+			->order('a.id');
+
 		if ($config->show_coupon_code_in_registrant_list)
 		{
-			$sql = 'SELECT a.*, b.event_date, b.title' . $fieldSuffix . ' AS event_title, c.code AS coupon_code FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id = b.id LEFT JOIN #__eb_coupons AS c ON a.coupon_id=c.id WHERE ' .
-				implode(' AND ', $where) . ' ORDER BY a.id ';
+			$query->select('c.code AS coupon_code')
+				->leftJoin('#__eb_coupons AS c ON a.coupon_id=c.id');
 		}
-		else
-		{
-			$sql = 'SELECT a.*, b.event_date, b.title' . $fieldSuffix . ' AS event_title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id = b.id WHERE ' .
-				implode(' AND ', $where) . ' ORDER BY a.id ';
-		}
-		$db->setQuery($sql);
+
+		$db->setQuery($query);
 		$rows = $db->loadObjectList();
+
 		if (count($rows) == 0)
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('EB_NO_REGISTRANTS_TO_EXPORT'));
 		}
+
 		if ($eventId)
 		{
 			if ($config->custom_field_by_category)
@@ -170,27 +170,57 @@ class EventbookingControllerRegistrant extends EventbookingController
 					->where('main_category=1');
 				$db->setQuery($query);
 				$categoryId = (int) $db->loadResult();
-				$sql        = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 AND (category_id=0 OR category_id=' . $categoryId .
-					') ORDER BY ordering';
+
+				$query->clear();
+				$query->select('id, name, title, is_core')
+					->from('#__eb_fields')
+					->where('published = 1')
+					->where('(category_id=0 OR category_id=' . $categoryId . ')')
+					->order('ordering');
 			}
 			else
 			{
-				$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 AND (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . ')) ORDER BY ordering';
+				$query->clear();
+				$query->select('id, name, title, is_core')
+					->from('#__eb_fields')
+					->where('published = 1')
+					->where('(event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . '))')
+					->order('ordering');
 			}
 		}
 		else
 		{
-			$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1  ORDER BY ordering';
+			$query->clear();
+			$query->select('id, name, title, is_core')
+				->from('#__eb_fields')
+				->where('published = 1')
+				->order('ordering');
 		}
-		$db->setQuery($sql);
+		$db->setQuery($query);
 		$rowFields = $db->loadObjectList();
-		//Get the custom fields value and store them into an array
-		$sql = 'SELECT id FROM #__eb_registrants AS a WHERE ' . implode(' AND ', $where);
-		$db->setQuery($sql);
+
 		$registrantIds = array(0);
-		$registrantIds = array_merge($registrantIds, $db->loadColumn());
-		$sql           = 'SELECT registrant_id, field_id, field_value FROM #__eb_field_values WHERE registrant_id IN (' . implode(',', $registrantIds) . ')';
-		$db->setQuery($sql);
+
+		//Get name of groups
+		$groupNames = array();
+		if (count($rows))
+		{
+			foreach ($rows as $row)
+			{
+				$registrantIds[] = $row->id;
+				if ($row->is_group_billing)
+				{
+					$groupNames[$row->id] = $row->first_name . ' ' . $row->last_name;
+				}
+			}
+		}
+
+		//Get the custom fields value and store them into an array
+		$query->clear();
+		$query->select('registrant_id, field_id, field_value')
+			->from('#__eb_field_values')
+			->where('registrant_id IN (' . implode(',', $registrantIds) . ')');
+		$db->setQuery($query);
 		$rowFieldValues = $db->loadObjectList();
 		$fieldValues    = array();
 		for ($i = 0, $n = count($rowFieldValues); $i < $n; $i++)
@@ -198,19 +228,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 			$rowFieldValue                                                        = $rowFieldValues[$i];
 			$fieldValues[$rowFieldValue->registrant_id][$rowFieldValue->field_id] = $rowFieldValue->field_value;
 		}
-		//Get name of groups
-		$groupNames = array();
-		$sql        = 'SELECT id, first_name, last_name FROM #__eb_registrants AS a WHERE is_group_billing = 1' .
-			(COUNT($where) ? ' AND ' . implode(' AND ', $where) : '');
-		$db->setQuery($sql);
-		$rowGroups = $db->loadObjectList();
-		if (count($rowGroups))
-		{
-			foreach ($rowGroups as $rowGroup)
-			{
-				$groupNames[$rowGroup->id] = $rowGroup->first_name . ' ' . $rowGroup->last_name;
-			}
-		}
+
 		EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues, $groupNames);
 	}
 }
