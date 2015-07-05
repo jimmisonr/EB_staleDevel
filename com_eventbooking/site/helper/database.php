@@ -109,6 +109,26 @@ class EventbookingHelperDatabase
 	}
 
 	/**
+	 * Get all published events
+	 *
+	 * @param string $order
+	 *
+	 * @return mixed
+	 */
+	public static function getAllEvents($order = 'title')
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('id, title, event_date')
+			->from('#__eb_events')
+			->where('published=1')
+			->order($order);
+		$db->setQuery($query);
+
+		return $db->loadObjectList();
+	}
+
+	/**
 	 * Helper method to get fields from database table in case the site is multilingual
 	 *
 	 * @param JDatabaseQuery $query
