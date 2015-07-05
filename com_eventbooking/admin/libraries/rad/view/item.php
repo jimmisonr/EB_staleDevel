@@ -77,7 +77,7 @@ class RADViewItem extends RADViewHtml
 			$this->addToolbar();
 		}
 		
-		$this->languages = OSMembershipHelper::getLanguages();
+		$this->languages = EventbookingHelper::getLanguages();
 	}
 
 	/**

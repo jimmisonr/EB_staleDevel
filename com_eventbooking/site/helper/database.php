@@ -129,6 +129,26 @@ class EventbookingHelperDatabase
 	}
 
 	/**
+	 * Get all published countries
+	 *
+	 * @param string $order
+	 *
+	 * @return mixed
+	 */
+	public static function getAllCountries($order = 'name')
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('id, name')
+			->from('#__eb_countries')
+			->where('published')
+			->order($order);
+		$db->setQuery($query);
+
+		return $db->loadObjectList();
+	}
+
+	/**
 	 * Helper method to get fields from database table in case the site is multilingual
 	 *
 	 * @param JDatabaseQuery $query
