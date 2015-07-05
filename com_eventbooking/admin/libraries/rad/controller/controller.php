@@ -197,7 +197,7 @@ class RADController
 		// Build default config data for the controller
 		if (empty($config['language_prefix']))
 		{
-			$component = substr($config['option'], 4);
+			$component                 = substr($config['option'], 4);
 			$config['language_prefix'] = strtoupper($component);
 		}
 
@@ -395,7 +395,7 @@ class RADController
 	{
 		// Merge config array with default config parameters
 		$config += $this->config;
-		$config['name'] = $name;
+		$config['name']   = $name;
 		$config['layout'] = $layout;
 
 		// Set the default paths for finding the layout if it is not specified in the $config array		
@@ -403,14 +403,7 @@ class RADController
 		{
 			$paths   = array();
 			$paths[] = JPATH_THEMES . '/' . $this->app->getTemplate() . '/html/' . $config['option'] . '/' . $name;
-			if ($this->app->isAdmin())
-			{
-				$paths[] = JPATH_ADMINISTRATOR . '/components/' . $config['option'] . '/view/' . $name . '/tmpl';
-			}
-			else
-			{
-				$paths[] = JPATH_ROOT . '/components/' . $config['option'] . '/view/' . $name . '/tmpl';
-			}
+			$paths[] = JPATH_BASE . '/components/' . $config['option'] . '/view/' . $name . '/tmpl';
 
 			$config['paths'] = $paths;
 		}
@@ -442,9 +435,7 @@ class RADController
 		{
 			$config['input'] = $this->input;
 		}
-
-
-
+		
 		return RADView::getInstance($name, $type, ucfirst($config['class_prefix']) . 'View', $config);
 	}
 
