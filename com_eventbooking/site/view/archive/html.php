@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.7.2
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -13,9 +13,10 @@ defined('_JEXEC') or die();
 class EventbookingViewArchiveHtml extends RADViewHtml
 {
 
-	function display($tpl = null)
+	public function display()
 	{
-		JFactory::getDocument()->setTitle(JText::_('EB_EVENTS_ARCHIVE'));
+		$app    = JFactory::getApplication();
+		$active = $app->getMenu()->getActive();
 		$model  = $this->getModel();
 		$state  = $model->getState();
 		$items  = $model->getData();
@@ -28,10 +29,20 @@ class EventbookingViewArchiveHtml extends RADViewHtml
 				$item->short_description = JHtml::_('content.prepare', $item->short_description);
 			}
 		}
+
+		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)
+		{
+			EventbookingHelperData::prepareCustomFieldsData($items);
+		}
+
+
+		$category = null;
 		if ($state->id)
 		{
-			$this->category = $model->getCategory();
+			$category = EventbookingHelperDatabase::getCategory($state->id);
 		}
+
+
 		if ($config->show_list_of_registrants)
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
@@ -50,14 +61,25 @@ class EventbookingViewArchiveHtml extends RADViewHtml
 			}
 			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
 		}
+
+		// Process page meta data
+		$params = EventbookingHelper::getViewParams($active, array('archive'));
+
+		if (!$params->get('page_title'))
+		{
+			$params->set('page_title', JText::_('EB_EVENTS_ARCHIVE'));
+		}
+
+		EventbookingHelperHtml::prepareDocument($params, $category);
+
 		$this->items           = $items;
 		$this->pagination      = $model->getPagination();
-		$this->Itemid          = JRequest::getInt('Itemid', 0);
 		$this->config          = $config;
 		$this->nullDate        = JFactory::getDbo()->getNullDate();
 		$this->categoryId      = $state->id;
+		$this->category        = $category;
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
-		parent::display($tpl);
+		parent::display();
 	}
 }
