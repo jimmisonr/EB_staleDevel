@@ -1,24 +1,24 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
-class EventBookingViewSearch extends JViewLegacy
+
+class EventbookingViewSearchHtml extends RADViewHtml
 {
 
-	function display($tpl = null)
-	{		
-		$db = JFactory::getDbo();
-		$document = JFactory::getDocument();
-		$model = $this->getModel();
-		$state = $model->getState();
-		$items = $model->getData();
+	public function display()
+	{
+		$document   = JFactory::getDocument();
+		$model      = $this->getModel();
+		$state      = $model->getState();
+		$items      = $model->getData();
 		$pagination = $model->getPagination();
 		$document->setTitle(JText::_('EB_SEARCH_RESULT'));
 		$config = EventbookingHelper::getConfig();
@@ -26,14 +26,13 @@ class EventBookingViewSearch extends JViewLegacy
 		{
 			for ($i = 0, $n = count($items); $i < $n; $i++)
 			{
-				$item = $items[$i];
-				$item->short_description = JHtml::_('content.prepare', $item->short_description);
-				;
+				$item                    = $items[$i];
+				$item->short_description = JHtml::_('content.prepare', $item->short_description);;
 			}
 		}
 		if ($config->multiple_booking)
 		{
-			EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');			
+			EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
 		}
 		if ($config->show_list_of_registrants)
 		{
@@ -41,17 +40,17 @@ class EventBookingViewSearch extends JViewLegacy
 		}
 		if ($config->show_location_in_category_view)
 		{
-			$width = (int) $config->map_width ;
+			$width = (int) $config->map_width;
 			if (!$width)
 			{
-				$width = 800 ;
+				$width = 800;
 			}
-			$height = (int) $config->map_height ;
+			$height = (int) $config->map_height;
 			if (!$height)
 			{
-				$height = 600 ;
-			}			
-			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width.'px', $height.'px', 'true', 'false');
+				$height = 600;
+			}
+			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
 		}
 		$pagination->setAdditionalUrlParam('view', 'search');
 		if ($state->category_id)
@@ -68,38 +67,15 @@ class EventBookingViewSearch extends JViewLegacy
 		}
 		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)
 		{
-			$params = new JRegistry();
-			$xml = JFactory::getXML(JPATH_COMPONENT . '/fields.xml');
-			$fields = $xml->fields->fieldset->children();
-			$customFields = array();
-			foreach ($fields as $field)
-			{
-				$name = $field->attributes()->name;
-				$label = JText::_($field->attributes()->label);
-				$customFields["$name"] = $label;
-			}
-			for ($i = 0, $n = count($items); $i < $n; $i++)
-			{
-				$item = $items[$i];
-				$params->loadString($item->custom_fields, 'JSON');
-				$paramData = array();
-				foreach ($customFields as $name => $label)
-				{
-					$paramData[$name]['title'] = $label;
-					$paramData[$name]['value'] = $params->get($name);
-				}
-				
-				$item->paramData = $paramData;
-			}
+			EventbookingHelperData::prepareCustomFieldsData($items);
 		}
-		$this->viewLevels = JFactory::getUser()->getAuthorisedViewLevels();
-		$this->items = $items;
-		$this->pagination = $pagination;
-		$this->Itemid = JRequest::getInt('Itemid', 0);
-		$this->config = $config;
-		$this->nullDate = $db->getNullDate();
+		$this->viewLevels      = JFactory::getUser()->getAuthorisedViewLevels();
+		$this->items           = $items;
+		$this->pagination      = $pagination;
+		$this->config          = $config;
+		$this->nullDate        = JFactory::getDbo()->getNullDate();
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
-		parent::display($tpl);
+		parent::display();
 	}
 }
