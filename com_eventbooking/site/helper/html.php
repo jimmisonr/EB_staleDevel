@@ -329,17 +329,20 @@ abstract class EventbookingHelperHtml
 		$document         = JFactory::getDocument();
 		$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
 		$pageTitle        = $params->get('page_title');
-		if ($siteNamePosition == 0)
+		if ($pageTitle)
 		{
-			$document->setTitle($pageTitle);
-		}
-		elseif ($siteNamePosition == 1)
-		{
-			$document->setTitle(JFactory::getConfig()->get('sitename') . ' - ' . $pageTitle);
-		}
-		else
-		{
-			$document->setTitle($pageTitle . ' - ' . JFactory::getConfig()->get('sitename'));
+			if ($siteNamePosition == 0)
+			{
+				$document->setTitle($pageTitle);
+			}
+			elseif ($siteNamePosition == 1)
+			{
+				$document->setTitle(JFactory::getConfig()->get('sitename') . ' - ' . $pageTitle);
+			}
+			else
+			{
+				$document->setTitle($pageTitle . ' - ' . JFactory::getConfig()->get('sitename'));
+			}
 		}
 
 		if (!empty($item->meta_keywords))
