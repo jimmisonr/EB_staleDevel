@@ -366,7 +366,7 @@ class RADController
 				}
 				else
 				{
-					$config['default_model_class'] = 'RADModelItem';
+					$config['default_model_class'] = 'RADModel';
 				}
 			}
 		}

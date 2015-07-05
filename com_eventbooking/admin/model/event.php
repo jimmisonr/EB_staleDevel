@@ -9,7 +9,7 @@
  */
 // no direct access
 defined('_JEXEC') or die();
-class EventbookingModelEvent extends RADModelItem
+class EventbookingModelEvent extends RADModelAdmin
 {
 
 	/**
@@ -799,7 +799,7 @@ class EventbookingModelEvent extends RADModelItem
 	/**
 	 * Load event date from database
 	 * 
-	 * @see RADModelItem::loadData()
+	 * @see RADModelAdmin::loadData()
 	 */
 	function loadData()
 	{

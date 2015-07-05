@@ -9,7 +9,7 @@
  */
 // no direct access
 defined('_JEXEC') or die();
-class EventbookingModelPlugin extends RADModelItem
+class EventbookingModelPlugin extends RADModelAdmin
 {		
 	public function __construct($config)
 	{

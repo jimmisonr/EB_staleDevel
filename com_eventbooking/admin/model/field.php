@@ -9,7 +9,7 @@
  */
 // no direct access
 defined('_JEXEC') or die();
-class EventbookingModelField extends RADModelItem
+class EventbookingModelField extends RADModelAdmin
 {
 
 	/**
@@ -179,7 +179,7 @@ class EventbookingModelField extends RADModelItem
 
 	/**
 	 * Publish custom fields. Two fields First Name and Email could not be unpublished
-	 * @see RADModelItem::publish()
+	 * @see RADModelAdmin::publish()
 	 */
 	public function publish($cid, $state)
 	{

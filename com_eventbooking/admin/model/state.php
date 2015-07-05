@@ -10,7 +10,7 @@
 // no direct access
 defined('_JEXEC') or die();
 
-class EventBookingModelState extends RADModelItem
+class EventBookingModelState extends RADModelAdmin
 {
 	/**
 	 * Method to store a country

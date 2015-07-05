@@ -9,7 +9,7 @@
  */
 // no direct access
 defined('_JEXEC') or die();
-class EventBookingModelLocation extends RADModelItem
+class EventBookingModelLocation extends RADModelAdmin
 {
 
 	/**

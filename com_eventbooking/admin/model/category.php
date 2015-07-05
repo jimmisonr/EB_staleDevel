@@ -9,7 +9,7 @@
  */
 // no direct access
 defined('_JEXEC') or die();
-class EventbookingModelCategory extends RADModelItem
+class EventbookingModelCategory extends RADModelAdmin
 {
     public function getReorderConditions($row)
     {

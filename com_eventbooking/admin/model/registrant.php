@@ -16,7 +16,7 @@ defined('_JEXEC') or die();
  * @package		Joomla
  * @subpackage	Event Booking
  */
-class EventbookingModelRegistrant extends RADModelItem
+class EventbookingModelRegistrant extends RADModelAdmin
 {
 
 	/**
@@ -33,7 +33,7 @@ class EventbookingModelRegistrant extends RADModelItem
 	/**
 	 * Initial registrant data
 	 * 
-	 * @see RADModelItem::initData()
+	 * @see RADModelAdmin::initData()
 	 */
 	public function initData()
 	{
