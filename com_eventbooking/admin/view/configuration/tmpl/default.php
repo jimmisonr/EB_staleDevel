@@ -662,7 +662,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_DECIMALS'); ?>
 						</td>
 						<td>
-							<input type="text" name="decimals" class="inputbox" value="<?php echo isset($this->config->decimals) ? $this->config->decimals : 2; ?>" size="10" />
+							<input type="text" name="decimals" class="inputbox" value="<?php echo $this->config->get('decimals', 2); ?>" size="10" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_DECIMALS_EXPLAIN'); ?>
@@ -674,7 +674,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_DECIMAL_POINT'); ?>
 						</td>
 						<td>
-							<input type="text" name="dec_point" class="inputbox" value="<?php echo isset($this->config->dec_point) ? $this->config->dec_point : '.'; ?>" size="10" />
+							<input type="text" name="dec_point" class="inputbox" value="<?php echo $this->config->get('dec_point', '.');?>" size="10" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_DECIMAL_POINT_EXPLAIN'); ?>
@@ -686,7 +686,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_THOUNSANDS_SEP'); ?>
 						</td>
 						<td>
-							<input type="text" name="thousands_sep" class="inputbox" value="<?php echo isset($this->config->thousands_sep) ? $this->config->thousands_sep : ','; ?>" size="10" />
+							<input type="text" name="thousands_sep" class="inputbox" value="<?php echo $this->config->get('thousands_sep', ','); ?>" size="10" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_THOUNSANDS_SEP_EXPLAIN'); ?>
@@ -1198,7 +1198,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_INVOICE_PREFIX'); ?>
 						</td>
 						<td>
-							<input type="text" name="invoice_prefix" class="inputbox" value="<?php echo isset($this->config->invoice_prefix) ? $this->config->invoice_prefix : 'IV'; ?>" size="10" />
+							<input type="text" name="invoice_prefix" class="inputbox" value="<?php echo $this->config->get('invoice_prefix', 'IV'); ?>" size="10" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_INVOICE_PREFIX_EXPLAIN'); ?>
@@ -1209,7 +1209,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_INVOICE_NUMBER_LENGTH'); ?>
 						</td>
 						<td>
-							<input type="text" name="invoice_number_length" class="inputbox" value="<?php echo $this->config->invoice_number_length ? $this->config->invoice_number_length : 5; ?>" size="10" />
+							<input type="text" name="invoice_number_length" class="inputbox" value="<?php echo $this->config->get('invoice_number_length', 5); ?>" size="10" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_INVOICE_NUMBER_LENGTH_EXPLAIN'); ?>
