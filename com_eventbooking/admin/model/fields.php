@@ -1,29 +1,28 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
+
 class EventbookingModelFields extends RADModelList
 {
 
 	/**
-	 * Constructor function	 
+	 * Constructor function
 	 */
-	function __construct($config)
+	public function __construct($config = array())
 	{
 		parent::__construct($config);
-		
-		$app = JFactory::getApplication();
-		$context = $this->option . '.' . $this->name . '.';
-		$this->state->insert('filter_category_id', 'int', $app->getUserStateFromRequest($context . 'filter_category_id', 'filter_category_id', 0))
-			->insert('filter_event_id', 'int', $app->getUserStateFromRequest($context . 'filter_event_id', 'filter_event_id', 0))
-			->insert('filter_show_core_fields', 'int', $app->getUserStateFromRequest($context . 'filter_show_core_fields', 'filter_show_core_fields', 0));
+
+		$this->state->insert('filter_category_id', 'int', 0)
+			->insert('filter_event_id', 'int', 0)
+			->insert('filter_show_core_fields', 'int', 0);
 	}
 
 	/**
@@ -45,6 +44,7 @@ class EventbookingModelFields extends RADModelList
 		{
 			$query->where('tbl.is_core = 0');
 		}
+
 		return parent::_buildQueryWhere($query);
 	}
 }

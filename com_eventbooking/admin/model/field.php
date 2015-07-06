@@ -1,140 +1,144 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
+
 class EventbookingModelField extends RADModelAdmin
 {
+	/**
+	 * Pre-process data before custom field is being saved to database
+	 *
+	 * @param JTable   $row
+	 * @param RADInput $input
+	 * @param bool     $isNew
+	 */
+	protected function beforeStore($row, $input, $isNew)
+	{
+		$input->set('depend_on_options', implode(',', $input->get('depend_on_options', array(), 'array')));
+		if (in_array($row->id, $this->getRestrictedFieldIds()))
+		{
+			$data = $input->getData(RAD_INPUT_ALLOWRAW);
+			unset($data['field_type']);
+			unset($data['published']);
+			unset($data['validation_rules']);
+			$input->setData($data);
+		}
+	}
 
 	/**
-	 * Method to store a field
+	 * Post - process, Store custom fields mapping with events.
 	 *
-	 * @param RADInput $input the input data 
-	 *	 
-	 * @return	boolean	True on success	
+	 * @param JTable   $row
+	 * @param RADInput $input
+	 * @param bool     $isNew
 	 */
-	function store($input, $ignore = array())
+	protected function afterStore($row, $input, $isNew)
 	{
 		$config = EventbookingHelper::getConfig();
-		$row = $this->getTable();
-		$fieldId = $input->getInt('id', 0);
-		if ($fieldId)
-		{
-			$row->load($fieldId);
-		}
-		$input->set('depend_on_options', implode(',', $input->get('depend_on_options', array(), 'array')));
-		if ($row->name == 'first_name' || $row->name == 'email')
-		{
-			$ignore = array('field_type', 'published', 'validation_rules');
-		}
-		else
-		{
-			$ignore = array();
-		}
 		if (!$config->custom_field_by_category)
 		{
+
 			$eventIds = $input->get('event_id', array(), 'array');
 			if (count($eventIds) == 0 || $eventIds[0] == -1 || $row->name == 'first_name' || $row->name == 'email')
 			{
-				$input->set('event_id', -1);
-				$eventIds = array();
+				$row->event_id = -1;
 			}
 			else
 			{
-				$input->set('event_id', 1);
+				$row->event_id = 1;
 			}
-		}
+			$row->store();
 
-		parent::store($input, $ignore);
-		if (!$config->custom_field_by_category)
-		{
-			$db = $this->getDbo();
-			$query = $db->getQuery(true);
-			$fieldId = $input->getInt('id', 0);
+			$fieldId = $row->id;
+			$db      = $this->getDbo();
+			$query   = $db->getQuery(true);
 			$query->clear();
-			$query->delete('#__eb_field_events')->where('field_id = ' . $fieldId);
-			$db->setQuery($query);
-			$db->query();
-			if (count($eventIds))
+			if (!$isNew)
+			{
+				$query->delete('#__eb_field_events')->where('field_id = ' . $fieldId);
+				$db->setQuery($query);
+				$db->execute();
+			}
+
+			if ($row->event_id != -1)
 			{
 				$query->clear();
 				$query->insert('#__eb_field_events')->columns('field_id, event_id');
 				for ($i = 0, $n = count($eventIds); $i < $n; $i++)
 				{
 					$eventId = (int) $eventIds[$i];
-					$query->values("$fieldId, $eventId");
+					if ($eventId > 0)
+					{
+						$query->values("$fieldId, $eventId");
+					}
 				}
 				$db->setQuery($query);
-				$db->query();
+				$db->execute();
 			}
 		}
 
-		// Calculate depend on options in different languages		
+		// Calculate depend on options in different languages
 		if (JLanguageMultilang::isEnabled())
 		{
 			$languages = EventbookingHelper::getLanguages();
 			if (count($languages))
 			{
-				$fieldId = $input->getInt('id', 0);
-				$row = $this->getTable();
-				$row->load($fieldId);
 				if ($row->depend_on_field_id > 0)
 				{
 					$masterField = $this->getTable();
 					$masterField->load($row->depend_on_field_id);
 					$masterFieldValues = explode("\r\n", $masterField->values);
-					$dependOnOptions = explode(',', $row->depend_on_options);
-					$dependOnIndexes = array();
-					foreach($dependOnOptions as $option)
+					$dependOnOptions   = explode(',', $row->depend_on_options);
+					$dependOnIndexes   = array();
+					foreach ($dependOnOptions as $option)
 					{
 						$index = array_search($option, $masterFieldValues);
-						if ($index !== FALSE)
+						if ($index !== false)
 						{
 							$dependOnIndexes[] = $index;
 						}
 					}
-					foreach($languages as $language)
+					foreach ($languages as $language)
 					{
-						$sef = $language->sef;
+						$sef                             = $language->sef;
 						$dependOnOptionsWithThisLanguage = array();
-						$values = explode("\r\n", $masterField->{'values_'.$sef});
-						foreach($dependOnIndexes as $index)
+						$values                          = explode("\r\n", $masterField->{'values_' . $sef});
+						foreach ($dependOnIndexes as $index)
 						{
 							if (isset($values[$index]))
 							{
 								$dependOnOptionsWithThisLanguage[] = $values[$index];
 							}
 						}
-						$row->{'depend_on_options_'.$sef} = implode(',', $dependOnOptionsWithThisLanguage);
+						$row->{'depend_on_options_' . $sef} = implode(',', $dependOnOptionsWithThisLanguage);
 					}
 					$row->store();
 				}
 			}
 		}
-
-		return true;
 	}
 
 	/**
 	 * Method to remove  fields
 	 *
-	 * @access	public
-	 * @return	boolean	True on success
+	 * @access    public
+	 * @return    boolean    True on success
 	 */
-	function delete($cid = array())
+	public function delete($cid = array())
 	{
 		if (count($cid))
 		{
-			$db = $this->getDbo();
-			$query = $db->getQuery(true);
+			$db     = $this->getDbo();
+			$query  = $db->getQuery(true);
 			$config = EventbookingHelper::getConfig();
-			$cids = implode(',', $cid);
+			$cids   = implode(',', $cid);
 			//Delete data from field values table
 			$query->delete('#__eb_field_values')->where('field_id IN (' . $cids . ')');
 			$db->setQuery($query);
@@ -144,7 +148,7 @@ class EventbookingModelField extends RADModelAdmin
 				$query->clear();
 				$query->delete('#__eb_field_events')->where('field_id IN (' . $cids . ')');
 				$db->setQuery($query);
-				$db->query();
+				$db->execute();
 			}
 			//Do not allow deleting core fields
 			$query->clear();
@@ -152,7 +156,7 @@ class EventbookingModelField extends RADModelAdmin
 			$db->setQuery($query);
 			$db->execute();
 		}
-		
+
 		return true;
 	}
 
@@ -160,41 +164,54 @@ class EventbookingModelField extends RADModelAdmin
 	 * Change require status
 	 *
 	 * @param array $cid
-	 * @param int $state
+	 * @param int   $state
+	 *
 	 * @return boolean
 	 */
-	function required($cid, $state)
+	public function required($cid, $state)
 	{
-		$cids = implode(',', $cid);
-		$db = $this->getDbo();
+		$cids  = implode(',', $cid);
+		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 		$query->update('#__eb_fields')
 			->set('required=' . $state)
 			->where('id IN (' . $cids . ' )');
 		$db->setQuery($query);
 		$db->execute();
-		
-		return true;
 	}
 
 	/**
-	 * Publish custom fields. Two fields First Name and Email could not be unpublished
-	 * @see RADModelAdmin::publish()
+	 * Method to change the published state of one or more records.
+	 *
+	 * @param array $pks   A list of the primary keys to change.
+	 * @param int   $value The value of the published state.
+	 *
+	 * @throws Exception
 	 */
-	public function publish($cid, $state)
+	public function publish($pks, $value = 1)
 	{
-		if (count($cid))
+		$restrictedFieldIds = $this->getRestrictedFieldIds();
+		$pks                = array_diff($pks, $restrictedFieldIds);
+		if (count($pks))
 		{
-			$db = $this->getDbo();
-			$cids = implode(',', $cid);
-			$query = $db->getQuery(true);
-			$query->update($this->table)
-				->set('published = ' . $state)
-				->where('id IN (' . $cids . ')')
-				->where('name != "first_name" AND name !="email"');
-			$db->setQuery($query);
-			$db->execute();
+			parent::publish($pks, $value);
 		}
-		return true;
+	}
+
+	/**
+	 * Get Ids of restricted fields which cannot be changed status, ddeleted...
+	 *
+	 * @return array
+	 */
+	private function getRestrictedFieldIds()
+	{
+		$db    = $this->getDbo();
+		$query = $db->getQuery(true);
+		$query->select('id')
+			->from('#__eb_fields')
+			->where('name IN ("first_name", "email")');
+		$db->setQuery($query);
+
+		return $db->loadColumn();
 	}
 }

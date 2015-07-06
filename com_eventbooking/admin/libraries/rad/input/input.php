@@ -61,6 +61,16 @@ class RADInput extends JInput
 	}
 
 	/**
+	 * Set data for the input object. This is usually called when you get data, modify it, and then set it back
+	 *
+	 * @param $data
+	 */
+	public function setData($data)
+	{
+		$this->data = $data;
+	}
+
+	/**
 	 * Magic method to get an input object
 	 *
 	 * @param   mixed $name Name of the input object to retrieve.
@@ -97,7 +107,7 @@ class RADInput extends JInput
 	}
 
 	/**
-	 * Check to see if a variable is avaialble in the input or not
+	 * Check to see if a variable is available in the input or not
 	 *
 	 * @param string $name the variable name
 	 *
@@ -109,10 +119,8 @@ class RADInput extends JInput
 		{
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
