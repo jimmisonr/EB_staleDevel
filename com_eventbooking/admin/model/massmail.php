@@ -20,7 +20,7 @@ class EventbookingModelMassmail extends RADModel
 	 * @return bool
 	 * @throws Exception
 	 */
-	function send($data)
+	public function send($data)
 	{
 		if ($data['event_id'] >= 1)
 		{
