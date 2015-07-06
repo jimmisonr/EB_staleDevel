@@ -553,7 +553,7 @@ $btnClass          = $bootstrapHelper->getClassMapping('btn');
 					{
 					?>
 						<li>
-							<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=edit_event&id='.$item->id.'&Itemid='.$this->Itemid); ?>">
+							<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id='.$item->id.'&Itemid='.$this->Itemid); ?>">
 								<i class="<?php echo $iconPencilClass; ?>"></i>
 								<?php echo JText::_('EB_EDIT'); ?>
 							</a>

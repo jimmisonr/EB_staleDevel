@@ -94,11 +94,7 @@ class EventbookingController extends RADController
 				$this->input->set('layout', 'cart');
 				break;
 
-			#Adding, managing events from front-end			
-			case 'edit_event':
-				$this->input->set('view', 'event');
-				$this->input->set('layout', 'form');
-				break;
+
 
 			#Location management
 			case 'edit_location':

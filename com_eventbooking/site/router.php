@@ -85,6 +85,7 @@ function EventbookingBuildRoute(&$query)
 	$catId   = isset($query['catid']) ? (int) $query['catid'] : 0;
 	$eventId = isset($query['event_id']) ? (int) $query['event_id'] : 0;
 	$task    = isset($query['task']) ? $query['task'] : '';
+	$layout    = isset($query['layout']) ? $query['layout'] : '';
 	switch ($view)
 	{
 		case 'calendar':
@@ -103,9 +104,16 @@ function EventbookingBuildRoute(&$query)
 			{
 				$segments[] = EventbookingHelperRoute::getEventTitle($id);
 			}
-			if ($catId)
+			if ($layout == 'form')
 			{
-				$segments = array_merge(EventbookingHelperRoute::getCategoriesPath($catId, 'alias'), $segments);
+				$segments[] = 'Edit';
+			}
+			else
+			{
+				if ($catId)
+				{
+					$segments = array_merge(EventbookingHelperRoute::getCategoriesPath($catId, 'alias'), $segments);
+				}
 			}
 			unset($query['id']);
 			break;
@@ -207,15 +215,6 @@ function EventbookingBuildRoute(&$query)
 			$segments[] = 'Edit Registrant';
 			unset($query['task']);
 			break;
-		case 'edit_event':
-			if ($id)
-			{
-				$segments[] = EventbookingHelperRoute::getEventTitle($id);
-			}
-			$segments[] = 'Edit';
-			unset($query['task']);
-			break;
-
 		case 'unpublish_event':
 			if ($id)
 			{

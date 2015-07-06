@@ -438,7 +438,7 @@ defined( '_JEXEC' ) or die ;
 							{
 								?>
 								<li>
-									<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=edit_event&id='.$event->id.'&Itemid='.$Itemid); ?>">
+									<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id='.$event->id.'&Itemid='.$Itemid); ?>">
 										<i class="<?php echo $iconPencilClass; ?>"></i>
 										<?php echo JText::_('EB_EDIT'); ?>
 									</a>
