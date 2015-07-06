@@ -22,7 +22,7 @@ $format = 'Y-m-d' ;
 	function checkData(pressbutton)
 	{
 		var form = document.adminForm;
-		if (pressbutton == 'cancel_event')
+		if (pressbutton == 'cancel')
 		{
 			Joomla.submitform( pressbutton );
 			return;
@@ -109,12 +109,12 @@ $format = 'Y-m-d' ;
 <div class="eb_form_header" style="width:100%;">
 	<div style="float: left; width: 40%;"><?php echo JText::_('EB_ADD_EDIT_EVENT'); ?></div>
 	<div style="float: right; width: 50%; text-align: right;">
-		<input type="button" name="btnSave" value="<?php echo JText::_('EB_SAVE'); ?>" onclick="checkData('save_event');" class="btn btn-primary" />
-		<input type="button" name="btnSave" value="<?php echo JText::_('EB_CANCEL_EVENT'); ?>" onclick="checkData('cancel_event');" class="btn btn-primary" />
+		<input type="button" name="btnSave" value="<?php echo JText::_('EB_SAVE'); ?>" onclick="checkData('save');" class="btn btn-primary" />
+		<input type="button" name="btnSave" value="<?php echo JText::_('EB_CANCEL_EVENT'); ?>" onclick="checkData('cancel');" class="btn btn-primary" />
 	</div>
 </div>
 <div class="clearfix"></div>
-<form action="index.php" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data" class="form form-horizontal">
+<form action="index.php?option=com_eventbooking&view=event" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data" class="form form-horizontal">
 <div class="row-fluid eb-container">
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="#basic-information-page" data-toggle="tab"><?php echo JText::_('EB_BASIC_INFORMATION');?></a></li>

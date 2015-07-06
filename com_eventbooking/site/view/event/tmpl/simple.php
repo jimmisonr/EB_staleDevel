@@ -243,7 +243,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 
 		function cancelEvent()
 		{
-			location.href   ="<?php echo JRoute::_('index.php?option=com_eventbooking&task=cancel_event&Itemid=' . $this->Itemid, false); ?>";
+			location.href   ="<?php echo JRoute::_('index.php?option=com_eventbooking&task=event.cancel&Itemid=' . $this->Itemid, false); ?>";
 		}
 	</script>
 	<input type="hidden" name="option" value="com_eventbooking" />
