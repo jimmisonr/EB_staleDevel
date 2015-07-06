@@ -77,4 +77,16 @@ class RADConfig
 	{
 		return $this->get($name);
 	}
+
+	/**
+	 * Test existence of a config variable
+	 *
+	 * @param string
+	 *
+	 * @return boolean
+	 */
+	public function __isset($name)
+	{
+		return isset($this->data[$name]);
+	}
 }
