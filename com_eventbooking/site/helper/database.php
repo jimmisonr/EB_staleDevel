@@ -109,6 +109,26 @@ class EventbookingHelperDatabase
 	}
 
 	/**
+	 * Get all published categories
+	 *
+	 * @param string $order
+	 *
+	 * @return mixed
+	 */
+	public static function getAllCategories($order = 'title')
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('id, parent, parent AS parent_id, name, name AS title')
+			->from('#__eb_categories')
+			->where('published=1')
+			->order($order);
+		$db->setQuery($query);
+
+		return $db->loadObjectList();
+	}
+
+	/**
 	 * Get all published events
 	 *
 	 * @param string $order
