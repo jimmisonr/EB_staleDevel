@@ -215,7 +215,7 @@ function EventbookingBuildRoute(&$query)
 			$segments[] = 'Edit Registrant';
 			unset($query['task']);
 			break;
-		case 'unpublish_event':
+		case 'event.unpublish':
 			if ($id)
 			{
 				$segments[] = EventbookingHelperRoute::getEventTitle($id);
@@ -224,7 +224,7 @@ function EventbookingBuildRoute(&$query)
 			unset($query['task']);
 			break;
 
-		case 'publish_event':
+		case 'event.publish':
 			if ($id)
 			{
 				$segments[] = EventbookingHelperRoute::getEventTitle($id);

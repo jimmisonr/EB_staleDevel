@@ -449,13 +449,13 @@ defined( '_JEXEC' ) or die ;
 							{
 								if ($event->published == 1)
 								{
-									$link = JRoute::_('index.php?option=com_eventbooking&task=unpublish_event&id='.$event->id.'&Itemid='.$Itemid);
+									$link = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id='.$event->id.'&Itemid='.$Itemid);
 									$text = JText::_('EB_UNPUBLISH');
 									$class = $iconRemoveClass;
 								}
 								else
 								{
-									$link = JRoute::_('index.php?option=com_eventbooking&task=publish_event&id='.$event->id.'&Itemid='.$Itemid);
+									$link = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id='.$event->id.'&Itemid='.$Itemid);
 									$text = JText::_('EB_PUBLISH');
 									$class = $iconOkClass;
 								}
