@@ -318,7 +318,7 @@ $selectedState = '';
 	?>				
 </div>		
 <div class="clearfix"></div>	
-	<input type="hidden" name="cid[]" value="<?php echo $this->item->id; ?>" />
+	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 	<input type="hidden" name="task" value="" />			
 	<?php echo JHtml::_( 'form.token' ); ?>
 	<script type="text/javascript">
