@@ -1,9 +1,16 @@
 <?php
 /**
- * Countries Table Class
- *
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
-class EventbookignTableCountry extends JTable
+// no direct access
+defined('_JEXEC') or die();
+
+class EventbookingTableCountry extends JTable
 {
 
 	/**
@@ -11,7 +18,7 @@ class EventbookignTableCountry extends JTable
 	 *
 	 * @param object Database connector object
 	 */
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
 		parent::__construct('#__eb_countries', 'id', $db);
 	}

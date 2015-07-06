@@ -10,7 +10,7 @@
 // no direct access
 defined('_JEXEC') or die();
 
-class EventbookingTableCoupon extends JTable
+class EventbookingTableRegistrant extends JTable
 {
 
 	/**
@@ -20,6 +20,6 @@ class EventbookingTableCoupon extends JTable
 	 */
 	public function __construct(& $db)
 	{
-		parent::__construct('#__eb_coupons', 'id', $db);
+		parent::__construct('#__eb_categories', 'id', $db);
 	}
 }

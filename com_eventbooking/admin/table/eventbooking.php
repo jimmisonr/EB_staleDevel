@@ -189,3 +189,39 @@ class FieldvalueEventBooking extends JTable
 		parent::__construct('#__eb_field_values', 'id', $db);
 	}
 }
+
+/**
+ * State Table Class
+ *
+ */
+class StateEventBooking extends JTable
+{
+
+	/**
+	 * Constructor
+	 *
+	 * @param object Database connector object
+	 */
+	function __construct(& $db)
+	{
+		parent::__construct('#__eb_states', 'id', $db);
+	}
+}
+
+/**
+ * State Table Class
+ *
+ */
+class CountryEventBooking extends JTable
+{
+
+	/**
+	 * Constructor
+	 *
+	 * @param object Database connector object
+	 */
+	function __construct(& $db)
+	{
+		parent::__construct('#__eb_countries', 'id', $db);
+	}
+}
