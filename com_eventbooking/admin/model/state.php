@@ -26,8 +26,8 @@ class EventBookingModelState extends RADModelAdmin
 			$db    = $this->getDbo();
 			$query = $db->getQuery(true);
 			$query->update('#__eb_states')
-				->set('state_id=id')
-				->where('id=' . $input->getInt('id', 0));
+				->set('state_id = id')
+				->where('id = ' . $input->getInt('id', 0));
 			$db->setQuery($query);
 			$db->execute();
 		}
