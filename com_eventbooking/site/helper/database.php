@@ -169,6 +169,26 @@ class EventbookingHelperDatabase
 	}
 
 	/**
+	 * Get all locations in the system
+	 *
+	 * @param string $order
+	 *
+	 * @return mixed
+	 */
+	public static function getAllLocations($order = 'name')
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('id, name')
+			->from('#__eb_locations')
+			->where('published')
+			->order($order);
+		$db->setQuery($query);
+
+		return $db->loadObjectList();
+	}
+
+	/**
 	 * Helper method to get fields from database table in case the site is multilingual
 	 *
 	 * @param JDatabaseQuery $query
