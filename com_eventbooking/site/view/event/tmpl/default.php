@@ -587,7 +587,7 @@ $btnClass          = $bootstrapHelper->getClassMapping('btn');
 					{
 					?>
 					   <li>
-							<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=csv_export&event_id='.$item->id.'&Itemid='.$this->Itemid); ?>">
+							<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.export&event_id='.$item->id.'&Itemid='.$this->Itemid); ?>">
 								 <i class="<?php echo $iconDownloadClass; ?>"></i>
 								<?php echo JText::_('EB_EXPORT_REGISTRANTS'); ?>
 							</a>
@@ -640,7 +640,7 @@ $btnClass          = $bootstrapHelper->getClassMapping('btn');
 	function cancelRegistration(registrantId) {
 		var form = document.adminForm ;
 		if (confirm("<?php echo JText::_('EB_CANCEL_REGISTRATION_CONFIRM'); ?>")) {
-			form.task.value = 'cancel_registration' ;
+			form.task.value = 'registrant.cancel' ;
 			form.id.value = registrantId ;
 			form.submit() ;
 		}

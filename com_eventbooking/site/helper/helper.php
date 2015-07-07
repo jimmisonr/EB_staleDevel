@@ -653,7 +653,7 @@ class EventbookingHelper
 			{
 				$Itemid = self::getItemid();
 			}
-			$replaces['cancel_registration_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=cancel_registration&cancel_code=' . $row->registration_code . '&Itemid=' . $Itemid;
+			$replaces['cancel_registration_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=registrant.cancel&cancel_code=' . $row->registration_code . '&Itemid=' . $Itemid;
 		}
 		else
 		{

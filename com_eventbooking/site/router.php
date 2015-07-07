@@ -233,7 +233,7 @@ function EventbookingBuildRoute(&$query)
 			$segments[] = 'Publish';
 			unset($query['task']);
 			break;
-		case 'csv_export':
+		case 'registrant.export':
 			if ($eventId)
 			{
 				$segments[] = EventbookingHelperRoute::getEventTitle($eventId);

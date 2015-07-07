@@ -51,7 +51,7 @@ JHtml::_('behavior.modal', 'a.eb-modal');
 		function cancelRegistration(registrantId) {
 			var form = document.adminForm ;
 			if (confirm("<?php echo JText::_('EB_CANCEL_REGISTRATION_CONFIRM'); ?>")) {
-				form.task.value = 'cancel_registration' ;
+				form.task.value = 'registrant.cancel' ;
 				form.id.value = registrantId ;
 				form.submit() ;
 			}

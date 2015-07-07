@@ -1,22 +1,23 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
-class EventbookingViewCalendar extends JViewLegacy
+
+class EventbookingViewCalendarRaw extends RADViewHtml
 {
 
-	function display($tpl = null)
+	public function display()
 	{
 		$Itemid = JRequest::getInt('Itemid', 0);
-		$month = JRequest::getInt('month');
-		$year = JRequest::getInt('year');
+		$month  = JRequest::getInt('month');
+		$year   = JRequest::getInt('year');
 		if (!$month)
 		{
 			$month = JRequest::getInt('default_month', 0);
@@ -35,37 +36,37 @@ class EventbookingViewCalendar extends JViewLegacy
 		}
 		$model = $this->getModel('Calendar');
 		list ($year, $month, $day) = $model->getYMD();
-		$rows = $model->getEventsByMonth($year, $month);
-		$this->data = EventbookingHelperData::getCalendarData($rows, $year, $month);
+		$rows        = $model->getEventsByMonth($year, $month);
+		$this->data  = EventbookingHelperData::getCalendarData($rows, $year, $month);
 		$this->month = $month;
-		$this->year = $year;
-		
-		$days = array();
+		$this->year  = $year;
+
+		$days     = array();
 		$startday = EventBookingHelper::getConfigValue('calendar_start_date');
 		for ($i = 0; $i < 7; $i++)
 		{
 			$days[$i] = $this->_getDayName(($i + $startday) % 7, true);
 		}
-		
+
 		$listMonth = array(
-			JText::_('EB_JAN'), 
-			JText::_('EB_FEB'), 
-			JText::_('EB_MARCH'), 
-			JText::_('EB_APR'), 
-			JText::_('EB_MAY'), 
-			JText::_('EB_JUNE'), 
-			JText::_('EB_JUL'), 
-			JText::_('EB_AUG'), 
-			JText::_('EB_SEP'), 
-			JText::_('EB_OCT'), 
-			JText::_('EB_NOV'), 
+			JText::_('EB_JAN'),
+			JText::_('EB_FEB'),
+			JText::_('EB_MARCH'),
+			JText::_('EB_APR'),
+			JText::_('EB_MAY'),
+			JText::_('EB_JUNE'),
+			JText::_('EB_JUL'),
+			JText::_('EB_AUG'),
+			JText::_('EB_SEP'),
+			JText::_('EB_OCT'),
+			JText::_('EB_NOV'),
 			JText::_('EB_DEC'));
-		
-		$this->days = $days;
-		$this->Itemid = $Itemid;
+
+		$this->days      = $days;
+		$this->Itemid    = $Itemid;
 		$this->listMonth = $listMonth;
-		
-		parent::display($tpl);
+
+		parent::display();
 	}
 
 	public static function _getDayName($daynb, $colored = false)
@@ -83,23 +84,26 @@ class EventbookingViewCalendar extends JViewLegacy
 		{
 			$dayname = self::getDayName($i);
 		}
+
 		return $dayname;
 	}
 
 	/**
 	 * Returns name of the day longversion
-	 * 
+	 *
 	 * @static
-	 * @param	int		daynb	# of day
-	 * @param	int		array, 0 return single day, 1 return array of all days
-	 * @return	mixed	localised short day letter or array of names
+	 *
+	 * @param    int        daynb    # of day
+	 * @param    int        array, 0 return single day, 1 return array of all days
+	 *
+	 * @return    mixed    localised short day letter or array of names
 	 **/
 	public static function getDayName($daynb = 0, $array = 0)
 	{
 		static $days = null;
 		if ($days === null)
 		{
-			$days = array();
+			$days    = array();
 			$days[0] = JText::_('EB_MINICAL_SUNDAY');
 			$days[1] = JText::_('EB_MINICAL_MONDAY');
 			$days[2] = JText::_('EB_MINICAL_TUESDAY');

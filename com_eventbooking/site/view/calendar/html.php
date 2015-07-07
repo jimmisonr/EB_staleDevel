@@ -15,13 +15,14 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 
 	public function display()
 	{
-		$app      = JFactory::getApplication();
-		$document = JFactory::getDocument();
-		$active   = $app->getMenu()->getActive();
-		$params   = EventbookingHelper::getViewParams($active, array('calendar'));
+		$app    = JFactory::getApplication();
+		$active = $app->getMenu()->getActive();
+		$params = EventbookingHelper::getViewParams($active, array('calendar'));
 
-		$config                 = EventbookingHelper::getConfig();
-		$showCalendarMenu       = $config->activate_weekly_calendar_view || $config->activate_daily_calendar_view;
+		$config           = EventbookingHelper::getConfig();
+		$showCalendarMenu = $config->activate_weekly_calendar_view || $config->activate_daily_calendar_view;
+
+		$this->currentDateData  = EventbookingModelCalendar::getCurrentDateData();
 		$this->showCalendarMenu = $showCalendarMenu;
 		$this->config           = $config;
 
@@ -29,38 +30,25 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 		$layout = $this->getLayout();
 		if ($layout == 'weekly')
 		{
-			$this->_displayWeeklyView($tpl);
+			$this->displayWeeklyView();
 
 			return;
 		}
 		else if ($layout == 'daily')
 		{
-			$this->_displayDailyView($tpl);
+			$this->displayDailyView();
 
 			return;
 		}
-		$Itemid = JRequest::getInt('Itemid', 0);
-		$month  = JRequest::getInt('month');
-		$year   = JRequest::getInt('year');
-		if (!$month)
-		{
-			$month = JRequest::getInt('default_month', 0);
-			if ($month)
-			{
-				JRequest::setVar('month', $month);
-			}
-		}
-		if (!$year)
-		{
-			$year = JRequest::getInt('default_year', 0);
-			if ($year)
-			{
-				JRequest::setVar('year', $year);
-			}
-		}
-		$model = $this->getModel('Calendar');
-		list ($year, $month, $day) = $model->getYMD();
-		$rows        = $model->getEventsByMonth($year, $month);
+
+		$model = $this->getModel();
+		$rows  = $model->getData();
+
+		$state = $model->getState();
+		$year  = $state->year;
+		$month = $state->month;
+
+
 		$this->data  = EventbookingHelperData::getCalendarData($rows, $year, $month);
 		$this->month = $month;
 		$this->year  = $year;
@@ -90,6 +78,7 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 			}
 			$options[] = JHtml::_('select.option', $value, $monthName);
 		}
+
 		$this->searchMonth = JHtml::_('select.genericlist', $options, 'month', 'class="input-medium" onchange="submit();" ', 'value', 'text', $month);
 		$options           = array();
 		for ($i = $year - 3; $i < ($year + 5); $i++)
@@ -98,41 +87,8 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 		}
 		$this->searchYear = JHtml::_('select.genericlist', $options, 'year', 'class="input-small" onchange="submit();" ', 'value', 'text', $year);
 
-		// Process page meta data
-		if ($params->get('page_title'))
-		{
-			$pageTitle        = $params->get('page_title');
-			$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
-			if ($siteNamePosition == 0)
-			{
-				$document->setTitle($pageTitle);
-			}
-			elseif ($siteNamePosition == 1)
-			{
-				$document->setTitle(JFactory::getConfig()->get('sitename') . ' - ' . $pageTitle);
-			}
-			else
-			{
-				$document->setTitle($pageTitle . ' - ' . JFactory::getConfig()->get('sitename'));
-			}
-		}
+		EventbookingHelperHtml::prepareDocument($params);
 
-		if ($params->get('menu-meta_description'))
-		{
-			$document->setDescription($params->get('menu-meta_description'));
-		}
-
-		if ($params->get('menu-meta_keywords'))
-		{
-			$document->setMetadata('keywords', $params->get('menu-meta_keywords'));
-		}
-
-		if ($params->get('robots'))
-		{
-			$document->setMetadata('robots', $params->get('robots'));
-		}
-
-		$this->Itemid    = $Itemid;
 		$this->listMonth = $listMonth;
 		$this->params    = $params;
 
@@ -140,34 +96,27 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 	}
 
 	/**
-	 * display event for weekly
-	 *
-	 * @param string $tpl
+	 * Display weekly events
 	 */
-	function _displayWeeklyView()
+	private function displayWeeklyView()
 	{
-		$this->events            = $this->get('EventsByWeek');
-		$day                     = 0;
-		$week_number             = date('W', time());
-		$year                    = date('Y', time());
-		$date                    = date('Y-m-d', strtotime($year . "W" . $week_number . $day));
-		$this->first_day_of_week = JRequest::getVar('date', $date);
-		$this->Itemid            = JRequest::getInt('Itemid', 0);
+		$model                   = $this->getModel();
+		$state                   = $model->getState();
+		$this->events            = $model->getEventsByWeek();
+		$this->first_day_of_week = $state->date;
 
 		parent::display();
 	}
 
 	/**
-	 *
-	 * Display Daily layout for event
-	 *
-	 * @param string $tpl
+	 * Display daily events
 	 */
-	function _displayDailyView()
+	private function displayDailyView()
 	{
-		$this->events = $this->get('EventsByDaily');
-		$this->day    = JRequest::getVar('day', date('Y-m-d', time()));
-		$this->Itemid = JRequest::getInt('Itemid', 0);
+		$model        = $this->getModel();
+		$state        = $model->getState();
+		$this->events = $model->getEventsByDaily();
+		$this->day    = $state->day;
 
 		parent::display();
 	}

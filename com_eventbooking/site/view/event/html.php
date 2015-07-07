@@ -29,7 +29,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$config = EventbookingHelper::getConfig();
 		$model  = $this->getModel();
 		$state  = $model->getState();
-		$item   = $model->getData();
+		$item   = $model->getEventData();
 
 		// Check to make sure the event is valid and user is allowed to access to it
 
@@ -147,8 +147,217 @@ class EventbookingViewEventHtml extends RADViewHtml
 		parent::display();
 	}
 
-	public function _displayForm()
+	/**
+	 * Display form which allows add/edit event
+	 *
+	 * @throws Exception
+	 */
+	protected function _displayForm()
 	{
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
+		$user        = JFactory::getUser();
+		$item        = $this->model->getData();
+		$config      = EventbookingHelper::getConfig();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		if ($config->submit_event_form_layout == 'simple')
+		{
+			$this->setLayout('simple');
+		}
+		if ($item->id)
+		{
+			$ret = EventbookingHelper::checkEditEvent($item->id);
+		}
+		else
+		{
+			$ret = EventbookingHelper::checkAddEvent();
+		}
+		if (!$ret)
+		{
+			//Redirect users to login page if they are not logged in
+			$user = JFactory::getUser();
+			if (!$user->id)
+			{
+				$currentUrl = JUri::current();
+				JFactory::getApplication()->redirect('index.php?option=com_users&view=login&return=' . base64_encode($currentUrl));
+			}
+			else
+			{
+				$url = JRoute::_('index.php');
+				JFactory::getApplication()->redirect($url, JText::_('EB_NO_ADDING_EVENT_PERMISSION'));
+			}
+		}
 
+		$prices = EventbookingHelperDatabase::getGroupRegistrationRates($item->id);
+
+		//Get list of location
+		$options = array();
+		$query->select('id, name')
+			->from('#__eb_locations')
+			->where('published = 1')
+			->order('name');
+		if (!$config->show_all_locations_in_event_submission_form)
+		{
+			$query->where('user_id = ' . (int) $user->id);
+		}
+		$db->setQuery($query);
+		$options[]            = JHtml::_('select.option', '', JText::_('Select Location'), 'id', 'name');
+		$options              = array_merge($options, $db->loadObjectList());
+		$lists['location_id'] = JHtml::_('select.genericlist', $options, 'location_id', '', 'id', 'name', $item->location_id);
+
+		// Categories dropdown
+		$query->clear();
+		$query->select("id, parent, parent AS parent_id, name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title")
+			->from('#__eb_categories')
+			->where('published = 1')
+			->order('name' . $fieldSuffix);
+		$db->setQuery($query);
+		$rows     = $db->loadObjectList();
+		$children = array();
+		if ($rows)
+		{
+			// first pass - collect children
+			foreach ($rows as $v)
+			{
+				$pt   = $v->parent;
+				$list = @$children[$pt] ? $children[$pt] : array();
+				array_push($list, $v);
+				$children[$pt] = $list;
+			}
+		}
+		$list    = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
+		$options = array();
+		foreach ($list as $listItem)
+		{
+			$options[] = JHtml::_('select.option', $listItem->id, '&nbsp;&nbsp;&nbsp;' . $listItem->treename);
+		}
+		if ($item->id)
+		{
+			$query->clear();
+			$query->select('category_id')
+				->from('#__eb_event_categories')
+				->where('event_id=' . $item->id)
+				->where('main_category=1');
+			$db->setQuery($query);
+			$mainCategoryId = $db->loadResult();
+			$query->clear();
+			$query->select('category_id')
+				->from('#__eb_event_categories')
+				->where('event_id=' . $item->id)
+				->where('main_category=0');
+			$db->setQuery($query);
+			$additionalCategories = $db->loadColumn();
+		}
+		else
+		{
+			$mainCategoryId       = 0;
+			$additionalCategories = array();
+		}
+
+		$lists['main_category_id']           = JHtml::_('select.genericlist', $options, 'main_category_id',
+			array(
+				'option.text.toHtml' => false,
+				'option.text'        => 'text',
+				'option.value'       => 'value',
+				'list.attr'          => '',
+				'list.select'        => $mainCategoryId));
+		$lists['category_id']                = JHtml::_('select.genericlist', $options, 'category_id[]',
+			array(
+				'option.text.toHtml' => false,
+				'option.text'        => 'text',
+				'option.value'       => 'value',
+				'list.attr'          => 'class="inputbox"  size="5" multiple="multiple"',
+				'list.select'        => $additionalCategories));
+		$options                             = array();
+		$options[]                           = JHtml::_('select.option', 1, JText::_('%'));
+		$options[]                           = JHtml::_('select.option', 2, $config->currency_symbol);
+		$lists['discount_type']              = JHtml::_('select.genericlist', $options, 'discount_type', ' class="input-mini" ', 'value', 'text',
+			$item->discount_type);
+		$lists['early_bird_discount_type']   = JHtml::_('select.genericlist', $options, 'early_bird_discount_type', ' class="input-mini" ', 'value',
+			'text', $item->early_bird_discount_type);
+		$options                             = array();
+		$options[]                           = JHtml::_('select.option', 0, JText::_('EB_INDIVIDUAL_GROUP'));
+		$options[]                           = JHtml::_('select.option', 1, JText::_('EB_INDIVIDUAL_ONLY'));
+		$options[]                           = JHtml::_('select.option', 2, JText::_('EB_GROUP_ONLY'));
+		$options[]                           = JHtml::_('select.option', 3, JText::_('EB_DISABLE_REGISTRATION'));
+		$lists['registration_type']          = JHtml::_('select.genericlist', $options, 'registration_type', ' class="inputbox" ', 'value', 'text',
+			$item->registration_type);
+		$lists['access']                     = JHtml::_('access.level', 'access', $item->access, 'class="inputbox"', false);
+		$lists['registration_access']        = JHtml::_('access.level', 'registration_access', $item->registration_access, 'class="inputbox"', false);
+		$lists['enable_cancel_registration'] = JHtml::_('select.booleanlist', 'enable_cancel_registration', ' class="inputbox" ',
+			$item->enable_cancel_registration);
+		$lists['enable_auto_reminder']       = JHtml::_('select.booleanlist', 'enable_auto_reminder', ' class="inputbox" ', $item->enable_auto_reminder);
+
+		$lists['published'] = JHtml::_('select.booleanlist', 'published', ' class="inputbox" ', $item->published);
+		if ($item->event_date != $db->getNullDate())
+		{
+			$selectedHour   = date('G', strtotime($item->event_date));
+			$selectedMinute = date('i', strtotime($item->event_date));
+		}
+		else
+		{
+			$selectedHour   = 0;
+			$selectedMinute = 0;
+		}
+		$lists['event_date_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'event_date_hour', ' class="input-mini" ', $selectedHour);
+		$lists['event_date_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'event_date_minute', ' class="input-mini" ', $selectedMinute, '%02d');
+		if ($item->event_end_date != $db->getNullDate())
+		{
+			$selectedHour   = date('G', strtotime($item->event_end_date));
+			$selectedMinute = date('i', strtotime($item->event_end_date));
+		}
+		else
+		{
+			$selectedHour   = 0;
+			$selectedMinute = 0;
+		}
+		$lists['event_end_date_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'event_end_date_hour', ' class="input-mini" ', $selectedHour);
+		$lists['event_end_date_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'event_end_date_minute', ' class="input-mini" ', $selectedMinute,
+			'%02d');
+
+		// Registration start time
+		if ($item->registration_start_date != $db->getNullDate())
+		{
+			$selectedHour   = date('G', strtotime($item->registration_start_date));
+			$selectedMinute = date('i', strtotime($item->registration_start_date));
+		}
+		else
+		{
+			$selectedHour   = 0;
+			$selectedMinute = 0;
+		}
+		$lists['registration_start_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'registration_start_hour', ' class="inputbox input-mini" ', $selectedHour);
+		$lists['registration_start_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d');
+
+		$query->clear();
+		$query->select('id, title')
+			->from('#__content')
+			->where('`state` = 1')
+			->order('title');
+		$db->setQuery($query);
+		$rows                      = $db->loadObjectList();
+		$options                   = array();
+		$options[]                 = JHtml::_('select.option', 0, JText::_('EB_SELECT_ARTICLE'), 'id', 'title');
+		$options                   = array_merge($options, $rows);
+		$this->lists['article_id'] = JHtml::_('select.genericlist', $options, 'article_id', 'class="inputbox"', 'id', 'title', $item->article_id);
+
+		//Custom field handles
+		if ($config->event_custom_field)
+		{
+			$registry = new JRegistry();
+			$registry->loadString($item->custom_fields);
+			$data         = new stdClass();
+			$data->params = $registry->toArray();
+			$form         = JForm::getInstance('pmform', JPATH_ROOT . '/components/com_eventbooking/fields.xml', array(), false, '//config');
+			$form->bind($data);
+			$this->assignRef('form', $form);
+		}
+		$this->item     = $item;
+		$this->prices   = $prices;
+		$this->lists    = $lists;
+		$this->nullDate = $db->getNullDate();
+		$this->config   = $config;
+
+		parent::display();
 	}
 }

@@ -42,7 +42,7 @@ else
 				<?php
 						if ($this->showCalendarMenu)
 						{
-								echo EventbookingHelperHtml::loadCommonLayout('common/calendar_navigation.php', array('Itemid' => $this->Itemid, 'config' => $this->config, 'layout' => 'default'));
+								echo EventbookingHelperHtml::loadCommonLayout('common/calendar_navigation.php', array('Itemid' => $this->Itemid, 'config' => $this->config, 'layout' => 'default', 'currentDateData' => $this->currentDateData));
 						}
 						echo EventbookingHelperHtml::loadCommonLayout('common/calendar.php',
 							array(
