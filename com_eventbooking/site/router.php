@@ -85,7 +85,7 @@ function EventbookingBuildRoute(&$query)
 	$catId   = isset($query['catid']) ? (int) $query['catid'] : 0;
 	$eventId = isset($query['event_id']) ? (int) $query['event_id'] : 0;
 	$task    = isset($query['task']) ? $query['task'] : '';
-	$layout    = isset($query['layout']) ? $query['layout'] : '';
+	$layout  = isset($query['layout']) ? $query['layout'] : '';
 	switch ($view)
 	{
 		case 'calendar':
@@ -312,15 +312,17 @@ function EventbookingParseRoute($segments)
 		}
 	}
 
-	$app  = JFactory::getApplication();
-	$menu = $app->getMenu();
-	if ($item = $menu->getActive())
+	$item = JFactory::getApplication()->getMenu()->getActive();
+	if ($item)
 	{
-		foreach ($item->query as $key => $value)
+		if (!empty($vars['view']) && empty($item->query['view']) && $vars['view'] == $item->query['view'])
 		{
-			if ($key != 'option' && $key != 'Itemid' && !isset($vars[$key]))
+			foreach ($item->query as $key => $value)
 			{
-				$vars[$key] = $value;
+				if ($key != 'option' && $key != 'Itemid' && !isset($vars[$key]))
+				{
+					$vars[$key] = $value;
+				}
 			}
 		}
 	}
