@@ -10,56 +10,18 @@
 // no direct access
 defined('_JEXEC') or die();
 
-/**
- * Event Booking controller
- * @package        Joomla
- * @subpackage     Event Booking
- */
 class EventbookingControllerEvent extends EventbookingController
 {
-
-	/**
-	 * Send invitation to friends
-	 * @return void|boolean
-	 */
-	public function send_invite()
+	public function __construct(RADInput $input = null, array $config = array())
 	{
-		if (EventbookingHelper::getConfigValue('show_invite_friend'))
-		{
+		parent::__construct($input, $config);
 
-			$config = EventbookingHelper::getConfig();
-			$user   = JFactory::getUser();
-			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
-			{
-				$input = JFactory::getApplication()->input;
-				//Check captcha
-				$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-				$res           = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
-				if (!$res)
-				{
-					JError::raiseWarning('', JText::_('EB_INVALID_CAPTCHA_ENTERED'));
-					JRequest::setVar('view', 'invite');
-					JRequest::setVar('layout', 'default');
-					$this->display();
-
-					return;
-				}
-			}
-			$model = $this->getModel('invite');
-			$post  = JRequest::get('post');
-			$model->sendInvite($post);
-			$this->setRedirect(
-				JRoute::_('index.php?option=com_eventbooking&view=invite&layout=complete&tmpl=component&Itemid=' . JRequest::getInt('Itemid', 0),
-					false));
-		}
-		else
-		{
-			JError::raiseError(403, JText::_('JLIB_APPLICATION_ERROR_ACCESS_FORBIDDEN'));
-
-			return false;
-		}
+		$this->registerTask('unpublish', 'publish');
 	}
 
+	/**
+	 * Save an event
+	 */
 	public function save()
 	{
 		$post       = $this->input->getData();
@@ -76,7 +38,7 @@ class EventbookingControllerEvent extends EventbookingController
 			$msg = JText::_('Error while saving event');
 		}
 
-		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', JRequest::getInt('Itemid')), false), $msg);
+		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', $this->input->getInt('Itemid')), false), $msg);
 	}
 
 	/**
@@ -85,132 +47,84 @@ class EventbookingControllerEvent extends EventbookingController
 	 */
 	public function publish()
 	{
-		//Check unpublish permission
-		$user = JFactory::getUser();
-		$db   = JFactory::getDbo();
-		$id   = JRequest::getInt('id', 0);
-		if (!$id)
-		{
-			$msg = JText::_('EB_INVALID_EVENT');
-			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', JRequest::getInt('Itemid', 0)), false), $msg);
-
-			return;
-		}
-		//Get the event object
-		$sql = 'SELECT * FROM #__eb_events WHERE id=' . $id;
-		$db->setQuery($sql);
-		$rowEvent = $db->loadObject();
-		if (!$rowEvent)
-		{
-			$msg = JText::_('EB_INVALID_EVENT');
-			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', JRequest::getInt('Itemid', 0)), false), $msg);
-
-			return;
-		}
+		$id = $this->input->getInt('id', 0);
 		if (!EventbookingHelper::canChangeEventStatus($id))
 		{
 			$msg = JText::_('EB_NO_PUBLISH_PERMISSION');
-			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', JRequest::getInt('Itemid', 0)), false), $msg);
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', $this->input->getInt('Itemid', 0)), false), $msg);
 
 			return;
 		}
-		//OK, enough permission checked. Publish the event		
-		$model = $this->getModel('event');
-		$ret   = $model->publish($id, 1);
-		if ($ret)
+
+		//OK, enough permission checked. Change status of the event
+		$task = $this->getTask();
+		if ($task == 'publish')
 		{
-			$msg = JText::_('EB_PUBLISH_SUCCESS');
+			$msg   = JText::_('EB_PUBLISH_SUCCESS');
+			$state = 1;
 		}
 		else
 		{
-			$msg = JText::_('EB_PUBLISH_ERROR');
+			$msg   = JText::_('EB_UNPUBLISH_SUCCESS');
+			$state = 0;
 		}
-		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', JRequest::getInt('Itemid', 0)), false), $msg);
+		$model = $this->getModel('event');
+		$model->publish($id, $state);
+
+		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', $this->input->getInt('Itemid', 0)), false), $msg);
 	}
 
 	/**
-	 * Unpublish the selected events
-	 *
+	 * Send invitation to friends
+	 * @return void|boolean
 	 */
-	public function unpublish()
+	public function send_invite()
 	{
-		$db   = JFactory::getDbo();
-		$user = JFactory::getUser();
-		$id   = JRequest::getInt('id', 0);
-		if (!$id)
+		$config = EventbookingHelper::getConfig();
+		if ($config->show_invite_friend)
 		{
-			$msg = JText::_('EB_INVALID_EVENT');
-			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', JRequest::getInt('Itemid', 0)), false), $msg);
+			$config = EventbookingHelper::getConfig();
+			$user   = JFactory::getUser();
+			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
+			{
+				$input = JFactory::getApplication()->input;
+				//Check captcha
+				$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+				$res           = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
+				if (!$res)
+				{
+					$this->app->enqueueMessage(JText::_('EB_INVALID_CAPTCHA_ENTERED'), 'warning');
+					$this->input->set('view', 'invite');
+					$this->input->set('layout', 'default');
+					$this->display();
 
-			return;
-		}
-		//Get the event object
-		$sql = 'SELECT * FROM #__eb_events WHERE id=' . $id;
-		$db->setQuery($sql);
-		$rowEvent = $db->loadObject();
-		if (!$rowEvent)
-		{
-			$msg = JText::_('EB_INVALID_EVENT');
-			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', JRequest::getInt('Itemid')), false), $msg);
-
-			return;
-		}
-
-		if (!EventbookingHelper::canChangeEventStatus($id))
-		{
-			$msg = JText::_('EB_NO_UNPUBLISH_PERMISSION');
-			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', JRequest::getInt('Itemid')), false), $msg);
-
-			return;
-		}
-		$model = $this->getModel('event');
-		$ret   = $model->publish($id, 0);
-		if ($ret)
-		{
-			$msg = JText::_('EB_UNPUBLISH_SUCCESS');
+					return;
+				}
+			}
+			$model = $this->getModel('invite');
+			$post  = $this->input->getData();
+			$model->sendInvite($post);
+			$this->setRedirect(
+				JRoute::_('index.php?option=com_eventbooking&view=invite&layout=complete&tmpl=component&Itemid=' . $this->input->getInt('Itemid', 0),
+					false));
 		}
 		else
 		{
-			$msg = JText::_('EB_UNPUBLISH_ERROR');
+			JError::raiseError(403, JText::_('JLIB_APPLICATION_ERROR_ACCESS_FORBIDDEN'));
 		}
-		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', JRequest::getInt('Itemid', 0)), false), $msg);
 	}
 
 	/**
-	 * Redirect user to events mangement page
-	 *
+	 * Download Ical
 	 */
-	public function cancel()
-	{
-		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=events&Itemid=' . JRequest::getInt('Itemid', 0), false));
-	}
-
-
 	public function download_ical()
 	{
 		$eventId = $this->input->getInt('event_id');
 		if ($eventId)
 		{
 			$config      = EventbookingHelper::getConfig();
-			$fieldSuffix = EventbookingHelper::getFieldSuffix();
-			$db          = JFactory::getDbo();
-			$query       = $db->getQuery(true);
-			$query->select('*')
-				->select('title' . $fieldSuffix . ' AS title, short_description' . $fieldSuffix . ' AS short_description, description' . $fieldSuffix . ' AS description')
-				->from('#__eb_events')
-				->where('id = ' . $eventId);
-			$db->setQuery($query);
-			$event = $db->loadObject();
-
-			$query->clear();
-			$query->select('a.*')
-				->from('#__eb_locations AS a')
-				->innerJoin('#__eb_events AS b ON a.id=b.location_id')
-				->where('b.id=' . $eventId);
-
-			$db->setQuery($query);
-			$rowLocation = $db->loadObject();
-
+			$event       = EventbookingHelperDatabase::getEvent($eventId);
+			$rowLocation = EventbookingHelperDatabase::getLocation($event->location_id);
 			if ($config->from_name)
 			{
 				$fromName = $config->from_name;
@@ -242,5 +156,14 @@ class EventbookingControllerEvent extends EventbookingController
 
 			$ics->download();
 		}
+	}
+
+	/**
+	 * Redirect user to events mangement page
+	 *
+	 */
+	public function cancel()
+	{
+		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=events&Itemid=' . $this->input->getInt('Itemid', 0), false));
 	}
 }
