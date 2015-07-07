@@ -1,42 +1,33 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
 
-/**
- * EventBooking Component Registrantration History Model
- *
- * @package		Joomla
- * @subpackage	Event Booking
- */
-class EventBookingModelHistory extends RADModelList
+class EventbookingModelHistory extends RADModelList
 {
 
-	function __construct($config = array())
+	public function __construct($config = array())
 	{
 		$config = array_merge($config, array('table' => '#__eb_registrants'));
 		parent::__construct($config);
-		$request = EventbookingHelper::getRequestData();
 		$this->state->insert('event_id', 'int', 0)
 			->insert('search', 'string', '')
 			->insert('filter_order', 'cmd', 'tbl.register_date')
 			->insert('filter_order_Dir', 'word', 'DESC');
-		$this->state->setData($request);
-		JFactory::getApplication()->setUserState('eventbooking.limit', $this->state->limit);
 	}
 
 	public function getTotal()
 	{
 		if (empty($this->total))
 		{
-			$db = $this->getDbo();
+			$db    = $this->getDbo();
 			$query = $db->getQuery(true);
 			$query->select('COUNT(*)');
 			$this->_buildQueryFrom($query)
@@ -45,7 +36,7 @@ class EventBookingModelHistory extends RADModelList
 			$db->setQuery($query);
 			$this->total = (int) $db->loadResult();
 		}
-		
+
 		return $this->total;
 	}
 
@@ -56,6 +47,7 @@ class EventBookingModelHistory extends RADModelList
 	{
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->select('tbl.*')->select('b.title' . $fieldSuffix . ' AS title, b.event_date');
+
 		return $this;
 	}
 
@@ -65,7 +57,7 @@ class EventBookingModelHistory extends RADModelList
 	protected function _buildQueryJoins(JDatabaseQuery $query)
 	{
 		$query->innerJoin('#__eb_events AS b ON tbl.event_id=b.id');
-		
+
 		return $this;
 	}
 
@@ -74,9 +66,9 @@ class EventBookingModelHistory extends RADModelList
 	 */
 	protected function _buildQueryWhere(JDatabaseQuery $query)
 	{
-		$db = $this->getDbo();
-		$user = JFactory::getUser();
-		$state = $this->getState();
+		$db     = $this->getDbo();
+		$user   = JFactory::getUser();
+		$state  = $this->getState();
 		$config = EventbookingHelper::getConfig();
 		$query->where('(tbl.published=1 OR tbl.payment_method LIKE "os_offline%")')->where(
 			'(tbl.user_id =' . $user->get('id') . ' OR tbl.email="' . $user->get('email') . '")');
@@ -88,7 +80,7 @@ class EventBookingModelHistory extends RADModelList
 		{
 			$search = $db->Quote('%' . $db->escape($state->search, true) . '%', false);
 			$query->where('LOWER(b.title) LIKE ' . $search);
-		}		
+		}
 		if (isset($config->include_group_billing_in_registrants) && !$config->include_group_billing_in_registrants)
 		{
 			$query->where('tbl.is_group_billing = 0 ');
@@ -97,7 +89,7 @@ class EventBookingModelHistory extends RADModelList
 		{
 			$query->where('tbl.group_id = 0');
 		}
-		
+
 		return $this;
 	}
 }
