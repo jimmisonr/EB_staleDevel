@@ -19,10 +19,10 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 	function checkData(pressbutton)
 	{
 		var form = document.adminForm;
-		if (form.event_id.value == 0)
+		if (form.filter_event_id.value == 0)
 		{
 			alert("<?php echo JText::_('EB_SELECT_EVENT_TO_ADD_REGISTRANT'); ?>");
-			form.event_id.focus();
+			form.filter_event_id.focus();
 			return ;
 		}		
 		Joomla.submitform( pressbutton );
@@ -40,7 +40,7 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 			</td >
 			<td style="float: right;">
 				<?php echo $this->lists['published'] ; ?>
-				<?php echo $this->lists['event_id'] ; ?>
+				<?php echo $this->lists['filter_event_id'] ; ?>
 				<button class="btn btn-small btn-success" onclick="checkData('add_registrant');" style="margin-top: 5px;">
 					<span class="icon-new icon-white"></span><?php echo JText::_('EB_NEW_REGISTRANTS'); ?></button>
 			</td>

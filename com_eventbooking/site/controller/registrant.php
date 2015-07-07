@@ -25,8 +25,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 		$this->csrfProtection();
 
 		$model = $this->getModel('registrant');
-		$post  = $this->input->post->getData();
-		$model->store($post);
+		$model->store($this->input);
 		$from = $this->input->getString('from', '');
 		if ($from == 'history')
 		{

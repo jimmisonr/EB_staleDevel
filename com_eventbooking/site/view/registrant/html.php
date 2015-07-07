@@ -1,38 +1,40 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
-class EventBookingViewRegistrant extends JViewLegacy
+
+class EventbookingViewRegistrantHtml extends RADViewHtml
 {
 
-	public function display($tpl = null)
+	public function display()
 	{
 		JFactory::getDocument()->addScript(JUri::base(true) . '/components/com_eventbooking/assets/js/paymentmethods.js');
 		$this->setLayout('default');
-		EventbookingHelper::checkEditRegistrant();
+
 		EventbookingHelper::addLangLinkForAjax();
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$user = JFactory::getUser();
-		$item = $this->get('Data');
-		$config = EventbookingHelper::getConfig();
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
+		$user        = JFactory::getUser();
+		$item        = $this->model->getData();
+		$config      = EventbookingHelper::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$userId = $user->get('id');
+		$userId      = $user->get('id');
+		EventbookingHelper::checkEditRegistrant($item);
 
 		if ($item->id)
 		{
-			$query->select('*, title'.$fieldSuffix.' AS title')
+			$query->select('*, title' . $fieldSuffix . ' AS title')
 				->from('#__eb_events')
 				->where('id=' . $item->event_id);
 			$db->setQuery($query);
-			$event = $db->loadObject();
+			$event       = $db->loadObject();
 			$this->event = $event;
 		}
 
@@ -48,11 +50,11 @@ class EventBookingViewRegistrant extends JViewLegacy
 		}
 		else
 		{
-			$rowFields = EventbookingHelper::getFormFields($item->event_id, 0, $item->language);
+			$rowFields  = EventbookingHelper::getFormFields($item->event_id, 0, $item->language);
 			$rowMembers = array();
 		}
 		$form = new RADForm($rowFields);
-		if($item->id)
+		if ($item->id)
 		{
 			$data = Eventbookinghelper::getRegistrantData($item, $rowFields);
 			$form->bind($data, false);
@@ -63,15 +65,15 @@ class EventBookingViewRegistrant extends JViewLegacy
 			$form->bind($data, true);
 		}
 		$form->bind($data);
-		$from = JRequest::getVar('from', '');
+		$from = $this->input->getString('from', '');
 		if ($userId && $user->authorise('eventbooking.registrants_management', 'com_eventbooking'))
 		{
-			$canChangeStatus = true;
-			$options = array();
-			$options[] = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
-			$options[] = JHtml::_('select.option', 1, JText::_('EB_PAID'));
-			$options[] = JHtml::_('select.option', 3, JText::_('EB_WAITING_LIST'));
-			$options[] = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
+			$canChangeStatus    = true;
+			$options            = array();
+			$options[]          = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
+			$options[]          = JHtml::_('select.option', 1, JText::_('EB_PAID'));
+			$options[]          = JHtml::_('select.option', 3, JText::_('EB_WAITING_LIST'));
+			$options[]          = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
 			$lists['published'] = JHtml::_('select.genericlist', $options, 'published', ' class="inputbox" ', 'value', 'text', $item->published);
 		}
 		else
@@ -88,7 +90,7 @@ class EventBookingViewRegistrant extends JViewLegacy
 			//Build list of event dropdown
 			$options = array();
 			$query->clear();
-			$query->select('id, title'.$fieldSuffix.' AS title, event_date')
+			$query->select('id, title' . $fieldSuffix . ' AS title, event_date')
 				->from('#__eb_events')
 				->where('published=1')
 				->order('title');
@@ -99,7 +101,7 @@ class EventBookingViewRegistrant extends JViewLegacy
 				$rows = $db->loadObjectList();
 				for ($i = 0, $n = count($rows); $i < $n; $i++)
 				{
-					$row = $rows[$i];
+					$row       = $rows[$i];
 					$options[] = JHtml::_('select.option', $row->id, $row->title . ' (' . JHtml::_('date', $row->event_date, $config->date_format) . ')' .
 						'', 'id', 'title');
 				}
@@ -116,7 +118,7 @@ class EventBookingViewRegistrant extends JViewLegacy
 			$rowMembers = array();
 			for ($i = 0; $i < $item->number_registrants; $i++)
 			{
-				$rowMember = new RADTable('#__eb_registrants', 'id', $db);
+				$rowMember           = new RADTable('#__eb_registrants', 'id', $db);
 				$rowMember->event_id = $item->event_id;
 				$rowMember->group_id = $item->id;
 				$rowMember->store();
@@ -124,14 +126,14 @@ class EventBookingViewRegistrant extends JViewLegacy
 			}
 		}
 
-		$this->item = $item;
-		$this->config = $config;
-		$this->lists = $lists;
-		$this->from = $from;
+		$this->item            = $item;
+		$this->config          = $config;
+		$this->lists           = $lists;
+		$this->from            = $from;
 		$this->canChangeStatus = $canChangeStatus;
-		$this->form = $form;
-		$this->rowMembers = $rowMembers;
-		
-		parent::display($tpl);
+		$this->form            = $form;
+		$this->rowMembers      = $rowMembers;
+
+		parent::display();
 	}
 }

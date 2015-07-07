@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	2.0.0
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -152,6 +152,7 @@ class EventbookingHelper
 			$_REQUEST['limitstart'] = 0;
 		}
 	}
+
 	/**
 	 * Get request data, used for RADList model
 	 *
@@ -3903,20 +3904,9 @@ class EventbookingHelper
 	 *
 	 * Check to see whether this users has permission to edit registrant
 	 */
-	public static function checkEditRegistrant()
+	public static function checkEditRegistrant($rowRegistrant)
 	{
-		$user         = JFactory::getUser();
-		$db           = JFactory::getDbo();
-		$cid          = Jrequest::getVar('cid', array());
-		$registrantId = (int) $cid[0];
-		$canAccess    = true;
-		if (!$registrantId)
-		{
-			$canAccess = false;
-		}
-		$sql = 'SELECT user_id, email FROM #__eb_registrants WHERE id=' . $registrantId;
-		$db->setQuery($sql);
-		$rowRegistrant = $db->loadObject();
+		$user = JFactory::getUser();
 		if ($user->authorise('eventbooking.registrants_management', 'com_eventbooking') || ($user->get('id') == $rowRegistrant->user_id) ||
 			($user->get('email') == $rowRegistrant->email)
 		)

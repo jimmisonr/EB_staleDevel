@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
@@ -13,23 +13,21 @@ defined('_JEXEC') or die();
 /**
  * EventBooking Component Registrants Model
  *
- * @package		Joomla
- * @subpackage	Event Booking
+ * @package        Joomla
+ * @subpackage     Event Booking
  */
 class EventBookingModelRegistrants extends RADModelList
 {
 
-	function __construct($config = array())
+	public function __construct($config = array())
 	{
 		parent::__construct($config);
-		$request = EventbookingHelper::getRequestData();
-		$this->state->insert('event_id', 'int', 0)
+
+		$this->state->insert('filter_event_id', 'int', 0)
 			->insert('search', 'string', '')
 			->insert('published', 'int', -1)
 			->insert('filter_order', 'cmd', 'tbl.register_date')
 			->insert('filter_order_Dir', 'word', 'DESC');
-		$this->state->setData($request);
-		JFactory::getApplication()->setUserState('eventbooking.limit', $this->state->limit);
 	}
 
 	/**
@@ -38,12 +36,12 @@ class EventBookingModelRegistrants extends RADModelList
 	 * @access public
 	 * @return array
 	 */
-	function getData()
+	public function getData()
 	{
 		if (empty($this->data))
 		{
-			$rows = parent::getData();
-			$db = $this->getDbo();
+			$rows  = parent::getData();
+			$db    = $this->getDbo();
 			$query = $db->getQuery(true);
 			$query->select('first_name, last_name FROM #__eb_registrants');
 			for ($i = 0, $n = count($rows); $i < $n; $i++)
@@ -60,6 +58,7 @@ class EventBookingModelRegistrants extends RADModelList
 			}
 			$this->data = $rows;
 		}
+
 		return $this->data;
 	}
 
@@ -70,7 +69,7 @@ class EventBookingModelRegistrants extends RADModelList
 	{
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->select('tbl.*')->select('b.title' . $fieldSuffix . ' AS title, b.event_date, c.code AS coupon_code');
-		
+
 		return $this;
 	}
 
@@ -80,7 +79,7 @@ class EventBookingModelRegistrants extends RADModelList
 	protected function _buildQueryJoins(JDatabaseQuery $query)
 	{
 		$query->innerJoin('#__eb_events AS b ON tbl.event_id=b.id')->leftJoin('#__eb_coupons AS c ON tbl.coupon_id = c.id');
-		
+
 		return $this;
 	}
 
@@ -89,8 +88,8 @@ class EventBookingModelRegistrants extends RADModelList
 	 */
 	protected function _buildQueryWhere(JDatabaseQuery $query)
 	{
-		$db = $this->getDbo();
-		$state = $this->getState();
+		$db     = $this->getDbo();
+		$state  = $this->getState();
 		$config = EventbookingHelper::getConfig();
 		if (!$config->show_pending_registrants)
 		{
@@ -100,16 +99,16 @@ class EventBookingModelRegistrants extends RADModelList
 		{
 			$query->where('tbl.published = ' . $state->published);
 		}
-		if ($state->event_id)
+		if ($state->filter_event_id)
 		{
-			$query->where('tbl.event_id=' . $state->event_id);
+			$query->where('tbl.event_id=' . $state->filter_event_id);
 		}
 		if ($state->search)
 		{
 			$search = $db->Quote('%' . $db->escape(JString::strtolower($state->search), true) . '%', false);
 			$query->where(
 				'(LOWER(tbl.first_name) LIKE ' . $search . ' OR LOWER(tbl.last_name) LIKE ' . $search . ' OR LOWER(tbl.transaction_id) LIKE ' . $search .
-					 ') ');
+				') ');
 		}
 		if (isset($config->include_group_billing_in_registrants) && !$config->include_group_billing_in_registrants)
 		{
@@ -123,7 +122,7 @@ class EventBookingModelRegistrants extends RADModelList
 		{
 			$query->where('tbl.event_id IN (SELECT id FROM #__eb_events WHERE created_by =' . JFactory::getUser()->id . ')');
 		}
-		
+
 		return $this;
 	}
 }
