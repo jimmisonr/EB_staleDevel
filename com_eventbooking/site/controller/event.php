@@ -24,18 +24,15 @@ class EventbookingControllerEvent extends EventbookingController
 	 */
 	public function save()
 	{
-		$post       = $this->input->getData();
-		$model      = $this->getModel('event');
-		$cid        = $post['cid'];
-		$post['id'] = (int) $cid[0];
-		$ret        = $model->store($post);
-		if ($ret)
+		$model = $this->getModel('event');
+		try
 		{
+			$model->store($this->input);
 			$msg = JText::_('Successfully saving event');
 		}
-		else
+		catch (Exception $e)
 		{
-			$msg = JText::_('Error while saving event');
+			$msg = JText::_('Error while saving event:' . $e->getMessage());
 		}
 
 		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', $this->input->getInt('Itemid')), false), $msg);

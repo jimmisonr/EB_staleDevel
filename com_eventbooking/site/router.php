@@ -107,6 +107,7 @@ function EventbookingBuildRoute(&$query)
 			if ($layout == 'form')
 			{
 				$segments[] = 'Edit';
+				unset($query['layout']);
 			}
 			else
 			{
