@@ -15,6 +15,6 @@ defined( '_JEXEC' ) or die;
 	<ul class="dropdown-menu">
 		<li><a class="google" href="<?php echo EventbookingHelperHtml::getAddToGoogleCalendarUrl($item); ?>" target="_blank"><?php echo JText::_('EB_GOOGLE_CALENDAR'); ?></a></li>
 		<li><a class="yahoo" href="<?php echo EventbookingHelperHtml::getAddToYahooCalendarUrl($item);?>" target="_blank"><?php echo JText::_('EB_YAHOO_CALENDAR'); ?></a></li>
-		<li><a class="download" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=download_ical&event_id='.$item->id.'&Itemid='.$Itemid); ?>"><i class="icon-download"></i> <?php echo JText::_('EB_DOWNLOAD_ICAL'); ?></a></li>
+		<li><a class="download" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=event.download_ical&event_id='.$item->id.'&Itemid='.$Itemid); ?>"><i class="icon-download"></i> <?php echo JText::_('EB_DOWNLOAD_ICAL'); ?></a></li>
 	</ul>
 </div>
