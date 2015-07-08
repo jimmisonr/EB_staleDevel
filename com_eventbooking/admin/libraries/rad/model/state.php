@@ -218,6 +218,14 @@ class RADModelState
 	}
 
 	/**
+	 * Get list of state variables is being stored
+	 */
+	public function getProperties()
+	{
+		return array_keys($this->data);
+	}
+	
+	/**
 	 * Magic method to get state value
 	 *
 	 * @param string

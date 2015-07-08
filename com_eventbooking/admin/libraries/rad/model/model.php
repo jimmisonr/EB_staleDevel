@@ -214,6 +214,36 @@ class RADModel
 	}
 
 	/**
+	 * Populate model state from input
+	 *
+	 * @param RADInput $input
+	 */
+	public function populateState($input)
+	{
+		$data = $input->getData();
+
+		// Try to get the state properties data from user session
+		if ($this->rememberStates)
+		{
+			$properties = $this->state->getProperties();
+			if (count($properties))
+			{
+				$context = $this->option . '.' . $input->get('view', $this->config['default_view']) . '.';
+				foreach ($properties as $property)
+				{
+					$newState = $this->getUserStateFromRequest($input, $context . $property, $property);
+					if ($newState != null)
+					{
+						$data[$property] = $newState;
+					}
+				}
+			}
+		}
+
+		$this->setState($data);
+	}
+
+	/**
 	 * Get JTable object for the model
 	 *
 	 * @param string $name
@@ -239,7 +269,7 @@ class RADModel
 	 *
 	 * @return RADModel
 	 */
-	public function set($property, $value = null)
+	public function setState($property, $value = null)
 	{
 		$changed = false;
 		if (is_array($property))
@@ -267,24 +297,10 @@ class RADModel
 
 		if ($changed)
 		{
-			$limit = $this->state->limit;
-			if ($limit)
-			{
-				$offset = $this->state->limitstart;
-				$total  = $this->getTotal();
-
-				// If the offset is higher than the total recalculate the offset
-				if ($offset !== 0 && $total !== 0)
-				{
-					if ($offset >= $total)
-					{
-						$offset                  = floor(($total - 1) / $limit) * $limit;
-						$this->state->limitstart = $offset;
-					}
-				}
-			}
-			$this->data  = null;
-			$this->total = null;
+			// Reset the data
+			$this->state->limitstart = 0;
+			$this->data              = null;
+			$this->total             = null;
 		}
 
 		return $this;
@@ -301,7 +317,7 @@ class RADModel
 	 *
 	 * @return mixed <string, RADModelState>
 	 */
-	public function get($property = null, $default = null)
+	public function getState($property = null, $default = null)
 	{
 		$result = $default;
 
@@ -338,21 +354,6 @@ class RADModel
 	}
 
 	/**
-	 * Method to get model state. If name is given, return data for that state, otherwise, return the state object
-	 *
-	 * @return mixed
-	 */
-	public function getState($name = null)
-	{
-		if ($name)
-		{
-			return $this->state->get($name);
-		}
-
-		return $this->state;
-	}
-
-	/**
 	 * Get the dbo
 	 *
 	 * @return JDatabaseDriver
@@ -370,6 +371,61 @@ class RADModel
 	public function getName()
 	{
 		return $this->name;
+	}
+
+	/**
+	 * Supports a simple form Fluent Interfaces.
+	 * Allows you to set states by
+	 * using the state name as the method name.
+	 *
+	 * For example : $model->filter_order('name')->filter_order_Dir('DESC')->limit(10)->getData();
+	 *
+	 * @param string Method name
+	 *
+	 * @param array  Array containing all the arguments for the original call
+	 *
+	 * @return RADModel
+	 */
+	public function __call($method, $args)
+	{
+		if (isset($this->state->$method))
+		{
+			return $this->set($method, $args[0]);
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * Gets the value of a user state variable.
+	 *
+	 * @param   RADInput $input   The input object
+	 * @param   string   $key     The key of the user state variable.
+	 * @param   string   $request The name of the variable passed in a request.
+	 * @param   string   $default The default value for the variable if not found. Optional.
+	 * @param   string   $type    Filter for the variable, for valid values see {@link JFilterInput::clean()}. Optional.
+	 *
+	 * @return  object  The request user state.
+	 */
+	protected function getUserStateFromRequest($input, $key, $request, $default = null, $type = 'none')
+	{
+		$app = JFactory::getApplication();
+
+		$currentState = $app->getUserState($key, $default);
+		$newState     = $input->get($request, null, $type);
+
+		// Save the new value only if it was set in this request.
+		if ($newState !== null)
+		{
+			$app->setUserState($key, $newState);
+		}
+		else
+		{
+			$newState = $currentState;
+		}
+
+		return $newState;
 	}
 
 	/**
@@ -398,52 +454,4 @@ class RADModel
 		}
 	}
 
-	/**
-	 * Get a model state by name
-	 *
-	 * @param string The key name.
-	 *
-	 * @return string The corresponding value.
-	 */
-	public function __get($key)
-	{
-		return $this->get($key);
-	}
-
-	/**
-	 * Set a model state by name
-	 *
-	 * @param string The key name.
-	 *
-	 * @param mixed  The value for the key
-	 *
-	 * @return void
-	 */
-	public function __set($key, $value)
-	{
-		$this->set($key, $value);
-	}
-
-	/**
-	 * Supports a simple form Fluent Interfaces.
-	 * Allows you to set states by
-	 * using the state name as the method name.
-	 *
-	 * For example : $model->filter_order('name')->filter_order_Dir('DESC')->limit(10)->getData();
-	 *
-	 * @param string Method name
-	 *
-	 * @param array  Array containing all the arguments for the original call
-	 *
-	 * @return RADModel
-	 */
-	public function __call($method, $args)
-	{
-		if (isset($this->state->$method))
-		{
-			return $this->set($method, $args[0]);
-		}
-
-		return null;
-	}
 }

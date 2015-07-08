@@ -194,6 +194,7 @@ class RADController
 		$this->input  = $input;
 		$this->option = $input->getCmd('option');
 		$this->name   = $config['name'];
+
 		// Build default config data for the controller
 		if (empty($config['language_prefix']))
 		{
@@ -281,7 +282,6 @@ class RADController
 		$viewLayout = $this->input->get('layout', 'default');
 		$view       = $this->getView($viewName, $viewType, $viewLayout);
 
-
 		// If view has model, create the model, and assign it to the view
 		if ($view->hasModel)
 		{
@@ -289,35 +289,8 @@ class RADController
 			$view->setModel($model);
 		}
 
-		// Display the view		
-		if ($cachable && $viewType != 'feed' && JFactory::getConfig()->get('caching') >= 1)
-		{
-			$cache = JFactory::getCache($this->option, 'view');
-			if (is_array($urlparams))
-			{
-				if (!empty($this->app->registeredurlparams))
-				{
-					$registeredurlparams = $this->app->registeredurlparams;
-				}
-				else
-				{
-					$registeredurlparams = new stdClass();
-				}
-
-				foreach ($urlparams as $key => $value)
-				{
-					// Add your safe url parameters with variable type as value {@see JFilterInput::clean()}.
-					$registeredurlparams->$key = $value;
-				}
-
-				$this->app->registeredurlparams = $registeredurlparams;
-			}
-			$cache->get($view, 'display');
-		}
-		else
-		{
-			$view->display();
-		}
+		// Render the view
+		$view->display();
 
 		return $this;
 	}
@@ -371,7 +344,7 @@ class RADController
 		$model = RADModel::getInstance($name, ucfirst($config['class_prefix']) . 'Model', $config);
 		if (!$model->ignoreRequest)
 		{
-			$this->populateModelStates($model);
+			$model->populateState($this->input);
 		}
 
 		return $model;
@@ -433,60 +406,6 @@ class RADController
 		}
 
 		return RADView::getInstance($name, $type, ucfirst($config['class_prefix']) . 'View', $config);
-	}
-
-	/**
-	 * Populate model states from controller input
-	 *
-	 * @param RADModel $model
-	 */
-	public function populateModelStates($model)
-	{
-		$data = $this->input->getData();
-		if ($model->rememberStates)
-		{
-			$states = array_keys($model->getState()->getData());
-			if (count($states))
-			{
-				$context = $this->option . '.' . $this->input->get('view', $this->config['default_view']) . '.';
-				foreach ($states as $state)
-				{
-					$newState = $this->getUserStateFromRequest($context . $state, $state);
-					if ($newState != null)
-					{
-						$data[$state] = $newState;
-					}
-				}
-			}
-		}
-		$model->set($data);
-	}
-
-	/**
-	 * Gets the value of a user state variable.
-	 *
-	 * @param   string $key     The key of the user state variable.
-	 * @param   string $request The name of the variable passed in a request.
-	 * @param   string $default The default value for the variable if not found. Optional.
-	 * @param   string $type    Filter for the variable, for valid values see {@link JFilterInput::clean()}. Optional.
-	 *
-	 * @return  object  The request user state.
-	 */
-	public function getUserStateFromRequest($key, $request, $default = null, $type = 'none')
-	{
-		$currentState = $this->app->getUserState($key, $default);
-		$newState     = $this->input->get($request, null, $type);
-		// Save the new value only if it was set in this request.
-		if ($newState !== null)
-		{
-			$this->app->setUserState($key, $newState);
-		}
-		else
-		{
-			$newState = $currentState;
-		}
-
-		return $newState;
 	}
 
 	/**

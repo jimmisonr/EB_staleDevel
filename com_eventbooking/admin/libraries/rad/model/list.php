@@ -137,24 +137,19 @@ class RADModelList extends RADModel
 			$db    = $this->getDbo();
 			$query = $this->query;
 
-			// In case the query was built before using getTotal method, we just clear the select clause
-			if ($query->type == 'select')
-			{
-				$query->clear('select');
-			}
-			else
-			{
-				$this->_buildQueryFrom($query)
-					->_buildQueryJoins($query)
-					->_buildQueryWhere($query);
-			}
-
 			$this->_buildQueryColumns($query)
+				->_buildQueryFrom($query)
+				->_buildQueryJoins($query)
+				->_buildQueryWhere($query)
 				->_buildQueryGroup($query)
 				->_buildQueryHaving($query)
 				->_buildQueryOrder($query);
 
-			$db->setQuery($query, $this->state->limitstart, $this->state->limit);
+			// Adjust the limitStart state property
+			$limit      = $this->state->limit;
+			$limitStart = $this->state->limitstart;
+			$limitStart = $limit != 0 ? (floor($limitStart / $limit) * $limit) : 0;
+			$db->setQuery($query, $limitStart, $limit);
 			$this->data = $db->loadObjectList();
 
 			// Store the query so that it can be used in getTotal method if needed
@@ -175,28 +170,16 @@ class RADModelList extends RADModel
 		if (empty($this->total))
 		{
 			$db    = $this->getDbo();
-			$query = $this->query;
-			if ($query->type == 'select')
-			{
-				$query->clear('select')
-					->clear('group')
-					->clear('having')
-					->clear('order')
-					->clear('limit')
-					->clear('offset');
-			}
-			else
-			{
-				$this->_buildQueryFrom($query)
-					->_buildQueryJoins($query)
-					->_buildQueryWhere($query);
-			}
-			$query->select('COUNT(*)');
+			$query = clone $this->query;
+			$query->clear('select')
+				->clear('group')
+				->clear('having')
+				->clear('order')
+				->clear('limit')
+				->clear('offset')
+				->select('COUNT(*)');
 			$db->setQuery($query);
 			$this->total = (int) $db->loadResult();
-
-			// Store the query object to used in getData method in case the getTotal method is called before that
-			$this->query = $query;
 		}
 
 		return $this->total;
@@ -346,6 +329,8 @@ class RADModelList extends RADModel
 	 * Builds a generic ORDER BY clasue based on the model's state
 	 *
 	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function _buildQueryOrder(JDatabaseQuery $query)
 	{
@@ -355,5 +340,7 @@ class RADModelList extends RADModel
 		{
 			$query->order($sort . ' ' . $direction);
 		}
+
+		return $this;
 	}
 }
