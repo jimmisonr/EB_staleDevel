@@ -76,7 +76,7 @@ class RADViewItem extends RADViewHtml
 		{
 			$this->addToolbar();
 		}
-		
+
 		$this->languages = EventbookingHelper::getLanguages();
 	}
 
@@ -92,7 +92,7 @@ class RADViewItem extends RADViewHtml
 		}
 		else
 		{
-			$canDo = call_user_func(array('RADHelper', 'getActions'), $this->viewConfig['option'], $this->name, $this->state);
+			$canDo = call_user_func(array('RADHelper', 'getActions'), $this->option, $this->name, $this->state);
 		}
 		if ($this->item->id)
 		{

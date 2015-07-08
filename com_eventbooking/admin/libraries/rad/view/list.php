@@ -83,7 +83,7 @@ class RADViewList extends RADViewHtml
 			$this->lists['filter_state']    = str_replace('class="inputbox"', 'class="input-medium"', JHtml::_('grid.state', $this->state->filter_state));
 			$this->lists['filter_access']   = JHtml::_('access.level', 'filter_access', $this->state->filter_access, 'onchange="submit();"', false);
 			$this->lists['filter_language'] = JHtml::_('select.genericlist', JHtml::_('contentlanguage.existing', true, true), 'filter_language',
-				' onchange="submit();" ', 'value', 'text', $this->state->filter_language);			
+				' onchange="submit();" ', 'value', 'text', $this->state->filter_language);
 			EventbookingHelperHtml::renderSubmenu($this->name);
 			$this->addToolbar();
 		}
@@ -102,7 +102,7 @@ class RADViewList extends RADViewHtml
 		}
 		else
 		{
-			$canDo = call_user_func(array('RADHelper', 'getActions'), $this->viewConfig['option'], $this->name, $this->state);
+			$canDo = call_user_func(array('RADHelper', 'getActions'), $this->option, $this->name, $this->state);
 		}
 		$languagePrefix = $this->viewConfig['language_prefix'];
 		JToolBarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')), 'link ' . $this->name);
@@ -130,7 +130,7 @@ class RADViewList extends RADViewHtml
 
 		if ($canDo->get('core.admin'))
 		{
-			JToolBarHelper::preferences($this->viewConfig['option']);
+			JToolBarHelper::preferences($this->option);
 		}
 	}
 }

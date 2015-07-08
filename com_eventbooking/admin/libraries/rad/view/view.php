@@ -17,6 +17,12 @@ defined('_JEXEC') or die();
  */
 abstract class RADView
 {
+	/**
+	 * Full name of the component com_foobar
+	 *
+	 * @var string
+	 */
+	protected $option;
 
 	/**
 	 * Name of the view
@@ -85,6 +91,25 @@ abstract class RADView
 	 */
 	public function __construct(array $config = array())
 	{
+		// Set the component name
+		if (isset($config['option']))
+		{
+			$this->option = $config['option'];
+		}
+		else
+		{
+			$className = get_class($this);
+			$pos       = strpos('View', $className);
+			if ($pos !== false)
+			{
+				$this->option = 'com_' . strtolower(substr($className, 0, $pos));
+			}
+			else
+			{
+				throw new Exception(JText::_('Could not detect the component for view'), 500);
+			}
+		}
+
 		// Set the view name
 		if (isset($config['name']))
 		{
@@ -105,30 +130,15 @@ abstract class RADView
 			$this->hasModel = $config['has_model'];
 		}
 
-		// Build default view config data if it is not set
-		if (empty($config['option']))
-		{
-			$className = get_class($this);
-			$viewPos   = strpos('View', $className);
-			if ($viewPos !== false)
-			{
-				$config['option'] = substr($className, 0, $viewPos);
-			}
-			else
-			{
-				throw new Exception(JText::_('Could not detect the component for view'), 500);
-			}
-		}
+		$component = substr($this->option, 4);
 
 		if (empty($config['language_prefix']))
 		{
-			$component                 = substr($config['option'], 4);
 			$config['language_prefix'] = strtoupper($component);
 		}
 
 		if (empty($config['class_prefix']))
 		{
-			$component              = substr($config['option'], 4);
 			$config['class_prefix'] = ucfirst($component);
 		}
 
