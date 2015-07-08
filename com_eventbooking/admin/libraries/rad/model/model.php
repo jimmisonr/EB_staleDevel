@@ -220,8 +220,7 @@ class RADModel
 	 *
 	 * @return JTable
 	 */
-	public
-	function getTable($name = '')
+	public function getTable($name = '')
 	{
 		if (!$name)
 		{
@@ -240,8 +239,7 @@ class RADModel
 	 *
 	 * @return RADModel
 	 */
-	public
-	function set($property, $value = null)
+	public function set($property, $value = null)
 	{
 		$changed = false;
 		if (is_array($property))
@@ -303,8 +301,7 @@ class RADModel
 	 *
 	 * @return mixed <string, RADModelState>
 	 */
-	public
-	function get($property = null, $default = null)
+	public function get($property = null, $default = null)
 	{
 		$result = $default;
 
@@ -330,8 +327,7 @@ class RADModel
 	 *
 	 * @return RADModel
 	 */
-	public
-	function reset($default = true)
+	public function reset($default = true)
 	{
 		$this->data  = null;
 		$this->total = null;
@@ -346,8 +342,7 @@ class RADModel
 	 *
 	 * @return mixed
 	 */
-	public
-	function getState($name = null)
+	public function getState($name = null)
 	{
 		if ($name)
 		{
@@ -362,8 +357,7 @@ class RADModel
 	 *
 	 * @return JDatabaseDriver
 	 */
-	public
-	function getDbo()
+	public function getDbo()
 	{
 		return $this->db;
 	}
@@ -373,8 +367,7 @@ class RADModel
 	 *
 	 * @return string
 	 */
-	public
-	function getName()
+	public function getName()
 	{
 		return $this->name;
 	}
@@ -388,8 +381,7 @@ class RADModel
 	 * @return  void
 	 *
 	 */
-	protected
-	function cleanCache($group = null, $client_id = 0)
+	protected function cleanCache($group = null, $client_id = 0)
 	{
 		$conf    = JFactory::getConfig();
 		$options = array(
@@ -413,8 +405,7 @@ class RADModel
 	 *
 	 * @return string The corresponding value.
 	 */
-	public
-	function __get($key)
+	public function __get($key)
 	{
 		return $this->get($key);
 	}
@@ -428,8 +419,7 @@ class RADModel
 	 *
 	 * @return void
 	 */
-	public
-	function __set($key, $value)
+	public function __set($key, $value)
 	{
 		$this->set($key, $value);
 	}
@@ -447,8 +437,7 @@ class RADModel
 	 *
 	 * @return RADModel
 	 */
-	public
-	function __call($method, $args)
+	public function __call($method, $args)
 	{
 		if (isset($this->state->$method))
 		{
