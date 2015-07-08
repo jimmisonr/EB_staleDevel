@@ -230,20 +230,6 @@ class EventbookingViewFieldHtml extends RADViewItem
 			$this->dependOptions = explode("\r\n", $db->loadResult());
 		}
 
-		if (JPluginHelper::isEnabled('osmembership', 'userprofile'))
-		{
-			$options   = array();
-			$options[] = JHtml::_('select.option', '', JText::_('Select Field'));
-
-			$fields = array('address1', 'address2', 'city', 'region', 'country', 'postal_code', 'phone', 'website', 'favoritebook', 'aboutme', 'dob');
-
-			foreach ($fields as $field)
-			{
-				$options[] = JHtml::_('select.option', $field);
-			}
-			$this->lists['profile_field_mapping'] = JHtml::_('select.genericlist', $options, 'profile_field_mapping', ' class="inputbox" ', 'value',
-				'text', $this->item->profile_field_mapping);
-		}
 		$this->integration = $integration;
 		$this->config      = $config;
 	}

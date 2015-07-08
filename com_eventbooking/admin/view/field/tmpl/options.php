@@ -1,12 +1,14 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
- */ 
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
+ */
+// no direct access
+defined('_JEXEC') or die;
 ?>
 <table cellspacing="3" cellpadding="3" width="100%">
     <?php
@@ -26,15 +28,15 @@
             <?php
             if (($i+1) % $optionsPerLine == 0)
             {
-                ?>
-                </tr>
+            ?>
+	            </tr>
             <?php
             }
         }
         if ($i % $optionsPerLine != 0)
         {
             $colspan = $optionsPerLine - $i % $optionsPerLine ;
-            ?>
+	        ?>
             <td colspan="<?php echo $colspan; ?>">&nbsp;</td>
             </tr>
         <?php

@@ -7,8 +7,9 @@
  * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
+
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingModelField extends RADModelAdmin
 {
@@ -44,7 +45,6 @@ class EventbookingModelField extends RADModelAdmin
 		$config = EventbookingHelper::getConfig();
 		if (!$config->custom_field_by_category)
 		{
-
 			$eventIds = $input->get('event_id', array(), 'array');
 			if (count($eventIds) == 0 || $eventIds[0] == -1 || $row->name == 'first_name' || $row->name == 'email')
 			{

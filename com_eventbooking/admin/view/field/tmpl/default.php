@@ -1,14 +1,14 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;
+defined('_JEXEC') or die;
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 if (version_compare(JVERSION, '3.0', 'ge'))
 {
@@ -221,7 +221,31 @@ if ($translatable)
 			<td>
 				<?php echo JText::_('EB_FEE_FORMULA_EXPLAIN'); ?>
 			</td>
-		</tr>	
+		</tr>
+
+		<tr class="eb-field eb-list eb-radio">
+			<td class="key">
+				<?php echo JText::_('EB_QUANTITY_FIELD'); ?>
+			</td>
+			<td>
+				<?php echo $this->lists['quantity_field'];?>
+			</td>
+			<td>
+				<?php echo JText::_('EB_QUANTITY_FIELD_EXPLAIN'); ?>
+			</td>
+		</tr>
+		<tr class="eb-field eb-list eb-radio">
+			<td class="key">
+				<?php echo JText::_('EB_QUANITY_VALUES') ; ?>
+			</td>
+			<td>
+				<textarea rows="5" cols="50" name="quantity_values" class="input-xlarge"><?php echo $this->item->quantity_values; ?></textarea>
+			</td>
+			<td>
+				<?php echo JText::_('EB_EACH_ITEM_LINE'); ?>
+			</td>
+		</tr>
+
 		<tr>
 			<td class="key">
 				<?php echo  JText::_('EB_DESCRIPTION'); ?>
