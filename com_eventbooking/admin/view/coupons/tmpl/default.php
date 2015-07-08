@@ -8,7 +8,11 @@
  * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ; 							
+defined( '_JEXEC' ) or die ;
+if (version_compare(JVERSION, '3.0', 'ge'))
+{
+	JHtml::_('formbehavior.chosen', 'select');
+}
 ?>
 <form action="index.php?option=com_eventbooking&view=coupons" method="post" name="adminForm" id="adminForm">
 <table width="100%">
@@ -91,14 +95,16 @@ defined( '_JEXEC' ) or die ;
 			</td>
 			<td class="center">
 				<?php
-					if ($row->valid_from != $this->nullDate) {
+					if ($row->valid_from != $this->nullDate)
+					{
 						echo JHtml::_('date', $row->valid_from, $this->dateFormat);
 					}
 				?>
 			</td>	
 			<td class="center">
 				<?php
-					if ($row->valid_to != $this->nullDate) {
+					if ($row->valid_to != $this->nullDate)
+					{
 						echo JHtml::_('date', $row->valid_to, $this->dateFormat);
 					}
 				?>
@@ -114,8 +120,7 @@ defined( '_JEXEC' ) or die ;
 	</tbody>
 	</table>
 	</div>
-	<input type="hidden" name="option" value="com_eventbooking" />
-	<input type="hidden" name="task" value="show_coupons" />
+	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->state->filter_order; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->state->filter_order_Dir; ?>" />	

@@ -9,21 +9,32 @@
  */
 // no direct access
 defined('_JEXEC') or die;
+if (version_compare(JVERSION, '3.0', 'ge'))
+{
+	JHtml::_('formbehavior.chosen', 'select');
+}
 ?>
 <script type="text/javascript">
-	Joomla.submitbutton = function (pressbutton) {
+	Joomla.submitbutton = function (pressbutton)
+	{
 		var form = document.adminForm;
-		if (pressbutton == 'cancel') {
+		if (pressbutton == 'cancel')
+		{
 			Joomla.submitform(pressbutton);
 			return;
-		} else if (form.code.value == "") {
+		}
+		else if (form.code.value == "")
+		{
 			alert("<?php echo JText::_("EB_ENTER_COUPON"); ?>");
 			form.code.focus();
-		} else if (form.discount.value == "") {
+		}
+		else if (form.discount.value == "")
+		{
 			alert("<?php echo JText::_("EN_ENTER_DISCOUNT_AMOUNT"); ?>");
 			form.discount.focus();
 		}
-		else {
+		else
+		{
 			Joomla.submitform(pressbutton);
 		}
 	}
@@ -32,7 +43,7 @@ defined('_JEXEC') or die;
 	<div class="row-fluid">
 		<table class="admintable adminform">
 			<tr>
-				<td width="100" class="key">
+				<td width="180" class="key">
 					<?php echo JText::_('EB_CODE'); ?>
 				</td>
 				<td>

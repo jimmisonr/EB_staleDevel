@@ -8,7 +8,7 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingViewCouponsHtml extends RADViewList
 {
@@ -18,7 +18,7 @@ class EventbookingViewCouponsHtml extends RADViewList
 		parent::prepareView();
 
 		$config              = EventbookingHelper::getConfig();
-		$discountTypes       = array(0 => '%', 1 => EventbookingHelper::getConfigValue('currency_symbol'));
+		$discountTypes       = array(0 => '%', 1 => $config->get('currency_symbol', '$'));
 		$this->discountTypes = $discountTypes;
 		$this->nullDate      = JFactory::getDbo()->getNullDate();
 		$this->dateFormat    = $config->get('date_format', 'Y-m-d');
