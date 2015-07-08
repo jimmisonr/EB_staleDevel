@@ -100,7 +100,7 @@ class RADModelAdmin extends RADModel
 	{
 		parent::__construct($config);
 
-		$this->context = $this->config['option'] . '.' . $this->name;
+		$this->context = $this->option . '.' . $this->name;
 		//Insert the default model states for admin
 		$this->state->insert('id', 'int', 0)->insert('cid', 'array', array());
 		if ($this->triggerEvents)
@@ -113,7 +113,7 @@ class RADModelAdmin extends RADModel
 			elseif (empty($this->pluginGroup))
 			{
 				//Plugin group should default to component name
-				$this->pluginGroup = substr($this->config['option'], 4);
+				$this->pluginGroup = substr($this->option, 4);
 			}
 			//Initialize the events
 			if (isset($config['event_after_delete']))
@@ -169,7 +169,7 @@ class RADModelAdmin extends RADModel
 		}
 		elseif (empty($this->languagePrefix))
 		{
-			$this->languagePrefix = strtoupper(substr($this->config['option'], 4));
+			$this->languagePrefix = strtoupper(substr($this->option, 4));
 		}
 	}
 

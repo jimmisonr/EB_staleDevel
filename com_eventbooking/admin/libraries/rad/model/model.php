@@ -18,6 +18,13 @@ defined('_JEXEC') or die();
 class RADModel
 {
 	/**
+	 * Full name of the component com_foobar
+	 *
+	 * @var string
+	 */
+	protected $option;
+
+	/**
 	 * The model name
 	 *
 	 * @var string
@@ -103,6 +110,25 @@ class RADModel
 	 */
 	public function __construct($config = array())
 	{
+
+		if (isset($config['option']))
+		{
+			$this->option = $config['option'];
+		}
+		else
+		{
+			$className = get_class($this);
+			$pos       = strpos($className, 'Model');
+			if ($pos !== false)
+			{
+				$this->option = 'com_' . strtolower(substr($className, 0, $pos));
+			}
+			else
+			{
+				throw new Exception(JText::_('Could not detect the component for model'), 500);
+			}
+		}
+
 		// Set the model name
 		if (isset($config['name']))
 		{
@@ -122,6 +148,15 @@ class RADModel
 			}
 		}
 
+		if (isset($config['db']))
+		{
+			$this->db = $config['db'];
+		}
+		else
+		{
+			$this->db = JFactory::getDbo();
+		}
+
 		// Set the model state
 		if (isset($config['state']))
 		{
@@ -132,45 +167,15 @@ class RADModel
 			$this->state = new RADModelState();
 		}
 
-		if (isset($config['db']))
-		{
-			$this->db = $config['db'];
-		}
-		else
-		{
-			$this->db = JFactory::getDbo();
-		}
-
-		// Build default model configuration if it is not set
-		if (empty($config['option']))
-		{
-			$className = get_class($this);
-			$pos       = strpos($className, 'Model');
-			if ($pos !== false)
-			{
-				$config['option'] = 'com_' . substr($className, 0, $pos);
-			}
-			else
-			{
-				throw new Exception(JText::_('Could not detect the component for model'), 500);
-			}
-		}
-
-		if (empty($config['table_prefix']))
-		{
-			$component              = substr($config['option'], 4);
-			$config['table_prefix'] = '#__' . strtolower($component) . '_';
-		}
+		$component = substr($this->option, 4);
 
 		if (empty($config['class_prefix']))
 		{
-			$component              = substr($config['option'], 4);
 			$config['class_prefix'] = ucfirst($component);
 		}
 
 		if (empty($config['language_prefix']))
 		{
-			$component                 = substr($config['option'], 4);
 			$config['language_prefix'] = strtoupper($component);
 		}
 
@@ -180,7 +185,7 @@ class RADModel
 		}
 		else
 		{
-			$this->table = $config['table_prefix'] . strtolower(RADInflector::pluralize($this->name));
+			$this->table = '#__' . $component . '_' . strtolower(RADInflector::pluralize($this->name));
 		}
 
 
@@ -197,7 +202,7 @@ class RADModel
 		$this->config = $config;
 
 		//Add include path to find table class
-		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/' . $config['option'] . '/table');
+		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/' . $this->option . '/table');
 	}
 
 	/**
@@ -372,7 +377,7 @@ class RADModel
 	{
 		$conf    = JFactory::getConfig();
 		$options = array(
-			'defaultgroup' => ($group) ? $group : $this->config['option'],
+			'defaultgroup' => ($group) ? $group : $this->option,
 			'cachebase'    => ($client_id) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache'));
 
 		$cache = JCache::getInstance('callback', $options);
