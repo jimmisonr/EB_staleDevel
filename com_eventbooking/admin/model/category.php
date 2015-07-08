@@ -22,6 +22,6 @@ class EventbookingModelCategory extends RADModelAdmin
 
 	protected function getReorderConditions($row)
 	{
-		return ' `parent` = ' . (int) $row->parent;
+		return array('`parent` = ' . (int) $row->parent);
 	}
 }
