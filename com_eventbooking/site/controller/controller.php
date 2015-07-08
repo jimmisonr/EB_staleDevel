@@ -73,16 +73,6 @@ class EventbookingController extends RADController
 				$this->input->set('view', 'cancel');
 				$this->input->set('layout', 'default');
 				break;
-
-			#Registrants
-			case 'edit_registrant':
-				$this->input->set('view', 'registrant');
-				break;
-			case 'add_registrant':
-				$this->input->set('view', 'registrant');
-				$this->input->set('form', false);
-				break;
-
 			#Cart function
 			case 'view_cart':
 				$this->input->set('view', 'cart');
@@ -92,19 +82,6 @@ class EventbookingController extends RADController
 			case 'checkout':
 				$this->input->set('view', 'register');
 				$this->input->set('layout', 'cart');
-				break;
-
-
-
-			#Location management
-			case 'edit_location':
-				$this->input->set('view', 'addlocation');
-				$this->input->set('layout', 'default');
-				break;
-
-			case 'add_location':
-				$this->input->set('view', 'addlocation');
-				$this->input->set('edit', false);
 				break;
 			default:
 
