@@ -30,9 +30,9 @@ class EventbookingModelHistory extends RADModelList
 			$db    = $this->getDbo();
 			$query = $db->getQuery(true);
 			$query->select('COUNT(*)');
-			$this->_buildQueryFrom($query)
-				->_buildQueryJoins($query)
-				->_buildQueryWhere($query);
+			$this->buildQueryFrom($query)
+				->buildQueryJoins($query)
+				->buildQueryWhere($query);
 			$db->setQuery($query);
 			$this->total = (int) $db->loadResult();
 		}
@@ -43,7 +43,7 @@ class EventbookingModelHistory extends RADModelList
 	/**
 	 * Builds SELECT columns list for the query
 	 */
-	protected function _buildQueryColumns(JDatabaseQuery $query)
+	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->select('tbl.*')->select('b.title' . $fieldSuffix . ' AS title, b.event_date');
@@ -54,7 +54,7 @@ class EventbookingModelHistory extends RADModelList
 	/**
 	 * Builds LEFT JOINS clauses for the query
 	 */
-	protected function _buildQueryJoins(JDatabaseQuery $query)
+	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
 		$query->innerJoin('#__eb_events AS b ON tbl.event_id=b.id');
 
@@ -64,7 +64,7 @@ class EventbookingModelHistory extends RADModelList
 	/**
 	 * Builds a WHERE clause for the query
 	 */
-	protected function _buildQueryWhere(JDatabaseQuery $query)
+	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
 		$db     = $this->getDbo();
 		$user   = JFactory::getUser();

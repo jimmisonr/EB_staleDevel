@@ -33,8 +33,8 @@ class EventbookingModelCategories extends RADModelList
 			$parent = $this->state->filter_parent;			
 			$db = $this->getDbo();
 			$query = $db->getQuery(true);
-			$this->_buildQueryColumns($query)
-				->_buildQueryFrom($query)
+			$this->buildQueryColumns($query)
+				->buildQueryFrom($query)
 				->_buildQueryJoins($query)
 				->_buildQueryWhere($query)
 				->_buildQueryGroup($query)
@@ -68,7 +68,7 @@ class EventbookingModelCategories extends RADModelList
 	/**
 	 * Builds SELECT columns list for the query
 	 */
-	protected function _buildQueryColumns(JDatabaseQuery $query)
+	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
 		$query->select('tbl.*, tbl.parent AS parent_id, tbl.name AS title, COUNT(ec.id) AS total_events');
 		
@@ -78,7 +78,7 @@ class EventbookingModelCategories extends RADModelList
 	/**
 	 * Builds LEFT JOINS clauses for the query
 	 */
-	protected function _buildQueryJoins(JDatabaseQuery $query)
+	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
 		$query->leftJoin('#__eb_event_categories AS ec ON tbl.id = ec.category_id');
 		
@@ -88,7 +88,7 @@ class EventbookingModelCategories extends RADModelList
 	/**
 	 * Builds a GROUP BY clause for the query
 	 */
-	protected function _buildQueryGroup(JDatabaseQuery $query)
+	protected function buildQueryGroup(JDatabaseQuery $query)
 	{
 		$query->group('tbl.id');
 		

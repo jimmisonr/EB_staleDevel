@@ -98,7 +98,7 @@ class EventbookingModelList extends RADModelList
 	 *
 	 * @return $this
 	 */
-	protected function _buildQueryColumns(JDatabaseQuery $query)
+	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
 		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
@@ -125,7 +125,7 @@ class EventbookingModelList extends RADModelList
 	 *
 	 * @return $this
 	 */
-	protected function _buildQueryJoins(JDatabaseQuery $query)
+	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
 		$query->leftJoin(
 			'#__eb_registrants AS b ON (tbl.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')->leftJoin(
@@ -141,7 +141,7 @@ class EventbookingModelList extends RADModelList
 	 *
 	 * @return $this
 	 */
-	protected function _buildQueryWhere(JDatabaseQuery $query)
+	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
 		$db             = $this->getDbo();
 		$user           = JFactory::getUser();
@@ -188,7 +188,7 @@ class EventbookingModelList extends RADModelList
 	 *
 	 * @return $this
 	 */
-	protected function _buildQueryGroup(JDatabaseQuery $query)
+	protected function buildQueryGroup(JDatabaseQuery $query)
 	{
 		$query->group('tbl.id');
 

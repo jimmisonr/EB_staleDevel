@@ -23,7 +23,7 @@ class EventbookingModelLocations extends RADModelList
 	/**
 	 * Builds a WHERE clause for the query
 	 */
-	protected function _buildQueryWhere(JDatabaseQuery $query)
+	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
 		$query->where('tbl.user_id=' . (int) JFactory::getUser()->id);
 

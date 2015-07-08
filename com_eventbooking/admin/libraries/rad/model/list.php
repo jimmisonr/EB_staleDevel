@@ -137,13 +137,13 @@ class RADModelList extends RADModel
 			$db    = $this->getDbo();
 			$query = $this->query;
 
-			$this->_buildQueryColumns($query)
-				->_buildQueryFrom($query)
-				->_buildQueryJoins($query)
-				->_buildQueryWhere($query)
-				->_buildQueryGroup($query)
-				->_buildQueryHaving($query)
-				->_buildQueryOrder($query);
+			$this->buildQueryColumns($query)
+				->buildQueryFrom($query)
+				->buildQueryJoins($query)
+				->buildQueryWhere($query)
+				->buildQueryGroup($query)
+				->buildQueryHaving($query)
+				->buildQueryOrder($query);
 
 			// Adjust the limitStart state property
 			$limit      = $this->state->limit;
@@ -209,7 +209,7 @@ class RADModelList extends RADModel
 	 *
 	 * @return $this
 	 */
-	protected function _buildQueryColumns(JDatabaseQuery $query)
+	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
 		$query->select(array('tbl.*'));
 
@@ -223,7 +223,7 @@ class RADModelList extends RADModel
 	 *
 	 * @return $this
 	 */
-	protected function _buildQueryFrom(JDatabaseQuery $query)
+	protected function buildQueryFrom(JDatabaseQuery $query)
 	{
 		$query->from($this->table . ' AS tbl');
 
@@ -237,7 +237,7 @@ class RADModelList extends RADModel
 	 *
 	 * @return $this
 	 */
-	protected function _buildQueryJoins(JDatabaseQuery $query)
+	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
 		return $this;
 	}
@@ -249,7 +249,7 @@ class RADModelList extends RADModel
 	 *
 	 * @return $this
 	 */
-	protected function _buildQueryWhere(JDatabaseQuery $query)
+	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
 		$user  = JFactory::getUser();
 		$db    = $this->getDbo();
@@ -308,7 +308,7 @@ class RADModelList extends RADModel
 	 *
 	 * @return $this
 	 */
-	protected function _buildQueryGroup(JDatabaseQuery $query)
+	protected function buildQueryGroup(JDatabaseQuery $query)
 	{
 		return $this;
 	}
@@ -320,7 +320,7 @@ class RADModelList extends RADModel
 	 *
 	 * @return $this
 	 */
-	protected function _buildQueryHaving(JDatabaseQuery $query)
+	protected function buildQueryHaving(JDatabaseQuery $query)
 	{
 		return $this;
 	}
@@ -332,7 +332,7 @@ class RADModelList extends RADModel
 	 *
 	 * @return $this
 	 */
-	protected function _buildQueryOrder(JDatabaseQuery $query)
+	protected function buildQueryOrder(JDatabaseQuery $query)
 	{
 		$sort      = $this->state->filter_order;
 		$direction = strtoupper($this->state->filter_order_Dir);

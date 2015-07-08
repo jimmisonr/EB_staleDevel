@@ -55,7 +55,7 @@ class EventbookingModelEvents extends RADModelList
 	/**
 	 * Builds SELECT columns list for the query
 	 */
-	protected function _buildQueryColumns(JDatabaseQuery $query)
+	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
 		$query->select('tbl.*,  SUM(rgt.number_registrants) AS total_registrants');
 
@@ -65,7 +65,7 @@ class EventbookingModelEvents extends RADModelList
 	/**
 	 * Builds LEFT JOINS clauses for the query
 	 */
-	protected function _buildQueryJoins(JDatabaseQuery $query)
+	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
 		$query->leftJoin('#__eb_registrants AS rgt ON (tbl.id = rgt.event_id AND rgt.group_id = 0 AND (rgt.published=1 OR (rgt.payment_method LIKE "os_offline%" AND rgt.published NOT IN (2,3))))');
 
@@ -75,9 +75,9 @@ class EventbookingModelEvents extends RADModelList
 	/**
 	 * Build where clase of the query
 	 *
-	 * @see RADModelList::_buildQueryWhere()
+	 * @see RADModelList::buildQueryWhere()
 	 */
-	protected function _buildQueryWhere(JDatabaseQuery $query)
+	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
 		if ($this->state->filter_category_id)
 		{
@@ -92,10 +92,10 @@ class EventbookingModelEvents extends RADModelList
 			$query->where('DATE(tbl.event_date) >= CURDATE()');
 		}
 
-		return parent::_buildQueryWhere($query);
+		return parent::buildQueryWhere($query);
 	}
 
-	protected function _buildQueryGroup(JDatabaseQuery $query)
+	protected function buildQueryGroup(JDatabaseQuery $query)
 	{
 		$query->group('tbl.id');
 

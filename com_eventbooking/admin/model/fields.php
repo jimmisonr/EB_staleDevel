@@ -28,7 +28,7 @@ class EventbookingModelFields extends RADModelList
 	/**
 	 * Builds a WHERE clause for the query
 	 */
-	protected function _buildQueryWhere(JDatabaseQuery $query)
+	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
 		$state = $this->state;
 		if ($state->filter_category_id)
@@ -45,6 +45,6 @@ class EventbookingModelFields extends RADModelList
 			$query->where('tbl.is_core = 0');
 		}
 
-		return parent::_buildQueryWhere($query);
+		return parent::buildQueryWhere($query);
 	}
 }

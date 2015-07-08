@@ -75,7 +75,7 @@ class EventbookingModelRegistrants extends RADModelList
 	/**
 	 * Builds SELECT columns list for the query
 	 */
-	protected function _buildQueryColumns(JDatabaseQuery $query)
+	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
 		$query->select('tbl.*, ev.title, ev.event_date, cp.code AS coupon_code');
 
@@ -85,7 +85,7 @@ class EventbookingModelRegistrants extends RADModelList
 	/**
 	 * Builds LEFT JOINS clauses for the query
 	 */
-	protected function _buildQueryJoins(JDatabaseQuery $query)
+	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
 		$query->leftJoin('#__eb_events AS ev ON tbl.event_id = ev.id')->leftJoin('#__eb_coupons AS cp ON tbl.coupon_id = cp.id');
 
@@ -95,9 +95,9 @@ class EventbookingModelRegistrants extends RADModelList
 	/**
 	 * Build where clase of the query
 	 *
-	 * @see RADModelList::_buildQueryWhere()
+	 * @see RADModelList::buildQueryWhere()
 	 */
-	protected function _buildQueryWhere(JDatabaseQuery $query)
+	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
 		$config = EventbookingHelper::getConfig();
 
@@ -125,6 +125,6 @@ class EventbookingModelRegistrants extends RADModelList
 			$query->where(' tbl.group_id = 0 ');
 		}
 
-		return parent::_buildQueryWhere($query);
+		return parent::buildQueryWhere($query);
 	}
 }
