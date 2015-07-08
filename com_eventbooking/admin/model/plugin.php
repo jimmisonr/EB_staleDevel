@@ -12,9 +12,15 @@ defined('_JEXEC') or die();
 
 class EventbookingModelPlugin extends RADModelAdmin
 {
+	/**
+	 * Instantiate the model.
+	 *
+	 * @param array $config configuration data for the model
+	 *
+	 */
 	public function __construct($config)
 	{
-		$config['table']        = '#__eb_payment_plugins';
+		$config['table'] = '#__eb_payment_plugins';
 
 		parent::__construct($config);
 	}

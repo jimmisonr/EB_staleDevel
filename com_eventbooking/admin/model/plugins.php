@@ -14,7 +14,10 @@ class EventbookingModelPlugins extends RADModelList
 {
 
 	/**
-	 * Constructor function
+	 * Instantiate the model.
+	 *
+	 * @param array $config configuration data for the model
+	 *
 	 */
 	public function __construct($config = array())
 	{

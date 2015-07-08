@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	2.0.0
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -12,7 +12,12 @@ defined('_JEXEC') or die();
 
 class EventbookingModelStates extends RADModelList
 {
-
+	/**
+	 * Instantiate the model.
+	 *
+	 * @param array $config configuration data for the model
+	 *
+	 */
 	public function __construct($config = array())
 	{
 		$config['search_fields'] = array('tbl.state_name', 'tbl.state_3_code', 'tbl.state_2_code');

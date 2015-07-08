@@ -20,9 +20,10 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 {
 
 	/**
-	 * Constructor function
+	 * Instantiate the model.
 	 *
-	 * @param array $config
+	 * @param array $config configuration data for the model
+	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -40,7 +41,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 		parent::initData();
 		$this->data->event_id = $this->state->filter_event_id;
 	}
-	
+
 	/**
 	 * Method to store a registrant
 	 *

@@ -14,7 +14,10 @@ class EventbookingModelRegistrants extends RADModelList
 {
 
 	/**
-	 * Constructor
+	 * Instantiate the model.
+	 *
+	 * @param array $config configuration data for the model
+	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -101,7 +104,7 @@ class EventbookingModelRegistrants extends RADModelList
 	{
 		$config = EventbookingHelper::getConfig();
 
-			if ($this->state->filter_published != -1)
+		if ($this->state->filter_published != -1)
 		{
 			$query->where(' tbl.published = ' . $this->state->filter_published);
 		}

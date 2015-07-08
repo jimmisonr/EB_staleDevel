@@ -13,13 +13,15 @@ defined('_JEXEC') or die();
 class EventbookingModelEvents extends RADModelList
 {
 	/**
-	 * Constructor
+	 * Instantiate the model.
+	 *
+	 * @param array $config configuration data for the model
 	 *
 	 */
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
-		
+
 		$this->state->insert('filter_category_id', 'int', 0)
 			->insert('filter_location_id', 'int', 0)
 			->insert('filter_past_events', 'int', 0)
