@@ -346,10 +346,6 @@ class RADController
 
 		// Set other model specific config data
 		$config['name'] = $name;
-		if (empty($config['table_prefix']))
-		{
-			$config['table_prefix'] = '#__' . strtolower($config['component']) . '_';
-		}
 
 		// Set default model class in case it is not existed
 		if (!isset($config['default_model_class']))
@@ -435,7 +431,7 @@ class RADController
 		{
 			$config['input'] = $this->input;
 		}
-		
+
 		return RADView::getInstance($name, $type, ucfirst($config['class_prefix']) . 'View', $config);
 	}
 

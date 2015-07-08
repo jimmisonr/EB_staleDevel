@@ -14,7 +14,6 @@ class EventbookingModelPlugin extends RADModelAdmin
 {
 	public function __construct($config)
 	{
-		$config['table_prefix'] = '#__eb_payment_';
 		$config['table']        = '#__eb_payment_plugins';
 
 		parent::__construct($config);
