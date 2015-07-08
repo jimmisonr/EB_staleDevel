@@ -61,10 +61,6 @@ class EventbookingController extends RADController
 			case 'view_category':
 				$this->input->set('view', 'category');
 				break;
-			case 'individual_registration':
-				$this->input->set('view', 'register');
-				$this->input->set('layout', 'default');
-				break;
 			case 'group_registration':
 				$this->input->set('view', 'register');
 				$this->input->set('layout', 'group');

@@ -116,6 +116,8 @@ class EventbookingControllerRegister extends EventbookingController
 		}
 		else
 		{
+			$this->input->set('view', 'register');
+			$this->input->set('layout', 'default');
 			$this->display();
 		}
 	}
