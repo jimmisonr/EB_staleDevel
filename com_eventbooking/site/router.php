@@ -119,6 +119,40 @@ function EventbookingBuildRoute(&$query)
 			unset($query['id']);
 			break;
 		case 'location':
+			if ($layout == 'form')
+			{
+				if ($id)
+				{
+					$q->clear();
+					$q->select('name')
+						->from('#__eb_locations')
+						->where('id=' . (int) $id);
+					$db->setQuery($q);
+					$segments[] = $id . '-' . $db->loadResult();
+					$segments[] = 'edit';
+					unset($query['id']);
+				}
+				else
+				{
+					$segments[] = 'Add Location';
+				}
+
+				unset($query['layout']);
+			}
+			else
+			{
+				if (isset($query['location_id']))
+				{
+					$q->clear();
+					$q->select('name')
+						->from('#__eb_locations')
+						->where('id=' . (int) $query['location_id']);
+					$db->setQuery($q);
+					$segments[] = $db->loadResult();
+					unset($query['location_id']);
+				}
+			}
+			break;
 		case 'map':
 			if (isset($query['location_id']))
 			{

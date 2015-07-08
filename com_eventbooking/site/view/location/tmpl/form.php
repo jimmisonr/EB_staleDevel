@@ -13,7 +13,6 @@ defined( '_JEXEC' ) or die ;
 <script type="text/javascript">
 	function checkData(pressbutton) {
 		var form = document.adminForm;
-		if (pressbutton == 'cancel_location') {
 			form.task.value = pressbutton;
 			form.submit();
 			return;
@@ -46,7 +45,6 @@ defined( '_JEXEC' ) or die ;
 	function deleteLocation() {
 		if (confirm("<?php echo JText::_("EB_DELETE_LOCATION_CONFIRM"); ?>")) {
 			var form = document.adminForm ;
-			form.task.value = 'delete_location';
 			form.submit();
 		}
 	}
@@ -54,7 +52,6 @@ defined( '_JEXEC' ) or die ;
 <div class="eb_form_header" style="width:100%;">
 	<div style="float: left; width: 50%;"><?php echo JText::_('EB_ADD_EDIT_LOCATION'); ?></div>
 	<div style="float: left; width: 50%; text-align: left;">
-		<input type="button" class="btn btn-primary" name="btnSave" value="<?php echo JText::_('EB_SAVE'); ?>" onclick="checkData('save_location');" />
 		<?php
 			if ($this->item->id) {
 			?>
@@ -62,11 +59,10 @@ defined( '_JEXEC' ) or die ;
 			<?php
 			}
 		?>
-		<input type="button" class="btn btn-primary" name="btnCancel" value="<?php echo JText::_('EB_CANCEL_LOCATION'); ?>" onclick="checkData('cancel_location');" />
+		<input type="button" class="btn btn-primary" name="btnCancel" value="<?php echo JText::_('EB_CANCEL_LOCATION'); ?>" onclick="checkData('location.cancel');" />
 	</div>
 </div>
 <div class="clearfix"></div>
-<form action="index.php" method="post" name="adminForm" id="adminForm">
 	<table class="admintable clearfix" width="100%">
 		<tr>
 			<td>
@@ -149,7 +145,6 @@ defined( '_JEXEC' ) or die ;
 	</table>
 	<div class="clr"></div>
 	<input type="hidden" name="option" value="com_eventbooking" />
-	<input type="hidden" name="cid[]" value="<?php echo $this->item->id; ?>" />
 	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
 	<input type="hidden" name="task" value="" />
 	<?php echo JHtml::_( 'form.token' ); ?>

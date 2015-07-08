@@ -1,42 +1,152 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
-require_once dirname(__FILE__) . '/list.php';
 
-/**
- * EventBooking Component Category Model
- *
- * @package		Joomla
- * @subpackage	EventBooking
- */
-class EventBookingModelLocation extends EventBookingModelList
+class EventbookingModelLocation extends EventbookingModelList
 {
 
 	function __construct($config = array())
 	{
 		parent::__construct($config);
+
 	}
 
 	/**
 	 * Get list of category
 	 *
 	 */
-	function getLocation()
+	public function getLocation()
 	{
-		$db = $this->getDbo();
+		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 		$query->select('*')
 			->from('#__eb_locations')
 			->where('id=' . $this->state->location_id);
 		$db->setQuery($query);
+
 		return $db->loadObject();
+	}
+
+	public function getLocationData()
+	{
+		if ($this->state->id)
+		{
+			return EventbookingHelperDatabase::getLocation($this->state->id);
+		}
+		else
+		{
+			$row          = $this->getTable();
+			$config       = EventbookingHelper::getConfig();
+			$row->country = $config->default_country;
+
+			return $row;
+		}
+	}
+
+	/**
+	 * Method to store a location
+	 *
+	 * @access    public
+	 * @return    boolean    True on success
+	 */
+	public function store($data)
+	{
+		$row          = $this->getTable();
+		$user         = JFactory::getUser();
+		$row->user_id = $user->id;
+		if ($data['id'])
+		{
+			$row->load($data['id']);
+		}
+		if (!$row->bind($data))
+		{
+			$this->setError($this->_db->getErrorMsg());
+
+			return false;
+		}
+
+		// Calculate location here
+		$ch = curl_init();
+		if (!$row->lat && !$row->long)
+		{
+			$address = array();
+			if ($row->address)
+			{
+				$address[] = $row->address;
+			}
+			if ($row->city)
+			{
+				$address[] = $row->city;
+			}
+			if ($row->state)
+			{
+				$address[] = $row->state;
+			}
+			if ($row->zip)
+			{
+				$address[] = $row->zip;
+			}
+			if ($row->country)
+			{
+				$address[] = $row->country;
+			}
+			$address = implode('+', $address);
+			$address = str_replace(' ', '+', $address);
+			$address = urlencode($address);
+			$url     = 'http://maps.google.com/maps/api/geocode/json?sensor=false&address=' . $address;
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			$data = curl_exec($ch);
+			curl_close($ch);
+			$arrData = json_decode($data, true);
+			if ($arrData['status'] == 'OK')
+			{
+				$location  = $arrData['results'][0]['geometry']['location'];
+				$row->lat  = $location['lat'];
+				$row->long = $location['lng'];
+			}
+		}
+		if (!$row->store())
+		{
+			$this->setError($this->db->getErrorMsg());
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Delete the selected location
+	 *
+	 * @param array $cid
+	 *
+	 * @return boolean
+	 */
+	public function delete($cid = array())
+	{
+		if (count($cid))
+		{
+			$db   = $this->getDbo();
+			$cids = implode(',', $cid);
+			$sql  = 'DELETE FROM #__eb_locations WHERE id IN (' . $cids . ')';
+			$db->setQuery($sql);
+			if (!$db->execute())
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 } 

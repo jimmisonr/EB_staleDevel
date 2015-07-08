@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.7.2
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -10,13 +10,19 @@
 // no direct access
 defined('_JEXEC') or die();
 
-class EventBookingViewLocation extends JViewLegacy
+class EventbookingViewLocationHtml extends RADViewHtml
 {
 
-	function display($tpl = null)
+	public function display()
 	{
-		$this->setLayout('default');
-		$db       = JFactory::getDbo();
+		$layout = $this->getLayout();
+		if ($layout == 'form')
+		{
+			$this->displayForm();
+
+			return;
+		}
+
 		$document = JFactory::getDocument();
 		$model    = $this->getModel();
 		$items    = $model->getData();
@@ -34,42 +40,44 @@ class EventBookingViewLocation extends JViewLegacy
 
 		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)
 		{
-			$params       = new JRegistry();
-			$xml          = JFactory::getXML(JPATH_COMPONENT . '/fields.xml');
-			$fields       = $xml->fields->fieldset->children();
-			$customFields = array();
-			foreach ($fields as $field)
-			{
-				$name                  = $field->attributes()->name;
-				$label                 = JText::_($field->attributes()->label);
-				$customFields["$name"] = $label;
-			}
-			for ($i = 0, $n = count($items); $i < $n; $i++)
-			{
-				$item = $items[$i];
-				$params->loadString($item->custom_fields, 'JSON');
-				$paramData = array();
-				foreach ($customFields as $name => $label)
-				{
-					$paramData[$name]['title'] = $label;
-					$paramData[$name]['value'] = $params->get($name);
-				}
-				$item->paramData = $paramData;
-			}
+			EventbookingHelperData::prepareCustomFieldsData($items);
 		}
-		$user             = JFactory::getUser();
-		$userId           = $user->get('id');
-		$viewLevels       = $user->getAuthorisedViewLevels();
-		$this->viewLevels = $viewLevels;
-		$this->userId     = $userId;
-		$this->items      = $items;
-		$this->pagination = $model->getPagination();
-		$this->Itemid     = JRequest::getInt('Itemid', 0);
-		$this->config     = $config;
-		$this->location   = $location;
-		$this->nullDate   = $db->getNullDate();
+
+		$user                  = JFactory::getUser();
+		$userId                = $user->get('id');
+		$viewLevels            = $user->getAuthorisedViewLevels();
+		$this->viewLevels      = $viewLevels;
+		$this->userId          = $userId;
+		$this->items           = $items;
+		$this->pagination      = $model->getPagination();
+		$this->config          = $config;
+		$this->location        = $location;
+		$this->nullDate        = JFactory::getDbo()->getNullDate();
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
-		parent::display($tpl);
+		parent::display();
+	}
+
+	protected function displayForm()
+	{
+		$user = JFactory::getUser();
+		if (!$user->authorise('eventbooking.addlocation', 'com_eventbooking'))
+		{
+			JFactory::getApplication()->redirect('index.php', JText::_("EB_NO_PERMISSION"));
+
+			return;
+		}
+
+		$item               = $this->model->getLocationData();
+		$options            = array();
+		$options[]          = JHtml::_('select.option', '', JText::_('Select Country'), 'id', 'name');
+		$options            = array_merge($options, EventbookingHelperDatabase::getAllCountries());
+		$lists['country']   = JHtml::_('select.genericlist', $options, 'country', ' class="inputbox" ', 'id', 'name', $item->country);
+		$lists['published'] = JHtml::_('select.booleanlist', 'published', '', $item->published);
+		$this->item         = $item;
+		$this->lists        = $lists;
+		$this->config       = EventbookingHelper::getConfig();
+
+		parent::display();
 	}
 }
