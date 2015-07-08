@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.7.1
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -10,88 +10,74 @@
 // no direct access
 defined('_JEXEC') or die();
 
-/**
- * EventBooking Component Categories Model
- *
- * @package        Joomla
- * @subpackage     EventBooking
- */
-class EventBookingModelCalendar extends JModelLegacy
+class EventbookingModelCalendar extends RADModel
 {
-
 	/**
-	 * Categories data array
+	 * Instantiate the model.
 	 *
-	 * @var array
-	 */
-	var $_data = null;
-
-	/**
-	 * Constructor
+	 * @param array $config configuration data for the model
 	 *
 	 */
-	function __construct()
+
+	public function __construct($config = array())
 	{
-		parent::__construct();
+		parent::__construct($config);
+
+		$this->state->insert('year', 'int', 0)
+			->insert('month', 'int', 0)
+			->insert('default_month', 'int', 0)
+			->insert('default_year', 'int', 0)
+			->insert('date', 'string', '')
+			->insert('day', 'string', '');
 	}
 
 	/**
-	 * Get array Year, Month, Day from current Request, fallback to current date
+	 * Get monthly events
 	 *
-	 * @return array
+	 * @return array|mixed
 	 */
-	function getYMD()
+	public function getData()
 	{
-		static $data;
+		$db              = $this->getDbo();
+		$query           = $db->getQuery(true);
+		$config          = EventbookingHelper::getConfig();
+		$fieldSuffix     = EventbookingHelper::getFieldSuffix();
+		$date            = JFactory::getDate('now', JFactory::getConfig()->get('offset'));
+		$year            = $this->state->year ? $this->state->year : $this->state->default_year;
+		$month           = $this->state->month ? $this->state->month : $this->state->default_month;
+		$currentDateData = self::getCurrentDateData();
 
-		if (!isset($data))
+		if (!$year)
 		{
-			list($year, $month, $day) = explode('-', JHtml::_('date', 'Now', 'Y-m-d'));
-			$year  = min(2100, abs(intval(JRequest::getVar('year', $year))));
-			$month = min(99, abs(intval(JRequest::getVar('month', $month))));
-			$day   = min(3650, abs(intval(JRequest::getVar('day', $day))));
-			if ($day <= '9')
-			{
-				$day = '0' . $day;
-			}
-			if ($month <= '9')
-			{
-				$month = '0' . $month;
-			}
-			$data   = array();
-			$data[] = $year;
-			$data[] = $month;
-			$data[] = $day;
+			$year = $currentDateData['year'];
 		}
 
-		return $data;
-	}
+		if (!$month)
+		{
+			$month = $currentDateData['month'];
+		}
 
-	/**
-	 * Get list of events by current month
-	 *
-	 * @param int $year
-	 * @param int $month
-	 *
-	 * @return string
-	 */
-	function getEventsByMonth($year, $month)
-	{
-		$config      = EventbookingHelper::getConfig();
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$db          = JFactory::getDbo();
-		$query       = $db->getQuery(true);
-		$startDate   = mktime(0, 0, 0, $month, 1, $year);
-		$endDate     = mktime(23, 59, 59, $month, date('t', $startDate), $year);
-		$startDate   = date('Y-m-d', $startDate) . " 00:00:00";
-		$endDate     = date('Y-m-d', $endDate) . " 23:59:59";
+		$this->state->set('month', $month)
+			->set('year', $year);
+
+		// Calculate start date and end date of the given month
+		$date->setDate($year, $month, 1);
+		$date->setTime(0, 0, 0);
+		$startDate = $date->toSql(true);
+
+		$date->setDate($year, $month, $date->daysinmonth);
+		$date->setTime(23, 59, 59);
+		$endDate = $date->toSql(true);
+
+
 		$query->select('a.*,title' . $fieldSuffix . ' AS title, SUM(b.number_registrants) AS total_registrants')
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id ) AND b.group_id = 0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3)))')
 			->where('a.published = 1')
-			->where('a.access in (' . implode(',' ,JFactory::getUser()->getAuthorisedViewLevels()) . ')')
+			->where('a.access in (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
 			->group('a.id')
 			->order('a.event_date ASC, a.ordering ASC');
+
 		if ($config->show_multiple_days_event_in_calendar)
 		{
 			$query->where("((`event_date` BETWEEN '$startDate' AND '$endDate') OR (MONTH(event_end_date) = $month AND YEAR(event_end_date) = $year ))");
@@ -100,9 +86,10 @@ class EventBookingModelCalendar extends JModelLegacy
 		{
 			$query->where("`event_date` BETWEEN '$startDate' AND '$endDate'");
 		}
+
 		if ($config->hide_past_events)
 		{
-			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
+			$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
 			$query->where('DATE(event_date) >= ' . $db->quote($currentDate));
 		}
 		$db->setQuery($query);
@@ -144,38 +131,52 @@ class EventBookingModelCalendar extends JModelLegacy
 		{
 			return $db->loadObjectList();
 		}
+
 	}
 
-	function getEventsByWeek()
+	/**
+	 * Get events of the given week
+	 *
+	 * @return array
+	 */
+	public function getEventsByWeek()
 	{
 		$config      = EventbookingHelper::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$db          = JFactory::getDbo();
+		$db          = $this->getDbo();
 		$query       = $db->getQuery(true);
 
 		// get first day of week of today
-		$day               = 0;
-		$week_number       = date('W', time());
-		$year              = date('Y', time());
-		$date              = date('Y-m-d', strtotime($year . "W" . $week_number . $day));
-		$first_day_of_week = JRequest::getVar('date', $date);
-		$last_day_of_week  = date('Y-m-d', strtotime("+6 day", strtotime($first_day_of_week)));
-		$startDate         = $first_day_of_week . " 00:00:00";
-		$endDate           = $last_day_of_week . " 23:59:59";
-
-
+		$currentDateData = self::getCurrentDateData();
+		$startWeekDate   = $this->state->date;
+		if ($startWeekDate)
+		{
+			$date = JFactory::getDate($startWeekDate, JFactory::getConfig()->get('offset'));
+		}
+		else
+		{
+			$date = JFactory::getDate($currentDateData['start_week_date'], JFactory::getConfig()->get('offset'));
+			$this->state->set('date', $date->format('Y-m-d', true));
+		}
+		$date->setTime(0, 0, 0);
+		$startDate = $date->toSql(true);
+		$date->modify('+6 day');
+		$endDate = $date->toSql(true);
 		$query->select('a.*')
-			->select('a.title' . $fieldSuffix . ' AS title')
-			->select('short_description' . $fieldSuffix . ' AS short_description')
 			->select('b.name AS location_name')
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')
 			->where('a.published = 1')
 			->where("(a.event_date BETWEEN '$startDate' AND '$endDate')")
 			->where('a.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
+
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('a.title', 'a.short_description'), $fieldSuffix);
+		}
 		if ($config->hide_past_events)
 		{
-			$query->where('DATE(event_date) >=' . JHtml::_('date', 'Now', 'Y-m-d'));
+			$query->where('DATE(a.event_date) >=' . $db->quote($currentDateData['current_date']));
 		}
 		$query->order('a.event_date ASC, a.ordering ASC');
 
@@ -191,18 +192,25 @@ class EventBookingModelCalendar extends JModelLegacy
 	}
 
 	/**
-	 * list events for day
+	 * Get events of the given date
 	 *
+	 * @return mixed
 	 */
-	function getEventsByDaily()
+	public function getEventsByDaily()
 	{
 		$config      = EventbookingHelper::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$db          = JFactory::getDbo();
+		$db          = $this->getDbo();
 		$query       = $db->getQuery(true);
-		$day         = JRequest::getVar('day', JHtml::_('date', 'Now', 'Y-m-d'));
-		$startDate   = $day . " 00:00:00";
-		$endDate     = $day . " 23:59:59";
+		$day         = $this->state->day;
+		if (!$day)
+		{
+			$currentDateData = self::getCurrentDateData();
+			$day             = $currentDateData['current_date'];
+			$this->state->set('day', $day);
+		}
+		$startDate = $day . " 00:00:00";
+		$endDate   = $day . " 23:59:59";
 		$query->select('a.*')
 			->select('a.title' . $fieldSuffix . ' AS title')
 			->select('short_description' . $fieldSuffix . ' AS short_description')
@@ -221,5 +229,37 @@ class EventBookingModelCalendar extends JModelLegacy
 		$db->setQuery($query);
 
 		return $db->loadObjectList();
+	}
+
+	/**
+	 * Get data of current date
+	 *
+	 * @return array
+	 */
+	public static function getCurrentDateData($currentDate = 'now')
+	{
+		static $data;
+		if (empty($data))
+		{
+			$config               = EventbookingHelper::getConfig();
+			$startDay             = (int) $config->calendar_start_date;
+			$data                 = array();
+			$date                 = new DateTime($currentDate, new DateTimeZone(JFactory::getConfig()->get('offset')));
+			$data['year']         = $date->format('Y');
+			$data['month']        = $date->format('m');
+			$data['current_date'] = $date->format('Y-m-d');
+			if ($startDay == 0)
+			{
+				$date->modify('Sunday last week');
+			}
+			else
+			{
+				$date->modify(('Sunday' == $date->format('l')) ? 'Monday last week' : 'Monday this week');
+			}
+			$data['start_week_date'] = $date->format('Y-m-d');
+			$data['end_week_date']   = $date->modify('+6 day')->format('Y-m-d');
+		}
+
+		return $data;
 	}
 }
