@@ -20,6 +20,6 @@ class EventbookingTableRegistrant extends JTable
 	 */
 	public function __construct(& $db)
 	{
-		parent::__construct('#__eb_categories', 'id', $db);
+		parent::__construct('#__eb_registrants', 'id', $db);
 	}
 }

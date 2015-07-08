@@ -242,6 +242,9 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		parent::display();
 	}
 
+	/**
+	 * Override addToolbar method to use custom buttons for this view
+	 */
 	protected function addToolbar()
 	{
 		JToolBarHelper::title(JText::_('EB_CONFIGURATION'), 'generic.png');
