@@ -7,7 +7,7 @@
  * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
-defined('_JEXEC') or die('');
+defined('_JEXEC') or die;
 ?>
 
 <table class="table table-stripped table-bordered">
