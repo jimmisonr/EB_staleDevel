@@ -10,13 +10,6 @@
 // no direct access
 defined('_JEXEC') or die();
 
-/**
- * HTML View class for EventBooking component
- *
- * @static
- * @package        Joomla
- * @subpackage     EventBooking
- */
 class EventbookingViewCategoryHtml extends RADViewItem
 {
 
