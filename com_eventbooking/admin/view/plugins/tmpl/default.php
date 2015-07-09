@@ -64,7 +64,7 @@ defined('_JEXEC') or die;
 	$ordering = ($this->state->filter_order == 'tbl.ordering');
 	for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 	{
-		$row = &$this->items[$i];
+		$row = $this->items[$i];
 		$link 	= JRoute::_( 'index.php?option=com_eventbooking&view=plugin&id='. $row->id );
 		$checked 	= JHtml::_('grid.id',   $i, $row->id );
 		$ordering = true ;

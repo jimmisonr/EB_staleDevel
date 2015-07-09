@@ -70,7 +70,7 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 	$k = 0;	
 	for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 	{
-		$row = &$this->items[$i];
+		$row = $this->items[$i];
 		$link 	= JRoute::_( 'index.php?option=com_eventbooking&view=coupon&id='. $row->id );
 		$checked 	= JHtml::_('grid.id',   $i, $row->id );
 		$published 	= JHtml::_('grid.published', $row, $i, 'tick.png', 'publish_x.png');

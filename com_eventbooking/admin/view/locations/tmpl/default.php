@@ -86,7 +86,7 @@ if (!function_exists('curl_init'))
 	$k = 0;	
 	for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 	{
-		$row = &$this->items[$i];
+		$row = $this->items[$i];
 		$link 	= JRoute::_( 'index.php?option=com_eventbooking&view=location&id='. $row->id );
 		$checked 	= JHtml::_('grid.id',   $i, $row->id );
 		$published = JHtml::_('grid.published', $row, $i, 'tick.png', 'publish_x.png');
