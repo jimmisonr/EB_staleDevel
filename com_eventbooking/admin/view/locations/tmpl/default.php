@@ -1,14 +1,14 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;	
+defined('_JEXEC') or die;
 if (!function_exists('curl_init')) 
 {
 	JFactory::getApplication()->enqueueMessage(JText::_('EB_CURL_NOT_INSTALLED'), 'warning');
@@ -135,7 +135,6 @@ if (!function_exists('curl_init'))
 	</tbody>
 	</table>
 	</div>
-	<input type="hidden" name="option" value="com_eventbooking" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->state->filter_order; ?>" />
