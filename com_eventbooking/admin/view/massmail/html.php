@@ -8,7 +8,7 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingViewMassmailHtml extends RADViewHtml
 {
@@ -33,7 +33,7 @@ class EventbookingViewMassmailHtml extends RADViewHtml
 			$options = array_merge($options, $rows);
 		}
 		$lists             = array();
-		$lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id', ' class="inputbox" ', 'id', 'title');
+		$lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id', '', 'id', 'title');
 		$this->lists       = $lists;
 
 		parent::display();

@@ -27,6 +27,7 @@ class EventbookingModelMassmail extends RADModel
 			$mailer = JFactory::getMailer();
 			$config = EventbookingHelper::getConfig();
 			$db     = JFactory::getDbo();
+			$query  = $db->getQuery(true);
 			if ($config->from_name)
 			{
 				$fromName = $config->from_name;
@@ -43,7 +44,6 @@ class EventbookingModelMassmail extends RADModel
 			{
 				$fromEmail = JFactory::getConfig()->get('mailfrom');
 			}
-			$query                         = $db->getQuery(true);
 			$event                         = EventbookingHelperDatabase::getEvent((int) $data['event_id']);
 			$replaces                      = array();
 			$replaces['event_title']       = $event->title;
