@@ -1,14 +1,15 @@
 <?php
 /**
- * @version		1.6.3
- * @package		Joomla
- * @subpackage	Membership Pro
- * @author  Tuan Pham Ngoc
- * @copyright	Copyright (C) 2012 - 2013 Ossolution Team
- * @license		GNU/GPL, see LICENSE.php
+ * @version            1.7.4
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 error_reporting(0);
+
 class plgContentEbCategory extends JPlugin
 {
 
@@ -25,70 +26,72 @@ class plgContentEbCategory extends JPlugin
 			{
 				return true;
 			}
-			$regex = "#{ebcategory (\d+)}#s";
+			$regex         = "#{ebcategory (\d+)}#s";
 			$article->text = preg_replace_callback($regex, array(&$this, 'displayEvents'), $article->text);
 		}
-		
+
 		return true;
 	}
 
 	/**
 	 * Replace callback function
-	 * 
+	 *
 	 * @param array $matches
 	 */
 	function displayEvents($matches)
 	{
 		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
 		$document = JFactory::getDocument();
-		$db = JFactory::getDbo();
-		$config = EventbookingHelper::getConfig();	
+		$config   = EventbookingHelper::getConfig();
 		EventbookingHelper::loadLanguage();
 		$document->addStyleSheet(JURI::base(true) . '/components/com_eventbooking/assets/css/style.css');
 		if ($config->calendar_theme)
 		{
-			$theme = $config->calendar_theme ;
+			$theme = $config->calendar_theme;
 		}
 		else
 		{
-			$theme = 'default' ;
+			$theme = 'default';
 		}
-		$styleUrl = JUri::base(true).'/components/com_eventbooking/assets/css/themes/'.$theme.'.css';
-		$document->addStylesheet( $styleUrl);
+		$styleUrl = JUri::base(true) . '/components/com_eventbooking/assets/css/themes/' . $theme . '.css';
+		$document->addStylesheet($styleUrl);
 		if ($config->load_jquery !== '0')
 		{
 			EventbookingHelper::loadJQuery();
 		}
-		if ($config->load_bootstrap_css_in_frontend!== '0')
+		if ($config->load_bootstrap_css_in_frontend !== '0')
 		{
-			EventbookingHelper::loadBootstrap() ;
+			EventbookingHelper::loadBootstrap();
 		}
-		JHtml::_('script', EventbookingHelper::getSiteUrl(). 'components/com_eventbooking/assets/js/noconflict.js', false, false);
+		JHtml::_('script', EventbookingHelper::getSiteUrl() . 'components/com_eventbooking/assets/js/noconflict.js', false, false);
 		if ($config->multiple_booking)
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
 		}
-		$width = (int) $config->map_width ;
+		$width = (int) $config->map_width;
 		if (!$width)
 		{
-			$width = 800 ;
+			$width = 800;
 		}
-		$height = (int) $config->map_height ;
+		$height = (int) $config->map_height;
 		if (!$height)
 		{
-			$height = 600 ;
+			$height = 600;
 		}
-		EventbookingHelperJquery::colorbox('eb-colorbox-map', $width.'px', $height.'px', 'true', 'false');	
+		EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
 		$Itemid = JRequest::getInt('Itemid');
 		if (!$Itemid)
 		{
 			$Itemid = EventbookingHelper::getItemid();
 		}
-		$categoryId = (int)$matches[1];
+		$categoryId = (int) $matches[1];
+
+		$bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 		//required eb category model
 		require_once JPATH_ROOT . '/components/com_eventbooking/models/category.php';
 		$categoryModel = new EventBookingModelCategory();
-		$items = $categoryModel->reset()->id($categoryId)->getData();
-        return '<div class="clearfix"></div>'.EventbookingHelperHtml::loadCommonLayout('common/events_table.php', array('items' => $items, 'config' => $config, 'Itemid' => $Itemid, 'categoryId' => $categoryId));
-    }
+		$items         = $categoryModel->reset()->id($categoryId)->getData();
+
+		return '<div class="clearfix"></div>' . EventbookingHelperHtml::loadCommonLayout('common/events_table.php', array('items' => $items, 'config' => $config, 'Itemid' => $Itemid, 'categoryId' => $categoryId, 'bootstrapHelper' => $bootstrapHelper));
+	}
 }
