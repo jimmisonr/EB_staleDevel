@@ -1,14 +1,13 @@
 <?php
 /**
- * @version        1.6.5
- * @package		Joomla
- * @subpackage	Event Booking
- * @author  Tuan Pham Ngoc
- * @copyright	Copyright (C) 2010 - 2015 Ossolution Team
- * @license		GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
-defined( '_JEXEC' ) or die ;				
+defined('_JEXEC') or die;
 ?>
 <form action="index.php?option=com_eventbooking&view=plugins" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data">
 <table>
@@ -45,7 +44,7 @@ defined( '_JEXEC' ) or die ;
 			</th>
 			<th width="8%" nowrap="nowrap">
 				<?php echo JHtml::_('grid.sort',  JText::_('EB_ORDER'), 'tbl.ordering', $this->state->filter_order_Dir, $this->state->filter_order); ?>
-				<?php echo JHtml::_('grid.order',  $this->items , 'filesave.png', 'save_order' ); ?>
+				<?php echo JHtml::_('grid.order',  $this->items , 'filesave.png', 'saveorder' ); ?>
 			</th>												
 			<th>
 				<?php echo JHtml::_('grid.sort', JText::_('EB_ID') , 'tbl.id', $this->state->filter_order_Dir, $this->state->filter_order); ?>
@@ -131,13 +130,15 @@ defined( '_JEXEC' ) or die ;
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->state->filter_order_Dir; ?>" />	
 	<?php echo JHtml::_( 'form.token' ); ?>
 	<script type="text/javascript">
-		function installPlugin() {
+		function installPlugin()
+		{
 			var form = document.adminForm ;
-			if (form.plugin_package.value =="") {
+			if (form.plugin_package.value =="")
+			{
 				alert("<?php echo JText::_('EB_CHOOSE_PLUGIN'); ?>");
 				return ;	
 			}
-			form.task.value = 'install' ;
+			form.task.value = 'install';
 			form.submit();
 		}
 	</script>

@@ -1,22 +1,26 @@
 <?php
 /**
- * @version		1.5.3
- * @package		Joomla
- * @subpackage	Event Booking
- * @author  Tuan Pham Ngoc
- * @copyright	Copyright (C) 2010 - 2015 Ossolution Team
- * @license		GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;		
+defined('_JEXEC') or die;
 ?>
 <script type="text/javascript">
-	Joomla.submitbutton = function(pressbutton) {
+	Joomla.submitbutton = function(pressbutton)
+	{
 		var form = document.adminForm;
-		if (pressbutton == 'cancel') {
+		if (pressbutton == 'cancel')
+		{
 			Joomla.submitform( pressbutton );
 			return;				
-		} else {
+		}
+		else
+		{
 			Joomla.submitform( pressbutton );
 		}
 	}
@@ -132,7 +136,8 @@ defined( '_JEXEC' ) or die ;
 	<fieldset class="adminform">
 		<legend><?php echo JText::_('Plugins Parameter'); ?></legend>
 		<?php
-			foreach ($this->form->getFieldset('basic') as $field) {
+			foreach ($this->form->getFieldset('basic') as $field)
+			{
 			?>
 			<div class="control-group">
 				<div class="control-label">
@@ -142,7 +147,7 @@ defined( '_JEXEC' ) or die ;
 					<?php echo  $field->input ; ?>
 				</div>
 			</div>	
-		<?php
+			<?php
 			}					
 		?>				
 	</fieldset>				
