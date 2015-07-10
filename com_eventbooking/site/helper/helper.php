@@ -8,7 +8,7 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingHelper
 {
@@ -68,7 +68,9 @@ class EventbookingHelper
 	/**
 	 * We only need to generate invoice for paid events only
 	 *
-	 * @param object $row
+	 * @param $row
+	 *
+	 * @return bool
 	 */
 	public static function needInvoice($row)
 	{
@@ -151,37 +153,6 @@ class EventbookingHelper
 		{
 			$_REQUEST['limitstart'] = 0;
 		}
-	}
-
-	/**
-	 * Get request data, used for RADList model
-	 *
-	 */
-	public static function getRequestData()
-	{
-		$request = $_REQUEST;
-		//Remove cookie vars from request
-		$cookieVars = array_keys($_COOKIE);
-		if (count($cookieVars))
-		{
-			foreach ($cookieVars as $key)
-			{
-				if (!isset($_POST[$key]) && !isset($_GET[$key]))
-				{
-					unset($request[$key]);
-				}
-			}
-		}
-		if (isset($request['start']) && !isset($request['limitstart']))
-		{
-			$request['limitstart'] = $request['start'];
-		}
-		if (!isset($request['limitstart']))
-		{
-			$request['limitstart'] = 0;
-		}
-
-		return $request;
 	}
 
 	/**
@@ -3200,16 +3171,17 @@ class EventbookingHelper
 	{
 		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
-		$document->addStyleSheet(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/css/bootstrap.css');
+		$rootUrl  = JUri::root(true);
+		$document->addStyleSheet($rootUrl . '/components/com_eventbooking/assets/bootstrap/css/bootstrap.css');
 
 		// Load bootstrap tabs css
 		if ($app->isAdmin())
 		{
-			$document->addStyleSheet(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/css/bootstrap-tabs-backend.css');
+			$document->addStyleSheet($rootUrl . '/components/com_eventbooking/assets/bootstrap/css/bootstrap-tabs-backend.css');
 		}
 		else
 		{
-			$document->addStyleSheet(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/css/bootstrap-tabs.css');
+			$document->addStyleSheet($rootUrl . '/components/com_eventbooking/assets/bootstrap/css/bootstrap-tabs.css');
 		}
 		if (version_compare(JVERSION, '3.0', 'ge'))
 		{
@@ -3226,13 +3198,13 @@ class EventbookingHelper
 		{
 			if ($loadJs && $app->isAdmin())
 			{
-				$document->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/jquery.min.js');
-				$document->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/jquery-noconflict.js');
-				$document->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
+				$document->addScript($rootUrl . '/components/com_eventbooking/assets/bootstrap/js/jquery.min.js');
+				$document->addScript($rootUrl . '/components/com_eventbooking/assets/bootstrap/js/jquery-noconflict.js');
+				$document->addScript($rootUrl . '/components/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
 			}
 			elseif ($loadJs && $app->isSite())
 			{
-				$document->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
+				$document->addScript($rootUrl . '/components/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
 			}
 		}
 	}
