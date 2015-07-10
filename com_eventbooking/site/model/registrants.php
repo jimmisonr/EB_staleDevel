@@ -65,7 +65,7 @@ class EventBookingModelRegistrants extends RADModelList
 	/**
 	 * Builds SELECT columns list for the query
 	 */
-	protected function _buildQueryColumns(JDatabaseQuery $query)
+	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->select('tbl.*')->select('b.title' . $fieldSuffix . ' AS title, b.event_date, c.code AS coupon_code');
@@ -76,7 +76,7 @@ class EventBookingModelRegistrants extends RADModelList
 	/**
 	 * Builds LEFT JOINS clauses for the query
 	 */
-	protected function _buildQueryJoins(JDatabaseQuery $query)
+	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
 		$query->innerJoin('#__eb_events AS b ON tbl.event_id=b.id')->leftJoin('#__eb_coupons AS c ON tbl.coupon_id = c.id');
 
@@ -86,7 +86,7 @@ class EventBookingModelRegistrants extends RADModelList
 	/**
 	 * Builds a WHERE clause for the query
 	 */
-	protected function _buildQueryWhere(JDatabaseQuery $query)
+	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
 		$db     = $this->getDbo();
 		$state  = $this->getState();

@@ -68,7 +68,7 @@ class EventBookingModelEvents extends RADModelList
 	/**
 	 * Builds SELECT columns list for the query
 	 */
-	protected function _buildQueryColumns(JDatabaseQuery $query)
+	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
 		$query->select('tbl.*')
 			->select('c.name AS location_name')
@@ -80,7 +80,7 @@ class EventBookingModelEvents extends RADModelList
 	/**
 	 * Builds LEFT JOINS clauses for the query
 	 */
-	protected function _buildQueryJoins(JDatabaseQuery $query)
+	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
 		$query->leftJoin(
 			'#__eb_registrants AS b ON (tbl.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')->leftJoin(
@@ -92,7 +92,7 @@ class EventBookingModelEvents extends RADModelList
 	/**
 	 * Builds a WHERE clause for the query
 	 */
-	protected function _buildQueryWhere(JDatabaseQuery $query)
+	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
 		$query->where('tbl.created_by=' . (int) JFactory::getUser()->id);
 		if ($this->state->filter_category_id)
@@ -113,7 +113,7 @@ class EventBookingModelEvents extends RADModelList
 	/**
 	 * Builds a GROUP BY clause for the query
 	 */
-	protected function _buildQueryGroup(JDatabaseQuery $query)
+	protected function buildQueryGroup(JDatabaseQuery $query)
 	{
 		$query->group('tbl.id');
 

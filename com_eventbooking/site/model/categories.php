@@ -65,7 +65,7 @@ class EventbookingModelCategories extends RADModelList
 	 *
 	 * @return $this
 	 */
-	protected function _buildQueryColumns(JDatabaseQuery $query)
+	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->select('tbl.id');
@@ -81,7 +81,7 @@ class EventbookingModelCategories extends RADModelList
 	 *
 	 * @return $this
 	 */
-	protected function _buildQueryWhere(JDatabaseQuery $query)
+	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
 		$query->where('tbl.published=1')
 			->where('tbl.parent=' . $this->state->id)
