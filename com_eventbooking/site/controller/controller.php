@@ -8,13 +8,8 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
-/**
- * Event Booking controller
- * @package        Joomla
- * @subpackage     Event Booking
- */
 class EventbookingController extends RADController
 {
 
@@ -130,8 +125,9 @@ class EventbookingController extends RADController
 	{
 		$db         = JFactory::getDbo();
 		$query      = $db->getQuery(true);
-		$username   = JRequest::getVar('fieldValue');
-		$validateId = JRequest::getVar('fieldId');
+		$username   = $this->input->get('fieldValue', '', 'none');
+		$validateId = $this->input->get('fieldId', '', 'none');
+
 		$query->select('COUNT(*)')
 			->from('#__users')
 			->where('username="' . $username . '"');
@@ -148,7 +144,8 @@ class EventbookingController extends RADController
 			$arrayToJs[1] = true;
 		}
 		echo json_encode($arrayToJs);
-		JFactory::getApplication()->close();
+
+		$this->app->close();
 	}
 
 	/**
@@ -156,16 +153,16 @@ class EventbookingController extends RADController
 	 */
 	public function validate_email()
 	{
-		$app          = JFactory::getApplication();
 		$db           = JFactory::getDbo();
 		$user         = JFactory::getUser();
 		$config       = EventbookingHelper::getConfig();
 		$query        = $db->getQuery(true);
-		$email        = $app->input->get('fieldValue', '', 'string');
-		$eventId      = $app->input->getInt('event_id', 0);
-		$validateId   = $app->input->get('fieldId', '');
+		$email        = $this->input->get('fieldValue', '', 'string');
+		$eventId      = $this->input->getInt('event_id', 0);
+		$validateId   = $this->input->get('fieldId', '', 'none');
 		$arrayToJs    = array();
 		$arrayToJs[0] = $validateId;
+
 		if ($config->prevent_duplicate_registration && !$config->multiple_booking)
 		{
 			$query->clear();
@@ -182,6 +179,7 @@ class EventbookingController extends RADController
 				$arrayToJs[2] = JText::_('EB_EMAIL_REGISTER_FOR_EVENT_ALREADY');
 			}
 		}
+
 		if (!isset($arrayToJs[1]))
 		{
 			$query->clear();
@@ -201,7 +199,7 @@ class EventbookingController extends RADController
 			}
 		}
 		echo json_encode($arrayToJs);
-		JFactory::getApplication()->close();
+		$this->app->close();
 	}
 
 	/**
@@ -214,7 +212,8 @@ class EventbookingController extends RADController
 		$stateName   = $this->input->getString('state_name', '');
 		if (!$countryName)
 		{
-			$countryName = EventbookingHelper::getConfigValue('default_country');
+			$config      = EventbookingHelper::getConfig();
+			$countryName = $config->default_country;
 		}
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
@@ -261,8 +260,7 @@ class EventbookingController extends RADController
 	 */
 	public function get_depend_fields_status()
 	{
-		$app            = JFactory::getApplication();
-		$input          = $app->input;
+		$input          = $this->input;
 		$db             = JFactory::getDbo();
 		$query          = $db->getQuery(true);
 		$fieldId        = $input->getInt('field_id', 0);
@@ -350,11 +348,11 @@ class EventbookingController extends RADController
 		}
 		echo json_encode(array('show_fields' => implode(',', $showFields), 'hide_fields' => implode(',', $hideFields)));
 
-		$app->close();
+		$this->app->close();
 	}
 
 	/**
-	 * Confirm the payment . Used for Paypal base payment gateway
+	 * Confirm the payment. Used for Paypal base payment gateway
 	 */
 	public function payment_confirm()
 	{
