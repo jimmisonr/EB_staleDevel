@@ -1,14 +1,14 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;
+defined('_JEXEC') or die;
 $hiddenPhoneClass = $this->bootstrapHelper->getClassMapping('hidden-phone');
 ?>
 <div id="eb-registrants-list-page" class="eb-container">
@@ -55,7 +55,7 @@ if (count($this->items))
 	$k = 0;
 	for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 	{
-		$row = &$this->items[$i];
+		$row = $this->items[$i];
 		?>
 		<tr>
 			<td class="<?php echo $hiddenPhoneClass; ?>">

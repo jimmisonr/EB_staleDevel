@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	2.0.0
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -8,12 +8,12 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
-class EventBookingViewRegistrantList extends JViewLegacy
+class EventbookingViewRegistrantlistHtml extends RADViewHtml
 {
 
-	function display($tpl = null)
+	public function display()
 	{
 		if (!EventbookingHelper::canViewRegistrantList())
 		{
@@ -22,7 +22,7 @@ class EventBookingViewRegistrantList extends JViewLegacy
 		$config  = EventbookingHelper::getConfig();
 		$db      = JFactory::getDbo();
 		$query   = $db->getQuery(true);
-		$eventId = JRequest::getInt('id');
+		$eventId = $this->input->getInt('id', 0);
 		if ($eventId)
 		{
 			// Get list of registration records
@@ -76,7 +76,7 @@ class EventBookingViewRegistrantList extends JViewLegacy
 				foreach ($rows as $row)
 				{
 					$registrantIds[] = $row->id;
-					foreach($rowFields as $rowField)
+					foreach ($rowFields as $rowField)
 					{
 						if ($rowField->is_core)
 						{
@@ -114,9 +114,9 @@ class EventBookingViewRegistrantList extends JViewLegacy
 			$this->items              = $rows;
 			$this->config             = $config;
 			$this->displayCustomField = $displayCustomField;
-			$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+			$this->bootstrapHelper    = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
-			parent::display($tpl);
+			parent::display();
 		}
 		else
 		{
