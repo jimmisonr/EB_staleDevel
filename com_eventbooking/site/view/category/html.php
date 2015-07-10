@@ -90,7 +90,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		$layout = $this->getLayout();
 		if ($layout == 'calendar')
 		{
-			$this->_displayCalendarView();
+			$this->displayCalendar();
 
 			return;
 		}
@@ -99,11 +99,18 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		if ($categoryId > 0)
 		{
 			JLoader::register('EventbookingModelCategories', JPATH_ROOT . '/components/com_eventbooking/models/categories.php');
-			$this->categories = RADModel::getInstance('Categories', 'EventbookingModel', array('table_prefix' => '#__eb_', 'ignore_session' => true))->limitstart(
-				0)
-				->limit(0)
-				->filter_order('tbl.ordering')
-				->id($categoryId)
+
+			$model            = new EventbookingModelCategories(
+				array(
+					'table_prefix'    => '#__eb_',
+					'remember_states' => false,
+					'ignore_request'  => true
+				)
+			);
+			$this->categories = $model->setState('limitstart', 0)
+				->setState('limit', 0)
+				->setState('filter_order', 'tbl.ordering')
+				->setState('id', $categoryId)
 				->getData();
 		}
 		else
@@ -153,7 +160,6 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		$this->params          = $params;
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
-
 		parent::display();
 	}
 
@@ -161,33 +167,38 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 	 * Display calendar view to user in a category
 	 *
 	 */
-	function _displayCalendarView()
+	protected function displayCalendar()
 	{
-		$Itemid = JRequest::getInt('Itemid', 0);
-		$config = EventbookingHelper::getConfig();
+		$config          = EventbookingHelper::getConfig();
+		$currentDateData = EventbookingModelCalendar::getCurrentDateData();
 		//Initialize default month and year
-		$month = JRequest::getInt('month');
-		$year  = JRequest::getInt('year');
+		$month = $this->input->getInt('month', 0);
+		$year  = $this->input->getInt('year', 0);
 		if (!$month)
 		{
-			$month = JRequest::getInt('default_month', 0);
-			if ($month)
+			$month = $this->input->getInt('default_month', 0);
+			if (!$month)
 			{
-				JRequest::setVar('month', $month);
+				$month = $currentDateData['month'];
 			}
 		}
+
 		if (!$year)
 		{
-			$year = JRequest::getInt('default_year', 0);
-			if ($year)
+			$year = $this->input->getInt('default_year', 0);
+			if (!$year)
 			{
-				JRequest::setVar('year', $year);
+				$year = $currentDateData['year'];
 			}
 		}
-		$category = $this->get('Category');
-		$model    = $this->getModel();
-		list ($year, $month, $day) = $model->getYMD();
-		$rows        = $model->getEventsByMonth($year, $month);
+		$categoryId = $this->input->getInt('id');
+
+		$category = EventbookingHelperDatabase::getCategory($categoryId);
+		$model    = new EventbookingModelCalendar(array('remember_states' => false, 'ignore_request' => true));
+		$model->setState('month', $month)
+			->setState('year', $year)
+			->setState('id', $categoryId);
+		$rows        = $model->getData();
 		$this->data  = EventbookingHelperData::getCalendarData($rows, $year, $month);
 		$this->month = $month;
 		$this->year  = $year;
@@ -226,7 +237,6 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		$this->searchYear      = JHtml::_('select.genericlist', $options, 'year', 'class="input-small" onchange="submit();" ', 'value', 'text', $year);
 		$this->category        = $category;
 		$this->config          = $config;
-		$this->Itemid          = $Itemid;
 		$this->listMonth       = $listMonth;
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
