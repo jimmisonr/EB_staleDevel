@@ -21,6 +21,7 @@ class EventbookingViewArchiveHtml extends RADViewHtml
 		$state  = $model->getState();
 		$items  = $model->getData();
 		$config = EventbookingHelper::getConfig();
+
 		if ($config->process_plugin)
 		{
 			for ($i = 0, $n = count($items); $i < $n; $i++)
@@ -35,18 +36,17 @@ class EventbookingViewArchiveHtml extends RADViewHtml
 			EventbookingHelperData::prepareCustomFieldsData($items);
 		}
 
-
 		$category = null;
 		if ($state->id)
 		{
 			$category = EventbookingHelperDatabase::getCategory($state->id);
 		}
 
-
 		if ($config->show_list_of_registrants)
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
 		}
+
 		if ($config->show_location_in_category_view)
 		{
 			$width = (int) $config->map_width;
@@ -75,9 +75,9 @@ class EventbookingViewArchiveHtml extends RADViewHtml
 		$this->items           = $items;
 		$this->pagination      = $model->getPagination();
 		$this->config          = $config;
-		$this->nullDate        = JFactory::getDbo()->getNullDate();
 		$this->categoryId      = $state->id;
 		$this->category        = $category;
+		$this->nullDate        = JFactory::getDbo()->getNullDate();
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
 		parent::display();
