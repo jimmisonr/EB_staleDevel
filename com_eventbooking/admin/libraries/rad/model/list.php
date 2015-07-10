@@ -146,10 +146,24 @@ class RADModelList extends RADModel
 				->buildQueryOrder($query);
 
 			// Adjust the limitStart state property
-			$limit      = $this->state->limit;
-			$limitStart = $this->state->limitstart;
-			$limitStart = $limit != 0 ? (floor($limitStart / $limit) * $limit) : 0;
-			$db->setQuery($query, $limitStart, $limit);
+			$limit = $this->state->limit;
+			if ($limit)
+			{
+				$offset = $this->state->limitstart;
+				$total  = $this->getTotal();
+
+				//If the offset is higher than the total recalculate the offset
+				if ($offset !== 0 && $total !== 0)
+				{
+					if ($offset >= $total)
+					{
+						$offset                  = floor(($total - 1) / $limit) * $limit;
+						$this->state->limitstart = $offset;
+					}
+				}
+			}
+			
+			$db->setQuery($query, $this->state->limitstart, $this->state->limit);
 			$this->data = $db->loadObjectList();
 
 			// Store the query so that it can be used in getTotal method if needed
@@ -172,6 +186,7 @@ class RADModelList extends RADModel
 			$db    = $this->getDbo();
 			$query = clone $this->query;
 			$query->clear('select')
+				->clear('join')
 				->clear('group')
 				->clear('having')
 				->clear('order')
