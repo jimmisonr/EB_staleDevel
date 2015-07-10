@@ -25,10 +25,7 @@ class EventbookingModelList extends RADModelList
 
 		parent::__construct($config);
 
-		$this->state->insert('id', 'int', 0)
-			->insert('category_id', 'int', 0)
-			->insert('location_id', 'int', '0')
-			->insert('search', 'string', '');
+		$this->state->insert('id', 'int', 0);
 
 		$ebConfig   = EventbookingHelper::getConfig();
 		$listLength = (int) $ebConfig->number_events;
@@ -143,20 +140,23 @@ class EventbookingModelList extends RADModelList
 	 */
 	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
-		$db             = $this->getDbo();
-		$user           = JFactory::getUser();
-		$state          = $this->getState();
-		$hidePastEvents = EventbookingHelper::getConfigValue('hide_past_events');
+		$db     = $this->getDbo();
+		$user   = JFactory::getUser();
+		$state  = $this->getState();
+		$config = EventbookingHelper::getConfig();
+
 		if (!$user->authorise('core.admin', 'com_eventbooking'))
 		{
-			$query->where('tbl.published=1')->where('tbl.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
+			$query->where('tbl.published=1')->where('tbl.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
 		}
 
 		$categoryId = $this->state->id ? $this->state->id : $this->state->category_id;
+
 		if ($categoryId)
 		{
 			$query->where(' tbl.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id=' . $categoryId . ')');
 		}
+
 		if ($state->location_id)
 		{
 			$query->where('tbl.location_id=' . $state->location_id);
@@ -172,7 +172,7 @@ class EventbookingModelList extends RADModelList
 		{
 			$query->where('DATE(tbl.event_date) < CURDATE()');
 		}
-		elseif ($hidePastEvents || ($name == 'upcomingevents'))
+		elseif ($config->hide_past_events || ($name == 'upcomingevents'))
 		{
 			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
 			$query->where('DATE(tbl.event_date) >= "' . $currentDate . '"');
