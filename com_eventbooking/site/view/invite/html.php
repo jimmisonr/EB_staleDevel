@@ -1,32 +1,34 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
-class EventBookingViewInvite extends JViewLegacy
+class EventbookingViewInviteHtml extends RADViewHtml
 {
-
-	function display($tpl = null)
+	/**
+	 * Display invitation form for an event
+	 *
+	 * @throws Exception
+	 */
+	public function display()
 	{
 		$layout = $this->getLayout();
 		if ($layout == 'complete')
 		{
-			$this->_displayInviteComplete($tpl);
+			$this->displayInviteComplete();
 		}
 		else
 		{
-			$db = JFactory::getDbo();
-			$user = JFactory::getUser();
-			$config = EventbookingHelper::getConfig();
-			$query = $db->getQuery(true);
-			$message = EventbookingHelper::getMessages();
+			$user        = JFactory::getUser();
+			$config      = EventbookingHelper::getConfig();
+			$message     = EventbookingHelper::getMessages();
 			$fieldSuffix = EventbookingHelper::getFieldSuffix();
 			if (strlen(trim(strip_tags($message->{'invitation_form_message' . $fieldSuffix}))))
 			{
@@ -40,7 +42,7 @@ class EventBookingViewInvite extends JViewLegacy
 			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 			{
 				$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-				if(!$captchaPlugin)
+				if (!$captchaPlugin)
 				{
 					// Hardcode to recaptcha, reduce support request
 					$captchaPlugin = 'recaptcha';
@@ -48,37 +50,35 @@ class EventBookingViewInvite extends JViewLegacy
 				$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
 				if ($plugin)
 				{
-					$showCaptcha = 1;									
-					$this->captcha = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
+					$showCaptcha         = 1;
+					$this->captcha       = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
 					$this->captchaPlugin = $captchaPlugin;
 				}
 				else
 				{
 					JFactory::getApplication()->enqueueMessage(JText::_('EB_CAPTCHA_NOT_ACTIVATED_IN_YOUR_SITE'), 'error');
 				}
-			}			
-			$eventId = JRequest::getInt('id', 0);
-			$query->select('*, title' . $fieldSuffix . ' AS title')
-				->from('#__eb_events')
-				->where('id=' . $eventId);
-			$db->setQuery($query);
-			$this->event = $db->loadObject();
-			$this->user = $user;
-			$this->inviteMessage = $inviteMessage;
-			$this->showCaptcha = $showCaptcha;
+			}
+
+			$eventId = $this->input->getInt('event_id');
+
+
+			$this->event           = EventbookingHelperDatabase::getEvent($eventId);
+			$this->user            = $user;
+			$this->inviteMessage   = $inviteMessage;
+			$this->showCaptcha     = $showCaptcha;
 			$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
-			parent::display($tpl);
+			parent::display();
 		}
 	}
 
 	/**
-	 * Display invitation complete message	
-	 * @param string $tpl
+	 * Display invitation complete message
 	 */
-	function _displayInviteComplete($tpl)
+	private function displayInviteComplete()
 	{
-		$message = EventbookingHelper::getMessages();
+		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		if (strlen(trim(strip_tags($message->{'invitation_complete' . $fieldSuffix}))))
 		{
@@ -88,6 +88,7 @@ class EventBookingViewInvite extends JViewLegacy
 		{
 			$this->message = $message->invitation_complete;
 		}
-		parent::display($tpl);
+
+		parent::display();
 	}
 }
