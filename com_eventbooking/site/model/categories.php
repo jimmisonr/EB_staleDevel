@@ -67,9 +67,14 @@ class EventbookingModelCategories extends RADModelList
 	 */
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
+		$query->select('tbl.*');
+
+		// Adding support for multilingual site
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$query->select('tbl.id');
-		EventbookingHelperDatabase::getMultilingualFields($query, array('name', 'description'), $fieldSuffix);
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('name', 'description'), $fieldSuffix);
+		}
 
 		return $this;
 	}
