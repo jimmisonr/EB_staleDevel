@@ -19,30 +19,8 @@ class EventbookingViewEventHtml extends RADViewItem
 		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
 		$item   = $this->item;
-		$prices = $this->model->getPrices();
+		$prices = EventbookingHelperDatabase::getGroupRegistrationRates($item->id);
 		$config = EventbookingHelper::getConfig();
-
-		//Reset some data for recurring event
-		if ($item->recurring_type)
-		{
-			if ($item->number_days == 0)
-			{
-				$item->number_days = '';
-			}
-
-			if ($item->number_weeks == 0)
-			{
-				$item->number_weeks = '';
-			}
-			if ($item->number_months == 0)
-			{
-				$item->number_months = '';
-			}
-			if ($item->recurring_occurrencies == 0)
-			{
-				$item->recurring_occurrencies = '';
-			}
-		}
 
 		//Locations dropdown
 		$options                    = array();
