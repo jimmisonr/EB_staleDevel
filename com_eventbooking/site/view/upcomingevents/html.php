@@ -9,7 +9,7 @@
  */
 
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 {
@@ -18,6 +18,7 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 	{
 		$app    = JFactory::getApplication();
 		$active = $app->getMenu()->getActive();
+		$config = EventbookingHelper::getConfig();
 		$user   = JFactory::getUser();
 		$model  = $this->getModel();
 		$state  = $model->getState();
@@ -37,7 +38,6 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 			$category = null;
 		}
 
-		$config = EventbookingHelper::getConfig();
 		if ($config->process_plugin)
 		{
 			for ($i = 0, $n = count($items); $i < $n; $i++)
