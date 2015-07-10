@@ -8,11 +8,16 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingModelLocations extends RADModelList
 {
-
+	/**
+	 * Instantiate the model.
+	 *
+	 * @param array $config configuration data for the model
+	 *
+	 */
 	public function __construct($config = array())
 	{
 		parent::__construct($config);

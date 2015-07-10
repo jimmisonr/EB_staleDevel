@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
@@ -13,14 +13,14 @@ defined('_JEXEC') or die();
 /**
  * Event Booking Component Event Model
  *
- * @package		Joomla
- * @subpackage	Event Booking
+ * @package        Joomla
+ * @subpackage     Event Booking
  */
 class EventBookingModelReminder extends JModelLegacy
 {
 
 	/**
-	 * Constructor function	 
+	 * Constructor function
 	 */
 	function __construct()
 	{
@@ -32,7 +32,7 @@ class EventBookingModelReminder extends JModelLegacy
 	 */
 	public static function sendReminder($numberEmailSendEachTime = 0)
 	{
-		$db = JFactory::getDbo();
+		$db     = JFactory::getDbo();
 		$config = EventbookingHelper::getConfig();
 		if (!$numberEmailSendEachTime)
 		{
@@ -60,7 +60,7 @@ class EventBookingModelReminder extends JModelLegacy
 			$languages = EventbookingHelper::getLanguages();
 			if (count($languages))
 			{
-				foreach($languages as $language)
+				foreach ($languages as $language)
 				{
 					$eventFields[] = 'b.title_' . $language->sef;
 				}
@@ -75,16 +75,16 @@ class EventBookingModelReminder extends JModelLegacy
 			$eventFields[] = 'b.title';
 		}
 		$sql = 'SELECT a.id, a.first_name, a.last_name, a.email, a.register_date, a.transaction_id, a.language, ' . implode(',', $eventFields) .
-			 ' FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ' . ' ON a.event_id = b.id ' .
-			 ' WHERE a.published=1 AND a.is_reminder_sent = 0 AND b.enable_auto_reminder=1 AND (DATEDIFF(b.event_date, NOW()) <= b.remind_before_x_days) AND (DATEDIFF(b.event_date, NOW()) >=0) ORDER BY b.event_date, a.register_date ' .
-			 ' LIMIT ' . $numberEmailSendEachTime;
+			' FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ' . ' ON a.event_id = b.id ' .
+			' WHERE a.published=1 AND a.is_reminder_sent = 0 AND b.enable_auto_reminder=1 AND (DATEDIFF(b.event_date, NOW()) <= b.remind_before_x_days) AND (DATEDIFF(b.event_date, NOW()) >=0) ORDER BY b.event_date, a.register_date ' .
+			' LIMIT ' . $numberEmailSendEachTime;
 		$db->setQuery($sql);
-		$rows = $db->loadObjectList();
+		$rows    = $db->loadObjectList();
 		$message = EventbookingHelper::getMessages();
-		$mailer = JFactory::getMailer();
+		$mailer  = JFactory::getMailer();
 		for ($i = 0, $n = count($rows); $i < $n; $i++)
 		{
-			$row = $rows[$i];
+			$row         = $rows[$i];
 			$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 			if (strlen($message->{'reminder_email_subject' . $fieldSuffix}))
 			{
@@ -103,10 +103,10 @@ class EventBookingModelReminder extends JModelLegacy
 			{
 				$emailBody = $message->reminder_email_body;
 			}
-			$replaces = array();
-			$replaces['event_date'] = JHtml::_('date', $row->event_date, $config->event_date_format, null);
-			$replaces['first_name'] = $row->first_name;
-			$replaces['last_name'] = $row->last_name;
+			$replaces                = array();
+			$replaces['event_date']  = JHtml::_('date', $row->event_date, $config->event_date_format, null);
+			$replaces['first_name']  = $row->first_name;
+			$replaces['last_name']   = $row->last_name;
 			$replaces['event_title'] = $row->event_title;
 			foreach ($replaces as $key => $value)
 			{
@@ -117,7 +117,7 @@ class EventBookingModelReminder extends JModelLegacy
 			$mailer->ClearAllRecipients();
 
 			//Mark this registrant as received reminder
-			$sql = 'UPDATE #__eb_registrants SET is_reminder_sent = 1 WHERE id = '.(int) $row->id;
+			$sql = 'UPDATE #__eb_registrants SET is_reminder_sent = 1 WHERE id = ' . (int) $row->id;
 			$db->setQuery($sql);
 			$db->execute();
 		}

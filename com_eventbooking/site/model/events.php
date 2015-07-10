@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	2.0.0
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -10,29 +10,23 @@
 // no direct access
 defined('_JEXEC') or die();
 
-/**
- * Events Booking Events Model
- *
- * @package        Joomla
- * @subpackage     Events Booking
- */
 class EventBookingModelEvents extends RADModelList
 {
-
-	function __construct($config = array())
+	/**
+	 * Instantiate the model.
+	 *
+	 * @param array $config configuration data for the model
+	 *
+	 */
+	public function __construct($config = array())
 	{
-		$config = array_merge($config, array('table' => '#__eb_events', 'ignore_session' => true));
+		$config = array_merge($config, array('table' => '#__eb_events', 'remember_states' => false));
+
 		parent::__construct($config);
 
-		$app     = JFactory::getApplication();
-		$context = $this->option . '.' . $this->name . '.';
-		$this->state->insert('filter_category_id', 'int', $app->getUserStateFromRequest($context . 'filter_category_id', 'filter_category_id', 0))
-			->insert('filter_search', 'string', $app->getUserStateFromRequest($context . 'filter_search', 'filter_search'));
-		$request = EventbookingHelper::getRequestData();
-		$this->state->setData($request);
-		$this->state->set('filter_order_Dir', 'DESC');
-
-		$app->setUserState('eventbooking.limit', $this->state->limit);
+		$this->state->insert('filter_category_id', 'int', 0)
+			->insert('filter_search', 'string', '')
+			->setDefault('filter_order_Dir', 'DESC');
 	}
 
 	/**
@@ -46,11 +40,11 @@ class EventBookingModelEvents extends RADModelList
 		// Lets load the content if it doesn't already exist
 		if (empty($this->data))
 		{
-			$rows  = parent::getData();
-			$db    = $this->getDbo();
-			$query = $db->getQuery(true);
+			$rows        = parent::getData();
+			$db          = $this->getDbo();
+			$query       = $db->getQuery(true);
 			$fieldSuffix = EventbookingHelper::getFieldSuffix();
-			$query->select('a.name'.$fieldSuffix.' AS name FROM #__eb_categories AS a')->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id');
+			$query->select('a.name' . $fieldSuffix . ' AS name FROM #__eb_categories AS a')->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id');
 			for ($i = 0, $n = count($rows); $i < $n; $i++)
 			{
 				$row = $rows[$i];
@@ -67,6 +61,10 @@ class EventBookingModelEvents extends RADModelList
 
 	/**
 	 * Builds SELECT columns list for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
@@ -78,19 +76,27 @@ class EventBookingModelEvents extends RADModelList
 	}
 
 	/**
-	 * Builds LEFT JOINS clauses for the query
+	 * Builds JOINS clauses for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
 		$query->leftJoin(
 			'#__eb_registrants AS b ON (tbl.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')->leftJoin(
-				'#__eb_locations AS c ON tbl.location_id = c.id ');
+			'#__eb_locations AS c ON tbl.location_id = c.id ');
 
 		return $this;
 	}
 
 	/**
 	 * Builds a WHERE clause for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
@@ -112,6 +118,10 @@ class EventBookingModelEvents extends RADModelList
 
 	/**
 	 * Builds a GROUP BY clause for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function buildQueryGroup(JDatabaseQuery $query)
 	{

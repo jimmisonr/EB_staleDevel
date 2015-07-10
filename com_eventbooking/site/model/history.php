@@ -23,6 +23,11 @@ class EventbookingModelHistory extends RADModelList
 			->insert('filter_order_Dir', 'word', 'DESC');
 	}
 
+	/**
+	 * Get total registration records of the user
+	 *
+	 * @return int
+	 */
 	public function getTotal()
 	{
 		if (empty($this->total))
@@ -42,6 +47,10 @@ class EventbookingModelHistory extends RADModelList
 
 	/**
 	 * Builds SELECT columns list for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
@@ -52,7 +61,11 @@ class EventbookingModelHistory extends RADModelList
 	}
 
 	/**
-	 * Builds LEFT JOINS clauses for the query
+	 * Builds JOINS clauses for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
@@ -63,6 +76,10 @@ class EventbookingModelHistory extends RADModelList
 
 	/**
 	 * Builds a WHERE clause for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function buildQueryWhere(JDatabaseQuery $query)
 	{

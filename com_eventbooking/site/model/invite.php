@@ -1,43 +1,39 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
-/**
- * Event Booking Component Event Model
- *
- * @package		Joomla
- * @subpackage	Event Booking
- */
-class EventBookingModelInvite extends JModelLegacy
+class EventBookingModelInvite extends RADModel
 {
 
 	/**
-	 * Send invitation	
+	 * Send invitation to users
+	 *
+	 * @param $data
+	 *
+	 * @throws Exception
 	 */
-	function sendInvite($data)
+	public function sendInvite($data)
 	{
-		$app = JFactory::getApplication();
-		$Itemid = (int) $data['Itemid'];
-		$eventId = $data['event_id'];
-		$config = EventbookingHelper::getConfig();
-		$message = EventbookingHelper::getMessages();
+		$Itemid      = (int) $data['Itemid'];
+		$eventId     = $data['event_id'];
+		$config      = EventbookingHelper::getConfig();
+		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$db = JFactory::getDbo();
 		if ($config->from_name)
 		{
 			$fromName = $config->from_name;
 		}
 		else
 		{
-			$fromName = $app->getCfg('fromname');
+			$fromName = JFactory::getConfig()->get('fromname');
 		}
 		if ($config->from_email)
 		{
@@ -45,18 +41,17 @@ class EventBookingModelInvite extends JModelLegacy
 		}
 		else
 		{
-			$fromEmail = $app->getCfg('mailfrom');
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
 		}
-		$sql = "SELECT *,title" . $fieldSuffix . " AS title FROM #__eb_events WHERE id=" . $eventId;
-		$db->setQuery($sql);
-		$event = $db->loadObject();
-		$link = JUri::getInstance()->toString(array('scheme', 'host', 'port')) .
-			 JRoute::_(EventbookingHelperRoute::getEventRoute($eventId, 0, $Itemid));
-		$eventLink = '<a href="' . $link . '">' . $link . '</a>';
-		$replaces = array();
-		$replaces['event_title'] = $event->title;
-		$replaces['sender_name'] = $data['name'];
-		$replaces['PERSONAL_MESSAGE'] = $data['message'];
+
+		$event                         = EventbookingHelperDatabase::getEvent($eventId);
+		$link                          = JUri::getInstance()->toString(array('scheme', 'host', 'port')) .
+			JRoute::_(EventbookingHelperRoute::getEventRoute($eventId, 0, $Itemid));
+		$eventLink                     = '<a href="' . $link . '">' . $link . '</a>';
+		$replaces                      = array();
+		$replaces['event_title']       = $event->title;
+		$replaces['sender_name']       = $data['name'];
+		$replaces['PERSONAL_MESSAGE']  = $data['message'];
 		$replaces['event_detail_link'] = $eventLink;
 		//Override config messages
 		if (strlen($message->{'invitation_email_subject' . $fieldSuffix}))
@@ -78,17 +73,17 @@ class EventBookingModelInvite extends JModelLegacy
 		$subject = str_replace('[EVENT_TITLE]', $event->title, $subject);
 		foreach ($replaces as $key => $value)
 		{
-			$key = strtoupper($key);
+			$key  = strtoupper($key);
 			$body = str_replace("[$key]", $value, $body);
 		}
 		$emails = explode("\r\n", $data['friend_emails']);
-		$names = explode("\r\n", $data['friend_names']);
+		$names  = explode("\r\n", $data['friend_names']);
 		$mailer = JFactory::getMailer();
 		for ($i = 0, $n = count($emails); $i < $n; $i++)
 		{
 			$emailBody = $body;
-			$email = $emails[$i];
-			$name = $names[$i];
+			$email     = $emails[$i];
+			$name      = $names[$i];
 			if ($name && $email)
 			{
 				$emailBody = str_replace('[NAME]', $name, $emailBody);

@@ -9,7 +9,6 @@
  */
 // no direct access
 defined('_JEXEC') or die;
-require_once dirname(__FILE__) . '/list.php';
 
 class EventbookingModelArchive extends EventbookingModelList
 {

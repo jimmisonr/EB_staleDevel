@@ -18,7 +18,12 @@ defined('_JEXEC') or die();
  */
 class EventBookingModelRegistrants extends RADModelList
 {
-
+	/**
+	 * Instantiate the model.
+	 *
+	 * @param array $config configuration data for the model
+	 *
+	 */
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
@@ -64,6 +69,10 @@ class EventBookingModelRegistrants extends RADModelList
 
 	/**
 	 * Builds SELECT columns list for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
@@ -74,7 +83,11 @@ class EventBookingModelRegistrants extends RADModelList
 	}
 
 	/**
-	 * Builds LEFT JOINS clauses for the query
+	 * Builds JOINS clauses for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
@@ -85,6 +98,10 @@ class EventBookingModelRegistrants extends RADModelList
 
 	/**
 	 * Builds a WHERE clause for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
 	 */
 	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
