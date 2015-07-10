@@ -8,11 +8,14 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingViewLocationHtml extends RADViewHtml
 {
 
+	/**
+	 * Display events from a location
+	 */
 	public function display()
 	{
 		$layout = $this->getLayout();
@@ -23,12 +26,12 @@ class EventbookingViewLocationHtml extends RADViewHtml
 			return;
 		}
 
-		$document = JFactory::getDocument();
+		$app      = JFactory::getApplication();
+		$active   = $app->getMenu()->getActive();
 		$model    = $this->getModel();
 		$items    = $model->getData();
-		$location = $model->getLocation();
-		$document->setTitle($location->name);
-		$config = EventbookingHelper::getConfig();
+		$location = EventbookingHelperDatabase::getLocation($this->input->getInt('location_id'));
+		$config   = EventbookingHelper::getConfig();
 		if ($config->process_plugin)
 		{
 			for ($i = 0, $n = count($items); $i < $n; $i++)
@@ -43,27 +46,41 @@ class EventbookingViewLocationHtml extends RADViewHtml
 			EventbookingHelperData::prepareCustomFieldsData($items);
 		}
 
+		// Process page meta data
+		$params = EventbookingHelper::getViewParams($active, array('location'));
+		if (!$params->get('page_title'))
+		{
+			if (!empty($location->name))
+			{
+				$params->set('page_title', $location->name);
+			}
+		}
+		EventbookingHelperHtml::prepareDocument($params, $location);
+
 		$user                  = JFactory::getUser();
-		$userId                = $user->get('id');
-		$viewLevels            = $user->getAuthorisedViewLevels();
-		$this->viewLevels      = $viewLevels;
-		$this->userId          = $userId;
 		$this->items           = $items;
-		$this->pagination      = $model->getPagination();
 		$this->config          = $config;
 		$this->location        = $location;
+		$this->pagination      = $model->getPagination();
 		$this->nullDate        = JFactory::getDbo()->getNullDate();
+		$this->viewLevels      = $user->getAuthorisedViewLevels();
+		$this->userId          = $user->get('id');
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
 		parent::display();
 	}
 
+	/**
+	 * Display Form to allow adding location for event
+	 *
+	 * @throws Exception
+	 */
 	protected function displayForm()
 	{
-		$user = JFactory::getUser();
-		if (!$user->authorise('eventbooking.addlocation', 'com_eventbooking'))
+
+		if (!JFactory::getUser()->authorise('eventbooking.addlocation', 'com_eventbooking'))
 		{
-			JFactory::getApplication()->redirect('index.php', JText::_("EB_NO_PERMISSION"));
+			JFactory::getApplication()->redirect('index.php', JText::_('EB_NO_PERMISSION'));
 
 			return;
 		}

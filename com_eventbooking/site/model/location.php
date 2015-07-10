@@ -22,24 +22,14 @@ class EventbookingModelLocation extends EventbookingModelList
 	{
 		parent::__construct($config);
 
+		$this->state->insert('location_id', 'int', 0);
 	}
 
 	/**
-	 * Get list of category
+	 * Get location information from database, using for add/edit page
 	 *
+	 * @return JTable|mixed
 	 */
-	public function getLocation()
-	{
-		$db    = $this->getDbo();
-		$query = $db->getQuery(true);
-		$query->select('*')
-			->from('#__eb_locations')
-			->where('id=' . $this->state->location_id);
-		$db->setQuery($query);
-
-		return $db->loadObject();
-	}
-
 	public function getLocationData()
 	{
 		if ($this->state->id)
