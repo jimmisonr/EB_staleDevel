@@ -8,15 +8,8 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
-/**
- * HTML View class for the Booking component
- *
- * @static
- * @package        Joomla
- * @subpackage     Events Booking
- */
 class EventbookingViewCancelHtml extends RADViewHtml
 {
 	public $hasModel = false;
