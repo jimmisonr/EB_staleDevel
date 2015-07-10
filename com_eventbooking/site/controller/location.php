@@ -8,54 +8,51 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
-/**
- * Event Booking controller
- * @package        Joomla
- * @subpackage     Event Booking
- */
 class EventbookingControllerLocation extends EventbookingController
 {
 	/**
 	 * save location
 	 *
 	 */
-	public function save_location()
+	public function save()
 	{
-		$post       = JRequest::get('post', JREQUEST_ALLOWHTML);
-		$model      = $this->getModel('addlocation');
-		$cid        = $post['cid'];
-		$post['id'] = (int) $cid[0];
-		$ret        = $model->store($post);
-		if ($ret)
+		$this->csrfProtection();
+		$post  = $this->input->getData();
+		$model = $this->getModel();
+		try
 		{
+			$model->store($post);
 			$msg = JText::_('EB_LOCATION_SAVED');
 		}
-		else
+		catch (Exception $e)
 		{
-			$msg = JText::_('EB_SAVING_LOCATION_ERROR');
+			$msg = JText::_('EB_ERROR_SAVING_LOCATION') . ':' . $e->getMessage();
 		}
 
-		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=locationlist&Itemid=' . JRequest::getInt('Itemid', 0)), $msg);
+		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=locations&Itemid=' . $this->input->getInt('Itemid', 0)), $msg);
 	}
 
-	public function delete_location()
+	/**
+	 * Delete location
+	 */
+	public function delete()
 	{
-		$model = $this->getModel('addlocation');
+		$this->csrfProtection();
+		$model = $this->getModel();
 		$cid   = JRequest::getVar('cid', array());
 		JArrayHelper::toInteger($cid);
 		$model->delete($cid);
 		$msg = JText::_('EB_LOCATION_REMOVED');
-		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=locationlist&Itemid=' . JRequest::getInt('Itemid', 0)), $msg);
+		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=locations&Itemid=' . $this->input->getInt('Itemid', 0)), $msg);
 	}
 
 	/**
-	 * Redirect user to locations
-	 *
+	 * Cancel location edit, redirect to location list page
 	 */
-	public function cancel_location()
+	public function cancel()
 	{
-		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=locationlist&Itemid=' . JRequest::getInt('Itemid', 0)));
+		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=locations&Itemid=' . $this->input->getInt('Itemid', 0)), $msg);
 	}
 }

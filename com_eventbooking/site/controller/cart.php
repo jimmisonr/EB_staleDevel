@@ -8,7 +8,7 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingControllerCart extends EventbookingController
 {
@@ -148,8 +148,8 @@ class EventbookingControllerCart extends EventbookingController
 			$this->app->redirect('index.php', JText::_('Sorry, your session was expired. Please try again!'));
 		}
 
-		$data  = $this->input->getData();
-		$model = $this->getModel('cart');
+		$data   = $this->input->getData();
+		$model  = $this->getModel('cart');
 		$return = $model->processCheckout($data);
 
 		if ($return == 1)

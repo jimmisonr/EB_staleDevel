@@ -8,13 +8,8 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
-/**
- * Event Booking controller
- * @package        Joomla
- * @subpackage     Event Booking
- */
 class EventbookingControllerRegistrant extends EventbookingController
 {
 	/**

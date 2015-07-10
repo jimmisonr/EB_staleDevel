@@ -8,7 +8,7 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingControllerRegister extends EventbookingController
 {
@@ -374,9 +374,9 @@ class EventbookingControllerRegister extends EventbookingController
 		$eventId       = $this->input->getInt('event_id', 0);
 		$data          = $this->input->getData();
 		$paymentMethod = $this->input->getString('payment_method', '');
-		$event     = EventbookingHelperDatabase::getEvent($eventId);
-		$rowFields = EventbookingHelper::getFormFields($eventId, 0);
-		$form      = new RADForm($rowFields);
+		$event         = EventbookingHelperDatabase::getEvent($eventId);
+		$rowFields     = EventbookingHelper::getFormFields($eventId, 0);
+		$form          = new RADForm($rowFields);
 		$form->bind($data);
 		$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
 
