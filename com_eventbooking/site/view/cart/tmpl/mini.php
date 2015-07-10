@@ -1,14 +1,14 @@
 <?php
 /**
- * @version		1.6.6
- * @package		Joomla
- * @subpackage	Event Booking
- * @author  Tuan Pham Ngoc
- * @copyright	Copyright (C) 2010 - 2015 Ossolution Team
- * @license		GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die();
+defined('_JEXEC') or die;
 if ($this->config->prevent_duplicate_registration)
 {
 	$readOnly = ' readonly="readonly" ' ;

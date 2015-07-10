@@ -8,7 +8,7 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingViewCartHtml extends RADViewHtml
 {
@@ -19,11 +19,7 @@ class EventbookingViewCartHtml extends RADViewHtml
 	public function display()
 	{
 		$layout = $this->getLayout();
-		if ($layout == 'mini')
-		{
-			$this->setLayout('mini');
-		}
-		else
+		if ($layout != 'mini')
 		{
 			$this->setLayout('default');
 		}
