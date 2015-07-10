@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.7.3
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -101,9 +101,8 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 	private function displayWeeklyView()
 	{
 		$model                   = $this->getModel();
-		$state                   = $model->getState();
 		$this->events            = $model->getEventsByWeek();
-		$this->first_day_of_week = $state->date;
+		$this->first_day_of_week = $model->getState('date');
 
 		parent::display();
 	}
@@ -114,9 +113,8 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 	private function displayDailyView()
 	{
 		$model        = $this->getModel();
-		$state        = $model->getState();
 		$this->events = $model->getEventsByDaily();
-		$this->day    = $state->day;
+		$this->day    = $model->getState('day');
 
 		parent::display();
 	}
