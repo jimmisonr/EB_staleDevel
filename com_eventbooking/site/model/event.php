@@ -56,6 +56,8 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 		}
 		$db->setQuery($query);
 		$row = $db->loadObject();
+
+		// Get additional information about the event
 		if ($row)
 		{
 			// Get the main category of this event

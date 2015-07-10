@@ -8,7 +8,7 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingViewEventHtml extends RADViewHtml
 {
@@ -18,13 +18,13 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$layout = $this->getLayout();
 		if ($layout == 'form')
 		{
-			$this->_displayForm();
+			$this->displayForm();
 
 			return;
 		}
+
 		$app    = JFactory::getApplication();
 		$active = $app->getMenu()->getActive();
-
 		$user   = JFactory::getUser();
 		$config = EventbookingHelper::getConfig();
 		$model  = $this->getModel();
@@ -32,7 +32,6 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$item   = $model->getEventData();
 
 		// Check to make sure the event is valid and user is allowed to access to it
-
 		if (empty($item) || !in_array($item->access, $user->getAuthorisedViewLevels()))
 		{
 			$app->redirect('index.php', JText::_('EB_INVALID_EVENT'));
@@ -71,12 +70,10 @@ class EventbookingViewEventHtml extends RADViewHtml
 
 		$item->description = JHtml::_('content.prepare', $item->description);
 
-
 		if ($item->location_id)
 		{
 			$this->location = EventbookingHelperDatabase::getLocation($item->location_id);
 		}
-
 
 		if ($config->event_custom_field && file_exists(JPATH_COMPONENT . '/fields.xml'))
 		{
@@ -84,7 +81,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 			$this->paramData = $item->paramData;
 		}
 
-		$params = EventbookingHelper::getViewParams($active, array('calendar', 'upcomingevents', 'categories', 'category', 'event'));
+		$params = EventbookingHelper::getViewParams($active, array('event'));
 
 		// Process page meta data
 		if (!$params->get('page_title'))
@@ -102,10 +99,12 @@ class EventbookingViewEventHtml extends RADViewHtml
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
 		}
+
 		if ($config->show_list_of_registrants)
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
 		}
+
 		$width = (int) $config->map_width;
 		if (!$width)
 		{
@@ -116,6 +115,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 		{
 			$height = 600;
 		}
+
 		EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
 		if ($config->show_invite_friend)
 		{
@@ -139,9 +139,9 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$this->item            = $item;
 		$this->config          = $config;
 		$this->userId          = $user->id;
+		$this->plugins         = $plugins;
 		$this->nullDate        = JFactory::getDbo()->getNullDate();
 		$this->rowGroupRates   = EventbookingHelperDatabase::getGroupRegistrationRates($item->id);
-		$this->plugins         = $plugins;
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
 		parent::display();
@@ -152,7 +152,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 	 *
 	 * @throws Exception
 	 */
-	protected function _displayForm()
+	protected function displayForm()
 	{
 		$db          = JFactory::getDbo();
 		$query       = $db->getQuery(true);
