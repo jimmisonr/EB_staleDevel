@@ -10,12 +10,6 @@
 // no direct access
 defined('_JEXEC') or die();
 
-/**
- * EventBooking Component Registrants Model
- *
- * @package        Joomla
- * @subpackage     Event Booking
- */
 class EventBookingModelRegistrants extends RADModelList
 {
 	/**
