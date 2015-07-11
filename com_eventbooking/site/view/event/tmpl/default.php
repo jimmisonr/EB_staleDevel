@@ -11,6 +11,7 @@
 defined('_JEXEC') or die;
 
 JHtml::_('behavior.modal', 'a.eb-modal');
+
 $item = $this->item ;
 $url = JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, 0, $this->Itemid), false);
 $canRegister = EventbookingHelper::acceptRegistration($item) ;
@@ -30,6 +31,7 @@ $iconOkClass       = $bootstrapHelper->getClassMapping('icon-ok');
 $iconRemoveClass   = $bootstrapHelper->getClassMapping('icon-remove');
 $iconDownloadClass = $bootstrapHelper->getClassMapping('icon-download');
 $btnClass          = $bootstrapHelper->getClassMapping('btn');
+$return = base64_encode(JUri::getInstance()->toString());
 ?>
 <div id="eb-event-page" class="eb-container eb-event">
 	<div class="eb-box-heading clearfix">
@@ -553,7 +555,7 @@ $btnClass          = $bootstrapHelper->getClassMapping('btn');
 					{
 					?>
 						<li>
-							<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id='.$item->id.'&Itemid='.$this->Itemid); ?>">
+							<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id='.$item->id.'&Itemid='.$this->Itemid.'&return='.$return); ?>">
 								<i class="<?php echo $iconPencilClass; ?>"></i>
 								<?php echo JText::_('EB_EDIT'); ?>
 							</a>
@@ -564,13 +566,13 @@ $btnClass          = $bootstrapHelper->getClassMapping('btn');
 					{
 						if ($item->published == 1)
 						{
-							$link = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id='.$item->id.'&Itemid='.$this->Itemid);
+							$link = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id='.$item->id.'&Itemid='.$this->Itemid.'&return='.$return);
 							$text = JText::_('EB_UNPUBLISH');
 							$class = $iconRemoveClass;
 						}
 						else
 						{
-							$link = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id='.$item->id.'&Itemid='.$this->Itemid);
+							$link = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id='.$item->id.'&Itemid='.$this->Itemid.'&return='.$return);
 							$text = JText::_('EB_PUBLISH');
 							$class = $iconOkClass;
 						}

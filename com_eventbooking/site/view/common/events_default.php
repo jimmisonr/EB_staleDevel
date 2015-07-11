@@ -9,6 +9,7 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
+$return = base64_encode(JUri::getInstance()->toString());
 ?>
 <div id="eb-events">
 	<?php
@@ -438,7 +439,7 @@ defined( '_JEXEC' ) or die ;
 							{
 								?>
 								<li>
-									<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id='.$event->id.'&Itemid='.$Itemid); ?>">
+									<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id='.$event->id.'&Itemid='.$Itemid.'&return='.$return); ?>">
 										<i class="<?php echo $iconPencilClass; ?>"></i>
 										<?php echo JText::_('EB_EDIT'); ?>
 									</a>
@@ -449,13 +450,13 @@ defined( '_JEXEC' ) or die ;
 							{
 								if ($event->published == 1)
 								{
-									$link = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id='.$event->id.'&Itemid='.$Itemid);
+									$link = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id='.$event->id.'&Itemid='.$Itemid.'&return='.$return);
 									$text = JText::_('EB_UNPUBLISH');
 									$class = $iconRemoveClass;
 								}
 								else
 								{
-									$link = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id='.$event->id.'&Itemid='.$Itemid);
+									$link = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id='.$event->id.'&Itemid='.$Itemid.'&return='.$return);
 									$text = JText::_('EB_PUBLISH');
 									$class = $iconOkClass;
 								}
