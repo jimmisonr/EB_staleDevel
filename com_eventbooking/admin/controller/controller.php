@@ -10,12 +10,6 @@
 // no direct access
 defined('_JEXEC') or die();
 
-/**
- * EventBooking controller
- *
- * @package		Joomla
- * @subpackage	Event Booking
- */
 class EventbookingController extends RADControllerAdmin
 {
 
