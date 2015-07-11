@@ -209,7 +209,7 @@ if ($this->config->activate_invoice_feature)
 				<?php	
 				}
 			?>										
-			<td class="center">
+			<td>
                 <a href="mailto:<?php echo $row->email;?>"><?php echo $row->email;?></a>
 			</td>							
 			<td class="center" style="font-weight: bold;">
