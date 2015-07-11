@@ -298,9 +298,8 @@ class RADModel
 		if ($changed)
 		{
 			// Reset the data
-			$this->state->limitstart = 0;
-			$this->data              = null;
-			$this->total             = null;
+			$this->data  = null;
+			$this->total = null;
 		}
 
 		return $this;

@@ -1,23 +1,21 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
-
 error_reporting(E_ALL);
-
 //Basic ACL support
 if (!JFactory::getUser()->authorise('core.manage', 'com_eventbooking'))
 {
 	return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
 }
-require_once JPATH_ADMINISTRATOR.'/components/com_eventbooking/libraries/rad/bootstrap.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
 
 if (JLanguageMultilang::isEnabled() && !EventbookingHelper::isSynchronized())
 {
@@ -30,7 +28,7 @@ if (isset($_POST['language']))
 }
 
 $config = EventbookingHelper::getComponentSettings('admin');
-$input = new RADInput();
+$input  = new RADInput();
 RADController::getInstance($input->getCmd('option'), $input, $config)
 	->execute()
 	->redirect();
