@@ -238,7 +238,7 @@ function EventbookingBuildRoute(&$query)
 			$segments[] = 'Group Billing';
 			unset($query['task']);
 			break;
-		case 'download_ical':
+		case 'event.download_ical':
 			if ($eventId)
 			{
 				$segments[] = EventbookingHelperRoute::getEventTitle($eventId);

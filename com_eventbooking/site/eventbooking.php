@@ -9,9 +9,10 @@
  */
 
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 error_reporting(E_ALL);
+
 define('EB_TBC_DATE', '2099-12-31 00:00:00');
 
 require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';

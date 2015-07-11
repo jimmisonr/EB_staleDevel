@@ -1,19 +1,20 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;
+defined('_JEXEC') or die;
 $cols = 8;
 if (version_compare(JVERSION, '3.0', 'ge'))
 {
 	JHtml::_('formbehavior.chosen', 'select');
 }
+$return = base64_encode(JUri::getInstance()->toString());
 ?>
 <script type="text/javascript">
 	function checkData(pressbutton)
@@ -119,8 +120,8 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 		<?php
 		for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 		{
-			$row = &$this->items[$i];
-			$link 	= JRoute::_( 'index.php?option=com_eventbooking&task=edit_registrant&cid[]='. $row->id.'&Itemid='.$this->Itemid);
+			$row = $this->items[$i];
+			$link 	= JRoute::_( 'index.php?option=com_eventbooking&task=edit_registrant&id='. $row->id.'&Itemid='.$this->Itemid.'&return='.$return);
 			$isMember = $row->group_id > 0 ? true : false ;
 			if ($isMember)
 			{

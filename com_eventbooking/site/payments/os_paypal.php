@@ -293,11 +293,10 @@ class os_paypal extends os_payment
 			{
 				EventbookingHelper::updateGroupRegistrationRecord($row->id);
 			}
+			EventbookingHelper::sendEmails($row, $config);
 			JPluginHelper::importPlugin('eventbooking');
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-			
-			EventbookingHelper::sendEmails($row, $config);			
 			return true;
 		}
 		else

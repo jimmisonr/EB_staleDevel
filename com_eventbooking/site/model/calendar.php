@@ -28,7 +28,8 @@ class EventbookingModelCalendar extends RADModel
 			->insert('default_month', 'int', 0)
 			->insert('default_year', 'int', 0)
 			->insert('date', 'string', '')
-			->insert('day', 'string', '');
+			->insert('day', 'string', '')
+			->insert('id', 'int', 0);
 	}
 
 	/**
@@ -78,6 +79,11 @@ class EventbookingModelCalendar extends RADModel
 			->group('a.id')
 			->order('a.event_date ASC, a.ordering ASC');
 
+		if ($this->state->id)
+		{
+			$catId = $this->state->id;
+			$query->where("a.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id=$catId)");
+		}
 		if ($config->show_multiple_days_event_in_calendar)
 		{
 			$query->where("((`event_date` BETWEEN '$startDate' AND '$endDate') OR (MONTH(event_end_date) = $month AND YEAR(event_end_date) = $year ))");
