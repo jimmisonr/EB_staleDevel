@@ -65,7 +65,6 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			$form->bind($data, true);
 		}
 		$form->bind($data);
-		$from = $this->input->getString('from', '');
 		if ($userId && $user->authorise('eventbooking.registrants_management', 'com_eventbooking'))
 		{
 			$canChangeStatus    = true;
@@ -129,10 +128,10 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		$this->item            = $item;
 		$this->config          = $config;
 		$this->lists           = $lists;
-		$this->from            = $from;
 		$this->canChangeStatus = $canChangeStatus;
 		$this->form            = $form;
 		$this->rowMembers      = $rowMembers;
+		$this->return          = $this->input->get('return', '', 'string');
 
 		parent::display();
 	}

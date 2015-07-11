@@ -1,15 +1,16 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;
+defined('_JEXEC') or die;
 $cols = 6;
+$return = base64_encode(JUri::getInstance()->toString());
 ?>
 <div id="eb-registration-history-page" class="eb-container row-fluid eb-event">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_REGISTRATION_HISTORY'); ?></h1>
@@ -95,8 +96,8 @@ $cols = 6;
 		$k = 0;
 		for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 		{
-			$row = &$this->items[$i];
-			$link 	= JRoute::_( 'index.php?option=com_eventbooking&task=edit_registrant&cid[]='. $row->id.'&from=history&Itemid='.JRequest::getInt('Itemid', 0));
+			$row = $this->items[$i];
+			$link 	= JRoute::_( 'index.php?option=com_eventbooking&task=edit_registrant&id='. $row->id.'&Itemid='.$this->Itemid.'&return='.$return);
 			?>
 			<tr>
 				<td class="hidden-phone">

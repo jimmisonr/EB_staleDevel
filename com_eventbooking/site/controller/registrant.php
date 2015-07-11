@@ -18,13 +18,12 @@ class EventbookingControllerRegistrant extends EventbookingController
 	public function save()
 	{
 		$this->csrfProtection();
-
 		$model = $this->getModel('registrant');
 		$model->store($this->input);
-		$from = $this->input->getString('from', '');
-		if ($from == 'history')
+		$return = base64_decode($this->input->getString('return', ''));
+		if ($return)
 		{
-			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('history', $this->input->getInt('Itemid')), false));
+			$this->setRedirect($return);
 		}
 		else
 		{

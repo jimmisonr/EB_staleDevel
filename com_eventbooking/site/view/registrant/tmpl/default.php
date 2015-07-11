@@ -290,7 +290,7 @@ $selectedState = '';
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>"/>
 	<input type="hidden" name="task" value="save"/>
 	<input type="hidden" name="event_id" value="<?php echo $this->item->event_id; ?>"/>
-	<input type="hidden" name="from" value="<?php echo $this->from; ?>"/>
+	<input type="hidden" name="return" value="<?php echo $this->return; ?>"/>
 	<?php echo JHtml::_('form.token'); ?>
 	<script type="text/javascript">
 		var siteUrl = "<?php echo EventbookingHelper::getSiteUrl(); ?>";
