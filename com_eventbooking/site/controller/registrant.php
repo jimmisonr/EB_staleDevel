@@ -88,6 +88,22 @@ class EventbookingControllerRegistrant extends EventbookingController
 	}
 
 	/**
+	 * Cancel editing a registration record
+	 */
+	public function cancel_edit()
+	{
+		$return = base64_decode($this->input->getString('return', ''));
+		if ($return)
+		{
+			$this->setRedirect($return);
+		}
+		else
+		{
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', $this->input->getInt('Itemid')), false));
+		}
+	}
+
+	/**
 	 * Download invoice associated to the registration record
 	 *
 	 * @throws Exception

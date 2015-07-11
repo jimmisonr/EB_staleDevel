@@ -53,6 +53,11 @@ class EventbookingController extends RADController
 
 		switch ($task)
 		{
+			case 'add_registrant':
+			case 'edit_registrant':
+				$this->input->set('view', 'registrant');
+				$this->input->set('layout', 'default');
+				break;
 			case 'view_category':
 				$this->input->set('view', 'category');
 				break;

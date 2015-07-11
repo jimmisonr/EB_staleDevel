@@ -79,10 +79,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		{
 			$canChangeStatus = false;
 		}
-		if (count($rowMembers))
-		{
-			$this->memberFormFields = EventbookingHelper::getFormFields($item->event_id, 2, $item->language);
-		}
+
 
 		if (empty($item->id))
 		{
@@ -123,6 +120,11 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 				$rowMember->store();
 				$rowMembers[] = $rowMember;
 			}
+		}
+
+		if (count($rowMembers))
+		{
+			$this->memberFormFields = EventbookingHelper::getFormFields($item->event_id, 2, $item->language);
 		}
 
 		$this->item            = $item;

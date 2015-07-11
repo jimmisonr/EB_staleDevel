@@ -24,7 +24,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 		{
 			alert("<?php echo JText::_('EB_SELECT_EVENT_TO_ADD_REGISTRANT'); ?>");
 			form.filter_event_id.focus();
-			return ;
+			return false;
 		}		
 		Joomla.submitform( pressbutton );
 	}
@@ -42,8 +42,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 			<td style="float: right;">
 				<?php echo $this->lists['published'] ; ?>
 				<?php echo $this->lists['filter_event_id'] ; ?>
-				<button class="btn btn-small btn-primary" onclick="checkData('add_registrant');">
-					<span class="icon-new icon-white"></span><?php echo JText::_('EB_NEW_REGISTRANTS'); ?></button>
+				<input type="button" class="btn btn-small btn-primary" onclick="checkData('add_registrant');" value="<?php echo JText::_('EB_NEW_REGISTRANTS'); ?>" />
 			</td>
 		</tr>
 	</table>

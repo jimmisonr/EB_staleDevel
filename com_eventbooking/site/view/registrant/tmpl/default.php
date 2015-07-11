@@ -270,9 +270,9 @@ $selectedState = '';
 		<tr>
 			<td colspan="2">
 				<input type="button" class="btn btn-primary" name="btnCancel" onclick="registrantList();"
-				       value="<?php echo $this->from == 'history' ? JText::_('EB_REGISTRATION_HISTORY') : JText::_('EB_REGISTRANT_LIST'); ?>"/>
+				       value="<?php echo JText::_('EB_BACK');?> "/>
 				<input type="submit" class="btn btn-primary" name="btnSave"
-				       value="<?php echo JText::_('EB_SAVE_REGISTRANT'); ?>"/>
+				       value="<?php echo JText::_('EB_SAVE'); ?>"/>
 				<?php
 				if (EventbookingHelper::canCancelRegistration($this->item->event_id) && $this->item->published != 2)
 				{
@@ -300,19 +300,17 @@ $selectedState = '';
 				buildStateField('state', 'country', '<?php echo $selectedState; ?>');
 			})
 		})(jQuery);
-		function registrantList() {
+
+		function registrantList()
+		{
 			var form = document.adminForm;
-			if (form.from.value == 'history') {
-				location.href = '<?php echo JRoute::_('index.php?option=com_eventbooking&view=history&Itemid='.JRequest::getInt('Itemid', 0)); ?>';
-			}
-			else {
-				location.href = '<?php echo JRoute::_('index.php?option=com_eventbooking&view=registrants&Itemid='.JRequest::getInt('Itemid', 0)); ?>';
-			}
+			form.task.value = 'cancel_edit';
+			form.submit();
 		}
 		function cancelRegistration() {
 			var form = document.adminForm;
 			if (confirm("<?php echo JText::_('EB_CANCEL_REGISTRATION_CONFIRM'); ?>")) {
-				form.task.value = 'registrant.cancel';
+				form.task.value = 'cancel';
 				form.submit();
 			}
 		}
