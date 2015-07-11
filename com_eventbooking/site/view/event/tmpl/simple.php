@@ -250,6 +250,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	<input type="hidden" name="option" value="com_eventbooking" />
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 	<input type="hidden" name="task" value="save" />
+	<input type="hidden" name="return" value="<?php echo $this->return; ?>" />
 	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 </form>

@@ -542,6 +542,7 @@ $format = 'Y-m-d' ;
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
+	<input type="hidden" name="return" value="<?php echo $this->return; ?>" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 	<script type="text/javascript">
 		function addRow() {

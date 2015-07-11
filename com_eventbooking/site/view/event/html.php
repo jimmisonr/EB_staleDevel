@@ -357,6 +357,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$this->lists    = $lists;
 		$this->nullDate = $db->getNullDate();
 		$this->config   = $config;
+		$this->return   = $this->input->getString('return');
 
 		parent::display();
 	}

@@ -35,7 +35,15 @@ class EventbookingControllerEvent extends EventbookingController
 			$msg = JText::_('Error while saving event:' . $e->getMessage());
 		}
 
-		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', $this->input->getInt('Itemid')), false), $msg);
+		$return = base64_decode($this->input->getString('return'));
+		if ($return)
+		{
+			$this->setRedirect($return);
+		}
+		else
+		{
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', $this->input->getInt('Itemid')), false), $msg);
+		}
 	}
 
 	/**
@@ -68,7 +76,15 @@ class EventbookingControllerEvent extends EventbookingController
 		$model = $this->getModel('event');
 		$model->publish($id, $state);
 
-		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', $this->input->getInt('Itemid', 0)), false), $msg);
+		$return = base64_decode($this->input->getString('return'));
+		if ($return)
+		{
+			$this->setRedirect($return);
+		}
+		else
+		{
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', $this->input->getInt('Itemid', 0)), false), $msg);
+		}
 	}
 
 	/**
