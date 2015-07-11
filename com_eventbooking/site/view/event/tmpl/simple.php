@@ -248,7 +248,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 		}
 	</script>
 	<input type="hidden" name="option" value="com_eventbooking" />
-	<input type="hidden" name="cid[]" value="<?php echo $this->item->id; ?>" />
+	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 	<input type="hidden" name="task" value="save" />
 	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
 	<?php echo JHtml::_( 'form.token' ); ?>
