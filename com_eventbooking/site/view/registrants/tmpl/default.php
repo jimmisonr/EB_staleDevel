@@ -29,12 +29,12 @@ $return = base64_encode(JUri::getInstance()->toString());
 		Joomla.submitform( pressbutton );
 	}
 </script>
-<h1 class="eb_title"><?php echo JText::_('EB_REGISTRANT_LIST'); ?></h1>
+<h1 class="eb-page-heading"><?php echo JText::_('EB_REGISTRANT_LIST'); ?></h1>
 <div id="eb-registrants-management-page" class="eb-container">
 <form action="<?php JRoute::_('index.php?option=com_eventbooking&view=registrants&Itemid='.$this->Itemid );?>" method="post" name="adminForm" id="adminForm">
-	<table width="100%">
+	<table width="100%" style="margin-bottom: 5px;">
 		<tr>
-			<td align="left" width="40%">
+			<td align="left">
 				<?php echo JText::_( 'EB_FILTER' ); ?>:
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search'];?>" class="input-medium text_area search-query" onchange="document.adminForm.submit();" />
 				<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'EB_GO' ); ?></button>
@@ -42,7 +42,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 			<td style="float: right;">
 				<?php echo $this->lists['published'] ; ?>
 				<?php echo $this->lists['filter_event_id'] ; ?>
-				<button class="btn btn-small btn-success" onclick="checkData('add_registrant');" style="margin-top: 5px;">
+				<button class="btn btn-small btn-primary" onclick="checkData('add_registrant');">
 					<span class="icon-new icon-white"></span><?php echo JText::_('EB_NEW_REGISTRANTS'); ?></button>
 			</td>
 		</tr>

@@ -15,9 +15,20 @@ class EventbookingViewRegistrantsHtml extends RADViewHtml
 
 	public function display()
 	{
-		EventbookingHelper::checkRegistrantsAccess();
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$user        = JFactory::getUser();
+		if (!$user->authorise('eventbooking.registrants_management', 'com_eventbooking'))
+		{
+			if ($user->get('guest'))
+			{
+				JFactory::getApplication()->redirect('index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString()));
+			}
+			else
+			{
+				JFactory::getApplication()->redirect('index.php', JText::_('NOT_AUTHORIZED'));
+			}
+		}
+
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$db          = JFactory::getDbo();
 		$query       = $db->getQuery(true);
 		$config      = EventbookingHelper::getConfig();

@@ -3853,18 +3853,6 @@ class EventbookingHelper
 	}
 
 	/**
-	 *
-	 * Check the access to registrants history from frontend
-	 */
-	public static function checkRegistrantsAccess()
-	{
-		if (!JFactory::getUser()->authorise('eventbooking.registrants_management', 'com_eventbooking'))
-		{
-			JFactory::getApplication()->redirect('index.php', JText::_('NOT_AUTHORIZED'));
-		}
-	}
-
-	/**
 	 * Check to see whether the current users can access View List function
 	 */
 	public static function canViewRegistrantList()
