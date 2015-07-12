@@ -17,7 +17,6 @@ class EventbookingViewSearchHtml extends RADViewHtml
 	{
 		$document   = JFactory::getDocument();
 		$model      = $this->getModel();
-		$state      = $model->getState();
 		$items      = $model->getData();
 		$pagination = $model->getPagination();
 		$document->setTitle(JText::_('EB_SEARCH_RESULT'));
@@ -52,19 +51,7 @@ class EventbookingViewSearchHtml extends RADViewHtml
 			}
 			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
 		}
-		$pagination->setAdditionalUrlParam('view', 'search');
-		if ($state->category_id)
-		{
-			$pagination->setAdditionalUrlParam('category_id', $state->category_id);
-		}
-		if ($state->location_id)
-		{
-			$pagination->setAdditionalUrlParam('location_id', $state->location_id);
-		}
-		if ($state->search)
-		{
-			$pagination->setAdditionalUrlParam('search', $state->search);
-		}
+
 		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)
 		{
 			EventbookingHelperData::prepareCustomFieldsData($items);

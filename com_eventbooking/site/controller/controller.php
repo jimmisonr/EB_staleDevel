@@ -123,6 +123,43 @@ class EventbookingController extends RADController
 		}
 	}
 
+	/***
+	 * Get search parameters from search module and performing redirect
+	 */
+	public function search()
+	{
+		$categoryId = $this->input->getInt('category_id', 0);
+		$locationId = $this->input->getInt('location_id', 0);
+		$Itemid     = $this->input->getInt('Itemid', 0);
+		$search     = $this->input->getString('search', '');
+		$layout     = $this->input->getCmd('layout', '');
+
+		$url = 'index.php?option=com_eventbooking&view=search';
+		if ($categoryId)
+		{
+			$url .= '&category_id=' . $categoryId;
+		}
+
+		if ($locationId)
+		{
+			$url .= '&location_id=' . $locationId;
+		}
+
+		if ($search)
+		{
+			$url .= '&search=' . $search;
+		}
+
+		if ($layout && ($layout != 'default'))
+		{
+			$url .= '&layout=' . $layout;
+		}
+
+		$url .= '&Itemid=' . $Itemid;
+
+		$this->app->redirect(JRoute::_($url, false, 0));
+	}
+
 	/**
 	 * Validate the username, make sure it has not been registered by someone else
 	 */

@@ -1,16 +1,16 @@
 <?php
 /**
- * @version		1.5.0
- * @package		Joomla
- * @subpackage	Event Booking
- * @author  Tuan Pham Ngoc
- * @copyright	Copyright (C) 2010 Ossolution Team
- * @license		GNU/GPL, see LICENSE.php
- */	
-defined('_JEXEC') or die ;
+ * @version        2.0.0
+ * @package        Joomla
+ * @subpackage     Event Booking
+ * @author         Tuan Pham Ngoc
+ * @copyright      Copyright (C) 2010 Ossolution Team
+ * @license        GNU/GPL, see LICENSE.php
+ */
+defined('_JEXEC') or die;
 $output = '<input name="search" id="search_eb_box" maxlength="50"  class="inputbox" type="text" size="20" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';		
 ?>					
-<form method="post" name="eb_search_form" id="eb_search_form" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=search&layout='.$layout.'&Itemid='.$itemId);  ?>">
+<form method="post" name="eb_search_form" id="eb_search_form" action="<?php echo JRoute::_('index.php?option=com_eventbooking&task=search&&Itemid='.$itemId);  ?>">
     <table width="100%" class="search_table">
     	<tr>
     		<td>
@@ -56,4 +56,6 @@ $output = '<input name="search" id="search_eb_box" maxlength="50"  class="inputb
         	form.submit();
     	}
     </script>
+
+	<input type="hidden" name="layout" value="<?php echo $layout; ?>" />
 </form>
