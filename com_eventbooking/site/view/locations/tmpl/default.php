@@ -12,8 +12,8 @@ defined('_JEXEC') or die;
 
 ?>
 <h1 class="eb_title"><?php echo JText::_('EB_LOCATIONS_MANAGEMENT'); ?>
-	<span class="add_location_link" style="padding-left:25px; font-size: 16px;"><a
-			href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=location&layout=form&Itemid=' . $this->Itemid); ?>"><?php echo JText::_('EB_SUBMIT_LOCATION'); ?></a></span>
+	<span class="add_location_link" style="float: right; font-size:14px;"><a
+			href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=location&layout=form&Itemid=' . $this->Itemid); ?>"><i class="icon-plus"></i></i><?php echo JText::_('EB_SUBMIT_LOCATION'); ?></a></span>
 </h1>
 <form method="post" name="adminForm" id="adminForm"
       action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=locations&Itemid=' . $this->Itemid);; ?>">

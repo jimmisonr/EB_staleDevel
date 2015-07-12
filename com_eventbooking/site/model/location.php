@@ -132,10 +132,13 @@ class EventbookingModelLocation extends EventbookingModelList
 	{
 		if (count($cid))
 		{
-			$db   = $this->getDbo();
-			$cids = implode(',', $cid);
-			$sql  = 'DELETE FROM #__eb_locations WHERE id IN (' . $cids . ')';
-			$db->setQuery($sql);
+			$db    = $this->getDbo();
+			$query = $db->getQuery(true);
+			$cids  = implode(',', $cid);
+			$query->delete('#__eb_locations')
+				->where('id IN (' . $cids . ')')
+				->where('user_id = ' . (int) JFactory::getUser()->id);
+			$db->setQuery($query);
 			if (!$db->execute())
 			{
 				return false;
