@@ -61,11 +61,18 @@ class EventbookingViewInviteHtml extends RADViewHtml
 			}
 
 			$eventId = $this->input->getInt('id');
-
+			$name    = $this->input->getString('name');
+			if (empty($name))
+			{
+				$name = $user->get('name');
+			}
 			$this->event           = EventbookingHelperDatabase::getEvent($eventId);
-			$this->user            = $user;
+			$this->name            = $name;
 			$this->inviteMessage   = $inviteMessage;
 			$this->showCaptcha     = $showCaptcha;
+			$this->friendNames     = $this->input->getString('friend_names');
+			$this->friendEmails    = $this->input->getString('friend_emails');
+			$this->mesage          = $this->input->getString('message');
 			$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
 			parent::display();

@@ -28,7 +28,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			<?php echo JText::_('EB_NAME'); ?>
 		</label>
 		<div class="<?php echo $controlsClass; ?>">
-			<input type="text" name="name" value="<?php echo JRequest::getVar('name') ? JRequest::getVar('name') : $this->user->get('name'); ?>" class="validate[required] inputbox" size="50" />
+			<input type="text" name="name" value="<?php echo $this->nam; ?>" class="validate[required] inputbox" size="50" />
 		</div>
 	</div>
 	<div class="<?php echo $controlGroupClass; ?>">
@@ -38,7 +38,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			<small><?php echo JText::_('EB_ONE_NAME_ONE_LINE'); ?></small>
 		</label>
 		<div class="<?php echo $controlsClass; ?>">
-			<textarea rows="5" cols="50" name="friend_names" class="validate[required] inputbox"><?php echo JRequest::getVar('friend_names'); ?></textarea>
+			<textarea rows="5" cols="50" name="friend_names" class="validate[required] inputbox"><?php echo $this->friendNames; ?></textarea>
 		</div>
 	</div>
 	<div class="<?php echo $controlGroupClass; ?>">
@@ -48,7 +48,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			<small><?php echo JText::_('EB_ONE_NAME_ONE_LINE'); ?></small>
 		</label>
 		<div class="<?php echo $controlsClass; ?>">
-			<textarea rows="5" cols="50" name="friend_emails" class="validate[required] inputbox"><?php echo JRequest::getVar('friend_emails');?></textarea>
+			<textarea rows="5" cols="50" name="friend_emails" class="validate[required] inputbox"><?php echo $this->friendEmails;?></textarea>
 		</div>
 	</div>
 	<div class="<?php echo $controlGroupClass; ?>">
@@ -56,7 +56,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			<?php echo JText::_('EB_MESSAGE'); ?>
 		</label>
 		<div class="<?php echo $controlsClass; ?>">
-			<textarea rows="10" cols="80" name="message" class="inputbox"><?php echo JRequest::getVar('message'); ?></textarea>
+			<textarea rows="10" cols="80" name="message" class="inputbox"><?php echo $this->mesage; ?></textarea>
 		</div>
 	</div>
 	<?php
@@ -96,5 +96,6 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	<input type="hidden" name="task" value="event.send_invite" />
 	<input type="hidden" name="event_id" value="<?php echo $this->event->id; ?>" />
 	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
+	<?php echo JHtml::_( 'form.token' ); ?>
 </form>
 </div>

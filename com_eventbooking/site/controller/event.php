@@ -93,6 +93,7 @@ class EventbookingControllerEvent extends EventbookingController
 	 */
 	public function send_invite()
 	{
+		$this->csrfProtection();
 		$config = EventbookingHelper::getConfig();
 		if ($config->show_invite_friend)
 		{
