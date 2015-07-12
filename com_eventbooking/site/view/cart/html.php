@@ -50,14 +50,14 @@ class EventbookingViewCartHtml extends RADViewHtml
 			$item = $items[$i];
 			if ($item->event_capacity == 0)
 			{
-				$availbleQuantity = -1;
+				$availableQuantity = -1;
 			}
 			else
 			{
-				$availbleQuantity = $item->event_capacity - $item->total_registrants;
+				$availableQuantity = $item->event_capacity - $item->total_registrants;
 			}
 			$jsString .= "arrEventIds[$i] = $item->id ;\n";
-			$jsString .= "arrQuantities[$i] = $availbleQuantity ;\n";
+			$jsString .= "arrQuantities[$i] = $availableQuantity ;\n";
 		}
 		$this->items           = $items;
 		$this->config          = $config;
