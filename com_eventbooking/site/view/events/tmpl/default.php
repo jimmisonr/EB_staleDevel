@@ -9,18 +9,22 @@
  */
 // no direct access
 defined('_JEXEC') or die;
+if (version_compare(JVERSION, '3.0', 'ge'))
+{
+	JHtml::_('formbehavior.chosen', 'select');
+}
+$return = base64_encode(JUri::getInstance()->toString());
 ?>
 <h1 class="eb-page-heading"><?php echo JText::_('EB_USER_EVENTS'); ?></h1>
 <form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=events&Itemid='.$this->Itemid); ; ?>">
-	<table width="100%">
+	<table width="100%" style="margin-bottom: 5px;">
 		<tr>
 			<td align="left">
 				<?php echo JText::_( 'EB_FILTER' ); ?>:
-				<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->lists['filter_search'];?>" class="input-medium" onchange="document.adminForm.submit();" />
+				<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->lists['filter_search'];?>" class="input-medium text_area search-query" onchange="document.adminForm.submit();" />
 				<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'EB_GO' ); ?></button>
-				<button onclick="document.getElementById('filter_search').value='';this.form.submit();" class="btn"><?php echo JText::_( 'EB_RESET' ); ?></button>
 			</td >
-			<td style="text-align: right;">
+			<td style="float: right;">
 				<?php echo $this->lists['filter_category_id'] ; ?>
 			</td>
 		</tr>
@@ -64,7 +68,7 @@ defined('_JEXEC') or die;
 				$k = 0;
 				for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 				{
-					$row = &$this->items[$i];
+					$row = $this->items[$i];
 					$link 	= JRoute::_(EventbookingHelperRoute::getEventRoute($row->id, 0, $this->Itemid));
 					?>
 					<tr class="<?php echo "row$k"; ?>">
@@ -73,17 +77,17 @@ defined('_JEXEC') or die;
 								<?php echo $row->title ; ?>
 							</a>
 							<span class="pull-right">
-								<a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id='.$row->id.'&Itemid='.$this->Itemid); ?>"><i class="icon-pencil"></i><?php echo JText::_('EB_EDIT'); ?></a>
+								<a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id='.$row->id.'&Itemid='.$this->Itemid.'&return='.$return); ?>"><i class="icon-pencil"></i><?php echo JText::_('EB_EDIT'); ?></a>
 								<?php
 								if ($row->published == 1)
 								{
-									$link = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id='.$row->id.'&Itemid='.$this->Itemid);
+									$link = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id='.$row->id.'&Itemid='.$this->Itemid.'&return='.$return);
 									$text = JText::_('EB_UNPUBLISH');
 									$class = 'icon-unpublish';
 								}
 								else
 								{
-									$link = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id='.$row->id.'&Itemid='.$this->Itemid);
+									$link = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id='.$row->id.'&Itemid='.$this->Itemid.'&return='.$return);
 									$text = JText::_('EB_PUBLISH');
 									$class = 'icon-publish';
 								}
