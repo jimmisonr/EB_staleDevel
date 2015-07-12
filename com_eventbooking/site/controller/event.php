@@ -179,6 +179,14 @@ class EventbookingControllerEvent extends EventbookingController
 	 */
 	public function cancel()
 	{
-		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=events&Itemid=' . $this->input->getInt('Itemid', 0), false));
+		$return = base64_decode($this->input->getString('return'));
+		if ($return)
+		{
+			$this->setRedirect($return);
+		}
+		else
+		{
+			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=events&Itemid=' . $this->input->getInt('Itemid', 0), false));
+		}
 	}
 }
