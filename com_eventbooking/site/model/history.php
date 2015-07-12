@@ -22,37 +22,13 @@ class EventbookingModelHistory extends RADModelList
 	{
 		$config['table']         = '#__eb_registrants';
 		$config['search_fields'] = 'b.title';
+		$config['clear_join']    = false;
 		parent::__construct($config);
 		$this->state->insert('filter_event_id', 'int', 0)
 			->insert('filter_order', 'cmd', 'tbl.register_date')
 			->insert('filter_order_Dir', 'word', 'DESC');
 	}
-
-	/**
-	 * Get total registration records of the user
-	 *
-	 * @return int
-	 */
-	public function getTotal()
-	{
-		if (empty($this->total))
-		{
-			$db    = $this->getDbo();
-			$query = clone $this->query;
-			$query->clear('select')
-				->clear('group')
-				->clear('having')
-				->clear('order')
-				->clear('limit')
-				->clear('offset')
-				->select('COUNT(*)');
-			$db->setQuery($query);
-			$this->total = (int) $db->loadResult();
-		}
-
-		return $this->total;
-	}
-
+	
 	/**
 	 * Builds SELECT columns list for the query
 	 *

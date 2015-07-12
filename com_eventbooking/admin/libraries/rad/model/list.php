@@ -65,6 +65,13 @@ class RADModelList extends RADModel
 	public $rememberStates = true;
 
 	/**
+	 * Clear join clause for getTotal method
+	 *
+	 * @var bool
+	 */
+	protected $clearJoin = true;
+
+	/**
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
@@ -94,6 +101,12 @@ class RADModelList extends RADModel
 		{
 			$this->stateField = 'tbl.state';
 		}
+
+		if (isset($config['clear_join']))
+		{
+			$this->clearJoin = $config['clear_join'];
+		}
+
 		$this->state->insert('limit', 'int', JFactory::getConfig()->get('list_limit'))
 			->insert('limitstart', 'int', 0)
 			->insert('filter_order', 'cmd', $defaultOrdering)
@@ -162,7 +175,7 @@ class RADModelList extends RADModel
 					}
 				}
 			}
-			
+
 			$db->setQuery($query, $this->state->limitstart, $this->state->limit);
 			$this->data = $db->loadObjectList();
 
@@ -186,13 +199,18 @@ class RADModelList extends RADModel
 			$db    = $this->getDbo();
 			$query = clone $this->query;
 			$query->clear('select')
-				->clear('join')
 				->clear('group')
 				->clear('having')
 				->clear('order')
 				->clear('limit')
 				->clear('offset')
 				->select('COUNT(*)');
+
+			if ($this->clearJoin)
+			{
+				$query->clear('join');
+			}
+
 			$db->setQuery($query);
 			$this->total = (int) $db->loadResult();
 		}
