@@ -39,7 +39,8 @@
     <filename>fields.xml</filename>
     <folder>controller</folder>	
     <folder>model</folder>		    
-    <folder>view</folder>        
+    <folder>view</folder>
+	<folder>views</folder>	
     <folder>helper</folder>
     <folder>payments</folder>
     <folder>assets</folder>    
