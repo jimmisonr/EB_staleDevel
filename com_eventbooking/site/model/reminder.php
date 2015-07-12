@@ -8,14 +8,8 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
-/**
- * Event Booking Component Event Model
- *
- * @package        Joomla
- * @subpackage     Event Booking
- */
 class EventBookingModelReminder extends JModelLegacy
 {
 
