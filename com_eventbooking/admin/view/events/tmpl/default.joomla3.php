@@ -52,11 +52,7 @@ if ($saveOrder)
 		<?php
 			echo $this->lists['filter_category_id'] ;
 			echo $this->lists['filter_location_id'] ;
-			echo $this->lists['filter_state'] ;
-			if (JLanguageMultilang::isEnabled())
-			{
-				echo $this->lists['filter_language'];
-			}
+			echo $this->lists['filter_state'] ;		
 			echo $this->lists['filter_past_events'];
 			echo $this->pagination->getLimitBox();
 		?>

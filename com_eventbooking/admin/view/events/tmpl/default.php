@@ -30,10 +30,6 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 			echo $this->lists['filter_category_id'] ;
 			echo $this->lists['filter_location_id'] ;
 			echo $this->lists['filter_state'] ;
-			if (JLanguageMultilang::isEnabled())
-			{
-				echo $this->lists['filter_language'];
-			}
 			echo $this->lists['filter_past_events'];
 			if (version_compare(JVERSION, '3.0', 'ge'))
 			{
