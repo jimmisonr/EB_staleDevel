@@ -21,14 +21,14 @@ class EventbookingModelHistory extends RADModelList
 	public function __construct($config = array())
 	{
 		$config['table']         = '#__eb_registrants';
-		$config['search_fields'] = 'b.title';
+		$config['search_fields'] = array('b.title');
 		$config['clear_join']    = false;
 		parent::__construct($config);
 		$this->state->insert('filter_event_id', 'int', 0)
 			->insert('filter_order', 'cmd', 'tbl.register_date')
 			->insert('filter_order_Dir', 'word', 'DESC');
 	}
-	
+
 	/**
 	 * Builds SELECT columns list for the query
 	 *
@@ -67,8 +67,6 @@ class EventbookingModelHistory extends RADModelList
 	 */
 	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
-		parent::buildQueryWhere($query);
-
 		$user   = JFactory::getUser();
 		$state  = $this->getState();
 		$config = EventbookingHelper::getConfig();
@@ -91,6 +89,6 @@ class EventbookingModelHistory extends RADModelList
 			$query->where('tbl.group_id = 0');
 		}
 
-		return $this;
+		return parent::buildQueryWhere($query);
 	}
 }
