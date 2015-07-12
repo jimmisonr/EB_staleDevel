@@ -21,8 +21,6 @@ class EventbookingModelCategories extends RADModelList
 	 */
 	public function __construct($config = array())
 	{
-		$config['table'] = '#__eb_categories';
-
 		parent::__construct($config);
 
 		$this->state->insert('id', 'int', 0)
