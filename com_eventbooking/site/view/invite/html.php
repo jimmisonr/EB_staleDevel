@@ -60,8 +60,7 @@ class EventbookingViewInviteHtml extends RADViewHtml
 				}
 			}
 
-			$eventId = $this->input->getInt('event_id');
-
+			$eventId = $this->input->getInt('id');
 
 			$this->event           = EventbookingHelperDatabase::getEvent($eventId);
 			$this->user            = $user;

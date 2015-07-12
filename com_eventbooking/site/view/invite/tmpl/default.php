@@ -93,8 +93,8 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			})
 	</script>
 	<input type="hidden" name="option" value="com_eventbooking" />
-	<input type="hidden" name="task" value="send_invite" />
+	<input type="hidden" name="task" value="event.send_invite" />
 	<input type="hidden" name="event_id" value="<?php echo $this->event->id; ?>" />
-	<input type="hidden" name="Itemid" value="<?php echo JRequest::getInt('Itemid', 0); ?>" />
+	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
 </form>
 </div>
