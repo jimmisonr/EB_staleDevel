@@ -11,27 +11,30 @@
 defined('_JEXEC') or die;
 $cols = 6;
 $return = base64_encode(JUri::getInstance()->toString());
+if (version_compare(JVERSION, '3.0', 'ge'))
+{
+	JHtml::_('formbehavior.chosen', 'select');
+}
 ?>
 <div id="eb-registration-history-page" class="eb-container row-fluid eb-event">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_REGISTRATION_HISTORY'); ?></h1>
 <form action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=history&Itemid='.$this->Itemid); ; ?>" method="post" name="adminForm"  id="adminForm">
+	<table width="100%" class="hidden-phone" style="margin-bottom: 5px;">
+		<tr>
+			<td align="left">
+				<?php echo JText::_( 'EB_FILTER' ); ?>:
+				<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->lists['search'];?>" class="input-medium text_area search-query" onchange="document.adminForm.submit();" />
+				<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'EB_GO' ); ?></button>
+			</td >
+			<td style="float: right;">
+				<?php echo $this->lists['filter_event_id']; ?>
+			</td>
+		</tr>
+	</table>
 <?php
 	if (count($this->items))
 	{
 	?>
-	<table width="100%" class="hidden-phone">
-		<tr>
-			<td align="left">
-				<?php echo JText::_( 'EB_FILTER' ); ?>:
-				<input type="text" name="search" id="search" value="<?php echo $this->lists['search'];?>" class="text_area" onchange="document.adminForm.submit();" />
-				<button onclick="this.form.submit();"><?php echo JText::_( 'EB_GO' ); ?></button>
-				<button onclick="document.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'EB_RESET' ); ?></button>
-			</td >
-			<td style="text-align: right;">
-				<?php echo $this->lists['event_id']; ?>
-			</td>
-		</tr>
-	</table>
 	<table class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
@@ -168,10 +171,9 @@ $return = base64_encode(JUri::getInstance()->toString());
 	}
 	else
 	{
-		echo '<div align="center" class="info">'.JText::_('EB_YOU_HAVENT_REGISTER_FOR_EVENTS').'</div>' ;
+		echo '<div class="text-info">'.JText::_('EB_NO_REGISTRATION_RECORDS').'</div>' ;
 	}
 ?>
-	<input type="hidden" name="option" value="com_eventbooking" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />

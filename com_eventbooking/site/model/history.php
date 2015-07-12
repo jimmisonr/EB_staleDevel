@@ -8,17 +8,22 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingModelHistory extends RADModelList
 {
-
+	/**
+	 * Instantiate the model.
+	 *
+	 * @param array $config configuration data for the model
+	 *
+	 */
 	public function __construct($config = array())
 	{
-		$config = array_merge($config, array('table' => '#__eb_registrants'));
+		$config['table']         = '#__eb_registrants';
+		$config['search_fields'] = 'b.title';
 		parent::__construct($config);
-		$this->state->insert('event_id', 'int', 0)
-			->insert('search', 'string', '')
+		$this->state->insert('filter_event_id', 'int', 0)
 			->insert('filter_order', 'cmd', 'tbl.register_date')
 			->insert('filter_order_Dir', 'word', 'DESC');
 	}
@@ -33,11 +38,14 @@ class EventbookingModelHistory extends RADModelList
 		if (empty($this->total))
 		{
 			$db    = $this->getDbo();
-			$query = $db->getQuery(true);
-			$query->select('COUNT(*)');
-			$this->buildQueryFrom($query)
-				->buildQueryJoins($query)
-				->buildQueryWhere($query);
+			$query = clone $this->query;
+			$query->clear('select')
+				->clear('group')
+				->clear('having')
+				->clear('order')
+				->clear('limit')
+				->clear('offset')
+				->select('COUNT(*)');
 			$db->setQuery($query);
 			$this->total = (int) $db->loadResult();
 		}
@@ -83,25 +91,25 @@ class EventbookingModelHistory extends RADModelList
 	 */
 	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
-		$db     = $this->getDbo();
+		parent::buildQueryWhere($query);
+
 		$user   = JFactory::getUser();
 		$state  = $this->getState();
 		$config = EventbookingHelper::getConfig();
+
 		$query->where('(tbl.published=1 OR tbl.payment_method LIKE "os_offline%")')->where(
 			'(tbl.user_id =' . $user->get('id') . ' OR tbl.email="' . $user->get('email') . '")');
-		if ($state->event_id)
+
+		if ($state->filter_event_id)
 		{
-			$query->where('tbl.event_id=' . $state->event_id);
+			$query->where('tbl.event_id=' . $state->filter_event_id);
 		}
-		if ($state->search)
-		{
-			$search = $db->Quote('%' . $db->escape($state->search, true) . '%', false);
-			$query->where('LOWER(b.title) LIKE ' . $search);
-		}
+
 		if (isset($config->include_group_billing_in_registrants) && !$config->include_group_billing_in_registrants)
 		{
 			$query->where('tbl.is_group_billing = 0 ');
 		}
+
 		if (!$config->include_group_members_in_registrants)
 		{
 			$query->where('tbl.group_id = 0');

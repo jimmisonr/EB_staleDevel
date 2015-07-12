@@ -8,41 +8,31 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingViewHistoryHtml extends RADViewHtml
 {
 
 	public function display()
 	{
-		$user = JFactory::getUser();
-		if (!$user->id)
+		if (!JFactory::getUser()->id)
 		{
 			JFactory::getApplication()->redirect('index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString()));
-
-			return;
 		}
+
 		$model              = $this->getModel();
 		$state              = $model->getState();
 		$config             = EventbookingHelper::getConfig();
-		$fieldSuffix        = EventbookingHelper::getFieldSuffix();
-		$lists['search']    = JString::strtolower($state->search);
+		$lists['search']    = JString::strtolower($state->filter_search);
 		$lists['order_Dir'] = $state->filter_order_Dir;
 		$lists['order']     = $state->filter_order;
-		//Get list of document		
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('id, title' . $fieldSuffix . ' AS title, event_date')
-			->from('#__eb_events')
-			->where('published = 1')
-			->where('id IN (SELECT event_id FROM #__eb_registrants AS tbl WHERE (tbl.published=1 OR tbl.payment_method LIKE "os_offline%") AND (tbl.user_id =' . $user->get('id') . ' OR tbl.email="' . $user->get('email') . '"))')
-			->order('title');
-		$db->setQuery($query);
+
+		//Get list of events
+		$rows      = EventbookingHelperDatabase::getAllEvents();
 		$options   = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_SELECT_EVENT'), 'id', 'title');
 		if ($config->show_event_date)
 		{
-			$rows = $db->loadObjectList();
 			for ($i = 0, $n = count($rows); $i < $n; $i++)
 			{
 				$row       = $rows[$i];
@@ -52,15 +42,15 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 		}
 		else
 		{
-			$options = array_merge($options, $db->loadObjectList());
+			$options = array_merge($options, $rows);
 		}
 
-		$lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id', ' class="inputbox" onchange="submit();"', 'id', 'title',
-			$state->event_id);
-		$this->lists       = $lists;
-		$this->items       = $model->getData();
-		$this->pagination  = $model->getPagination();
-		$this->config      = $config;
+		$lists['filter_event_id'] = JHtml::_('select.genericlist', $options, 'filter_event_id', 'class="input-xlarge" onchange="submit();"', 'id', 'title',
+			$state->filter_event_id);
+		$this->lists              = $lists;
+		$this->items              = $model->getData();
+		$this->pagination         = $model->getPagination();
+		$this->config             = $config;
 
 		parent::display();
 	}
