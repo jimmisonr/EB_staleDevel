@@ -2025,6 +2025,14 @@ class EventbookingController extends RADControllerAdmin
 			}
 		}
 
+		// We don't need views folder for Joomla 3
+		if (version_compare(JVERSION, '3.0', 'ge'))
+		{
+			if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/views'))
+			{
+				JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/views');
+			}
+		}
 		// Redirect to dashboard view
 		$installType = $this->input->getCmd('install_type', '');
 		if ($installType == 'install')
