@@ -19,6 +19,7 @@ if ($app->isAdmin())
 else
 {
 	JLoader::register('EventbookingModelRegistrants', JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/registrants.php');
+	JLoader::register('EventbookingModelEvents', JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/events.php');
 }
 JLoader::register('os_payments', JPATH_ROOT . '/components/com_eventbooking/payments/os_payments.php');
 JLoader::register('os_payment', JPATH_ROOT . '/components/com_eventbooking/payments/os_payment.php');

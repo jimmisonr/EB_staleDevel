@@ -94,6 +94,11 @@ class EventbookingModelEvents extends RADModelList
 			$query->where('DATE(tbl.event_date) >= CURDATE()');
 		}
 
+		if (JFactory::getApplication()->isSite())
+		{
+			$query->where('tbl.created_by=' . (int) JFactory::getUser()->id);
+		}
+
 		return parent::buildQueryWhere($query);
 	}
 
