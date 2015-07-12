@@ -24,6 +24,7 @@ class EventbookingControllerEvent extends EventbookingController
 	 */
 	public function save()
 	{
+		$this->csrfProtection();
 		$model = $this->getModel('event');
 		try
 		{
