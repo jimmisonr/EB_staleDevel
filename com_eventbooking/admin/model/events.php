@@ -81,6 +81,7 @@ class EventbookingModelEvents extends RADModelList
 	 */
 	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
+		$app = JFactory::getApplication();
 		if ($this->state->filter_category_id)
 		{
 			$query->where('tbl.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id=' . $this->state->filter_category_id . ')');
@@ -89,12 +90,12 @@ class EventbookingModelEvents extends RADModelList
 		{
 			$query->where('tbl.location_id=' . $this->state->filter_location_id);
 		}
-		if ($this->state->filter_past_events == 0)
+		if ($this->state->filter_past_events == 0 && $app->isAdmin())
 		{
 			$query->where('DATE(tbl.event_date) >= CURDATE()');
 		}
 
-		if (JFactory::getApplication()->isSite())
+		if ($app->isSite())
 		{
 			$query->where('tbl.created_by=' . (int) JFactory::getUser()->id);
 		}
