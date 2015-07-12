@@ -36,11 +36,11 @@ $return = base64_encode(JUri::getInstance()->toString());
 		<tr>
 			<td align="left">
 				<?php echo JText::_( 'EB_FILTER' ); ?>:
-				<input type="text" name="search" id="search" value="<?php echo $this->lists['search'];?>" class="input-medium text_area search-query" onchange="document.adminForm.submit();" />
+				<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->lists['search'];?>" class="input-medium text_area search-query" onchange="document.adminForm.submit();" />
 				<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'EB_GO' ); ?></button>
 			</td >
 			<td style="float: right;">
-				<?php echo $this->lists['published'] ; ?>
+				<?php echo $this->lists['filter_published'] ; ?>
 				<?php echo $this->lists['filter_event_id'] ; ?>
 				<input type="button" class="btn btn-small btn-primary" onclick="checkData('add_registrant');" value="<?php echo JText::_('EB_NEW_REGISTRANTS'); ?>" />
 			</td>

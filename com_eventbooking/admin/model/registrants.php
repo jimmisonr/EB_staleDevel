@@ -128,6 +128,11 @@ class EventbookingModelRegistrants extends RADModelList
 			$query->where(' tbl.group_id = 0 ');
 		}
 
+		if (JFactory::getApplication()->isSite() && $config->only_show_registrants_of_event_owner)
+		{
+			$query->where('tbl.event_id IN (SELECT id FROM #__eb_events WHERE created_by =' . JFactory::getUser()->id . ')');
+		}
+
 		return parent::buildQueryWhere($query);
 	}
 }

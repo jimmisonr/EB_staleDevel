@@ -8,14 +8,14 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingViewRegistrantsHtml extends RADViewHtml
 {
 
 	public function display()
 	{
-		$user        = JFactory::getUser();
+		$user = JFactory::getUser();
 		if (!$user->authorise('eventbooking.registrants_management', 'com_eventbooking'))
 		{
 			if ($user->get('guest'))
@@ -62,20 +62,20 @@ class EventbookingViewRegistrantsHtml extends RADViewHtml
 		}
 		$lists['filter_event_id']  = JHtml::_('select.genericlist', $options, 'filter_event_id', ' class="inputbox" onchange="submit();"', 'id', 'title',
 			$state->filter_event_id);
-		$options            = array();
-		$options[]          = JHtml::_('select.option', -1, JText::_('EB_REGISTRATION_STATUS'));
-		$options[]          = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
-		$options[]          = JHtml::_('select.option', 1, JText::_('EB_PAID'));
-		$options[]          = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
-		$lists['published'] = JHtml::_('select.genericlist', $options, 'published', ' class="input-medium" onchange="submit()" ', 'value', 'text',
-			$state->published);
-		$lists['search']    = $state->search;
-		$lists['order_Dir'] = $state->filter_order_Dir;
-		$lists['order']     = $state->filter_order;
-		$this->lists        = $lists;
-		$this->items        = $model->getData();
-		$this->pagination   = $model->getPagination();
-		$this->config       = $config;
+		$options                   = array();
+		$options[]                 = JHtml::_('select.option', -1, JText::_('EB_REGISTRATION_STATUS'));
+		$options[]                 = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
+		$options[]                 = JHtml::_('select.option', 1, JText::_('EB_PAID'));
+		$options[]                 = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
+		$lists['filter_published'] = JHtml::_('select.genericlist', $options, 'filter_published', ' class="input-medium" onchange="submit()" ', 'value', 'text',
+			$state->filter_published);
+		$lists['search']           = $state->filter_search;
+		$lists['order_Dir']        = $state->filter_order_Dir;
+		$lists['order']            = $state->filter_order;
+		$this->lists               = $lists;
+		$this->items               = $model->getData();
+		$this->pagination          = $model->getPagination();
+		$this->config              = $config;
 
 		parent::display();
 	}
