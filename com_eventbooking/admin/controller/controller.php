@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
@@ -16,15 +16,15 @@ class EventbookingController extends RADControllerAdmin
 	public function display($cachable = false, array $urlparams = array())
 	{
 		JFactory::getDocument()->addStyleSheet(JURI::base(true) . '/components/com_eventbooking/assets/css/style.css');
-		
+
 		parent::display($cachable, $urlparams);
-		
+
 		if (version_compare(JVERSION, '3.0', 'le'))
 		{
 			EventbookingHelper::loadJQuery();
 			EventbookingHelper::loadBootstrap();
 		}
-		
+
 		if ($this->input->getCmd('format', 'html') != 'raw')
 		{
 			EventbookingHelper::displayCopyRight();
@@ -36,10 +36,10 @@ class EventbookingController extends RADControllerAdmin
 	 */
 	public function resend_email()
 	{
-		$cid = $this->input->get('cid', array(), 'array');
-		$id = (int) $cid[0];
+		$cid   = $this->input->get('cid', array(), 'array');
+		$id    = (int) $cid[0];
 		$model = $this->getModel('Registrant');
-		$ret = $model->resendEmail($id);
+		$ret   = $model->resendEmail($id);
 		if ($ret)
 		{
 			$this->setMessage(JText::_('EB_EMAIL_SUCCESSFULLY_RESENT'));
@@ -51,17 +51,18 @@ class EventbookingController extends RADControllerAdmin
 
 		$this->setRedirect('index.php?option=com_eventbooking&view=registrants');
 	}
+
 	/**
-     * Export registrants into a CSV file
-     */
+	 * Export registrants into a CSV file
+	 */
 	public function csv_export()
 	{
 		set_time_limit(0);
 		require_once JPATH_ROOT . '/components/com_eventbooking/helper/data.php';
-		$db = JFactory::getDBO();
-		$config = EventbookingHelper::getConfig();
-		$eventId = JRequest::getInt('filter_event_id');		
-		$where = array();
+		$db      = JFactory::getDBO();
+		$config  = EventbookingHelper::getConfig();
+		$eventId = JRequest::getInt('filter_event_id');
+		$where   = array();
 		$where[] = '(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published NOT IN (2,3)))';
 		if ($eventId)
 		{
@@ -78,12 +79,12 @@ class EventbookingController extends RADControllerAdmin
 		if ($config->show_coupon_code_in_registrant_list)
 		{
 			$sql = 'SELECT a.*, b.event_date, b.title AS event_title, c.code AS coupon_code FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id = b.id LEFT JOIN #__eb_coupons AS c ON a.coupon_id=c.id WHERE ' .
-				 implode(' AND ', $where) . ' ORDER BY a.id ';
+				implode(' AND ', $where) . ' ORDER BY a.id ';
 		}
 		else
 		{
 			$sql = 'SELECT a.*, b.event_date, b.title AS event_title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id = b.id WHERE ' .
-				 implode(' AND ', $where) . ' ORDER BY a.id ';
+				implode(' AND ', $where) . ' ORDER BY a.id ';
 		}
 		$db->setQuery($sql);
 		$rows = $db->loadObjectList();
@@ -121,19 +122,19 @@ class EventbookingController extends RADControllerAdmin
 		$db->setQuery($sql);
 		$registrantIds = array(0);
 		$registrantIds = array_merge($registrantIds, $db->loadColumn());
-		$sql = 'SELECT registrant_id, field_id, field_value FROM #__eb_field_values WHERE registrant_id IN (' . implode(',', $registrantIds) . ')';
+		$sql           = 'SELECT registrant_id, field_id, field_value FROM #__eb_field_values WHERE registrant_id IN (' . implode(',', $registrantIds) . ')';
 		$db->setQuery($sql);
 		$rowFieldValues = $db->loadObjectList();
-		$fieldValues = array();
+		$fieldValues    = array();
 		for ($i = 0, $n = count($rowFieldValues); $i < $n; $i++)
 		{
-			$rowFieldValue = $rowFieldValues[$i];
+			$rowFieldValue                                                        = $rowFieldValues[$i];
 			$fieldValues[$rowFieldValue->registrant_id][$rowFieldValue->field_id] = $rowFieldValue->field_value;
 		}
 		//Get name of groups
 		$groupNames = array();
-		$sql = 'SELECT id, first_name, last_name FROM #__eb_registrants AS a WHERE is_group_billing = 1' .
-			 (COUNT($where) ? ' AND ' . implode(' AND ', $where) : '');
+		$sql        = 'SELECT id, first_name, last_name FROM #__eb_registrants AS a WHERE is_group_billing = 1' .
+			(COUNT($where) ? ' AND ' . implode(' AND ', $where) : '');
 		$db->setQuery($sql);
 		$rowGroups = $db->loadObjectList();
 		if (count($rowGroups))
@@ -160,24 +161,24 @@ class EventbookingController extends RADControllerAdmin
 	}
 
 	/**
-     * This method is implemented to help calling by typing the url on web browser to update database schema to latest version
-     */
+	 * This method is implemented to help calling by typing the url on web browser to update database schema to latest version
+	 */
 	function upgrade()
 	{
 		$this->update_db_schema();
 	}
 
 	/**
-     * Update database schema when users update from old version to 1.6.4.
-     * We need to implement this function outside the installation script to avoid timeout during upgrade
-     */
+	 * Update database schema when users update from old version to 1.6.4.
+	 * We need to implement this function outside the installation script to avoid timeout during upgrade
+	 */
 	function update_db_schema()
 	{
 		jimport('joomla.filesystem.folder');
 		$db = JFactory::getDbo();
 		//Setup menus
 		$menuSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/menus.eventbooking.sql';
-		$sql = JFile::read($menuSql);
+		$sql     = JFile::read($menuSql);
 		$queries = $db->splitSql($sql);
 		if (count($queries))
 		{
@@ -198,8 +199,8 @@ class EventbookingController extends RADControllerAdmin
 		if (!$total)
 		{
 			$configSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/config.eventbooking.sql';
-			$sql = JFile::read($configSql);
-			$queries = $db->splitSql($sql);
+			$sql       = JFile::read($configSql);
+			$queries   = $db->splitSql($sql);
 			if (count($queries))
 			{
 				foreach ($queries as $query)
@@ -230,8 +231,8 @@ class EventbookingController extends RADControllerAdmin
 		if (!$total)
 		{
 			$configSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/plugins.eventbooking.sql';
-			$sql = JFile::read($configSql);
-			$queries = $db->splitSql($sql);
+			$sql       = JFile::read($configSql);
+			$queries   = $db->splitSql($sql);
 			if (count($queries))
 			{
 				foreach ($queries as $query)
@@ -322,42 +323,42 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		//Change field type of some fields
 		$sql = 'ALTER TABLE  `#__eb_events` CHANGE  `short_description`  `short_description` MEDIUMTEXT  NULL DEFAULT NULL';
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		$sql = "ALTER TABLE  `#__eb_events` CHANGE  `discount`  `discount` DECIMAL( 10, 2 ) NULL DEFAULT  '0'";
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		$sql = "ALTER TABLE  `#__eb_locations` CHANGE  `lat`  `lat` DECIMAL( 10, 6 ) NULL DEFAULT '0'";
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		$sql = "ALTER TABLE  `#__eb_locations` CHANGE  `long`  `long` DECIMAL( 10, 6 ) NULL DEFAULT '0'";
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		$sql = "ALTER TABLE  `#__eb_coupons` CHANGE  `valid_from`  `valid_from` DATETIME NULL";
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		$sql = "ALTER TABLE  `#__eb_coupons` CHANGE  `valid_to`  `valid_to` DATETIME NULL";
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		$sql = "ALTER TABLE  `#__eb_coupons` CHANGE `used` `used` INT( 11 ) NULL DEFAULT  '0'";
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		$sql = 'UPDATE #__eb_coupons SET `used` = 0 WHERE `used` IS NULL';
 		$db->setQuery($sql);
 		$db->execute();
 		$sql = 'ALTER TABLE  `#__eb_fields` CHANGE  `description`  `description` MEDIUMTEXT  NULL DEFAULT NULL';
 		$db->setQuery($sql);
-		$db->execute();				
+		$db->execute();
 		##Locations table
 		$fields = array_keys($db->getTableColumns('#__eb_locations'));
 		if (!in_array('user_id', $fields))
@@ -371,12 +372,12 @@ class EventbookingController extends RADControllerAdmin
 			$sql = "ALTER TABLE  `#__eb_locations` ADD  `language` VARCHAR( 50 ) NULL DEFAULT  '*';";
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			$sql = 'UPDATE #__eb_locations SET `language`="*" ';
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		$fields = array_keys($db->getTableColumns('#__eb_configs'));
 		if (!in_array('language', $fields))
 		{
@@ -386,7 +387,7 @@ class EventbookingController extends RADControllerAdmin
 		}
 		//Joomla default language
 		$defaultLanguage = JComponentHelper::getParams('com_languages')->get('site', 'en-GB');
-		$sql = 'SELECT COUNT(*) FROM #__eb_configs WHERE language="' . $defaultLanguage . '"';
+		$sql             = 'SELECT COUNT(*) FROM #__eb_configs WHERE language="' . $defaultLanguage . '"';
 		$db->setQuery($sql);
 		$total = $db->loadResult();
 		if (!$total)
@@ -409,12 +410,12 @@ class EventbookingController extends RADControllerAdmin
 			$sql = "ALTER TABLE  `#__eb_fields` ADD  `language` VARCHAR( 50 ) NULL DEFAULT  '*';";
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			$sql = 'UPDATE #__eb_fields SET `language`="*" ';
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('datatype_validation', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_fields` ADD  `datatype_validation` TINYINT NOT NULL DEFAULT  '0' ;";
@@ -437,46 +438,46 @@ class EventbookingController extends RADControllerAdmin
 				$db->execute();
 			}
 		}
-		
+
 		if (!in_array('access', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_fields` ADD  `access` INT NOT NULL DEFAULT  '1';";
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			$sql = 'UPDATE #__eb_fields SET `access` = 1';
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('show_in_list_view', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_fields` ADD  `show_in_list_view` TINYINT NOT NULL DEFAULT  '0';";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('depend_on_field_id', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_fields` ADD  `depend_on_field_id` INT NOT NULL DEFAULT '0';";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('depend_on_options', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_fields` ADD  `depend_on_options` TEXT NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('max_length', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_fields` ADD  `max_length` INT NOT NULL DEFAULT  '0';";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('place_holder', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_fields` ADD   `place_holder` VARCHAR( 255 ) NULL;";
@@ -489,7 +490,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('validation_rules', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_fields` ADD  `validation_rules` VARCHAR( 255 ) NULL;";
@@ -563,21 +564,21 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('access', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `access` TINYINT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('registration_access', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `registration_access` TINYINT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('max_group_number', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `max_group_number` INT NOT NULL DEFAULT  '0' ;";
@@ -591,49 +592,49 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('paypal_email', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `paypal_email` VARCHAR( 255 ) NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('registration_handle_url', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `registration_handle_url` VARCHAR( 255 ) NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('api_login', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `api_login` VARCHAR( 255 ) NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('transaction_key', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `transaction_key` VARCHAR( 255 ) NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('fixed_group_price', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `fixed_group_price` DECIMAL( 10, 2 ) NULL DEFAULT '0';";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('paypal_email', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `paypal_email` VARCHAR( 255 ) NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('attachment', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `attachment` VARCHAR( 255 ) NULL;";
@@ -645,7 +646,7 @@ class EventbookingController extends RADControllerAdmin
 				JFolder::create(JPATH_ROOT . '/media/com_eventbooking');
 			}
 		}
-		
+
 		if (!in_array('notification_emails', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `notification_emails` VARCHAR( 255 ) NULL;";
@@ -660,28 +661,28 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('user_email_body_offline', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `user_email_body_offline` TEXT NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('thanks_message', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `thanks_message` TEXT NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('thanks_message_offline', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `thanks_message_offline` TEXT NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		//Adding some new fields for supporting recurring events
 		if (!in_array('enable_cancel_registration', $fields))
 		{
@@ -689,133 +690,133 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('cancel_before_date', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `cancel_before_date` DATETIME NULL ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('enable_auto_reminder', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `enable_auto_reminder` TINYINT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('remind_before_x_days', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `remind_before_x_days` TINYINT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('early_bird_discount_type', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `early_bird_discount_type` TINYINT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('early_bird_discount_date', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `early_bird_discount_date` DATETIME NULL ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('early_bird_discount_amount', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `early_bird_discount_amount` DECIMAL( 10, 2 ) NULL DEFAULT '0';";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('parent_id', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `parent_id` INT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('created_by', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `created_by` INT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('event_type', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `event_type` TINYINT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('recurring_type', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `recurring_type` TINYINT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('recurring_frequency', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `recurring_frequency` INT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('article_id', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `article_id` INT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('weekdays', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `weekdays` VARCHAR( 50 ) NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('monthdays', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `monthdays` VARCHAR( 50 ) NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('recurring_end_date', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `recurring_end_date` DATETIME NULL ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('recurring_occurrencies', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `recurring_occurrencies` INT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('recurring_occurrencies', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `recurring_occurrencies` INT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('custom_fields', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `custom_fields` TEXT NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		#Support deposit payment
 		if (!in_array('deposit_type', $fields))
 		{
@@ -823,14 +824,14 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('deposit_amount', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `deposit_amount` DECIMAL( 10, 2 ) NULL DEFAULT '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('registration_type', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `registration_type` TINYINT NOT NULL DEFAULT  '0' AFTER  `enable_group_registration` ;";
@@ -848,7 +849,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('custom_field_ids', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `custom_field_ids` VARCHAR( 255 ) NULL;";
@@ -868,21 +869,21 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('currency_code', $fields))
 		{
 			$sql = "ALTER TABLE `#__eb_events` ADD `currency_code` VARCHAR( 10 ) NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('currency_symbol', $fields))
 		{
 			$sql = "ALTER TABLE `#__eb_events` ADD `currency_symbol` VARCHAR( 20 ) NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		//Thumb image for event
 		if (!in_array('thumb', $fields))
 		{
@@ -890,14 +891,14 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('registration_approved_email_body', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD `registration_approved_email_body` TEXT NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('fixed_daylight_saving_time', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `fixed_daylight_saving_time`  TINYINT NOT NULL DEFAULT  '0' ;";
@@ -905,33 +906,33 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 		/**
-         * Add support for multilingual
-         */
+		 * Add support for multilingual
+		 */
 		if (!in_array('language', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `language` VARCHAR( 50 ) NULL DEFAULT  '*';";
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			$sql = 'UPDATE #__eb_events SET `language`="*" ';
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('meta_keywords', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `meta_keywords` VARCHAR( 255 ) NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('meta_description', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `meta_description` VARCHAR( 255 ) NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('enable_coupon', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `enable_coupon` TINYINT NOT NULL DEFAULT  '0' ;";
@@ -1000,7 +1001,7 @@ class EventbookingController extends RADControllerAdmin
 			$sql = "ALTER TABLE  `#__eb_categories` ADD  `language` VARCHAR( 50 ) NULL DEFAULT  '*';";
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			$sql = 'UPDATE #__eb_categories SET `language`="*" ';
 			$db->setQuery($sql);
 			$db->execute();
@@ -1030,7 +1031,7 @@ class EventbookingController extends RADControllerAdmin
 				foreach ($rowCategories as $rowCategory)
 				{
 					$alias = JApplication::stringURLSafe($rowCategory->name);
-					$sql = 'UPDATE #__eb_categories SET `alias`=' . $db->quote($alias) . ' WHERE id=' . $rowCategory->id;
+					$sql   = 'UPDATE #__eb_categories SET `alias`=' . $db->quote($alias) . ' WHERE id=' . $rowCategory->id;
 					$db->setQuery($sql);
 					$db->execute();
 				}
@@ -1043,11 +1044,11 @@ class EventbookingController extends RADControllerAdmin
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `total_amount` DECIMAL( 10, 6 ) NULL DEFAULT '0';";
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `discount_amount` DECIMAL( 10, 6 ) NULL DEFAULT '0';";
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			$sql = 'UPDATE #__eb_registrants  SET total_amount=`amount`';
 			$db->setQuery($sql);
 			$db->execute();
@@ -1059,7 +1060,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('cart_id', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `cart_id`  INT NOT NULL DEFAULT  '0' ;";
@@ -1073,46 +1074,46 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('deposit_amount', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD `deposit_amount` DECIMAL( 10, 2 ) NULL DEFAULT '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('payment_status', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `payment_status`  TINYINT NOT NULL DEFAULT  '1' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('coupon_id', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `coupon_id`  INT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('check_coupon', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `check_coupon`  TINYINT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('tax_amount', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `tax_amount` DECIMAL( 10, 6 ) NULL DEFAULT '0';";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		$sql = "ALTER TABLE `#__eb_registrants` CHANGE `tax_amount` `tax_amount` DECIMAL(10,2) NULL DEFAULT '0.00';";
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		if (!in_array('registration_code', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `registration_code` VARCHAR( 15 ) NULL;";
@@ -1126,7 +1127,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('is_reminder_sent', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `is_reminder_sent` TINYINT NOT NULL DEFAULT  '0';";
@@ -1139,7 +1140,7 @@ class EventbookingController extends RADControllerAdmin
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `is_group_billing` TINYINT NOT NULL DEFAULT  '0';";
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			//Update all other records
 			$sql = 'SELECT DISTINCT group_id FROM #__eb_registrants WHERE group_id > 0';
 			$db->setQuery($sql);
@@ -1151,47 +1152,47 @@ class EventbookingController extends RADControllerAdmin
 				$db->execute();
 				//Need to update the published field
 				$sql = 'SELECT id, payment_method, transaction_id, published FROM #__eb_registrants WHERE id IN (' .
-					 implode(',', $groupIds) . ') OR number_registrants > 1';
+					implode(',', $groupIds) . ') OR number_registrants > 1';
 				$db->setQuery($sql);
 				$rowGroups = $db->loadObjectList();
 				foreach ($rowGroups as $rowGroup)
 				{
-					$id = $rowGroup->id;
+					$id            = $rowGroup->id;
 					$paymentMethod = $rowGroup->payment_method;
 					$transactionId = $rowGroup->transaction_id;
-					$published = $rowGroup->published;
-					$sql = "UPDATE  #__eb_registrants SET payment_method='$paymentMethod', transaction_id='$transactionId', published='$published', number_registrants=1 WHERE group_id=$id";
+					$published     = $rowGroup->published;
+					$sql           = "UPDATE  #__eb_registrants SET payment_method='$paymentMethod', transaction_id='$transactionId', published='$published', number_registrants=1 WHERE group_id=$id";
 					$db->setQuery($sql);
 					$db->execute();
 				}
 			}
 		}
-		
+
 		$sql = "ALTER TABLE  `#__eb_registrants` CHANGE  `group_id`  `group_id` INT( 11 ) NULL DEFAULT  '0';";
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		$sql = 'UPDATE #__eb_registrants SET group_id = 0 WHERE group_id IS NULL';
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		if (!in_array('language', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `language` VARCHAR( 50 ) NULL DEFAULT  '*';";
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			$sql = 'UPDATE #__eb_registrants SET `language`="*" ';
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('invoice_number', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `invoice_number` INT NOT NULL DEFAULT  '0';";
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			//Update membership Id field
 			$sql = 'SELECT id FROM #__eb_registrants WHERE group_id=0 AND (published=1 OR payment_method LIKE "%os_offline%") ORDER BY id';
 			$db->setQuery($sql);
@@ -1362,10 +1363,10 @@ class EventbookingController extends RADControllerAdmin
 			</tr>
 			</tbody>
 			</table>';
-			$sql = 'INSERT INTO #__eb_configs(config_key, config_value) VALUES ("invoice_format", ' . $db->quote($invoiceFormat) . ')';
+			$sql           = 'INSERT INTO #__eb_configs(config_key, config_value) VALUES ("invoice_format", ' . $db->quote($invoiceFormat) . ')';
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			$invoiceFormat = '<table border="0" width="100%" cellspacing="0" cellpadding="2">
 			<tbody>
 			<tr>
@@ -1487,10 +1488,10 @@ class EventbookingController extends RADControllerAdmin
 			</tr>
 			</tbody>
 			</table>';
-			$sql = 'INSERT INTO #__eb_configs(config_key, config_value) VALUES ("invoice_format_cart", ' . $db->quote($invoiceFormat) . ')';
+			$sql           = 'INSERT INTO #__eb_configs(config_key, config_value) VALUES ("invoice_format_cart", ' . $db->quote($invoiceFormat) . ')';
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			$query = $db->getQuery(true);
 			$query->insert('#__eb_configs')
 				->columns('config_key, config_value')
@@ -1502,7 +1503,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($query);
 			$db->execute();
 		}
-		
+
 		//Update to use event can be assigned to multiple categories feature
 		$sql = 'SELECT COUNT(id) FROM #__eb_event_categories';
 		$db->setQuery($sql);
@@ -1528,7 +1529,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		$fields = array_keys($db->getTableColumns('#__eb_event_categories'));
 		if (!in_array('main_category', $fields))
 		{
@@ -1548,7 +1549,7 @@ class EventbookingController extends RADControllerAdmin
 				}
 			}
 		}
-		
+
 		$fields = array_keys($db->getTableColumns('#__eb_fields'));
 		if (!in_array('is_core', $fields))
 		{
@@ -1569,8 +1570,8 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 			$coreFieldsSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/fields.eventbooking.sql';
-			$sql = JFile::read($coreFieldsSql);
-			$queries = $db->splitSql($sql);
+			$sql           = JFile::read($coreFieldsSql);
+			$queries       = $db->splitSql($sql);
 			if (count($queries))
 			{
 				foreach ($queries as $query)
@@ -1585,33 +1586,33 @@ class EventbookingController extends RADControllerAdmin
 			}
 			$sql = 'SELECT MAX(id) FROM #__eb_fields';
 			$db->setQuery($sql);
-			$maxId = (int) $db->loadResult();
+			$maxId         = (int) $db->loadResult();
 			$autoincrement = $maxId + 1;
-			$sql = 'ALTER TABLE #__eb_fields AUTO_INCREMENT=' . $autoincrement;
+			$sql           = 'ALTER TABLE #__eb_fields AUTO_INCREMENT=' . $autoincrement;
 			$db->setQuery($sql);
 			$db->execute();
 			//Update field type , change it to something meaningful
 			$typeMapping = array(
-				1 => 'Text', 
-				2 => 'Textarea', 
-				3 => 'List', 
-				5 => 'Checkboxes', 
-				6 => 'Radio', 
-				7 => 'Date', 
-				8 => 'Heading', 
+				1 => 'Text',
+				2 => 'Textarea',
+				3 => 'List',
+				5 => 'Checkboxes',
+				6 => 'Radio',
+				7 => 'Date',
+				8 => 'Heading',
 				9 => 'Message');
-			
+
 			foreach ($typeMapping as $key => $value)
 			{
 				$sql = "UPDATE #__eb_fields SET fieldtype='$value' WHERE field_type='$key'";
 				$db->setQuery($sql);
 				$db->execute();
 			}
-			
+
 			$sql = "UPDATE #__eb_fields SET fieldtype='List', multiple=1 WHERE field_type='4'";
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			$sql = 'UPDATE #__eb_fields SET fieldtype="Countries" WHERE name="country"';
 			$db->setQuery($sql);
 			$db->execute();
@@ -1629,7 +1630,7 @@ class EventbookingController extends RADControllerAdmin
 						$fieldValue = explode(',', $fieldValue);
 					}
 					$fieldValue = json_encode($fieldValue);
-					$sql = 'UPDATE #__eb_field_values SET field_value=' . $db->quote($fieldValue) . ' WHERE id=' . $rowFieldValue->id;
+					$sql        = 'UPDATE #__eb_field_values SET field_value=' . $db->quote($fieldValue) . ' WHERE id=' . $rowFieldValue->id;
 					$db->setQuery($sql);
 					$db->execute();
 				}
@@ -1646,40 +1647,40 @@ class EventbookingController extends RADControllerAdmin
 			if ($event)
 			{
 				$params = new JRegistry($event->params);
-				$keys = array(
-					's_lastname', 
-					'r_lastname', 
-					's_organization', 
-					'r_organization', 
-					's_address', 
-					'r_address', 
-					's_address2', 
-					'r_address2', 
-					's_city', 
-					'r_city', 
-					's_state', 
-					'r_state', 
-					's_zip', 
-					'r_zip', 
-					's_country', 
-					'r_country', 
-					's_phone', 
-					'r_phone', 
-					's_fax', 
-					'r_fax', 
-					's_comment', 
-					'r_comment', 
-					'gs_lastname', 
-					'gs_organization', 
-					'gs_address', 
-					'gs_address2', 
-					'gs_city', 
-					'gs_state', 
-					'gs_zip', 
-					'gs_country', 
-					'gs_phone', 
-					'gs_fax', 
-					'gs_email', 
+				$keys   = array(
+					's_lastname',
+					'r_lastname',
+					's_organization',
+					'r_organization',
+					's_address',
+					'r_address',
+					's_address2',
+					'r_address2',
+					's_city',
+					'r_city',
+					's_state',
+					'r_state',
+					's_zip',
+					'r_zip',
+					's_country',
+					'r_country',
+					's_phone',
+					'r_phone',
+					's_fax',
+					'r_fax',
+					's_comment',
+					'r_comment',
+					'gs_lastname',
+					'gs_organization',
+					'gs_address',
+					'gs_address2',
+					'gs_city',
+					'gs_state',
+					'gs_zip',
+					'gs_country',
+					'gs_phone',
+					'gs_fax',
+					'gs_email',
 					'gs_comment');
 				foreach ($keys as $key)
 				{
@@ -1688,63 +1689,63 @@ class EventbookingController extends RADControllerAdmin
 			}
 			//Process publish status of core fields
 			$publishStatus = array(
-				'first_name' => 1, 
-				'last_name' => $config->s_lastname, 
-				'organization' => $config->s_organization, 
-				'address' => $config->s_address, 
-				'address2' => $config->s_address2, 
-				'city' => $config->s_city, 
-				'state' => $config->s_state, 
-				'zip' => $config->s_zip, 
-				'country' => $config->s_country, 
-				'phone' => $config->s_phone, 
-				'fax' => $config->s_fax, 
-				'comment' => $config->s_comment, 
-				'email' => 1);
-			
+				'first_name'   => 1,
+				'last_name'    => $config->s_lastname,
+				'organization' => $config->s_organization,
+				'address'      => $config->s_address,
+				'address2'     => $config->s_address2,
+				'city'         => $config->s_city,
+				'state'        => $config->s_state,
+				'zip'          => $config->s_zip,
+				'country'      => $config->s_country,
+				'phone'        => $config->s_phone,
+				'fax'          => $config->s_fax,
+				'comment'      => $config->s_comment,
+				'email'        => 1);
+
 			foreach ($publishStatus as $key => $value)
 			{
 				$value = (int) $value;
-				$sql = 'UPDATE #__eb_fields SET published=' . $value . ' WHERE name=' . $db->quote($key);
+				$sql   = 'UPDATE #__eb_fields SET published=' . $value . ' WHERE name=' . $db->quote($key);
 				$db->setQuery($sql);
 				$db->execute();
 			}
-			
+
 			$requiredStatus = array(
-				'first_name' => 1, 
-				'last_name' => $config->r_lastname, 
-				'organization' => $config->r_organization, 
-				'address' => $config->r_address, 
-				'address2' => $config->r_address2, 
-				'city' => $config->r_city, 
-				'state' => $config->r_state, 
-				'zip' => $config->r_zip, 
-				'country' => $config->r_country, 
-				'phone' => $config->r_phone, 
-				'fax' => $config->r_fax, 
-				'comment' => $config->r_comment, 
-				'email' => 1);
-			
+				'first_name'   => 1,
+				'last_name'    => $config->r_lastname,
+				'organization' => $config->r_organization,
+				'address'      => $config->r_address,
+				'address2'     => $config->r_address2,
+				'city'         => $config->r_city,
+				'state'        => $config->r_state,
+				'zip'          => $config->r_zip,
+				'country'      => $config->r_country,
+				'phone'        => $config->r_phone,
+				'fax'          => $config->r_fax,
+				'comment'      => $config->r_comment,
+				'email'        => 1);
+
 			foreach ($requiredStatus as $key => $value)
 			{
 				$value = (int) $value;
-				$sql = 'UPDATE #__eb_fields SET required=' . $value . ' WHERE name=' . $db->quote($key);
+				$sql   = 'UPDATE #__eb_fields SET required=' . $value . ' WHERE name=' . $db->quote($key);
 				$db->setQuery($sql);
 				$db->execute();
 			}
 			//Now, we will need to change display settings for core fields
 			$groupMemberFields = array(
-				'last_name' => $config->gs_lastname, 
-				'organization' => $config->gs_organization, 
-				'address' => $config->gs_address, 
-				'address2' => $config->gs_address2, 
-				'city' => $config->gs_city, 
-				'state' => $config->gs_state, 
-				'zip' => $config->gs_zip, 
-				'country' => $config->gs_country, 
-				'phone' => $config->gs_phone, 
-				'fax' => $config->gs_fax, 
-				'comment' => $config->gs_comment);
+				'last_name'    => $config->gs_lastname,
+				'organization' => $config->gs_organization,
+				'address'      => $config->gs_address,
+				'address2'     => $config->gs_address2,
+				'city'         => $config->gs_city,
+				'state'        => $config->gs_state,
+				'zip'          => $config->gs_zip,
+				'country'      => $config->gs_country,
+				'phone'        => $config->gs_phone,
+				'fax'          => $config->gs_fax,
+				'comment'      => $config->gs_comment);
 			foreach ($groupMemberFields as $fieldName => $showed)
 			{
 				$showed = (int) $showed;
@@ -1759,7 +1760,7 @@ class EventbookingController extends RADControllerAdmin
 				$sql = "UPDATE #__eb_fields SET display_in=" . $db->quote($displayIn) . ' WHERE name=' . $db->quote($fieldName);
 				$db->setQuery($sql);
 				$db->execute();
-			}						
+			}
 		}
 		if (!in_array('category_id', $fields))
 		{
@@ -1785,7 +1786,7 @@ class EventbookingController extends RADControllerAdmin
 					{
 						//Get main category
 						$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $eventId .
-							 ' AND main_category=1';
+							' AND main_category=1';
 						$db->setQuery($sql);
 						$categoryId = (int) $db->loadResult();
 						if ($categoryId)
@@ -1811,7 +1812,7 @@ class EventbookingController extends RADControllerAdmin
 					}
 				}
 			}
-		}				
+		}
 		$sql = "SELECT id, validation_rules FROM #__eb_fields WHERE required = 1";
 		$db->setQuery($sql);
 		$fields = $db->loadObjectList();
@@ -1838,80 +1839,80 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		$sql = 'CREATE TABLE IF NOT EXISTS `#__eb_messages` (
 					`id` INT NOT NULL AUTO_INCREMENT,
 		  `message_key` VARCHAR(50) NULL,
 		  `message` TEXT NULL,
 		  PRIMARY KEY(`id`)
 				  ) CHARACTER SET `utf8`;';
-		
+
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		$sql = 'SELECT COUNT(*) FROM #__eb_messages';
 		$db->setQuery($sql);
 		$total = $db->loadResult();
-		
+
 		if (!$total)
 		{
 			require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/table/table.php';
-			$row = new RADTable('#__eb_messages', 'id', $db);
+			$row  = new RADTable('#__eb_messages', 'id', $db);
 			$keys = array(
-				'admin_email_subject', 
-				'admin_email_body', 
-				'user_email_subject', 
-				'user_email_body', 
-				'user_email_body_offline', 
-				'registration_form_message', 
-				'registration_form_message_group', 
-				'number_members_form_message', 
-				'member_information_form_message', 
-				'confirmation_message', 
-				'thanks_message', 
-				'thanks_message_offline', 
-				'cancel_message', 
-				'registration_cancel_message_free', 
-				'registration_cancel_message_paid', 
-				'invitation_form_message', 
-				'invitation_email_subject', 
-				'invitation_email_body', 
-				'invitation_complete', 
-				'reminder_email_subject', 
-				'reminder_email_body', 
-				'registration_cancel_email_subject', 
-				'registration_cancel_email_body', 
-				'registration_approved_email_subject', 
-				'registration_approved_email_body', 
-				'waitinglist_form_message', 
-				'waitinglist_complete_message', 
-				'watinglist_confirmation_subject', 
-				'watinglist_confirmation_body', 
-				'watinglist_notification_subject', 
+				'admin_email_subject',
+				'admin_email_body',
+				'user_email_subject',
+				'user_email_body',
+				'user_email_body_offline',
+				'registration_form_message',
+				'registration_form_message_group',
+				'number_members_form_message',
+				'member_information_form_message',
+				'confirmation_message',
+				'thanks_message',
+				'thanks_message_offline',
+				'cancel_message',
+				'registration_cancel_message_free',
+				'registration_cancel_message_paid',
+				'invitation_form_message',
+				'invitation_email_subject',
+				'invitation_email_body',
+				'invitation_complete',
+				'reminder_email_subject',
+				'reminder_email_body',
+				'registration_cancel_email_subject',
+				'registration_cancel_email_body',
+				'registration_approved_email_subject',
+				'registration_approved_email_body',
+				'waitinglist_form_message',
+				'waitinglist_complete_message',
+				'watinglist_confirmation_subject',
+				'watinglist_confirmation_body',
+				'watinglist_notification_subject',
 				'watinglist_notification_body');
 			foreach ($keys as $key)
 			{
-				$row->id = 0;
+				$row->id          = 0;
 				$row->message_key = $key;
-				$row->message = $config->{$key};
+				$row->message     = $config->{$key};
 				$row->store();
 			}
 		}
-		
+
 		//Update ACL field, from 1.4.1 and before to 1.4.2
 		$sql = 'UPDATE #__eb_categories SET `access` = 1 WHERE `access` = 0';
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		$sql = 'UPDATE #__eb_events SET `access` = 1 WHERE `access` = 0';
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		$sql = 'UPDATE #__eb_events SET `registration_access` = 1 WHERE `registration_access` = 0';
 		$db->setQuery($sql);
 		$db->execute();
-		
+
 		//Update SEF setting
 		$sql = 'SELECT COUNT(*) FROM #__eb_configs WHERE config_key="insert_event_id"';
 		$db->setQuery($sql);
@@ -1921,7 +1922,7 @@ class EventbookingController extends RADControllerAdmin
 			$sql = "INSERT INTO #__eb_configs(config_key, config_value) VALUES('insert_event_id', '0') ";
 			$db->setQuery($sql);
 			$db->execute();
-			
+
 			$sql = "INSERT INTO #__eb_configs(config_key, config_value) VALUES('insert_category', '0') ";
 			$db->setQuery($sql);
 			$db->execute();
@@ -1981,8 +1982,51 @@ class EventbookingController extends RADControllerAdmin
 			}
 		}
 
+		// Files, Folders clean up
+		$deleteFiles = array(
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller/daylightsaving.php',
+			JPATH_ROOT . '/components/com_eventbooking/helper/os_cart.php',
+			JPATH_ROOT . '/components/com_eventbooking/helper/fields.php',
+			JPATH_ROOT . '/components/com_eventbooking/helper/captcha.php',
+			JPATH_ROOT . '/components/com_eventbooking/views/register/tmpl/group_member.php',
+			JPATH_ROOT . '/components/com_eventbooking/views/waitinglist/tmpl/complete.php',
+			JPATH_ROOT . '/components/com_eventbooking/models/waitinglist.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waitings.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waiting.php',
+			JPATH_ROOT . '/media/com_eventbooking/.htaccess'
+		);
 
-		$installType = JRequest::getVar('install_type');
+		$deleteFolders = array(
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/models',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/views',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/daylightsaving',
+			JPATH_ROOT . '/components/com_eventbooking/views/confirmation',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waiting',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waitings',
+			JPATH_ROOT . '/components/com_eventbooking/assets/validate',
+			JPATH_ROOT . '/components/com_eventbooking/assets/colorbox',
+			JPATH_ROOT . '/components/com_eventbooking/models'
+		);
+
+		foreach ($deleteFiles as $file)
+		{
+			if (JFile::exists(JPATH_ROOT . $file))
+			{
+				JFile::delete(JPATH_ROOT . $file);
+			}
+		}
+
+		foreach ($deleteFolders as $folder)
+		{
+			if (JFolder::exists(JPATH_ROOT . $folder))
+			{
+				JFolder::delete(JPATH_ROOT . $folder);
+			}
+		}
+
+		// Redirect to dashboard view
+		$installType = $this->input->getCmd('install_type', '');
 		if ($installType == 'install')
 		{
 			$msg = JText::_('The extension was successfully installed');
@@ -1990,25 +2034,25 @@ class EventbookingController extends RADControllerAdmin
 		else
 		{
 			$msg = JText::_('The extension was successfully updated');
-		}						
+		}
 		//Redirecting users to dasdboard
 		JFactory::getApplication()->redirect('index.php?option=com_eventbooking&view=dashboard', $msg);
 	}
 
 	/**
-     * Check to see the installed version is up to date or not
-     *
-     * @return int 0 : error, 1 : Up to date, 2 : outof date
-     */
+	 * Check to see the installed version is up to date or not
+	 *
+	 * @return int 0 : error, 1 : Up to date, 2 : outof date
+	 */
 	function check_update()
 	{
 		$installedVersion = EventbookingHelper::getInstalledVersion();
-		$result = array();
+		$result           = array();
 		$result['status'] = 0;
 		if (function_exists('curl_init'))
 		{
 			$url = 'http://joomdonation.org/versions/eventbooking.txt';
-			$ch = curl_init();
+			$ch  = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			$latestVersion = curl_exec($ch);
@@ -2017,12 +2061,12 @@ class EventbookingController extends RADControllerAdmin
 			{
 				if (version_compare($latestVersion, $installedVersion, 'gt'))
 				{
-					$result['status'] = 2;
+					$result['status']  = 2;
 					$result['message'] = JText::sprintf('EB_UPDATE_CHECKING_UPDATEFOUND', $latestVersion);
 				}
 				else
 				{
-					$result['status'] = 1;
+					$result['status']  = 1;
 					$result['message'] = JText::_('EB_UPDATE_CHECKING_UPTODATE');
 				}
 			}
@@ -2032,8 +2076,8 @@ class EventbookingController extends RADControllerAdmin
 	}
 
 	/**
-     * Reset the urls table
-     */
+	 * Reset the urls table
+	 */
 	public function reset_urls()
 	{
 		JFactory::getDbo()->truncateTable('#__eb_urls');
@@ -2045,11 +2089,11 @@ class EventbookingController extends RADControllerAdmin
 	 */
 	public function download_file()
 	{
-		$filePath = JPATH_ROOT.'/media/com_eventbooking/files';
+		$filePath = JPATH_ROOT . '/media/com_eventbooking/files';
 		$fileName = JRequest::getVar('file_name', '');
 		if (file_exists($filePath . '/' . $fileName))
 		{
-			while (@ob_end_clean());
+			while (@ob_end_clean()) ;
 			EventbookingHelper::processDownload($filePath . '/' . $fileName, $fileName, true);
 			JFactory::getApplication()->close();
 		}
@@ -2058,6 +2102,7 @@ class EventbookingController extends RADControllerAdmin
 			JFactory::getApplication()->redirect('index.php?option=com_eventbooking&view=dashboard', JText::_('File does not exist'));
 		}
 	}
+
 	/**
 	 * Get profile data of the registrant, return reson format using for ajax request
 	 *

@@ -1,14 +1,14 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class com_eventbookingInstallerScript
 {
@@ -32,82 +32,10 @@ class com_eventbookingInstallerScript
 				JFile::copy(JPATH_ROOT . '/language/en-GB/' . $languageFile, JPATH_ROOT . '/language/en-GB/bak.' . $languageFile);
 			}
 		}
-		//Deleting files/folders which are not using in latest version						
-		if (JFolder::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/models'))
-		{
-			JFolder::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/models');
-		}
-		if (JFolder::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/views'))
-		{
-			JFolder::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/views');
-		}
-		if (JFolder::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/daylightsaving'))
-		{
-			JFolder::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/daylightsaving');
-		}
-		if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/views/confirmation'))
-		{
-			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/views/confirmation');
-		}
-		if (JFile::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php'))
-		{
-			JFile::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php');
-		}
-		if (JFile::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller/daylightsaving.php'))
-		{
-			JFile::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller/daylightsaving.php');
-		}
-		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/helper/os_cart.php'))
-		{
-			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/helper/os_cart.php');
-		}
-		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/helper/fields.php'))
-		{
-			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/helper/fields.php');
-		}
-		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/helper/captcha.php'))
-		{
-			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/helper/captcha.php');
-		}		
-		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/views/register/tmpl/group_member.php'))
-		{
-			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/views/register/tmpl/group_member.php');
-		}
-
-		//Delete the the waiting list related files
-		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/views/waitinglist/tmpl/complete.php'))
-		{
-			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/views/register/tmpl/complete.php');
-		}
-
-		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/models/waitinglist.php'))
-		{
-			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/models/waitinglist.php');
-		}
-
-		if (JFolder::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waiting'))
-		{
-			JFolder::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waiting');
-		}
-
-		if (JFolder::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waitings'))
-		{
-			JFolder::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waitings');
-		}
-
-		if (JFile::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waitings.php'))
-		{
-			JFile::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waitings.php');
-		}
-
-		if (JFile::exists(JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waiting.php'))
-		{
-			JFile::delete(JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waiting.php');
-		}
 
 		//Delete the css files which are now moved to themes folder
 		$files = array('default.css', 'fire.css', 'leaf.css', 'ocean.css', 'sky.css', 'tree.css');
-		$path = JPATH_ROOT . '/components/com_eventbooking/assets/css/';
+		$path  = JPATH_ROOT . '/components/com_eventbooking/assets/css/';
 		foreach ($files as $file)
 		{
 			$filePath = $path . $file;
@@ -116,29 +44,22 @@ class com_eventbookingInstallerScript
 				JFile::delete($filePath);
 			}
 		}
-		#Remove htaccess file to support image feature
-		if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/.htaccess'))
-		{
-			JFile::delete(JPATH_ROOT . '/media/com_eventbooking/.htaccess');
-		}
+
 		//Backup files which need to be keep 
 		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/fields.xml'))
 		{
 			JFile::copy(JPATH_ROOT . '/components/com_eventbooking/fields.xml', JPATH_ROOT . '/components/com_eventbooking/bak.fields.xml');
 		}
-		
+
 		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css'))
 		{
-			JFile::copy(JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css', 
+			JFile::copy(JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css',
 				JPATH_ROOT . '/components/com_eventbooking/assets/css/bak.custom.css');
 		}
-		if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/assets/validate'))
+
+		if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/views'))
 		{
-			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/assets/validate');
-		}
-		if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/assets/colorbox'))
-		{
-			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/assets/colorbox');
+			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/views');
 		}
 	}
 
@@ -168,7 +89,7 @@ class com_eventbookingInstallerScript
 		$registry = new JRegistry();
 		foreach (self::$languageFiles as $languageFile)
 		{
-			$backupFile = JPATH_ROOT . '/language/en-GB/bak.' . $languageFile;
+			$backupFile  = JPATH_ROOT . '/language/en-GB/bak.' . $languageFile;
 			$currentFile = JPATH_ROOT . '/language/en-GB/' . $languageFile;
 			if (JFile::exists($currentFile) && JFile::exists($backupFile))
 			{
@@ -176,8 +97,8 @@ class com_eventbookingInstallerScript
 				$currentItems = $registry->toArray();
 				$registry->loadFile($backupFile, 'INI');
 				$backupItems = $registry->toArray();
-				$items = array_merge($currentItems, $backupItems);
-				$content = "";
+				$items       = array_merge($currentItems, $backupItems);
+				$content     = "";
 				foreach ($items as $key => $value)
 				{
 					$content .= "$key=\"$value\"\n";
@@ -195,19 +116,14 @@ class com_eventbookingInstallerScript
 		}
 		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/assets/css/bak.custom.css'))
 		{
-			JFile::copy(JPATH_ROOT . '/components/com_eventbooking/assets/css/bak.custom.css', 
+			JFile::copy(JPATH_ROOT . '/components/com_eventbooking/assets/css/bak.custom.css',
 				JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css');
 			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/assets/css/bak.custom.css');
 		}
 
-		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/views/register/metadata.xml'))
-		{
-			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/views/register/metadata.xml');
-		}
-
 		if ($this->installType == 'install')
 		{
-			$db = JFactory::getDbo();
+			$db  = JFactory::getDbo();
 			$sql = 'SELECT COUNT(*) FROM #__eb_messages';
 			$db->setQuery($sql);
 			$total = $db->loadResult();
@@ -230,7 +146,7 @@ class com_eventbookingInstallerScript
 				}
 			}
 		}
-		
+
 		JFactory::getApplication()->redirect(
 			JRoute::_('index.php?option=com_eventbooking&task=update_db_schema&install_type=' . $this->installType, false));
 	}
