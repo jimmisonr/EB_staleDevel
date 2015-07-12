@@ -33,6 +33,8 @@ class EventbookingViewCategoriesHtml extends RADViewHtml
 			{
 				$app->redirect('index.php', JText::_('EB_INVALID_CATEGORY_OR_NOT_AUTHORIZED'));
 			}
+
+			$this->category = $category;
 		}
 
 		// Build page title if it has not been set from menu title
@@ -68,7 +70,6 @@ class EventbookingViewCategoriesHtml extends RADViewHtml
 		}
 
 		$this->categoryId = $categoryId;
-		$this->category   = $category;
 		$this->config     = $config;
 		$this->items      = $items;
 		$this->pagination = $pagination;
