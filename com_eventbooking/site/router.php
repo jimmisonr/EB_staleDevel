@@ -7,8 +7,9 @@
  * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
+
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 JLoader::registerPrefix('Eventbooking', JPATH_ROOT . '/components/com_eventbooking');
 JLoader::register('RADConfig', JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/config/config.php');
 
@@ -16,36 +17,44 @@ function EventbookingBuildRoute(&$query)
 {
 	$segments = array();
 	$db       = JFactory::getDbo();
-	$q        = $db->getQuery(true);
-	$queryArr = $query;
-	if (isset($queryArr['option']))
-	{
-		unset($queryArr['option']);
-	}
-	if (isset($queryArr['Itemid']))
-	{
-		unset($queryArr['Itemid']);
-	}
+	$dbQuery  = $db->getQuery(true);
+
 	//Store the query string to use in the parseRouter method
-	$queryString = http_build_query($queryArr);
-	$app         = JFactory::getApplication();
-	$menu        = $app->getMenu();
+	$queryArr = $query;
+
+	$app  = JFactory::getApplication();
+	$menu = $app->getMenu();
+
 	//We need a menu item.  Either the one specified in the query, or the current active one if none specified
 	if (empty($query['Itemid']))
 	{
-		$menuItem = $menu->getActive();
+		$menuItem      = $menu->getActive();
+		$menuItemGiven = false;
 	}
 	else
 	{
-		$menuItem = $menu->getItem($query['Itemid']);
+		$menuItem      = $menu->getItem($query['Itemid']);
+		$menuItemGiven = true;
 	}
+
+	// If the given menu item doesn't belong to our component, unset the Itemid from query array
+	if ($menuItemGiven && isset($menuItem) && $menuItem->component != 'com_eventbooking')
+	{
+		$menuItemGiven = false;
+		unset($query['Itemid']);
+	}
+
 	if (empty($menuItem->query['view']))
 	{
 		$menuItem->query['view'] = '';
 	}
+
 	//Are we dealing with the current view which is attached to a menu item?
-	if (($menuItem instanceof stdClass) && isset($query['view']) && isset($query['id']) && $menuItem->query['view'] == $query['view'] &&
-		isset($query['id']) && $menuItem->query['id'] == intval($query['id'])
+	if (($menuItem instanceof stdClass)
+		&& isset($query['view'])
+		&& isset($query['id'])
+		&& $menuItem->query['view'] == $query['view']
+		&& isset($query['id']) && $menuItem->query['id'] == intval($query['id'])
 	)
 	{
 		unset($query['view']);
@@ -54,25 +63,26 @@ function EventbookingBuildRoute(&$query)
 			unset($query['catid']);
 		}
 		unset($query['id']);
+		if (isset($query['layout']))
+		{
+			unset($query['layout']);
+		}
 	}
 
-	if (($menuItem instanceof stdClass) && isset($query['view']) && ($menuItem->query['view'] == 'calendar') &&
-		$menuItem->query['view'] == $query['view']
-	)
-	{
-		unset($query['view']);
-	}
-
-	if (($menuItem instanceof stdClass) && isset($query['view']) && ($menuItem->query['view'] == 'events') &&
-		$menuItem->query['view'] == $query['view']
+	if (($menuItem instanceof stdClass)
+		&& isset($query['view'])
+		&& $menuItem->query['view'] == $query['view']
+		&& (in_array($menuItem->query['view'], array('calendar', 'events')))
 	)
 	{
 		unset($query['view']);
 	}
 
 	//Dealing with the catid parameter in the link to event.
-	if (($menuItem instanceof stdClass) && ($menuItem->query['view'] == 'category') && isset($query['catid']) &&
-		$menuItem->query['id'] == intval($query['catid'])
+	if (($menuItem instanceof stdClass)
+		&& ($menuItem->query['view'] == 'category')
+		&& isset($query['catid'])
+		&& $menuItem->query['id'] == intval($query['catid'])
 	)
 	{
 		if (isset($query['catid']))
@@ -80,12 +90,15 @@ function EventbookingBuildRoute(&$query)
 			unset($query['catid']);
 		}
 	}
+
+
 	$view    = isset($query['view']) ? $query['view'] : '';
 	$id      = isset($query['id']) ? (int) $query['id'] : 0;
 	$catId   = isset($query['catid']) ? (int) $query['catid'] : 0;
 	$eventId = isset($query['event_id']) ? (int) $query['event_id'] : 0;
 	$task    = isset($query['task']) ? $query['task'] : '';
 	$layout  = isset($query['layout']) ? $query['layout'] : '';
+
 	switch ($view)
 	{
 		case 'calendar':
@@ -123,11 +136,11 @@ function EventbookingBuildRoute(&$query)
 			{
 				if ($id)
 				{
-					$q->clear();
-					$q->select('name')
+					$dbQuery->clear();
+					$dbQuery->select('name')
 						->from('#__eb_locations')
 						->where('id=' . (int) $id);
-					$db->setQuery($q);
+					$db->setQuery($dbQuery);
 					$segments[] = $id . '-' . $db->loadResult();
 					$segments[] = 'edit';
 					unset($query['id']);
@@ -143,11 +156,11 @@ function EventbookingBuildRoute(&$query)
 			{
 				if (isset($query['location_id']))
 				{
-					$q->clear();
-					$q->select('name')
+					$dbQuery->clear();
+					$dbQuery->select('name')
 						->from('#__eb_locations')
 						->where('id=' . (int) $query['location_id']);
-					$db->setQuery($q);
+					$db->setQuery($dbQuery);
 					$segments[] = $db->loadResult();
 					unset($query['location_id']);
 				}
@@ -156,25 +169,25 @@ function EventbookingBuildRoute(&$query)
 		case 'map':
 			if (isset($query['location_id']))
 			{
-				$q->clear();
-				$q->select('name')
+				$dbQuery->clear();
+				$dbQuery->select('name')
 					->from('#__eb_locations')
 					->where('id=' . (int) $query['location_id']);
-				$db->setQuery($q);
+				$db->setQuery($dbQuery);
 				$segments[] = $db->loadResult();
 				unset($query['location_id']);
 			}
-			$segments[] = JText::_('EB_SEF_VIEW_' . strtoupper($view));
+			$segments[] = 'View Map';
 			break;
 		case 'cart':
-			$segments[] = JText::_('EB_SEF_VIEW_CART');
+			$segments[] = 'View Cart';
 			break;
 		case 'invite':
 			if ($id)
 			{
 				$segments[] = EventbookingHelperRoute::getEventTitle($id);
 			}
-			$segments[] = JText::_('EB_SEF_INVITE_FRIEND');
+			$segments[] = 'Invite Friend';
 			unset($query['id']);
 			break;
 		case 'password':
@@ -190,23 +203,23 @@ function EventbookingBuildRoute(&$query)
 			{
 				$segments[] = EventbookingHelperRoute::getEventTitle($id);
 			}
-			$segments[] = JText::_('EB_SEF_REGISTRANTS_LIST');
+			$segments[] = 'Registrants List';
 			unset($query['id']);
 			break;
 		case 'waitinglist':
-			$segments[] = JText::_('EB_SEF_WAITINGLIST_COMPLETE');
+			$segments[] = 'Join Waitinglist successfull';
 			break;
 		case 'failure':
-			$segments[] = JText::_('EB_SEF_REGISTRATION_FAILURE');
+			$segments[] = 'Registration Failure';
 			break;
 		case 'cancel':
-			$segments[] = JText::_('EB_SEF_REGISTRATION_CANCEL');
+			$segments[] = 'Registration Cancel';
 			break;
 		case 'complete':
-			$segments[] = JText::_('EB_SEF_REGISTRATION_COMPLETE');
+			$segments[] = 'Registration Complete';
 			break;
 		case 'registrationcancel':
-			$segments[] = JText::_('EB_SEF_REGISTRATION_CANCELLED');
+			$segments[] = 'Registration Cancelled';
 			break;
 		case 'search':
 			$segments[] = 'search result';
@@ -257,6 +270,7 @@ function EventbookingBuildRoute(&$query)
 			}
 			$segments[] = 'Unpublish';
 			unset($query['task']);
+			unset($query['id']);
 			break;
 
 		case 'event.publish':
@@ -266,17 +280,18 @@ function EventbookingBuildRoute(&$query)
 			}
 			$segments[] = 'Publish';
 			unset($query['task']);
+			unset($query['id']);
 			break;
 		case 'registrant.export':
 			if ($eventId)
 			{
 				$segments[] = EventbookingHelperRoute::getEventTitle($eventId);
 			}
-			$segments[] = JText::_('EB_SEF_CSV_EXPORT');
+			$segments[] = 'Export Registrants';
 			unset($query['task']);
 			break;
 		case 'view_checkout':
-			$segments[] = JText::_('EB_SEF_VIEW_CHECKOUT');
+			$segments[] = 'Checkout';
 			unset($query['task']);
 			break;
 	}
@@ -298,21 +313,41 @@ function EventbookingBuildRoute(&$query)
 	}
 	if (count($segments))
 	{
-		$segments = array_map('JApplication::stringURLSafe', $segments);
-		$key      = md5(implode('/', $segments));
-		$q        = $db->getQuery(true);
-		$q->select('COUNT(*)')
+		$unProcessedVariables = array(
+			'option',
+			'Itemid',
+			'location_id',
+			'category_id',
+			'registration_code',
+			'search',
+			'start',
+			'limitstart',
+			'limit'
+		);
+
+		foreach ($unProcessedVariables as $variable)
+		{
+			if (isset($queryArr[$variable]))
+			{
+				unset($queryArr[$variable]);
+			}
+		}
+		$queryString = http_build_query($queryArr);
+		$segments    = array_map('JApplication::stringURLSafe', $segments);
+		$key         = md5(implode('/', $segments));
+		$dbQuery     = $db->getQuery(true);
+		$dbQuery->select('COUNT(*)')
 			->from('#__eb_urls')
 			->where('md5_key="' . $key . '"');
-		$db->setQuery($q);
+		$db->setQuery($dbQuery);
 		$total = $db->loadResult();
 		if (!$total)
 		{
-			$q->clear();
-			$q->insert('#__eb_urls')
+			$dbQuery->clear();
+			$dbQuery->insert('#__eb_urls')
 				->columns('md5_key, `query`')
 				->values("'$key', '$queryString'");
-			$db->setQuery($q);
+			$db->setQuery($dbQuery);
 			$db->execute();
 		}
 	}
@@ -350,7 +385,7 @@ function EventbookingParseRoute($segments)
 	$item = JFactory::getApplication()->getMenu()->getActive();
 	if ($item)
 	{
-		if (!empty($vars['view']) && empty($item->query['view']) && $vars['view'] == $item->query['view'])
+		if (!empty($vars['view']) && !empty($item->query['view']) && $vars['view'] == $item->query['view'])
 		{
 			foreach ($item->query as $key => $value)
 			{
