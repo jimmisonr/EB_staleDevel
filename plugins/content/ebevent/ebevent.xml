@@ -10,7 +10,6 @@
     <version>2.0.0</version>
     <description>This plugin is used to display event detail within a Joomla article</description>
     <files>
-        <filename plugin="ebevent">ebevent.php</filename>
-        <folder>ebevent</folder>
+        <filename plugin="ebevent">ebevent.php</filename>        
     </files>
 </extension>
