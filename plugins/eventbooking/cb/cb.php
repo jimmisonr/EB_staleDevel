@@ -16,7 +16,6 @@ class plgEventBookingCB extends JPlugin
 
 	public function __construct(& $subject, $config = array())
 	{
-		
 		parent::__construct($subject, $config);
 		$this->canRun = file_exists(JPATH_ROOT . '/components/com_comprofiler/comprofiler.php');
 	}
@@ -28,7 +27,7 @@ class plgEventBookingCB extends JPlugin
 	 *
 	 * @return bool|void
 	 */
-	function onAfterStoreRegistrant($row)
+	public function onAfterStoreRegistrant($row)
 	{
 		if (!$this->canRun)
 		{
