@@ -1,14 +1,15 @@
 <?php
 /**
- * @version		1.0.0
- * @package		Joomla
- * @subpackage	Event Booking
- * @author  Tuan Pham Ngoc
- * @copyright	Copyright (C) 2010 Ossolution Team
- * @license		GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 
-defined( '_JEXEC' ) or die ;
+// no direct access
+defined('_JEXEC') or die;
 
 class plgEventbookingJoomlagroups extends JPlugin
 {
@@ -16,18 +17,20 @@ class plgEventbookingJoomlagroups extends JPlugin
 	{
 		parent::__construct($subject, $config);
 		JFactory::getLanguage()->load('plg_eventbooking_joomlagroups', JPATH_ADMINISTRATOR);
-		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/tables');
+		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/table');
 	}
-
+	
 	/**
-	 * Render settings from
+	 * Render settings form
 	 *
-	 * @param Event $row
+	 * @param $row
+	 *
+	 * @return array
 	 */
-	function onEditEvent($row)
+	public function onEditEvent($row)
 	{
 		ob_start();
-		$this->_drawSettingForm($row);
+		$this->drawSettingForm($row);
 		$form = ob_get_contents();
 		ob_end_clean();
 
@@ -42,7 +45,7 @@ class plgEventbookingJoomlagroups extends JPlugin
 	 * @param Event   $row
 	 * @param Boolean $isNew true if create new plan, false if edit
 	 */
-	function onAfterSaveEvent($row, $data, $isNew)
+	public function onAfterSaveEvent($row, $data, $isNew)
 	{
 		$params = new JRegistry($row->params);
 		$params->set('joomla_group_ids', implode(',', $data['joomla_group_ids']));
@@ -52,11 +55,11 @@ class plgEventbookingJoomlagroups extends JPlugin
 	}
 
 	/**
-	 * Run when a membership activated
+	 * Add registrants to selected Joomla groups when payment for registration completed
 	 *
 	 * @param PlanOsMembership $row
 	 */
-	function onAfterPaymentSuccess($row)
+	public function onAfterPaymentSuccess($row)
 	{
 		if ($row->user_id)
 		{
@@ -92,30 +95,33 @@ class plgEventbookingJoomlagroups extends JPlugin
 			$user->save(true);
 		}
 	}
+
 	/**
-	 * Display form allows users to change setting for this subscription plan 
+	 * Display form allows users to change setting for this subscription plan
+	 *
 	 * @param object $row
-	 * 
-	 */	
-	function _drawSettingForm($row) {
-		$params = new JRegistry($row->params);		
-		$joomla_group_ids 			= explode(',',$params->get('joomla_group_ids', ''));
-	?>	
+	 *
+	 */
+	private function drawSettingForm($row)
+	{
+		$params           = new JRegistry($row->params);
+		$joomla_group_ids = explode(',', $params->get('joomla_group_ids', ''));
+		?>
 		<table class="admintable adminform" style="width: 90%;">
-				<tr>
-					<td width="220" class="key">
-						<?php echo  JText::_('PLG_EVENTBOOKING_JOOMLA_ASSIGN_TO_JOOMLA_GROUPS'); ?>
-					</td>
-					<td>
-						<?php
-							echo JHtml::_('access.usergroup', 'joomla_group_ids[]', $joomla_group_ids,  ' multiple="multiple" size="6" ', false) ;
-						?>
-					</td>
-					<td>
-						<?php echo JText::_('PLG_EVENTBOOKING_JOOMLA_ASSIGN_TO_JOOMLA_GROUPS_EXPLAIN'); ?>
-					</td>
-				</tr>
-		</table>	
-	<?php							
+			<tr>
+				<td width="220" class="key">
+					<?php echo JText::_('PLG_EVENTBOOKING_JOOMLA_ASSIGN_TO_JOOMLA_GROUPS'); ?>
+				</td>
+				<td>
+					<?php
+					echo JHtml::_('access.usergroup', 'joomla_group_ids[]', $joomla_group_ids, ' multiple="multiple" size="6" ', false);
+					?>
+				</td>
+				<td>
+					<?php echo JText::_('PLG_EVENTBOOKING_JOOMLA_ASSIGN_TO_JOOMLA_GROUPS_EXPLAIN'); ?>
+				</td>
+			</tr>
+		</table>
+	<?php
 	}
 }	
