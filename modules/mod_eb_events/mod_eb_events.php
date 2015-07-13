@@ -1,50 +1,70 @@
 <?php
 /**
- * @version        1.7.2
+ * @version        2.0.0
  * @package        Joomla
  * @subpackage     Event Booking
  * @author         Tuan Pham Ngoc
  * @copyright      Copyright (C) 2010 - 2015 Ossolution Team
  * @license        GNU/GPL, see LICENSE.php
  */
-defined('_JEXEC') or die();
+
+// no direct access
+defined('_JEXEC') or die;
+
 error_reporting(0);
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/route.php';
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/jquery.php';
+$user     = JFactory::getUser();
+$config   = EventbookingHelper::getConfig();
+$document = JFactory::getDocument();
 EventbookingHelper::loadLanguage();
-$db = JFactory::getDbo();
-$itemId = (int) $params->get('item_id', 0);
+$db      = JFactory::getDbo();
+$query   = $db->getQuery(true);
+$baseUrl = JUri::base(true);
+$itemId  = (int) $params->get('item_id', 0);
 if (!$itemId)
 {
 	$itemId = EventbookingHelper::getItemid();
 }
-$user = JFactory::getUser();
-$fieldSuffix = EventbookingHelper::getFieldSuffix();
+$fieldSuffix  = EventbookingHelper::getFieldSuffix();
+$currentDate  = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
 $numberEvents = $params->get('number_events', 6);
-$categoryIds = trim($params->get('category_ids', ''));
+$categoryIds  = trim($params->get('category_ids', ''));
 $showCategory = $params->get('show_category', 1);
 $showLocation = $params->get('show_location');
-$where = array();
-$where[] = 'a.published =1 ';
-$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
-$where[] = 'DATE(a.event_date) >= "' . $currentDate . '"';
-// $where[] = '(cut_off_date = "'.$db->getNullDate().'" OR DATE(cut_off_date) >= CURDATE())' ;
-if ($categoryIds != '')
+
+$query->select('a.*, c.name AS location_name')
+	->from('#__eb_events AS a')
+	->leftJoin('#__eb_locations AS c ON a.location_id = c.id')
+	->where('a.published = 1')
+	->where('a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
+	->where('DATE(a.event_date) >= ' . $db->quote($currentDate))
+	->order('a.event_date');
+
+if ($fieldSuffix)
 {
-	$where[] = ' a.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id IN (' . $categoryIds . '))';
+	$query->select('a.title' . $fieldSuffix . ' AS title');
 }
-$where[] = ' a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')';
-$sql = 'SELECT a.*,a.title' . $fieldSuffix . ' AS title, c.name AS location_name FROM #__eb_events AS a ' . ' LEFT JOIN #__eb_locations AS c ' . ' ON a.location_id = c.id ' . ' WHERE ' .
-	implode(' AND ', $where) . ' ORDER BY a.event_date ' . ' LIMIT ' . $numberEvents;
-$db->setQuery($sql);
+
+if ($categoryIds)
+{
+	$query->where('a.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id IN (' . $categoryIds . '))');
+}
+
+$db->setQuery($query, 0, $numberEvents);
 $rows = $db->loadObjectList();
+
+$query->clear();
+$query->select('a.id, a.name' . $fieldSuffix . ' AS name')
+	->from('#__eb_categories AS a')
+	->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id');
+
 for ($i = 0, $n = count($rows); $i < $n; $i++)
 {
 	$row = $rows[$i];
-	// Get all categories
-	$sql = 'SELECT a.id, a.name FROM #__eb_categories AS a INNER JOIN #__eb_event_categories AS b ON a.id = b.category_id WHERE b.event_id=' . $row->id;
-	$db->setQuery($sql);
+	$query->where('b.event_id = ' . $row->id);
+	$db->setQuery($query);
 	$categories = $db->loadObjectList();
 	if (count($categories))
 	{
@@ -52,17 +72,18 @@ for ($i = 0, $n = count($rows); $i < $n; $i++)
 		foreach ($categories as $category)
 		{
 			$itemCategories[] = '<a href="' . EventbookingHelperRoute::getCategoryRoute($category->id, $itemId) . '"><strong>' . $category->name .
-				 '</strong></a>';
+				'</strong></a>';
 		}
 		$row->categories = implode('&nbsp;|&nbsp;', $itemCategories);
 	}
+	$query->clear('where');
 }
-$config = EventbookingHelper::getConfig();
+
+
 $layout = $params->get('layout', 'default');
-$document = JFactory::getDocument();
 if ($layout == 'default')
 {
-	$document->addStyleSheet(JUri::base(true) . '/modules/mod_eb_events/css/style.css');
+	$document->addStyleSheet($baseUrl . '/modules/mod_eb_events/css/style.css');
 }
 else
 {
@@ -70,7 +91,7 @@ else
 	{
 		EventbookingHelper::loadBootstrap();
 	}
-	$document->addStyleSheet(JUri::base(true) . '/modules/mod_eb_events/css/improved.css');
+	$document->addStyleSheet($baseUrl . '/modules/mod_eb_events/css/improved.css');
 }
 if ($config->calendar_theme)
 {
@@ -80,6 +101,6 @@ else
 {
 	$theme = 'default';
 }
-$styleUrl = JUri::base(true) . '/components/com_eventbooking/assets/css/themes/' . $theme . '.css';
-$document->addStyleSheet($styleUrl);
-require (JModuleHelper::getLayoutPath('mod_eb_events', $layout));
+
+$document->addStyleSheet($baseUrl . '/components/com_eventbooking/assets/css/themes/' . $theme . '.css');
+require(JModuleHelper::getLayoutPath('mod_eb_events', $layout));

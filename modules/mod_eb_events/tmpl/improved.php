@@ -1,13 +1,16 @@
 <?php
 /**
- * @version        1.7.2
+ * @version        2.0.0
  * @package        Joomla
  * @subpackage     Event Booking
  * @author         Tuan Pham Ngoc
- * @copyright      Copyright (C) 2010 Ossolution Team
+ * @copyright      Copyright (C) 2010 - 2015 Ossolution Team
  * @license        GNU/GPL, see LICENSE.php
  */
-defined('_JEXEC') or die ();
+
+// no direct access
+defined('_JEXEC') or die;
+
 JHtml::_('script', JUri::root().'components/com_eventbooking/assets/js/noconflict.js', false, false);	
 if ($showLocation)
 {
