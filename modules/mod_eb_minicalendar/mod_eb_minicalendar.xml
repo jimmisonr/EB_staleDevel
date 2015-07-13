@@ -10,8 +10,7 @@
 	<version>1.6.1</version>
 	<description>Shows event in one monthly calendar for Ebooking component</description>
 	<files>
-		<filename module="mod_eb_minicalendar">mod_eb_minicalendar.php</filename>
-		<filename>helper.php</filename>
+		<filename module="mod_eb_minicalendar">mod_eb_minicalendar.php</filename>		
 		<folder>tmpl</folder>		
 	</files>
 	<config>
