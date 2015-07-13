@@ -10,13 +10,19 @@
  */
 class EventbookingHelperData
 {
-	public static $days;
-
+	/**
+	 * Get day name from given day number
+	 *
+	 * @param $dayNumber
+	 *
+	 * @return mixed
+	 */
 	public static function getDayName($dayNumber)
 	{
-		if (self::$days == null)
+		static $days;
+		if ($days == null)
 		{
-			self::$days = array(
+			$days = array(
 				JText::_('EB_SUNDAY'),
 				JText::_('EB_MONDAY'),
 				JText::_('EB_TUESDAY'),
@@ -28,7 +34,86 @@ class EventbookingHelperData
 		}
 		$i = $dayNumber % 7;
 
-		return self::$days[$i];
+		return $days[$i];
+	}
+
+	/**
+	 * Get day name from day number in mini calendar
+	 *
+	 * @param $dayNumber
+	 *
+	 * @return mixed
+	 */
+	public static function getDayNameMini($dayNumber)
+	{
+		static $daysMini = null;
+		if ($daysMini === null)
+		{
+			$daysMini    = array();
+			$daysMini[0] = JText::_('EB_MINICAL_SUNDAY');
+			$daysMini[1] = JText::_('EB_MINICAL_MONDAY');
+			$daysMini[2] = JText::_('EB_MINICAL_TUESDAY');
+			$daysMini[3] = JText::_('EB_MINICAL_WEDNESDAY');
+			$daysMini[4] = JText::_('EB_MINICAL_THURSDAY');
+			$daysMini[5] = JText::_('EB_MINICAL_FRIDAY');
+			$daysMini[6] = JText::_('EB_MINICAL_SATURDAY');
+		}
+		$i = $dayNumber % 7; //
+		return $daysMini[$i];
+	}
+
+	/**
+	 * Get day name HTML code for a given day
+	 *
+	 * @param int  $dayNumber
+	 * @param bool $colored
+	 *
+	 * @return string
+	 */
+	public static function getDayNameHtml($dayNumber, $colored = false)
+	{
+		$i = $dayNumber % 7; // modulo 7
+		if ($i == '0' && $colored === true)
+		{
+			$dayName = '<span class="sunday">' . self::getDayName($i) . '</span>';
+		}
+		else if ($i == '6' && $colored === true)
+		{
+			$dayName = '<span class="saturday">' . self::getDayName($i) . '</span>';
+		}
+		else
+		{
+			$dayName = self::getDayName($i);
+		}
+
+		return $dayName;
+	}
+
+	/**
+	 * Get day name HTML code for a given day
+	 *
+	 * @param int  $dayNumber
+	 * @param bool $colored
+	 *
+	 * @return string
+	 */
+	public static function getDayNameHtmlMini($dayNumber, $colored = false)
+	{
+		$i = $dayNumber % 7; // modulo 7
+		if ($i == '0' && $colored === true)
+		{
+			$dayName = '<span class="sunday">' . self::getDayNameMini($i) . '</span>';
+		}
+		else if ($i == '6' && $colored === true)
+		{
+			$dayName = '<span class="saturday">' . self::getDayNameMini($i) . '</span>';
+		}
+		else
+		{
+			$dayName = self::getDayNameMini($i);
+		}
+
+		return $dayName;
 	}
 
 	/**
@@ -40,7 +125,7 @@ class EventbookingHelperData
 	 *
 	 * @return array
 	 */
-	public static function getCalendarData($rows, $year, $month)
+	public static function getCalendarData($rows, $year, $month, $mini = false)
 	{
 		$rowCount         = count($rows);
 		$data             = array();
@@ -57,7 +142,14 @@ class EventbookingHelperData
 		// get days in week
 		for ($i = 0; $i < 7; $i++)
 		{
-			$data["daynames"][$i] = self::getDayName(($i + $startDay) % 7);
+			if ($mini)
+			{
+				$data["daynames"][$i] = self::getDayNameMini(($i + $startDay) % 7);
+			}
+			else
+			{
+				$data["daynames"][$i] = self::getDayName(($i + $startDay) % 7);
+			}
 		}
 		//Start days
 		$start = ((date('w', mktime(0, 0, 0, $month, 1, $year)) - $startDay + 7) % 7);
@@ -285,14 +377,14 @@ class EventbookingHelperData
 	 */
 	public static function prepareCustomFieldsData($items)
 	{
-		$params = new JRegistry();
-		$xml = JFactory::getXML(JPATH_COMPONENT . '/fields.xml');
-		$fields = $xml->fields->fieldset->children();
+		$params       = new JRegistry();
+		$xml          = JFactory::getXML(JPATH_COMPONENT . '/fields.xml');
+		$fields       = $xml->fields->fieldset->children();
 		$customFields = array();
 		foreach ($fields as $field)
 		{
-			$name = $field->attributes()->name;
-			$label = JText::_($field->attributes()->label);
+			$name                  = $field->attributes()->name;
+			$label                 = JText::_($field->attributes()->label);
 			$customFields["$name"] = $label;
 		}
 		for ($i = 0, $n = count($items); $i < $n; $i++)

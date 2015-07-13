@@ -10,7 +10,7 @@
 // no direct access
 defined('_JEXEC') or die;
 $data = $this->data;
-$link = JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$this->month.'&Itemid='.$this->Itemid) ;	
+$link = JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$this->month.'&Itemid='.$this->Itemid) ;
 ?>
 <script type="text/javascript" src="<?php echo JUri::root().'components/com_eventbooking/assets/js/minicalendar.js'; ?>"></script>
 <table class="extcal_navbar" border="0" width="100%">
@@ -78,7 +78,7 @@ $link = JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$this
                         {
                             $link = JRoute::_("index.php?option=com_eventbooking&view=calendar&layout=daily&day=$this->year-$this->month-$dayos&Itemid=$this->Itemid");
                         }
-                        else
+                        elseif ($numberEvents == 1)
                         {
                             $link = JRoute::_(EventbookingHelperRoute::getEventRoute($currentDay['events'][0]->id, 0, $this->Itemid));
                         }
@@ -93,20 +93,20 @@ $link = JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$this
                     ?>
                     	<td class="<?php echo $class_today.' '.$class_event; ?>">
 	                    	<?php
+		                    if ($d == 0)
+		                    {
+			                    $class = "sunday";
+		                    }
+		                    else if($d == 6)
+		                    {
+			                    $class = "saturday";
+		                    }
+		                    else
+		                    {
+			                    $class = "nomarl";
+		                    }
 	                    	if(count($currentDay["events"]))
-	                    	{ 
-                   				if ($d == 0)
-	                    		{
-	                    			$class = "sunday";
-	                    		}
-	                    		else if($d == 6)
-	                    		{
-	                    			$class = "saturday";
-	                    		}
-	                    		else
-	                    		{
-	                    			$class = "nomarl";
-	                    		}
+	                    	{
 	                    	?>
 	                    		<a href="<?php echo $link; ?>" title="<?php echo  ($numberEvents > 1 ? $numberEvents.JText::_('EB_EVENTS') :  $currentDay["events"][0]->title) ; ?>" rel="nofollow">
 	                    			<span class="<?php echo $class?>"><?php echo $currentDay['d']; ?></span>
