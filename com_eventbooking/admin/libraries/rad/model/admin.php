@@ -234,7 +234,7 @@ class RADModelAdmin extends RADModel
 		}
 		if ($this->triggerEvents)
 		{
-			$result = $dispatcher->trigger($this->eventBeforeSave, array($this->context, $row, $data, $isNew));
+			$result = $dispatcher->trigger($this->eventBeforeSave, array($row, $data, $isNew));
 			if (in_array(false, $result, true))
 			{
 				throw new Exception($row->getError());
@@ -248,7 +248,7 @@ class RADModelAdmin extends RADModel
 		}
 		if ($this->triggerEvents)
 		{
-			$dispatcher->trigger($this->eventAfterSave, array($this->context, $row, $data, $isNew));
+			$dispatcher->trigger($this->eventAfterSave, array($row, $data, $isNew));
 		}
 
 		$input->set('id', $row->id);
