@@ -1,13 +1,14 @@
 <?php
 /**
- * @version        1.6.6
- * @package        Joomla
- * @subpackage     Events Booking
- * @author         Tuan Pham Ngoc
- * @copyright      Copyright (C) 2010 - 2015 Ossolution Team
- * @license        GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 
+// no direct access
 defined('_JEXEC') or die;
 
 class plgEventBookingAcymailing extends JPlugin
@@ -22,9 +23,11 @@ class plgEventBookingAcymailing extends JPlugin
 	/**
 	 * Render setting form
 	 *
-	 * @param PlanOSMembership $row
+	 * @param JTable $row
+	 *
+	 * @return array
 	 */
-	function onEditEvent($row)
+	public function onEditEvent($row)
 	{
 		if (!is_dir(JPATH_ADMINISTRATOR . '/components/com_acymailing'))
 		{
@@ -33,7 +36,7 @@ class plgEventBookingAcymailing extends JPlugin
 			);
 		}
 		ob_start();
-		$this->_drawSettingForm($row);
+		$this->drawSettingForm($row);
 		$form = ob_get_contents();
 		ob_end_clean();
 
@@ -48,7 +51,7 @@ class plgEventBookingAcymailing extends JPlugin
 	 * @param event   $row
 	 * @param Boolean $isNew true if create new plan, false if edit
 	 */
-	function onAfterSaveEvent($row, $data, $isNew)
+	public function onAfterSaveEvent($row, $data, $isNew)
 	{
 		// $row of table EB_plans
 		$params = new JRegistry($row->params);
@@ -63,13 +66,13 @@ class plgEventBookingAcymailing extends JPlugin
 	 *
 	 * @param PlanOsMembership $row
 	 */
-	function onAfterStoreRegistrant($row)
+	public function onAfterStoreRegistrant($row)
 	{
 		if (!file_exists(JPATH_ADMINISTRATOR . '/components/com_acymailing/acymailing.php'))
 		{
 			return;
 		}
-		$event =  & JTable::getInstance('EventBooking', 'Event');
+		$event =  JTable::getInstance('EventBooking', 'Event');
 		$event->load($row->event_id);
 		$params  = new JRegistry($event->params);
 		$listIds = $params->get('acymailing_list_ids', '');
@@ -105,7 +108,7 @@ class plgEventBookingAcymailing extends JPlugin
 	 *
 	 * @param object $row
 	 */
-	function _drawSettingForm($row)
+	private function drawSettingForm($row)
 	{
 		require_once JPATH_ADMINISTRATOR . '/components/com_acymailing/helpers/helper.php';
 		$params    = new JRegistry($row->params);
