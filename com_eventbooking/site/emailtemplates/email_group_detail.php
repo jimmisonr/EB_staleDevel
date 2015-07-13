@@ -250,10 +250,10 @@ defined('_JEXEC') or die;
 			<td colspan="2">										
 				<table width="100%" class="os_member_list">																		
 					<?php			
-						$rowFields = EventbookingHelper::getFormFields($row->event_id, 2);
-						$memberForm = new RADForm($rowFields);
+						$rowFields = EventbookingHelper::getFormFields($row->event_id, 2);						
 						for ($i = 0 , $n  = count($rowMembers); $i < $n; $i++) 
 						{
+							$memberForm = new RADForm($rowFields);
 							if ($i %2 == 0)
 							{
 								echo "<tr>\n" ;

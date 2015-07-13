@@ -240,11 +240,11 @@ $span6Class        = $bootstrapHelper->getClassMapping('span6');
 		        </div>
             </div>
             <?php
-            	$rowFields = EventbookingHelper::getFormFields($row->event_id, 2);
-            	$memberForm = new RADForm($rowFields);                           
+            	$rowFields = EventbookingHelper::getFormFields($row->event_id, 2);            	
                 for ($i = 0 , $n  = count($rowMembers); $i < $n; $i++)
                 {
-                    $rowMember = $rowMembers[$i] ;
+					$memberForm = new RADForm($rowFields);                           
+                    $rowMember = $rowMembers[$i];
                     if ($i %2 == 0)
                     {                    	
                         echo "<div class=\"".$rowFluidClass."\">\n" ;
