@@ -3670,7 +3670,7 @@ class EventbookingHelper
 
 	public static function downloadInvoice($id)
 	{
-		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_eventbooking/tables');
+		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_eventbooking/table');
 		$config = self::getConfig();
 		$row    = JTable::getInstance('EventBooking', 'Registrant');
 		$row->load($id);

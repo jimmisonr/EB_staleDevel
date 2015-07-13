@@ -17,7 +17,7 @@ class plgEventBookingMailchimp extends JPlugin
 	{
 		parent::__construct($subject, $config);
 		JFactory::getLanguage()->load('plg_eventbooking_mailchimp', JPATH_ADMINISTRATOR);
-		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/tables');
+		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/table');
 	}
 
 	/**

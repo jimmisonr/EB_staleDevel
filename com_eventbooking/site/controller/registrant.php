@@ -116,7 +116,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 			JFactory::getApplication()->redirect('index.php', JText::_('You do not have permission to download the invoice'));
 		}
 		$id = $this->input->getInt('id', 0);
-		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/tables');
+		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/table');
 		$row = JTable::getInstance('eventbooking', 'Registrant');
 		$row->load($id);
 		if (!$row->id || ($row->user_id != $user->id))

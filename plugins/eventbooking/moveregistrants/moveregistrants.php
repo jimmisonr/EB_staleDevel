@@ -20,7 +20,7 @@ class plgEventBookingMoveRegistrants extends JPlugin
 	 */
 	public function onRegistrationCancel($row) {		
 		require_once JPATH_ROOT.'/components/com_eventbooking/helper/helper.php';		
-		require_once JPATH_ADMINISTRATOR.'/components/com_eventbooking/tables/eventbooking.php';
+		require_once JPATH_ADMINISTRATOR.'/components/com_eventbooking/table/eventbooking.php';
 		$db = & JFactory::getDbo() ;
 		$config = EventBookingHelper::getConfig();
 		$fields = array(
