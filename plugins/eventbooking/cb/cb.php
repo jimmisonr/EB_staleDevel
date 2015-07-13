@@ -1,14 +1,15 @@
 <?php
 /**
- * @version		1.0.0
- * @package		Joomla
- * @subpackage	Event Booking
- * @author  Tuan Pham Ngoc
- * @copyright	Copyright (C) 2010 Ossolution Team
- * @license		GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 
-defined('_JEXEC') or die();
+// no direct access
+defined('_JEXEC') or die;
 
 class plgEventBookingCB extends JPlugin
 {
@@ -21,8 +22,11 @@ class plgEventBookingCB extends JPlugin
 	}
 
 	/**
-	 * Run when a membership activated
-	 * @param PlanOsMembership $row
+	 * Update CB profile data with information which registrant entered on registration form
+	 *
+	 * @param $row
+	 *
+	 * @return bool|void
 	 */
 	function onAfterStoreRegistrant($row)
 	{
@@ -31,8 +35,8 @@ class plgEventBookingCB extends JPlugin
 			return;
 		}
 		require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
-		$integration = EventBookingHelper::getConfigValue('cb_integration');
-		if ($row->user_id && $integration == 1)
+		$config = EventbookingHelper::getConfig();
+		if ($row->user_id && $config->cb_integration == 1)
 		{
 			$db = JFactory::getDBO();
 			$sql = 'SELECT count(*) FROM `#__comprofiler` WHERE `user_id` = ' . $db->Quote($row->user_id);
@@ -108,10 +112,11 @@ class plgEventBookingCB extends JPlugin
 				$profile->{$fieldName} = $value;
 			}
 			$db->insertObject('#__comprofiler', $profile);			
+
 			//Update the block field in users table
 			$sql = 'UPDATE  #__users SET `block` = 0 WHERE id=' . $row->user_id;
 			$db->setQuery($sql);
-			$db->query();			
+			$db->execute();
 			return true;
 		}
 	}
