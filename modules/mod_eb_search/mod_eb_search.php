@@ -9,12 +9,10 @@
  */
 defined('_JEXEC') or die ('');
 error_reporting(0);
-$document = JFactory::getDocument();
-$styleUrl = JUri::base(true) . '/components/com_eventbooking/assets/css/style.css';
-$document->addStylesheet($styleUrl, 'text/css', null, null);
+JFactory::getDocument()->addStylesheet(JUri::base(true) . '/components/com_eventbooking/assets/css/style.css', 'text/css', null, null);
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/database.php';
-EventBookingHelper::loadLanguage();
+EventbookingHelper::loadLanguage();
 
 $input        = JFactory::getApplication()->input;
 $showCategory = $params->get('show_category', 1);
