@@ -3,8 +3,8 @@
  * Register the prefix so that the classes in RAD library can be auto-load
  */
 defined('_JEXEC') or die();
-
 define('EB_TBC_DATE', '2099-12-31 00:00:00');
+
 JLoader::registerPrefix('RAD', dirname(__FILE__));
 $app = JFactory::getApplication();
 JLoader::registerPrefix('Eventbooking', JPATH_BASE . '/components/com_eventbooking');
