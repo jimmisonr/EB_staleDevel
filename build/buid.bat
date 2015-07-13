@@ -39,8 +39,6 @@ cd E:\www\eventbooking\plugins\eventbooking\cartupdate\
 7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_cartupdate.zip *
 cd E:\www\eventbooking\plugins\eventbooking\cb\
 7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_cb.zip *
-cd E:\www\eventbooking\plugins\eventbooking\ccnewsletter\
-7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_ccnewsletter.zip *
 cd E:\www\eventbooking\plugins\eventbooking\invoice\
 7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_invoice.zip *
 cd E:\www\eventbooking\plugins\eventbooking\jcomments\

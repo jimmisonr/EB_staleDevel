@@ -20,8 +20,7 @@
 	   <file type="module" id="eventbooking" client="site">mod_eb_search.zip</file>   
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_acymailing.zip</file>
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_cartupdate.zip</file>
-	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_cb.zip</file>	
-	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_ccnewsletter.zip</file>
+	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_cb.zip</file>		   
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_invoice.zip</file>
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_map.zip</file>
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_jcomments.zip</file>
