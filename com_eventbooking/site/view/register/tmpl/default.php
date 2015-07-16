@@ -551,32 +551,37 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	$articleId  = $this->event->article_id ? $this->event->article_id : $this->config->article_id ;
 	if ($this->config->accept_term ==1 && $articleId)
 	{
-		$db =  JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('id, catid')
-			->from('#__content')
-			->where('id = '. (int) $articleId);
-		$db->setQuery($query);
-		$article = $db->loadObject();
-		require_once JPATH_ROOT.'/components/com_content/helpers/route.php' ;
-		if ($this->config->fix_term_and_condition_popup)
+		if (version_compare(JVERSION, '3.1', 'ge') && JLanguageMultilang::isEnabled())
 		{
-			$termLink = ContentHelperRoute::getArticleRoute($article->id, $article->catid).'&format=html' ;
-			$extra = ' target="_blank" ';
+			$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $articleId);
+			$langCode     = JFactory::getLanguage()->getTag();
+			if (isset($associations[$langCode]))
+			{
+				$article = $associations[$langCode];
+			}
 		}
-		else
+
+		if (!isset($article))
 		{
-			EventbookingHelperJquery::colorbox('eb-colorbox-term');
-			$termLink = ContentHelperRoute::getArticleRoute($article->id, $article->catid).'&tmpl=component&format=html' ;
-			$extra = ' class="eb-colorbox-term" ' ;
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('id, catid')
+				->from('#__content')
+				->where('id = ' . (int) $articleId);
+			$db->setQuery($query);
+			$article = $db->loadObject();
 		}
+
+		require_once JPATH_ROOT . '/components/com_content/helpers/route.php';
+		EventbookingHelperJquery::colorbox('eb-colorbox-term');
+		$termLink = ContentHelperRoute::getArticleRoute($article->id, $article->catid) . '&tmpl=component&format=html';
 		?>
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="checkbox">
 				<input type="checkbox" name="accept_term" value="1" class="validate[required]" data-errormessage="<?php echo JText::_('EB_ACCEPT_TERMS');?>" />
 				<?php echo JText::_('EB_ACCEPT'); ?>&nbsp;
 				<?php
-					echo "<a $extra href=\"".JRoute::_($termLink)."\">"."<strong>".JText::_('EB_TERM_AND_CONDITION')."</strong>"."</a>\n";
+					echo "<a class=\"eb-colorbox-term\" href=\"".JRoute::_($termLink)."\">"."<strong>".JText::_('EB_TERM_AND_CONDITION')."</strong>"."</a>\n";
 				?>
 			</label>
 		</div>
