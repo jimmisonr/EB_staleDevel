@@ -17,9 +17,7 @@ $span6Class        = $bootstrapHelper->getClassMapping('span6');
 ?>
 <form id="adminForm" class="form form-horizontal">
     <div class="<?php echo $controlGroupClass;  ?>">
-	    <div class="<?php echo $controlsClass;  ?>">
-	        <h3 class="eb-heading"><?php echo JText::_('EB_GENERAL_INFORMATION') ; ?></h3>
-		</div>
+	    <h3 class="eb-heading"><?php echo JText::_('EB_GENERAL_INFORMATION') ; ?></h3>
     </div>
     <div class="<?php echo $controlGroupClass;  ?>">
         <label class="<?php echo $controlLabelClass;  ?>">
@@ -102,9 +100,7 @@ $span6Class        = $bootstrapHelper->getClassMapping('span6');
         {
         ?>
             <div class="<?php echo $controlGroupClass;  ?>">
-	            <div class="<?php echo $controlsClass;  ?>">
-                    <h3 class="eb-heading"><?php echo JText::_('EB_BILLING_INFORMATION') ; ?></h3>
-		        </div>
+	            <h3 class="eb-heading"><?php echo JText::_('EB_BILLING_INFORMATION') ; ?></h3>
             </div>
         <?php
             //Show data for form
@@ -235,9 +231,7 @@ $span6Class        = $bootstrapHelper->getClassMapping('span6');
         {
         ?>
             <div class="<?php echo $controlGroupClass;  ?>">
-	            <div class="<?php echo $controlsClass;  ?>">
-                    <h3 class="eb-heading"><?php echo JText::_('EB_MEMBERS_INFORMATION') ; ?></h3>
-		        </div>
+	            <h3 class="eb-heading"><?php echo JText::_('EB_MEMBERS_INFORMATION') ; ?></h3>
             </div>
             <?php
             	$rowFields = EventbookingHelper::getFormFields($row->event_id, 2);            	
@@ -266,9 +260,7 @@ $span6Class        = $bootstrapHelper->getClassMapping('span6');
                 ?>
                 <div class="<?php echo $span6Class; ?>">
                     <div class="<?php echo $controlGroupClass;  ?>">
-	                    <div class="<?php echo $controlsClass;  ?>">
-                            <h4 class="eb-heading"><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1) ; ?></h4>
-		                </div>
+	                    <h4 class="eb-heading"><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1) ; ?></h4>
                     </div>
                     <?php
 	                    $fields = $memberForm->getFields();
