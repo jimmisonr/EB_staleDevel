@@ -484,40 +484,7 @@ $editor = JFactory::getEditor();
 						<td>
 							<?php echo JText::_('EB_HIDE_PAST_EVENTS_EXPLAIN'); ?>
 						</td>
-					</tr>			
-					<tr>
-						<td class="key">
-							<?php echo JText::_('EB_FIX_PROCESS_BUTTON_NOT_WORKING'); ?>
-						</td>
-						<td>
-							<?php echo $this->lists['fix_next_button']; ?>
-						</td>
-						<td>
-							<?php echo JText::_('EB_FIX_PROCESS_BUTTON_NOT_WORKING_EXPLAIN'); ?>
-						</td>
 					</tr>
-					<tr>
-						<td class="key">
-							<?php echo JText::_('EB_FIX_BREADCRUMBS'); ?>
-						</td>
-						<td>
-							<?php echo $this->lists['fix_breadcrumbs']; ?>
-						</td>
-						<td>
-							<?php echo JText::_('EB_FIX_BREADCRUMBS_EXPLAIN'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td class="key">
-							<?php echo JText::_('EB_FIX_TERM_AND_CONDITION_POPUP'); ?>
-						</td>
-						<td>
-							<?php echo $this->lists['fix_term_and_condition_popup']; ?>
-						</td>
-						<td>
-							<?php echo JText::_('EB_FIX_TERM_AND_CONDITION_POPUP_EXPLAIN'); ?>
-						</td>
-					</tr>											
 					<tr>
 						<td class="key">
 							<?php echo JText::_('EB_SHOW_TERM_AND_CONDITION') ?>

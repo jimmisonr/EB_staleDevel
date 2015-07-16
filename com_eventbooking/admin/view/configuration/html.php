@@ -79,11 +79,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['enable_captcha']                     = JHtml::_('select.booleanlist', 'enable_captcha', '', $config->enable_captcha > 0 ? "1" : "0");
 		$lists['bypass_captcha_for_registered_user'] = JHtml::_('select.booleanlist', 'bypass_captcha_for_registered_user', '',
 			$config->bypass_captcha_for_registered_user);
-		$lists['fix_next_button']                    = JHtml::_('select.booleanlist', 'fix_next_button', '', $config->fix_next_button);
-		$lists['fix_term_and_condition_popup']       = JHtml::_('select.booleanlist', 'fix_term_and_condition_popup', '',
-			$config->fix_term_and_condition_popup);
 		$lists['activate_recurring_event']           = JHtml::_('select.booleanlist', 'activate_recurring_event', '', $config->activate_recurring_event);
-		$lists['fix_breadcrumbs']                    = JHtml::_('select.booleanlist', 'fix_breadcrumbs', '', $config->fix_breadcrumbs);
 		$lists['send_ics_file']                      = JHtml::_('select.booleanlist', 'send_ics_file', '', $config->send_ics_file);
 
 		$query->select('id, title')
