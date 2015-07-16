@@ -353,6 +353,7 @@ td.eb-event-property-label {
 form.form-horizontal .control-label, form.form-horizontal .control-label label {
     text-align: left;
     font-weight: bold;
+	padding: 0px;
 }
 
 /**Form CSSS**/
