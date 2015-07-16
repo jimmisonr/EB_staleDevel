@@ -28,7 +28,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			<?php echo JText::_('EB_NAME'); ?>
 		</label>
 		<div class="<?php echo $controlsClass; ?>">
-			<input type="text" name="name" value="<?php echo $this->nam; ?>" class="validate[required] inputbox" size="50" />
+			<input type="text" name="name" value="<?php echo $this->name; ?>" class="validate[required] inputbox" size="50" />
 		</div>
 	</div>
 	<div class="<?php echo $controlGroupClass; ?>">
