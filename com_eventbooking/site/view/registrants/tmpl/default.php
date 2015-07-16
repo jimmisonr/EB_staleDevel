@@ -97,8 +97,18 @@ $return = base64_encode(JUri::getInstance()->toString());
 				}
 				?>
 				<th class="list_id">
-					<?php echo JHtml::_('grid.sort',  JText::_('EB_REGISTRATION_STATUS'), 'tbl.published', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					<?php echo JHtml::_('grid.sort',  JText::_('EB_REGISTRATION_STATUS'), 'tbl.published', $this->lists['order_Dir'], $this->lists['order']); ?>
 				</th>
+				<?php
+				if ($this->config->activate_invoice_feature)
+				{
+				?>
+					<th width="8%">
+						<?php echo JHtml::_('grid.sort',  JText::_('EB_INVOICE_NUMBER'), 'tbl.invoice_number', $this->lists['order_Dir'], $this->lists['order']); ?>
+					</th>
+				<?php
+				}
+				?>
 			</tr>
 		</thead>
 		<tfoot>
@@ -212,6 +222,23 @@ $return = base64_encode(JUri::getInstance()->toString());
 					}
 					?>
 				</td>
+				<?php
+				if ($this->config->activate_invoice_feature)
+				{
+				?>
+					<td class="center">
+						<?php
+						if ($row->invoice_number)
+						{
+						?>
+							<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_invoice&id='.($row->cart_id ? $row->cart_id : ($row->group_id ? $row->group_id : $row->id))); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo EventbookingHelper::formatInvoiceNumber($row->invoice_number, $this->config) ; ?></a>
+						<?php
+						}
+						?>
+					</td>
+				<?php
+				}
+				?>
 			</tr>
 			<?php
 		}

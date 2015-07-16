@@ -115,11 +115,46 @@ class EventbookingControllerRegistrant extends EventbookingController
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('You do not have permission to download the invoice'));
 		}
+
 		$id = $this->input->getInt('id', 0);
 		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/table');
 		$row = JTable::getInstance('eventbooking', 'Registrant');
 		$row->load($id);
-		if (!$row->id || ($row->user_id != $user->id))
+		$canDownload = false;
+
+		if ($row->user_id == $user->id)
+		{
+			$canDownload = true;
+		}
+
+		if (!$canDownload)
+		{
+			if ($user->authorise('eventbooking.registrants_management', 'com_eventbooking'))
+			{
+				$config = EventbookingHelper::getConfig();
+				if ($config->only_show_registrants_of_event_owner)
+				{
+					$db = JFactory::getDbo();
+					$query = $db->getQuery(true);
+					$query->select('created_by')
+						->from('#__eb_events')
+						->where('id = '. $row->event_id);
+					$db->setQuery($query);
+					$createdBy = $db->loadResult();
+					if ($createdBy == $user->id)
+					{
+						$canDownload = true;
+					}
+				}
+				else
+				{
+					$canDownload = true;
+				}
+			}
+		}
+
+
+		if (!$canDownload)
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('You do not have permission to download the invoice'));
 		}
