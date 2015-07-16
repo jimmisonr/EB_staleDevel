@@ -313,7 +313,6 @@ function EventbookingBuildRoute(&$query)
 		$unProcessedVariables = array(
 			'option',
 			'Itemid',
-			'location_id',
 			'category_id',
 			'registration_code',
 			'search',
@@ -321,6 +320,11 @@ function EventbookingBuildRoute(&$query)
 			'limitstart',
 			'limit'
 		);
+
+		if ($view != 'location')
+		{
+			$unProcessedVariables[] = 'location_id';
+		}
 
 		foreach ($unProcessedVariables as $variable)
 		{
