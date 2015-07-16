@@ -303,10 +303,7 @@ function EventbookingBuildRoute(&$query)
 	{
 		unset($query['event_id']);
 	}
-	if (isset($query['category_id']))
-	{
-		unset($query['category_id']);
-	}
+
 	if (isset($query['catid']))
 	{
 		unset($query['catid']);

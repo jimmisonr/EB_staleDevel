@@ -59,12 +59,6 @@ class RADModelList extends RADModel
 	protected $searchFields = array();
 
 	/**
-	 * Remember model states, always set to true for model list
-	 * @var boolean
-	 */
-	public $rememberStates = true;
-
-	/**
 	 * Clear join clause for getTotal method
 	 *
 	 * @var bool
@@ -135,6 +129,11 @@ class RADModelList extends RADModel
 			{
 				$this->searchFields[] = 'tbl.alias';
 			}
+		}
+
+		if (!isset($config['remember_states']) && JFactory::getApplication()->isAdmin())
+		{
+			$this->rememberStates = true;
 		}
 	}
 
