@@ -591,7 +591,7 @@ li.getdirection a {
     width: auto;
 }
 
-.nav {
+.eb-container .nav {
     width: 100%;
 }
 
