@@ -117,7 +117,7 @@ class EventbookingModelCart extends RADModel
 			$recordData = $recordsData[$eventId];
 			$row->bind($data);
 			$row->event_id               = $eventId;
-			$row->coupon_id              = $recordData['coupon_id'];
+			$row->coupon_id              = isset($recordData['coupon_id']) ? $recordData['coupon_id'] : 0;
 			$row->total_amount           = $recordData['total_amount'];
 			$row->discount_amount        = $recordData['discount_amount'];
 			$row->tax_amount             = $recordData['tax_amount'];
