@@ -41,7 +41,7 @@ $output = '<input name="search" id="search_eb_box" maxlength="50"  class="inputb
     	?>	
     	<tr>
     		<td>
-    			<input type="button" class="button search_button" value="<?php echo JText::_('EB_SEARCH'); ?>" onclick="searchData();" /> 
+    			<input type="button" class="btn btn-primary button search_button" value="<?php echo JText::_('EB_SEARCH'); ?>" onclick="searchData();" /> 
     		</td>
     	</tr>
     </table>
@@ -59,3 +59,9 @@ $output = '<input name="search" id="search_eb_box" maxlength="50"  class="inputb
 
 	<input type="hidden" name="layout" value="<?php echo $layout; ?>" />
 </form>
+<style type="text/css">
+#eb_search_form td {
+	border: none;
+	padding: 5px;
+}
+</style>
