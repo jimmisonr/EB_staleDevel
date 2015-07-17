@@ -386,7 +386,7 @@ abstract class EventbookingHelperHtml
 		$db->setQuery($query);
 		$menus = $db->loadObjectList();
 		$html  = '';
-		$html .= '<ul class="nav nav-tabs">';
+		$html .= '<ul id="eb-dropdown-menu" class="nav nav-tabs">';
 		for ($i = 0; $n = count($menus), $i < $n; $i++)
 		{
 			$menu = $menus[$i];
