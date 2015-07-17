@@ -531,28 +531,36 @@ class EventbookingHelper
 			$db->setQuery($sql);
 			$taxAmount = $db->loadResult();
 
+			$sql = 'SELECT SUM(payment_processing_fee) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
+			$db->setQuery($sql);
+			$paymentProcessingFee = $db->loadResult();
+
 			$sql = 'SELECT SUM(discount_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$discountAmount = $db->loadResult();
-			$amount         = $totalAmount - $discountAmount + $taxAmount;
+			$amount         = $totalAmount - $discountAmount + $paymentProcessingFee + $taxAmount;
 
-			$replaces['total_amount']    = EventbookingHelper::formatCurrency($totalAmount, $config, $event->currency_symbol);
-			$replaces['tax_amount']      = EventbookingHelper::formatCurrency($taxAmount, $config, $event->currency_symbol);
-			$replaces['discount_amount'] = EventbookingHelper::formatCurrency($discountAmount, $config, $event->currency_symbol);
-			$replaces['amount']          = EventbookingHelper::formatCurrency($amount, $config, $event->currency_symbol);
+			$replaces['total_amount']           = EventbookingHelper::formatCurrency($totalAmount, $config, $event->currency_symbol);
+			$replaces['tax_amount']             = EventbookingHelper::formatCurrency($taxAmount, $config, $event->currency_symbol);
+			$replaces['discount_amount']        = EventbookingHelper::formatCurrency($discountAmount, $config, $event->currency_symbol);
+			$replaces['payment_processing_fee'] = EventbookingHelper::formatCurrency($paymentProcessingFee, $config, $event->currency_symbol);
+			$replaces['amount']                 = EventbookingHelper::formatCurrency($amount, $config, $event->currency_symbol);
 
-			$replaces['amt_total_amount']    = $totalAmount;
-			$replaces['amt_tax_amount']      = $taxAmount;
-			$replaces['amt_discount_amount'] = $discountAmount;
-			$replaces['amt_amount']          = $amount;
+			$replaces['amt_total_amount']           = $totalAmount;
+			$replaces['amt_tax_amount']             = $taxAmount;
+			$replaces['amt_discount_amount']        = $discountAmount;
+			$replaces['amt_amount']                 = $amount;
+			$replaces['amt_payment_processing_fee'] = $paymentProcessingFee;
 		}
 		else
 		{
-			$replaces['total_amount']    = EventbookingHelper::formatCurrency($row->total_amount, $config, $event->currency_symbol);
-			$replaces['tax_amount']      = EventbookingHelper::formatCurrency($row->tax_amount, $config, $event->currency_symbol);
-			$replaces['discount_amount'] = EventbookingHelper::formatCurrency($row->discount_amount, $config, $event->currency_symbol);
-			$replaces['amount']          = EventbookingHelper::formatCurrency($row->amount, $config, $event->currency_symbol);
+			$replaces['total_amount']           = EventbookingHelper::formatCurrency($row->total_amount, $config, $event->currency_symbol);
+			$replaces['tax_amount']             = EventbookingHelper::formatCurrency($row->tax_amount, $config, $event->currency_symbol);
+			$replaces['discount_amount']        = EventbookingHelper::formatCurrency($row->discount_amount, $config, $event->currency_symbol);
+			$replaces['payment_processing_fee'] = EventbookingHelper::formatCurrency($row->payment_processing_fee, $config, $event->currency_symbol);
+			$replaces['amount']                 = EventbookingHelper::formatCurrency($row->amount, $config, $event->currency_symbol);
 		}
+
 		// Add support for location tag
 		$query->clear();
 		$query->select('a.*')
@@ -3624,12 +3632,13 @@ class EventbookingHelper
 			$sql = 'SELECT a.title' . $fieldSuffix . ' AS title, a.event_date, b.* FROM #__eb_events AS a INNER JOIN #__eb_registrants AS b ' . ' ON a.id = b.event_id ' .
 				' WHERE b.id=' . $row->id . ' OR b.cart_id=' . $row->id;
 			$db->setQuery($sql);
-			$rowEvents                   = $db->loadObjectList();
-			$subTotal                    = $replaces['amt_total_amount'];
-			$taxAmount                   = $replaces['amt_tax_amount'];
-			$discountAmount              = $replaces['amt_discount_amount'];
-			$total                       = $replaces['amt_amount'];
-			$replaces['EVENTS_LIST']     = EventbookingHelperHtml::loadCommonLayout(
+			$rowEvents                          = $db->loadObjectList();
+			$subTotal                           = $replaces['amt_total_amount'];
+			$taxAmount                          = $replaces['amt_tax_amount'];
+			$discountAmount                     = $replaces['amt_discount_amount'];
+			$total                              = $replaces['amt_amount'];
+			$paymentProcessingFee               = $replaces['amt_payment_processing_fee'];
+			$replaces['EVENTS_LIST']            = EventbookingHelperHtml::loadCommonLayout(
 				JPATH_ROOT . '/components/com_eventbooking/emailtemplates/invoice_items.php',
 				array(
 					'rowEvents'      => $rowEvents,
@@ -3638,22 +3647,24 @@ class EventbookingHelper
 					'discountAmount' => $discountAmount,
 					'total'          => $total,
 					'config'         => $config));
-			$replaces['SUB_TOTAL']       = EventbookingHelper::formatCurrency($subTotal, $config);
-			$replaces['DISCOUNT_AMOUNT'] = EventbookingHelper::formatCurrency($discountAmount, $config);
-			$replaces['TAX_AMOUNT']      = EventbookingHelper::formatCurrency($taxAmount, $config);
-			$replaces['TOTAL_AMOUNT']    = EventbookingHelper::formatCurrency($total, $config);
+			$replaces['SUB_TOTAL']              = EventbookingHelper::formatCurrency($subTotal, $config);
+			$replaces['DISCOUNT_AMOUNT']        = EventbookingHelper::formatCurrency($discountAmount, $config);
+			$replaces['TAX_AMOUNT']             = EventbookingHelper::formatCurrency($taxAmount, $config);
+			$replaces['TOTAL_AMOUNT']           = EventbookingHelper::formatCurrency($total, $config);
+			$replaces['PAYMENT_PROCESSING_FEE'] = EventbookingHelper::formatCurrency($paymentProcessingFee, $config);
 		}
 		else
 		{
-			$replaces['ITEM_QUANTITY']   = 1;
-			$replaces['ITEM_AMOUNT']     = $replaces['ITEM_SUB_TOTAL'] = self::formatCurrency($row->total_amount, $config);
-			$replaces['DISCOUNT_AMOUNT'] = self::formatCurrency($row->discount_amount, $config);
-			$replaces['SUB_TOTAL']       = self::formatCurrency($row->total_amount - $row->discount_amount, $config);
-			$replaces['TAX_AMOUNT']      = self::formatCurrency($row->tax_amount, $config);
-			$replaces['TOTAL_AMOUNT']    = self::formatCurrency($row->total_amount - $row->discount_amount + $row->tax_amount, $config);
-			$itemName                    = JText::_('EB_EVENT_REGISTRATION');
-			$itemName                    = str_replace('[EVENT_TITLE]', $rowEvent->title, $itemName);
-			$replaces['ITEM_NAME']       = $itemName;
+			$replaces['ITEM_QUANTITY']          = 1;
+			$replaces['ITEM_AMOUNT']            = $replaces['ITEM_SUB_TOTAL'] = self::formatCurrency($row->total_amount, $config);
+			$replaces['DISCOUNT_AMOUNT']        = self::formatCurrency($row->discount_amount, $config);
+			$replaces['SUB_TOTAL']              = self::formatCurrency($row->total_amount - $row->discount_amount, $config);
+			$replaces['TAX_AMOUNT']             = self::formatCurrency($row->tax_amount, $config);
+			$replaces['PAYMENT_PROCESSING_FEE'] = self::formatCurrency($row->payment_processing_fee, $config);
+			$replaces['TOTAL_AMOUNT']           = self::formatCurrency($row->total_amount - $row->discount_amount + $row->payment_processing_fee + $row->tax_amount, $config);
+			$itemName                           = JText::_('EB_EVENT_REGISTRATION');
+			$itemName                           = str_replace('[EVENT_TITLE]', $rowEvent->title, $itemName);
+			$replaces['ITEM_NAME']              = $itemName;
 		}
 		foreach ($replaces as $key => $value)
 		{
