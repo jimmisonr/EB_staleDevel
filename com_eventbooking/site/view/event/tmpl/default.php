@@ -620,6 +620,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 					$html .= EventbookingHelper::getStumbleuponButton( $title, $socialUrl );
 					$html .= EventbookingHelper::getTechnoratiButton( $title, $socialUrl );
 					$html .= EventbookingHelper::getTwitterButton( $title, $socialUrl );
+					$html .= EventbookingHelper::getLinkedInButton( $title, $socialUrl );
 					echo $html ;
 				?>
 			</div>

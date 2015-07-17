@@ -4503,6 +4503,13 @@ class EventbookingHelper
         </a>';
 	}
 
+	public static function getLinkedInButton($title, $link)
+	{
+		$img_url = "components/com_eventbooking/assets/images/socials/linkedin.png";
+
+		return '<a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=' . $link . '&amp;title=' . $title . '" title="Submit ' . $title . ' in LinkedIn" target="_blank" ><img src="' . $img_url . '" alt="Submit ' . $title . ' in LinkedIn" /></a>';
+	}
+
 	/**
 	 *
 	 * @param string $vName
