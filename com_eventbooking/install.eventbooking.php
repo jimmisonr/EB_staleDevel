@@ -61,6 +61,11 @@ class com_eventbookingInstallerScript
 		{
 			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/views');
 		}
+		
+		if (JFolder::exists(JPATH_ROOT . '/administrator/components/com_eventbooking/controller'))
+		{
+			JFolder::delete(JPATH_ROOT . '/administrator/components/com_eventbooking/controller');
+		}
 	}
 
 	/**
