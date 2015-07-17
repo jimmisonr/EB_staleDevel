@@ -1,7 +1,6 @@
 <?php
-
 /**
- * @version            1.7.2
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -70,7 +69,8 @@ class EventbookingHelperBootstrap
 				'add-on'          => 'add-on',
 				'img-polaroid'    => 'img-polaroid',
 				'control-label'   => 'control-label',
-				'controls'        => 'controls'
+				'controls'        => 'controls',
+				'icon-location'	  => 'icon-location'	
 			);
 		}
 		else
@@ -106,7 +106,8 @@ class EventbookingHelperBootstrap
 				'add-on'          => 'input-group-addon',
 				'img-polaroid'    => 'img-thumbnail',
 				'control-label'   => 'col-sm-3 control-label',
-				'controls'        => 'col-sm-9'
+				'controls'        => 'col-sm-9',
+				'icon-location'	  => 'icon-location'
 			);
 		}
 	}

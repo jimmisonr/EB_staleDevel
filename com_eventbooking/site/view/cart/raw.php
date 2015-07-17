@@ -21,11 +21,10 @@ class EventbookingViewCartRaw extends RADViewHtml
 		if ($layout == 'module')
 		{
 			$this->displayModule();
-		}
-		else
-		{
-			$this->setLayout('mini');
-		}
+			return;
+		}		
+		
+		$this->setLayout('mini');		
 		$config     = EventbookingHelper::getConfig();
 		$categoryId = (int) JFactory::getSession()->get('last_category_id', 0);
 		if (!$categoryId)

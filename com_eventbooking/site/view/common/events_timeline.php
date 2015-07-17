@@ -21,7 +21,7 @@ $iconRemoveClass   = $bootstrapHelper->getClassMapping('icon-remove');
 $iconPencilClass   = $bootstrapHelper->getClassMapping('icon-pencil');
 $iconDownloadClass = $bootstrapHelper->getClassMapping('icon-download');
 $iconCalendarClass = $bootstrapHelper->getClassMapping('icon-calendar');
-$iconMapMakerClass = $bootstrapHelper->getClassMapping('icon-map-marker');
+$iconMapMakerClass = $bootstrapHelper->getClassMapping('icon-location');
 $return = base64_encode(JUri::getInstance()->toString());
 ?>
 <div id="eb-events" class="eb-events-timeline">
