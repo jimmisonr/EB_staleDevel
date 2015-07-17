@@ -198,7 +198,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 		$query->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published NOT IN (2,3)))')
 			->where('a.event_id = ' . $eventId);
 
-		if (!$config->get(include_group_billing_in_csv_export, 1))
+		if (!$config->get('include_group_billing_in_csv_export', 1))
 		{
 			$query->where('a.is_group_billing = 0');
 		}
