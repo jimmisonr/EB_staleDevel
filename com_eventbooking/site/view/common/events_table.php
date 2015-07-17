@@ -33,6 +33,14 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 			<?php echo JText::_('EB_EVENT_DATE'); ?>
 		</th>
 		<?php
+			if ($config->show_event_end_date_in_table_layout)
+			{
+			?>
+				<th class="date_col <?php echo $hiddenPhoneClass; ?>">
+					<?php echo JText::_('EB_EVENT_END_DATE'); ?>
+				</th>
+			<?php
+			}
 			if ($config->show_location_in_category_view)
 			{
 			?>
@@ -132,6 +140,23 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 					?>
 				</td>
 				<?php
+					if ($config->show_event_end_date_in_table_layout)
+					{
+					?>
+						<td>
+							<?php 
+								if ($item->event_end_date == EB_TBC_DATE)
+								{
+									echo JText::_('EB_TBC');
+								}
+								else
+								{
+									echo JHtml::_('date', $item->event_end_date, $config->event_date_format, null);
+								}
+							?>
+						</td>
+					<?php
+					}
 					if ($config->show_location_in_category_view)
 					{
 					?>

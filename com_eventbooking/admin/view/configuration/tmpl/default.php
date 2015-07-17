@@ -947,6 +947,17 @@ $editor = JFactory::getEditor();
 					</tr>
 					<tr>
 						<td width="30%" class="key">
+							<?php echo JText::_('EB_SHOW_EVENT_END_DATE_IN_TABLE_LAYOUT'); ?>
+						</td>
+						<td>
+							<?php echo $this->lists['show_event_end_date_in_table_layout']; ?>
+						</td>
+						<td>
+							&nbsp;
+						</td>
+					</tr>
+					<tr>
+						<td width="30%" class="key">
 							<?php echo JText::_('EB_SHOW_PRICE_IN_TABLE_LAYOUT'); ?>
 						</td>
 						<td>

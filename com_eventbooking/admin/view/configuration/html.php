@@ -159,7 +159,9 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['show_cat_decription_in_table_layout']        = JHtml::_('select.booleanlist', 'show_cat_decription_in_table_layout', '',
 			$config->show_cat_decription_in_table_layout);
 		$lists['show_price_in_table_layout']                 = JHtml::_('select.booleanlist', 'show_price_in_table_layout', '', $config->show_price_in_table_layout);
-		$lists['show_image_in_table_layout']                 = JHtml::_('select.booleanlist', 'show_image_in_table_layout', '', $config->show_image_in_table_layout);
+		$lists['show_image_in_table_layout']                 = JHtml::_('select.booleanlist', 'show_image_in_table_layout', '', $config->show_image_in_table_layout);		
+		$lists['show_event_end_date_in_table_layout']                 = JHtml::_('select.booleanlist', 'show_event_end_date_in_table_layout', '', $config->show_event_end_date_in_table_layout);
+		
 		$lists['show_cat_decription_in_calendar_layout']     = JHtml::_('select.booleanlist', 'show_cat_decription_in_calendar_layout', '',
 			$config->show_cat_decription_in_calendar_layout);
 		$lists['display_message_for_full_event']             = JHtml::_('select.booleanlist', 'display_message_for_full_event', '',
