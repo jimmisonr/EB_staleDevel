@@ -70,7 +70,8 @@ if ($showCategory)
 
 //Build location dropdown
 if ($showLocation)
-{
+{	
+	$options   			  = array();
 	$options[]            = JHtml::_('select.option', 0, JText::_('EB_SELECT_LOCATION'), 'id', 'name');
 	$options              = array_merge($options, EventbookingHelperDatabase::getAllLocations());
 	$lists['location_id'] = JHtml::_('select.genericlist', $options, 'location_id', ' class="inputbox location_box" ', 'id', 'name', $locationId);
@@ -83,4 +84,4 @@ if (!$itemId)
 
 $layout = $params->get('layout_type', 'default');
 
-require(JModuleHelper::getLayoutPath('mod_eb_search', $params->get('module_layout', 'default');));
+require(JModuleHelper::getLayoutPath('mod_eb_search', $params->get('module_layout', 'default')));
