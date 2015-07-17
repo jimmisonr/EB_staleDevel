@@ -195,6 +195,20 @@ class EventbookingControllerRegistrant extends EventbookingController
 				->leftJoin('#__eb_coupons AS c ON a.coupon_id=c.id');
 		}
 
+		$query->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published NOT IN (2,3)))')
+			->where('a.event_id = ' . $eventId);
+
+		if (!$config->get(include_group_billing_in_csv_export, 1))
+		{
+			$query->where('a.is_group_billing = 0');
+		}
+
+		if (!$config->include_group_members_in_csv_export)
+		{
+			$query->where('a.group_id = 0');
+		}
+
+
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
 
