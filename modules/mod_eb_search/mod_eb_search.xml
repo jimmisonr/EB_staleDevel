@@ -34,6 +34,10 @@
                     <option value="default">Default Layout</option>
                     <option value="table">Table Layout</option>
                 </field>
+                <field name="module_layout" type="list" label="Module Layout" description="Choose the layout you want to use to display the module" default="default">
+                    <option value="default">Default Layout</option>
+                    <option value="horizontal">Horizontal Layout</option>
+                </field>
 				<field name="item_id" type="text"
 					label="Itemid" description="Itemid">
 				</field>							
