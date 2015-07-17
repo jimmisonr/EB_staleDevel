@@ -9,7 +9,7 @@
  */
 // no direct access
 defined('_JEXEC') or die();
-error_reporting(E_ALL);
+error_reporting(0);
 //Basic ACL support
 if (!JFactory::getUser()->authorise('core.manage', 'com_eventbooking'))
 {

@@ -11,7 +11,7 @@
 // no direct access
 defined('_JEXEC') or die;
 
-error_reporting(E_ALL);
+error_reporting(0);
 
 require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
 
