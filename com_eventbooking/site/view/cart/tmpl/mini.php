@@ -178,7 +178,7 @@ else
 				var quantity = $("input[id='quantity']").map(function(){return $(this).val();}).get();
 				$.ajax({
 					type : 'POST',
-					url  : 'index.php?option=com_eventbooking&task=cart.update_cart&redirect=0&event_id=' + eventId + '&quantity=' + quantity,
+					url  : 'index.php?option=com_eventbooking&task=cart.update_cart&Itemid=<?php echo $this->Itemid ?>&redirect=0&event_id=' + eventId + '&quantity=' + quantity,
 					dataType: 'html',
 					beforeSend: function() {
 					$('#add_more_item').before('<span class="wait"><img src="<?php echo JUri::base(true); ?>/media/com_eventbooking/ajax-loadding-animation.gif" alt="" /></span>');
@@ -200,7 +200,7 @@ else
 		Eb.jQuery(function($) {
 			$.ajax({
 				type :'POST',
-				url  : 'index.php?option=com_eventbooking&task=cart.remove_cart&id=' +  id + '&redirect=0',
+				url  : 'index.php?option=com_eventbooking&task=cart.remove_cart&id=' +  id + '&Itemid=<?php echo $this->Itemid ?>&redirect=0',
 				dataType: 'html',
 				beforeSend: function() {
 					$('#add_more_item').before('<span class="wait"><img src="<?php echo JUri::base(true); ?>/media/com_eventbooking/ajax-loadding-animation.gif" alt="" /></span>');
