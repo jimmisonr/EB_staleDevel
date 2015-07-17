@@ -68,9 +68,3 @@ else
 	}
 	?>
 </table>
-<script type="text/javascript">
-	function checkOut()
-	{
-		location.href = '<?php echo $checkoutUrl; ?>';
-	}
-</script>
