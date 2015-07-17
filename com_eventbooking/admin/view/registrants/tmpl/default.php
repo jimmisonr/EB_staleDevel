@@ -124,7 +124,7 @@ if ($this->config->activate_invoice_feature)
 			if ($this->config->activate_invoice_feature) 
 			{				
 			?>
-				<th width="8%">
+				<th width="8%" class="center">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_INVOICE_NUMBER'), 'tbl.invoice_number', $this->state->filter_order_Dir, $this->state->filter_order); ?>
 				</th>
 			<?php	

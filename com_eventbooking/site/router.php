@@ -290,6 +290,7 @@ function EventbookingBuildRoute(&$query)
 			$segments[] = 'Export Registrants';
 			unset($query['task']);
 			break;
+		case 'checkout':
 		case 'view_checkout':
 			$segments[] = 'Checkout';
 			unset($query['task']);
