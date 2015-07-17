@@ -83,4 +83,4 @@ if (!$itemId)
 
 $layout = $params->get('layout_type', 'default');
 
-require(JModuleHelper::getLayoutPath('mod_eb_search', 'default'));
+require(JModuleHelper::getLayoutPath('mod_eb_search', $params->get('module_layout', 'default');));
