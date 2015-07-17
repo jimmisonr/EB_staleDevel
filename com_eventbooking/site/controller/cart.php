@@ -26,6 +26,8 @@ class EventbookingControllerCart extends EventbookingController
 		$this->input->set('view', 'cart');
 		$this->input->set('layout', 'mini');
 
+		$this->reloadCartModule();
+
 		$this->display();
 		$this->app->close();
 	}
@@ -56,6 +58,7 @@ class EventbookingControllerCart extends EventbookingController
 		{
 			$this->input->set('view', 'cart');
 			$this->input->set('layout', 'mini');
+			$this->reloadCartModule();
 			$this->display();
 			$this->app->close();
 		}
@@ -79,6 +82,7 @@ class EventbookingControllerCart extends EventbookingController
 		{
 			$this->input->set('view', 'cart');
 			$this->input->set('layout', 'mini');
+			$this->reloadCartModule();
 			$this->display();
 			$this->app->close();
 		}
@@ -240,5 +244,34 @@ class EventbookingControllerCart extends EventbookingController
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Refresh content of cart module so that data will be keep synchronized
+	 */
+	private function reloadCartModule()
+	{
+		jimport('joomla.application.module.helper');
+		$module = JModuleHelper::isEnabled('mod_eb_cart');
+		if (!$module)
+		{
+			return;
+		}
+		?>
+		<script type="text/javascript">
+			Eb.jQuery(function ($) {
+				$(document).ready(function () {
+					$.ajax({
+						type: 'POST',
+						url: 'index.php?option=com_eventbooking&view=cart&layout=module&format=raw',
+						dataType: 'html',
+						success: function (html) {
+							$('#cart_result').html(html);
+						}
+					})
+				})
+			})
+		</script>
+	<?php
 	}
 }

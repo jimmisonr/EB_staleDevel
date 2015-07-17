@@ -17,7 +17,15 @@ class EventbookingViewCartRaw extends RADViewHtml
 	 */
 	public function display()
 	{
-		$this->setLayout('mini');
+		$layout = $this->getLayout();
+		if ($layout == 'module')
+		{
+			$this->displayModule();
+		}
+		else
+		{
+			$this->setLayout('mini');
+		}
 		$config     = EventbookingHelper::getConfig();
 		$categoryId = (int) JFactory::getSession()->get('last_category_id', 0);
 		if (!$categoryId)
@@ -60,6 +68,30 @@ class EventbookingViewCartRaw extends RADViewHtml
 		$this->jsString        = $jsString;
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
+		parent::display();
+	}
+
+	/**
+	 * Display content of cart module, using for ajax request
+	 */
+	private function displayModule()
+	{
+		jimport('joomla.application.module.helper');
+		$module = JModuleHelper::getModule('mod_eb_cart');
+		$params = new JRegistry($module->params);
+		if ($params->get('item_id'))
+		{
+			$Itemid = $params->get('item_id');
+		}
+		else
+		{
+			$Itemid = $this->input->getInt('Itemid');
+		}
+		$cart         = new EventbookingHelperCart();
+		$rows         = $cart->getEvents();
+		$this->rows   = $rows;
+		$this->config = EventbookingHelper::getConfig();
+		$this->Itemid = $Itemid;
 		parent::display();
 	}
 }
