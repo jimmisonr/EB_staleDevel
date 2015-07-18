@@ -4450,6 +4450,75 @@ class EventbookingHelper
 		return $eventDates;
 	}
 
+
+	/**
+	 * Get list of event dates for recurring events happen on specific date in a month
+	 *
+	 * @param $startDate
+	 * @param $endDate
+	 * @param $monthlyFrequency
+	 * @param $numberOccurrences
+	 * @param $n
+	 * @param $day
+	 *
+	 * @return array
+	 */
+	public static function getMonthlyRecurringAtDayInWeekEventDates($startDate, $endDate, $monthlyFrequency, $numberOccurrences, $n, $day)
+	{
+		$eventDates = array();
+		$timeZone           = new DateTimeZone(JFactory::getConfig()->get('offset'));
+		$recurringStartDate = new Datetime($startDate, $timeZone);
+		$date               = clone $recurringStartDate;
+		$dateInterval       = new DateInterval('P' . $monthlyFrequency . 'M');
+
+		if ($numberOccurrences)
+		{
+			$count = 0;
+			while ($count < $numberOccurrences)
+			{
+				$currentMonth = $date->format('M');
+				$currentYear  = $date->format('Y');
+				$timeString = "$n $day";
+				$timeString .= " of $currentMonth $currentYear";
+				$date->setTimestamp(strtotime($timeString));
+				$date->setTime($recurringStartDate->format('H'), $recurringStartDate->format('i'), 0);
+				if (($date >= $recurringStartDate) && ($count < $numberOccurrences))
+				{
+					$eventDates[] = $date->format('Y-m-d H:i:s');
+					$count++;
+				}
+
+				$date->add($dateInterval);
+			}
+		}
+		else
+		{
+			$recurringEndDate = new DateTime($endDate . ' 23:59:59', $timeZone);
+			while (true)
+			{
+				$currentMonth = $date->format('M');
+				$currentYear  = $date->format('Y');
+				$timeString = "$n $day";
+				$timeString .= " of $currentMonth $currentYear";
+				$date->setTimestamp(strtotime($timeString));
+				$date->setTime($recurringStartDate->format('H'), $recurringStartDate->format('i'), 0);
+				if (($date >= $recurringStartDate) && ($date <= $recurringEndDate))
+				{
+					$eventDates[] = $date->format('Y-m-d H:i:s');
+				}
+				if ($date > $recurringEndDate)
+				{
+					break;
+				}
+				$date->add(new DateInterval('P' . $monthlyFrequency . 'M'));
+			}
+		}
+
+		return $eventDates;
+	}
+
+
+
 	public static function getDeliciousButton($title, $link)
 	{
 		$img_url = "components/com_eventbooking/assets/images/socials/delicious.png";

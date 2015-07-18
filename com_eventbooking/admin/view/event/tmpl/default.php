@@ -408,12 +408,12 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 											</tr>
 											<tr>
 												<td>
-													<input type="radio" name="recurring_type" value="1" <?php if ($this->item->recurring_type == 1) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" /> <?php echo JText::_('EB_REPEAT_EVERY'); ?> <input type="text" name="number_days" size="5" class="inputbox clearfloat" value="<?php echo $this->item->number_days ; ?>" /> <?php echo JText::_('EB_DAYS'); ?>				
+													<input type="radio" name="recurring_type" value="1" <?php if ($this->item->recurring_type == 1) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" /> <?php echo JText::_('EB_REPEAT_EVERY'); ?> <input type="text" name="number_days" size="5" class="input-mini clearfloat" value="<?php echo $this->item->number_days ; ?>" /> <?php echo JText::_('EB_DAYS'); ?>
 												</td>
 											</tr>
 											<tr>
 												<td>
-			    										<input type="radio" name="recurring_type" value="2" <?php if ($this->item->recurring_type == 2) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" /> <?php echo JText::_('EB_REPEAT_EVERY'); ?> <input type="text" name="number_weeks" size="5" class="inputbox clearfloat" value="<?php echo $this->item->number_weeks ; ?>" /> <?php echo JText::_('EB_WEEKS'); ?>
+			    										<input type="radio" name="recurring_type" value="2" <?php if ($this->item->recurring_type == 2) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" /> <?php echo JText::_('EB_REPEAT_EVERY'); ?> <input type="text" name="number_weeks" size="5" class="input-mini clearfloat" value="<?php echo $this->item->number_weeks ; ?>" /> <?php echo JText::_('EB_WEEKS'); ?>
 			    										<br />
 			    										<strong><?php echo JText::_('EB_ON'); ?></strong> 
 			        									<?php
@@ -431,10 +431,38 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 											</tr>
 											<tr>
 												<td>
-													<input type="radio" name="recurring_type" value="3" <?php if ($this->item->recurring_type == 3) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" /> <?php echo JText::_('EB_REPEAT_EVERY'); ?> <input type="text" name="number_months" size="5" class="inputbox clearfloat" value="<?php echo $this->item->number_months ; ?>" /> <?php echo JText::_('EB_MONTHS'); ?>																								
-											        <?php echo JText::_('EB_ON'); ?> <input type="text" name="monthdays" class="inputbox clearfloat" size="10" value="<?php echo $this->item->monthdays; ?>" />
+													<input type="radio" name="recurring_type" value="3" <?php if ($this->item->recurring_type == 3) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" /> <?php echo JText::_('EB_REPEAT_EVERY'); ?> <input type="text" name="number_months" size="5" class="input-mini clearfloat" value="<?php echo $this->item->number_months ; ?>" /> <?php echo JText::_('EB_MONTHS'); ?>
+											        <?php echo JText::_('EB_ON'); ?> <input type="text" name="monthdays" class="input-mini clearfloat" size="10" value="<?php echo $this->item->monthdays; ?>" />
 												</td>
 											</tr>
+
+											<tr>
+												<td>
+													<?php
+														$params = new JRegistry($this->item->params);
+														$options = array();
+														$options[] = JHtml::_('select.option', 'first', JText::_('EB_FIRST'));
+														$options[] = JHtml::_('select.option', 'second', JText::_('EB_SECOND'));
+														$options[] = JHtml::_('select.option', 'third', JText::_('EB_THIRD'));
+														$options[] = JHtml::_('select.option', 'fourth', JText::_('EB_FOURTH'));
+														$options[] = JHtml::_('select.option', 'fifth', JText::_('EB_FIFTH'));
+														$daysOfWeek = array(
+															'Sun' => JText::_('EB_SUNDAY'),
+															'Mon' => JText::_('EB_MONDAY'),
+															'Tue' => JText::_('EB_TUESDAY'),
+															'Web' => JText::_('EB_WEDNESDAY'),
+															'THU' => JText::_('EB_THURSDAY'),
+															'Fri' => JText::_('EB_FRIDAY'),
+															'Sat' => JText::_('EB_SATURDAY')
+														);
+													?>
+													<input type="radio" name="recurring_type" value="4" <?php if ($this->item->recurring_type == 4) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" /> <?php echo JText::_('EB_REPEAT_EVERY'); ?> <input type="text" name="weekly_number_months" size="5" class="input-mini clearfloat" value="<?php echo $params->get('weekly_number_months', ''); ?>" /> <?php echo JText::_('EB_MONTHS'); ?>
+													<?php echo JText::_('EB_ON'); ?> <?php echo JHtml::_('select.genericlist', $options, 'week_in_month', ' class="input-small" ', 'value', 'text', $params->get('week_in_month', 'first')); ?>
+													<?php echo JHtml::_('select.genericlist', $daysOfWeek, 'day_of_week', ' class="input-small" ', 'value', 'text', $params->get('day_of_week', 'Sun'));?>
+													of the month
+												</td>
+											</tr>
+
 										</table>																																										
 									</td>
 								</tr>
@@ -929,6 +957,10 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 					form.number_weeks.value = 1 ;
 				}
 			} else if (form.recurring_type[3].checked) {
+				if (form.number_months.value == '') {
+					form.number_months.value = 1 ;
+				}
+			} else if (form.recurring_type[4].checked) {
 				if (form.number_months.value == '') {
 					form.number_months.value = 1 ;
 				}

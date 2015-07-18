@@ -117,6 +117,12 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		{
 			$data['recurring_end_date'] = $db->getNullDate();
 		}
+
+		if (!$data['weekly_number_months'])
+		{
+			$data['weekly_number_months'] = 1;
+		}
+
 		if (isset($data['payment_methods']))
 		{
 			$data['payment_methods'] = implode(',', $data['payment_methods']);
@@ -379,12 +385,24 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				(int) $data['recurring_occurrencies'], $data['weekdays']);
 			$row->recurring_frequency = $data['number_weeks'];
 		}
-		else
+		elseif ($data['recurring_type'] == 3)
 		{
 			//Monthly recurring
 			$eventDates               = EventbookingHelper::getMonthlyRecurringEventDates($row->event_date, $data['recurring_end_date'],
 				(int) $data['number_months'], (int) $data['recurring_occurrencies'], $data['monthdays']);
 			$row->recurring_frequency = $data['number_months'];
+		}
+		else
+		{
+			// Monthly recurring at a specific date in the week
+			$eventDates               = EventbookingHelper::getMonthlyRecurringAtDayInWeekEventDates($row->event_date, $data['recurring_end_date'], (int) $data['weekly_number_months'], (int) $data['recurring_occurrencies'], $data['week_in_month'], $data['day_of_week']);
+			$row->recurring_frequency = $data['weekly_number_months'];
+
+			$params = new JRegistry($row->params);
+			$params->set('weekly_number_months', $data['weekly_number_months']);
+			$params->set('week_in_month', $data['week_in_month']);
+			$params->set('day_of_week', $data['day_of_week']);
+			$row->params = $params->toString();
 		}
 
 		if (strlen(trim($data['event_end_date'])) && $row->event_end_date != $nullDate)
