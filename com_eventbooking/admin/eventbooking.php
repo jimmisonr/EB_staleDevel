@@ -8,13 +8,14 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
-error_reporting(0);
+defined('_JEXEC') or die;
+
 //Basic ACL support
 if (!JFactory::getUser()->authorise('core.manage', 'com_eventbooking'))
 {
 	return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
 }
+
 require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
 
 if (JLanguageMultilang::isEnabled() && !EventbookingHelper::isSynchronized())
