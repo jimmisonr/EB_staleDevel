@@ -111,8 +111,17 @@ class RADViewList extends RADViewHtml
 		{
 			$canDo = call_user_func(array('RADHelper', 'getActions'), $this->option, $this->name, $this->state);
 		}
+		
 		$languagePrefix = $this->viewConfig['language_prefix'];
-		JToolBarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')), 'link ' . $this->name);
+		if (version_compare(JVERSION, '3.0', 'ge'))
+		{
+			JToolBarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')), 'link ' . $this->name);
+		}
+		else 
+		{
+			JToolBarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')));
+		}
+		
 		if ($canDo->get('core.create') && !in_array('add', $this->hideButtons))
 		{
 			JToolBarHelper::addNew('add', 'JTOOLBAR_NEW');
