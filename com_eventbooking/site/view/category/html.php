@@ -136,7 +136,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		}
 
 		// Process page meta data
-		$params = EventbookingHelper::getViewParams($active, array('categories', 'category'));
+		$params = EventbookingHelper::getViewParams($active, array('category'));
 
 		if (!$params->get('page_title'))
 		{

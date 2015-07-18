@@ -24,9 +24,17 @@ JHtml::_('behavior.modal', 'a.eb-modal');
 		<?php
 		if ($this->category)
 		{
+			if ($this->params->get('page_heading'))
+			{
+				$pageHeading = $this->params->get('page_heading');
+			}
+			else
+			{
+				$pageHeading = $this->category->name;
+			}
 		?>
 			<div id="eb-category">
-				<h1 class="eb-page-heading"><?php echo $this->category->name;?></h1>
+				<h1 class="eb-page-heading"><?php echo $pageHeading;?></h1>
 				<?php
 				if($this->category->description != '')
 				{
