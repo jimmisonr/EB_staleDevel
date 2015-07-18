@@ -568,7 +568,7 @@ class RADModelAdmin extends RADModel
 			if (JLanguageMultilang::isEnabled())
 			{
 				// Build alias alias for other languages
-				$languages = OSMembershipHelper::getLanguages();
+				$languages = EventbookingHelper::getLanguages();
 				if (count($languages))
 				{
 					foreach ($languages as $language)
