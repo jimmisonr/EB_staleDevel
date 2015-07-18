@@ -4518,10 +4518,9 @@ class EventbookingHelper
 	}
 
 
-
 	public static function getDeliciousButton($title, $link)
 	{
-		$img_url = JUri::root(true)."/components/com_eventbooking/assets/images/socials/delicious.png";
+		$img_url = JUri::root(true) . "/components/com_eventbooking/assets/images/socials/delicious.png";
 
 		return '<a href="http://del.icio.us/post?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="Submit ' . $title . ' in Delicious" target="blank" >
 		<img src="' . $img_url . '" alt="Submit ' . $title . ' in Delicious" />
@@ -4530,7 +4529,7 @@ class EventbookingHelper
 
 	public static function getDiggButton($title, $link)
 	{
-		$img_url = JUri::root(true)."/components/com_eventbooking/assets/images/socials/digg.png";
+		$img_url = JUri::root(true) . "/components/com_eventbooking/assets/images/socials/digg.png";
 
 		return '<a href="http://digg.com/submit?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="Submit ' . $title . ' in Digg" target="blank" >
         <img src="' . $img_url . '" alt="Submit ' . $title . ' in Digg" />
@@ -4539,7 +4538,7 @@ class EventbookingHelper
 
 	public static function getFacebookButton($title, $link)
 	{
-		$img_url = JUri::root(true)."/components/com_eventbooking/assets/images/socials/facebook.png";
+		$img_url = JUri::root(true) . "/components/com_eventbooking/assets/images/socials/facebook.png";
 
 		return '<a href="http://www.facebook.com/sharer.php?u=' . rawurlencode($link) . '&amp;t=' . rawurlencode($title) . '" title="Submit ' . $title . ' in FaceBook" target="blank" >
         <img src="' . $img_url . '" alt="Submit ' . $title . ' in FaceBook" />
@@ -4548,7 +4547,7 @@ class EventbookingHelper
 
 	public static function getGoogleButton($title, $link)
 	{
-		$img_url = JUri::root(true)."/components/com_eventbooking/assets/images/socials/google.png";
+		$img_url = JUri::root(true) . "/components/com_eventbooking/assets/images/socials/google.png";
 
 		return '<a href="http://www.google.com/bookmarks/mark?op=edit&bkmk=' . rawurlencode($link) . '" title="Submit ' . $title . ' in Google Bookmarks" target="blank" >
         <img src="' . $img_url . '" alt="Submit ' . $title . ' in Google Bookmarks" />
@@ -4557,7 +4556,7 @@ class EventbookingHelper
 
 	public static function getStumbleuponButton($title, $link)
 	{
-		$img_url = JUri::root(true)."/components/com_eventbooking/assets/images/socials/stumbleupon.png";
+		$img_url = JUri::root(true) . "/components/com_eventbooking/assets/images/socials/stumbleupon.png";
 
 		return '<a href="http://www.stumbleupon.com/submit?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="Submit ' .
 		$title . ' in Stumbleupon" target="blank" >
@@ -4567,7 +4566,7 @@ class EventbookingHelper
 
 	public static function getTechnoratiButton($title, $link)
 	{
-		$img_url = JUri::root(true)."/components/com_eventbooking/assets/images/socials/technorati.png";
+		$img_url = JUri::root(true) . "/components/com_eventbooking/assets/images/socials/technorati.png";
 
 		return '<a href="http://technorati.com/faves?add=' . rawurlencode($link) . '" title="Submit ' . $title . ' in Technorati" target="blank" >
         <img src="' . $img_url . '" alt="Submit ' . $title . ' in Technorati" />
@@ -4575,8 +4574,8 @@ class EventbookingHelper
 	}
 
 	public static function getTwitterButton($title, $link)
-	{		
-		$img_url = JUri::root(true)."/components/com_eventbooking/assets/images/socials/twitter.png";
+	{
+		$img_url = JUri::root(true) . "/components/com_eventbooking/assets/images/socials/twitter.png";
 
 		return '<a href="http://twitter.com/?status=' . rawurlencode($title . " " . $link) . '" title="Submit ' . $title . ' in Twitter" target="blank" >
         <img src="' . $img_url . '" alt="Submit ' . $title . ' in Twitter" />
@@ -4585,7 +4584,7 @@ class EventbookingHelper
 
 	public static function getLinkedInButton($title, $link)
 	{
-		$img_url = JUri::root(true)."/components/com_eventbooking/assets/images/socials/linkedin.png";
+		$img_url = JUri::root(true) . "/components/com_eventbooking/assets/images/socials/linkedin.png";
 
 		return '<a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=' . $link . '&amp;title=' . $title . '" title="Submit ' . $title . ' in LinkedIn" target="_blank" ><img src="' . $img_url . '" alt="Submit ' . $title . ' in LinkedIn" /></a>';
 	}
