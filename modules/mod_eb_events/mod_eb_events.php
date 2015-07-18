@@ -28,7 +28,7 @@ if (!$itemId)
 	$itemId = EventbookingHelper::getItemid();
 }
 $fieldSuffix  = EventbookingHelper::getFieldSuffix();
-$currentDate  = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+$currentDate  = JHtml::_('date', 'Now', 'Y-m-d');
 $numberEvents = $params->get('number_events', 6);
 $categoryIds  = trim($params->get('category_ids', ''));
 $showCategory = $params->get('show_category', 1);

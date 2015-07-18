@@ -23,13 +23,22 @@ class EventbookingViewDashboardHtml extends RADViewHtml
 	 */
 	public function display()
 	{
-		$this->latestRegistrants = RADModel::getInstance('Registrants', 'EventbookingModel', array('table_prefix' => '#__eb_'))
+		$this->latestRegistrants = RADModel::getInstance('Registrants', 'EventbookingModel', array('table_prefix' => '#__eb_', 'ignore_request' => true, 'remember_states' => false))
 			->setState('limitstart', 0)
 			->setState('limit', 5)
 			->setState('filter_order', 'tbl.id')
 			->setState('filter_order_Dir', 'DESC')
 			->getData();
 
+		$this->upcomingEvents = RADModel::getInstance('Events', 'EventbookingModel', array('table_prefix' => '#__eb_', 'ignore_request' => true, 'remember_states' => false))
+			->setState('limitstart', 0)
+			->setState('limit', 5)
+			->setState('filter_order', 'tbl.event_date')
+			->setState('filter_order_Dir', 'ASC')
+			->setState('filter_upcoming_events', 1)
+			->getData();
+
+		$this->config = EventbookingHelper::getConfig();
 		parent::display();
 	}
 

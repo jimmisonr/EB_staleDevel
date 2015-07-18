@@ -22,18 +22,21 @@ defined( '_JEXEC' ) or die;
 	</thead>
 	<tbody>	
 		<?php
-			foreach ($this->latestRegistrants as $row)
-			{ 				
-			?>
-				<tr>
-					<td><a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=registrant&id='.(int)$row->id); ?>"><?php echo $row->first_name; ?></a></td>
-					<td><?php echo $row->last_name; ?></td>
-					<td><a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&id='.(int)$row->event_id); ?>"> <?php echo $row->title; ?></a></td>
-					<td><?php echo $row->email; ?></td>
-					<td class="center"><?php echo $row->number_registrants; ?></td>
-				</tr>
-			<?php
-			} 
+			if (count($this->latestRegistrants))
+			{
+				foreach ($this->latestRegistrants as $row)
+				{
+				?>
+					<tr>
+						<td><a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=registrant&id='.(int)$row->id); ?>"><?php echo $row->first_name; ?></a></td>
+						<td><?php echo $row->last_name; ?></td>
+						<td><a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&id='.(int)$row->event_id); ?>"> <?php echo $row->title; ?></a></td>
+						<td><?php echo $row->email; ?></td>
+						<td class="center"><?php echo $row->number_registrants; ?></td>
+					</tr>
+				<?php
+				}
+			}
 		?>
 	</tbody>
 </table>
