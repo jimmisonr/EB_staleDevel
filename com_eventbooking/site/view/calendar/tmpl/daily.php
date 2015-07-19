@@ -55,7 +55,7 @@ $monthsInYear = array(
 	<tr class="tablec">
 		<td class="previousday">
 			<a href="<?php echo JRoute::_("index.php?option=com_eventbooking&view=calendar&layout=daily&day=".date('Y-m-d',strtotime("-1 day", strtotime($this->day)))."&Itemid=$this->Itemid");?>" rel="nofollow">
-				<img src="<?php echo JUri::root()?>components/com_eventbooking/assets/images/calendar_previous.png" alt="<?php echo JText::_('EB_PREVIOUS_DAY')?>">
+				<img src="<?php echo JUri::root()?>media/com_eventbooking/assets/images/calendar_previous.png" alt="<?php echo JText::_('EB_PREVIOUS_DAY')?>">
 			</a>
 		</td>
 		<td class="currentday currentdaytoday">
@@ -66,7 +66,7 @@ $monthsInYear = array(
 		</td>
 		<td class="nextday">
 			<a href="<?php echo JRoute::_("index.php?option=com_eventbooking&view=calendar&layout=daily&day=".date('Y-m-d',strtotime("+1 day", strtotime($this->day)))."&Itemid=$this->Itemid");?>" rel="nofollow">
-				<img src="<?php echo JUri::root()?>components/com_eventbooking/assets/images/calendar_next.png" alt="<?php echo JText::_('EB_NEXT_DAY')?>">
+				<img src="<?php echo JUri::root()?>media/com_eventbooking/assets/images/calendar_next.png" alt="<?php echo JText::_('EB_NEXT_DAY')?>">
 			</a>
 		</td>
 	</tr>

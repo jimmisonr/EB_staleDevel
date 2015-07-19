@@ -9,7 +9,7 @@
  */
 defined('_JEXEC') or die ('');
 error_reporting(0);
-JFactory::getDocument()->addStylesheet(JUri::base(true) . '/components/com_eventbooking/assets/css/style.css', 'text/css', null, null);
+JFactory::getDocument()->addStylesheet(JUri::base(true) . '/media/com_eventbooking/assets/css/style.css', 'text/css', null, null);
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/database.php';
 EventbookingHelper::loadLanguage();

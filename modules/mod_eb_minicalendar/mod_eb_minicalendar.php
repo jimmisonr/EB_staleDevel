@@ -19,12 +19,12 @@ $option   = $input->getCmd('option');
 $rootUrl  = JUri::base(true);
 if ($option != 'com_eventbooking')
 {
-	$document->addStyleSheet($rootUrl . "/components/com_eventbooking/assets/css/style.css");
+	$document->addStyleSheet($rootUrl . "/media/com_eventbooking/assets/css/style.css");
 	if ($config->load_jquery !== '0')
 	{
 		EventbookingHelper::loadJQuery();
 	}
-	JHtml::_('script', JUri::root() . '/components/com_eventbooking/assets/js/noconflict.js', false, false);
+	JHtml::_('script', JUri::root() . '/media/com_eventbooking/assets/js/noconflict.js', false, false);
 
 	if ($config->calendar_theme)
 	{
@@ -34,9 +34,9 @@ if ($option != 'com_eventbooking')
 	{
 		$theme = 'default';
 	}
-	$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/themes/' . $theme . '.css');
+	$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/themes/' . $theme . '.css');
 }
-$document->addScript($rootUrl . '/components/com_eventbooking/assets/js/minicalendar.js');
+$document->addScript($rootUrl . '/media/com_eventbooking/assets/js/minicalendar.js');
 EventbookingHelper::addLangLinkForAjax();
 
 

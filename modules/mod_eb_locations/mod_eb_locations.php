@@ -13,7 +13,7 @@ defined('_JEXEC') or die;
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 
 $document = JFactory::getDocument();
-$document->addStylesheet(JUri::base(true) . '/components/com_eventbooking/assets/css/style.css', 'text/css', null, null);
+$document->addStylesheet(JUri::base(true) . '/media/com_eventbooking/assets/css/style.css', 'text/css', null, null);
 $user = JFactory::getUser();
 EventbookingHelper::loadLanguage();
 $app              = JFactory::getApplication();

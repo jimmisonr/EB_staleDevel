@@ -14,7 +14,7 @@ defined('_JEXEC') or die;
 error_reporting(0);
 $document = JFactory::getDocument();
 $document->addStyleSheet(JUri::root().'modules/mod_eb_googlemap/asset/style.css');
-$document->addStyleSheet(JUri::root().'components/com_eventbooking/assets/css/style.css');
+$document->addStyleSheet(JUri::root().'media/com_eventbooking/assets/css/style.css');
 require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
 require_once dirname(__FILE__).'/helper.php';
 $config = EventbookingHelper::getConfig();
@@ -26,7 +26,7 @@ if ($config->load_bootstrap_css_in_frontend !== '0')
 {
 	EventbookingHelper::loadBootstrap();
 }
-JHtml::_('script', EventbookingHelper::getURL() . 'components/com_eventbooking/assets/js/noconflict.js', false, false);
+JHtml::_('script', EventbookingHelper::getURL() . 'media/com_eventbooking/assets/js/noconflict.js', false, false);
 
 // params
 $width = $params->get('width', 100);

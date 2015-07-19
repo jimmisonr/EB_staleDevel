@@ -86,7 +86,7 @@ $monthsInYear = array(
 	<tr class="tablec">
 		<td class="previousweek">
 			<a href="<?php echo JRoute::_("index.php?option=com_eventbooking&view=calendar&layout=weekly&date=".date('Y-m-d',strtotime("-7 day", strtotime($this->first_day_of_week)))."&Itemid=$this->Itemid"); ?>" rel="nofollow">
-				<img src="<?php echo JUri::root()?>components/com_eventbooking/assets/images/calendar_previous.png" alt="<?php echo JText::_('EB_PREVIOUS_WEEK')?>">
+				<img src="<?php echo JUri::root()?>media/com_eventbooking/assets/images/calendar_previous.png" alt="<?php echo JText::_('EB_PREVIOUS_WEEK')?>">
 			</a>
 		</td>
 		<td class="currentweek currentweektoday">
@@ -94,7 +94,7 @@ $monthsInYear = array(
 		</td>
 		<td class="nextweek">
 			<a class="shajaxLinkNextWeek extcalendar prefetch" href="<?php echo JRoute::_("index.php?option=com_eventbooking&view=calendar&layout=weekly&date=".date('Y-m-d',strtotime("+7 day", strtotime($this->first_day_of_week)))."&Itemid=$this->Itemid"); ?>" rel="nofollow">
-				<img src="<?php echo JUri::root()?>components/com_eventbooking/assets/images/calendar_next.png" alt="<?php echo JText::_('EB_NEXT_WEEK')?>">
+				<img src="<?php echo JUri::root()?>media/com_eventbooking/assets/images/calendar_next.png" alt="<?php echo JText::_('EB_NEXT_WEEK')?>">
 			</a>
 		</td>
 	</tr>

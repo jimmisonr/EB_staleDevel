@@ -31,7 +31,7 @@ else
 	$previousYear = $this->year ;
 }
 ?>
-<script src="<?php echo JURI::base(true) . '/components/com_eventbooking/assets/js/jquery.equalheights.js'; ?>" type="text/javascript"></script>
+<script src="<?php echo JURI::base(true) . '/media/com_eventbooking/assets/js/jquery.equalheights.js'; ?>" type="text/javascript"></script>
 <div id="eb-category-calendar-page" class="eb-container row-fluid">
 	<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=category&layout=calendar&id='.$this->category->id.'&Itemid='.$this->Itemid);?>">
 		<?php

@@ -48,7 +48,7 @@ if (count($this->items)) {
 						<?php echo JText::_('EB_PRICE'); ?>
 					</th>
 					<th class="col_quantity">
-						<?php echo JText::_('EB_QUANTITY'); ?><a id="update_cart_icon"><img onclick="javascript:updateCart();" src="<?php echo JUri::base(true).'/components/com_eventbooking/assets/images/update_quantity.png' ?>" title="<?php echo JText::_("EB_UPDATE_QUANTITY"); ?>" align="top" /></a>
+						<?php echo JText::_('EB_QUANTITY'); ?><a id="update_cart_icon"><img onclick="javascript:updateCart();" src="<?php echo JUri::base(true).'/media/com_eventbooking/assets/images/update_quantity.png' ?>" title="<?php echo JText::_("EB_UPDATE_QUANTITY"); ?>" align="top" /></a>
 					</th>
 					<th class="col_quantity">
 						<?php echo JText::_('EB_SUB_TOTAL'); ?>
@@ -89,7 +89,7 @@ if (count($this->items)) {
 							}
 						?>
 						<td align="center" class="col_action">
-							<img onclick="javascript:removeCart(<?php echo $item->id; ?>);" class="eb-remove-item" id="<?php echo $item->id?>" src="<?php echo JUri::base().'components/com_eventbooking/assets/images/remove_from_cart.png'; ?>" border="0" />
+							<img onclick="javascript:removeCart(<?php echo $item->id; ?>);" class="eb-remove-item" id="<?php echo $item->id?>" src="<?php echo JUri::base().'media/com_eventbooking/assets/images/remove_from_cart.png'; ?>" border="0" />
 							<input id="event_id" type="hidden" name="event_id[]" value="<?php echo $item->id; ?>" />
 						</td>
 						<td class="col_price">

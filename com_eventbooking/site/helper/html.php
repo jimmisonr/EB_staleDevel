@@ -50,8 +50,8 @@ abstract class EventbookingHelperHtml
 			else
 			{
 				$document = JFactory::getDocument();
-				$document->addScript(JURI::base() . 'components/com_eventbooking/assets/chosen/chosen.jquery.js');
-				$document->addStyleSheet(JURI::base() . 'components/com_eventbooking/assets/chosen/chosen.css');
+				$document->addScript(JURI::base() . 'media/com_eventbooking/assets/chosen/chosen.jquery.js');
+				$document->addStyleSheet(JURI::base() . 'media/com_eventbooking/assets/chosen/chosen.css');
 				$document->addScriptDeclaration(
 					"jQuery(document).ready(function(){
                             jQuery(\"select\").chosen();

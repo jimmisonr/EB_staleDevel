@@ -15,7 +15,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 
 	public function display()
 	{
-		JFactory::getDocument()->addScript(JUri::base(true) . '/components/com_eventbooking/assets/js/paymentmethods.js');
+		JFactory::getDocument()->addScript(JUri::base(true) . '/media/com_eventbooking/assets/js/paymentmethods.js');
 		$this->setLayout('default');
 
 		EventbookingHelper::addLangLinkForAjax();

@@ -76,7 +76,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	private function displayIndividualRegistrationForm($event, $input)
 	{
-		JFactory::getDocument()->addScript(JUri::base(true) . '/components/com_eventbooking/assets/js/paymentmethods.js');
+		JFactory::getDocument()->addScript(JUri::base(true) . '/media/com_eventbooking/assets/js/paymentmethods.js');
 		$config    = EventbookingHelper::getConfig();
 		$user      = JFactory::getUser();
 		$userId    = $user->get('id');
@@ -287,7 +287,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	{
 		$user     = JFactory::getUser();
 		$document = JFactory::getDocument();
-		$document->addScript(JUri::base(true) . '/components/com_eventbooking/assets/js/paymentmethods.js');
+		$document->addScript(JUri::base(true) . '/media/com_eventbooking/assets/js/paymentmethods.js');
 		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
 		$this->event           = $event;
 		$this->message         = EventbookingHelper::getMessages();
@@ -336,7 +336,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	private function displayCart()
 	{
-		JFactory::getDocument()->addScript(JUri::base(true) . '/components/com_eventbooking/assets/js/paymentmethods.js');
+		JFactory::getDocument()->addScript(JUri::base(true) . '/media/com_eventbooking/assets/js/paymentmethods.js');
 		$app    = JFactory::getApplication();
 		$input  = $this->input;
 		$db     = JFactory::getDbo();

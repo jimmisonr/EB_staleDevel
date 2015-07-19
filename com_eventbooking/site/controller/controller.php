@@ -31,8 +31,8 @@ class EventbookingController extends RADController
 			EventbookingHelper::loadBootstrap();
 		}
 		$rootUrl = JUri::root(true);
-		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/style.css');
-		JHtml::_('script', EventbookingHelper::getURL() . 'components/com_eventbooking/assets/js/noconflict.js', false, false);
+		$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/style.css');
+		JHtml::_('script', EventbookingHelper::getURL() . 'media/com_eventbooking/assets/js/noconflict.js', false, false);
 
 		// Load bootstrap js
 		if ($config->show_save_to_personal_calendar)
@@ -48,8 +48,8 @@ class EventbookingController extends RADController
 		{
 			$theme = 'default';
 		}
-		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/themes/' . $theme . '.css');
-		$document->addStylesheet($rootUrl . '/components/com_eventbooking/assets/css/custom.css');
+		$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/themes/' . $theme . '.css');
+		$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/custom.css');
 
 		switch ($task)
 		{

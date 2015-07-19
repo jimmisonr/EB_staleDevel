@@ -13,7 +13,7 @@ defined('_JEXEC') or die;
 
 if (file_exists(JPATH_ROOT . '/components/com_eventbooking/helper/helper.php'))
 {
-	JFactory::getDocument()->addStyleSheet(JUri::root(true) . '/components/com_eventbooking/assets/css/style.css');
+	JFactory::getDocument()->addStyleSheet(JUri::root(true) . '/media/com_eventbooking/assets/css/style.css');
 	require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 	require_once JPATH_ROOT . '/components/com_eventbooking/helper/cart.php';
 	require_once JPATH_ROOT . '/components/com_eventbooking/helper/route.php';

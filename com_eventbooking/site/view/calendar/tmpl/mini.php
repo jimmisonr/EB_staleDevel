@@ -12,7 +12,7 @@ defined('_JEXEC') or die;
 $data = $this->data;
 $link = JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$this->month.'&Itemid='.$this->Itemid) ;
 ?>
-<script type="text/javascript" src="<?php echo JUri::root().'components/com_eventbooking/assets/js/minicalendar.js'; ?>"></script>
+<script type="text/javascript" src="<?php echo JUri::root().'media/com_eventbooking/assets/js/minicalendar.js'; ?>"></script>
 <table class="extcal_navbar" border="0" width="100%">
 	<tr>		
 		<td><div class="mod_eb_minicalendar_link"><a id="prev_year" style="cursor: pointer;">&laquo;</a></div></td>

@@ -30,8 +30,8 @@ abstract class EventbookingHelperJquery
 		if (!$loaded)
 		{
 			$uncompressed = JFactory::getConfig()->get('debug') ? '' : '.min';
-			JHtml::_('stylesheet', EventbookingHelper::getSiteUrl().'components/com_eventbooking/assets/js/colorbox/colorbox.css', false, false);
-			JHtml::_('script', EventbookingHelper::getSiteUrl().'components/com_eventbooking/assets/js/colorbox/jquery.colorbox'.$uncompressed.'.js', false, false);
+			JHtml::_('stylesheet', EventbookingHelper::getSiteUrl().'media/com_eventbooking/assets/js/colorbox/colorbox.css', false, false);
+			JHtml::_('script', EventbookingHelper::getSiteUrl().'media/com_eventbooking/assets/js/colorbox/jquery.colorbox'.$uncompressed.'.js', false, false);
 
 			$activeLanguageTag = JFactory::getLanguage()->getTag();
 			$allowedLanguageTags = array('ar-AA', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'es-ES', 'et-EE',
@@ -42,7 +42,7 @@ abstract class EventbookingHelperJquery
 			// English is bundled into the source therefore we don't have to load it.
 			if (in_array($activeLanguageTag, $allowedLanguageTags))
 			{
-				JHtml::_('script', EventbookingHelper::getSiteUrl().'components/com_eventbooking/assets/js/colorbox/i18n/jquery.colorbox-' . $activeLanguageTag . '.js', false, false);
+				JHtml::_('script', EventbookingHelper::getSiteUrl().'media/com_eventbooking/assets/js/colorbox/i18n/jquery.colorbox-' . $activeLanguageTag . '.js', false, false);
 			}
 			$script = 'Eb.jQuery(document).ready(function($){$(".'.$class.'").colorbox({iframe: '.$iframe.', fastIframe:false, inline: '.$inline.', width:"'.$width.'", height:"'.$height.'"});});';
 			JFactory::getDocument()->addScriptDeclaration($script);
@@ -64,7 +64,7 @@ abstract class EventbookingHelperJquery
 		static $loaded = false;
 		if (!$loaded)
 		{
-			JHtml::_('stylesheet', EventbookingHelper::getSiteUrl() . 'components/com_eventbooking/assets/js/validate/css/validationEngine.jquery.css', false, false);
+			JHtml::_('stylesheet', EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/assets/js/validate/css/validationEngine.jquery.css', false, false);
 			$document = JFactory::getDocument();
 			$document->addScriptDeclaration(
 				'
@@ -234,7 +234,7 @@ abstract class EventbookingHelperJquery
 				    $.validationEngineLanguage.newLang();
 				});
 			');
-			JHtml::_('script', EventbookingHelper::getSiteUrl() . 'components/com_eventbooking/assets/js/validate/js/jquery.validationEngine.js', false, false);		 
+			JHtml::_('script', EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/assets/js/validate/js/jquery.validationEngine.js', false, false);		 
 		}
 		$loaded = true;
 	}

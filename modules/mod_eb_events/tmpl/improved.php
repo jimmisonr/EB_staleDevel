@@ -11,7 +11,7 @@
 // no direct access
 defined('_JEXEC') or die;
 
-JHtml::_('script', JUri::root().'components/com_eventbooking/assets/js/noconflict.js', false, false);	
+JHtml::_('script', JUri::root().'media/com_eventbooking/assets/js/noconflict.js', false, false);	
 if ($showLocation)
 {
 	$width = (int) $config->map_width ;

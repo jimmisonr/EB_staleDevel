@@ -102,5 +102,5 @@ else
 	$theme = 'default';
 }
 
-$document->addStyleSheet($baseUrl . '/components/com_eventbooking/assets/css/themes/' . $theme . '.css');
+$document->addStyleSheet($baseUrl . '/media/com_eventbooking/assets/css/themes/' . $theme . '.css');
 require(JModuleHelper::getLayoutPath('mod_eb_events', $layout));
