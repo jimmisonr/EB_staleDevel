@@ -1,24 +1,28 @@
 <?php
 /**
- * @version        	1.7.4
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
+
 class EventbookingModelPlugins extends RADModelList
 {
 
 	/**
-	 * Constructor function	 
+	 * Instantiate the model.
+	 *
+	 * @param array $config configuration data for the model
+	 *
 	 */
-	function __construct($config)
+	public function __construct($config = array())
 	{
-		$config['table_prefix'] = '#__eb_payment_';
-		
-		parent::__construct($config);				
+		$config['table'] = '#__eb_payment_plugins';
+
+		parent::__construct($config);
 	}
 }

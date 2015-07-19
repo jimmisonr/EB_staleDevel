@@ -1,33 +1,40 @@
 <?php
 /**
- * View List class, used to render list of records from back-end of your component
- * 
- * @package     Joomla.RAD
- * @subpackage  ViewList
- * @author	Ossolution Team
+ * @package     RAD
+ * @subpackage  Controller
+ *
+ * @copyright   Copyright (C) 2015 Ossolution Team, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 defined('_JEXEC') or die();
 
+/**
+ * Joomla CMS View List class, used to render list of records from front-end or back-end of your component
+ *
+ * @package      RAD
+ * @subpackage   View
+ * @since        2.0
+ */
 class RADViewList extends RADViewHtml
 {
 
 	/**
-	 * The model state 
+	 * The model state
+	 *
 	 * @var RADModelState
 	 */
 	protected $state;
 
 	/**
 	 * List of records which will be displayed
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $items;
 
 	/**
 	 * The pagination object
-	 * 
+	 *
 	 * @var JPagination
 	 */
 	protected $pagination;
@@ -37,96 +44,106 @@ class RADViewList extends RADViewHtml
 	 *
 	 * @var Array
 	 */
-	protected $lists;
+	protected $lists = array();
 
+	/**
+	 * Method to instantiate the view.
+	 *
+	 * @param   array $config The configuration data for the view
+	 *
+	 * @since  1.0
+	 */
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
-		
-		$this->state = $this->model->getState();
-		$this->items = $this->model->getData();
-		$this->pagination = $this->model->getPagination();
-		//State filter
-		$this->lists['filter_state'] = JHtml::_('grid.state', $this->state->filter_state);
-		$this->lists['filter_access'] = JHtml::_('access.level', 'filter_access', $this->state->filter_access, 'class="inputbox" onchange="submit();"', false);
-		$this->lists['filter_language'] = JHtml::_('select.genericlist', JHtml::_('contentlanguage.existing', true, true), 'filter_language', 
-			' class="inputbox" onchange="submit();" ', 'value', 'text', $this->state->filter_language);
-
-        $layout = JRequest::getVar('layout', '');
-        if ($layout != 'modal')
-        {
-            if (version_compare(JVERSION, '3.0', 'ge'))
-            {
-                EventbookingHelperHtml::renderSubmenu($this->name);
-            }
-            else
-            {
-                $component = substr($this->option, 4);
-                $helperClass = ucfirst($component) . 'Helper';
-                if (is_callable($helperClass . '::addSubmenus'))
-                {
-                    call_user_func(array($helperClass, 'addSubmenus'), $this->name);
-                }
-                else
-                {
-                    call_user_func(array('RADHelper', 'addSubmenus'), $this->name);
-                }
-            }
-            $this->addToolbar();
-        }
 	}
 
 	/**
-	 * Add the page title and toolbar.
-	 *	 
+	 * Method to display a view
+	 *
+	 * @see RADViewHtml::display()
+	 */
+	public function display()
+	{
+		$this->prepareView();
+		parent::display();
+	}
+
+	/**
+	 * Prepare the view before it is displayed
+	 *
+	 */
+	protected function prepareView()
+	{
+		$this->state      = $this->model->getState();
+		$this->items      = $this->model->getData();
+		$this->pagination = $this->model->getPagination();
+		if ($this->isAdminView)
+		{
+			$this->lists['filter_state']    = str_replace('class="inputbox"', 'class="input-medium"', JHtml::_('grid.state', $this->state->filter_state));
+			$this->lists['filter_access']   = JHtml::_('access.level', 'filter_access', $this->state->filter_access, 'onchange="submit();"', false);
+			$this->lists['filter_language'] = JHtml::_('select.genericlist', JHtml::_('contentlanguage.existing', true, true), 'filter_language',
+				' onchange="submit();" ', 'value', 'text', $this->state->filter_language);
+			if (version_compare(JVERSION, '3.0', 'ge'))
+			{
+				EventbookingHelperHtml::renderSubmenu($this->name);
+			}
+			else
+			{
+				EventbookingHelper::addSubMenus($this->name);
+			}
+			$this->addToolbar();
+		}
+	}
+
+	/**
+	 * Method to add toolbar buttons
+	 *
 	 */
 	protected function addToolbar()
 	{
-		$state = $this->state;
-		$component = substr($this->option, 4);
-		$helperClass = ucfirst($component) . 'Helper';
+		$helperClass = $this->viewConfig['class_prefix'] . 'Helper';
 		if (is_callable($helperClass . '::getActions'))
 		{
-			$canDo = call_user_func(array($helperClass, 'getActions'), $this->option);
+			$canDo = call_user_func(array($helperClass, 'getActions'), $this->name, $this->state);
 		}
 		else
 		{
-			$canDo = call_user_func(array('RADHelper', 'getActions'), $this->option);
+			$canDo = call_user_func(array('RADHelper', 'getActions'), $this->option, $this->name, $this->state);
 		}
-		JToolBarHelper::title(JText::_(strtoupper($this->languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')), 
-			'generic.png');
-		if ($canDo->get('core.create'))
+		
+		$languagePrefix = $this->viewConfig['language_prefix'];
+		if (version_compare(JVERSION, '3.0', 'ge'))
+		{
+			JToolBarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')), 'link ' . $this->name);
+		}
+		else 
+		{
+			JToolBarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')));
+		}
+		
+		if ($canDo->get('core.create') && !in_array('add', $this->hideButtons))
 		{
 			JToolBarHelper::addNew('add', 'JTOOLBAR_NEW');
 		}
-		
-		if ($canDo->get('core.edit') && isset($this->items[0]))
+		if ($canDo->get('core.edit') && isset($this->items[0]) && !in_array('edit', $this->hideButtons))
 		{
 			JToolBarHelper::editList('edit', 'JTOOLBAR_EDIT');
 		}
-		if ($canDo->get('core.create') && isset($this->items[0]))
+		if ($canDo->get('core.delete') && isset($this->items[0]) && !in_array('delete', $this->hideButtons))
 		{
-			JToolBarHelper::custom('copy', 'copy.png', 'copy_f2.png', 'Copy', true);
+			JToolBarHelper::deleteList(JText::_($languagePrefix . '_DELETE_CONFIRM'), 'delete');
 		}
-		if ($canDo->get('core.delete') && isset($this->items[0]))
+
+		if ($canDo->get('core.edit.state') && !in_array('publish', $this->hideButtons))
 		{
-			JToolBarHelper::deleteList(JText::_($this->languagePrefix.'_DELETE_CONFIRM') , 'remove');
-		}
-		if ($canDo->get('core.edit.state'))
-		{
-			if (isset($this->items[0]->published))
+			if (isset($this->items[0]->published) || isset($this->items[0]->state))
 			{
-				JToolBarHelper::divider();
-				JToolBarHelper::custom('publish', 'publish.png', 'publish_f2.png', 'JTOOLBAR_PUBLISH', true);
-				JToolBarHelper::custom('unpublish', 'unpublish.png', 'unpublish_f2.png', 'JTOOLBAR_UNPUBLISH', true);
+				JToolbarHelper::publish('publish', 'JTOOLBAR_PUBLISH', true);
+				JToolbarHelper::unpublish('unpublish', 'JTOOLBAR_UNPUBLISH', true);
 			}
 		}
-		
-		if ($canDo->get('core.delte'))
-		{
-			JToolBarHelper::deleteList('', 'delete', 'JTOOLBAR_DELETE');
-		}
-		
+
 		if ($canDo->get('core.admin'))
 		{
 			JToolBarHelper::preferences($this->option);

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.7.4
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -8,42 +8,28 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
-class EventBookingModelCountry extends RADModelItem
+class EventbookingModelCountry extends RADModelAdmin
 {
-
 	/**
-	 * Method to store a country
+	 * Update country_id make it the same with id
 	 *
-	 * @param    RADInput $input
-	 *
-	 * @return    boolean    True on success
+	 * @param JTable   $row
+	 * @param RADInput $input
+	 * @param bool     $isNew
 	 */
-	function store($input, $ignore = array())
+	protected function afterStore($row, $input, $isNew)
 	{
-		if ($input->getInt('id'))
-		{
-			$isNew = false;
-		}
-		else
-		{
-			$isNew = true;
-		}
-
-		parent::store($input, $ignore);
-
 		if ($isNew)
 		{
 			$db    = $this->getDbo();
 			$query = $db->getQuery(true);
 			$query->update('#__eb_countries')
-				->set('country_id=id')
-				->where('id=' . $input->getInt('id', 0));
+				->set('country_id = id')
+				->where('id = ' . $input->getInt('id', 0));
 			$db->setQuery($query);
 			$db->execute();
 		}
-
-		return true;
 	}
 }

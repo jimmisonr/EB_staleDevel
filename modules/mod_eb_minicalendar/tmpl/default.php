@@ -1,4 +1,16 @@
-<?php defined('_JEXEC') or die('Restricted access'); ?>
+<?php
+/**
+ * @version        2.0.0
+ * @package        Joomla
+ * @subpackage     Event Booking
+ * @author         Tuan Pham Ngoc
+ * @copyright      Copyright (C) 2010 - 2015 Ossolution Team
+ * @license        GNU/GPL, see LICENSE.php
+ */
+
+// no direct access
+defined('_JEXEC') or die;
+?>
 <div style="margin: 0px; padding: 0px; width:100%">
 <span style="display: none;" id="eb_minicalendar"></span>
 <div id="extcal_minical997" class="extcal_minical">
@@ -23,7 +35,7 @@
 			<td><div class="mod_eb_minicalendar_link"><a id="prev_month" style="cursor: pointer;" rel="nofollow">&lt;</a></div></td>
 			<td nowrap="nowrap" height="18" align="center" width="98%" valign="middle" class="extcal_month_label">
 				<a class="mod_eb_minicalendar_link" href="<?php echo $link;?>">
-					<?php echo $listmonth[$month-1]; ?> &nbsp;
+					<?php echo $listMonth[$month-1]; ?> &nbsp;
 				</a>
 				<a class="mod_eb_minicalendar_link" href="<?php echo $link;?>">
 					<?php echo $year; ?>
@@ -37,7 +49,7 @@
 		<tbody id="calendar_result">
 			<tr class="mod_eb_mincalendar_dayname">
 				<?php 
-					foreach ($data["daynames"] as $dayname) 
+					foreach ($days as $dayname)
 					{ 
 				?>
 		             <td class="mod_eb_mincalendar_td_dayname">
@@ -80,15 +92,18 @@
 		                    	{
                                     $link = JRoute::_("index.php?option=com_eventbooking&view=calendar&layout=daily&day=$year-$month-$dayos&Itemid=$Itemid");
 		                    	}
-		                    	else 
+		                    	elseif ($numberEvents == 1)
 		                    	{
                                     $link = JRoute::_(EventbookingHelperRoute::getEventRoute($currentDay['events'][0]->id, 0, $Itemid));
 		                    	}
-		              		    if ($numberEvents > 0){
-		              				$class_event = "mod_eb_mincalendar_event";
-		              			}else{
-		              				$class_event = "mod_eb_mincalendar_no_event";              				
-		              			}
+				                if ($numberEvents > 0)
+				                {
+					               $class_event = "mod_eb_mincalendar_event";
+				                }
+				                else
+				                {
+					              $class_event = "mod_eb_mincalendar_no_event";
+				                }
 		             		?>
 			                   <td class="<?php echo $class_today.' '.$class_event; ?>">		                   		
 			                    	<?php 

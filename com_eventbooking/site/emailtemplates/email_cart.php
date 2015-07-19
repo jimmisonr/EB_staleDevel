@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.4
+ * @version        	2.0.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -10,7 +10,7 @@
 defined('_JEXEC') or die;
 ?>
 <style type="text/css">
-<?php echo file_get_contents(JPATH_ROOT.'/components/com_eventbooking/assets/bootstrap/css/bootstrap.css') ; ?>
+<?php echo file_get_contents(JPATH_ROOT.'/media/com_eventbooking/assets/bootstrap/css/bootstrap.css') ; ?>
 .price_col {
 	width : 10%;
 	text-align: right ;

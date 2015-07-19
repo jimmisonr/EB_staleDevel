@@ -1,76 +1,115 @@
 <?php
 /**
- * Html view class
- * 
- * @package     Joomla.RAD
- * @subpackage  ViewHtml
- * @author	Ossolution Team
+ * @package     RAD
+ * @subpackage  Controller
+ *
+ * @copyright   Copyright (C) 2015 Ossolution Team, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 defined('_JEXEC') or die();
 
+/**
+ * Joomla CMS Base View Html Class
+ *
+ * @package      RAD
+ * @subpackage   View
+ * @since        2.0
+ */
 jimport('joomla.filesystem.path');
 
 class RADViewHtml extends RADView
 {
 
 	/**
-	 * Prefix of the language items used in the view
-	 * 
-	 * @var string
-	 */
-	protected $languagePrefix;
-
-	/**
 	 * The view layout.
 	 *
-	 * @var    string	 
+	 * @var string
 	 */
 	protected $layout = 'default';
 
 	/**
 	 * The paths queue.
 	 *
-	 * @var    Array	 
+	 * @var array
 	 */
 	protected $paths = array();
 
 	/**
+	 * Default Itemid variable value for the links in the view
+	 *
+	 * @var int
+	 */
+	public $Itemid;
+
+	/**
+	 * The input object passed from the controller while creating the view
+	 *
+	 * @var RADInput
+	 */
+
+	protected $input;
+
+	/**
+	 * This is a front-end or back-end view.
+	 * We need this field to determine whether we need to addToolbar or build the filter
+	 *
+	 * @var boolean
+	 */
+	protected $isAdminView = false;
+
+	/**
+	 * Options to allow hide default toolbar buttons from backend view
+	 *
+	 * @var array
+	 */
+	protected $hideButtons = array();
+
+	/**
 	 * Method to instantiate the view.
 	 *
-	 * @param   $config A named configuration array for object construction	 
-	 *	 
+	 * @param array $config A named configuration array for object construction
+	 *
 	 */
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
-		
+
 		if (isset($config['layout']))
 		{
 			$this->layout = $config['layout'];
 		}
-		
-		if (isset($config['language_prefix']))
+		if (isset($config['paths']))
 		{
-			$this->languagePrefix = $config['language_prefix'];
+			$this->paths = $config['paths'];
 		}
 		else
 		{
-			$this->languagePrefix = strtoupper($this->option);
+			$this->paths = array();
 		}
-		
-		if (isset($config['template_path']))
+
+		if (!empty($config['is_admin_view']))
 		{
-			$this->addTemplatePath($config['template_path']);
+			$this->isAdminView = $config['is_admin_view'];
 		}
-		else
+
+		if (!empty($config['Itemid']))
 		{
-			throw new RuntimeException('You need to give template path for the view');
+			$this->Itemid = $config['Itemid'];
+		}
+
+		if (isset($config['input']))
+		{
+			$this->input = $config['input'];
+		}
+
+		if (isset($config['hide_buttons']))
+		{
+			$this->hideButtons = $config['hide_buttons'];
 		}
 	}
 
 	/**
-	 * Display the view
+	 * Method to display the view
 	 */
 	public function display()
 	{
@@ -80,7 +119,7 @@ class RADViewHtml extends RADView
 	/**
 	 * Magic toString method that is a proxy for the render method.
 	 *
-	 * @return  string		
+	 * @return string
 	 */
 	public function __toString()
 	{
@@ -90,9 +129,9 @@ class RADViewHtml extends RADView
 	/**
 	 * Method to escape output.
 	 *
-	 * @param   string  $output  The output to escape.
+	 * @param string $output The output to escape.
 	 *
-	 * @return  string  The escaped output.	 	
+	 * @return string The escaped output.
 	 */
 	public function escape($output)
 	{
@@ -102,7 +141,7 @@ class RADViewHtml extends RADView
 	/**
 	 * Method to get the view layout.
 	 *
-	 * @return  string  The layout name.	
+	 * @return string The layout name.
 	 */
 	public function getLayout()
 	{
@@ -112,29 +151,36 @@ class RADViewHtml extends RADView
 	/**
 	 * Method to get the layout path.
 	 *
-	 * @param   string  $layout  The layout name.
+	 * @param string $layout The layout name.
 	 *
-	 * @return  mixed  The layout file name if found, false otherwise.
-	 *
-	 * @since   12.1
+	 * @return mixed The layout file name if found, false otherwise.
 	 */
 	public function getPath($layout)
 	{
-		// Get the layout file name.
-		$file = JPath::clean($layout . '.php');
-		
-		// Find the layout file path.
-		$path = JPath::find($this->paths, $file);
-		
+		// Try to find alternative layout for Joomla3
+		if (version_compare(JVERSION, '3.0', 'ge'))
+		{
+			$file = JPath::clean($layout . '.joomla3.php');
+			$path = JPath::find($this->paths, $file);
+		}
+
+		// If no layout for Joomla3 found, use normal layout
+		if (empty($path))
+		{
+			// Get the layout file name.
+			$file = JPath::clean($layout . '.php');
+			// Find the layout file path.
+			$path = JPath::find($this->paths, $file);
+		}
+
 		return $path;
 	}
 
 	/**
 	 * Method to get the view paths.
 	 *
-	 * @return  SplPriorityQueue  The paths queue.
+	 * @return SplPriorityQueue The paths queue.
 	 *
-	 * @since   12.1
 	 */
 	public function getPaths()
 	{
@@ -144,147 +190,86 @@ class RADViewHtml extends RADView
 	/**
 	 * Method to render the view.
 	 *
-	 * @return  string  The rendered view.
-	 * 	 	
-	 * @throws  RuntimeException
+	 * @return string The rendered view.
+	 *
+	 * @throws RuntimeException
 	 */
 	public function render()
 	{
-		//Add support for template override
-		$app = JFactory::getApplication();
-		$fallback = JPATH_THEMES . '/' . $app->getTemplate() . '/html/' . $this->option . '/' . $this->getName();
-		$this->addTemplatePath($fallback);
 		// Get the layout path.
 		$path = $this->getPath($this->getLayout());
-		
 		// Check if the layout path was found.
 		if (!$path)
 		{
 			throw new RuntimeException('Layout Path Not Found');
 		}
-		
 		// Start an output buffer.
 		ob_start();
-		
+
 		// Load the layout.
 		include $path;
-		
+
 		// Get the layout contents.
 		$output = ob_get_clean();
-		
+
 		return $output;
 	}
 
 	/**
 	 * Load sub-template for the current layout
-	 * @param string $template The sub-template to load
+	 *
+	 * @param string $template
+	 *
 	 * @throws RuntimeException
+	 *
 	 * @return string The output of sub-layout
 	 */
 	public function loadTemplate($template, $data = array())
 	{
-		extract($data);
-		//Add support for template override
-		$app = JFactory::getApplication();
-		$fallback = JPATH_THEMES . '/' . $app->getTemplate() . '/html/' . $this->option . '/' . $this->getName();
-		$this->addTemplatePath($fallback);
 		// Get the layout path.
 		$path = $this->getPath($this->getLayout() . '_' . $template);
-		
 		// Check if the layout path was found.
 		if (!$path)
 		{
 			throw new RuntimeException('Layout Path Not Found');
 		}
-		
+		extract($data);
 		// Start an output buffer.
 		ob_start();
-		
 		// Load the layout.
 		include $path;
-		
 		// Get the layout contents.
 		$output = ob_get_clean();
-		
-		return $output;
-	}
 
-	/**
-	 * Load a template file from a given absolute path 
-	 * 
-	 * @param string $path the absolute path to the template file to load
-	 * 
-	 * @return 
-	 */
-	public function loadAnyTemplate($path, $data = array())
-	{
-				
-		ob_start();
-		
-		// Load the layout.
-		include $path;
-		
-		// Get the layout contents.
-		$output = ob_get_clean();
-		
 		return $output;
 	}
 
 	/**
 	 * Method to set the view layout.
 	 *
-	 * @param   string  $layout  The layout name.
+	 * @param string $layout The layout name.
 	 *
-	 * @return  RADViewHtml  Method supports chaining.
-	 *	 
+	 * @return RADViewHtml Method supports chaining.
 	 */
 	public function setLayout($layout)
 	{
 		$this->layout = $layout;
-		
-		return $this;
-	}
 
-	/**
-	 * Add Template path to the queue
-	 * 
-	 * @param mixed $path The directory or stream, or an array of either, to search.
-	 */
-	public function addTemplatePath($path)
-	{
-		// Just force to array
-		settype($path, 'array');
-		
-		// Loop through the path directories
-		foreach ($path as $dir)
-		{
-			// No surrounding spaces allowed!
-			$dir = trim($dir);
-			
-			// Add trailing separators as needed
-			if (substr($dir, -1) != DIRECTORY_SEPARATOR)
-			{
-				// Directory
-				$dir .= DIRECTORY_SEPARATOR;
-			}
-			
-			// Add to the top of the search dirs
-			array_unshift($this->paths, $dir);
-		}
+		return $this;
 	}
 
 	/**
 	 * Method to set the view paths.
 	 *
-	 * @param   $paths  The paths queue.
+	 * @param $paths The paths queue.
 	 *
-	 * @return  RADViewHtml  Method supports chaining.
-	 *	 
+	 * @return RADViewHtml Method supports chaining.
+	 *
 	 */
 	public function setPaths($paths)
 	{
 		$this->paths = $paths;
-		
+
 		return $this;
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.4
+ * @version        	2.0.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -10,12 +10,6 @@
 // no direct access
 defined('_JEXEC') or die();
 
-/**
- * EventBooking Message controller
- *
- * @package		Joomla
- * @subpackage	Event Booking
- */
 class EventbookingControllerMessage extends EventbookingController
 {
 
@@ -24,11 +18,20 @@ class EventbookingControllerMessage extends EventbookingController
 		$data = $this->input->getData();
 		$model = $this->getModel();
 		$model->store($data);
-		$this->setRedirect('index.php?option=com_eventbooking&view=message', JText::_('EB_MESSAGES_SAVED'));
+
+		$task = $this->getTask();
+		if ($task == 'save')
+		{
+			$this->setRedirect('index.php?option=com_eventbooking&view=dashboard', JText::_('EB_MESSAGES_SAVED'));
+		}
+		else
+		{
+			$this->setRedirect('index.php?option=com_eventbooking&view=message', JText::_('EB_MESSAGES_SAVED'));
+		}
 	}
 	
 	public function cancel()
 	{
-		$this->setRedirect('index.php?option=com_eventbooking');
+		$this->setRedirect('index.php?option=com_eventbooking&view=dashboard');
 	}
 }

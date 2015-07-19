@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.4
+ * @version        	2.0.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -37,6 +37,8 @@ JToolBarHelper::title(JText::_('EB_DASHBOARD'), 'generic.png');
 		<td valign="top" width="55%">
 			<?php
 				echo JHtml::_('sliders.start', 'statistics_pane');
+				echo JHtml::_('sliders.panel', JText::_('EB_UPCOMING_EVENTS'), 'upcoming_events');
+				echo $this->loadTemplate('upcoming_events');
 				echo JHtml::_('sliders.panel', JText::_('EB_LASTEST_REGISTRANGS'), 'registrants');
 				echo $this->loadTemplate('registrants');
 				echo JHtml::_('sliders.panel', JText::_('EB_USEFUL_LINKS'), 'links_panel');

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	1.7.4
+ * @version        	2.0.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -484,40 +484,7 @@ $editor = JFactory::getEditor();
 						<td>
 							<?php echo JText::_('EB_HIDE_PAST_EVENTS_EXPLAIN'); ?>
 						</td>
-					</tr>			
-					<tr>
-						<td class="key">
-							<?php echo JText::_('EB_FIX_PROCESS_BUTTON_NOT_WORKING'); ?>
-						</td>
-						<td>
-							<?php echo $this->lists['fix_next_button']; ?>
-						</td>
-						<td>
-							<?php echo JText::_('EB_FIX_PROCESS_BUTTON_NOT_WORKING_EXPLAIN'); ?>
-						</td>
 					</tr>
-					<tr>
-						<td class="key">
-							<?php echo JText::_('EB_FIX_BREADCRUMBS'); ?>
-						</td>
-						<td>
-							<?php echo $this->lists['fix_breadcrumbs']; ?>
-						</td>
-						<td>
-							<?php echo JText::_('EB_FIX_BREADCRUMBS_EXPLAIN'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td class="key">
-							<?php echo JText::_('EB_FIX_TERM_AND_CONDITION_POPUP'); ?>
-						</td>
-						<td>
-							<?php echo $this->lists['fix_term_and_condition_popup']; ?>
-						</td>
-						<td>
-							<?php echo JText::_('EB_FIX_TERM_AND_CONDITION_POPUP_EXPLAIN'); ?>
-						</td>
-					</tr>											
 					<tr>
 						<td class="key">
 							<?php echo JText::_('EB_SHOW_TERM_AND_CONDITION') ?>
@@ -662,7 +629,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_DECIMALS'); ?>
 						</td>
 						<td>
-							<input type="text" name="decimals" class="inputbox" value="<?php echo isset($this->config->decimals) ? $this->config->decimals : 2; ?>" size="10" />
+							<input type="text" name="decimals" class="inputbox" value="<?php echo $this->config->get('decimals', 2); ?>" size="10" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_DECIMALS_EXPLAIN'); ?>
@@ -674,7 +641,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_DECIMAL_POINT'); ?>
 						</td>
 						<td>
-							<input type="text" name="dec_point" class="inputbox" value="<?php echo isset($this->config->dec_point) ? $this->config->dec_point : '.'; ?>" size="10" />
+							<input type="text" name="dec_point" class="inputbox" value="<?php echo $this->config->get('dec_point', '.');?>" size="10" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_DECIMAL_POINT_EXPLAIN'); ?>
@@ -686,7 +653,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_THOUNSANDS_SEP'); ?>
 						</td>
 						<td>
-							<input type="text" name="thousands_sep" class="inputbox" value="<?php echo isset($this->config->thousands_sep) ? $this->config->thousands_sep : ','; ?>" size="10" />
+							<input type="text" name="thousands_sep" class="inputbox" value="<?php echo $this->config->get('thousands_sep', ','); ?>" size="10" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_THOUNSANDS_SEP_EXPLAIN'); ?>
@@ -980,6 +947,17 @@ $editor = JFactory::getEditor();
 					</tr>
 					<tr>
 						<td width="30%" class="key">
+							<?php echo JText::_('EB_SHOW_EVENT_END_DATE_IN_TABLE_LAYOUT'); ?>
+						</td>
+						<td>
+							<?php echo $this->lists['show_event_end_date_in_table_layout']; ?>
+						</td>
+						<td>
+							&nbsp;
+						</td>
+					</tr>
+					<tr>
+						<td width="30%" class="key">
 							<?php echo JText::_('EB_SHOW_PRICE_IN_TABLE_LAYOUT'); ?>
 						</td>
 						<td>
@@ -1198,7 +1176,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_INVOICE_PREFIX'); ?>
 						</td>
 						<td>
-							<input type="text" name="invoice_prefix" class="inputbox" value="<?php echo isset($this->config->invoice_prefix) ? $this->config->invoice_prefix : 'IV'; ?>" size="10" />
+							<input type="text" name="invoice_prefix" class="inputbox" value="<?php echo $this->config->get('invoice_prefix', 'IV'); ?>" size="10" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_INVOICE_PREFIX_EXPLAIN'); ?>
@@ -1209,7 +1187,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_INVOICE_NUMBER_LENGTH'); ?>
 						</td>
 						<td>
-							<input type="text" name="invoice_number_length" class="inputbox" value="<?php echo $this->config->invoice_number_length ? $this->config->invoice_number_length : 5; ?>" size="10" />
+							<input type="text" name="invoice_number_length" class="inputbox" value="<?php echo $this->config->get('invoice_number_length', 5); ?>" size="10" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_INVOICE_NUMBER_LENGTH_EXPLAIN'); ?>

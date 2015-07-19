@@ -1,15 +1,16 @@
 <?php
 /**
- * @version        	1.7.4
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
-class EventBookingModelLanguage extends RADModel
+
+class EventbookingModelLanguage extends RADModel
 {
 
 	/**
@@ -28,7 +29,7 @@ class EventBookingModelLanguage extends RADModel
 
 	/**
 	 * Model list data
-	 * 
+	 *
 	 * @var Array
 	 */
 	protected $data;
@@ -36,35 +37,34 @@ class EventBookingModelLanguage extends RADModel
 	/**
 	 * Instantiate the model.
 	 *
-	 * @param   array	$config	The configuration data for the model
+	 * @param   array $config The configuration data for the model
 	 *
 	 */
 	public function __construct($config)
 	{
 		parent::__construct($config);
-		$app = JFactory::getApplication();
-		$context = $this->option . '.' . $this->name . '.';
+
 		$this->state->insert('filter_search', 'string')
-			->insert('filter_item', 'string', $app->getUserStateFromRequest($context . 'filter_item', 'filter_item', 'com_eventbooking'))
-			->insert('filter_language', 'string', $app->getUserStateFromRequest($context . 'filter_language', 'filter_language', 'en-GB'))
-			->insert('limit', 'int', $app->getUserStateFromRequest($context . 'limit', 'limit', 100))
-			->insert('limitstart', 'int', $app->getUserStateFromRequest($context . 'limitstart', 'limitstart', 0));
+			->insert('filter_item', 'string', 'com_eventbooking')
+			->insert('filter_language', 'string', 'en-GB')
+			->insert('limit', 'int', 100)
+			->insert('limitstart', 'int', 0);
 	}
 
 	/**
 	 * Get language items and store them in an array
 	 *
 	 */
-	function getData()
+	public function getData()
 	{
-		$registry = new JRegistry();
-		$search = $this->state->filter_search;
-		$language = $this->state->filter_language;
+		$registry     = new JRegistry();
+		$search       = $this->state->filter_search;
+		$language     = $this->state->filter_language;
 		$languageFile = $this->state->filter_item;
-		if (strpos($languageFile, 'admin') !== FALSE)
+		if (strpos($languageFile, 'admin') !== false)
 		{
 			$languageFolder = JPATH_ROOT . '/administrator/language/';
-			$languageFile = substr($languageFile, 6);
+			$languageFile   = substr($languageFile, 6);
 		}
 		else
 		{
@@ -76,14 +76,14 @@ class EventBookingModelLanguage extends RADModel
 		if ($language != 'en-GB')
 		{
 			$translatedRegistry = new JRegistry();
-			$translatedPath = $languageFolder . $language . '/' . $language . '.' . $languageFile . '.ini';
+			$translatedPath     = $languageFolder . $language . '/' . $language . '.' . $languageFile . '.ini';
 			if (JFile::exists($translatedPath))
 			{
 				$translatedRegistry->loadFile($translatedPath);
 				$translatedLanguageItems = $translatedRegistry->toArray();
 				//Remove unused language items
 				$enGbKeys = array_keys($enGbItems);
-				$changed = false;
+				$changed  = false;
 				foreach ($translatedLanguageItems as $key => $value)
 				{
 					if (!in_array($key, $enGbKeys))
@@ -108,7 +108,6 @@ class EventBookingModelLanguage extends RADModel
 				if (!in_array($key, $translatedLanguageKeys))
 				{
 					$translatedRegistry->set($key, $value);
-					$changed = true;
 				}
 			}
 			JFile::write($translatedPath, $translatedRegistry->toString('INI'));
@@ -124,7 +123,7 @@ class EventBookingModelLanguage extends RADModel
 				}
 			}
 		}
-		$this->total = count($enGbItems);
+		$this->total                  = count($enGbItems);
 		$data['en-GB'][$languageFile] = array_slice($enGbItems, $this->state->limitstart, $this->state->limit);
 		if ($language != 'en-GB')
 		{
@@ -132,12 +131,12 @@ class EventBookingModelLanguage extends RADModel
 			if (JFile::exists($path))
 			{
 				$registry->loadFile($path);
-				$languageItems = $registry->toArray();
+				$languageItems   = $registry->toArray();
 				$translatedItems = array();
 				foreach ($data['en-GB'][$languageFile] as $key => $value)
 				{
 					$translatedItems[$key] = isset($languageItems[$key]) ? $languageItems[$key] : '';
-				}								
+				}
 				$data[$language][$languageFile] = $translatedItems;
 			}
 			else
@@ -145,26 +144,37 @@ class EventBookingModelLanguage extends RADModel
 				$data[$language][$languageFile] = array();
 			}
 		}
+
 		return $data;
 	}
 
 	/**
-	 *  Get site languages
+	 * Get site languages
 	 *
+	 * @return array
 	 */
-	function getSiteLanguages()
+	public function getSiteLanguages()
 	{
 		jimport('joomla.filesystem.folder');
-		$path = JPATH_ROOT . '/language';
+		$path    = JPATH_ROOT . '/language';
 		$folders = JFolder::folders($path);
-		$rets = array();
+		$result  = array();
 		foreach ($folders as $folder)
+		{
 			if ($folder != 'pdf_fonts' && $folder != 'overrides')
-				$rets[] = $folder;
-		
-		return $rets;
+			{
+				$result[] = $folder;
+			}
+		}
+
+		return $result;
 	}
 
+	/**
+	 * Get total number of language items
+	 *
+	 * @return int
+	 */
 	public function getTotal()
 	{
 		return $this->total;
@@ -175,7 +185,7 @@ class EventBookingModelLanguage extends RADModel
 	 *
 	 * @return JPagination
 	 */
-	function getPagination()
+	public function getPagination()
 	{
 		// Lets load the content if it doesn't already exist
 		if (empty($this->pagination))
@@ -183,23 +193,25 @@ class EventBookingModelLanguage extends RADModel
 			jimport('joomla.html.pagination');
 			$this->pagination = new JPagination($this->getTotal(), abs($this->state->limitstart), $this->state->limit);
 		}
-		
+
 		return $this->pagination;
 	}
 
 	/**
 	 * Save translation data
 	 *
-	 * @param array $data
+	 * @param $data
+	 *
+	 * @return bool
 	 */
-	function save($data)
+	public function save($data)
 	{
-		$language = $this->state->filter_language;
+		$language     = $this->state->filter_language;
 		$languageFile = $this->state->filter_item;
-		if (strpos($languageFile, 'admin') !== FALSE)
+		if (strpos($languageFile, 'admin') !== false)
 		{
 			$languageFolder = JPATH_ROOT . '/administrator/language/';
-			$languageFile = substr($languageFile, 6);
+			$languageFile   = substr($languageFile, 6);
 		}
 		else
 		{
@@ -207,7 +219,7 @@ class EventBookingModelLanguage extends RADModel
 		}
 		$registry = new JRegistry();
 		$filePath = $languageFolder . $language . '/' . $language . '.' . $languageFile . '.ini';
-		
+
 		if (JFile::exists($filePath))
 		{
 			$registry->loadFile($filePath, 'INI');
@@ -218,25 +230,25 @@ class EventBookingModelLanguage extends RADModel
 		}
 		//Get the current language file and store it to array				
 		$keys = $data['keys'];
-		$content = "";
 		foreach ($keys as $key)
 		{
-			$key = trim($key);
+			$key   = trim($key);
 			$value = ltrim($data[$key]);
 			$registry->set($key, $value);
 		}
 		if (isset($data['extra_keys']))
 		{
-			$keys = $data['extra_keys'];
+			$keys   = $data['extra_keys'];
 			$values = $data['extra_values'];
 			for ($i = 0, $n = count($keys); $i < $n; $i++)
 			{
-				$key = trim($keys[$i]);
+				$key   = trim($keys[$i]);
 				$value = ltrim($values[$i]);
 				$registry->set($key, $value);
 			}
 		}
 		JFile::write($filePath, $registry->toString('INI'));
+
 		return true;
 	}
 }

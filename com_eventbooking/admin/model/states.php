@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.7.4
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -8,11 +8,16 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingModelStates extends RADModelList
 {
-
+	/**
+	 * Instantiate the model.
+	 *
+	 * @param array $config configuration data for the model
+	 *
+	 */
 	public function __construct($config = array())
 	{
 		$config['search_fields'] = array('tbl.state_name', 'tbl.state_3_code', 'tbl.state_2_code');
@@ -24,7 +29,7 @@ class EventbookingModelStates extends RADModelList
 	/**
 	 * Builds SELECT columns list for the query
 	 */
-	protected function _buildQueryColumns(JDatabaseQuery $query)
+	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
 		$query->select('tbl.*,  b.name AS country_name');
 
@@ -34,7 +39,7 @@ class EventbookingModelStates extends RADModelList
 	/**
 	 * Builds LEFT JOINS clauses for the query
 	 */
-	protected function _buildQueryJoins(JDatabaseQuery $query)
+	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
 		$query->leftJoin('#__eb_countries AS b ON tbl.country_id = b.id');
 
@@ -44,7 +49,7 @@ class EventbookingModelStates extends RADModelList
 	/**
 	 * Builds a WHERE clause for the query
 	 */
-	protected function _buildQueryWhere(JDatabaseQuery $query)
+	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
 
 		if ($this->state->filter_country_id)
@@ -52,6 +57,6 @@ class EventbookingModelStates extends RADModelList
 			$query->where('tbl.country_id=' . $this->state->filter_country_id);
 		}
 
-		return parent::_buildQueryWhere($query);
+		return parent::buildQueryWhere($query);
 	}
 }

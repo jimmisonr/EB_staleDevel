@@ -33,16 +33,12 @@ cd E:\www\eventbooking\plugins\editors-xtd\ebevent\
 7z a -tzip E:\www\eventbooking\build/packages/plug_editors_xtd_ebevent.zip *
 cd E:\www\eventbooking\plugins\editors-xtd\ebregister\
 7z a -tzip E:\www\eventbooking\build/packages/plug_editors_xtd_ebregister.zip *
-cd E:\www\eventbooking\plugins\eventbooking\acajoom\
-7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_acajoom.zip *
 cd E:\www\eventbooking\plugins\eventbooking\acymailing\
 7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_acymailing.zip *
 cd E:\www\eventbooking\plugins\eventbooking\cartupdate\
 7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_cartupdate.zip *
 cd E:\www\eventbooking\plugins\eventbooking\cb\
 7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_cb.zip *
-cd E:\www\eventbooking\plugins\eventbooking\ccnewsletter\
-7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_ccnewsletter.zip *
 cd E:\www\eventbooking\plugins\eventbooking\invoice\
 7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_invoice.zip *
 cd E:\www\eventbooking\plugins\eventbooking\jcomments\

@@ -1,19 +1,29 @@
 <?php
 /**
- * Generic Controller Class
- *
- * @author      Ossolution Team
  * @package     RAD
- * @subpackage	Controller    
+ * @subpackage  Controller
+ *
+ * @copyright   Copyright (C) 2015 Ossolution Team, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE
  */
 defined('_JEXEC') or die();
 
+/**
+ * Base class for a Joomla Controller
+ *
+ * Controller (Controllers are where you put all the actual code.) Provides basic
+ * functionality, such as rendering views (aka displaying templates).
+ *
+ * @package        RAD
+ * @subpackage     Controller
+ * @since          2.0
+ */
 class RADController
 {
 
 	/**
 	 * Array which hold all the controller objects has been created
-	 * 
+	 *
 	 * @var Array
 	 */
 	protected static $instances = array();
@@ -21,87 +31,47 @@ class RADController
 	/**
 	 * The application object.
 	 *
-	 * @var    JApplication	 
+	 * @var JApplicationCms
 	 */
 	protected $app;
 
 	/**
 	 * The input object.
 	 *
-	 * @var    RADInput	 
+	 * @var RADInput
 	 */
 	protected $input;
 
 	/**
-	 * Full name of the component being dispatchaed com_foobar
-	 * 
+	 * Full name of the component being dispatched com_foobar
+	 *
 	 * @var string
 	 */
 	protected $option;
 
 	/**
-	 * Name of the component, use as prefix for controller, model and view classes
-	 * @var string
-	 */
-	protected $component;
-
-	/**
 	 * Name of the controller
+	 *
 	 * @var string
 	 */
 	protected $name;
 
 	/**
-	 * Prefix for Model class, to allow auto-loader, it is forced to ComponentnameModel
+	 * Controller config
 	 *
-	 * @var string
+	 * @var array
 	 */
-	protected $modelPrefix;
-
-	/**
-	 * Prefix for View class, to allow auto-loader, it is forced to ComponentnameView
-	 *
-	 * @var string
-	 */
-	protected $viewPrefix;
-
-	/**
-	 * Language prefix, used for language string
-	 * 
-	 * @var string
-	 */
-	protected $languagePrefix;
-
-	/**
-	 * Database table prefix, use as prefix for all tables in the component
-	 * 
-	 * @var string
-	 */
-	protected $tablePrefix;
-
-	/**
-	 * The default view which will be rendered in case there is no view specified
-	 *
-	 * @var string
-	 */
-	protected $defaultView;
-
-	/**
-	 * The path to component folder
-	 * 
-	 * @var string
-	 */
-	protected $basePath;
+	protected $config;
 
 	/**
 	 * Array of class methods
 	 *
-	 * @var    array
+	 * @var array
 	 */
 	protected $methods;
 
 	/**
-	 * Array of class methods to call for a given task.
+	 * Array which map a task with the method will be called
 	 *
 	 * @var array
 	 */
@@ -110,107 +80,139 @@ class RADController
 	/**
 	 * Current or most recently performed task.
 	 *
-	 * @var    string	 	
+	 * @var string
 	 */
 	protected $task;
 
 	/**
 	 * Redirect message.
 	 *
-	 * @var    string	 	 
+	 * @var string
 	 */
 	protected $message;
 
 	/**
 	 * Redirect message type.
 	 *
-	 * @var    string	 
+	 * @var string
 	 */
 	protected $messageType;
 
 	/**
 	 * URL for redirection.
 	 *
-	 * @var    string	 
+	 * @var string
 	 */
 	protected $redirect;
 
 	/**
 	 * Method to get instance of a controller
 	 *
-	 * @param Array $config
+	 * @param string   $option
+	 * @param RADInput $input
+	 * @param array    $config
 	 *
-	 * @return RADController
+	 * @return mixed
+	 * @throws Exception
 	 */
-	public static function getInstance($config = array())
+	public static function getInstance($option, RADInput $input, array $config = array())
 	{
-		if (isset($config['input']))
+		//Make sure the component is passed to the method		
+		if (empty($option) || !JComponentHelper::isEnabled($option))
 		{
-			$input = $config['input'];
+			throw new Exception(JText::_('JLIB_APPLICATION_ERROR_COMPONENT_NOT_FOUND'), 404);
+		}
+
+		// Determine controller name
+		$task = $input->get('task', '');
+		$pos  = strpos($task, '.');
+		if ($pos !== false)
+		{
+			//In case task has dot in it, task need to have the format controllername.task
+			$name = substr($task, 0, $pos);
+			$task = substr($task, $pos + 1);
+			$input->set('task', $task);
+		}
+		elseif (isset($config['name']))
+		{
+			$name = $config['name'];
 		}
 		else
 		{
-			$input = new RADInput();
+			$name = RADInflector::singularize($input->getCmd('view'));
+			if (!$name)
+			{
+				$name = 'controller';
+			}
 		}
-		$option = $input->getCmd('option');
-		$view = $input->getCmd('view');
+
+		// Create the controller if it doesn't exist
 		$component = substr($option, 4);
-		if (!isset(self::$instances[$component . $view]))
+		if (!isset(self::$instances[$component . $name]))
 		{
-			if ($view)
+			if (empty($config['class_prefix']))
 			{
-				$class = ucfirst($component) . 'Controller' . ucfirst(RADInflector::singularize($view));
+				$config['class_prefix'] = ucfirst($component);;
 			}
-			else
-			{
-				$class = ucfirst($component) . 'Controller';
-			}
-			//Fallback to default class
+
+			$class = ucfirst($config['class_prefix']) . 'Controller' . ucfirst($name);
+
 			if (!class_exists($class))
 			{
-				if (isset($config['fallback_class']))
+				if (isset($config['default_controller_class']))
 				{
-					$class = $config['fallback_class'];
+					$class = $config['default_controller_class'];
 				}
 				else
 				{
-					$app = JFactory::getApplication();
-					if ($app->isAdmin())
-					{
-						$class = 'RADControllerAdmin';
-					}
-					else
-					{
-						$class = 'RADController';
-					}
+					$class = 'RADController';
 				}
 			}
-			self::$instances[$option . $view] = new $class($config);
+
+			$config['option']    = $option;
+			$config['component'] = $component;
+			$config['name']      = $name;
+			$input->set('option', $option);
+
+			self::$instances[$option . $name] = new $class($input, $config);
 		}
-		
-		return self::$instances[$option . $view];
+
+		return self::$instances[$option . $name];
 	}
 
 	/**
 	 * Constructor.
 	 *
-	 * @param   array  $config  An optional associative array of configuration settings.	 	
-	 *	 
+	 * @param RADInput $input
+	 * @param array    $config An optional associative array of configuration settings.
+	 *
+	 * @throws Exception
 	 */
-	public function __construct($config = array())
+	public function __construct(RADInput $input = null, array $config = array())
 	{
-		$this->app = JFactory::getApplication();
-		if (isset($config['input']))
+		$this->app    = JFactory::getApplication();
+		$this->input  = $input;
+		$this->option = $input->getCmd('option');
+		$this->name   = $config['name'];
+
+		// Build default config data for the controller
+		if (empty($config['language_prefix']))
 		{
-			$this->input = $config['input'];
+			$component                 = substr($config['option'], 4);
+			$config['language_prefix'] = strtoupper($component);
 		}
-		else
+
+		if (empty($config['default_view']))
 		{
-			$this->input = new RADInput();
+			$config['default_view'] = $config['component'];
 		}
-		//Build the default taskMap based on the class methods
+
+		// Store the controller config
+		$this->config = $config;
+
+		// Build the default taskMap based on the class methods
 		$xMethods = get_class_methods('RADController');
-		$r = new ReflectionClass($this);
+		$r        = new ReflectionClass($this);
 		$rMethods = $r->getMethods(ReflectionMethod::IS_PUBLIC);
 		foreach ($rMethods as $rMethod)
 		{
@@ -218,62 +220,12 @@ class RADController
 			if (!in_array($mName, $xMethods) || $mName == 'display')
 			{
 				$this->taskMap[strtolower($mName)] = $mName;
-				$this->methods[] = strtolower($mName);
+				$this->methods[]                   = strtolower($mName);
 			}
 		}
-		$this->option = $this->input->get('option');
-		$this->component = substr($this->option, 4);
-		$this->modelPrefix = ucfirst($this->component) . 'Model';
-		$this->viewPrefix = ucfirst($this->component) . 'View';
-		if (isset($config['name']))
-		{
-			$this->name = $config['name'];
-		}
-		else
-		{
-			$this->name = RADInflector::singularize($this->input->get('view'));
-			if (!$this->name)
-			{
-				$this->name = 'controller';
-			}
-		}
-		if ($this->app->isSite())
-		{
-			$this->basePath = JPATH_ROOT . '/components/' . $this->option;
-		}
-		else
-		{
-			$this->basePath = JPATH_ROOT . '/administrator/components/' . $this->option;
-		}
-		
-		if (isset($config['language_prefix']))
-		{
-			$this->languagePrefix = $config['language_prefix'];
-		}
-		else
-		{
-			$this->languagePrefix = strtoupper($this->component);
-		}
-		
-		if (isset($config['table_prefix']))
-		{
-			$this->tablePrefix = $config['table_prefix'];
-		}
-		else
-		{
-			$this->tablePrefix = '#__' . strtolower($this->component) . '_';
-		}
-		
-		if (isset($config['default_view']))
-		{
-			$this->defaultView = $config['default_view'];
-		}
-		else
-		{
-			$this->defaultView = $this->component;
-		}
-		
-		$this->task = $this->input->get('task', 'display');
+		$this->task = $input->get('task', 'display');
+
+		// Register controller default task
 		if (isset($config['default_task']))
 		{
 			$this->registerTask('__default', $config['default_task']);
@@ -286,8 +238,9 @@ class RADController
 
 	/**
 	 * Excute the given task
-	 * 
-	 * @return RADController return itself to support changing 	 
+	 *
+	 * @return $this return itself to support changing
+	 * @throws Exception
 	 */
 	public function execute()
 	{
@@ -305,7 +258,7 @@ class RADController
 			throw new Exception(JText::sprintf('JLIB_APPLICATION_ERROR_TASK_NOT_FOUND', $task), 404);
 		}
 		$this->$doTask();
-		
+
 		return $this;
 	}
 
@@ -315,151 +268,176 @@ class RADController
 	 * This function is provide as a default implementation, in most cases
 	 * you will need to override it in your own controllers.
 	 *
-	 * @param   boolean  $cachable   If true, the view output will be cached
-	 * @param   array    $urlparams  An array of safe url parameters and their variable types, for valid values see {@link JFilterInput::clean()}.
+	 * @param boolean $cachable  If true, the view output will be cached
 	 *
-	 * @return  RADControllerBase  A RADControllerBase object to support chaining.	 	
+	 * @param array   $urlparams An array of safe url parameters and their variable types, for valid values see {@link JFilterInput::clean()}.
+	 *
+	 * @return RADController A RADController object to support chaining.
 	 */
-	public function display($cachable = false, $urlparams = array())
+	public function display($cachable = false, array $urlparams = array())
 	{
-		$viewType = JFactory::getDocument()->getType();
-		$viewName = $this->input->get('view', $this->defaultView);
+		// Create the view object
+		$viewType   = $this->input->get('format', 'html');
+		$viewName   = $this->input->get('view', $this->config['default_view']);
 		$viewLayout = $this->input->get('layout', 'default');
-		$config = array('template_path' => $this->basePath . '/view/' . $viewName . '/tmpl', 'view_type' => $viewType, 'layout' => $viewLayout);
-		$view = $this->getView($viewName, $config);
+		$view       = $this->getView($viewName, $viewType, $viewLayout);
+
+		// If view has model, create the model, and assign it to the view
+		if ($view->hasModel)
+		{
+			$model = $this->getModel($viewName);
+			$view->setModel($model);
+		}
+
+		// Render the view
 		$view->display();
-		
+
 		return $this;
 	}
 
 	/**
 	 * Method to get a model object, loading it if required.
 	 *
-	 * @param   string  $name    The model name. Optional.	 
-	 * @param   array   $config  Configuration array for model. Optional.
+	 * @param string $name   The model name. Optional. Default will be the controller name
 	 *
-	 * @return  object  The model.
-	 *	 
+	 * @param array  $config Configuration array for model. Optional.
+	 *
+	 * @return RADModel The model.
+	 *
 	 */
-	public function getModel($name = '', $config = array())
+	public function getModel($name = '', array $config = array())
 	{
+		// If name is not given, the model will has same name with controller
 		if (empty($name))
 		{
 			$name = $this->name;
 		}
-		$defaultConfig = array(
-			'option' => $this->option, 
-			'name' => $name, 
-			'language_prefix' => $this->languagePrefix, 
-			'table_prefix' => $this->tablePrefix);
-		
-		if ($this->app->isAdmin())
+
+		// Merge method config data with default controller config
+
+		$config += $this->config;
+
+		// Set other model specific config data
+		$config['name'] = $name;
+
+		// Set default model class in case it is not existed
+		if (!isset($config['default_model_class']))
 		{
-			If (RADInflector::isPlural($name))
+			if (RADInflector::isPlural($name))
 			{
-				$defaultConfig['fallback_class'] = 'RADModelList';
+				$config['default_model_class'] = 'RADModelList';
 			}
 			else
 			{
-				$defaultConfig['fallback_class'] = 'RADModelItem';
+				if ($this->app->isAdmin())
+				{
+					$config['default_model_class'] = 'RADModelAdmin';
+				}
+				else
+				{
+					$config['default_model_class'] = 'RADModel';
+				}
 			}
 		}
-		
-		$config = array_merge($defaultConfig, $config);
-		$model = RADModel::getInstance($name, $this->modelPrefix, $config);
-		$model->set($this->input->getData());
-		
+
+		//Create model and auto populate model states if required
+		$model = RADModel::getInstance($name, ucfirst($config['class_prefix']) . 'Model', $config);
+		if (!$model->ignoreRequest)
+		{
+			$model->populateState($this->input);
+		}
+
 		return $model;
 	}
 
 	/**
-	 * Method to get a reference to the current view and load it if necessary.
+	 * Method to get instance of a view
 	 *
-	 * @param   string  $name    The view name. Optional, defaults to the controller name.	 
-	 * @param   array   $config  Configuration array for view. Optional.
+	 * @param string $name   The view name
 	 *
-	 * @return  JViewBase Reference to the view or an error.
-	 *	 
-	 * @throws  Exception
+	 * @param array  $config Configuration array for view. Optional.
+	 *
+	 * @return RADView Reference to the view
+	 *
 	 */
-	public function getView($name = '', $config = array())
+	public function getView($name, $type = 'html', $layout = 'default', array $config = array())
 	{
-		if (empty($name))
-		{
-			$name = $this->component;
-		}
-		if (isset($config['view_type']))
-		{
-			$type = $config['view_type'];
-		}
-		else
-		{
-			$type = 'html';
-		}
-		$model = $this->getModel($name);
-		$defaultConfig = array(
-			'option' => $this->option, 
-			'name' => $name, 
-			'model' => $model, 
-			'view_type' => $type, 
-			'language_prefix' => $this->languagePrefix, 
-			'template_path' => $this->basePath . '/view/' . $name . '/tmpl');
-		
-		//The full class Name of the view
-		$class = ucfirst($this->viewPrefix) . ucfirst($name) . ucfirst($type);
+		// Merge config array with default config parameters
+		$config += $this->config;
+		$config['name']   = $name;
+		$config['layout'] = $layout;
 
-
-		$config = array_merge($defaultConfig, $config);
-		if (!class_exists($class))
+		// Set the default paths for finding the layout if it is not specified in the $config array		
+		if (empty($config['paths']))
 		{
-			if ($this->app->isAdmin())
+			$paths   = array();
+			$paths[] = JPATH_THEMES . '/' . $this->app->getTemplate() . '/html/' . $config['option'] . '/' . $name;
+			$paths[] = JPATH_BASE . '/components/' . $config['option'] . '/view/' . $name . '/tmpl';
+
+			$config['paths'] = $paths;
+		}
+
+		//Set default view class if class is not existed
+		if (!isset($config['default_view_class']))
+		{
+			if (RADInflector::isPlural($name))
 			{
-				If (RADInflector::isPlural($name))
-				{
-					$class = 'RADViewList';
-				}
-				else
-				{
-					$class = 'RADViewItem';
-				}
+				$config['default_view_class'] = 'RADViewList';
 			}
 			else
 			{
-				$class = 'RADView' . ucfirst($type);
+				$config['default_view_class'] = 'RADViewItem';
 			}
 		}
-		$view = new $class($config);
-		
-		return $view;
+
+		if ($this->app->isAdmin())
+		{
+			$config['is_admin_view'] = true;
+		}
+
+		if (!isset($config['Itemid']))
+		{
+			$config['Itemid'] = $this->input->getInt('Itemid');
+		}
+
+		if (!isset($config['input']))
+		{
+			$config['input'] = $this->input;
+		}
+
+		return RADView::getInstance($name, $type, ucfirst($config['class_prefix']) . 'View', $config);
 	}
 
 	/**
 	 * Sets the internal message that is passed with a redirect
 	 *
-	 * @param   string  $text  Message to display on redirect.
-	 * @param   string  $type  Message type. Optional, defaults to 'message'.
+	 * @param string $text Message to display on redirect.
 	 *
-	 * @return  string  Previous message
-	 *	 
+	 * @param string $type Message type. Optional, defaults to 'message'.
+	 *
+	 * @return string Previous message
+	 *
 	 */
 	public function setMessage($text, $type = 'message')
 	{
-		$previous = $this->message;
-		$this->message = $text;
+		$previous          = $this->message;
+		$this->message     = $text;
 		$this->messageType = $type;
-		
+
 		return $previous;
 	}
 
 	/**
 	 * Set a URL for browser redirection.
 	 *
-	 * @param   string  $url   URL to redirect to.
-	 * @param   string  $msg   Message to display on redirect. Optional, defaults to value set internally by controller, if any.
-	 * @param   string  $type  Message type. Optional, defaults to 'message' or the type set by a previous call to setMessage.
+	 * @param string $url  URL to redirect to.
 	 *
-	 * @return  RADControllerBase  This object to support chaining.
-	 *	 
+	 * @param string $msg  Message to display on redirect. Optional, defaults to value set internally by controller, if any.
+	 *
+	 * @param string $type Message type. Optional, defaults to 'message' or the type set by a previous call to setMessage.
+	 *
+	 * @return RADController This object to support chaining.
+	 *
 	 */
 	public function setRedirect($url, $msg = null, $type = null)
 	{
@@ -469,7 +447,7 @@ class RADController
 			// Controller may have set this directly
 			$this->message = $msg;
 		}
-		
+
 		// Ensure the type is not overwritten by a previous call to setMessage.
 		if (empty($type))
 		{
@@ -483,31 +461,32 @@ class RADController
 		{
 			$this->messageType = $type;
 		}
-		
+
 		return $this;
 	}
 
 	/**
 	 * Redirects the browser or returns false if no redirect is set.
 	 *
-	 * @return  boolean  False if no redirect exists.
-	 *	 
+	 * @return boolean False if no redirect exists.
+	 *
 	 */
 	public function redirect()
 	{
 		if ($this->redirect)
 		{
-			$this->app->redirect($this->redirect, $this->message, $this->messageType);
+			$this->app->enqueueMessage($this->message, $this->messageType);
+			$this->app->redirect($this->redirect);
 		}
-		
+
 		return false;
 	}
 
 	/**
 	 * Get the last task that is being performed or was most recently performed.
 	 *
-	 * @return  string  The task that is being performed or was most recently performed.
-	 *	 
+	 * @return string The task that is being performed or was most recently performed.
+	 *
 	 */
 	public function getTask()
 	{
@@ -517,11 +496,12 @@ class RADController
 	/**
 	 * Register (map) a task to a method in the class.
 	 *
-	 * @param   string  $task    The task.
-	 * @param   string  $method  The name of the method in the derived class to perform for this task.
+	 * @param string $task   The task name
 	 *
-	 * @return  RADControllerBase  A RADControllerBase object to support chaining.
-	 * 	 	
+	 * @param string $method The name of the method in the derived class to perform for this task.
+	 *
+	 * @return RADController A RADController object to support chaining.
+	 *
 	 */
 	public function registerTask($task, $method)
 	{
@@ -529,14 +509,14 @@ class RADController
 		{
 			$this->taskMap[strtolower($task)] = $method;
 		}
-		
+
 		return $this;
 	}
 
 	/**
 	 * Get the application object.
 	 *
-	 * @return  JApplicationBase  The application object.
+	 * @return JApplicationBase The application object.
 	 *
 	 */
 	public function getApplication()
@@ -547,11 +527,19 @@ class RADController
 	/**
 	 * Get the input object.
 	 *
-	 * @return  JInput  The input object.
+	 * @return RADInput The input object.
 	 *
 	 */
 	public function getInput()
 	{
 		return $this->input;
+	}
+
+	/**
+	 * Check token to prevent CSRF attack
+	 */
+	protected function csrfProtection()
+	{
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 	}
 }

@@ -1,48 +1,49 @@
 <?php
 /**
- * @version		1.5.1
- * @package		Joomla
- * @subpackage	OS Membership Plugins
- * @author  Tuan Pham Ngoc
- * @copyright	Copyright (C) 2010 Ossolution Team
- * @license		GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 
-defined( '_JEXEC' ) or die ;
+// no direct access
+defined('_JEXEC') or die;
 
 class plgEventBookingJcomments extends JPlugin
-{	
+{
 	public function __construct(& $subject, $config)
 	{
 		parent::__construct($subject, $config);
-		JTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_eventbooking/tables');
+		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/table');
 	}
-	/**
-	 * Render setting form
-	 * @param PlanOSMembership $row
-	 */
-	function onEventDisplay($row) {	
+
+	public function onEventDisplay($row)
+	{
 		ob_start();
-		$this->_drawSettingForm($row);		
-		$form = ob_get_contents();	
-		ob_end_clean();	
+		$this->displayCommentForm($row);
+		$form = ob_get_contents();
+		ob_end_clean();
 
-		return array('title' => JText::_('Comment'),							
-					'form' => $form
-		) ;				
+		return array('title' => JText::_('Comment'),
+		             'form'  => $form
+		);
 	}
 
 	/**
-	 * Display form allows users to change settings on subscription plan add/edit screen 
+	 * Display form allows users to add comments about the event via JComments
+	 *
 	 * @param object $row
-	 */	
-	function _drawSettingForm($row) {
-		$comments = JPATH_ROOT.'/components/com_jcomments/jcomments.php';
-	    if (file_exists($comments))
-	    {
-	     require_once($comments);
-	     echo '<div style="clear:both; padding-top: 10px;"></div>';
-	     echo JComments::showComments($row->id, 'com_eventbooking', $row->title);
-	    } 
+	 */
+	private function displayCommentForm($row)
+	{
+		$comments = JPATH_ROOT . '/components/com_jcomments/jcomments.php';
+		if (file_exists($comments))
+		{
+			require_once($comments);
+			echo '<div style="clear:both; padding-top: 10px;"></div>';
+			echo JComments::showComments($row->id, 'com_eventbooking', $row->title);
+		}
 	}
 }	

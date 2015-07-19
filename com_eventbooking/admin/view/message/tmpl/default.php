@@ -1,14 +1,14 @@
 <?php
 /**
- * @version		1.3.0
- * @package		Joomla
- * @subpackage	Helpdesk Pro
- * @author  Tuan Pham Ngoc
- * @copyright	Copyright (C) 2013 Ossolution Team
- * @license		GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;
+defined('_JEXEC') or die;
 
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 $editor = JFactory::getEditor();
@@ -34,7 +34,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_ADMIN_EMAIL_SUBJECT'); ?>
 						</td>
 						<td>
-							<input type="text" name="admin_email_subject" class="inputbox" value="<?php echo $this->message->admin_email_subject; ?>" size="80" />
+							<input type="text" name="admin_email_subject" class="input-xlarge" value="<?php echo $this->message->admin_email_subject; ?>" size="80" />
 						</td>
 						<td width="35%">
 							<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -56,7 +56,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_USER_EMAIL_SUBJECT'); ?>
 						</td>
 						<td>					
-							<input type="text" name="user_email_subject" class="inputbox" value="<?php echo $this->message->user_email_subject; ?>" size="50" />
+							<input type="text" name="user_email_subject" class="input-xlarge" value="<?php echo $this->message->user_email_subject; ?>" size="50" />
 						</td>
 						<td>
 							<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -89,7 +89,7 @@ $editor = JFactory::getEditor();
                             <?php echo JText::_('EB_GROUP_MEMBER_EMAIL_SUBJECT'); ?>
                         </td>
                         <td>
-                            <input type="text" name="group_member_email_subject" class="inputbox" value="<?php echo $this->message->group_member_email_subject; ?>" size="50" />
+                            <input type="text" name="group_member_email_subject" class="input-xlarge" value="<?php echo $this->message->group_member_email_subject; ?>" size="50" />
                         </td>
                         <td>
                             <strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -233,7 +233,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_INVITATION_EMAIL_SUBJECT'); ?>
 						</td>
 						<td>					
-							<input type="text" name="invitation_email_subject" class="inputbox" value="<?php echo $this->message->invitation_email_subject; ?>" size="50" />
+							<input type="text" name="invitation_email_subject" class="input-xlarge" value="<?php echo $this->message->invitation_email_subject; ?>" size="50" />
 						</td>
 						<td>
 							<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -266,7 +266,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_REMINDER_EMAIL_SUBJECT'); ?>
 						</td>
 						<td>					
-							<input type="text" name="reminder_email_subject" class="inputbox" value="<?php echo $this->message->reminder_email_subject; ?>" size="50" />
+							<input type="text" name="reminder_email_subject" class="input-xlarge" value="<?php echo $this->message->reminder_email_subject; ?>" size="50" />
 						</td>
 						<td>
 							<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -288,7 +288,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_CANCEL_NOTIFICATION_EMAIL_SUBJECT'); ?>
 						</td>
 						<td>					
-							<input type="text" name="registration_cancel_email_subject" class="inputbox" value="<?php echo $this->message->registration_cancel_email_subject; ?>" size="50" />
+							<input type="text" name="registration_cancel_email_subject" class="input-xlarge" value="<?php echo $this->message->registration_cancel_email_subject; ?>" size="50" />
 						</td>
 						<td>
 							<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -311,7 +311,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_REGISTRATION_APPROVED_EMAIL_SUBJECT'); ?>
 						</td>
 						<td>					
-							<input type="text" name="registration_approved_email_subject" class="inputbox" value="<?php echo $this->message->registration_approved_email_subject; ?>" size="50" />
+							<input type="text" name="registration_approved_email_subject" class="input-xlarge" value="<?php echo $this->message->registration_approved_email_subject; ?>" size="50" />
 						</td>
 						<td>
 							<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -344,7 +344,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_WAITINGLIST_CONFIRMATION_SUBJECT');  ?>
 						</td>
 						<td>
-							<input type="text" name="watinglist_confirmation_subject" class="inputbox" size="70" value="<?php echo $this->message->watinglist_confirmation_subject ; ?>" />
+							<input type="text" name="watinglist_confirmation_subject" class="input-xlarge" size="70" value="<?php echo $this->message->watinglist_confirmation_subject ; ?>" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_WAITINGLIST_CONFIRMATION_SUBJECT_EXPLAIN');  ?>
@@ -367,7 +367,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_WAITINGLIST_NOTIFICATION_SUBJECT');  ?>
 						</td>
 						<td>
-							<input type="text" name="watinglist_notification_subject" class="inputbox" size="70" value="<?php echo $this->message->watinglist_notification_subject ; ?>" />
+							<input type="text" name="watinglist_notification_subject" class="input-xlarge" size="70" value="<?php echo $this->message->watinglist_notification_subject ; ?>" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_WAITINGLIST_NOTIFICATION_SUBJECT_EXPLAIN');  ?>
@@ -390,7 +390,7 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_REGISTRANT_WAITINGLIST_NOTIFICATION_SUBJECT');  ?>
 						</td>
 						<td>
-							<input type="text" name="registrant_waitinglist_notification_subject" class="inputbox" size="70" value="<?php echo $this->message->registrant_waitinglist_notification_subject ; ?>" />
+							<input type="text" name="registrant_waitinglist_notification_subject" class="input-xlarge" size="70" value="<?php echo $this->message->registrant_waitinglist_notification_subject ; ?>" />
 						</td>
 						<td>
 							<?php echo JText::_('EB_REGISTRANT_WAITINGLIST_NOTIFICATION_SUBJECT_EXPLAIN');  ?>
@@ -441,7 +441,7 @@ $editor = JFactory::getEditor();
 										<?php echo JText::_('EB_ADMIN_EMAIL_SUBJECT'); ?>
 									</td>
 									<td>
-										<input type="text" name="admin_email_subject_<?php echo $sef; ?>" class="inputbox" value="<?php echo $this->message->{'admin_email_subject_'.$sef}; ?>" size="80" />
+										<input type="text" name="admin_email_subject_<?php echo $sef; ?>" class="input-xlarge" value="<?php echo $this->message->{'admin_email_subject_'.$sef}; ?>" size="80" />
 									</td>
 									<td width="35%">
 										<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -463,7 +463,7 @@ $editor = JFactory::getEditor();
 										<?php echo JText::_('EB_USER_EMAIL_SUBJECT'); ?>
 									</td>
 									<td>					
-										<input type="text" name="user_email_subject_<?php echo $sef; ?>" class="inputbox" value="<?php echo $this->message->{'user_email_subject_'.$sef}; ?>" size="50" />
+										<input type="text" name="user_email_subject_<?php echo $sef; ?>" class="input-xlarge" value="<?php echo $this->message->{'user_email_subject_'.$sef}; ?>" size="50" />
 									</td>
 									<td>
 										<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -496,7 +496,7 @@ $editor = JFactory::getEditor();
                                         <?php echo JText::_('EB_GROUP_MEMBER_EMAIL_SUBJECT'); ?>
                                     </td>
                                     <td>
-                                        <input type="text" name="group_member_email_subject_<?php echo $sef; ?>" class="inputbox" value="<?php echo $this->message->{'group_member_email_subject_'.$sef}; ?>" size="50" />
+                                        <input type="text" name="group_member_email_subject_<?php echo $sef; ?>" class="input-xlarge" value="<?php echo $this->message->{'group_member_email_subject_'.$sef}; ?>" size="50" />
                                     </td>
                                     <td>
                                         <strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -640,7 +640,7 @@ $editor = JFactory::getEditor();
 										<?php echo JText::_('EB_INVITATION_EMAIL_SUBJECT'); ?>
 									</td>
 									<td>					
-										<input type="text" name="invitation_email_subject_<?php echo $sef ?>" class="inputbox" value="<?php echo $this->message->{'invitation_email_subject_'.$sef}; ?>" size="50" />
+										<input type="text" name="invitation_email_subject_<?php echo $sef ?>" class="input-xlarge" value="<?php echo $this->message->{'invitation_email_subject_'.$sef}; ?>" size="50" />
 									</td>
 									<td>
 										<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -673,7 +673,7 @@ $editor = JFactory::getEditor();
 										<?php echo JText::_('EB_REMINDER_EMAIL_SUBJECT'); ?>
 									</td>
 									<td>					
-										<input type="text" name="reminder_email_subject_<?php echo $sef; ?>" class="inputbox" value="<?php echo $this->message->{'reminder_email_subject_'.$sef}; ?>" size="50" />
+										<input type="text" name="reminder_email_subject_<?php echo $sef; ?>" class="input-xlarge" value="<?php echo $this->message->{'reminder_email_subject_'.$sef}; ?>" size="50" />
 									</td>
 									<td>
 										<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -695,7 +695,7 @@ $editor = JFactory::getEditor();
 										<?php echo JText::_('EB_CANCEL_NOTIFICATION_EMAIL_SUBJECT'); ?>
 									</td>
 									<td>					
-										<input type="text" name="registration_cancel_email_subject_<?php echo $sef; ?>" class="inputbox" value="<?php echo $this->message->{'registration_cancel_email_subject_'.$sef}; ?>" size="50" />
+										<input type="text" name="registration_cancel_email_subject_<?php echo $sef; ?>" class="input-xlarge" value="<?php echo $this->message->{'registration_cancel_email_subject_'.$sef}; ?>" size="50" />
 									</td>
 									<td>
 										<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -718,7 +718,7 @@ $editor = JFactory::getEditor();
 										<?php echo JText::_('EB_REGISTRATION_APPROVED_EMAIL_SUBJECT'); ?>
 									</td>
 									<td>					
-										<input type="text" name="registration_approved_email_subject_<?php echo $sef; ?>" class="inputbox" value="<?php echo $this->message->{'registration_approved_email_subject_'.$sef}; ?>" size="50" />
+										<input type="text" name="registration_approved_email_subject_<?php echo $sef; ?>" class="input-xlarge" value="<?php echo $this->message->{'registration_approved_email_subject_'.$sef}; ?>" size="50" />
 									</td>
 									<td>
 										<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> : [EVENT_TITLE]</strong>
@@ -763,7 +763,7 @@ $editor = JFactory::getEditor();
 										<?php echo JText::_('EB_WAITINGLIST_CONFIRMATION_SUBJECT');  ?>
 									</td>
 									<td>
-										<input type="text" name="watinglist_confirmation_subject_<?php echo $sef; ?>" class="inputbox" size="70" value="<?php echo $this->message->{'watinglist_confirmation_subject_'.$sef} ; ?>" />
+										<input type="text" name="watinglist_confirmation_subject_<?php echo $sef; ?>" class="input-xlarge" size="70" value="<?php echo $this->message->{'watinglist_confirmation_subject_'.$sef} ; ?>" />
 									</td>
 									<td>
 										<?php echo JText::_('EB_WAITINGLIST_CONFIRMATION_SUBJECT_EXPLAIN');  ?>
@@ -786,7 +786,7 @@ $editor = JFactory::getEditor();
 										<?php echo JText::_('EB_WAITINGLIST_NOTIFICATION_SUBJECT');  ?>
 									</td>
 									<td>
-										<input type="text" name="watinglist_notification_subject_<?php echo $sef; ?>" class="inputbox" size="70" value="<?php echo $this->message->{'watinglist_notification_subject_'.$sef} ; ?>" />
+										<input type="text" name="watinglist_notification_subject_<?php echo $sef; ?>" class="input-xlarge" size="70" value="<?php echo $this->message->{'watinglist_notification_subject_'.$sef} ; ?>" />
 									</td>
 									<td>
 										<?php echo JText::_('EB_WAITINGLIST_NOTIFICATION_SUBJECT_EXPLAIN');  ?>
@@ -809,7 +809,7 @@ $editor = JFactory::getEditor();
 										<?php echo JText::_('EB_REGISTRANT_WAITINGLIST_NOTIFICATION_SUBJECT');  ?>
 									</td>
 									<td>
-										<input type="text" name="registrant_waitinglist_notification_subject_<?php echo $sef; ?>" class="inputbox" size="70" value="<?php echo $this->message->{'registrant_waitinglist_notification_subject_'.$sef} ; ?>" />
+										<input type="text" name="registrant_waitinglist_notification_subject_<?php echo $sef; ?>" class="input-xlarge" size="70" value="<?php echo $this->message->{'registrant_waitinglist_notification_subject_'.$sef} ; ?>" />
 									</td>
 									<td>
 										<?php echo JText::_('EB_REGISTRANT_WAITINGLIST_NOTIFICATION_SUBJECT_EXPLAIN');  ?>

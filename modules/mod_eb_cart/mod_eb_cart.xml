@@ -5,9 +5,9 @@
 	<creationDate>Jan 2010</creationDate>
 	<copyright>Ossolution Team</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
-	<authorEmail>contact@joomservices.com</authorEmail>
-	<authorUrl>www.joomservices.com</authorUrl>
-	<version>1.6.6</version>
+	<authorEmail>tuanpn@joomdonation.com</authorEmail>
+	<authorUrl>www.joomdonation.com</authorUrl>
+	<version>2.0.0</version>
 	<description>This module is used to display list of events which registrants has added to cart</description>
 	<files>
 		<filename module="mod_eb_cart">mod_eb_cart.php</filename>		

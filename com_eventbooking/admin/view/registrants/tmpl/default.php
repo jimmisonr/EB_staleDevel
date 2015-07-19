@@ -1,42 +1,38 @@
 <?php
 /**
- * @version        1.6.5
- * @package		Joomla
- * @subpackage	Event Booking
- * @author  Tuan Pham Ngoc
- * @copyright	Copyright (C) 2010 - 2015 Ossolution Team
- * @license		GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;
+defined('_JEXEC') or die;
+
 if (version_compare(JVERSION, '3.0', 'ge'))
 {
 	JHtml::_('formbehavior.chosen', 'select');
 }
-$colspan = 11;
+$colSpan = 11;
 if ($this->config->show_event_date)
 {
-	$colspan++;
+	$colSpan++;
 }    
 if ($this->config->activate_deposit_feature)
 {
-	$colspan++;
+	$colSpan++;
 }    
 if ($this->totalPlugins > 1) 
 {
-	$colspan++ ;
+	$colSpan++ ;
 }
 
 if ($this->config->activate_invoice_feature)
 {
-	$colspan++;
+	$colSpan++;
 }
 ?>
-<style>
-	.icon-32-export {
-		background-image:url("components/com_eventbooking/assets/icons/export.png");
-	}
-</style>
 <form action="index.php?option=com_eventbooking&view=registrants" method="post" name="adminForm" id="adminForm">
 <table width="100%">
 <tr>
@@ -104,14 +100,16 @@ if ($this->config->activate_invoice_feature)
             			</th>	
 				    <?php    
 				    }
-				    if ($this->config->show_coupon_code_in_registrant_list) {
+				    if ($this->config->show_coupon_code_in_registrant_list)
+				    {
 				    ?>
 				    	<th width="7%" class="title" nowrap="nowrap">
             				<?php echo JHtml::_('grid.sort',  JText::_('EB_COUPON'), 'cp.code', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
             			</th>
 				    <?php    
 				    } 
-				    if ($this->totalPlugins > 1) {
+				    if ($this->totalPlugins > 1)
+				    {
 				    ?>
     					<th width="5%" class="title" nowrap="nowrap">
     						<?php echo JHtml::_('grid.sort',  JText::_('EB_PAYMENT_METHOD'), 'tbl.payment_method', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
@@ -126,7 +124,7 @@ if ($this->config->activate_invoice_feature)
 			if ($this->config->activate_invoice_feature) 
 			{				
 			?>
-				<th width="8%">
+				<th width="8%" class="center">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_INVOICE_NUMBER'), 'tbl.invoice_number', $this->state->filter_order_Dir, $this->state->filter_order); ?>
 				</th>
 			<?php	
@@ -139,7 +137,7 @@ if ($this->config->activate_invoice_feature)
 	</thead>
 	<tfoot>
 		<tr>			
-			<td colspan="<?php echo $colspan ; ?>">
+			<td colspan="<?php echo $colSpan ; ?>">
 				<?php echo $this->pagination->getListFooter(); ?>
 			</td>							
 		</tr>
@@ -211,7 +209,7 @@ if ($this->config->activate_invoice_feature)
 				<?php	
 				}
 			?>										
-			<td class="center">
+			<td>
                 <a href="mailto:<?php echo $row->email;?>"><?php echo $row->email;?></a>
 			</td>							
 			<td class="center" style="font-weight: bold;">
@@ -292,8 +290,7 @@ if ($this->config->activate_invoice_feature)
 	</tbody>
 	</table>
 	</div>
-	<input type="hidden" name="option" value="com_eventbooking" />
-	<input type="hidden" name="task" value="show_registrants" />
+	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->state->filter_order; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->state->filter_order_Dir; ?>" />	

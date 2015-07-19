@@ -1,62 +1,42 @@
 <?php
 /**
- * @version        	1.7.4
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
 
-/**
- * EventBooking Configuration controller
- *
- * @package		Joomla
- * @subpackage	Event Booking
- */
 class EventbookingControllerConfiguration extends EventbookingController
 {
-    public function __construct($config = array())
-    {
-        parent::__construct($config);
-
-        $this->registerTask('apply', 'save');
-    }
-
+	/**
+	 * Save configuration data
+	 */
 	public function save()
 	{
-		$data = $this->input->getData();
+		$data  = $this->input->getData();
 		$model = $this->getModel();
-		$model->store($data);		
-		//Publish the neccessary plugins
-		$db = JFactory::getDbo();
-		if ($data['activate_invoice_feature'])
-		{			
-			$sql = 'UPDATE #__extensions SET `enabled`= 1 WHERE `element`="invoice" AND `folder`="eventbooking"';
-			$db->setQuery($sql);
-			$db->execute();			
-		}
-		if ($data['multiple_booking'])
+		$model->store($data);
+
+		$task = $this->getTask();
+		if ($task == 'save')
 		{
-			$sql = 'UPDATE #__extensions SET `enabled`= 1 WHERE `element`="cartupdate" AND `folder`="eventbooking"';
-			$db->setQuery($sql);
-			$db->execute();
-		}		
-        $task = $this->getTask();
-        if ($task == 'save')
-        {
-            $this->setRedirect('index.php?option=com_eventbooking&view=dashboard', JText::_('EB_CONFIGURATION_DATA_SAVED'));
-        }
-        else
-        {
-            $this->setRedirect('index.php?option=com_eventbooking&view=configuration', JText::_('EB_CONFIGURATION_DATA_SAVED'));
-        }
+			$this->setRedirect('index.php?option=com_eventbooking&view=dashboard', JText::_('EB_CONFIGURATION_DATA_SAVED'));
+		}
+		else
+		{
+			$this->setRedirect('index.php?option=com_eventbooking&view=configuration', JText::_('EB_CONFIGURATION_DATA_SAVED'));
+		}
 	}
-	
+
+	/**
+	 * Cancel configuration action, redirect back to dashboard
+	 */
 	public function cancel()
 	{
-		$this->setRedirect('index.php?option=com_eventbooking');
+		$this->setRedirect('index.php?option=com_eventbooking&view=dashboard');
 	}
 }

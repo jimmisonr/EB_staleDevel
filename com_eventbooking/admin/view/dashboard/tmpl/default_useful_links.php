@@ -1,13 +1,13 @@
 <?php
 /**
- * @version        	1.7.4
+ * @version        	2.0.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
  * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
-defined('_JEXEC') or die('');
+defined('_JEXEC') or die;
 ?>
 
 <table class="table table-stripped table-bordered">

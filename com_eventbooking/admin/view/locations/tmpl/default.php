@@ -1,14 +1,14 @@
 <?php
 /**
- * @version        	1.7.4
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;	
+defined('_JEXEC') or die;
 if (!function_exists('curl_init')) 
 {
 	JFactory::getApplication()->enqueueMessage(JText::_('EB_CURL_NOT_INSTALLED'), 'warning');
@@ -86,7 +86,7 @@ if (!function_exists('curl_init'))
 	$k = 0;	
 	for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 	{
-		$row = &$this->items[$i];
+		$row = $this->items[$i];
 		$link 	= JRoute::_( 'index.php?option=com_eventbooking&view=location&id='. $row->id );
 		$checked 	= JHtml::_('grid.id',   $i, $row->id );
 		$published = JHtml::_('grid.published', $row, $i, 'tick.png', 'publish_x.png');
@@ -135,7 +135,6 @@ if (!function_exists('curl_init'))
 	</tbody>
 	</table>
 	</div>
-	<input type="hidden" name="option" value="com_eventbooking" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->state->filter_order; ?>" />

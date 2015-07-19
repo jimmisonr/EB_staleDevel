@@ -1,12 +1,13 @@
 <?php
 /**
- * @version        	1.7.4
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
+
 // no direct access
 defined( '_JEXEC' ) or die ;
 if (version_compare(JVERSION, '3.0', 'ge'))
@@ -67,7 +68,7 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 			</th>
 			<th width="8%" nowrap="nowrap">
 				<?php echo JHtml::_('grid.sort',  JText::_('EB_ORDER'), 'tbl.ordering', $this->state->filter_order_Dir, $this->state->filter_order); ?>
-				<?php echo JHtml::_('grid.order',  $this->items , 'filesave.png', 'save_order' ); ?>
+				<?php echo JHtml::_('grid.order',  $this->items , 'filesave.png', 'saveorder' ); ?>
 			</th>						
 			<th width="1%" nowrap="nowrap">
 				<?php echo JHtml::_('grid.sort',  JText::_('EB_ID'), 'tbl.id', $this->state->filter_order_Dir, $this->state->filter_order); ?>
@@ -87,7 +88,7 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 	$ordering = ($this->state->filter_order == 'tbl.ordering');
 	for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 	{
-		$row = &$this->items[$i];
+		$row = $this->items[$i];
 		$link 	= JRoute::_( 'index.php?option=com_eventbooking&view=field&id='. $row->id );
 		$checked 	= JHtml::_('grid.id',   $i, $row->id );
 		$published = JHtml::_('grid.published', $row, $i, 'tick.png', 'publish_x.png');
@@ -143,7 +144,6 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 	</tbody>
 	</table>
 	</div>
-	<input type="hidden" name="option" value="com_eventbooking" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->state->filter_order; ?>" />

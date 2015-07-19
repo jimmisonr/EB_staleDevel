@@ -362,7 +362,7 @@ class RADForm
 	public function storeData($registrantId, $data)
 	{
 		jimport('joomla.filesystem.folder');
-		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_eventbooking/tables');
+		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_eventbooking/table');
 		$rowFieldValue = JTable::getInstance('EventBooking', 'Fieldvalue');
 		$fieldIds      = array(0);
 		$fileFieldIds  = array(0);

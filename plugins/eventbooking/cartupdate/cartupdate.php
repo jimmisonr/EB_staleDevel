@@ -1,26 +1,33 @@
 <?php
 /**
- * @version		1.5.0
- * @package		Joomla
- * @subpackage	Event Booking
- * @author  Tuan Pham Ngoc
- * @copyright	Copyright (C) 2010 Ossolution Team
- * @license		GNU/GPL, see LICENSE.php
+ * @version            2.0.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
-// No direct access.
+
+// no direct access
 defined('_JEXEC') or die;
-jimport('joomla.plugin.plugin');
+
 class plgEventBookingCartUpdate extends JPlugin
-{	
-	public function __construct(& $subject, $config)
+{
+
+	/**
+	 * Mark all registration records in cart paid when the payment completed
+	 *
+	 * @param $row
+	 */
+	public function onAfterPaymentSuccess($row)
 	{
-		parent::__construct($subject, $config);		
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->update('#__eb_registrants')
+			->set('published = 1')
+			->set('payment_date = NOW()')
+			->where('cart_id = ' . (int) $row->id);
+		$db->setQuery($query);
+		$db->execute();
 	}
-	
-	public function onAfterPaymentSuccess($row) {
-		$db = JFactory::getDBO() ;
-		$sql = 'UPDATE #__eb_registrants SET published=1, payment_date=NOW() WHERE cart_id='.$row->id;
-		$db->setQuery($sql) ;
-		$db->query();
-	} 	
 }
