@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.7.4
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -8,7 +8,6 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 defined('_JEXEC') or die;
-error_reporting(0);
 
 class plgContentEbCategory extends JPlugin
 {
@@ -34,64 +33,28 @@ class plgContentEbCategory extends JPlugin
 	}
 
 	/**
-	 * Replace callback function
+	 * Display events from a category
 	 *
-	 * @param array $matches
+	 * @param $matches
+	 *
+	 * @return string
+	 * @throws Exception
 	 */
-	function displayEvents($matches)
+	public function displayEvents($matches)
 	{
+
 		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
-		$document = JFactory::getDocument();
-		$config   = EventbookingHelper::getConfig();
 		EventbookingHelper::loadLanguage();
-		$document->addStyleSheet(JURI::base(true) . '/components/com_eventbooking/assets/css/style.css');
-		if ($config->calendar_theme)
-		{
-			$theme = $config->calendar_theme;
-		}
-		else
-		{
-			$theme = 'default';
-		}
-		$styleUrl = JUri::base(true) . '/components/com_eventbooking/assets/css/themes/' . $theme . '.css';
-		$document->addStylesheet($styleUrl);
-		if ($config->load_jquery !== '0')
-		{
-			EventbookingHelper::loadJQuery();
-		}
-		if ($config->load_bootstrap_css_in_frontend !== '0')
-		{
-			EventbookingHelper::loadBootstrap();
-		}
-		JHtml::_('script', EventbookingHelper::getSiteUrl() . 'components/com_eventbooking/assets/js/noconflict.js', false, false);
-		if ($config->multiple_booking)
-		{
-			EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
-		}
-		$width = (int) $config->map_width;
-		if (!$width)
-		{
-			$width = 800;
-		}
-		$height = (int) $config->map_height;
-		if (!$height)
-		{
-			$height = 600;
-		}
-		EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
-		$Itemid = JRequest::getInt('Itemid');
-		if (!$Itemid)
-		{
-			$Itemid = EventbookingHelper::getItemid();
-		}
 		$categoryId = (int) $matches[1];
+		$request    = array('option' => 'com_eventbooking', 'view' => 'category', 'id' => $categoryId, 'limit' => 0, 'hmvc_call' => 1, 'Itemid' => EventbookingHelper::getItemid());
+		$input      = new RADInput($request);
+		$config     = EventbookingHelper::getComponentSettings('site');
+		ob_start();
 
-		$bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
-		//required eb category model
-		require_once JPATH_ROOT . '/components/com_eventbooking/models/category.php';
-		$categoryModel = new EventBookingModelCategory();
-		$items         = $categoryModel->reset()->id($categoryId)->getData();
+		//Initialize the controller, execute the task
+		RADController::getInstance('com_eventbooking', $input, $config)
+			->execute();
 
-		return '<div class="clearfix"></div>' . EventbookingHelperHtml::loadCommonLayout('common/events_table.php', array('items' => $items, 'config' => $config, 'Itemid' => $Itemid, 'categoryId' => $categoryId, 'bootstrapHelper' => $bootstrapHelper));
+		return '<div class="clearfix"></div>' . ob_get_clean();
 	}
 }

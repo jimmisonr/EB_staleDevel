@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            1.7.4
+ * @version            2.0.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -8,7 +8,7 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingHelper
 {
@@ -18,7 +18,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '1.7.4';
+		return '2.0.0';
 	}
 
 	/**
@@ -26,24 +26,12 @@ class EventbookingHelper
 	 *
 	 * @return object
 	 */
-	public static function getConfig($nl2br = false, $language = null)
+	public static function getConfig()
 	{
 		static $config;
 		if (!$config)
 		{
-			$config = new stdClass();
-			$db     = JFactory::getDbo();
-			$query  = $db->getQuery(true);
-			$query->select('config_key, config_value')->from('#__eb_configs');
-			$db->setQuery($query);
-			$rows = $db->loadObjectList();
-			for ($i = 0, $n = count($rows); $i < $n; $i++)
-			{
-				$row          = $rows[$i];
-				$key          = $row->config_key;
-				$value        = stripslashes($row->config_value);
-				$config->$key = $value;
-			}
+			$config = new RADConfig('#__eb_configs');
 		}
 
 		return $config;
@@ -53,23 +41,36 @@ class EventbookingHelper
 	 * Get specify config value
 	 *
 	 * @param string $key
+	 *
+	 * @return string
 	 */
-	public static function getConfigValue($key)
+	public static function getConfigValue($key, $default = null)
 	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('config_value')
-			->from('#__eb_configs')
-			->where('config_key="' . $key . '"');
-		$db->setQuery($query);
+		$config = self::getConfig();
 
-		return $db->loadResult();
+		return $config->get($key, $default);
+	}
+
+	/**
+	 * Get component settings from json config file
+	 *
+	 * @param $appName
+	 *
+	 * @return array
+	 */
+	public static function getComponentSettings($appName)
+	{
+		$settings = json_decode(file_get_contents(JPATH_ADMINISTRATOR . '/components/com_eventbooking/config.json'), true);
+
+		return $settings[strtolower($appName)];
 	}
 
 	/**
 	 * We only need to generate invoice for paid events only
 	 *
-	 * @param object $row
+	 * @param $row
+	 *
+	 * @return bool
 	 */
 	public static function needInvoice($row)
 	{
@@ -125,13 +126,14 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Get request data, used for RADList model
 	 *
+	 * Apply some fixes for request data
+	 *
+	 * @return void
 	 */
-	public static function getRequestData()
+	public static function prepareRequestData()
 	{
-		$request = $_REQUEST;
-		//Remove cookie vars from request
+		//Remove cookie vars from request data
 		$cookieVars = array_keys($_COOKIE);
 		if (count($cookieVars))
 		{
@@ -139,20 +141,18 @@ class EventbookingHelper
 			{
 				if (!isset($_POST[$key]) && !isset($_GET[$key]))
 				{
-					unset($request[$key]);
+					unset($_REQUEST[$key]);
 				}
 			}
 		}
-		if (isset($request['start']) && !isset($request['limitstart']))
+		if (isset($_REQUEST['start']) && !isset($_REQUEST['limitstart']))
 		{
-			$request['limitstart'] = $request['start'];
+			$_REQUEST['limitstart'] = $_REQUEST['start'];
 		}
-		if (!isset($request['limitstart']))
+		if (!isset($_REQUEST['limitstart']))
 		{
-			$request['limitstart'] = 0;
+			$_REQUEST['limitstart'] = 0;
 		}
-
-		return $request;
 	}
 
 	/**
@@ -557,9 +557,10 @@ class EventbookingHelper
 			$replaces['total_amount']           = EventbookingHelper::formatCurrency($row->total_amount, $config, $event->currency_symbol);
 			$replaces['tax_amount']             = EventbookingHelper::formatCurrency($row->tax_amount, $config, $event->currency_symbol);
 			$replaces['discount_amount']        = EventbookingHelper::formatCurrency($row->discount_amount, $config, $event->currency_symbol);
-			$replaces['amount']                 = EventbookingHelper::formatCurrency($row->amount, $config, $event->currency_symbol);
 			$replaces['payment_processing_fee'] = EventbookingHelper::formatCurrency($row->payment_processing_fee, $config, $event->currency_symbol);
+			$replaces['amount']                 = EventbookingHelper::formatCurrency($row->amount, $config, $event->currency_symbol);
 		}
+
 		// Add support for location tag
 		$query->clear();
 		$query->select('a.*')
@@ -632,7 +633,7 @@ class EventbookingHelper
 			{
 				$Itemid = self::getItemid();
 			}
-			$replaces['cancel_registration_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=cancel_registration&cancel_code=' . $row->registration_code . '&Itemid=' . $Itemid;
+			$replaces['cancel_registration_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=registrant.cancel&cancel_code=' . $row->registration_code . '&Itemid=' . $Itemid;
 		}
 		else
 		{
@@ -1184,7 +1185,7 @@ class EventbookingHelper
 
 			// Early Bird Discount
 			if (($event->early_bird_discount_amount > 0) && ($event->early_bird_discount_date != $nullDate) &&
-				(strtotime($event->early_bird_discount_date) >= mktime())
+				(strtotime($event->early_bird_discount_date) >= time())
 			)
 			{
 				if ($event->early_bird_discount_type == 1)
@@ -1837,7 +1838,7 @@ class EventbookingHelper
 		{
 			$text .= "
 				<style type=\"text/css\">
-				" . JFile::read(JPATH_ROOT . '/components/com_eventbooking/assets/css/style.css') . "
+				" . JFile::read(JPATH_ROOT . '/media/com_eventbooking/assets/css/style.css') . "
                 </style>
             ";
 		}
@@ -1986,7 +1987,7 @@ class EventbookingHelper
 		{
 			$text .= "
 				<style type=\"text/css\">
-				" . JFile::read(JPATH_ROOT . '/components/com_eventbooking/assets/css/style.css') . "
+				" . JFile::read(JPATH_ROOT . '/media/com_eventbooking/assets/css/style.css') . "
                 </style>
             ";
 		}
@@ -3166,8 +3167,8 @@ class EventbookingHelper
 		else
 		{
 			$document = JFactory::getDocument();
-			$document->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/jquery.min.js');
-			$document->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/jquery-noconflict.js');
+			$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/bootstrap/js/jquery.min.js');
+			$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/bootstrap/js/jquery-noconflict.js');
 		}
 	}
 
@@ -3178,16 +3179,17 @@ class EventbookingHelper
 	{
 		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
-		$document->addStyleSheet(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/css/bootstrap.css');
+		$rootUrl  = JUri::root(true);
+		$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap.css');
 
 		// Load bootstrap tabs css
 		if ($app->isAdmin())
 		{
-			$document->addStyleSheet(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/css/bootstrap-tabs-backend.css');
+			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap-tabs-backend.css');
 		}
 		else
 		{
-			$document->addStyleSheet(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/css/bootstrap-tabs.css');
+			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap-tabs.css');
 		}
 		if (version_compare(JVERSION, '3.0', 'ge'))
 		{
@@ -3204,13 +3206,13 @@ class EventbookingHelper
 		{
 			if ($loadJs && $app->isAdmin())
 			{
-				$document->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/jquery.min.js');
-				$document->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/jquery-noconflict.js');
-				$document->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
+				$document->addScript($rootUrl . '/media/com_eventbooking/assets/bootstrap/js/jquery.min.js');
+				$document->addScript($rootUrl . '/media/com_eventbooking/assets/bootstrap/js/jquery-noconflict.js');
+				$document->addScript($rootUrl . '/media/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
 			}
 			elseif ($loadJs && $app->isSite())
 			{
-				$document->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
+				$document->addScript($rootUrl . '/media/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
 			}
 		}
 	}
@@ -3226,7 +3228,7 @@ class EventbookingHelper
 		}
 		else
 		{
-			JFactory::getDbo()->addScript(JUri::root(true) . '/components/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
+			JFactory::getDbo()->addScript(JUri::root(true) . '/media/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
 		}
 	}
 
@@ -3679,7 +3681,7 @@ class EventbookingHelper
 
 	public static function downloadInvoice($id)
 	{
-		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_eventbooking/tables');
+		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_eventbooking/table');
 		$config = self::getConfig();
 		$row    = JTable::getInstance('EventBooking', 'Registrant');
 		$row->load($id);
@@ -3828,27 +3830,6 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Check category access
-	 *
-	 * @param int $categoryId
-	 */
-	public static function checkCategoryAccess($categoryId)
-	{
-		$user  = JFactory::getUser();
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('`access`')
-			->from('#__eb_categories')
-			->where('id=' . $categoryId);
-		$db->setQuery($query);
-		$access = (int) $db->loadResult();
-		if (!in_array($access, $user->getAuthorisedViewLevels()))
-		{
-			JFactory::getApplication()->redirect('index.php', JText::_('NOT_AUTHORIZED'));
-		}
-	}
-
-	/**
 	 * Check to see whether the current user can
 	 *
 	 * @param int $eventId
@@ -3883,18 +3864,6 @@ class EventbookingHelper
 	}
 
 	/**
-	 *
-	 * Check the access to registrants history from frontend
-	 */
-	public static function checkRegistrantsAccess()
-	{
-		if (!JFactory::getUser()->authorise('eventbooking.registrants_management', 'com_eventbooking'))
-		{
-			JFactory::getApplication()->redirect('index.php', JText::_('NOT_AUTHORIZED'));
-		}
-	}
-
-	/**
 	 * Check to see whether the current users can access View List function
 	 */
 	public static function canViewRegistrantList()
@@ -3906,20 +3875,9 @@ class EventbookingHelper
 	 *
 	 * Check to see whether this users has permission to edit registrant
 	 */
-	public static function checkEditRegistrant()
+	public static function checkEditRegistrant($rowRegistrant)
 	{
-		$user         = JFactory::getUser();
-		$db           = JFactory::getDbo();
-		$cid          = Jrequest::getVar('cid', array());
-		$registrantId = (int) $cid[0];
-		$canAccess    = true;
-		if (!$registrantId)
-		{
-			$canAccess = false;
-		}
-		$sql = 'SELECT user_id, email FROM #__eb_registrants WHERE id=' . $registrantId;
-		$db->setQuery($sql);
-		$rowRegistrant = $db->loadObject();
+		$user = JFactory::getUser();
 		if ($user->authorise('eventbooking.registrants_management', 'com_eventbooking') || ($user->get('id') == $rowRegistrant->user_id) ||
 			($user->get('email') == $rowRegistrant->email)
 		)
@@ -4492,9 +4450,77 @@ class EventbookingHelper
 		return $eventDates;
 	}
 
+
+	/**
+	 * Get list of event dates for recurring events happen on specific date in a month
+	 *
+	 * @param $startDate
+	 * @param $endDate
+	 * @param $monthlyFrequency
+	 * @param $numberOccurrences
+	 * @param $n
+	 * @param $day
+	 *
+	 * @return array
+	 */
+	public static function getMonthlyRecurringAtDayInWeekEventDates($startDate, $endDate, $monthlyFrequency, $numberOccurrences, $n, $day)
+	{
+		$eventDates = array();
+		$timeZone           = new DateTimeZone(JFactory::getConfig()->get('offset'));
+		$recurringStartDate = new Datetime($startDate, $timeZone);
+		$date               = clone $recurringStartDate;
+		$dateInterval       = new DateInterval('P' . $monthlyFrequency . 'M');
+
+		if ($numberOccurrences)
+		{
+			$count = 0;
+			while ($count < $numberOccurrences)
+			{
+				$currentMonth = $date->format('M');
+				$currentYear  = $date->format('Y');
+				$timeString = "$n $day";
+				$timeString .= " of $currentMonth $currentYear";
+				$date->setTimestamp(strtotime($timeString));
+				$date->setTime($recurringStartDate->format('H'), $recurringStartDate->format('i'), 0);
+				if (($date >= $recurringStartDate) && ($count < $numberOccurrences))
+				{
+					$eventDates[] = $date->format('Y-m-d H:i:s');
+					$count++;
+				}
+
+				$date->add($dateInterval);
+			}
+		}
+		else
+		{
+			$recurringEndDate = new DateTime($endDate . ' 23:59:59', $timeZone);
+			while (true)
+			{
+				$currentMonth = $date->format('M');
+				$currentYear  = $date->format('Y');
+				$timeString = "$n $day";
+				$timeString .= " of $currentMonth $currentYear";
+				$date->setTimestamp(strtotime($timeString));
+				$date->setTime($recurringStartDate->format('H'), $recurringStartDate->format('i'), 0);
+				if (($date >= $recurringStartDate) && ($date <= $recurringEndDate))
+				{
+					$eventDates[] = $date->format('Y-m-d H:i:s');
+				}
+				if ($date > $recurringEndDate)
+				{
+					break;
+				}
+				$date->add(new DateInterval('P' . $monthlyFrequency . 'M'));
+			}
+		}
+
+		return $eventDates;
+	}
+
+
 	public static function getDeliciousButton($title, $link)
 	{
-		$img_url = "components/com_eventbooking/assets/images/socials/delicious.png";
+		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/delicious.png";
 
 		return '<a href="http://del.icio.us/post?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="Submit ' . $title . ' in Delicious" target="blank" >
 		<img src="' . $img_url . '" alt="Submit ' . $title . ' in Delicious" />
@@ -4503,7 +4529,7 @@ class EventbookingHelper
 
 	public static function getDiggButton($title, $link)
 	{
-		$img_url = "components/com_eventbooking/assets/images/socials/digg.png";
+		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/digg.png";
 
 		return '<a href="http://digg.com/submit?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="Submit ' . $title . ' in Digg" target="blank" >
         <img src="' . $img_url . '" alt="Submit ' . $title . ' in Digg" />
@@ -4512,7 +4538,7 @@ class EventbookingHelper
 
 	public static function getFacebookButton($title, $link)
 	{
-		$img_url = "components/com_eventbooking/assets/images/socials/facebook.png";
+		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/facebook.png";
 
 		return '<a href="http://www.facebook.com/sharer.php?u=' . rawurlencode($link) . '&amp;t=' . rawurlencode($title) . '" title="Submit ' . $title . ' in FaceBook" target="blank" >
         <img src="' . $img_url . '" alt="Submit ' . $title . ' in FaceBook" />
@@ -4521,7 +4547,7 @@ class EventbookingHelper
 
 	public static function getGoogleButton($title, $link)
 	{
-		$img_url = "components/com_eventbooking/assets/images/socials/google.png";
+		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/google.png";
 
 		return '<a href="http://www.google.com/bookmarks/mark?op=edit&bkmk=' . rawurlencode($link) . '" title="Submit ' . $title . ' in Google Bookmarks" target="blank" >
         <img src="' . $img_url . '" alt="Submit ' . $title . ' in Google Bookmarks" />
@@ -4530,7 +4556,7 @@ class EventbookingHelper
 
 	public static function getStumbleuponButton($title, $link)
 	{
-		$img_url = "components/com_eventbooking/assets/images/socials/stumbleupon.png";
+		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/stumbleupon.png";
 
 		return '<a href="http://www.stumbleupon.com/submit?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="Submit ' .
 		$title . ' in Stumbleupon" target="blank" >
@@ -4540,7 +4566,7 @@ class EventbookingHelper
 
 	public static function getTechnoratiButton($title, $link)
 	{
-		$img_url = "components/com_eventbooking/assets/images/socials/technorati.png";
+		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/technorati.png";
 
 		return '<a href="http://technorati.com/faves?add=' . rawurlencode($link) . '" title="Submit ' . $title . ' in Technorati" target="blank" >
         <img src="' . $img_url . '" alt="Submit ' . $title . ' in Technorati" />
@@ -4549,11 +4575,18 @@ class EventbookingHelper
 
 	public static function getTwitterButton($title, $link)
 	{
-		$img_url = "components/com_eventbooking/assets/images/socials/twitter.png";
+		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/twitter.png";
 
 		return '<a href="http://twitter.com/?status=' . rawurlencode($title . " " . $link) . '" title="Submit ' . $title . ' in Twitter" target="blank" >
         <img src="' . $img_url . '" alt="Submit ' . $title . ' in Twitter" />
         </a>';
+	}
+
+	public static function getLinkedInButton($title, $link)
+	{
+		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/linkedin.png";
+
+		return '<a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=' . $link . '&amp;title=' . $title . '" title="Submit ' . $title . ' in LinkedIn" target="_blank" ><img src="' . $img_url . '" alt="Submit ' . $title . ' in LinkedIn" /></a>';
 	}
 
 	/**
