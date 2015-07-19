@@ -9,6 +9,8 @@
  */
 // no direct access
 defined('_JEXEC') or die;
+jimport('joomla.filesystem.file');
+jimport('joomla.filesystem.folder');
 
 class com_eventbookingInstallerScript
 {
@@ -22,8 +24,6 @@ class com_eventbookingInstallerScript
 	 */
 	function preflight($type, $parent)
 	{
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
 		//Backup the old language files
 		foreach (self::$languageFiles as $languageFile)
 		{
@@ -51,22 +51,11 @@ class com_eventbookingInstallerScript
 			JFile::copy(JPATH_ROOT . '/components/com_eventbooking/fields.xml', JPATH_ROOT . '/components/com_eventbooking/bak.fields.xml');
 		}
 
-		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css'))
-		{
-			JFile::copy(JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css',
-				JPATH_ROOT . '/components/com_eventbooking/assets/css/bak.custom.css');
-		}
-
 		if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/views'))
 		{
 			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/views');
 		}
-		
-		if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/assets'))
-		{
-			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/assets');
-		}
-		
+
 		if (JFolder::exists(JPATH_ROOT . '/administrator/components/com_eventbooking/controller'))
 		{
 			JFolder::delete(JPATH_ROOT . '/administrator/components/com_eventbooking/controller');
@@ -93,8 +82,6 @@ class com_eventbookingInstallerScript
 	 */
 	function postflight($type, $parent)
 	{
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
 		//Restore the modified language strings by merging to language files
 		$registry = new JRegistry();
 		foreach (self::$languageFiles as $languageFile)
@@ -124,11 +111,9 @@ class com_eventbookingInstallerScript
 			JFile::copy(JPATH_ROOT . '/components/com_eventbooking/bak.fields.xml', JPATH_ROOT . '/components/com_eventbooking/fields.xml');
 			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/bak.fields.xml');
 		}
-		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/assets/css/bak.custom.css'))
+		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css'))
 		{
-			JFile::copy(JPATH_ROOT . '/components/com_eventbooking/assets/css/bak.custom.css',
-				JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css');
-			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/assets/css/bak.custom.css');
+			JFIle::move(JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css', JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css');
 		}
 
 		if ($this->installType == 'install')

@@ -41,8 +41,8 @@ class EventbookingControllerCart extends EventbookingController
 	{
 		$Itemid     = $this->input->getInt('Itemid', 0);
 		$redirect   = $this->input->getInt('redirect', 1);
-		$eventIds   = $this->input->getString('event_id');
-		$quantities = $this->input->getString('quantity');
+		$eventIds   = $this->input->get('event_id', '', 'none');
+		$quantities = $this->input->get('quantity', '', 'none');
 		$model      = $this->getModel('cart');
 		if (!$redirect)
 		{
