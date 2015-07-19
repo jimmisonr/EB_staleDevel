@@ -66,7 +66,8 @@ form#adminForm label.control-label {
 
 /* ---------- Categories styles ------------------------------------- */
 body .eb-topmenu-calendar ul li {
-    margin: 0
+    margin: 0;
+    float: right;
 }
 
 #eb-categories h2.eb-category-title {
@@ -826,6 +827,8 @@ body .eb-calendar li {
     position: absolute;
     top: 5px;
 }
+
+
 
 @media screen and (max-width: 767px) {
     body .eb-calendar ul.eb-month-browser li {
