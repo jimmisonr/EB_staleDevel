@@ -93,7 +93,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$captchaInvalid = $input->getInt('captcha_invalid', 0);
 		if ($captchaInvalid)
 		{
-			$data = $input->getData();
+			$data = $input->post->getData();
 		}
 		else
 		{
@@ -356,7 +356,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$captchaInvalid = $input->getInt('captcha_invalid', 0);
 		if ($captchaInvalid)
 		{
-			$data = $input->getData();
+			$data = $input->post->getData();
 		}
 		else
 		{

@@ -186,7 +186,7 @@ class EventbookingControllerRegister extends EventbookingController
 			$fromArticle = $input->post->getInt('from_article', 0);
 			if ($fromArticle)
 			{
-				$formData = $input->getData();
+				$formData = $input->post->getData();
 				$session->set('eb_form_data', serialize($formData));
 				$session->set('eb_catpcha_invalid', 1);
 				$app->redirect($session->get('eb_artcile_url'));
@@ -202,7 +202,7 @@ class EventbookingControllerRegister extends EventbookingController
 			}
 		}
 		$session->clear('eb_catpcha_invalid');
-		$data   = $input->getData();
+		$data   = $input->post->getData();
 		$model  = $this->getModel('Register');
 		$return = $model->processIndividualRegistration($data);
 
@@ -244,7 +244,7 @@ class EventbookingControllerRegister extends EventbookingController
 	 */
 	public function store_group_members_data()
 	{
-		$membersData = $this->input->getData();
+		$membersData = $this->input->post->getData();
 		$session     = JFactory::getSession();
 		$session->set('eb_group_members_data', serialize($membersData));
 		$eventId         = $this->input->getInt('event_id', 0);
@@ -323,7 +323,7 @@ class EventbookingControllerRegister extends EventbookingController
 				$app->enqueueMessage(JText::_('EB_INVALID_CAPTCHA_ENTERED'), 'warning');
 			}
 
-			$data = $input->getData();
+			$data = $input->post->getData();
 			$session->set('eb_group_billing_data', serialize($data));
 			$input->set('captcha_invalid', 1);
 			$input->set('view', 'register');
@@ -350,7 +350,7 @@ class EventbookingControllerRegister extends EventbookingController
 			$app->redirect($signupUrl, JText::_('Sorry, your session was expired. Please try again!'));
 		}
 
-		$data   = $input->getData();
+		$data   = $input->post->getData();
 		$model  = $this->getModel('Register');
 		$return = $model->processGroupRegistration($data);
 		if ($return === 1)
@@ -372,7 +372,7 @@ class EventbookingControllerRegister extends EventbookingController
 	{
 		$config        = EventbookingHelper::getConfig();
 		$eventId       = $this->input->getInt('event_id', 0);
-		$data          = $this->input->getData();
+		$data          = $this->input->post->getData();
 		$paymentMethod = $this->input->getString('payment_method', '');
 		$event         = EventbookingHelperDatabase::getEvent($eventId);
 		$rowFields     = EventbookingHelper::getFormFields($eventId, 0);
@@ -400,7 +400,7 @@ class EventbookingControllerRegister extends EventbookingController
 	{
 		$config        = EventbookingHelper::getConfig();
 		$eventId       = $this->input->getInt('event_id');
-		$data          = $this->input->getData();
+		$data          = $this->input->post->getData();
 		$paymentMethod = $this->input->getString('payment_method', '');
 
 		$event = EventbookingHelperDatabase::getEvent($eventId);

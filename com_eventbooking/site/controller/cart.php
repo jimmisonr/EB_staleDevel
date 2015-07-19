@@ -152,7 +152,7 @@ class EventbookingControllerCart extends EventbookingController
 			$this->app->redirect('index.php', JText::_('Sorry, your session was expired. Please try again!'));
 		}
 
-		$data   = $this->input->getData();
+		$data   = $this->input->post->getData();
 		$model  = $this->getModel('cart');
 		$return = $model->processCheckout($data);
 
@@ -171,7 +171,7 @@ class EventbookingControllerCart extends EventbookingController
 		$input               = $this->input;
 		$config              = EventbookingHelper::getConfig();
 		$paymentMethod       = $input->getString('payment_method', '');
-		$data                = $input->getData();
+		$data                = $input->post->getData();
 		$data['coupon_code'] = $input->getString('coupon_code', '');
 		$cart                = new EventbookingHelperCart();
 		$response            = array();

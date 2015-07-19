@@ -19,7 +19,7 @@ class EventbookingControllerLocation extends EventbookingController
 	public function save()
 	{
 		$this->csrfProtection();
-		$post  = $this->input->getData();
+		$post  = $this->input->post->getData();
 		$model = $this->getModel();
 		try
 		{

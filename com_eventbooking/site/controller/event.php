@@ -117,7 +117,7 @@ class EventbookingControllerEvent extends EventbookingController
 				}
 			}
 			$model = $this->getModel('invite');
-			$post  = $this->input->getData();
+			$post  = $this->input->post->getData();
 			$model->sendInvite($post);
 			$this->setRedirect(
 				JRoute::_('index.php?option=com_eventbooking&view=invite&layout=complete&tmpl=component&Itemid=' . $this->input->getInt('Itemid', 0),
