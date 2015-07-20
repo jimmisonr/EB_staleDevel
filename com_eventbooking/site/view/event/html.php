@@ -350,7 +350,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 			$data->params = $registry->toArray();
 			$form         = JForm::getInstance('pmform', JPATH_ROOT . '/components/com_eventbooking/fields.xml', array(), false, '//config');
 			$form->bind($data);
-			$this->assignRef('form', $form);
+			$this->form = $form;
 		}
 		$this->item     = $item;
 		$this->prices   = $prices;

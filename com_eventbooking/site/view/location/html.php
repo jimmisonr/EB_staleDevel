@@ -85,6 +85,7 @@ class EventbookingViewLocationHtml extends RADViewHtml
 			return;
 		}
 
+		$config             = EventbookingHelper::getConfig();
 		$item               = $this->model->getLocationData();
 		$options            = array();
 		$options[]          = JHtml::_('select.option', '', JText::_('Select Country'), 'id', 'name');
@@ -93,7 +94,9 @@ class EventbookingViewLocationHtml extends RADViewHtml
 		$lists['published'] = JHtml::_('select.booleanlist', 'published', '', $item->published);
 		$this->item         = $item;
 		$this->lists        = $lists;
-		$this->config       = EventbookingHelper::getConfig();
+		$this->config       = $config;
+
+		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
 		parent::display();
 	}
