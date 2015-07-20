@@ -399,6 +399,7 @@ class EventbookingController extends RADController
 	public function payment_confirm()
 	{
 		$model = $this->getModel('Register');
-		$model->paymentConfirm();
+		$paymentMethod = $this->input->getString('payment_method');	
+		$model->paymentConfirm($paymentMethod);
 	}
 }
