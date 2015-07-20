@@ -1957,6 +1957,23 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 		$db->truncateTable('#__eb_waiting_lists');
+		
+		// Update old links from older version to 2.0.x
+		$query = $db->getQuery(true);
+		$query->update('#__menu')
+			->set($db->quoteName('link') . '=' . $db->quote('index.php?option=com_eventbooking&view=locations'))
+			->where($db->quoteName('link') . '=' . $db->quote('index.php?option=com_eventbooking&view=locationlist'));
+		$db->setQuery($query);
+		$db->execute();
+
+		$query->clear();
+		$query = $db->getQuery(true);
+		$query->update('#__menu')
+			->set($db->quoteName('link') . '=' . $db->quote('index.php?option=com_eventbooking&view=location&layout=form'))
+			->where($db->quoteName('link') . '=' . $db->quote('index.php?option=com_eventbooking&view=addlocation'));
+		$db->setQuery($query);
+		$db->execute();
+
 
 		// Try to delete the file com_eventbooking.zip from tmp folder
 		$tmpFolder = JFactory::getConfig()->get('tmp_path');

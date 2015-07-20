@@ -31,6 +31,7 @@ class EventbookingHelper
 		static $config;
 		if (!$config)
 		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/config/config.php';
 			$config = new RADConfig('#__eb_configs');
 		}
 
