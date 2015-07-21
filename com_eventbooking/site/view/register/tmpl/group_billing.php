@@ -32,7 +32,7 @@ if (!$this->userId && $this->config->user_registration)
 	$validateLoginForm = true;
 ?>
 <h3 class="eb-heading"><?php echo JText::_('EB_EXISTING_USER_LOGIN'); ?></h3>
-<form method="post" action="<?php echo JRoute::_('index.php?option=com_users&task=user.login') ; ?>" name="eb-form-login" id="eb-form-login" autocomplete="off" class="form form-horizontal">
+<form method="post" action="index.php" name="eb-form-login" id="eb-form-login" autocomplete="off" class="form form-horizontal">
 	<div class="<?php echo $controlGroupClass; ?>">
 		<label class="<?php echo $controlLabelClass; ?>" for="username">
 			<?php echo  JText::_('EB_USERNAME') ?><span class="required">*</span>
@@ -62,6 +62,8 @@ if (!$this->userId && $this->config->user_registration)
 		<?php
 		}
 	?>
+	<input type="hidden" name="option" value="com_users" />
+	<input type="hidden" name="task" value="user.login" />
 	<input type="hidden" name="return" id="return_url" value="" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 </form>

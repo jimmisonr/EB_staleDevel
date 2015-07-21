@@ -145,10 +145,9 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 <?php	
 if (!$this->userId && $this->config->user_registration)
 {
-	$actionUrl = JRoute::_('index.php?option=com_users&task=user.login');
 	$validateLoginForm = true;
 	?>
-	<form method="post" action="<?php echo $actionUrl ; ?>" name="eb-login-form" id="eb-login-form" autocomplete="off" class="form form-horizontal">			
+	<form method="post" action="index.php" name="eb-login-form" id="eb-login-form" autocomplete="off" class="form form-horizontal">			
 		<h3 class="eb-heading"><?php echo JText::_('EB_EXISTING_USER_LOGIN'); ?></h3>			
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>" for="username">
@@ -180,6 +179,8 @@ if (!$this->userId && $this->config->user_registration)
 			<?php	
 			}
 		?>		
+		<input type="hidden" name="option" value="com_users" />
+		<input type="hidden" name="task" value="user.login" />
 		<input type="hidden" name="return" value="<?php echo base64_encode(JFactory::getURI()->toString()); ?>" />
 		<?php echo JHtml::_( 'form.token' ); ?>			
 	</form>	
