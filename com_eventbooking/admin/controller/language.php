@@ -27,7 +27,9 @@ class EventbookingControllerLanguage extends EventbookingController
 		$task = $this->getTask();
 		if ($task == 'apply')
 		{
-			$this->setRedirect('index.php?option=com_eventbooking&view=language');
+			$lang = $data['filter_language'];
+			$item = $data['filter_item'];
+			$this->setRedirect('index.php?option=com_eventbooking&view=language&filter_language=' . $lang . '&filter_item=' . $item);
 		}
 		else
 		{
