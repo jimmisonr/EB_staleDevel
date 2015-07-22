@@ -2476,11 +2476,11 @@ class EventbookingHelper
 			$replaces['registrant_last_name']  = $row->last_name;
 			if (JFactory::getApplication()->isSite())
 			{
-				$replaces['event_url'] = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')) . JRoute::_(EventbookingHelperRoute::getEventRoute($row->event_id, 0, EventbookingHelper::getItemid()));
+				$replaces['event_link'] = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')) . JRoute::_(EventbookingHelperRoute::getEventRoute($row->event_id, 0, EventbookingHelper::getItemid()));
 			}
 			else
 			{
-				$replaces['event_url'] = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')) . EventbookingHelperRoute::getEventRoute($row->event_id, 0, EventbookingHelper::getItemid());
+				$replaces['event_link'] = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')) . EventbookingHelperRoute::getEventRoute($row->event_id, 0, EventbookingHelper::getItemid());
 			}
 			$query->clear();
 			$query->select('*, title' . $fieldSuffix . ' AS title')
