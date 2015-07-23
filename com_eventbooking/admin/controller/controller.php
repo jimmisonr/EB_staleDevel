@@ -2021,9 +2021,7 @@ class EventbookingController extends RADControllerAdmin
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/daylightsaving',
 			JPATH_ROOT . '/components/com_eventbooking/views/confirmation',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waiting',
-			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waitings',
-			JPATH_ROOT . '/components/com_eventbooking/assets/validate',
-			JPATH_ROOT . '/components/com_eventbooking/assets/colorbox',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waitings',			
 			JPATH_ROOT . '/components/com_eventbooking/models',
 			JPATH_ROOT . '/components/com_eventbooking/assets'
 		);
