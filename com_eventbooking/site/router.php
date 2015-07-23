@@ -322,7 +322,7 @@ function EventbookingBuildRoute(&$query)
 			'limit'
 		);
 
-		if ($view != 'location')
+		if ($view != 'location' && $view != 'map')
 		{
 			$unProcessedVariables[] = 'location_id';
 		}
