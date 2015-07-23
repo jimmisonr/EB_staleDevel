@@ -13,6 +13,7 @@ JLoader::registerPrefix('Eventbooking', JPATH_BASE . '/components/com_eventbooki
 if ($app->isAdmin())
 {
 	JLoader::register('EventbookingHelper', JPATH_ROOT . '/components/com_eventbooking/helper/helper.php');
+	JLoader::register('EventbookingHelperIcs', JPATH_ROOT . '/components/com_eventbooking/helper/ics.php');
 	JLoader::register('EventbookingHelperHtml', JPATH_ROOT . '/components/com_eventbooking/helper/html.php');	
 	JLoader::register('EventbookingHelperCart', JPATH_ROOT . '/components/com_eventbooking/helper/cart.php');
 	JLoader::register('EventbookingHelperRoute', JPATH_ROOT . '/components/com_eventbooking/helper/route.php');
