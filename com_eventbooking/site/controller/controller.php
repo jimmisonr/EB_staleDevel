@@ -49,7 +49,11 @@ class EventbookingController extends RADController
 			$theme = 'default';
 		}
 		$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/themes/' . $theme . '.css');
-		$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/custom.css');
+
+		if (file_exists(JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css') && filesize(JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css') > 0)
+		{
+			$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/custom.css');
+		}
 
 		switch ($task)
 		{

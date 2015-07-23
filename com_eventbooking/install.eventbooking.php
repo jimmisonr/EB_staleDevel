@@ -60,6 +60,12 @@ class com_eventbookingInstallerScript
 		{
 			JFolder::delete(JPATH_ROOT . '/administrator/components/com_eventbooking/controller');
 		}
+
+		// Backup css file
+		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css'))
+		{
+			JFile::copy(JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css', JPATH_ROOT . '/components/com_eventbooking/custom.css');
+		}
 	}
 
 	/**
@@ -111,9 +117,18 @@ class com_eventbookingInstallerScript
 			JFile::copy(JPATH_ROOT . '/components/com_eventbooking/bak.fields.xml', JPATH_ROOT . '/components/com_eventbooking/fields.xml');
 			JFile::delete(JPATH_ROOT . '/components/com_eventbooking/bak.fields.xml');
 		}
-		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css'))
+
+		if (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/custom.css'))
 		{
-			JFIle::move(JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css', JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css');
+			JFile::move(JPATH_ROOT . '/components/com_eventbooking/custom.css', JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css');
+		}
+
+		$customCss = JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css';
+		if (!file_exists($customCss))
+		{
+			$fp = fopen($customCss, 'w');
+			fclose($fp);
+			@chmod($customCss, 0777);
 		}
 
 		if ($this->installType == 'install')
