@@ -666,6 +666,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			{
 				$fieldsToUpdate = array(
 					'category_id',
+					'thumb',
 					'location_id',
 					'registration_type',
 					'title',

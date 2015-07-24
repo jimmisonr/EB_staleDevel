@@ -24,7 +24,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 		vertical-align: bottom;
 	}
 </style>
-<form action="index.php" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data" class="form form-horizontal">
+<form action="index.php?option=com_eventbooking&view=event" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data" class="form form-horizontal">
 <div id="eb-submit-event-simple" class="row-fluid eb-container">
 		<div class="eb_form_header" style="width:100%;">
 			<div style="float: left; width: 40%;"><?php echo JText::_('EB_ADD_EDIT_EVENT'); ?></div>
