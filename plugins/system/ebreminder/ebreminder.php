@@ -83,7 +83,7 @@ class plgSystemEBReminder extends JPlugin
 			}
 
 			require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
-			require_once JPATH_ROOT . '/components/com_eventbooking/models/reminder.php';
+			require_once JPATH_ROOT . '/components/com_eventbooking/model/reminder.php';
 			EventBookingModelReminder::sendReminder($numberEmailSendEachTime);
 		}
 
