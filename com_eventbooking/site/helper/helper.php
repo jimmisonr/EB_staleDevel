@@ -2657,11 +2657,11 @@ class EventbookingHelper
 		}
 		if ($config->multiple_booking)
 		{
-			$sql = 'SELECT event_id FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id . ' ORDER BY id';
-			$db->setQuery($sql);
-			$eventIds = $db->loadColumn();
-			$sql      = 'SELECT attachment FROM #__eb_events WHERE id IN (' . implode(',', $eventIds) . ')';
-			$db->setQuery($sql);
+			$query->clear();
+			$query->select('attachment')
+				->from('#__eb_events')
+				->where('id IN (SELECT event_id FROM #__eb_registrants AS a WHERE a.id=' . $row->id . ' OR a.cart_id=' . $row->id . ' ORDER BY a.id)');
+			$db->setQuery($query);
 			$attachmentFiles = $db->loadColumn();
 			foreach ($attachmentFiles as $attachmentFile)
 			{
@@ -2698,11 +2698,14 @@ class EventbookingHelper
 		}
 
 		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1, null, null, $attachments);
-		$mailer->ClearAttachments();
 		if ($config->send_email_to_group_members && $row->is_group_billing)
 		{
-			$sql = 'SELECT * FROM #__eb_registrants WHERE group_id=' . $row->id;
-			$db->setQuery($sql);
+			$query->clear();
+			$query->select('*')
+				->from('#__eb_registrants')
+				->where('group_id = '. $row->id)
+				->order('id');
+			$db->setQuery($query);
 			$rowMembers = $db->loadObjectList();
 			if (count($rowMembers))
 			{
@@ -2779,11 +2782,13 @@ class EventbookingHelper
 					}
 					$body = self::convertImgTags($body);
 					$mailer->ClearAllRecipients();
-					$mailer->ClearAttachments();
 					$mailer->sendMail($fromEmail, $fromName, $rowMember->email, $subject, $body, 1, null);
 				}
 			}
 		}
+
+		// Clear attachments
+		$mailer->ClearAttachments();
 
 		//Send emails to notification emails
 		if (strlen(trim($event->notification_emails)) > 0)
