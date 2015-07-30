@@ -934,6 +934,19 @@ $editor = JFactory::getEditor();
 							&nbsp;
 						</td>
 					</tr>
+
+					<tr>
+						<td width="30%" class="key">
+							<?php echo JText::_('EB_SHOW_EVENT_IMAGE_IN_CALENDAR'); ?>
+						</td>
+						<td>
+							<?php echo $this->lists['show_thumb_in_calendar']; ?>
+						</td>
+						<td>
+							&nbsp;
+						</td>
+					</tr>
+
 					<tr>
 						<td width="30%" class="key">
 							<?php echo JText::_('EB_SHOW_EVENT_IMAGE_IN_TABLE_LAYOUT'); ?>

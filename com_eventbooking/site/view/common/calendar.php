@@ -65,10 +65,18 @@ EventbookingHelperJquery::equalHeights();
 						{
 							$color =   EventbookingHelper::getColorCodeOfEvent($event->id);
 							$eventIds[] = $event->id;
+							if ($config->show_thumb_in_calendar && $event->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $event->thumb))
+							{
+								$thumbSource = JUri::root(true) . '/media/com_eventbooking/images/thumbs/' . $event->thumb;
+							}
+							else
+							{
+								$thumbSource = JUri::root(true) . '/media/com_eventbooking/assets/images/calendar_event.png';
+							}
 							?>
 							<div class="date day_cell">
 								<a class="eb_event_link" href="<?php echo JText::_(EventbookingHelperRoute::getEventRoute($event->id, isset($categoryId) ? $categoryId : 0, $Itemid)); ?>" title="<?php echo $event->title; ?>" <?php if ($color) echo 'style="background-color:#'.$color.'";' ; ?>>
-									<img border="0" align="top" title="<?php echo JText::_("Event")?>" src="<?php echo JURI::root()?>media/com_eventbooking/assets/images/calendar_event.png">
+									<img border="0" align="top" title="<?php echo $event->title; ?>" src="<?php echo $thumbSource; ?>">
 									<?php
 										if ($config->show_event_time)
 										{
