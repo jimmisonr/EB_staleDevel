@@ -8,7 +8,7 @@
  * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;
+defined( '_JEXEC' ) or die;
 if ($this->config->use_https)
 {
 	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_group_registration&Itemid='.$this->Itemid, false, 1);

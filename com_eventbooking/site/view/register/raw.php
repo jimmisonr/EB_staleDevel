@@ -230,6 +230,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		{
 			$waitingList = false;
 		}
+
 		//Get data				
 		$form = new RADForm($rowFields);
 		if ($captchaInvalid)
@@ -343,7 +344,6 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		{
 			$form->setEventId($eventId);
 		}
-
 		// Assign these parameters
 		$this->paymentMethod        = $paymentMethod;
 		$this->lists                = $lists;

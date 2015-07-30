@@ -519,7 +519,14 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-
+		
+		if (!in_array('only_show_for_first_member', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_fields` ADD  `only_show_for_first_member` TINYINT NOT NULL DEFAULT  '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+		
 		//Events table
 		$fields = array_keys($db->getTableColumns('#__eb_events'));
 

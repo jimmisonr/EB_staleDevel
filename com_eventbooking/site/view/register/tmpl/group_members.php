@@ -53,6 +53,10 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 	}
 	foreach ($fields as $field)
 	{
+		if ($i > 1 && $field->row->only_show_for_first_member)
+		{
+			continue;
+		}
 		echo $field->getControlGroup($bootstrapHelper);
 		if ($field->type == 'Date')
 		{

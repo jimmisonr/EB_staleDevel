@@ -1966,8 +1966,12 @@ class EventbookingHelper
 			$data['form']        = $form;
 			if ($row->is_group_billing && $config->collect_member_information)
 			{
-				$sql = 'SELECT * FROM #__eb_registrants WHERE group_id=' . $row->id;
-				$db->setQuery($sql);
+				$query->clear();
+				$query->select('*')
+					->from('#__eb_registrants')
+					->where('group_id = '. $row->id)
+					->order('id');
+				$db->setQuery($query);
 				$rowMembers         = $db->loadObjectList();
 				$data['rowMembers'] = $rowMembers;
 			}

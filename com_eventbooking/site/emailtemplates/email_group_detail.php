@@ -281,6 +281,10 @@ defined('_JEXEC') or die;
 					                    $fields = $memberForm->getFields();
 					                    foreach ($fields as $field)
 					                    {
+						                    if ($i > 0 && $field->row->only_show_for_first_member)
+						                    {
+							                    continue;
+						                    }
 					                    	echo $field->getOutput(false);
 					                    }	
 				                    ?>																																					

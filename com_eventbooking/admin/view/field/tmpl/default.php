@@ -367,7 +367,19 @@ if ($translatable)
 				&nbsp;
 			</td>
 		</tr>
-					
+
+		<tr>
+			<td class="key">
+				<?php echo JText::_('EB_ONLY_SHOW_FOR_FIRST_GROUP_MEMBER'); ?>
+			</td>
+			<td>
+				<?php echo $this->lists['only_show_for_first_member']; ?>
+			</td>
+			<td>
+				<?php echo JText::_('EB_ONLY_SHOW_FOR_FIRST_GROUP_MEMBER_EXPLAIN'); ?>
+			</td>
+		</tr>
+
 		<!--<tr class="validation-rules">
 			<td class="key">
 				<?php echo JText::_('EB_VALIDATION_ERROR_MESSAGE') ; ?>

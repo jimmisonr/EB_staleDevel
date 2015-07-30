@@ -242,7 +242,9 @@ $span6Class        = $bootstrapHelper->getClassMapping('span6');
                     if ($i %2 == 0)
                     {                    	
                         echo "<div class=\"".$rowFluidClass."\">\n" ;
-                    }  
+                    }
+
+
                     $memberData = EventbookingHelper::getRegistrantData($rowMember, $rowFields);
                     $memberForm->bind($memberData); 
                     
@@ -266,6 +268,10 @@ $span6Class        = $bootstrapHelper->getClassMapping('span6');
 	                    $fields = $memberForm->getFields();
 	                    foreach ($fields as $field)
 	                    {
+		                    if ($i > 0 && $field->row->only_show_for_first_member)
+		                    {
+			                    continue;
+		                    }
 	                    	echo $field->getOutput(true, $bootstrapHelper);
 	                    }	
                     ?>
