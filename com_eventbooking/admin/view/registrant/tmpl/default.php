@@ -279,6 +279,10 @@ $selectedState = '';
 							$fields = $form->getFields();									
 							foreach ($fields as $field)
 							{
+								if ($i > 0 && $field->row->only_show_for_first_member)
+								{
+									continue;
+								}
 								$fieldType = strtolower($field->type);
 								switch ($fieldType)
 								{

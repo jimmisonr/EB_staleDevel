@@ -77,7 +77,8 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 			$query = $db->getQuery(true);
 			$query->select('*')
 				->from('#__eb_registrants')
-				->where('group_id=' . $this->item->id);
+				->where('group_id=' . $this->item->id)
+				->order('id');
 			$db->setQuery($query);
 			$rowMembers = $db->loadObjectList();
 		}
