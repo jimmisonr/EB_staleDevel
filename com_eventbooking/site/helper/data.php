@@ -378,7 +378,7 @@ class EventbookingHelperData
 	public static function prepareCustomFieldsData($items)
 	{
 		$params       = new JRegistry();
-		$xml          = JFactory::getXML(JPATH_COMPONENT . '/fields.xml');
+		$xml          = JFactory::getXML(JPATH_ROOT . '/components/com_eventbooking/fields.xml');
 		$fields       = $xml->fields->fieldset->children();
 		$customFields = array();
 		foreach ($fields as $field)

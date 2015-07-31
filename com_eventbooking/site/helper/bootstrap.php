@@ -70,7 +70,8 @@ class EventbookingHelperBootstrap
 				'img-polaroid'    => 'img-polaroid',
 				'control-label'   => 'control-label',
 				'controls'        => 'controls',
-				'icon-location'	  => 'icon-location'	
+				'icon-location'	  => 'icon-location',
+				'icon-map-marker'	  => 'icon-map-marker',
 			);
 		}
 		else
