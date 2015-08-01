@@ -414,6 +414,12 @@ CREATE TABLE IF NOT EXISTS `#__eb_field_events` (
   `event_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) CHARACTER SET `utf8`;
+CREATE TABLE IF NOT EXISTS `#__eb_field_categories` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `field_id` int(11) DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) CHARACTER SET `utf8`;
 CREATE TABLE IF NOT EXISTS `#__eb_locations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
