@@ -83,6 +83,46 @@ class EventbookingModelField extends RADModelAdmin
 				$db->execute();
 			}
 		}
+		else
+		{
+			$categoryIds = $input->get('category_id', array(), 'array');
+			if (count($categoryIds) == 0 || $categoryIds[0] == -1 || $row->name == 'first_name' || $row->name == 'email')
+			{
+				$row->category_id = -1;
+			}
+			else
+			{
+				$row->category_id = 1;
+			}
+			$row->store();
+
+			$fieldId = $row->id;
+			$db      = $this->getDbo();
+			$query   = $db->getQuery(true);
+			$query->clear();
+			if (!$isNew)
+			{
+				$query->delete('#__eb_field_categories')->where('field_id = ' . $fieldId);
+				$db->setQuery($query);
+				$db->execute();
+			}
+
+			if ($row->category_id != -1)
+			{
+				$query->clear();
+				$query->insert('#__eb_field_categories')->columns('field_id, category_id');
+				for ($i = 0, $n = count($categoryIds); $i < $n; $i++)
+				{
+					$categoryId = (int) $categoryIds[$i];
+					if ($categoryId > 0)
+					{
+						$query->values("$fieldId, $categoryId");
+					}
+				}
+				$db->setQuery($query);
+				$db->execute();
+			}
+		}
 
 		// Calculate depend on options in different languages
 		if (JLanguageMultilang::isEnabled())

@@ -54,18 +54,33 @@ class EventbookingViewFieldHtml extends RADViewItem
 			}
 			$list      = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
 			$options   = array();
-			$options[] = JHtml::_('select.option', 0, JText::_('EB_ALL_CATEGORIES'));
+			$options[] = JHtml::_('select.option', -1, JText::_('EB_ALL_CATEGORIES'));
 			foreach ($list as $listItem)
 			{
 				$options[] = JHtml::_('select.option', $listItem->id, '&nbsp;&nbsp;&nbsp;' . $listItem->treename);
 			}
-			$this->lists['category_id'] = JHtml::_('select.genericlist', $options, 'category_id',
+
+			if (empty($this->item->id) || $this->item->category_id == -1)
+			{
+				$selectedCategoryIds[] = -1;
+			}
+			else
+			{
+				$query->clear();
+				$query->select('category_id')
+					->from('#__eb_field_categories')
+					->where('field_id=' . $this->item->id);
+				$db->setQuery($query);
+				$selectedCategoryIds = $db->loadColumn();
+			}
+
+			$this->lists['category_id'] = JHtml::_('select.genericlist', $options, 'category_id[]',
 				array(
 					'option.text.toHtml' => false,
 					'option.text'        => 'text',
 					'option.value'       => 'value',
-					'list.attr'          => ' class="input-xlarge" ',
-					'list.select'        => $this->item->category_id));
+					'list.attr'          => ' class="input-xlarge" multiple="multiple" ',
+					'list.select'        => $selectedCategoryIds));
 		}
 		else
 		{
@@ -88,7 +103,7 @@ class EventbookingViewFieldHtml extends RADViewItem
 
 			if (empty($this->item->id) || $this->item->event_id == -1)
 			{
-				$selecteds[] = -1;
+				$selectedEventIds[] = -1;
 			}
 			else
 			{
@@ -97,11 +112,11 @@ class EventbookingViewFieldHtml extends RADViewItem
 					->from('#__eb_field_events')
 					->where('field_id=' . $this->item->id);
 				$db->setQuery($query);
-				$selecteds = $db->loadColumn();
+				$selectedEventIds = $db->loadColumn();
 			}
 
 			$this->lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id[]', 'class="input-xlarge" multiple="multiple" size="5" ', 'id',
-				'title', $selecteds);
+				'title', $selectedEventIds);
 		}
 		$this->lists['required']       = JHtml::_('select.booleanlist', 'required', '', $this->item->required);
 		$this->lists['fee_field']      = JHtml::_('select.booleanlist', 'fee_field', '', $this->item->fee_field);
