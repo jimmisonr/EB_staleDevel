@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>contact@joomdonation.com</authorEmail>
 	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>2.0.1</version>
+	<version>2.0.2</version>
 	<description>This plugin is use to update all registration record in cart when a payment completed</description>
 	<files>
 		<filename plugin="cartupdate">cartupdate.php</filename>
