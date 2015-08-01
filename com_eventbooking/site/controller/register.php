@@ -81,7 +81,7 @@ class EventbookingControllerRegister extends EventbookingController
 			$query->clear();
 			$query->select('COUNT(id)')
 				->from('#__eb_fields')
-				->where('published=1 AND fee_field=1 AND (category_id = 0 OR category_id=' . $categoryId . ')');
+				->where('published=1 AND fee_field=1 AND (category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 			$db->setQuery($query);
 			$total = (int) $db->loadResult();
 		}

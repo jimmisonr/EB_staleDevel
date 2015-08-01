@@ -1373,7 +1373,7 @@ class EventbookingHelper
 				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $cartEventId . ' AND main_category = 1';
 				$db->setQuery($sql);
 				$categoryId = (int) $db->loadResult();
-				$query->where('(category_id = 0 OR category_id=' . $categoryId . ')');
+				$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 			}
 			else
 			{
@@ -1395,7 +1395,7 @@ class EventbookingHelper
 				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $eventId . ' AND main_category = 1';
 				$db->setQuery($sql);
 				$categoryId = (int) $db->loadResult();
-				$query->where('(category_id = 0 OR category_id=' . $categoryId . ')');
+				$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 			}
 			else
 			{
@@ -1582,7 +1582,7 @@ class EventbookingHelper
 				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $eventId . ' AND main_category = 1';
 				$db->setQuery($sql);
 				$categoryId = (int) $db->loadResult();
-				$sql        = 'SELECT COUNT(*) FROM #__eb_fields WHERE fee_field = 1 AND published= 1 AND (category_id = 0 OR category_id=' . $categoryId . ')';
+				$sql        = 'SELECT COUNT(*) FROM #__eb_fields WHERE fee_field = 1 AND published= 1 AND (category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))';
 				$db->setQuery($sql);
 			}
 			else
@@ -2285,7 +2285,7 @@ class EventbookingHelper
 				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $event->id . ' AND main_category = 1';
 				$db->setQuery($sql);
 				$categoryId = (int) $db->loadResult();
-				$query->where('(category_id = 0 OR category_id=' . $categoryId . ')');
+				$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 			}
 			else
 			{

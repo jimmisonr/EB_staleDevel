@@ -233,7 +233,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 				$query->select('id, name, title, is_core')
 					->from('#__eb_fields')
 					->where('published = 1')
-					->where('(category_id=0 OR category_id=' . $categoryId . ')')
+					->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))')
 					->order('ordering');
 			}
 			else
