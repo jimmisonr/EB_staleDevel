@@ -183,13 +183,17 @@ class EventbookingModelField extends RADModelAdmin
 			$query->delete('#__eb_field_values')->where('field_id IN (' . $cids . ')');
 			$db->setQuery($query);
 			$db->execute();
+			$query->clear();
 			if (!$config->custom_field_by_category)
 			{
-				$query->clear();
 				$query->delete('#__eb_field_events')->where('field_id IN (' . $cids . ')');
-				$db->setQuery($query);
-				$db->execute();
 			}
+			else
+			{
+				$query->delete('#__eb_field_categories')->where('field_id IN (' . $cids . ')');
+			}
+			$db->setQuery($query);
+			$db->execute();
 			//Do not allow deleting core fields
 			$query->clear();
 			$query->delete('#__eb_fields')->where('id IN (' . $cids . ') AND is_core=0');

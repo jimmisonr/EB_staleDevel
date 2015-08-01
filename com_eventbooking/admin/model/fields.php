@@ -36,12 +36,11 @@ class EventbookingModelFields extends RADModelList
 		$state = $this->state;
 		if ($state->filter_category_id)
 		{
-			$query->where('tbl.category_id=' . $state->filter_category_id);
+			$query->where('(tbl.category_id = -1 OR tbl.id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $state->filter_category_id . '))');
 		}
 		if ($state->filter_event_id)
 		{
-			$query->where(
-				' (tbl.event_id = -1 OR tbl.id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $state->filter_event_id . '))');
+			$query->where('(tbl.event_id = -1 OR tbl.id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $state->filter_event_id . '))');
 		}
 		if ($state->filter_show_core_fields == 2)
 		{

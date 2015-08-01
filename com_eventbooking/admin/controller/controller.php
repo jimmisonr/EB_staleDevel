@@ -97,8 +97,7 @@ class EventbookingController extends RADControllerAdmin
 				$db->setQuery($sql);
 				$categoryId = (int) $db->loadResult();
 
-				$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 AND (category_id = 0 OR category_id=' . $categoryId .
-					') ORDER BY ordering';
+				$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 AND (category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . ')) ORDER BY ordering';
 				$db->setQuery($sql);
 				$rowFields = $db->loadObjectList();
 			}
