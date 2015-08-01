@@ -215,6 +215,10 @@ $return = base64_encode(JUri::getInstance()->toString());
 												if ($event->discounted_price > 0)
 												{
 													echo EventbookingHelper::formatCurrency($event->discounted_price, $config, $event->currency_symbol);
+													if ($event->early_bird_discount_date != $nullDate)
+													{
+														echo ' <em> '.JText::sprintf('EB_UNTIl_DATE', JHtml::_('date', $event->early_bird_discount_date, $config->date_format, null)).'</em>';
+													}
 												}
 												else
 												{

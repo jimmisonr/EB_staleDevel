@@ -251,9 +251,17 @@ $return = base64_encode(JUri::getInstance()->toString());
 									<td class="eb_price">
 										<?php
 											if ($item->discounted_price > 0)
-												echo EventbookingHelper::formatCurrency($item->discounted_price, $this->config, $item->currency_symbol) ;
+											{
+												echo EventbookingHelper::formatCurrency($item->discounted_price, $this->config, $item->currency_symbol);
+												if ($item->early_bird_discount_date != $nullDate)
+												{
+													echo ' <em> '.JText::sprintf('EB_UNTIl_DATE', JHtml::_('date', $item->early_bird_discount_date, $this->config->date_format, null)).'</em>';
+												}
+											}
 											else
+											{
 												echo '<span class="eb_free">'.JText::_('EB_FREE').'</span>' ;
+											}
 										?>
 									</td>
 								</tr>

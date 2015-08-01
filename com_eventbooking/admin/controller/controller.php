@@ -97,8 +97,7 @@ class EventbookingController extends RADControllerAdmin
 				$db->setQuery($sql);
 				$categoryId = (int) $db->loadResult();
 
-				$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 AND (category_id = 0 OR category_id=' . $categoryId .
-					') ORDER BY ordering';
+				$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 AND (category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . ')) ORDER BY ordering';
 				$db->setQuery($sql);
 				$rowFields = $db->loadObjectList();
 			}
@@ -1981,6 +1980,29 @@ class EventbookingController extends RADControllerAdmin
 		$db->setQuery($query);
 		$db->execute();
 
+		// Field categories table
+		$sql = "CREATE TABLE IF NOT EXISTS `#__eb_field_categories` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `field_id` int(11) DEFAULT NULL,
+		  `category_id` int(11) DEFAULT NULL,
+		  PRIMARY KEY (`id`)
+		) CHARACTER SET `utf8`;";
+
+		$db->setQuery($sql);
+		$db->execute();
+
+		$sql = 'SELECT COUNT(*) FROM #__eb_field_categories';
+		$db->setQuery($sql);
+		$total = $db->loadResult();
+		if (!$total)
+		{
+			$sql = 'UPDATE #__eb_fields SET category_id = -1 WHERE category_id = 0';
+			$db->setQuery($sql);
+			$db->execute();
+			$sql = 'INSERT INTO #__eb_field_categories(field_id, category_id) SELECT id, category_id FROM #__eb_field_categories WHERE category_id != -1 ';
+			$db->setQuery($sql);
+			$db->execute();
+		}
 
 		// Try to delete the file com_eventbooking.zip from tmp folder
 		$tmpFolder = JFactory::getConfig()->get('tmp_path');
