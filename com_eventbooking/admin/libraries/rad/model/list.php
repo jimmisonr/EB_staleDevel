@@ -201,10 +201,16 @@ class RADModelList extends RADModel
 				->clear('group')
 				->clear('having')
 				->clear('order')
-				->clear('limit')
-				->clear('offset')
 				->select('COUNT(*)');
 
+			// Limit, offset is only available in Joomla 3.x
+			if (version_compare(JVERSION, '3.0', 'ge'))
+			{
+				$query->clear('limit')
+					->clear('offset');
+			}
+
+			// Clear join clause if needed
 			if ($this->clearJoin)
 			{
 				$query->clear('join');
@@ -222,7 +228,7 @@ class RADModelList extends RADModel
 	 *
 	 * @return JPagination
 	 */
-	function getPagination()
+	public function getPagination()
 	{
 		// Lets load the content if it doesn't already exist
 		if (empty($this->pagination))
