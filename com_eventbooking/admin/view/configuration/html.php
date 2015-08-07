@@ -228,6 +228,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		#Invoice settings
 		$lists['activate_invoice_feature'] = JHtml::_('select.booleanlist', 'activate_invoice_feature', '', $config->activate_invoice_feature);
 		$lists['send_invoice_to_customer'] = JHtml::_('select.booleanlist', 'send_invoice_to_customer', '', $config->send_invoice_to_customer);
+		$lists['send_invoice_to_admin'] = JHtml::_('select.booleanlist', 'send_invoice_to_admin', '', $config->send_invoice_to_admin);
 
 		#SEF setting
 		$lists['insert_event_id'] = JHtml::_('select.booleanlist', 'insert_event_id', '', $config->insert_event_id);

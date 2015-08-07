@@ -1185,7 +1185,18 @@ $editor = JFactory::getEditor();
 						<td>
 							<?php echo JText::_('EB_SEND_INVOICE_TO_SUBSCRIBERS_EXPLAIN'); ?>
 						</td>
-					</tr>		
+					</tr>
+					<tr>
+						<td  class="key" width="10%">
+							<?php echo JText::_('EB_SEND_INVOICE_TO_ADMIN'); ?>
+						</td>
+						<td width="60%">
+							<?php echo $this->lists['send_invoice_to_admin']; ?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_SEND_INVOICE_TO_ADMIN_EXPLAIN'); ?>
+						</td>
+					</tr>
 					<tr>
 						<td  class="key">
 							<?php echo JText::_('EB_INVOICE_START_NUMBER'); ?>

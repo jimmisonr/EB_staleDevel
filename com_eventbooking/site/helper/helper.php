@@ -2708,6 +2708,7 @@ class EventbookingHelper
 		}
 
 		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1, null, null, $attachments);
+
 		if ($config->send_email_to_group_members && $row->is_group_billing)
 		{
 			$query->clear();
@@ -2799,6 +2800,16 @@ class EventbookingHelper
 
 		// Clear attachments
 		$mailer->ClearAttachments();
+
+		// Add attachment to admin email if needed
+		if ($config->send_invoice_to_admin)
+		{
+			$invoiceFilePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
+			if (file_exists($invoiceFilePath))
+			{
+				$mailer->addAttachment($invoiceFilePath);
+			}
+		}
 
 		//Send emails to notification emails
 		if (strlen(trim($event->notification_emails)) > 0)
