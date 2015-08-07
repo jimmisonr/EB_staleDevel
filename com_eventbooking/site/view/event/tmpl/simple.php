@@ -62,7 +62,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>"><?php echo JText::_('EB_THUMB_IMAGE') ; ?></label>
 			<div class="<?php echo $controlsClass; ?>">
-				<input type="file" class="inputbox" name="thumb" size="60" />
+				<input type="file" class="inputbox" name="thumb_image" size="60" />
 				<?php
 				if ($this->item->thumb)
 				{

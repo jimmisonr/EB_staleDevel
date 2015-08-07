@@ -168,7 +168,7 @@ $format = 'Y-m-d' ;
 				<tr>
 					<td class="key"><?php echo JText::_('EB_THUMB_IMAGE') ; ?></td>
 					<td>
-						<input type="file" class="inputbox" name="thumb" size="60" />
+						<input type="file" class="inputbox" name="thumb_image" size="60" />
 						<?php
 							if ($this->item->thumb) {
 							?>
