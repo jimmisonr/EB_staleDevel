@@ -476,6 +476,16 @@ class EventbookingHelper
 		$replaces['short_description'] = $event->short_description;
 		$replaces['description']       = $event->description;
 
+		// Event custom fields
+		if ($config->event_custom_field && file_exists(JPATH_COMPONENT . '/fields.xml'))
+		{
+			EventbookingHelperData::prepareCustomFieldsData(array($event));
+			foreach($event->paramData as $customFieldName => $param)
+			{
+				$replaces[$customFieldName] = $param['value'];
+			}
+		}
+
 		// Form fields
 		$fields = $form->getFields();
 		foreach ($fields as $field)
