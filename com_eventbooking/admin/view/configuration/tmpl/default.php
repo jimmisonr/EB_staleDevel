@@ -694,6 +694,19 @@ $editor = JFactory::getEditor();
 							&nbsp;
 						</td>
 					</tr>
+					
+					<tr>
+						<td class="key">
+							<?php echo JText::_('EB_CONVERSION_TRACKING_CODE'); ?>
+						</td>
+						<td>
+							<textarea name="conversion_tracking_code" class="input-xlarge" rows="10"><?php echo $this->config->conversion_tracking_code;?></textarea>
+						</td>
+						<td>
+							<?php echo JText::_('EB_CONVERSION_TRACKING_CODE_EXPLAIN');?>
+						</td>
+					</tr>
+					
 				</table>		
 			</div>			
 			<div class="tab-pane" id="theme-page">

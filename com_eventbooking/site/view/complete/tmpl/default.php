@@ -33,4 +33,5 @@ defined( '_JEXEC' ) or die ;
 		</script>
 	<?php
 	}
+	echo $this->conversionTrackingCode;
 ?>

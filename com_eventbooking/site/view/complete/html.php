@@ -119,6 +119,7 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		$this->registrationCode = $registrationCode;
 		$this->tmpl             = JRequest::getVar('tmpl', '');
 		$this->Itemid           = JRequest::getInt('Itemid', 0);
+		$this->conversionTrackingCode = $config->conversion_tracking_code;
 
 		parent::display();
 	}

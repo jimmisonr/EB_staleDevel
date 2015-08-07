@@ -17,7 +17,7 @@ class EventbookingControllerConfiguration extends EventbookingController
 	 */
 	public function save()
 	{
-		$data  = $this->input->getData();
+		$data  = $this->input->getData(RAD_INPUT_ALLOWRAW);
 		$model = $this->getModel();
 		$model->store($data);
 
