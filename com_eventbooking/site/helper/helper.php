@@ -477,7 +477,7 @@ class EventbookingHelper
 		$replaces['description']       = $event->description;
 
 		// Event custom fields
-		if ($config->event_custom_field && file_exists(JPATH_COMPONENT . '/fields.xml'))
+		if ($config->event_custom_field && file_exists(JPATH_ROOT . '/components/com_eventbooking/fields.xml'))
 		{
 			EventbookingHelperData::prepareCustomFieldsData(array($event));
 			foreach($event->paramData as $customFieldName => $param)
@@ -2383,22 +2383,29 @@ class EventbookingHelper
 	/**
 	 * Get registration rate for group registration
 	 *
-	 * @param int $eventId
-	 * @param int $numberRegistrants
+	 * @param $eventId
+	 * @param $numberRegistrants
 	 *
-	 * @return
+	 * @return mixed
 	 */
 	public static function getRegistrationRate($eventId, $numberRegistrants)
 	{
 		$db  = JFactory::getDbo();
-		$sql = 'SELECT price FROM #__eb_event_group_prices WHERE event_id=' . $eventId . ' AND registrant_number <= ' . $numberRegistrants .
-			' ORDER BY registrant_number DESC LIMIT 1';
-		$db->setQuery($sql);
+		$query = $db->getQuery(true);
+		$query->select('price')
+			->from('#__eb_event_group_prices')
+			->where('event_id = '. $eventId)
+			->where('registrant_number <= '.$numberRegistrants)
+			->order('registrant_number DESC');
+		$db->setQuery($query, 0, 1);
 		$rate = $db->loadResult();
 		if (!$rate)
 		{
-			$sql = 'SELECT individual_price FROM #__eb_events WHERE id=' . $eventId;
-			$db->setQuery($sql);
+			$query->clear();
+			$query->select('individual_price')
+				->from('#__eb_events')
+				->where('id = '. $eventId);
+			$db->setQuery($query);
 			$rate = $db->loadResult();
 		}
 
@@ -2411,13 +2418,24 @@ class EventbookingHelper
 	 */
 	public static function idealEnabled()
 	{
-		$db  = JFactory::getDbo();
-		$sql = 'SELECT COUNT(id) FROM #__eb_payment_plugins WHERE name="os_ideal" AND published=1';
-		$db->setQuery($sql);
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('COUNT(id)')
+			->from('#__eb_payment_plugins')
+			->where('name = "os_ideal"')
+			->where('published = 1');
+		$db->setQuery($query);
 		$total = $db->loadResult();
 		if ($total)
 		{
-			require_once JPATH_COMPONENT . '/payments/ideal/ideal.class.php';
+			if (file_exists(JPATH_ROOT . '/components/com_eventbooking/payments/Mollie/API/Autoloader.php'))
+			{
+				require_once JPATH_ROOT . '/components/com_eventbooking/payments/Mollie/API/Autoloader.php';
+			}
+			else
+			{
+				require_once JPATH_ROOT . '/components/com_eventbooking/payments/ideal/ideal.class.php';
+			}
 
 			return true;
 		}
@@ -2435,13 +2453,30 @@ class EventbookingHelper
 	{
 		$idealPlugin = os_payments::loadPaymentMethod('os_ideal');
 		$params      = new JRegistry($idealPlugin->params);
-		$partnerId   = $params->get('partner_id');
-		$ideal       = new iDEAL_Payment($partnerId);
-		if (!$params->get('ideal_mode', 0))
+		if (file_exists(JPATH_ROOT . '/components/com_eventbooking/payments/Mollie/API/Autoloader.php'))
 		{
-			$ideal->setTestmode(true);
+			$mollie = new Mollie_API_Client();
+			$mollie->setApiKey($params->get('api_key'));
+			$bankLists = array();
+			$issuers   = $mollie->issuers->all();
+			foreach ($issuers as $issuer)
+			{
+				if ($issuer->method == Mollie_API_Object_Method::IDEAL)
+				{
+					$bankLists[$issuer->id] = $issuer->name;
+				}
+			}
 		}
-		$bankLists = $ideal->getBanks();
+		else
+		{
+			$partnerId = $params->get('partner_id');
+			$ideal     = new iDEAL_Payment($partnerId);
+			if (!$params->get('ideal_mode', 0))
+			{
+				$ideal->setTestmode(true);
+			}
+			$bankLists = $ideal->getBanks();
+		}
 
 		return $bankLists;
 	}

@@ -75,7 +75,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 			$this->location = EventbookingHelperDatabase::getLocation($item->location_id);
 		}
 
-		if ($config->event_custom_field && file_exists(JPATH_COMPONENT . '/fields.xml'))
+		if ($config->event_custom_field && file_exists(JPATH_ROOT . '/components/com_eventbooking/fields.xml'))
 		{
 			EventbookingHelperData::prepareCustomFieldsData(array($item));
 			$this->paramData = $item->paramData;
