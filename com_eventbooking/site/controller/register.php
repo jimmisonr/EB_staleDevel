@@ -112,7 +112,17 @@ class EventbookingControllerRegister extends EventbookingController
 			$data['email']    = $user->email;
 			$data['event_id'] = $eventId;
 			$model            = $this->getModel('Register');
-			$model->processIndividualRegistration($data);
+			$return = $model->processIndividualRegistration($data);
+			if ($return === 1)
+			{
+				// Redirect registrants to registration complete page
+				$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->input->getInt('Itemid'), false, false));
+			}
+			elseif ($return === 2)
+			{
+				// Redirect to waiting list complete page
+				$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=waitinglist&Itemid=' . $this->input->getInt('Itemid'), false, false));
+			}
 		}
 		else
 		{
