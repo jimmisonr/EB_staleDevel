@@ -102,11 +102,20 @@ class EventbookingControllerEvent extends EventbookingController
 			$user   = JFactory::getUser();
 			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 			{
-				$input = JFactory::getApplication()->input;
-				//Check captcha
-				$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-				$res           = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
-				if (!$res)
+				$captchaValid  = true;
+				$input         = $this->input;
+				$captchaPlugin = $this->app->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+				if (!$captchaPlugin)
+				{
+					// Hardcode to recaptcha, reduce support request
+					$captchaPlugin = 'recaptcha';
+				}
+				$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+				if ($plugin)
+				{
+					$captchaValid = JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
+				}
+				if (!$captchaValid)
 				{
 					$this->app->enqueueMessage(JText::_('EB_INVALID_CAPTCHA_ENTERED'), 'warning');
 					$this->input->set('view', 'invite');
