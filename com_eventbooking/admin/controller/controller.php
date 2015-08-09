@@ -1089,6 +1089,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('late_fee', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `late_fee` DECIMAL( 10, 6 ) NULL DEFAULT '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		if (!in_array('cart_id', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `cart_id`  INT NOT NULL DEFAULT  '0' ;";

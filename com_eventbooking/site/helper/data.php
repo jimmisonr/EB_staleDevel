@@ -245,33 +245,44 @@ class EventbookingHelperData
 	public static function calculateDiscount($rows)
 	{
 		$db       = JFactory::getDbo();
+		$query    = $db->getQuery(true);
 		$user     = JFactory::getUser();
 		$config   = EventbookingHelper::getConfig();
 		$nullDate = $db->getNullDate();
-		if ($user->get('id'))
+		$userId   = $user->get('id');
+		for ($i = 0, $n = count($rows); $i < $n; $i++)
 		{
-			$userId = $user->get('id');
-			for ($i = 0, $n = count($rows); $i < $n; $i++)
+			$row = $rows[$i];
+
+			if ($userId > 0)
 			{
-				$row = $rows[$i];
-				$sql = 'SELECT COUNT(id) FROM #__eb_registrants WHERE user_id=' . $userId . ' AND event_id=' . $row->id . ' AND (published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))';
-				$db->setQuery($sql);
+				$query->select('COUNT(id)')
+					->from('#__eb_registrants')
+					->where('user_id = ' . $userId)
+					->where('event_id = ' . $row->id)
+					->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
+				$db->setQuery($query);
 				$row->user_registered = $db->loadResult();
-				// Calculate discount price
-				if ($config->show_discounted_price)
+				$query->clear();
+			}
+
+			// Calculate discount price
+			if ($config->show_discounted_price)
+			{
+				$discount = 0;
+				if (($row->early_bird_discount_date != $nullDate) && ($row->date_diff >= 0))
 				{
-					$discount = 0;
-					if (($row->early_bird_discount_date != $nullDate) && ($row->date_diff >= 0))
+					if ($row->early_bird_discount_type == 1)
 					{
-						if ($row->early_bird_discount_type == 1)
-						{
-							$discount += $row->individual_price * $row->early_bird_discount_amount / 100;
-						}
-						else
-						{
-							$discount += $row->early_bird_discount_amount;
-						}
+						$discount += $row->individual_price * $row->early_bird_discount_amount / 100;
 					}
+					else
+					{
+						$discount += $row->early_bird_discount_amount;
+					}
+				}
+				if ($userId > 0)
+				{
 					$discountRate = EventbookingHelper::calculateMemberDiscount($row->discount_amounts, $row->discount_groups);
 					if ($discountRate > 0)
 					{
@@ -284,33 +295,26 @@ class EventbookingHelperData
 							$discount += $discountRate;
 						}
 					}
-					$row->discounted_price = $row->individual_price - $discount;
 				}
+
+				$row->discounted_price = $row->individual_price - $discount;
 			}
-		}
-		else
-		{
-			//Calculate discounted price
-			if ($config->show_discounted_price)
+
+			$lateFee = 0;
+			if (($row->late_fee_date != $nullDate) && $row->late_fee_date_diff >= 0 && $row->late_fee_amount > 0)
 			{
-				for ($i = 0, $n = count($rows); $i < $n; $i++)
+				if ($row->late_fee_type == 1)
 				{
-					$row      = $rows[$i];
-					$discount = 0;
-					if (($row->early_bird_discount_date != $nullDate) && ($row->date_diff >= 0))
-					{
-						if ($row->early_bird_discount_type == 1)
-						{
-							$discount += $row->individual_price * $row->early_bird_discount_amount / 100;
-						}
-						else
-						{
-							$discount += $row->early_bird_discount_amount;
-						}
-					}
-					$row->discounted_price = $row->individual_price - $discount;
+					$lateFee = $row->individual_price * $row->late_fee_amount / 100;
+				}
+				else
+				{
+
+					$lateFee = $row->late_fee_amount;
 				}
 			}
+
+			$row->late_fee = $lateFee;
 		}
 	}
 

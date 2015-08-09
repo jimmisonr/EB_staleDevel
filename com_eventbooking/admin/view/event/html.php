@@ -89,6 +89,7 @@ class EventbookingViewEventHtml extends RADViewItem
 		$options[]                               = JHtml::_('select.option', 2, $config->currency_symbol);
 		$this->lists['discount_type']            = JHtml::_('select.genericlist', $options, 'discount_type', ' class="input-small" ', 'value', 'text', $item->discount_type);
 		$this->lists['early_bird_discount_type'] = JHtml::_('select.genericlist', $options, 'early_bird_discount_type', 'class="input-small"', 'value', 'text', $item->early_bird_discount_type);
+		$this->lists['late_fee_type'] = JHtml::_('select.genericlist', $options, 'late_fee_type', 'class="input-small"', 'value', 'text', $item->late_fee_type);
 		if ($config->activate_deposit_feature)
 		{
 			$this->lists['deposit_type'] = JHtml::_('select.genericlist', $options, 'deposit_type', ' class="input-small" ', 'value', 'text', $item->deposit_type);
