@@ -23,7 +23,7 @@ class EventbookingViewCouponHtml extends RADViewItem
 		$options[]                  = JHtml::_('select.option', 1, $config->currency_symbol);
 		$this->lists['coupon_type'] = JHtml::_('select.genericlist', $options, 'coupon_type', 'class="input-mini"', 'value', 'text', $this->item->coupon_type);
 		$options                    = array();
-		$options[]                  = JHtml::_('select.option', 0, JText::_('EB_ALL_EVENTS'), 'id', 'title');
+		$options[]                  = JHtml::_('select.option', -1, JText::_('EB_ALL_EVENTS'), 'id', 'title');
 		$rows                       = EventbookingHelperDatabase::getAllEvents('title, ordering');
 
 		if ($config->show_event_date)
@@ -39,7 +39,23 @@ class EventbookingViewCouponHtml extends RADViewItem
 		{
 			$options = array_merge($options, $rows);
 		}
-		$this->lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id', 'class="input-xlarge"', 'id', 'title', $this->item->event_id);
+
+		if (empty($this->item->id) || $this->item->event_id == -1)
+		{
+			$selectedEventIds[] = -1;
+		}
+		else
+		{
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('event_id')
+				->from('#__eb_coupon_events')
+				->where('coupon_id=' . $this->item->id);
+			$db->setQuery($query);
+			$selectedEventIds = $db->loadColumn();
+		}
+
+		$this->lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id[]', 'class="input-xlarge" multiple="multiple" ', 'id', 'title', $selectedEventIds);
 		$this->nullDate          = JFactory::getDbo()->getNullDate();
 	}
 }
