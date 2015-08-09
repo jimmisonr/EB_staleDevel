@@ -715,6 +715,7 @@ class EventbookingHelper
 				}
 			}
 		}
+
 		if ($couponCode)
 		{
 			//Validate the coupon
@@ -726,7 +727,8 @@ class EventbookingHelper
 				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
 				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
 				->where('(times = 0 OR times > used)')
-				->where('(event_id=0 OR event_id=' . $event->id . ')');
+				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id=' . $event->id . '))')
+				->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
 			if ($coupon)
@@ -916,7 +918,8 @@ class EventbookingHelper
 				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
 				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
 				->where('(times = 0 OR times > used)')
-				->where('(event_id=0 OR event_id=' . $eventId . ')');
+				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id=' . $event->id . '))')
+				->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
 			if ($coupon)
@@ -1131,17 +1134,31 @@ class EventbookingHelper
 			$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
 			$paymentFeePercent = (float) $params->get('payment_fee_percent');
 		}
+
+		$couponDiscountedEventIds = array();
 		if ($couponCode)
 		{
 			$query->clear();
 			$query->select('*')
 				->from('#__eb_coupons')
-				->where('code=' . $db->quote($couponCode));
+				->where('code=' . $db->quote($couponCode))
+				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id IN (' . implode(',', $items) . ')))')
+				->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
 			if ($coupon)
 			{
 				$fees['coupon_valid'] = 1;
+				if ($coupon->event_id != -1)
+				{
+					// Get list of events which will receive discount
+					$query->clear();
+					$query->select('event_id')
+						->from('#__eb_coupon_events')
+						->where('coupon_id = '. $coupon->id);
+					$db->setQuery($query);
+					$couponDiscountedEventIds = $db->loadColumn();
+				}
 			}
 			else
 			{
@@ -1152,7 +1169,6 @@ class EventbookingHelper
 		{
 			$fees['coupon_valid'] = 1;
 		}
-
 
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
@@ -1210,7 +1226,7 @@ class EventbookingHelper
 			}
 
 			// Coupon discount
-			if (!empty($coupon) && ($coupon->event_id == 0 || $coupon->event_id == $eventId))
+			if (!empty($coupon) && ($coupon->event_id == -1 || in_array($eventId, $couponDiscountedEventIds)))
 			{
 				if ($coupon->coupon_type == 0)
 				{
