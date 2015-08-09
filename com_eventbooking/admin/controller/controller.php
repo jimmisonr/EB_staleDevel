@@ -739,6 +739,28 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		// Late Fee date
+		if (!in_array('late_fee_discount_type', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `late_fee_discount_type` TINYINT NOT NULL DEFAULT  '0' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('late_fee_discount_date', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `late_fee_discount_date` DATETIME NULL ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('late_fee_discount_amount', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `late_fee_discount_amount` DECIMAL( 10, 2 ) NULL DEFAULT '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		if (!in_array('parent_id', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `parent_id` INT NOT NULL DEFAULT  '0' ;";
