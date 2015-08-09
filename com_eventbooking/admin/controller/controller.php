@@ -2004,6 +2004,29 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		// Coupon events
+		$sql = "CREATE TABLE IF NOT EXISTS `#__eb_coupon_events` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `coupon_id` int(11) DEFAULT NULL,
+		  `event_id` int(11) DEFAULT NULL,
+		  PRIMARY KEY (`id`)
+		) CHARACTER SET `utf8`;";
+		$db->setQuery($sql);
+		$db->execute();
+
+		$sql = 'SELECT COUNT(*) FROM #__eb_coupon_events';
+		$db->setQuery($sql);
+		$total = $db->loadResult();
+		if (!$total)
+		{
+			$sql = 'UPDATE #__eb_coupons SET event_id = -1 WHERE event_id = 0';
+			$db->setQuery($sql);
+			$db->execute();
+			$sql = 'INSERT INTO #__eb_coupon_events(coupon_id, event_id) SELECT id, event_id FROM #__eb_coupons WHERE event_id != -1 ';
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		// Try to delete the file com_eventbooking.zip from tmp folder
 		$tmpFolder = JFactory::getConfig()->get('tmp_path');
 		if (!JFolder::exists($tmpFolder))

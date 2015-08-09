@@ -494,6 +494,12 @@ CREATE TABLE IF NOT EXISTS `#__eb_coupons` (
   `published` TINYINT UNSIGNED NULL,
   PRIMARY KEY(`id`)
 ) CHARACTER SET `utf8`;
+CREATE TABLE IF NOT EXISTS `#__eb_coupon_events` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `coupon_id` int(11) DEFAULT NULL,
+  `event_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) CHARACTER SET `utf8`;
 CREATE TABLE IF NOT EXISTS `#__eb_event_categories` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `event_id` INT NULL,
