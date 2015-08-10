@@ -107,6 +107,7 @@ class EventBookingModelRegister extends RADModel
 		}
 		$data['total_amount']           = round($fees['total_amount'], 2);
 		$data['discount_amount']        = round($fees['discount_amount'], 2);
+		$data['late_fee']               = round($fees['late_fee'], 2);
 		$data['tax_amount']             = round($fees['tax_amount'], 2);
 		$data['amount']                 = round($fees['amount'], 2);
 		$data['deposit_amount']         = $fees['deposit_amount'];
