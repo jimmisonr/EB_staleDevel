@@ -798,6 +798,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		$this->data->event_date               = $db->getNullDate();
 		$this->data->event_end_date           = $db->getNullDate();
 		$this->data->registration_start_date  = $db->getNullDate();
+		$this->data->late_fee_date  		  = $db->getNullDate();
 		$this->data->cut_off_date             = $db->getNullDate();
 		$this->data->registration_type        = isset($config->registration_type) ? $config->registration_type : 0;
 		$this->data->access                   = isset($config->access) ? $config->access : 1;
