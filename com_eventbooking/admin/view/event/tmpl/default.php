@@ -568,7 +568,7 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_LATE_FEE_DATE' );?>::<?php echo JText::_('EB_LATE_FEE_DATE_EXPLAIN'); ?>"><?php echo JText::_('EB_LATE_FEE_DATE'); ?></span>
 				</td>
 				<td>
-					<?php echo JHtml::_('calendar', $this->item->late_fee_date != $this->nullDate ? JHtml::_('date', $this->item->late_fee_date, $format, null) : '', 'late_fee_date', 'late_fee_date'); ?>
+					<?php echo JHtml::_('calendar', $this->item->late_fee_date && $this->item->late_fee_date != $this->nullDate ? JHtml::_('date', $this->item->late_fee_date, $format, null) : '', 'late_fee_date', 'late_fee_date'); ?>
 				</td>
 			</tr>
 		</table>

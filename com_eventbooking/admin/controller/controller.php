@@ -749,7 +749,7 @@ class EventbookingController extends RADControllerAdmin
 
 		if (!in_array('late_fee_date', $fields))
 		{
-			$sql = "ALTER TABLE  `#__eb_events` ADD  `late_fee_date` DATETIME NULL ;";
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `late_fee_date` DATETIME NULL DEFAULT NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
