@@ -206,8 +206,7 @@ class RADModelList extends RADModel
 			// Limit, offset is only available in Joomla 3.x
 			if (version_compare(JVERSION, '3.0', 'ge'))
 			{
-				$query->clear('limit')
-					->clear('offset');
+				$query->clear('limit');
 			}
 
 			// Clear join clause if needed
