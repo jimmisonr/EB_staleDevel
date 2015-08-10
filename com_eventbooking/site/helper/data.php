@@ -460,6 +460,7 @@ class EventbookingHelperData
 			$fields[] = JText::_('EB_NUMBER_REGISTRANTS');
 			$fields[] = JText::_('EB_AMOUNT');
 			$fields[] = JText::_('EB_DISCOUNT_AMOUNT');
+			$fields[] = JText::_('EB_LATE_FEE');
 			if ($taxEnabled)
 			{
 				$fields[] = JText::_('EB_TAX');
@@ -523,6 +524,7 @@ class EventbookingHelperData
 				$fields[] = $r->number_registrants;
 				$fields[] = EventbookingHelper::formatAmount($r->total_amount, $config);
 				$fields[] = EventbookingHelper::formatAmount($r->discount_amount, $config);
+				$fields[] = EventbookingHelper::formatAmount($r->late_fee, $config);
 				if ($taxEnabled)
 				{
 					$fields[] = EventbookingHelper::formatAmount($r->tax_amount, $config);

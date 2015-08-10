@@ -122,11 +122,11 @@ $selectedState = '';
 		</tr>
 
 		<?php
-		if ($this->item->discount_amount > 0 || $this->item->tax_amount > 0 || empty($this->item->id))
+		if ($this->item->discount_amount > 0 || $this->item->late_fee > 0 || $this->item->tax_amount > 0 || empty($this->item->id))
 		{
 			if ($this->item->discount_amount > 0 || empty($this->item->id))
 			{
-				?>
+			?>
 				<tr>
 					<td class="title_cell">
 						<?php echo JText::_('EB_DISCOUNT_AMOUNT'); ?>
@@ -134,11 +134,28 @@ $selectedState = '';
 					<td>
 						<?php echo $this->config->currency_symbol?><input type="text" name="discount_amount"
 						                                                  class="input-medium"
-						                                                  value="<?php echo $this->item->total_amount > 0 ? round($this->item->total_amount, 2) : null;?>"/>
+						                                                  value="<?php echo $this->item->discount_amount > 0 ? round($this->item->discount_amount, 2) : null;?>"/>
 					</td>
 				</tr>
 			<?php
 			}
+
+			if ($this->item->late_fee > 0 || empty($this->item->id))
+			{
+			?>
+				<tr>
+					<td class="title_cell">
+						<?php echo JText::_('EB_LATE_FEE'); ?>
+					</td>
+					<td>
+						<?php echo $this->config->currency_symbol?><input type="text" name="late_fee"
+						                                                  class="input-medium"
+						                                                  value="<?php echo $this->item->late_fee > 0 ? round($this->item->late_fee, 2) : null;?>"/>
+					</td>
+				</tr>
+			<?php
+			}
+
 			if ($this->item->tax_amount > 0 || empty($this->item->id))
 			{
 				?>
