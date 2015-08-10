@@ -554,6 +554,23 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 					<?php echo JHtml::_('calendar', $this->item->early_bird_discount_date != $this->nullDate ? JHtml::_('date', $this->item->early_bird_discount_date, $format, null) : '', 'early_bird_discount_date', 'early_bird_discount_date'); ?>
 				</td>
 			</tr>
+
+			<tr>
+				<td class="key" width="30%">
+					<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_LATE_FEE' );?>::<?php echo JText::_('EB_LATE_FEE_EXPLAIN'); ?>"><?php echo JText::_('EB_LATE_FEE'); ?></span>
+				</td>
+				<td>
+					<input type="text" name="late_fee_amount" id="late_fee_amount" class="input-mini" size="5" value="<?php echo $this->item->late_fee_amount; ?>" />&nbsp;&nbsp;<?php echo $this->lists['late_fee_type'] ; ?>
+				</td>
+			</tr>
+			<tr>
+				<td class="key" width="30%">
+					<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_LATE_FEE_DATE' );?>::<?php echo JText::_('EB_LATE_FEE_DATE_EXPLAIN'); ?>"><?php echo JText::_('EB_LATE_FEE_DATE'); ?></span>
+				</td>
+				<td>
+					<?php echo JHtml::_('calendar', $this->item->late_fee_date != $this->nullDate ? JHtml::_('date', $this->item->late_fee_date, $format, null) : '', 'late_fee_date', 'late_fee_date'); ?>
+				</td>
+			</tr>
 		</table>
 	</div>	
 	<?php 

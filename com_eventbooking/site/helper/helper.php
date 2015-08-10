@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.0.2
+ * @version            2.0.3
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -18,7 +18,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '2.0.2';
+		return '2.0.3';
 	}
 
 	/**
@@ -549,17 +549,24 @@ class EventbookingHelper
 			$sql = 'SELECT SUM(discount_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$discountAmount = $db->loadResult();
-			$amount         = $totalAmount - $discountAmount + $paymentProcessingFee + $taxAmount;
+
+			$sql = 'SELECT SUM(late_fee) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
+			$db->setQuery($sql);
+			$lateFee = $db->loadResult();
+
+			$amount         = $totalAmount - $discountAmount + $paymentProcessingFee + $taxAmount + $lateFee;
 
 			$replaces['total_amount']           = EventbookingHelper::formatCurrency($totalAmount, $config, $event->currency_symbol);
 			$replaces['tax_amount']             = EventbookingHelper::formatCurrency($taxAmount, $config, $event->currency_symbol);
 			$replaces['discount_amount']        = EventbookingHelper::formatCurrency($discountAmount, $config, $event->currency_symbol);
+			$replaces['late_fee']        = EventbookingHelper::formatCurrency($lateFee, $config, $event->currency_symbol);
 			$replaces['payment_processing_fee'] = EventbookingHelper::formatCurrency($paymentProcessingFee, $config, $event->currency_symbol);
 			$replaces['amount']                 = EventbookingHelper::formatCurrency($amount, $config, $event->currency_symbol);
 
 			$replaces['amt_total_amount']           = $totalAmount;
 			$replaces['amt_tax_amount']             = $taxAmount;
 			$replaces['amt_discount_amount']        = $discountAmount;
+			$replaces['amt_late_fee']               = $lateFee;
 			$replaces['amt_amount']                 = $amount;
 			$replaces['amt_payment_processing_fee'] = $paymentProcessingFee;
 		}
@@ -568,6 +575,7 @@ class EventbookingHelper
 			$replaces['total_amount']           = EventbookingHelper::formatCurrency($row->total_amount, $config, $event->currency_symbol);
 			$replaces['tax_amount']             = EventbookingHelper::formatCurrency($row->tax_amount, $config, $event->currency_symbol);
 			$replaces['discount_amount']        = EventbookingHelper::formatCurrency($row->discount_amount, $config, $event->currency_symbol);
+			$replaces['late_fee']               = EventbookingHelper::formatCurrency($row->late_fee, $config, $event->currency_symbol);
 			$replaces['payment_processing_fee'] = EventbookingHelper::formatCurrency($row->payment_processing_fee, $config, $event->currency_symbol);
 			$replaces['amount']                 = EventbookingHelper::formatCurrency($row->amount, $config, $event->currency_symbol);
 		}
@@ -675,6 +683,7 @@ class EventbookingHelper
 		$totalAmount           = $event->individual_price + $form->calculateFee();
 		$discountAmount        = 0;
 		$fees['discount_rate'] = 0;
+		$nullDate              = $db->getNullDate();
 		if ($user->id)
 		{
 			$discountRate = self::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
@@ -692,18 +701,9 @@ class EventbookingHelper
 			}
 		}
 
-		$todayDate = JHtml::_('date', 'now', 'Y-m-d');
-		$query->select('COUNT(id)')
-			->from('#__eb_events')
-			->where('id = ' . $event->id)
-			->where('DATEDIFF(early_bird_discount_date, "' . $todayDate . '") >= 0');
-		$db->setQuery($query);
-		$total = $db->loadResult();
-
-		if ($total)
+		if (($event->early_bird_discount_date != $nullDate) && ($event->date_diff >= 0))
 		{
-			$earlyBirdDiscountAmount = $event->early_bird_discount_amount;
-			if ($earlyBirdDiscountAmount > 0)
+			if ($event->early_bird_discount_amount > 0)
 			{
 				if ($event->early_bird_discount_type == 1)
 				{
@@ -758,15 +758,32 @@ class EventbookingHelper
 		{
 			$discountAmount = $totalAmount;
 		}
+
+		// Late Fee
+		$lateFee = 0;
+		if (($event->late_fee_date != $nullDate) && $event->late_fee_date_diff >= 0 && $event->late_fee_amount > 0)
+		{
+			if ($event->late_fee_type == 1)
+			{
+				$lateFee = $event->individual_price * $event->late_fee_amount / 100;
+			}
+			else
+			{
+
+				$lateFee = $event->late_fee_amount;
+			}
+		}
+
 		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
 		{
-			$taxAmount = round(($totalAmount - $discountAmount) * $config->tax_rate / 100, 2);
+			$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $config->tax_rate / 100, 2);
 		}
 		else
 		{
 			$taxAmount = 0;
 		}
-		$amount = $totalAmount - $discountAmount + $taxAmount;
+
+		$amount = $totalAmount - $discountAmount + $taxAmount + $lateFee;
 
 		// Payment processing fee
 		$paymentFeeAmount  = 0;
@@ -810,6 +827,7 @@ class EventbookingHelper
 		$fees['tax_amount']      = $taxAmount;
 		$fees['amount']          = $amount;
 		$fees['deposit_amount']  = $depositAmount;
+		$fees['late_fee']        = $lateFee;
 
 		return $fees;
 	}
@@ -838,9 +856,11 @@ class EventbookingHelper
 		$numberRegistrants     = (int) $session->get('eb_number_registrants', '');
 		$memberFormFields      = EventbookingHelper::getFormFields($eventId, 2);
 		$rate                  = EventbookingHelper::getRegistrationRate($eventId, $numberRegistrants);
+		$nullDate              = $db->getNullDate();
 		$membersForm           = array();
 		$membersTotalAmount    = array();
 		$membersDiscountAmount = array();
+		$membersLateFee        = array();
 		$membersTaxAmount      = array();
 		// Members data
 		if ($config->collect_member_information)
@@ -863,6 +883,7 @@ class EventbookingHelper
 				$extraFee += $memberExtraFee;
 				$membersTotalAmount[$i]    = $rate + $memberExtraFee;
 				$membersDiscountAmount[$i] = 0;
+				$membersLateFee[$i] = 0;
 				$membersForm[$i]           = $memberForm;
 			}
 		}
@@ -961,19 +982,10 @@ class EventbookingHelper
 			$fees['coupon_valid'] = 1;
 		}
 
-		// Early bird discount
-		$todayDate = JHtml::_('date', 'now', 'Y-m-d');
-		$query->clear();
-		$query->select('COUNT(id)')
-			->from('#__eb_events')
-			->where('id=' . $eventId)
-			->where('DATEDIFF(early_bird_discount_date, "' . $todayDate . '") >= 0');
-		$db->setQuery($query);
-		$total = $db->loadResult();
-		if ($total)
+
+		if (($event->early_bird_discount_date != $nullDate) && ($event->date_diff >= 0))
 		{
-			$earlyBirdDiscountAmount = $event->early_bird_discount_amount;
-			if ($earlyBirdDiscountAmount > 0)
+			if ($event->early_bird_discount_amount > 0)
 			{
 				if ($event->early_bird_discount_type == 1)
 				{
@@ -1000,6 +1012,35 @@ class EventbookingHelper
 			}
 		}
 
+		// Late Fee
+		$lateFee = 0;
+		if (($event->late_fee_date != $nullDate) && $event->late_fee_date_diff >= 0 && $event->late_fee_amount > 0)
+		{
+			if ($event->late_fee_type == 1)
+			{
+				$lateFee = $totalAmount * $event->late_fee_amount / 100;
+				if ($config->collect_member_information)
+				{
+					for ($i = 0; $i < $numberRegistrants; $i++)
+					{
+						$membersLateFee[$i] = $membersTotalAmount[$i] * $event->late_fee_amount / 100;
+					}
+				}
+			}
+			else
+			{
+
+				$lateFee = $numberRegistrants * $event->late_fee_amount;
+				if ($config->collect_member_information)
+				{
+					for ($i = 0; $i < $numberRegistrants; $i++)
+					{
+						$membersLateFee[$i] = $event->late_fee_amount;
+					}
+				}
+			}
+		}
+
 		// In case discount amount greater than total amount, reset it to total amount
 		if ($discountAmount > $totalAmount)
 		{
@@ -1018,14 +1059,14 @@ class EventbookingHelper
 		}
 
 		// Calculate tax amount
-		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
+		if ($config->enable_tax && ($totalAmount - $discountAmount + $lateFee > 0))
 		{
-			$taxAmount = round(($totalAmount - $discountAmount) * $config->tax_rate / 100, 2);
+			$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $config->tax_rate / 100, 2);
 			if ($config->collect_member_information)
 			{
 				for ($i = 0; $i < $numberRegistrants; $i++)
 				{
-					$membersTaxAmount[$i] = round(($membersTotalAmount[$i] - $membersDiscountAmount[$i]) * $config->tax_rate / 100, 2);
+					$membersTaxAmount[$i] = round(($membersTotalAmount[$i] - $membersDiscountAmount[$i] + $membersLateFee[$i]) * $config->tax_rate / 100, 2);
 				}
 			}
 		}
@@ -1042,7 +1083,7 @@ class EventbookingHelper
 		}
 
 		// Gross amount
-		$amount = $totalAmount - $discountAmount + $taxAmount;
+		$amount = $totalAmount - $discountAmount + $taxAmount + $lateFee;
 
 		// Payment processing fee
 		$paymentFeeAmount  = 0;
@@ -1083,6 +1124,7 @@ class EventbookingHelper
 
 		$fees['total_amount']            = $totalAmount;
 		$fees['discount_amount']         = $discountAmount;
+		$fees['late_fee']                = $lateFee;
 		$fees['tax_amount']              = $taxAmount;
 		$fees['amount']                  = $amount;
 		$fees['deposit_amount']          = $depositAmount;
@@ -1090,6 +1132,7 @@ class EventbookingHelper
 		$fees['members_total_amount']    = $membersTotalAmount;
 		$fees['members_discount_amount'] = $membersDiscountAmount;
 		$fees['members_tax_amount']      = $membersTaxAmount;
+		$fees['members_late_fee']        = $membersLateFee;
 
 		return $fees;
 	}
@@ -1115,6 +1158,7 @@ class EventbookingHelper
 		$recordsData          = array();
 		$totalAmount          = 0;
 		$discountAmount       = 0;
+		$lateFee              = 0;
 		$taxAmount            = 0;
 		$amount               = 0;
 		$depositAmount        = 0;
@@ -1175,12 +1219,7 @@ class EventbookingHelper
 			$eventId               = (int) $items[$i];
 			$quantity              = (int) $quantities[$i];
 			$recordsData[$eventId] = array();
-			$query->clear();
-			$query->select('*')
-				->from('#__eb_events')
-				->where('id=' . $eventId);
-			$db->setQuery($query);
-			$event = $db->loadObject();
+			$event = EventbookingHelperDatabase::getEvent($eventId);
 			$rate  = self::getRegistrationRate($eventId, $quantity);
 			if ($i == 0)
 			{
@@ -1209,11 +1248,7 @@ class EventbookingHelper
 					}
 				}
 			}
-
-			// Early Bird Discount
-			if (($event->early_bird_discount_amount > 0) && ($event->early_bird_discount_date != $nullDate) &&
-				(strtotime($event->early_bird_discount_date) >= time())
-			)
+			if (($event->early_bird_discount_date != $nullDate) && $event->date_diff >= 0 && $event->early_bird_discount_amount > 0)
 			{
 				if ($event->early_bird_discount_type == 1)
 				{
@@ -1224,6 +1259,7 @@ class EventbookingHelper
 					$registrantDiscount += $event->early_bird_discount_amount;
 				}
 			}
+
 
 			// Coupon discount
 			if (!empty($coupon) && ($coupon->event_id == -1 || in_array($eventId, $couponDiscountedEventIds)))
@@ -1247,16 +1283,30 @@ class EventbookingHelper
 				$registrantDiscount = $registrantTotalAmount;
 			}
 
+			// Late Fee
+			$registrantLateFee = 0;
+			if (($event->late_fee_date != $nullDate) && $event->late_fee_date_diff >= 0 && $event->late_fee_amount > 0)
+			{
+				if ($event->late_fee_type == 1)
+				{
+					$registrantLateFee = $registrantTotalAmount * $event->late_fee_amount / 100;
+				}
+				else
+				{
+
+					$registrantLateFee = $quantity*$event->late_fee_amount;
+				}
+			}
+
 			if ($config->enable_tax && $config->tax_rate > 0)
 			{
-				$registrantTaxAmount = round($config->tax_rate * ($registrantTotalAmount - $registrantDiscount) / 100, 2);
+				$registrantTaxAmount = round($config->tax_rate * ($registrantTotalAmount - $registrantDiscount + $registrantLateFee) / 100, 2);
 			}
 			else
 			{
 				$registrantTaxAmount = 0;
 			}
-			$registrantAmount = $registrantTotalAmount - $registrantDiscount + $registrantTaxAmount;
-
+			$registrantAmount = $registrantTotalAmount - $registrantDiscount + $registrantTaxAmount + $registrantLateFee;
 
 			if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $registrantAmount > 0)
 			{
@@ -1286,6 +1336,7 @@ class EventbookingHelper
 			}
 			$totalAmount += $registrantTotalAmount;
 			$discountAmount += $registrantDiscount;
+			$lateFee        += $registrantLateFee;
 			$depositAmount += $registrantDepositAmount;
 			$taxAmount += $registrantTaxAmount;
 			$amount += $registrantAmount;
@@ -1295,6 +1346,7 @@ class EventbookingHelper
 			{
 				$recordsData[$eventId]['total_amount']           = $registrantTotalAmount;
 				$recordsData[$eventId]['discount_amount']        = $registrantDiscount;
+				$recordsData[$eventId]['late_fee']               = $registrantLateFee;
 				$recordsData[$eventId]['tax_amount']             = $registrantTaxAmount;
 				$recordsData[$eventId]['payment_processing_fee'] = $registrantPaymentProcessingFee;
 				$recordsData[$eventId]['amount']                 = $registrantAmount;
@@ -1304,6 +1356,7 @@ class EventbookingHelper
 
 		$fees['total_amount']           = $totalAmount;
 		$fees['discount_amount']        = $discountAmount;
+		$fees['late_fee']               = $lateFee;
 		$fees['tax_amount']             = $taxAmount;
 		$fees['amount']                 = $amount;
 		$fees['deposit_amount']         = $depositAmount;
@@ -1949,17 +2002,22 @@ class EventbookingHelper
 			$db->setQuery($sql);
 			$discountAmount = $db->loadResult();
 
+			$sql = 'SELECT SUM(late_fee) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
+			$db->setQuery($sql);
+			$lateFee = $db->loadResult();
+
 			$sql = 'SELECT SUM(payment_processing_fee) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$paymentProcessingFee = $db->loadResult();
 
-			$amount = $totalAmount + $paymentProcessingFee - $discountAmount + $taxAmount;
+			$amount = $totalAmount + $paymentProcessingFee - $discountAmount + $taxAmount + $lateFee;
 
 			$sql = 'SELECT SUM(deposit_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$depositAmount = $db->loadResult();
 			//Added support for custom field feature
 			$data['discountAmount']       = $discountAmount;
+			$data['lateFee']              = $lateFee;
 			$data['totalAmount']          = $totalAmount;
 			$data['items']                = $rows;
 			$data['amount']               = $amount;

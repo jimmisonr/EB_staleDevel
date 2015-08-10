@@ -124,6 +124,21 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
     			</div>
     		<?php
     		}
+
+		    if ($lateFee > 0)
+		    {
+			?>
+			    <div class="<?php echo $controlGroupClass; ?>">
+				    <label class="<?php echo $controlLabelClass; ?>">
+					    <?php echo  JText::_('EB_LATE_FEE'); ?>
+				    </label>
+				    <div class="<?php echo $controlsClass; ?>">
+					    <?php echo EventbookingHelper::formatCurrency($lateFee, $config); ?>
+				    </div>
+			    </div>
+		    <?php
+		    }
+
     		if ($taxAmount > 0)
     		{
     		?>
@@ -150,7 +165,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			    </div>
 		    <?php
 		    }
-		    if ($discountAmount > 0 || $taxAmount > 0 || $paymentProcessingFee > 0)
+		    if ($discountAmount > 0 || $taxAmount > 0 || $paymentProcessingFee > 0 || $lateFee > 0)
     		{
     		?>                
     			<div class="<?php echo $controlGroupClass; ?>">

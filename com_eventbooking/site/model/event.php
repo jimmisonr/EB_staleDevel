@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.0.2
+ * @version            2.0.3
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -41,6 +41,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
 		$query->select('a.*')
 			->select("DATEDIFF(event_date, '$currentDate') AS number_event_dates")
+			->select("DATEDIFF('$currentDate', a.late_fee_date) AS late_fee_date_diff")
 			->select("TIMESTAMPDIFF(MINUTE, registration_start_date, '$currentDate') AS registration_start_minutes")
 			->select("TIMESTAMPDIFF(MINUTE, cut_off_date, '$currentDate') AS cut_off_minutes")
 			->select("DATEDIFF(early_bird_discount_date, '$currentDate') AS date_diff")

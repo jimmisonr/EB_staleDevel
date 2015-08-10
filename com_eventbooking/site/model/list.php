@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.0.2
+ * @version            2.0.3
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -101,6 +101,7 @@ class EventbookingModelList extends RADModelList
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->select('tbl.*')
 			->select("DATEDIFF(tbl.early_bird_discount_date, '$currentDate') AS date_diff")
+			->select("DATEDIFF('$currentDate', tbl.late_fee_date) AS late_fee_date_diff")
 			->select("DATEDIFF(tbl.event_date, '$currentDate') AS number_event_dates")
 			->select("TIMESTAMPDIFF(MINUTE, tbl.registration_start_date, '$currentDate') AS registration_start_minutes")
 			->select("TIMESTAMPDIFF(MINUTE, tbl.cut_off_date, '$currentDate') AS cut_off_minutes")

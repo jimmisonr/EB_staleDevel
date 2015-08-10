@@ -270,6 +270,25 @@ $return = base64_encode(JUri::getInstance()->toString());
 								</tr>
 							<?php
 							}
+
+
+							if ($event->late_fee > 0)
+							{
+							?>
+								<tr class="eb-event-property">
+									<td class="eb-event-property-label">
+										<?php echo JText::_('EB_LATE_FEE'); ?>
+									</td>
+									<td class="eb-event-property-value">
+										<?php
+											echo EventbookingHelper::formatCurrency($event->late_fee, $config, $event->currency_symbol);
+											echo ' <em> '.JText::sprintf('EB_FROM_DATE', JHtml::_('date', $event->late_fee_date, $config->date_format, null)).'</em>';
+										?>
+									</td>
+								</tr>
+							<?php
+							}
+
 							if (isset($event->paramData))
 							{
 								foreach ($event->paramData as $paramItem)

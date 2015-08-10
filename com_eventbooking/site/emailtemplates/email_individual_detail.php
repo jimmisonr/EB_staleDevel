@@ -110,6 +110,19 @@ defined('_JEXEC') or die;
 			</tr>
 		<?php
 		}
+		if ($row->late_fee > 0)
+		{
+		?>
+			<tr>
+				<td class="title_cell">
+					<?php echo  JText::_('EB_LATE_FEE'); ?>
+				</td>
+				<td class="field_cell">
+					<?php echo EventbookingHelper::formatCurrency($row->late_fee, $config, $rowEvent->currency_symbol); ?>
+				</td>
+			</tr>
+		<?php
+		}
 		if ($row->tax_amount > 0)
 		{
 		?>
@@ -136,7 +149,7 @@ defined('_JEXEC') or die;
 			</tr>
 		<?php
 		}
-		if ($row->discount_amount > 0 || $row->tax_amount > 0 || $row->payment_processing_fee > 0)
+		if ($row->discount_amount > 0 || $row->tax_amount > 0 || $row->payment_processing_fee > 0 || $row->late_fee > 0)
 		{
 		?>                
 			<tr>

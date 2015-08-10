@@ -220,6 +220,21 @@ span.view_list {
 			</tr>
 		<?php
 		}
+
+		if ($lateFee > 0)
+		{
+		?>
+			<tr>
+				<td class="title_cell">
+					<?php echo  JText::_('EB_LATE_FEE'); ?>
+				</td>
+				<td class="field_cell">
+					<?php echo EventbookingHelper::formatCurrency($lateFee, $config); ?>
+				</td>
+			</tr>
+		<?php
+		}
+
 		if ($taxAmount > 0)
 		{
 		?>

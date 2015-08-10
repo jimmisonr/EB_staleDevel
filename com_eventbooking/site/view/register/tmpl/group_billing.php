@@ -187,6 +187,38 @@ else
 		</div>
 		<?php
 		}
+		if($this->lateFee > 0)
+		{
+		?>
+			<div class="<?php echo $controlGroupClass;  ?>">
+				<label class="<?php echo $controlLabelClass; ?>">
+					<?php echo JText::_('EB_LATE_FEE'); ?>
+				</label>
+				<div class="<?php echo $controlsClass; ?>">
+					<?php
+					if ($this->config->currency_position == 0)
+					{
+						?>
+						<div class="<?php echo $inputPrependClass;  ?> inline-display">
+							<span class="<?php echo $addOnClass;?>"><?php echo $this->event->currency_symbol ? $this->event->currency_symbol : $this->config->currency_symbol;?></span>
+							<input id="late_fee" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->lateFee, $this->config); ?>" />
+						</div>
+					<?php
+					}
+					else
+					{
+						?>
+						<div class="<?php echo $inputAppendClass;  ?> inline-display">
+							<input id="late_fee" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->lateFee, $this->config); ?>" />
+							<span class="<?php echo $addOnClass;?>"><?php echo $this->event->currency_symbol ? $this->event->currency_symbol : $this->config->currency_symbol;?></span>
+						</div>
+					<?php
+					}
+					?>
+				</div>
+			</div>
+		<?php
+		}
 		if($this->config->enable_tax && $this->config->tax_rate > 0)
 		{
 		?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.0.2
+ * @version            2.0.3
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -304,6 +304,23 @@ $return = base64_encode(JUri::getInstance()->toString());
 								<td class="eb_price">
 									<?php
 										echo EventbookingHelper::formatCurrency($item->fixed_group_price, $this->config, $item->currency_symbol) ;
+									?>
+								</td>
+							</tr>
+						<?php
+						}
+
+						if ($item->late_fee > 0)
+						{
+						?>
+							<tr class="eb-event-property">
+								<td class="eb-event-property-label">
+									<?php echo JText::_('EB_LATE_FEE'); ?>
+								</td>
+								<td class="eb-event-property-value">
+									<?php
+									echo EventbookingHelper::formatCurrency($item->late_fee, $config, $item->currency_symbol);
+									echo ' <em> '.JText::sprintf('EB_FROM_DATE', JHtml::_('date', $item->late_fee_date, $this->config->date_format, null)).'</em>';
 									?>
 								</td>
 							</tr>
