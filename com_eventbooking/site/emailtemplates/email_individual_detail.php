@@ -149,7 +149,7 @@ defined('_JEXEC') or die;
 			</tr>
 		<?php
 		}
-		if ($row->discount_amount > 0 || $row->tax_amount > 0 || $row->payment_processing_fee > 0)
+		if ($row->discount_amount > 0 || $row->tax_amount > 0 || $row->payment_processing_fee > 0 || $row->late_fee > 0)
 		{
 		?>                
 			<tr>

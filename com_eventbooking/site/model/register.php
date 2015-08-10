@@ -276,6 +276,7 @@ class EventBookingModelRegister extends RADModel
 		$membersTotalAmount    = $fees['members_total_amount'];
 		$membersDiscountAmount = $fees['members_discount_amount'];
 		$membersTaxAmount      = $fees['members_tax_amount'];
+		$membersLateFee        = $fees['members_late_fee'];
 		$paymentType           = (int) @$data['payment_type'];
 		if ($paymentType == 0)
 		{
@@ -284,6 +285,7 @@ class EventBookingModelRegister extends RADModel
 		//The data for group billing record		
 		$data['total_amount']           = $fees['total_amount'];
 		$data['discount_amount']        = $fees['discount_amount'];
+		$data['late_fee']               = $fees['late_fee'];
 		$data['tax_amount']             = $fees['tax_amount'];
 		$data['deposit_amount']         = $fees['deposit_amount'];
 		$data['payment_processing_fee'] = $fees['payment_processing_fee'];
@@ -382,8 +384,9 @@ class EventBookingModelRegister extends RADModel
 				$rowMember->register_date      = $row->register_date;
 				$rowMember->total_amount       = $membersTotalAmount[$i];
 				$rowMember->discount_amount    = $membersDiscountAmount[$i];
+				$rowMember->late_fee           = $membersLateFee[$i];
 				$rowMember->tax_amount         = $membersTaxAmount[$i];
-				$rowMember->amount             = $rowMember->total_amount - $rowMember->discount_amount + $rowMember->tax_amount;
+				$rowMember->amount             = $rowMember->total_amount - $rowMember->discount_amount + $rowMember->tax_amount + $rowMember->late_fee;
 				$rowMember->number_registrants = 1;
 				$membersForm[$i]->removeFieldSuffix();
 				$memberData = $membersForm[$i]->getFormData();

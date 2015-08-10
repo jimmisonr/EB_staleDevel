@@ -154,7 +154,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 		        </div>
 	        <?php
 	        }
-			if ($row->discount_amount > 0 || $row->tax_amount > 0 || $row->payment_processing_fee > 0)
+			if ($row->discount_amount > 0 || $row->tax_amount > 0 || $row->payment_processing_fee > 0 || $row->late_fee > 0)
 			{
 			?>                
 				<div class="<?php echo $controlGroupClass; ?>">
