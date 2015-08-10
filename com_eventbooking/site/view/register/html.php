@@ -518,6 +518,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$this->totalAmount          = $fees['total_amount'];
 		$this->taxAmount            = $fees['tax_amount'];
 		$this->discountAmount       = $fees['discount_amount'];
+		$this->lateFee              = $fees['late_fee'];
 		$this->depositAmount        = $fees['deposit_amount'];
 		$this->paymentProcessingFee = $fees['payment_processing_fee'];
 		$this->amount               = $fees['amount'];

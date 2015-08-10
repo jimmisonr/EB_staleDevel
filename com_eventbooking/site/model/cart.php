@@ -120,6 +120,7 @@ class EventbookingModelCart extends RADModel
 			$row->coupon_id              = isset($recordData['coupon_id']) ? $recordData['coupon_id'] : 0;
 			$row->total_amount           = $recordData['total_amount'];
 			$row->discount_amount        = $recordData['discount_amount'];
+			$row->late_fee               = $recordData['late_fee'];
 			$row->tax_amount             = $recordData['tax_amount'];
 			$row->payment_processing_fee = $recordData['payment_processing_fee'];
 			$row->amount                 = $recordData['amount'];

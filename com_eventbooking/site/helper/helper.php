@@ -549,17 +549,24 @@ class EventbookingHelper
 			$sql = 'SELECT SUM(discount_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$discountAmount = $db->loadResult();
-			$amount         = $totalAmount - $discountAmount + $paymentProcessingFee + $taxAmount;
+
+			$sql = 'SELECT SUM(late_fee) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
+			$db->setQuery($sql);
+			$lateFee = $db->loadResult();
+
+			$amount         = $totalAmount - $discountAmount + $paymentProcessingFee + $taxAmount + $lateFee;
 
 			$replaces['total_amount']           = EventbookingHelper::formatCurrency($totalAmount, $config, $event->currency_symbol);
 			$replaces['tax_amount']             = EventbookingHelper::formatCurrency($taxAmount, $config, $event->currency_symbol);
 			$replaces['discount_amount']        = EventbookingHelper::formatCurrency($discountAmount, $config, $event->currency_symbol);
+			$replaces['late_fee']        = EventbookingHelper::formatCurrency($lateFee, $config, $event->currency_symbol);
 			$replaces['payment_processing_fee'] = EventbookingHelper::formatCurrency($paymentProcessingFee, $config, $event->currency_symbol);
 			$replaces['amount']                 = EventbookingHelper::formatCurrency($amount, $config, $event->currency_symbol);
 
 			$replaces['amt_total_amount']           = $totalAmount;
 			$replaces['amt_tax_amount']             = $taxAmount;
 			$replaces['amt_discount_amount']        = $discountAmount;
+			$replaces['amt_late_fee']               = $lateFee;
 			$replaces['amt_amount']                 = $amount;
 			$replaces['amt_payment_processing_fee'] = $paymentProcessingFee;
 		}
@@ -568,6 +575,7 @@ class EventbookingHelper
 			$replaces['total_amount']           = EventbookingHelper::formatCurrency($row->total_amount, $config, $event->currency_symbol);
 			$replaces['tax_amount']             = EventbookingHelper::formatCurrency($row->tax_amount, $config, $event->currency_symbol);
 			$replaces['discount_amount']        = EventbookingHelper::formatCurrency($row->discount_amount, $config, $event->currency_symbol);
+			$replaces['late_fee']               = EventbookingHelper::formatCurrency($row->late_fee, $config, $event->currency_symbol);
 			$replaces['payment_processing_fee'] = EventbookingHelper::formatCurrency($row->payment_processing_fee, $config, $event->currency_symbol);
 			$replaces['amount']                 = EventbookingHelper::formatCurrency($row->amount, $config, $event->currency_symbol);
 		}
@@ -1286,7 +1294,7 @@ class EventbookingHelper
 				else
 				{
 
-					$registrantLateFee = $event->late_fee_amount;
+					$registrantLateFee = $quantity*$event->late_fee_amount;
 				}
 			}
 
@@ -1994,17 +2002,22 @@ class EventbookingHelper
 			$db->setQuery($sql);
 			$discountAmount = $db->loadResult();
 
+			$sql = 'SELECT SUM(late_fee) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
+			$db->setQuery($sql);
+			$lateFee = $db->loadResult();
+
 			$sql = 'SELECT SUM(payment_processing_fee) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$paymentProcessingFee = $db->loadResult();
 
-			$amount = $totalAmount + $paymentProcessingFee - $discountAmount + $taxAmount;
+			$amount = $totalAmount + $paymentProcessingFee - $discountAmount + $taxAmount + $lateFee;
 
 			$sql = 'SELECT SUM(deposit_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$depositAmount = $db->loadResult();
 			//Added support for custom field feature
 			$data['discountAmount']       = $discountAmount;
+			$data['lateFee']              = $lateFee;
 			$data['totalAmount']          = $totalAmount;
 			$data['items']                = $rows;
 			$data['amount']               = $amount;
