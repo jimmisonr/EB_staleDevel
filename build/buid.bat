@@ -22,6 +22,8 @@ cd E:\www\eventbooking\modules\mod_eb_search\
 7z a -tzip E:\www\eventbooking\build/packages/mod_eb_search.zip *
 cd E:\www\eventbooking\modules\mod_eb_googlemap\
 7z a -tzip E:\www\eventbooking\build/packages/mod_eb_googlemap.zip *
+cd E:\www\eventbooking\modules\mod_eb_view\
+7z a -tzip E:\www\eventbooking\build/packages/mod_eb_view.zip *
 REM Plugins
 cd E:\www\eventbooking\plugins\content\ebevent\
 7z a -tzip E:\www\eventbooking\build/packages/plug_content_ebevent.zip *

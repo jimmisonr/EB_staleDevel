@@ -213,7 +213,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 								<strong><?php echo JText::_('EB_CUT_OFF_DATE'); ?></strong>
 							</td>
 							<td>
-								<?php echo JHtml::_('date', $item->cut_off_date, $this->config->date_format, null) ; ?>
+								<?php echo JHtml::_('date', $item->cut_off_date, $this->config->event_date_format, null) ; ?>
 							</td>
 						</tr>
 						<?php

@@ -127,6 +127,27 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		{
 			$data['payment_methods'] = implode(',', $data['payment_methods']);
 		}
+
+		if (empty($data['event_date_hour'] ))
+		{
+			$data['event_date_hour'] = '00';
+		}
+
+		if (empty($data['event_date_minute'] ))
+		{
+			$data['event_date_minute'] = '00';
+		}
+
+		if (empty($data['cut_off_hour'] ))
+		{
+			$data['cut_off_hour'] = '00';
+		}
+
+		if (empty($data['cut_off_minute'] ))
+		{
+			$data['cut_off_minute'] = '00';
+		}
+
 		if (isset($data['recurring_type']) && $data['recurring_type'])
 		{
 			$this->_storeRecurringEvent($data);
