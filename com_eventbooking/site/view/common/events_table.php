@@ -333,7 +333,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 								</div>
 								<?php
 								}
-								elseif($item->registration_type != 3 && $config->display_message_for_full_event && !$waitingList && $item->registration_start_minutes > 0)
+								elseif($item->registration_type != 3 && $config->display_message_for_full_event && !$waitingList && $item->registration_start_minutes >= 0)
 								{
 									if (@$item->user_registered)
 									{
