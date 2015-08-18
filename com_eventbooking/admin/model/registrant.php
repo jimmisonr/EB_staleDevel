@@ -56,7 +56,7 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 		// Load the default frontend language
 		$lang = JFactory::getLanguage();
 		$tag  = $row->language;
-		if (!$tag)
+		if (!$tag || $tag == '*')
 		{
 			$tag = JComponentHelper::getParams('com_languages')->get('site', 'en-GB');
 		}
