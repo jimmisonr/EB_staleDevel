@@ -51,7 +51,8 @@ if (!$month)
 // Get calendar data for the current month and year
 $model = new EventbookingModelCalendar(array('remember_states' => false, 'ignore_request' => true));
 $model->setState('month', $month)
-	->setState('year', $year);
+	->setState('year', $year)
+	->setState('mini_calendar', 1);
 $rows = $model->getData();
 $data = EventbookingHelperData::getCalendarData($rows, $year, $month, true);
 

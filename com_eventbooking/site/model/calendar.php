@@ -29,7 +29,8 @@ class EventbookingModelCalendar extends RADModel
 			->insert('default_year', 'int', 0)
 			->insert('date', 'string', '')
 			->insert('day', 'string', '')
-			->insert('id', 'int', 0);
+			->insert('id', 'int', 0)
+			->insert('mini_calendar', 'int', 0);
 	}
 
 	/**
@@ -84,7 +85,7 @@ class EventbookingModelCalendar extends RADModel
 			$catId = $this->state->id;
 			$query->where("a.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id=$catId)");
 		}
-		if ($config->show_multiple_days_event_in_calendar)
+		if ($config->show_multiple_days_event_in_calendar && !$this->state->mini_calendar)
 		{
 			$query->where("((`event_date` BETWEEN '$startDate' AND '$endDate') OR (MONTH(event_end_date) = $month AND YEAR(event_end_date) = $year ))");
 		}
@@ -99,7 +100,7 @@ class EventbookingModelCalendar extends RADModel
 			$query->where('DATE(event_date) >= ' . $db->quote($currentDate));
 		}
 		$db->setQuery($query);
-		if ($config->show_multiple_days_event_in_calendar)
+		if ($config->show_multiple_days_event_in_calendar && !$this->state->mini_calendar)
 		{
 			$rows      = $db->loadObjectList();
 			$rowEvents = array();
