@@ -385,7 +385,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 								{
 								?>
 									<li>
-										<a class="<?php echo $btnClass; ?>" href="<?php echo $registrationUrl; ?>" target="_blank"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+										<a class="<?php echo $btnClass; ?>" href="<?php echo $registrationUrl; ?>" target="_blank"><?php echo JText::_('EB_REGISTER');; ?></a>
 									</li>
 								<?php
 								}

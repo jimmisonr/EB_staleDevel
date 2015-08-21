@@ -57,7 +57,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 					<!-- FB -->
 					<div style="float:left;" id="rsep_fb_like">
 						<div id="fb-root"></div>
-						<script src="http://connect.facebook.net/en_US/all.js" type="text/javascript"></script>
+						<script src="https://connect.facebook.net/en_US/all.js" type="text/javascript"></script>
 						<script type="text/javascript">
 							FB.init({appId: '340486642645761', status: true, cookie: true, xfbml: true});
 						</script>
@@ -493,7 +493,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 						{
 						?>
 							<li>
-								<a class="<?php echo $btnClass; ?>" href="<?php echo $registrationUrl; ?>" target="_blank"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+								<a class="<?php echo $btnClass; ?>" href="<?php echo $registrationUrl; ?>" target="_blank"><?php echo JText::_('EB_REGISTER');; ?></a>
 							</li>
 						<?php
 						}

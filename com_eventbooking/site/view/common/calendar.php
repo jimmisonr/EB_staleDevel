@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	2.0.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.3
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
@@ -75,7 +75,7 @@ EventbookingHelperJquery::equalHeights();
 							}
 							?>
 							<div class="date day_cell">
-								<a class="eb_event_link" href="<?php echo JText::_(EventbookingHelperRoute::getEventRoute($event->id, isset($categoryId) ? $categoryId : 0, $Itemid)); ?>" title="<?php echo $event->title; ?>" <?php if ($color) echo 'style="background-color:#'.$color.'";' ; ?>>
+								<a class="eb_event_link" href="<?php echo JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, isset($categoryId) ? $categoryId : 0, $Itemid)); ?>" title="<?php echo $event->title; ?>" <?php if ($color) echo 'style="background-color:#'.$color.'";' ; ?>>
 									<img border="0" align="top" title="<?php echo $event->title; ?>" src="<?php echo $thumbSource; ?>">
 									<?php
 										if ($config->show_event_time)
