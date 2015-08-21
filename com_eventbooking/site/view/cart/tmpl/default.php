@@ -157,11 +157,12 @@ if (count($this->items))
 					form.submit() ;
 				}
 			}
-			function continueShopping() {
-				var form = document.adminForm ;
-				form.task.value = 'view_category';
-				form.submit();
+
+			function continueShopping()
+			{
+				document.location.href= "<?php echo $this->continueUrl; ?>";
 			}
+
 			function updateCart() {
 				var form = document.adminForm ;
 				var ret = checkQuantity();

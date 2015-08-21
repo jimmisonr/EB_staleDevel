@@ -43,6 +43,7 @@ class EventbookingViewCartHtml extends RADViewHtml
 			}
 		}
 		$items = $this->model->getData();
+
 		//Generate javascript string
 		$jsString = " var arrEventIds = new Array() \n; var arrQuantities = new Array();\n";
 		for ($i = 0, $n = count($items); $i < $n; $i++)
@@ -59,6 +60,17 @@ class EventbookingViewCartHtml extends RADViewHtml
 			$jsString .= "arrEventIds[$i] = $item->id ;\n";
 			$jsString .= "arrQuantities[$i] = $availableQuantity ;\n";
 		}
+
+		// Continue shopping url
+		if ($categoryId)
+		{
+			$this->continueUrl = JRoute::_(EventbookingHelperRoute::getCategoryRoute($categoryId, $this->Itemid));
+		}
+		else
+		{
+			$this->continueUrl = JRoute::_('index.php?Itemid=' . EventbookingHelper::getItemid());
+		}
+
 		$this->items           = $items;
 		$this->config          = $config;
 		$this->categoryId      = $categoryId;
