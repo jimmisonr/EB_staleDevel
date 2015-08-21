@@ -25,8 +25,16 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 	 */
 	public function store($input, $ignore = array())
 	{
-		$db         = $this->getDbo();
-		$data       = $input->getData();
+		$db  = $this->getDbo();
+		$app = JFactory::getApplication();
+		if ($app->isAdmin())
+		{
+			$data = $input->getData(RAD_INPUT_ALLOWRAW);
+		}
+		else
+		{
+			$data = $input->getData();
+		}
 		$config     = EventbookingHelper::getConfig();
 		$thumbImage = $input->files->get('thumb_image');
 		if ($thumbImage['name'])
