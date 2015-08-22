@@ -774,9 +774,9 @@ class EventbookingHelper
 			}
 		}
 
-		if ($config->enable_tax && ($totalAmount - $discountAmount > 0))
+		if ($event->tax_rate && ($totalAmount - $discountAmount + $lateFee > 0))
 		{
-			$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $config->tax_rate / 100, 2);
+			$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $event->tax_rate / 100, 2);
 		}
 		else
 		{
@@ -1059,14 +1059,14 @@ class EventbookingHelper
 		}
 
 		// Calculate tax amount
-		if ($config->enable_tax && ($totalAmount - $discountAmount + $lateFee > 0))
+		if ($event->tax_rate && ($totalAmount - $discountAmount + $lateFee > 0))
 		{
-			$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $config->tax_rate / 100, 2);
+			$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $event->tax_rate / 100, 2);
 			if ($config->collect_member_information)
 			{
 				for ($i = 0; $i < $numberRegistrants; $i++)
 				{
-					$membersTaxAmount[$i] = round(($membersTotalAmount[$i] - $membersDiscountAmount[$i] + $membersLateFee[$i]) * $config->tax_rate / 100, 2);
+					$membersTaxAmount[$i] = round(($membersTotalAmount[$i] - $membersDiscountAmount[$i] + $membersLateFee[$i]) * $event->tax_rate / 100, 2);
 				}
 			}
 		}
@@ -1298,9 +1298,9 @@ class EventbookingHelper
 				}
 			}
 
-			if ($config->enable_tax && $config->tax_rate > 0)
+			if ($event->tax_rate > 0)
 			{
-				$registrantTaxAmount = round($config->tax_rate * ($registrantTotalAmount - $registrantDiscount + $registrantLateFee) / 100, 2);
+				$registrantTaxAmount = round($event->tax_rate * ($registrantTotalAmount - $registrantDiscount + $registrantLateFee) / 100, 2);
 			}
 			else
 			{

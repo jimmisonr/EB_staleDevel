@@ -263,29 +263,7 @@ $editor = JFactory::getEditor();
 		        		<td>
 		        			<?php echo JText::_('EB_SHOW_PENDING_REGISTRANTS_EXPLAIN'); ?>
 		        		</td>
-		        	</tr>     
-					<tr>
-						<td class="key">
-							<?php echo JText::_('EB_ENABLE_TAX'); ?>
-						</td>
-						<td>
-							<?php echo $this->lists['enable_tax']; ?>
-						</td>
-						<td>
-							&nbsp;
-						</td>
-					</tr>			
-					<tr>				
-						<td class="key">
-							<?php echo JText::_('EB_TAX_RATE'); ?>
-						</td>
-						<td>						
-							<input type="text" name="tax_rate" class="inputbox" value="<?php echo $this->config->tax_rate ; ?>" />
-						</td>
-						<td>
-							%
-						</td>					
-					</tr>
+		        	</tr>
 					<tr>
 						<td class="key">
 							<?php echo JText::_('EB_SHOW_PRICE_INCLUDING_TAX'); ?>

@@ -76,12 +76,13 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 
 			// Apply tax rate to price for displaying purpose
 			$config = EventbookingHelper::getConfig();
-			if ($config->enable_tax && $config->show_price_including_tax)
+			if ($config->show_price_including_tax)
 			{
-				$taxRate = $config->tax_rate;
+
 				for ($i = 0, $n = count($rows); $i < $n; $i++)
 				{
 					$row                    = $rows[$i];
+					$taxRate                = $row->tax_rate;
 					$row->individual_price  = round($row->individual_price * (1 + $taxRate / 100), 2);
 					$row->fixed_group_price = round($row->fixed_group_price * (1 + $taxRate / 100), 2);
 					if ($config->show_discounted_price)

@@ -219,7 +219,7 @@ else
 			</div>
 		<?php
 		}
-		if($this->config->enable_tax && $this->config->tax_rate > 0)
+		if($this->event->tax_rate > 0)
 		{
 		?>
 		<div class="<?php echo $controlGroupClass; ?>">
@@ -283,7 +283,7 @@ else
 			</div>
 		<?php
 		}
-		if ($this->enableCoupon || $this->discountAmount > 0 || ($this->config->enable_tax && $this->config->tax_rate > 0) || $this->showPaymentFee)
+		if ($this->enableCoupon || $this->discountAmount > 0 || $this->event->tax_rate > 0 || $this->showPaymentFee)
 		{
 		?>
 		<div class="<?php echo $controlGroupClass; ?>">

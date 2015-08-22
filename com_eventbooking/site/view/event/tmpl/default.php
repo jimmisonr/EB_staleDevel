@@ -448,9 +448,9 @@ $return = base64_encode(JUri::getInstance()->toString());
 						<tbody>
 						<?php
 							$i = 0 ;
-							if ($this->config->enable_tax && $this->config->show_price_including_tax)
+							if ($this->config->show_price_including_tax)
 							{
-								$taxRate = $this->config->tax_rate;
+								$taxRate = $this->item->tax_rate;
 							}
 							else
 							{

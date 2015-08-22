@@ -160,6 +160,14 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 						</tr>
 						<tr>
 							<td class="key">
+								<?php echo JText::_('EB_TAX_RATE'); ?>
+							</td>
+							<td>
+								<input type="text" name="tax_rate" id="tax_rate" class="input-small" size="10" value="<?php echo $this->item->tax_rate; ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td class="key">
 								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_EVENT_CAPACITY' );?>::<?php echo JText::_('EB_CAPACITY_EXPLAIN'); ?>"><?php echo JText::_('EB_CAPACITY'); ?></span>
 							</td>
 							<td>

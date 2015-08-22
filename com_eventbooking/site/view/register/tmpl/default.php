@@ -258,7 +258,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 		<?php
 		}
 
-		if($this->config->enable_tax && $this->config->tax_rate > 0)
+		if($this->event->tax_rate > 0)
 		{
 		?>
 		<div class="<?php echo $controlGroupClass;  ?>">
@@ -270,19 +270,19 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 					if ($this->config->currency_position == 0)
 					{
 					?>
-					<div class="<?php echo $inputPrependClass;  ?> inline-display">
-						<span class="<?php echo $addOnClass;?>"><?php echo $this->event->currency_symbol ? $this->event->currency_symbol : $this->config->currency_symbol;?></span>
-						<input id="tax_amount" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->taxAmount, $this->config); ?>" />
-					</div>
+						<div class="<?php echo $inputPrependClass;  ?> inline-display">
+							<span class="<?php echo $addOnClass;?>"><?php echo $this->event->currency_symbol ? $this->event->currency_symbol : $this->config->currency_symbol;?></span>
+							<input id="tax_amount" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->taxAmount, $this->config); ?>" />
+						</div>
 					<?php
 					}
 					else
 					{
 					?>
-					<div class="<?php echo $inputAppendClass;  ?> inline-display">
-						<input id="tax_amount" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->taxAmount, $this->config); ?>" />
-						<span class="<?php echo $addOnClass;?>"><?php echo $this->event->currency_symbol ? $this->event->currency_symbol : $this->config->currency_symbol;?></span>
-					</div>
+						<div class="<?php echo $inputAppendClass;  ?> inline-display">
+							<input id="tax_amount" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->taxAmount, $this->config); ?>" />
+							<span class="<?php echo $addOnClass;?>"><?php echo $this->event->currency_symbol ? $this->event->currency_symbol : $this->config->currency_symbol;?></span>
+						</div>
 					<?php
 					}
 				?>
@@ -322,7 +322,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			</div>
 		<?php
 		}
-		if ($this->enableCoupon || $this->discountAmount > 0 || $this->discountRate > 0 || ($this->config->enable_tax && $this->config->tax_rate > 0) || $this->showPaymentFee)
+		if ($this->enableCoupon || $this->discountAmount > 0 || $this->discountRate > 0 || $this->event->tax_rate > 0 || $this->showPaymentFee)
 		{
 		?>
 		<div class="<?php echo $controlGroupClass;  ?>">

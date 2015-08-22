@@ -1010,6 +1010,22 @@ class EventbookingController extends RADControllerAdmin
 				}
 			}
 		}
+
+		if (!in_array('tax_rate', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `tax_rate` DECIMAL( 10, 2 ) NULL DEFAULT  '0';";
+			$db->setQuery($sql);
+			$db->execute();
+			//Set tax rate for the plan from configuration
+			$taxRate = (float) $config->tax_rate;
+			if ($taxRate > 0)
+			{
+				$sql = 'UPDATE #__eb_events SET tax_rate=' . $taxRate;
+				$db->setQuery($sql);
+				$db->execute();
+			}
+		}
+
 		//The Categories table
 		$fields = array_keys($db->getTableColumns('#__eb_categories'));
 		if (!in_array('access', $fields))

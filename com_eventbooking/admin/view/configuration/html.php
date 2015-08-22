@@ -98,7 +98,6 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['send_email_to_group_members'] = JHtml::_('select.booleanlist', 'send_email_to_group_members', '',
 			$config->send_email_to_group_members);
 		$lists['enable_coupon']               = JHtml::_('select.booleanlist', 'enable_coupon', '', $config->enable_coupon);
-		$lists['enable_tax']                  = JHtml::_('select.booleanlist', 'enable_tax', '', $config->enable_tax);
 
 		$options                  = array();
 		$options[]                = JHtml::_('select.option', 1, JText::_('EB_ORDERING'));

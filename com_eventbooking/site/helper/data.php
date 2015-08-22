@@ -442,8 +442,6 @@ class EventbookingHelperData
 			$fp = fopen('php://output', 'w');
 			fwrite($fp, "\xEF\xBB\xBF");
 			$delimiter = $config->csv_delimiter ? $config->csv_delimiter : ',';
-
-			$taxEnabled = $config->enable_tax && ($config->tax_rate > 0);
 			$fields     = array();
 			$fields[]   = JText::_('EB_EVENT');
 			if ($config->show_event_date)
@@ -461,10 +459,7 @@ class EventbookingHelperData
 			$fields[] = JText::_('EB_AMOUNT');
 			$fields[] = JText::_('EB_DISCOUNT_AMOUNT');
 			$fields[] = JText::_('EB_LATE_FEE');
-			if ($taxEnabled)
-			{
-				$fields[] = JText::_('EB_TAX');
-			}
+			$fields[] = JText::_('EB_TAX');
 			$fields[] = JText::_('EB_GROSS_AMOUNT');
 			if ($config->activate_deposit_feature)
 			{
@@ -525,10 +520,7 @@ class EventbookingHelperData
 				$fields[] = EventbookingHelper::formatAmount($r->total_amount, $config);
 				$fields[] = EventbookingHelper::formatAmount($r->discount_amount, $config);
 				$fields[] = EventbookingHelper::formatAmount($r->late_fee, $config);
-				if ($taxEnabled)
-				{
-					$fields[] = EventbookingHelper::formatAmount($r->tax_amount, $config);
-				}
+				$fields[] = EventbookingHelper::formatAmount($r->tax_amount, $config);
 				$fields[] = EventbookingHelper::formatAmount($r->amount, $config);
 				if ($config->activate_deposit_feature)
 				{
