@@ -23,6 +23,7 @@ $iconDownloadClass = $bootstrapHelper->getClassMapping('icon-download');
 $iconCalendarClass = $bootstrapHelper->getClassMapping('icon-calendar');
 $iconMapMakerClass = $bootstrapHelper->getClassMapping('icon-map-marker');
 $return = base64_encode(JUri::getInstance()->toString());
+$session = JFactory::getSession();
 ?>
 <div id="eb-events" class="eb-events-timeline">
 	<?php
@@ -171,7 +172,14 @@ $return = base64_encode(JUri::getInstance()->toString());
 								if ($config->multiple_booking)
 								{
 									$url        = 'index.php?option=com_eventbooking&task=cart.add_cart&id=' . (int) $event->id . '&Itemid=' . (int) $Itemid;
-									$extraClass = 'eb-colorbox-addcart';
+									if ($event->event_password)
+									{
+										$extraClass = '';
+									}
+									else
+									{
+										$extraClass = 'eb-colorbox-addcart';
+									}
 									$text       = JText::_('EB_REGISTER');
 								}
 								else

@@ -20,6 +20,28 @@ class EventbookingControllerCart extends EventbookingController
 	public function add_cart()
 	{
 		$data  = $this->input->getData();
+		if (is_numeric($data['id']))
+		{
+			// Check if this is event is password protected
+			$event = EventbookingHelperDatabase::getEvent((int) $data['id']);
+			if ($event->event_password)
+			{
+				$passwordPassed = JFactory::getSession()->get('eb_passowrd_' . $event->id, 0);
+				if (!$passwordPassed)
+				{
+					$return = base64_encode(JUri::getInstance()->toString());
+					$this->app->redirect(JRoute::_('index.php?option=com_eventbooking&view=password&event_id=' . $event->id . '&return=' . $return . '&Itemid=' . $this->input->getInt('Itemid', 0), false));
+				}
+				else
+				{
+					// Add event to cart, then redirect to cart page
+					$model = $this->getModel('cart');
+					$model->processAddToCart($data);
+					$Itemid = $this->input->getInt('Itemid', 0);
+					$this->app->redirect(JRoute::_(EventbookingHelperRoute::getViewRoute('cart', $Itemid), false));
+				}
+			}
+		}
 		$model = $this->getModel('cart');
 		$model->processAddToCart($data);
 

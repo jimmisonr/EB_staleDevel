@@ -276,7 +276,14 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 													if ($config->multiple_booking)
 													{
 														$url        = 'index.php?option=com_eventbooking&task=cart.add_cart&id=' . (int) $item->id . '&Itemid=' . (int) $Itemid;
-														$extraClass = 'eb-colorbox-addcart';
+														if ($item->event_password)
+														{
+															$extraClass = '';
+														}
+														else
+														{
+															$extraClass = 'eb-colorbox-addcart';
+														}
 														$text       = JText::_('EB_REGISTER');
 													}
 													else
