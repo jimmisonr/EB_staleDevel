@@ -685,10 +685,28 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		}
 		elseif (isset($data['update_children_event']))
 		{
+			$deleteEventIds = array();
+			$eventDatesDate = array();
+
+			foreach($eventDates as $eventDate)
+			{
+				$eventDatesDate[] = JHtml::_('date', $eventDate, 'Y-m-d', null);
+			}
+
+			// The parent event
+			$childEventDate = JHtml::_('date', $row->event_date, 'Y-m-d', null);
+			$index          = array_search($childEventDate, $eventDatesDate);
+			if ($index !== false)
+			{
+				unset($eventDatesDate[$index]);
+			}
+
 			$query->clear();
 			$query->select('id')
 				->from('#__eb_events')
-				->where('parent_id=' . $row->id);;
+				->where('parent_id=' . $row->id)
+				->order('event_date');
+
 			$db->setQuery($query);
 			$children = $db->loadColumn();
 			if (count($children))
@@ -697,6 +715,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					'category_id',
 					'thumb',
 					'location_id',
+					'tax_rate',
 					'registration_type',
 					'title',
 					'short_description',
@@ -721,10 +740,22 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					'currency_code',
 					'currency_symbol',
 					'published');
-				$rowChildEvent  = $this->getTable();
+				$rowChildEvent = $this->getTable();
 				foreach ($children as $childId)
 				{
 					$rowChildEvent->load($childId);
+					$childEventDate = JHtml::_('date', $rowChildEvent->event_date, 'Y-m-d', null);
+					$index          = array_search($childEventDate, $eventDatesDate);
+					if ($index !== false)
+					{
+						unset($eventDatesDate[$index]);
+					}
+					else
+					{
+						$deleteEventIds[] = $rowChildEvent->id;
+						continue;
+					}
+
 					foreach ($fieldsToUpdate as $field)
 					{
 						$rowChildEvent->$field = $row->$field;
@@ -805,6 +836,131 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 						. "SELECT $rowChildEvent->id, category_id, main_category FROM #__eb_event_categories WHERE event_id=$row->id";
 					$db->setQuery($sql);
 					$db->execute();
+				}
+			}
+
+			// Insert new events
+			if (count($eventDatesDate))
+			{
+				foreach($eventDatesDate as $newEventDate)
+				{
+					$rowChildEvent             = clone ($row);
+					$rowChildEvent->id         = 0;
+					$rowChildEvent->event_date = $newEventDate;
+					$rowChildEvent->event_date = JHtml::_('date', $rowChildEvent->event_date, 'Y-m-d', null) . ' ' . JHtml::_('date', $row->event_date, 'H:i:s', null);
+					if ($eventDuration)
+					{
+						$rowChildEvent->event_end_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($rowChildEvent->event_date) + $eventDuration);
+					}
+					else
+					{
+						$rowChildEvent->event_end_date = '';
+					}
+
+					if ($cutOffDuration)
+					{
+						$rowChildEvent->cut_off_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($rowChildEvent->event_date) - $cutOffDuration);
+					}
+					if ($cancelDuration)
+					{
+						$rowChildEvent->cancel_before_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($rowChildEvent->event_date) - $cancelDuration);
+					}
+					if ($earlyBirdDuration)
+					{
+						$rowChildEvent->early_bird_discount_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($rowChildEvent->event_date) - $earlyBirdDuration);
+					}
+					if ($registrationStartDuration)
+					{
+						$rowChildEvent->registration_start_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($rowChildEvent->event_date) - $registrationStartDuration);
+					}
+					$rowChildEvent->event_type             = 2;
+					$rowChildEvent->parent_id              = $row->id;
+					$rowChildEvent->recurring_type         = 0;
+					$rowChildEvent->recurring_frequency    = 0;
+					$rowChildEvent->weekdays               = '';
+					$rowChildEvent->monthdays              = '';
+					$rowChildEvent->recurring_end_date     = $db->getNullDate();
+					$rowChildEvent->recurring_occurrencies = 0;
+					$rowChildEvent->created_by             = $row->created_by;
+					$rowChildEvent->alias                  = JApplication::stringURLSafe(
+						$rowChildEvent->title . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null));
+
+					// Build alias for other languages
+					if (JLanguageMultilang::isEnabled())
+					{
+						if (count($languages))
+						{
+							foreach ($languages as $language)
+							{
+								$sef                              = $language->sef;
+								$rowChildEvent->{'alias_' . $sef} = JApplication::stringURLSafe(
+									$rowChildEvent->{'alias_' . $sef} . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null));
+							}
+						}
+					}
+
+					$rowChildEvent->store();
+					//Generate alias
+					$query->clear();
+					$query->select('COUNT(*)')
+						->from('#__eb_events')
+						->where('alias=' . $db->quote($rowChildEvent->alias))
+						->where('id !=' . $rowChildEvent->id);
+					$db->setQuery($query);
+					$total = $db->loadResult();
+					if ($total)
+					{
+						$alias = $rowChildEvent->id . '-' . $rowChildEvent->alias;
+						$query->clear();
+						$query->update('#__eb_events')
+							->set('alias=' . $db->quote($alias))
+							->where('id=' . $rowChildEvent->id);
+						$db->setQuery($query);
+						$db->execute();
+					}
+
+					//Event Price
+					for ($j = 0, $m = count($prices); $j < $m; $j++)
+					{
+						$price            = $prices[$j];
+						$registrantNumber = $registrantNumbers[$j];
+						if (($registrantNumber > 0) && ($price > 0))
+						{
+							$query->clear();
+							$query->insert('#__eb_event_group_prices')
+								->columns('event_id, registrant_number, price')
+								->values("$rowChildEvent->id, $registrantNumber, $price");
+							$db->setQuery($query);
+							$db->execute();
+						}
+					}
+					$sql = 'INSERT INTO #__eb_event_categories(event_id, category_id, main_category) '
+						. "SELECT $rowChildEvent->id, category_id, main_category FROM #__eb_event_categories WHERE event_id=$row->id";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+			}
+			if (count($deleteEventIds))
+			{
+				foreach($deleteEventIds as $i => $deleteEventId)
+				{
+					// Check to see if this event has registrants, if it doesn't have registrants, it is safe to delete
+					$query->clear();
+					$query->select('COUNT(*)')
+						->from('#__eb_registrants')
+						->where('event_id = '. $deleteEventId)
+						->where('(published >= 1 OR payment_method LIKE "os_offline%")');
+					$db->setQuery($query);
+					$total = $db->loadResult();
+					if ($total)
+					{
+						unset($deleteEventIds[$i]);
+					}
+				}
+
+				if (count($deleteEventIds))
+				{
+					$this->delete($deleteEventIds);
 				}
 			}
 		}
