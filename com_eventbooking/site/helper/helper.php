@@ -2386,7 +2386,7 @@ class EventbookingHelper
 					$quantityValues = explode("\r\n", $field->quantity_values);
 					if (count($values) && count($quantityValues))
 					{
-						$values = EventbookingHelperHtml::getAvailableQuantityOptions($values, $quantityValues, $event->id, $field->id);
+						$values = EventbookingHelperHtml::getAvailableQuantityOptions($values, $quantityValues, $event->id, $field->id, ($field->fieldtype == 'Checkboxes') ? true : false);
 						if (!count($values))
 						{
 							return false;

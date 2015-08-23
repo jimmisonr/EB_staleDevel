@@ -280,7 +280,7 @@ abstract class EventbookingHelperHtml
 	 *
 	 * @return array
 	 */
-	public static function getAvailableQuantityOptions(&$values, $quantityValues, $eventId, $fieldId)
+	public static function getAvailableQuantityOptions(&$values, $quantityValues, $eventId, $fieldId, $multiple = false)
 	{
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
@@ -295,17 +295,66 @@ abstract class EventbookingHelperHtml
 		if (count($registrantIds))
 		{
 			$registrantIds = implode(',', $registrantIds);
+			if ($multiple)
+			{
+				$fieldValuesQuantity = array();
+				$query->clear();
+				$query->select('field_value')
+					->from('#__eb_field_values')
+					->where('field_id = '. $fieldId)
+					->where('registrant_id IN ('.$registrantIds.')');
+				$db->setQuery($query);
+				$rowFieldValues = $db->loadObjectList();
+				if (count($rowFieldValues))
+				{
+					foreach($rowFieldValues as $rowFieldValue)
+					{
+						$fieldValue = $rowFieldValue->field_value;
+						if ($fieldValue)
+						{
+							if (is_string($fieldValue) && is_array(json_decode($fieldValue)))
+							{
+								$selectedOptions = json_decode($fieldValue);
+							}
+							else
+							{
+								$selectedOptions = array($fieldValue);
+							}
+
+							foreach($selectedOptions as $selectedOption)
+							{
+								if (isset($fieldValuesQuantity[$selectedOption]))
+								{
+									$fieldValuesQuantity[$selectedOption]++;
+								}
+								else
+								{
+									$fieldValuesQuantity[$selectedOption] = 1;
+								}
+							}
+						}
+					}
+				}
+			}
+
 			for ($i = 0, $n = count($values) ; $i < $n; $i++)
 			{
 				$value = trim($values[$i]);
-				$query->clear();
-				$query->select('COUNT(*)')
-					->from('#__eb_field_values')
-					->where('field_id = '. $fieldId)
-					->where('registrant_id IN ('.$registrantIds.')')
-					->where('field_value='.$db->quote($value));
-				$db->setQuery($query);
-				$total = $db->loadResult();
+				if ($multiple)
+				{
+					$total = isset($fieldValuesQuantity[$value]) ? $fieldValuesQuantity[$value] : 0;
+				}
+				else
+				{
+					$query->clear();
+					$query->select('COUNT(*)')
+						->from('#__eb_field_values')
+						->where('field_id = '. $fieldId)
+						->where('registrant_id IN ('.$registrantIds.')')
+						->where('field_value='.$db->quote($value));
+					$db->setQuery($query);
+					$total = $db->loadResult();
+				}
 
 				if ($total && !empty($quantityValues[$i]) && $quantityValues[$i] <= $total)
 				{

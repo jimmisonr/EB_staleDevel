@@ -97,10 +97,9 @@ class RADFormFieldCheckboxes extends RADFormField
 
 	protected function getOptions()
 	{
-		$options = array();
 		if (is_array($this->row->values))
 		{
-			$options = $this->row->values;
+			$values = $this->row->values;
 		}
 		elseif (strpos($this->row->values, "\r\n") !== false)
 		{
@@ -109,6 +108,13 @@ class RADFormFieldCheckboxes extends RADFormField
 		else
 		{
 			$values = explode(",", $this->row->values);
+		}
+
+		$quantityValues = explode("\r\n", $this->row->quantity_values);
+
+		if ($this->row->quantity_field && count($values) && count($quantityValues) && $this->eventId)
+		{
+			$values = EventbookingHelperHtml::getAvailableQuantityOptions($values, $quantityValues, $this->eventId, $this->row->id, true);
 		}
 
 		return $values;

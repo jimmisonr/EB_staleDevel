@@ -223,7 +223,7 @@ if ($translatable)
 			</td>
 		</tr>
 
-		<tr class="eb-field eb-list eb-radio">
+		<tr class="eb-field eb-list eb-radio eb-checkboxes">
 			<td class="key">
 				<?php echo JText::_('EB_QUANTITY_FIELD'); ?>
 			</td>
@@ -234,7 +234,7 @@ if ($translatable)
 				<?php echo JText::_('EB_QUANTITY_FIELD_EXPLAIN'); ?>
 			</td>
 		</tr>
-		<tr class="eb-field eb-list eb-radio">
+		<tr class="eb-field eb-list eb-radio eb-checkboxes">
 			<td class="key">
 				<?php echo JText::_('EB_QUANITY_VALUES') ; ?>
 			</td>

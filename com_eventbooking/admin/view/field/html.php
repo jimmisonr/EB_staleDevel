@@ -136,7 +136,6 @@ class EventbookingViewFieldHtml extends RADViewItem
 					$query->select('name AS `value`, name AS `text`')
 						->from('#__comprofiler_fields')
 						->where('`table`="#__comprofiler"');
-					$sql = 'SELECT name AS `value`, name AS `text` FROM #__comprofiler_fields WHERE `table`="#__comprofiler"';
 				}
 				else
 				{
