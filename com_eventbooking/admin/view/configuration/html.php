@@ -224,6 +224,16 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options[]                     = JHtml::_('select.option', 1, JText::_('EB_PUBLISHED'));
 		$lists['default_event_status'] = JHtml::_('select.genericlist', $options, 'default_event_status', ' class="inputbox"', 'value', 'text', $config->get('default_event_status', 0));
 
+		$options = array();
+		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_FORMAT'));
+		$options[] = JHtml::_('select.option', '%Y-%m-%d', 'Y-m-d');
+		$options[] = JHtml::_('select.option', '%Y/%m/%d', 'Y/m/d');
+		$options[] = JHtml::_('select.option', '%m-%d-%Y', 'm-d-Y');
+		$options[] = JHtml::_('select.option', '%m/%d/%Y', 'm/d/Y');
+		$options[] = JHtml::_('select.option', '%d-%m-%Y', 'd-m-Y');
+		$options[] = JHtml::_('select.option', '%/%m/%Y', 'd/m/Y');
+		$lists['date_field_format'] = JHtml::_('select.genericlist', $options, 'date_field_format', '', 'value', 'text', isset($config->date_field_format) ? $config->date_field_format : 'Y-m-d');
+
 		#Invoice settings
 		$lists['activate_invoice_feature'] = JHtml::_('select.booleanlist', 'activate_invoice_feature', '', $config->activate_invoice_feature);
 		$lists['send_invoice_to_customer'] = JHtml::_('select.booleanlist', 'send_invoice_to_customer', '', $config->send_invoice_to_customer);

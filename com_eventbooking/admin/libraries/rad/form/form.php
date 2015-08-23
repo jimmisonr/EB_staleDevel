@@ -364,6 +364,9 @@ class RADForm
 		jimport('joomla.filesystem.folder');
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_eventbooking/table');
 		$rowFieldValue = JTable::getInstance('EventBooking', 'Fieldvalue');
+		$config = EventbookingHelper::getConfig();
+		$dateFormat = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
+		$dateFormat = str_replace('%', '', $dateFormat);
 		$fieldIds      = array(0);
 		$fileFieldIds  = array(0);
 		foreach ($this->fields as $field)
@@ -431,6 +434,33 @@ class RADForm
 					}
 				}
 			}
+
+			if ($fieldType == 'date')
+			{
+				$fieldValue = $data[$field->name];
+				if ($fieldValue)
+				{
+					// Try to convert the format
+					try
+					{
+						$date       = DateTime::createFromFormat($dateFormat, $fieldValue);
+						if ($date)
+						{
+							$fieldValue = $date->format('Y-m-d');
+						}
+						else
+						{
+							$fieldValue = '';
+						}
+					}
+					catch (Exception $e)
+					{
+						$fieldValue = '';
+					}
+					$data[$field->name] = $fieldValue;
+				}
+			}
+
 			$fieldValue = isset($data[$field->name]) ? $data[$field->name] : '';
 			if ($fieldValue != '')
 			{

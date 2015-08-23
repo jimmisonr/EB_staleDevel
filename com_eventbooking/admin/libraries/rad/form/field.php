@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Abstract Form Field class for the RAD framework
  *

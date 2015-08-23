@@ -588,8 +588,18 @@ $editor = JFactory::getEditor();
 						<td>
 							<?php echo JText::_('EB_TIME_FORMAT_EXPLAIN'); ?>
 						</td>
-					</tr>	
-								
+					</tr>
+					<tr>
+						<td class="key">
+							<?php echo JText::_('EB_DATE_FIELD_FORMAT') ; ?>
+						</td>
+						<td>
+							<?php echo $this->lists['date_field_format']; ?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_DATE_FIELD_FORMAT_EXPLAIN') ; ?>
+						</td>
+					</tr>
 					<tr>
 						<td class="key">
 							<?php echo JText::_('EB_CURRENCY_SYMBOL'); ?>
