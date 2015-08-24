@@ -319,7 +319,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 								</td>
 								<td class="eb-event-property-value">
 									<?php
-									echo EventbookingHelper::formatCurrency($item->late_fee, $config, $item->currency_symbol);
+									echo EventbookingHelper::formatCurrency($item->late_fee, $this->config, $item->currency_symbol);
 									echo ' <em> '.JText::sprintf('EB_FROM_DATE', JHtml::_('date', $item->late_fee_date, $this->config->date_format, null)).'</em>';
 									?>
 								</td>
