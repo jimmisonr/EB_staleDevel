@@ -57,7 +57,14 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 		{
 			continue;
 		}
+
+		if ($i > 1 && $field->row->only_require_for_first_member)
+		{
+			$field->makeFieldOptional();
+		}
+
 		echo $field->getControlGroup($bootstrapHelper);
+
 		if ($field->type == 'Date')
 		{
 			$dateFields[] = $field->name;

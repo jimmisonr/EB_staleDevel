@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Abstract Form Field class for the RAD framework
  *
@@ -211,7 +212,7 @@ abstract class RADFormField
 	public function setFieldSuffix($suffix)
 	{
 		$this->suffix = $suffix;
-		$this->name = $this->name . '_' . $suffix;
+		$this->name   = $this->name . '_' . $suffix;
 	}
 
 	/**
@@ -251,6 +252,19 @@ abstract class RADFormField
 	}
 
 	/**
+	 * Remove the attribute
+	 *
+	 * @param $name
+	 */
+	function removeAttribute($name)
+	{
+		if (isset($this->attributes[$name]))
+		{
+			unset($this->attributes[$name]);
+		}
+	}
+
+	/**
 	 * Mark this field as a fee-affected custom field
 	 *
 	 * @param int $feeCalculation
@@ -275,6 +289,7 @@ abstract class RADFormField
 	{
 		$this->eventId = $eventId;
 	}
+
 	/**
 	 *
 	 */
@@ -359,7 +374,7 @@ abstract class RADFormField
 			{
 				if ($this->suffix)
 				{
-					$classes[] = 'master-field-'.$this->suffix;
+					$classes[] = 'master-field-' . $this->suffix;
 				}
 				else
 				{
@@ -444,5 +459,49 @@ abstract class RADFormField
 		}
 
 		return count($html) > 0 ? ' ' . implode(' ', $html) : '';
+	}
+
+	/**
+	 * Make current file optional
+	 */
+	public function makeFieldOptional()
+	{
+		// This only need to be processed if the field is required
+		if (!$this->row->required)
+		{
+			return;
+		}
+
+		$cssClass = $this->getAttribute('class');
+		if (strpos($cssClass, 'validate[required,') !== false)
+		{
+			$cssClass = str_replace('validate[required,', 'validate[', $cssClass);
+		}
+
+		if (strpos($cssClass, 'validate[required') !== false)
+		{
+			$cssClass = str_replace('validate[required', 'validate[', $cssClass);
+		}
+
+		if (strpos($cssClass, ' validate[]') !== false)
+		{
+			$cssClass = str_replace(' validate[]', '', $cssClass);
+		}
+
+		if (strpos($cssClass, 'validate[]') !== false)
+		{
+			$cssClass = str_replace('validate[]', '', $cssClass);
+		}
+
+		if ($cssClass)
+		{
+			$this->setAttribute('class', $cssClass);
+		}
+		else
+		{
+			$this->removeAttribute('class');
+		}
+
+		$this->row->required = 0;
 	}
 }

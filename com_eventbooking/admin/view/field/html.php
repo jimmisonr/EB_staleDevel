@@ -122,6 +122,7 @@ class EventbookingViewFieldHtml extends RADViewItem
 		$this->lists['fee_field']      = JHtml::_('select.booleanlist', 'fee_field', '', $this->item->fee_field);
 		$this->lists['quantity_field'] = JHtml::_('select.booleanlist', 'quantity_field', '', $this->item->quantity_field);
 		$this->lists['only_show_for_first_member'] = JHtml::_('select.booleanlist', 'only_show_for_first_member', '', $this->item->only_show_for_first_member);
+		$this->lists['only_require_for_first_member'] = JHtml::_('select.booleanlist', 'only_require_for_first_member', '', $this->item->only_require_for_first_member);
 		$this->lists['multiple']       = JHtml::_('select.booleanlist', 'multiple', ' class="inputbox" ', $this->item->multiple);
 		$integration                   = $config->cb_integration;
 		if ($integration)
