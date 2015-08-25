@@ -50,8 +50,17 @@ class EventbookingModelMassmail extends RADModel
 			$replaces['event_date']        = JHtml::_('date', $event->event_date, $config->event_date_format, null);
 			$replaces['short_description'] = $event->short_description;
 			$replaces['description']       = $event->description;
-			$replaces['event_location']    = $event->name . ' (' . $event->address . ', ' . $event->city . ', ' . $event->zip . ', ' . $event->country . ')';
+			if ($event->location_id)
+			{
+				$location = EventbookingHelperDatabase::getLocation($event->location_id);
+				$replaces['event_location']    = $location->name . ' (' . $location->address . ', ' . $location->city . ', ' . $location->zip . ', ' . $location->country . ')';
+			}
+			else
+			{
+				$replaces['event_location'] = '';
+			}
 
+			$query->clear();
 			$query->select('first_name, last_name, email')
 				->from('#__eb_registrants')
 				->where('event_id = ' . (int) $data['event_id'])
