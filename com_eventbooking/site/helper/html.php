@@ -14,7 +14,8 @@ abstract class EventbookingHelperHtml
 	public static function getCalendarSetupJs($fields)
 	{
 		$firstDay = JFactory::getLanguage()->getFirstDay();
-
+		$config     = EventbookingHelper::getConfig();
+		$dateFormat = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
 		$output = array();
 		foreach ($fields as $field)
 		{
@@ -22,7 +23,7 @@ abstract class EventbookingHelperHtml
 			// Id of the input field
 			inputField: "' . $field . '",
 			// Format of the input field
-			ifFormat: "%Y-%m-%d",
+			ifFormat: "' . $dateFormat . '",
 			// Trigger for the calendar (button ID)
 			button: "' . $field . '_img",
 			// Alignment (defaults to "Bl")
