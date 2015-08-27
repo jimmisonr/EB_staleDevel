@@ -331,7 +331,7 @@ $selectedState = '';
 		function cancelRegistration() {
 			var form = document.adminForm;
 			if (confirm("<?php echo JText::_('EB_CANCEL_REGISTRATION_CONFIRM'); ?>")) {
-				form.task.value = 'cancel';
+				form.task.value = 'registrant.cancel';
 				form.submit();
 			}
 		}
