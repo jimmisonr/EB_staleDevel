@@ -231,7 +231,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options[] = JHtml::_('select.option', '%m-%d-%Y', 'm-d-Y');
 		$options[] = JHtml::_('select.option', '%m/%d/%Y', 'm/d/Y');
 		$options[] = JHtml::_('select.option', '%d-%m-%Y', 'd-m-Y');
-		$options[] = JHtml::_('select.option', '%/%m/%Y', 'd/m/Y');
+		$options[] = JHtml::_('select.option', '%d/%m/%Y', 'd/m/Y');
 		$lists['date_field_format'] = JHtml::_('select.genericlist', $options, 'date_field_format', '', 'value', 'text', isset($config->date_field_format) ? $config->date_field_format : 'Y-m-d');
 
 		#Invoice settings
