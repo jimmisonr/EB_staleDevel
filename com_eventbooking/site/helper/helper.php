@@ -3271,9 +3271,12 @@ class EventbookingHelper
 		if (!isset($colors[$eventId]))
 		{
 			$db  = JFactory::getDbo();
-			$sql = 'SELECT color_code FROM #__eb_categories AS a INNER JOIN #__eb_event_categories AS b ON a.id = b.category_id WHERE b.event_id=' .
-				$eventId . ' ORDER BY b.id DESC';
-			$db->setQuery($sql);
+			$query = $db->getQuery(true);
+			$query->select('color_code')
+				->from('#__eb_categories AS a')
+				->innerJoin('#__eb_event_categories AS b ON (a.id = b.category_id AND b.main_category = 1)')
+				->where('b.event_id = '. $eventId);
+			$db->setQuery($query);
 			$colors[$eventId] = $db->loadResult();
 		}
 
