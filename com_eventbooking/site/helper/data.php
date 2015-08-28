@@ -442,11 +442,26 @@ class EventbookingHelperData
 			$fp = fopen('php://output', 'w');
 			fwrite($fp, "\xEF\xBB\xBF");
 			$delimiter = $config->csv_delimiter ? $config->csv_delimiter : ',';
+
+			$showGroup = false;
+			foreach($rows as $row)
+			{
+				if ($row->is_group_billing || $row->group_id > 0)
+				{
+					$showGroup = true;
+					break;
+				}
+			}
+
 			$fields     = array();
 			$fields[]   = JText::_('EB_EVENT');
 			if ($config->show_event_date)
 			{
 				$fields[] = JText::_('EB_EVENT_DATE');
+			}
+			if ($showGroup)
+			{
+				$fields[]   = JText::_('EB_GROUP');
 			}
 			if (count($rowFields))
 			{
@@ -484,24 +499,24 @@ class EventbookingHelperData
 				{
 					$fields[] = JHtml::_('date', $r->event_date, $config->date_format, null);
 				}
+				if ($showGroup)
+				{
+					if ($r->is_group_billing)
+					{
+						$fields[] = $r->first_name . ' ' . $r->last_name;
+					}
+					elseif ($r->group_id > 0)
+					{
+						$fields[] = isset($groupNames[$r->group_id]) ? $groupNames[$r->group_id] : '';
+					}
+					else
+					{
+						$fields[] = '';
+					}
+				}
+
 				foreach ($rowFields as $rowField)
 				{
-					if ($rowField->name == 'first_name')
-					{
-						if ($r->is_group_billing)
-						{
-							$fields[] = $r->first_name . ' ' . JText::_('EB_GROUP_BILLING');
-						}
-						elseif ($r->group_id > 0)
-						{
-							$fields[] = $r->first_name . ' ' . JText::_('EB_GROUP') . $groupNames[$r->group_id];
-						}
-						else
-						{
-							$fields[] = $r->first_name;
-						}
-						continue;
-					}
 					if ($rowField->is_core)
 					{
 						$fields[] = @$r->{$rowField->name};
@@ -516,6 +531,7 @@ class EventbookingHelperData
 						$fields[] = $fieldValue;
 					}
 				}
+
 				$fields[] = $r->number_registrants;
 				$fields[] = EventbookingHelper::formatAmount($r->total_amount, $config);
 				$fields[] = EventbookingHelper::formatAmount($r->discount_amount, $config);
