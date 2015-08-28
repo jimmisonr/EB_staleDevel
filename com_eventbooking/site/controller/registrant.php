@@ -172,15 +172,9 @@ class EventbookingControllerRegistrant extends EventbookingController
 		$config      = EventbookingHelper::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$eventId     = $this->input->getInt('event_id', 0);
-
 		if (!EventbookingHelper::canExportRegistrants($eventId))
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('EB_NOT_ALLOWED_TO_EXPORT'));
-		}
-
-		if (!$eventId)
-		{
-			JFactory::getApplication()->redirect('index.php', JText::_('EB_PLEASE_CHOOSE_AN_EVENT_TO_EXPORT_REGISTRANTS'));
 		}
 
 		$query->select('a.*, b.event_date')
@@ -195,8 +189,12 @@ class EventbookingControllerRegistrant extends EventbookingController
 				->leftJoin('#__eb_coupons AS c ON a.coupon_id=c.id');
 		}
 
-		$query->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published NOT IN (2,3)))')
-			->where('a.event_id = ' . $eventId);
+		$query->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published NOT IN (2,3)))');
+
+		if ($eventId > 0)
+		{
+			$query->where('a.event_id = ' . $eventId);
+		}
 
 		if (!$config->get('include_group_billing_in_csv_export', 1))
 		{
@@ -207,7 +205,6 @@ class EventbookingControllerRegistrant extends EventbookingController
 		{
 			$query->where('a.group_id = 0');
 		}
-
 
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
