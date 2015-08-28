@@ -35,7 +35,6 @@ if ($this->waitingList)
 	{
 		$msg = $this->message->waitinglist_form_message;
 	}
-	$msg = str_replace('[EVENT_TITLE]', $this->event->title, $msg) ;
 }
 else
 {
@@ -48,10 +47,17 @@ else
 	{
 		$msg = $this->message->registration_form_message_group;
 	}
-	$msg = str_replace('[EVENT_TITLE]', $this->event->title, $msg) ;
-	$msg = str_replace('[EVENT_DATE]', JHtml::_('date', $this->event->event_date, $this->config->event_date_format, null), $msg) ;
 }
-$headerText = str_replace('[EVENT_TITLE]', $this->event->title, $headerText);
+$replaces = EventbookingHelper::buildEventTags($this->event, $this->config);
+foreach ($replaces as $key => $value)
+{
+	foreach ($replaces as $key => $value)
+	{
+		$key        = strtoupper($key);
+		$msg        = str_replace("[$key]", $value, $msg);
+		$headerText = str_replace("[$key]", $headerText, $headerText);
+	}
+}
 ?>
 <div id="eb-group-registration-form" class="eb-container">
 	<h1 class="eb-page-title"><?php echo $headerText; ?></h1>

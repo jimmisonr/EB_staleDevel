@@ -435,9 +435,60 @@ class EventbookingHelper
 		}
 	}
 
+	/**
+	 * Build tags related to event
+	 *
+	 * @param $event
+	 * @param $config
+	 *
+	 * @return array
+	 */
+	public static function buildEventTags($event, $config)
+	{
+		$replaces = array();
+		$replaces['event_title']       = $event->title;
+		$replaces['event_date']        = JHtml::_('date', $event->event_date, $config->event_date_format, null);
+		$replaces['event_end_date']    = JHtml::_('date', $event->event_end_date, $config->event_date_format, null);
+		$replaces['short_description'] = $event->short_description;
+		$replaces['description']       = $event->description;
+		if ($event->location_id > 0)
+		{
+			$rowLocation = EventbookingHelperDatabase::getLocation($event->location_id);
+			$locationInformation = array();
+			if ($rowLocation->address)
+			{
+				$locationInformation[] = $rowLocation->address;
+			}
+			if ($rowLocation->city)
+			{
+				$locationInformation[] = $rowLocation->city;
+			}
+			if ($rowLocation->state)
+			{
+				$locationInformation[] = $rowLocation->state;
+			}
+			if ($rowLocation->zip)
+			{
+				$locationInformation[] = $rowLocation->zip;
+			}
+			if ($rowLocation->country)
+			{
+				$locationInformation[] = $rowLocation->country;
+			}
+			$replaces['location'] = $rowLocation->name . ' (' . implode(', ', $locationInformation) . ')';
+			$replaces['location_name'] = $rowLocation->name;
+		}
+		else
+		{
+			$replaces['location'] = '';
+			$replaces['location_name'] = '';
+		}
+
+		return $replaces;
+	}
 
 	/**
-	 * Buld tags array to use to replace the tags use in email & messages
+	 * Build tags array to use to replace the tags use in email & messages
 	 *
 	 * @param $row
 	 * @param $form

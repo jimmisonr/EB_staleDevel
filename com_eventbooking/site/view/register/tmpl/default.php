@@ -21,7 +21,6 @@ if ($this->waitingList)
 	{
 		$msg = $this->message->waitinglist_form_message;
 	}
-	$msg = str_replace('[EVENT_TITLE]', $this->event->title, $msg) ;
 }
 else
 {
@@ -34,11 +33,21 @@ else
 	{
 		$msg = $this->message->registration_form_message;
 	}
-	$msg = str_replace('[EVENT_TITLE]', $this->event->title, $msg) ;
-	$msg = str_replace('[EVENT_DATE]', JHtml::_('date', $this->event->event_date, $this->config->event_date_format, null), $msg) ;
+
 	$msg = str_replace('[AMOUNT]', EventbookingHelper::formatCurrency($this->amount, $this->config, $this->event->currency_symbol), $msg) ;
 }
-$headerText = str_replace('[EVENT_TITLE]', $this->event->title, $headerText) ;
+
+$replaces = EventbookingHelper::buildEventTags($this->event, $this->config);
+foreach ($replaces as $key => $value)
+{
+	foreach ($replaces as $key => $value)
+	{
+		$key        = strtoupper($key);
+		$msg        = str_replace("[$key]", $value, $msg);
+		$headerText = str_replace("[$key]", $headerText, $headerText);
+	}
+}
+
 if ($this->config->use_https)
 {
 	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_individual_registration&Itemid='.$this->Itemid, false, 1);
