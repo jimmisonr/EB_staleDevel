@@ -406,7 +406,17 @@ class EventbookingHelperData
 		}
 	}
 
-
+	/**
+	 * Export registration records into csv file
+	 *
+	 * @param $rows
+	 * @param $config
+	 * @param $rowFields
+	 * @param $fieldValues
+	 * @param $groupNames
+	 *
+	 * @throws Exception
+	 */
 	public static function csvExport($rows, $config, $rowFields, $fieldValues, $groupNames)
 	{
 		if (count($rows))
@@ -559,13 +569,20 @@ class EventbookingHelperData
 
 				$fields[] = JHtml::_('date', $r->register_date, $config->date_format);
 				$fields[] = $r->transaction_id;
-				if ($r->published)
+				switch($r->published)
 				{
-					$fields[] = 'Paid';
-				}
-				else
-				{
-					$fields[] = 'Not Paid';
+					case 0:
+						$fields[] = JText::_('EB_PENDING');
+						break;
+					case 1:
+						$fields[] = JText::_('EB_PAID');
+						break;
+					case 2:
+						$fields[] = JText::_('EB_CANCELLED');
+						break;
+					case 3:
+						$fields[] = JText::_('EB_WAITING_LIST');
+						break;
 				}
 				$fields[] = $r->id;
 				fputcsv($fp, $fields, $delimiter);

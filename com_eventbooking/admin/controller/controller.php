@@ -58,71 +58,121 @@ class EventbookingController extends RADControllerAdmin
 	public function csv_export()
 	{
 		set_time_limit(0);
-		require_once JPATH_ROOT . '/components/com_eventbooking/helper/data.php';
-		$db      = JFactory::getDBO();
-		$config  = EventbookingHelper::getConfig();
-		$eventId = JRequest::getInt('filter_event_id');
-		$where   = array();
-		$where[] = '(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published NOT IN (2,3)))';
-		if ($eventId)
-		{
-			$where[] = ' a.event_id=' . $eventId;
-		}
-		if (isset($config->include_group_billing_in_csv_export) && !$config->include_group_billing_in_csv_export)
-		{
-			$where[] = ' a.is_group_billing = 0 ';
-		}
-		if (!$config->include_group_members_in_csv_export)
-		{
-			$where[] = ' a.group_id = 0 ';
-		}
+		$config    = EventbookingHelper::getConfig();
+		$db        = JFactory::getDbo();
+		$query     = $db->getQuery(true);
+		$eventId   = $this->input->getInt('filter_event_id', 0);
+		$published = $this->input->getInt('filter_published', -1);
+		$query->select('a.*, b.event_date, b.event_end_date')
+			->select(' b.title AS event_title')
+			->from('#__eb_registrants AS a')
+			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+			->order('a.id');
+
 		if ($config->show_coupon_code_in_registrant_list)
 		{
-			$sql = 'SELECT a.*, b.event_date, b.title AS event_title, c.code AS coupon_code FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id = b.id LEFT JOIN #__eb_coupons AS c ON a.coupon_id=c.id WHERE ' .
-				implode(' AND ', $where) . ' ORDER BY a.id ';
+			$query->select('c.code AS coupon_code')
+				->leftJoin('#__eb_coupons AS c ON a.coupon_id=c.id');
+		}
+
+		if ($eventId > 0)
+		{
+			$query->where('a.event_id = ' . $eventId);
+		}
+
+		if ($published != -1)
+		{
+			$query->where('a.published = ' . $published);
+			if ($published == 0)
+			{
+				$query->where('a.payment_method LIKE "os_offline%"');
+			}
 		}
 		else
 		{
-			$sql = 'SELECT a.*, b.event_date, b.title AS event_title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id = b.id WHERE ' .
-				implode(' AND ', $where) . ' ORDER BY a.id ';
+			$query->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published NOT IN (2,3)))');
 		}
-		$db->setQuery($sql);
+
+		if (!$config->get('include_group_billing_in_csv_export', 1))
+		{
+			$query->where('a.is_group_billing = 0');
+		}
+
+		if (!$config->include_group_members_in_csv_export)
+		{
+			$query->where('a.group_id = 0');
+		}
+
+		$db->setQuery($query);
 		$rows = $db->loadObjectList();
+
+		if (count($rows) == 0)
+		{
+			$this->setMessage(JText::_('There are no registrants to export'));
+			$this->setRedirect('index.php?option=com_eventbooking&view=dashboard');
+
+			return;
+		}
+
 		if ($eventId)
 		{
 			if ($config->custom_field_by_category)
 			{
-				//Select main category
-				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $eventId . ' AND main_category = 1';
-				$db->setQuery($sql);
+				$query->clear();
+				$query->select('category_id')
+					->from('#__eb_event_categories')
+					->where('event_id=' . $eventId)
+					->where('main_category=1');
+				$db->setQuery($query);
 				$categoryId = (int) $db->loadResult();
 
-				$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 AND (category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . ')) ORDER BY ordering';
-				$db->setQuery($sql);
-				$rowFields = $db->loadObjectList();
+				$query->clear();
+				$query->select('id, name, title, is_core')
+					->from('#__eb_fields')
+					->where('published = 1')
+					->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))')
+					->order('ordering');
 			}
 			else
 			{
-				$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 AND (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' .
-					$eventId . ')) ORDER BY ordering';
-				$db->setQuery($sql);
-				$rowFields = $db->loadObjectList();
+				$query->clear();
+				$query->select('id, name, title, is_core')
+					->from('#__eb_fields')
+					->where('published = 1')
+					->where('(event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . '))')
+					->order('ordering');
 			}
 		}
 		else
 		{
-			//Get all published custom fields
-			$sql = 'SELECT id, name, title, is_core FROM #__eb_fields WHERE published=1 ORDER BY ordering';
-			$db->setQuery($sql);
-			$rowFields = $db->loadObjectList();
+			$query->clear();
+			$query->select('id, name, title, is_core')
+				->from('#__eb_fields')
+				->where('published = 1')
+				->order('ordering');
 		}
+		$db->setQuery($query);
+		$rowFields = $db->loadObjectList();
+
+		$registrantIds = array();
+
+		//Get name of groups
+		$groupNames = array();
+		foreach ($rows as $row)
+		{
+			$registrantIds[] = $row->id;
+			if ($row->is_group_billing)
+			{
+				$groupNames[$row->id] = $row->first_name . ' ' . $row->last_name;
+			}
+		}
+
 		//Get the custom fields value and store them into an array
-		$sql = 'SELECT id FROM #__eb_registrants AS a WHERE ' . implode(' AND ', $where);
-		$db->setQuery($sql);
-		$registrantIds = array(0);
-		$registrantIds = array_merge($registrantIds, $db->loadColumn());
-		$sql           = 'SELECT registrant_id, field_id, field_value FROM #__eb_field_values WHERE registrant_id IN (' . implode(',', $registrantIds) . ')';
-		$db->setQuery($sql);
+		$query->clear();
+		$query->select('registrant_id, field_id, field_value')
+			->from('#__eb_field_values')
+			->where('registrant_id IN (' . implode(',', $registrantIds) . ')');
+		$db->setQuery($query);
 		$rowFieldValues = $db->loadObjectList();
 		$fieldValues    = array();
 		for ($i = 0, $n = count($rowFieldValues); $i < $n; $i++)
@@ -130,39 +180,23 @@ class EventbookingController extends RADControllerAdmin
 			$rowFieldValue                                                        = $rowFieldValues[$i];
 			$fieldValues[$rowFieldValue->registrant_id][$rowFieldValue->field_id] = $rowFieldValue->field_value;
 		}
-		//Get name of groups
-		$groupNames = array();
-		$sql        = 'SELECT id, first_name, last_name FROM #__eb_registrants AS a WHERE is_group_billing = 1' .
-			(COUNT($where) ? ' AND ' . implode(' AND ', $where) : '');
-		$db->setQuery($sql);
-		$rowGroups = $db->loadObjectList();
-		if (count($rowGroups))
-		{
-			foreach ($rowGroups as $rowGroup)
-			{
-				$groupNames[$rowGroup->id] = $rowGroup->first_name . ' ' . $rowGroup->last_name;
-			}
-		}
-		if (count($rows))
-		{
-			EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues, $groupNames);
-		}
-		else
-		{
-			$this->setRedirect('index.php?option=com_eventbooking&view=registrants', JText::_('There are no registrants to export'));
-		}
+
+		EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues, $groupNames);
 	}
 
-	function download_invoice()
+	/**
+	 * Download invoice of the given registration record
+	 */
+	public function download_invoice()
 	{
-		$id = JRequest::getInt('id');
+		$id = $this->input->getInt('id');
 		EventbookingHelper::downloadInvoice($id);
 	}
 
 	/**
 	 * This method is implemented to help calling by typing the url on web browser to update database schema to latest version
 	 */
-	function upgrade()
+	public function upgrade()
 	{
 		$this->update_db_schema();
 	}
@@ -171,7 +205,7 @@ class EventbookingController extends RADControllerAdmin
 	 * Update database schema when users update from old version to 1.6.4.
 	 * We need to implement this function outside the installation script to avoid timeout during upgrade
 	 */
-	function update_db_schema()
+	public function update_db_schema()
 	{
 		jimport('joomla.filesystem.folder');
 		$db = JFactory::getDbo();
@@ -518,7 +552,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('only_show_for_first_member', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_fields` ADD  `only_show_for_first_member` TINYINT NOT NULL DEFAULT  '0';";
@@ -532,7 +566,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		//Events table
 		$fields = array_keys($db->getTableColumns('#__eb_events'));
 
@@ -2015,7 +2049,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 		$db->truncateTable('#__eb_waiting_lists');
-		
+
 		// Update old links from older version to 2.0.x
 		$query = $db->getQuery(true);
 		$query->update('#__menu')
@@ -2125,7 +2159,7 @@ class EventbookingController extends RADControllerAdmin
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/daylightsaving',
 			JPATH_ROOT . '/components/com_eventbooking/views/confirmation',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waiting',
-			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waitings',			
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waitings',
 			JPATH_ROOT . '/components/com_eventbooking/models',
 			JPATH_ROOT . '/components/com_eventbooking/assets'
 		);
