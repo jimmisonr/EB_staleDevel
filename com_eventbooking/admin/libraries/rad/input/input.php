@@ -7,9 +7,8 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 defined('_JEXEC') or die();
-
-const RAD_INPUT_ALLOWRAW  = 2;
-const RAD_INPUT_ALLOWHTML = 4;
+define('RAD_INPUT_ALLOWRAW', 2);
+define('RAD_INPUT_ALLOWHTML', 4);
 /**
  * Extends JInput class to allow getting raw data from Input object. This can be removed when we don't provide support for Joomla 2.5.x
  *

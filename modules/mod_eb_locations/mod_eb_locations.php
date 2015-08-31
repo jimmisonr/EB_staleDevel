@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        2.0.0
- * @package        Joomla
- * @subpackage     Event Booking
- * @author         Tuan Pham Ngoc
- * @copyright      Copyright (C) 2010 - 2015 Ossolution Team
- * @license        GNU/GPL, see LICENSE.php
+ * @version            2.0.4
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 
 // no direct access
@@ -16,6 +16,7 @@ $document = JFactory::getDocument();
 $document->addStylesheet(JUri::base(true) . '/media/com_eventbooking/assets/css/style.css', 'text/css', null, null);
 $user = JFactory::getUser();
 EventbookingHelper::loadLanguage();
+$config = EventbookingHelper::getConfig();
 $app              = JFactory::getApplication();
 $db               = JFactory::getDBO();
 $query            = $db->getQuery(true);
@@ -24,15 +25,17 @@ $showNumberEvents = (int) $params->get('show_number_events', 1);
 
 $query->select('a.id, a.name, COUNT(b.id) AS total_events')
 	->from('#__eb_locations AS a')
-	->leftJoin('#__eb_events AS b ON (a.id = b.location_id AND b.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . '))')
+	->innerJoin('#__eb_events AS b ON a.id = b.location_id')
 	->where('a.published = 1')
+	->where('b.published = 1')
+	->where('b.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
 	->group('a.id')
-	->having('total_events > 0')
 	->order('a.name');
 
-if ($app->getLanguageFilter())
+if ($config->hide_past_events)
 {
-	$query->where('a.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
+	$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
+	$query->where('DATE(b.event_date) >= "' . $currentDate . '"');
 }
 
 if ($numberLocations)
