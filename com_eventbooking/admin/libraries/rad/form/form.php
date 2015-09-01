@@ -533,6 +533,7 @@ class RADForm
 			{
 				continue;
 			}
+			$fieldsFee[$fieldName] = 0;
 			$fieldType = strtolower($field->type);
 			if (in_array($fieldType, $feeFieldTypes))
 			{
@@ -542,6 +543,42 @@ class RADForm
 				}
 				elseif ($fieldType == 'checkboxes' || ($fieldType == 'list' && $field->row->multiple))
 				{
+					$feeValues = explode("\r\n", $field->row->fee_values);
+					$values    = explode("\r\n", $field->row->values);
+					$feeAmount = 0;
+
+					if (is_array($field->value))
+					{
+						$selectedOptions = $field->value;
+					}
+					elseif (strpos($field->value, "\r\n"))
+					{
+						$selectedOptions = explode("\r\n", $field->value);
+					}
+					elseif (is_string($field->value) && is_array(json_decode($field->value)))
+					{
+						$selectedOptions = json_decode($field->value);
+					}
+					else
+					{
+						$selectedOptions = array($field->value);
+					}
+					if (is_array($selectedOptions))
+					{
+						foreach ($selectedOptions as $selectedOption)
+						{
+							$index = array_search($selectedOption, $values);
+							if ($index !== false)
+							{
+								if (isset($feeValues[$index]))
+								{
+									$feeAmount += floatval($feeValues[$index]);
+								}
+							}
+						}
+					}
+
+					$fieldsFee[$fieldName] = $feeAmount;
 				}
 				else
 				{
@@ -551,7 +588,7 @@ class RADForm
 					$valueIndex = array_search(trim($field->value), $values);
 					if ($valueIndex !== false && isset($feeValues[$valueIndex]))
 					{
-						$fieldsFee[$fieldName] = $feeValues[$valueIndex];
+						$fieldsFee[$fieldName] = floatval($feeValues[$valueIndex]);
 					}
 				}
 			}
