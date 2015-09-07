@@ -458,8 +458,8 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 															'Sun' => JText::_('EB_SUNDAY'),
 															'Mon' => JText::_('EB_MONDAY'),
 															'Tue' => JText::_('EB_TUESDAY'),
-															'Web' => JText::_('EB_WEDNESDAY'),
-															'THU' => JText::_('EB_THURSDAY'),
+															'Wed' => JText::_('EB_WEDNESDAY'),
+															'Thu' => JText::_('EB_THURSDAY'),
 															'Fri' => JText::_('EB_FRIDAY'),
 															'Sat' => JText::_('EB_SATURDAY')
 														);
