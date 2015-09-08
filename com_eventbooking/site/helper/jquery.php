@@ -65,7 +65,50 @@ abstract class EventbookingHelperJquery
 		if (!$loaded)
 		{
 			JHtml::_('stylesheet', EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/assets/js/validate/css/validationEngine.jquery.css', false, false);
+
+			$config      = EventbookingHelper::getConfig();
+			$dateFormat  = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
+			$dateFormat  = str_replace('%', '', $dateFormat);
+			$humanFormat = str_replace('Y', 'YYYY', $dateFormat);
+			$humanFormat = str_replace('m', 'MM', $humanFormat);
+			$humanFormat = str_replace('d', 'DD', $humanFormat);
+
+			if (strpos($dateFormat, '.') !== false)
+			{
+				$dateParts = explode('.', $dateFormat);
+				$separator = '.';
+			}
+
+			if (strpos($dateFormat, '-') !== false)
+			{
+				$dateParts = explode('-', $dateFormat);
+				$separator = '-';
+			}
+
+			if (strpos($dateFormat, '/') !== false)
+			{
+				$dateParts = explode('/', $dateFormat);
+				$separator = '/';
+			}
+
+			$yearIndex  = array_search('Y', $dateParts);
+			$monthIndex = array_search('m', $dateParts);
+			$dayIndex   = array_search('d', $dateParts);
+
+			$regex   = 'var pattern = new RegExp(/^' . $dateFormat . '$/);';
+			$regex   = str_replace($separator, '[\\' . $separator . ']', $regex);
+			$regex   = str_replace('d', '(0?[1-9]|[12][0-9]|3[01])', $regex);
+			$regex   = str_replace('Y', '(\d{4})', $regex);
+			$regex   = str_replace('m', '(0?[1-9]|1[012])', $regex);
 			$document = JFactory::getDocument();
+
+			$document->addScriptDeclaration("
+				var yearPartIndex = $yearIndex;
+				var monthPartIndex = $monthIndex;
+				var dayPartIndex = $dayIndex;
+				var customDateFormat = '$dateFormat';
+			");
+
 			$document->addScriptDeclaration(
 				'
 				Eb.jQuery(function($) {
@@ -168,19 +211,19 @@ abstract class EventbookingHelperJquery
 				                "date": {
 				                    //	Check if date is valid by leap year
 								"func": function (field) {
-									var pattern = new RegExp(/^(\d{4})[\/\-\.](0?[1-9]|1[012])[\/\-\.](0?[1-9]|[12][0-9]|3[01])$/);
+									' . $regex . '
 									var match = pattern.exec(field.val());
 									if (match == null)
 									   return false;
 		
-									var year = match[1];
-									var month = match[2]*1;
-									var day = match[3]*1;
+									var year = match[yearPartIndex + 1];
+									var month = match[monthPartIndex + 1]*1;
+									var day = match[dayPartIndex + 1]*1;
 									var date = new Date(year, month - 1, day); // because months starts from 0.
 		
 									return (date.getFullYear() == year && date.getMonth() == (month - 1) && date.getDate() == day);
-								},
-							 	"alertText": "' . JText::_('EB_VALIDATION_INVALID_DATE') . '"
+								},							 	
+								"alertText": "' . str_replace('YYYY-MM-DD', $humanFormat, JText::_('EB_VALIDATION_INVALID_DATE')) . '"
 				                },
 				                "ipv4": {
 				                    "regex": /^((([01]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))[.]){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))$/,

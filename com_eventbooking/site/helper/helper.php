@@ -1738,7 +1738,11 @@ class EventbookingHelper
 	 */
 	public static function validateEngine()
 	{
-		$dateNow = JHtml::_('date', JFactory::getDate(), 'Y/m/d');
+		$config = self::getConfig();
+		$dateFormat = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
+		$dateFormat = str_replace('%', '', $dateFormat);		
+		$dateNow = JHtml::_('date', JFactory::getDate(), $dateFormat);		
+					
 		//validate[required,custom[integer],min[-5]] text-input
 		$validClass = array(
 			"",

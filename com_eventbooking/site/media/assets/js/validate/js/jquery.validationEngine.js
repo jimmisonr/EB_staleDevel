@@ -1492,8 +1492,13 @@ Eb.jQuery(function($) {
 		*
 		* @param {Object} date
 		*/
-		_dateToString: function(date) {
-			return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+		_dateToString: function(date) {			
+			var dateString = customDateFormat;
+			dateString = dateString.replace('Y', date.getFullYear());
+			dateString = dateString.replace('m', (date.getMonth()+1));
+			dateString = dateString.replace('d', date.getDate());			
+			
+			return ' ' + dateString;
 		},
 		/**
 		* Parses an ISO date
@@ -1506,9 +1511,9 @@ Eb.jQuery(function($) {
 				dateParts = d.split("/");
 			if(dateParts==d) {
 				dateParts = d.split(".");
-				return new Date(dateParts[2], (dateParts[1] - 1), dateParts[0]);
+				return new Date(dateParts[yearPartIndex], (dateParts[monthPartIndex ] - 1), dateParts[dayPartIndex]);
 			}
-			return new Date(dateParts[0], (dateParts[1] - 1) ,dateParts[2]);
+			return new Date(dateParts[yearPartIndex], (dateParts[monthPartIndex] - 1) ,dateParts[dayPartIndex]);
 		},
 		/**
 		* Builds or updates a prompt with the given information
