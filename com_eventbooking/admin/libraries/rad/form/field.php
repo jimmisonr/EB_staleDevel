@@ -421,6 +421,19 @@ abstract class RADFormField
 		{
 			$fieldValue = $this->value;
 		}
+
+		if ($fieldValue && $this->type == 'Date')
+		{
+			$date = JFactory::getDate($fieldValue);
+			if ($date)
+			{
+				$config = EventbookingHelper::getConfig();
+				$dateFormat  = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
+				$dateFormat  = str_replace('%', '', $dateFormat);
+				$fieldValue = $date->format($dateFormat);
+			}
+		}
+
 		if ($tableLess)
 		{
 			$controlGroupClass = $bootstrapHelper ? $bootstrapHelper->getClassMapping('control-group') : 'control-group';
