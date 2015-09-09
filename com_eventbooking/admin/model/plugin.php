@@ -65,7 +65,14 @@ class EventbookingModelPlugin extends RADModelAdmin
 			return false;
 		}
 		$destinationDir = JFactory::getConfig()->get('tmp_path') . '/' . $plugin['name'];
-		$uploaded       = JFile::upload($plugin['tmp_name'], $destinationDir);
+		if (version_compare(JVERSION, '3.4.0', 'ge'))
+		{
+			$uploaded       = JFile::upload($plugin['tmp_name'], $destinationDir, false, true);
+		}
+		else 
+		{
+			$uploaded       = JFile::upload($plugin['tmp_name'], $destinationDir);
+		}		
 		if (!$uploaded)
 		{
 			throw new Exception(JText::_('Upload plugin package'));
