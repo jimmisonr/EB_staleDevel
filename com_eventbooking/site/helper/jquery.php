@@ -94,12 +94,14 @@ abstract class EventbookingHelperJquery
 			$yearIndex  = array_search('Y', $dateParts);
 			$monthIndex = array_search('m', $dateParts);
 			$dayIndex   = array_search('d', $dateParts);
-
-			$regex   = 'var pattern = new RegExp(/^' . $dateFormat . '$/);';
+			
+			$regex 	 = $dateFormat;
 			$regex   = str_replace($separator, '[\\' . $separator . ']', $regex);
 			$regex   = str_replace('d', '(0?[1-9]|[12][0-9]|3[01])', $regex);
 			$regex   = str_replace('Y', '(\d{4})', $regex);
 			$regex   = str_replace('m', '(0?[1-9]|1[012])', $regex);
+			$regex   = 'var pattern = new RegExp(/^' . $regex . '$/);';		
+			
 			$document = JFactory::getDocument();
 
 			$document->addScriptDeclaration("
