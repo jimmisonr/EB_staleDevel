@@ -95,6 +95,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 					$memberId  = $ids[$i];
 					$rowMember = $this->getTable();
 					$rowMember->load($memberId);
+					$rowMember->event_id       = $row->event_id;
 					$rowMember->published      = $row->published;
 					$rowMember->payment_method = $row->payment_method;
 					$rowMember->transaction_id = $row->transaction_id;
