@@ -104,6 +104,9 @@ class EventbookingModelRegistrants extends RADModelList
 	{
 		$config = EventbookingHelper::getConfig();
 
+		// Prevent empty registration records (spams) from being showed
+		$query->where(' tbl.first_name != ""');
+
 		if ($this->state->filter_published != -1)
 		{
 			$query->where(' tbl.published = ' . $this->state->filter_published);
