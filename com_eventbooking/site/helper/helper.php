@@ -675,6 +675,7 @@ class EventbookingHelper
 		$replaces['invoice_number']     = $row->invoice_number;
 		$replaces['invoice_number']     = EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config);
 		$replaces['transaction_id']     = $row->transaction_id;
+		$replaces['id']     			= $row->id;
 		$method                         = os_payments::loadPaymentMethod($row->payment_method);
 		if ($method)
 		{
