@@ -309,7 +309,7 @@ $selectedState = '';
 	<!-- End members information -->
 	<input type="hidden" name="option" value="com_eventbooking"/>
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>"/>
-	<input type="hidden" name="task" value="save"/>
+	<input type="hidden" name="task" value="registrant.save"/>
 	<input type="hidden" name="event_id" value="<?php echo $this->item->event_id; ?>"/>
 	<input type="hidden" name="return" value="<?php echo $this->return; ?>"/>
 	<?php echo JHtml::_('form.token'); ?>
