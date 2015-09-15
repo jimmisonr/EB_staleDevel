@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	2.0.0
+ * @version            2.0.4
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -15,17 +15,13 @@ class plgSystemEBReminder extends JPlugin
 	public function onAfterRender()
 	{
 		error_reporting(0);
-		$secretCode = trim($this->params->get('secret_code'));
-		if ($secretCode && (JFactory::getApplication()->input->getString('secret_code') != $secretCode))
-		{
-			return;
-		}
 		if (file_exists(JPATH_ROOT . '/components/com_eventbooking/eventbooking.php'))
 		{
+			$bccEmail                = $this->params->get('bcc_email', '');
 			$lastRun                 = (int) $this->params->get('last_run', 0);
 			$numberEmailSendEachTime = (int) $this->params->get('number_registrants', 0);
 			$now                     = time();
-			$cacheTime               = 3600; // 60 minutes
+			$cacheTime               = 1200; // 60 minutes
 
 			if (($now - $lastRun) < $cacheTime)
 			{
@@ -83,8 +79,7 @@ class plgSystemEBReminder extends JPlugin
 			}
 
 			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
-			require_once JPATH_ROOT . '/components/com_eventbooking/model/reminder.php';
-			EventBookingModelReminder::sendReminder($numberEmailSendEachTime);
+			EventbookingHelper::sendReminder($numberEmailSendEachTime, $bccEmail);
 		}
 
 		return true;
@@ -98,7 +93,7 @@ class plgSystemEBReminder extends JPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   1.7.4
+	 * @since   2.0.4
 	 */
 	private function clearCacheGroups(array $clearGroups, array $cacheClients = array(0, 1))
 	{

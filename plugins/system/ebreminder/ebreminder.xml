@@ -18,7 +18,7 @@
 			<fieldset name="basic">
 				<field name="last_run" label="Last Run Time" type="text" readonly="true" size="30" description="Store Last Run Time of the plugin"></field>
 				<field name="number_registrants" label="Number Registrants" type="text" size="30" default="15" description="Number of registrants which we will send reminder each time the plugin run"></field>
-                <field name="secret_code" label="Secret code" type="text" size="30" default="" description="Only enter secret code if you setup cron job to send reminder. We will have documentation for you later. Post question on forum if you are not sure what todo"></field>
+                <field name="bcc_email" label="BCC Email" type="text" size="30" default="" description="If you want to receive a copy of reminder email so that you can keep track of reminder, enter the email you want here"></field>
 			</fieldset>
 		</fields>
 	</config>	

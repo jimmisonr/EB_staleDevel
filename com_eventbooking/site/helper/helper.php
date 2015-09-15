@@ -3241,6 +3241,166 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Send reminder email to registrants
+	 *
+	 * @param int  $numberEmailSendEachTime
+	 * @param null $bccEmail
+	 */
+	public static function sendReminder($numberEmailSendEachTime = 0, $bccEmail = null)
+	{
+		$db      = JFactory::getDbo();
+		$query   = $db->getQuery(true);
+		$config  = EventbookingHelper::getConfig();
+		$message = EventbookingHelper::getMessages();
+		$mailer  = JFactory::getMailer();
+
+		self::loadLanguage();
+
+		if ($bccEmail)
+		{
+			$mailer->AddBCC($bccEmail);
+		}
+
+		if (!$numberEmailSendEachTime)
+		{
+			$numberEmailSendEachTime = 15;
+		}
+
+		if ($config->from_name)
+		{
+			$fromName = $config->from_name;
+		}
+		else
+		{
+			$fromName = JFactory::getConfig()->get('fromname');
+		}
+
+		if ($config->from_email)
+		{
+			$fromEmail = $config->from_email;
+		}
+		else
+		{
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
+		}
+
+		$eventFields = array('b.id as event_id', 'b.event_date');
+
+		if (JLanguageMultilang::isEnabled())
+		{
+			$languages = EventbookingHelper::getLanguages();
+			if (count($languages))
+			{
+				foreach ($languages as $language)
+				{
+					$eventFields[] = 'b.title_' . $language->sef;
+				}
+			}
+			else
+			{
+				$eventFields[] = 'b.title';
+			}
+		}
+		else
+		{
+			$eventFields[] = 'b.title';
+		}
+
+		$query->select('a.*')
+			->select(implode(',', $eventFields))
+			->from('#__eb_registrants AS a')
+			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+			->where('a.published = 1')
+			->where('a.is_reminder_sent = 0')
+			->where('DATEDIFF(b.event_date, NOW()) <= b.remind_before_x_days')
+			->where('DATEDIFF(b.event_date, NOW()) >= 0')
+			->order('b.event_date, a.register_date');
+		$db->setQuery($query, 0, $numberEmailSendEachTime);
+
+		try
+		{
+			$rows = $db->loadObjectList();
+		}
+		catch (Exception  $e)
+		{
+			$rows = array();
+		}
+
+		for ($i = 0, $n = count($rows); $i < $n; $i++)
+		{
+			$row         = $rows[$i];
+			$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
+			if (strlen($message->{'reminder_email_subject' . $fieldSuffix}))
+			{
+				$emailSubject = $message->{'reminder_email_subject' . $fieldSuffix};
+			}
+			else
+			{
+				$emailSubject = $message->reminder_email_subject;
+			}
+			$emailSubject = str_replace('[EVENT_TITLE]', $row->title . $fieldSuffix, $emailSubject);
+			if (strlen($message->{'reminder_email_body' . $fieldSuffix}))
+			{
+				$emailBody = $message->{'reminder_email_body' . $fieldSuffix};
+			}
+			else
+			{
+				$emailBody = $message->reminder_email_body;
+			}
+			$replaces                = array();
+			$replaces['event_date']  = JHtml::_('date', $row->event_date, $config->event_date_format, null);
+			$replaces['first_name']  = $row->first_name;
+			$replaces['last_name']   = $row->last_name;
+			$replaces['event_title'] = $row->event_title;
+
+			// On process [REGISTRATION_DETAIL] tag if it is available in the email message
+			if (strpos($emailBody, '[REGISTRATION_DETAIL]') !== false)
+			{
+				// Build this tag
+				if ($config->multiple_booking)
+				{
+					$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+				}
+				elseif ($row->is_group_billing)
+				{
+					$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+				}
+				else
+				{
+					$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+				}
+
+				$form = new RADForm($rowFields);
+				$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+				$form->bind($data);
+				$form->buildFieldsDependency();
+
+				$replaces['registration_detail'] = EventbookingHelper::getEmailContent($config, $row, true, $form);
+			}
+
+			foreach ($replaces as $key => $value)
+			{
+				$emailBody = str_replace('[' . strtoupper($key) . ']', $value, $emailBody);
+			}
+
+			$emailBody = EventbookingHelper::convertImgTags($emailBody);
+			$mailer->sendMail($fromEmail, $fromName, $row->email, $emailSubject, $emailBody, 1);
+			echo $row->email;
+			echo $emailSubject;
+			echo $emailBody;
+			$mailer->clearAddresses();
+
+			//die();
+			$query->clear();
+			$query->update('#__eb_registrants')
+				->set('is_reminder_sent = 1')
+				->where('id = ' . (int) $row->id);
+			$db->setQuery($query);
+			$db->execute();
+		}
+	}
+
+	/**
 	 * Get country code
 	 *
 	 * @param string $countryName
@@ -3249,16 +3409,21 @@ class EventbookingHelper
 	 */
 	public static function getCountryCode($countryName)
 	{
-		$db = JFactory::getDbo();
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
 		if (empty($countryName))
 		{
 			$countryName = self::getConfigValue('default_country');
 		}
-		$sql = 'SELECT country_2_code FROM #__eb_countries WHERE LOWER(name)="' . JString::strtolower($countryName) . '"';
-		$db->setQuery($sql);
+		$query->select('country_2_code')
+			->from('#__eb_countries')
+			->where('LOWER(name) = ' . $db->quote(JString::strtolower($countryName)));
+		$db->setQuery($query);
 		$countryCode = $db->loadResult();
 		if (!$countryCode)
+		{
 			$countryCode = 'US';
+		}
 
 		return $countryCode;
 	}
