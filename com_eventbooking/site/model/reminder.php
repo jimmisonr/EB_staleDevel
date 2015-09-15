@@ -68,7 +68,7 @@ class EventBookingModelReminder extends JModelLegacy
 		{
 			$eventFields[] = 'b.title';
 		}
-		$sql = 'SELECT a.id, a.first_name, a.last_name, a.email, a.register_date, a.transaction_id, a.language, ' . implode(',', $eventFields) .
+		$sql = 'SELECT a.id, a.event_id, a.first_name, a.last_name, a.email, a.register_date, a.transaction_id, a.language, ' . implode(',', $eventFields) .
 			' FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ' . ' ON a.event_id = b.id ' .
 			' WHERE a.published=1 AND a.is_reminder_sent = 0 AND b.enable_auto_reminder=1 AND (DATEDIFF(b.event_date, NOW()) <= b.remind_before_x_days) AND (DATEDIFF(b.event_date, NOW()) >=0) ORDER BY b.event_date, a.register_date ' .
 			' LIMIT ' . $numberEmailSendEachTime;
@@ -102,10 +102,37 @@ class EventBookingModelReminder extends JModelLegacy
 			$replaces['first_name']  = $row->first_name;
 			$replaces['last_name']   = $row->last_name;
 			$replaces['event_title'] = $row->event_title;
+
+			// On process [REGISTRATION_DETAIL] tag if it is available in the email message
+			if (strpos($emailBody, '[REGISTRATION_DETAIL]') !== false)
+			{
+				// Build this tag
+				if ($config->multiple_booking)
+				{
+					$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+				}
+				elseif ($row->is_group_billing)
+				{
+					$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+				}
+				else
+				{
+					$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+				}
+
+				$form = new RADForm($rowFields);
+				$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+				$form->bind($data);
+				$form->buildFieldsDependency();
+
+				$replaces['registration_detail'] = EventbookingHelper::getEmailContent($config, $row, true, $form);
+			}
+
 			foreach ($replaces as $key => $value)
 			{
 				$emailBody = str_replace('[' . strtoupper($key) . ']', $value, $emailBody);
 			}
+
 			$emailBody = EventbookingHelper::convertImgTags($emailBody);
 			$mailer->sendMail($fromEmail, $fromName, $row->email, $emailSubject, $emailBody, 1);
 			$mailer->ClearAllRecipients();
@@ -115,5 +142,6 @@ class EventBookingModelReminder extends JModelLegacy
 			$db->setQuery($sql);
 			$db->execute();
 		}
+
 	}
 } 
