@@ -2373,14 +2373,20 @@ class EventbookingHelper
 			return false;
 		}
 
-		if ($event->cut_off_date != $db->getNullDate() && $event->cut_off_minutes > 0)
+		// If cut off date is entered, we will check registration based on cut of date, not event date
+		if ($event->cut_off_date != $db->getNullDate())
 		{
-			return false;
+			if ($event->cut_off_minutes > 0)
+			{
+				return false;
+			}
 		}
-
-		if ($event->number_event_dates < 0)
+		else
 		{
-			return false;
+			if ($event->number_event_dates < 0)
+			{
+				return false;
+			}
 		}
 
 		if ($event->event_capacity && ($event->total_registrants >= $event->event_capacity))
