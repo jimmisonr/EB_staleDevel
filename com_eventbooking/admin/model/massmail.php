@@ -52,8 +52,8 @@ class EventbookingModelMassmail extends RADModel
 			$replaces['description']       = $event->description;
 			if ($event->location_id)
 			{
-				$location = EventbookingHelperDatabase::getLocation($event->location_id);
-				$replaces['event_location']    = $location->name . ' (' . $location->address . ', ' . $location->city . ', ' . $location->zip . ', ' . $location->country . ')';
+				$location                   = EventbookingHelperDatabase::getLocation($event->location_id);
+				$replaces['event_location'] = $location->name . ' (' . $location->address . ', ' . $location->city . ', ' . $location->zip . ', ' . $location->country . ')';
 			}
 			else
 			{
@@ -61,7 +61,7 @@ class EventbookingModelMassmail extends RADModel
 			}
 
 			$query->clear();
-			$query->select('first_name, last_name, email')
+			$query->select('*')
 				->from('#__eb_registrants')
 				->where('event_id = ' . (int) $data['event_id'])
 				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
@@ -81,12 +81,37 @@ class EventbookingModelMassmail extends RADModel
 				foreach ($rows as $row)
 				{
 					$message = $body;
-
-					$email = $row->email;
+					$email   = $row->email;
 					if (!in_array($email, $emails))
 					{
-						$message  = str_replace("[FIRST_NAME]", $row->first_name, $message);
-						$message  = str_replace("[LAST_NAME]", $row->last_name, $message);
+						$message = str_replace("[FIRST_NAME]", $row->first_name, $message);
+						$message = str_replace("[LAST_NAME]", $row->last_name, $message);
+
+						// Process [REGISTRATION_DETAIL] tag if it is used in the message
+						if (strpos($message, '[REGISTRATION_DETAIL]') !== false)
+						{
+							// Build this tag
+							if ($config->multiple_booking)
+							{
+								$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+							}
+							elseif ($row->is_group_billing)
+							{
+								$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+							}
+							else
+							{
+								$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+							}
+
+							$form = new RADForm($rowFields);
+							$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+							$form->bind($data);
+							$form->buildFieldsDependency();
+							$registrationDetail = EventbookingHelper::getEmailContent($config, $row, true, $form);
+							$message            = str_replace("[REGISTRATION_DETAIL]", $registrationDetail, $message);
+						}
+
 						$emails[] = $email;
 						$mailer->sendMail($fromEmail, $fromName, $email, $subject, $message, 1);
 						$mailer->ClearAllRecipients();

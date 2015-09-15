@@ -68,7 +68,7 @@ class EventBookingModelReminder extends JModelLegacy
 		{
 			$eventFields[] = 'b.title';
 		}
-		$sql = 'SELECT a.id, a.event_id, a.first_name, a.last_name, a.email, a.register_date, a.transaction_id, a.language, ' . implode(',', $eventFields) .
+		$sql = 'SELECT a.*, ' . implode(',', $eventFields) .
 			' FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ' . ' ON a.event_id = b.id ' .
 			' WHERE a.published=1 AND a.is_reminder_sent = 0 AND b.enable_auto_reminder=1 AND (DATEDIFF(b.event_date, NOW()) <= b.remind_before_x_days) AND (DATEDIFF(b.event_date, NOW()) >=0) ORDER BY b.event_date, a.register_date ' .
 			' LIMIT ' . $numberEmailSendEachTime;
