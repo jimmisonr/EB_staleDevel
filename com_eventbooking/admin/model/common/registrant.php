@@ -58,6 +58,14 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 		$query  = $db->getQuery(true);
 		$row    = $this->getTable();
 		$data   = $input->getData();
+
+		// In case number registrants is empty, we set it default to 1
+		$data['number_registrants'] = (int) $data['number_registrants'];
+		if (empty($data['number_registrants']))
+		{
+			$data['number_registrants'] = 1;
+		}
+
 		if ($data['id'])
 		{
 			//We will need to calculate total amount here now
