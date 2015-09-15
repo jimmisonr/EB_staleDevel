@@ -12,6 +12,7 @@
 		<filename module="mod_eb_search">index.html</filename>
 		<filename module="mod_eb_search">mod_eb_search.php</filename>		
 		<filename module="mod_eb_search">tmpl/default.php</filename>
+		<filename module="mod_eb_search">tmpl/horizontal.php</filename>
 		<filename module="mod_eb_search">tmpl/index.html</filename>		
 	</files>			
 	<config>	
