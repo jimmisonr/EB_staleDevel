@@ -3385,12 +3385,8 @@ class EventbookingHelper
 
 			$emailBody = EventbookingHelper::convertImgTags($emailBody);
 			$mailer->sendMail($fromEmail, $fromName, $row->email, $emailSubject, $emailBody, 1);
-			echo $row->email;
-			echo $emailSubject;
-			echo $emailBody;
 			$mailer->clearAddresses();
 
-			//die();
 			$query->clear();
 			$query->update('#__eb_registrants')
 				->set('is_reminder_sent = 1')
