@@ -183,16 +183,6 @@ class EventbookingViewEventHtml extends RADViewItem
 		$options                   = array_merge($options, $rows);
 		$this->lists['article_id'] = JHtml::_('select.genericlist', $options, 'article_id', 'class="inputbox"', 'id', 'title', $item->article_id);
 
-		$query->clear();
-		$query->select('id, CONCAT(username, "(", name, " )") AS name')
-			->from('#__users')
-			->where('block = 0')
-			->order('username');
-		$db->setQuery($query);
-		$options                   = array();
-		$options[]                 = JHtml::_('select.option', '0', JText::_('EB_SELECT_USER'), 'id', 'name');
-		$options                   = array_merge($options, $db->loadObjectList());
-		$this->lists['created_by'] = JHtml::_('select.genericlist', $options, 'created_by', ' class="inputbox" ', 'id', 'name', $item->created_by);
 		$nullDate                  = $db->getNullDate();
 		//Custom field handles
 		if ($config->event_custom_field)

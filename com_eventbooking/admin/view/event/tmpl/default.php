@@ -77,7 +77,7 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 						<tr>
 							<td class="key"><?php echo JText::_('EB_CREATED_BY') ; ?></td>
 							<td>
-								<?php echo $this->lists['created_by'] ; ?>
+								<?php echo EventbookingHelper::getUserInput($this->item->created_by, 'created_by', 1) ; ?>
 							</td>
 						</tr>
 						<tr>

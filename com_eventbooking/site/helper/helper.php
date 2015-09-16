@@ -3812,11 +3812,14 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Generate User Input Select
+	 * Generate user selection box
+	 * @param int    $userId
+	 * @param string $fieldName
+	 * @param int    $registrantId
 	 *
-	 * @param int $userId
+	 * @return string
 	 */
-	public static function getUserInput($userId, $fieldName = 'user_id', $registerId)
+	public static function getUserInput($userId, $fieldName = 'user_id', $registrantId = 0)
 	{
 		// Initialize variables.
 		$html = array();
@@ -3828,12 +3831,12 @@ class EventbookingHelper
 		// Build the script.
 		$script   = array();
 		$script[] = '	function jSelectUser_user_id(id, title) {';
-		$script[] = '		var old_id = document.getElementById("user_id").value;';
+		$script[] = '		var old_id = document.getElementById("'.$fieldName.'").value;';
 		$script[] = '		if (old_id != id) {';
 		$script[] = '			document.getElementById("' . $fieldName . '").value = id;';
 		$script[] = '			document.getElementById("user_id_name").value = title;';
 		$script[] = '		}';
-		if (!$registerId)
+		if (!$registrantId)
 		{
 			$script[] = ' populateRegisterData(id, document.getElementById("event_id").value, title); ';
 		}
@@ -3851,19 +3854,35 @@ class EventbookingHelper
 		{
 			$table->name = '';
 		}
-		// Create a dummy text field with the user name.
-		$html[] = '<div class="fltlft">';
-		$html[] = '	<input type="text" id="user_id_name"' . ' value="' . htmlspecialchars($table->name, ENT_COMPAT, 'UTF-8') . '"' .
-			' disabled="disabled"' . $attr . ' />';
-		$html[] = '</div>';
-		// Create the user select button.
-		$html[] = '<div class="button2-left">';
-		$html[] = '<div class="blank">';
-		$html[] = '<a class="modal_user_id" title="' . JText::_('JLIB_FORM_CHANGE_USER') . '"' . ' href="' . $link . '"' .
-			' rel="{handler: \'iframe\', size: {x: 800, y: 500}}">';
-		$html[] = '	' . JText::_('JLIB_FORM_CHANGE_USER') . '</a>';
-		$html[] = '</div>';
-		$html[] = '</div>';
+
+		if (version_compare(JVERSION, '3.0', 'ge'))
+		{
+			$html[] = '<div class="input-append">';
+			$html[] = '	<input type="text" id="user_id_name"' . ' value="' . htmlspecialchars($table->name, ENT_COMPAT, 'UTF-8') . '"' .
+				' disabled="disabled"' . $attr . ' />';
+			// Create the user select button.
+			$html[] = '<a class="btn btn-primary modal_user_id" title="' . JText::_('JLIB_FORM_CHANGE_USER') . '"' . ' href="' . $link . '"' .
+				' rel="{handler: \'iframe\', size: {x: 800, y: 500}}">';
+
+			$html[] = '<span class="icon-user"></span></a>';
+			$html[] = '</div>';
+		}
+		else
+		{
+			$html[] = '<div class="fltlft">';
+			$html[] = '	<input type="text" id="user_id_name"' . ' value="' . htmlspecialchars($table->name, ENT_COMPAT, 'UTF-8') . '"' .
+				' disabled="disabled"' . $attr . ' />';
+			$html[] = '</div>';
+			// Create the user select button.
+			$html[] = '<div class="button2-left">';
+			$html[] = '<div class="blank">';
+			$html[] = '<a class="modal_user_id" title="' . JText::_('JLIB_FORM_CHANGE_USER') . '"' . ' href="' . $link . '"' .
+				' rel="{handler: \'iframe\', size: {x: 800, y: 500}}">';
+			$html[] = '	' . JText::_('JLIB_FORM_CHANGE_USER') . '</a>';
+			$html[] = '</div>';
+			$html[] = '</div>';
+		}
+
 		// Create the real field, hidden, that stored the user id.
 		$html[] = '<input type="hidden" id="' . $fieldName . '" name="' . $fieldName . '" value="' . $userId . '" />';
 
