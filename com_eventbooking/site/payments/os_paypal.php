@@ -73,6 +73,7 @@ class os_paypal extends os_payment
 		$this->setParam('lc', 'US');
 		$this->setParam('currency_code', $params->get('paypal_currency', 'USD'));
         $this->setParam('charset', 'utf-8');
+		$this->setParam('tax', 0);
 	}
 
 	/**

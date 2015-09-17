@@ -39,7 +39,7 @@ $query->select('a.*, c.name AS location_name')
 	->leftJoin('#__eb_locations AS c ON a.location_id = c.id')
 	->where('a.published = 1')
 	->where('a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
-	->where('DATE(a.event_date) >= ' . $db->quote($currentDate))
+	->where('(DATE(a.event_date) >= ' . $db->quote($currentDate).' OR DATE(a.cut_off_date) >= '.$db->quote($currentDate).')')
 	->order('a.event_date');
 
 if ($fieldSuffix)
