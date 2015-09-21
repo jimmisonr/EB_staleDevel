@@ -1122,6 +1122,41 @@ class EventbookingController extends RADControllerAdmin
 				}
 			}
 		}
+
+		if (!in_array('level', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_categories` ADD  `level` TINYINT( 4 ) NOT NULL DEFAULT '1';";
+			$db->setQuery($sql);
+			$db->execute();
+
+			// Update level for categories
+			$query = $db->getQuery(true);
+			$query->select('id, `parent`');
+			$query->from('#__eb_categories');
+			$db->setQuery($query);
+			$rows = $db->loadObjectList();
+			// first pass - collect children
+			if (count($rows))
+			{
+				$children = array();
+				foreach ($rows as $v)
+				{
+					$pt   = $v->parent;
+					$list = @$children[$pt] ? $children[$pt] : array();
+					array_push($list, $v);
+					$children[$pt] = $list;
+				}
+
+				$list = EventbookingHelper::calculateCategoriesLevel(0, array(), $children, 4);
+				foreach ($list as $id => $category)
+				{
+					$sql = "UPDATE #__eb_categories SET `level` = $category->level WHERE id = $id";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+			}
+		}
+
 		//Registrants table
 		$fields = array_keys($db->getTableColumns('#__eb_registrants'));
 		if (!in_array('total_amount', $fields))
