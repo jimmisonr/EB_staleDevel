@@ -157,20 +157,56 @@ class RADViewHtml extends RADView
 	 */
 	public function getPath($layout)
 	{
-		// Try to find alternative layout for Joomla3
-		if (version_compare(JVERSION, '3.0', 'ge'))
+		// Get the device type from session
+		$session    = JFactory::getSession();
+		$deviceType = $session->get('eb_device_type');
+
+		// If no data found from session, using mobile detect class to detect the device type
+		if (!$deviceType)
 		{
-			$file = JPath::clean($layout . '.joomla3.php');
-			$path = JPath::find($this->paths, $file);
+			if (!class_exists('Mobile_Detect'))
+			{
+				require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/serbanghita/Mobile_Detect.php';
+			}
+
+			$mobileDetect = new Mobile_Detect();
+			$deviceType   = 'desktop';
+
+			if ($mobileDetect->isMobile())
+			{
+				$deviceType = 'mobile';
+			}
+
+			if ($mobileDetect->isTablet())
+			{
+				$deviceType = 'tablet';
+			}
+
+			// Store the device type into session so that we don't have to find it for next request
+			$session->set('eb_device_type', $deviceType);
 		}
 
-		// If no layout for Joomla3 found, use normal layout
-		if (empty($path))
+		// Try to find the layout file with the following priority order: Device type, Joomla version, Default Layout
+		$filesToFind = array($layout);
+
+		if (version_compare(JVERSION, '3.0', 'ge'))
 		{
-			// Get the layout file name.
-			$file = JPath::clean($layout . '.php');
-			// Find the layout file path.
+			array_unshift($filesToFind, $layout . '.joomla3');
+		}
+
+		if ($deviceType !== 'desktop')
+		{
+			array_unshift($filesToFind, $layout . '.' . $deviceType);
+		}
+
+		foreach ($filesToFind as $fileLayout)
+		{
+			$file = JPath::clean($fileLayout . '.php');
 			$path = JPath::find($this->paths, $file);
+			if ($path)
+			{
+				break;
+			}
 		}
 
 		return $path;
