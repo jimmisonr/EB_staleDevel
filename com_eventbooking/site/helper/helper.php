@@ -3318,9 +3318,12 @@ class EventbookingHelper
 			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
 			->where('a.published = 1')
 			->where('a.is_reminder_sent = 0')
+			->where('b.published = 1')
+			->where('b.enable_auto_reminder = 1')
 			->where('DATEDIFF(b.event_date, NOW()) <= b.remind_before_x_days')
 			->where('DATEDIFF(b.event_date, NOW()) >= 0')
 			->order('b.event_date, a.register_date');
+
 		$db->setQuery($query, 0, $numberEmailSendEachTime);
 
 		try
