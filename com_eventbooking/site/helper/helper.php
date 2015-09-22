@@ -3316,7 +3316,7 @@ class EventbookingHelper
 			->select(implode(',', $eventFields))
 			->from('#__eb_registrants AS a')
 			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
-			->where('a.published = 1')
+			->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published = 0))')
 			->where('a.is_reminder_sent = 0')
 			->where('b.published = 1')
 			->where('b.enable_auto_reminder = 1')
