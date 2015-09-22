@@ -9,11 +9,7 @@
  */
 
 // no direct access
-defined( '_JEXEC' ) or die ;
-if (version_compare(JVERSION, '3.0', 'ge'))
-{
-	JHtml::_('formbehavior.chosen', 'select');
-}
+defined( '_JEXEC' ) or die;
 ?>
 <form action="index.php?option=com_eventbooking&view=fields" method="post" name="adminForm" id="adminForm">
 <table width="100%">

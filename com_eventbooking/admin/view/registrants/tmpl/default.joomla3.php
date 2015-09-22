@@ -10,10 +10,7 @@
 // no direct access
 defined('_JEXEC') or die;
 
-if (version_compare(JVERSION, '3.0', 'ge'))
-{
-	JHtml::_('formbehavior.chosen', 'select');
-}
+JHtml::_('formbehavior.chosen', 'select');
 $colSpan = 11;
 if ($this->config->show_event_date)
 {

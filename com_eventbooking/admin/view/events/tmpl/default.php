@@ -10,10 +10,6 @@
 // no direct access
 defined( '_JEXEC' ) or die ;				
 $ordering = ($this->state->filter_order == 'tbl.ordering');
-if (version_compare(JVERSION, '3.0', 'ge'))
-{
-	JHtml::_('formbehavior.chosen', 'select');
-}
 ?>
 <form action="index.php?option=com_eventbooking&view=events" method="post" name="adminForm" id="adminForm">
 <table width="100%">
