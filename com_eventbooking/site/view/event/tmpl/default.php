@@ -398,7 +398,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 		</table>
 		<?php
 			$activateWaitingList = $this->config->activate_waitinglist_feature ;
-			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !@$item->user_registered && $item->number_event_dates > 0)
+			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !@$item->user_registered && ($item->number_event_dates > 0 || $item->cut_off_minutes < 0))
 			{
 				$waitingList = true ;
 			}

@@ -93,7 +93,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 		{
 			$item = $items[$i] ;
 			$canRegister = EventbookingHelper::acceptRegistration($item) ;
-			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !$item->user_registered && $item->number_event_dates > 0)
+			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !$item->user_registered && ($item->number_event_dates > 0 || $item->cut_off_minutes < 0))
 			{
 				$waitingList = true ;
 			}

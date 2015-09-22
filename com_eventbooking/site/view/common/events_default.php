@@ -27,7 +27,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 			$event = $events[$i] ;
 			$canRegister = EventbookingHelper::acceptRegistration($event);
 			$detailUrl = JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, @$category->id, $Itemid));
-			if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants) && $activateWaitingList && !@$event->user_registered && $event->number_event_dates > 0)
+			if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants) && $activateWaitingList && !@$event->user_registered && ($event->number_event_dates > 0 || $event->cut_off_minutes < 0))
 			{
 				$waitingList = true ;
 			}
