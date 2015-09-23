@@ -280,6 +280,40 @@ abstract class EventbookingHelperHtml
 	}
 
 	/**
+	 * Get available fields tags using in the email messages & invoice
+	 *
+	 * @param bool $defaultTags
+	 *
+	 * @return array|string
+	 */
+	public static function getAvailableMessagesTags($defaultTags = true)
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('name')
+			->from('#__eb_fields')
+			->where('published = 1')
+			->order('ordering');
+		$db->setQuery($query);
+
+		if ($defaultTags)
+		{
+			$fields = array('registration_detail', 'date', 'event_title', 'event_date', 'event_end_date', 'short_description', 'description', 'total_amount', 'tax_amount', 'discount_amount', 'late_fee', 'payment_processing_fee', 'amount', 'location', 'number_registrants', 'invoice_number', 'transaction_id', 'id', 'payment_method');
+		}
+		else
+		{
+			$fields = array();
+		}
+
+		$fields = array_merge($fields, $db->loadColumn());
+
+		$fields = array_map('strtoupper', $fields);
+		$fields = '[' . implode('], [', $fields) . ']';
+
+		return $fields;
+	}
+
+	/**
 	 * Get URL to add the given event to Google Calendar
 	 *
 	 * @param $row
