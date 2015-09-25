@@ -65,6 +65,13 @@ class RADViewHtml extends RADView
 	protected $hideButtons = array();
 
 	/**
+	 * The device type is accessing to the view, it can be desktop, tablet or mobile
+	 *
+	 * @var string
+	 */
+	protected $deviceType = 'desktop';
+
+	/**
 	 * Method to instantiate the view.
 	 *
 	 * @param array $config A named configuration array for object construction
@@ -106,6 +113,8 @@ class RADViewHtml extends RADView
 		{
 			$this->hideButtons = $config['hide_buttons'];
 		}
+
+		$this->deviceType = EventbookingHelper::getDeviceType();
 	}
 
 	/**
@@ -157,35 +166,6 @@ class RADViewHtml extends RADView
 	 */
 	public function getPath($layout)
 	{
-		// Get the device type from session
-		$session    = JFactory::getSession();
-		$deviceType = $session->get('eb_device_type');
-
-		// If no data found from session, using mobile detect class to detect the device type
-		if (!$deviceType)
-		{
-			if (!class_exists('Mobile_Detect'))
-			{
-				require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/serbanghita/Mobile_Detect.php';
-			}
-
-			$mobileDetect = new Mobile_Detect();
-			$deviceType   = 'desktop';
-
-			if ($mobileDetect->isMobile())
-			{
-				$deviceType = 'mobile';
-			}
-
-			if ($mobileDetect->isTablet())
-			{
-				$deviceType = 'tablet';
-			}
-
-			// Store the device type into session so that we don't have to find it for next request
-			$session->set('eb_device_type', $deviceType);
-		}
-
 		// Try to find the layout file with the following priority order: Device type, Joomla version, Default Layout
 		$filesToFind = array($layout);
 
@@ -194,9 +174,9 @@ class RADViewHtml extends RADView
 			array_unshift($filesToFind, $layout . '.joomla3');
 		}
 
-		if ($deviceType !== 'desktop')
+		if ($this->deviceType !== 'desktop')
 		{
-			array_unshift($filesToFind, $layout . '.' . $deviceType);
+			array_unshift($filesToFind, $layout . '.' . $this->deviceType);
 		}
 
 		foreach ($filesToFind as $fileLayout)

@@ -76,17 +76,17 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 		}
 		if ($config->show_location_in_category_view || ($this->getLayout() == 'timeline'))
 		{
-			$width = (int) $config->map_width;
-			if (!$width)
+			$width  = (int) $config->get('map_width', 800);
+			$height = (int) $config->get('map_height', 600);
+
+			if ($this->deviceType == 'mobile')
 			{
-				$width = 800;
+				EventbookingHelperJquery::colorbox('eb-colorbox-map', '100%', $height . 'px', 'true', 'false');
 			}
-			$height = (int) $config->map_height;
-			if (!$height)
+			else
 			{
-				$height = 600;
+				EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
 			}
-			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
 		}
 
 		$this->viewLevels      = $user->getAuthorisedViewLevels();

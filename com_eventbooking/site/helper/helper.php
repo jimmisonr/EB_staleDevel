@@ -107,6 +107,44 @@ class EventbookingHelper
 		}
 	}
 
+	/**
+	 * Get the device type (desktop, tablet, mobile) accessing the extension
+	 *
+	 * @return string
+	 */
+	public static function getDeviceType()
+	{
+		$session    = JFactory::getSession();
+		$deviceType = $session->get('eb_device_type');
+
+		// If no data found from session, using mobile detect class to detect the device type
+		if (!$deviceType)
+		{
+			if (!class_exists('Mobile_Detect'))
+			{
+				require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/serbanghita/Mobile_Detect.php';
+			}
+
+			$mobileDetect = new Mobile_Detect();
+			$deviceType   = 'desktop';
+
+			if ($mobileDetect->isMobile())
+			{
+				$deviceType = 'mobile';
+			}
+
+			if ($mobileDetect->isTablet())
+			{
+				$deviceType = 'tablet';
+			}
+
+			// Store the device type into session so that we don't have to find it for next request
+			$session->set('eb_device_type', $deviceType);
+		}
+
+
+		return $deviceType;
+	}
 
 	/**
 	 * Get page params of the givem view
@@ -3316,11 +3354,14 @@ class EventbookingHelper
 			->select(implode(',', $eventFields))
 			->from('#__eb_registrants AS a')
 			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
-			->where('a.published = 1')
+			->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published = 0))')
 			->where('a.is_reminder_sent = 0')
+			->where('b.published = 1')
+			->where('b.enable_auto_reminder = 1')
 			->where('DATEDIFF(b.event_date, NOW()) <= b.remind_before_x_days')
 			->where('DATEDIFF(b.event_date, NOW()) >= 0')
 			->order('b.event_date, a.register_date');
+
 		$db->setQuery($query, 0, $numberEmailSendEachTime);
 
 		try
@@ -3481,33 +3522,6 @@ class EventbookingHelper
 		{
 			return array();
 		}
-	}
-
-	/**
-	 * Calculate level for categories, used when upgrade from old version to new version
-	 *
-	 * @param     $id
-	 * @param     $list
-	 * @param     $children
-	 * @param int $maxlevel
-	 * @param int $level
-	 *
-	 * @return mixed
-	 */
-	public static function calculateCategoriesLevel($id, $list, &$children, $maxlevel = 9999, $level = 1)
-	{
-		if (@$children[$id] && $level <= $maxlevel)
-		{
-			foreach ($children[$id] as $v)
-			{
-				$id = $v->id;
-				$v->level = $level;
-				$list[$id] = $v;
-				$list = self::calculateCategoriesLevel($id, $list, $children, $maxlevel, $level + 1);
-			}
-		}
-
-		return $list;
 	}
 
 	/**

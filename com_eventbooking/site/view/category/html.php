@@ -132,7 +132,14 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		{
 			$width  = (int) $config->get('map_width', 800);
 			$height = (int) $config->get('map_height', 600);
-			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
+			if ($this->deviceType == 'mobile')
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-map', '100%', $height . 'px', 'true', 'false');
+			}
+			else
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
+			}
 		}
 
 		// Process page meta data

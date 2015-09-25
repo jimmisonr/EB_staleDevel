@@ -105,18 +105,17 @@ class EventbookingViewEventHtml extends RADViewHtml
 			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
 		}
 
-		$width = (int) $config->map_width;
-		if (!$width)
+		$width  = (int) $config->get('map_width', 800);
+		$height = (int) $config->get('map_height', 600);
+		if ($this->deviceType == 'mobile')
 		{
-			$width = 800;
+			EventbookingHelperJquery::colorbox('eb-colorbox-map', '100%', $height . 'px', 'true', 'false');
 		}
-		$height = (int) $config->map_height;
-		if (!$height)
+		else
 		{
-			$height = 600;
+			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
 		}
 
-		EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
 		if ($config->show_invite_friend)
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-invite');

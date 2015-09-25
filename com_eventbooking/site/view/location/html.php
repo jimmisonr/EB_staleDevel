@@ -46,6 +46,20 @@ class EventbookingViewLocationHtml extends RADViewHtml
 			EventbookingHelperData::prepareCustomFieldsData($items);
 		}
 
+		if ($config->show_location_in_category_view)
+		{
+			$width  = (int) $config->get('map_width', 800);
+			$height = (int) $config->get('map_height', 600);
+			if ($this->deviceType == 'mobile')
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-map', '100%', $height . 'px', 'true', 'false');
+			}
+			else
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
+			}
+		}
+
 		// Process page meta data
 		$params = EventbookingHelper::getViewParams($active, array('location'));
 		if (!$params->get('page_title'))
