@@ -28,6 +28,7 @@ else
 	$url = JRoute::_('index.php?option=com_eventbooking&Itemid='.$this->Itemid, false);
 }
 $btnClass = $this->bootstrapHelper->getClassMapping('btn');
+$span12  = $this->bootstrapHelper->getClassMapping('span12');
 ?>
 <div id="eb-cart-page" class="eb-container">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_ADDED_EVENTS'); ?></h1>
@@ -36,107 +37,68 @@ if (count($this->items))
 {
 ?>
 	<form method="post" name="adminForm" id="adminForm" action="<?php echo $url; ?>">
-		<table class="table table-striped table-bordered table-condensed">
-			<thead>
-				<tr>
-					<th class="col_event">
-						<?php echo JText::_('EB_EVENT'); ?>
-					</th>
-					<?php
-						if ($this->config->show_event_date)
-						{
-						?>
-							<th class="col_event_date">
-								<?php echo JText::_('EB_EVENT_DATE'); ?>
-							</th>
-						<?php
-						}
-					?>
-					<th class="col_action">
-						<?php echo JText::_('EB_REMOVE'); ?>
-					</th>
-					<th class="col_price">
-						<?php echo JText::_('EB_PRICE'); ?>
-					</th>
-					<th class="col_quantity">
-						<?php echo JText::_('EB_QUANTITY'); ?><a href="javascript:updateCart()"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/assets/images/update_quantity.png' ?>" title="<?php echo JText::_("EB_UPDATE_QUANTITY"); ?>" align="top" /></a>
-					</th>
-					<th class="col_subtotal eb-right-align">
-						<?php echo JText::_('EB_SUB_TOTAL'); ?>
-					</th>
-				</tr>
-			</thead>
-			<tbody>
-			<?php
-				$total = 0 ;
-				$k = 0 ;
-				for ($i = 0 , $n = count($this->items) ; $i < $n; $i++)
-				{
-					$item = $this->items[$i];
-					if ($this->config->show_discounted_price)
-					{
-						$item->rate = $item->discounted_rate;
-					}
-					$total += $item->quantity*$item->rate ;
-					$url = JRoute::_('index.php?option=com_eventbooking&view=event&id='.$item->id.'&tmpl=component&Itemid='.$this->Itemid);
-				?>
-					<tr>
-						<td class="col_event">
-							<a href="<?php echo $url; ?>" <?php echo $popup; ?>><?php echo $item->title; ?></a>
-						</td>
-						<?php
-							if ($this->config->show_event_date) {
-							?>
-								<td class="col_event_date">
-									<?php
-										if ($item->event_date == EB_TBC_DATE)
-										{
-											echo JText::_('EB_TBC');
-										}
-										else
-										{
-											echo JHtml::_('date', $item->event_date, $this->config->event_date_format, null);
-										}
-									?>
-								</td>
-							<?php
-							}
-						?>
-						<td align="center" class="col_action">
-							<a href="javascript:removeItem(<?php echo $item->id; ?>)"><img src="<?php echo JUri::base().'media/com_eventbooking/assets/images/remove_from_cart.png'; ?>" border="0" /></a>
-							<input type="hidden" name="event_id[]" value="<?php echo $item->id; ?>" />
-						</td>
-						<td class="col_price">
-							<?php echo EventbookingHelper::formatAmount($item->rate, $this->config); ?>
-						</td>
-						<td class="col_quantity">
-							<input type="text" class="input-mini inputbox quantity_box" size="3" value="<?php echo $item->quantity ; ?>" name="quantity[]" <?php echo $readOnly ; ?> />
-						</td>
-						<td class="col_subtotal">
-							<?php echo EventbookingHelper::formatAmount($item->rate*$item->quantity, $this->config); ?>
-						</td>
-					</tr>
+		<?php
+		$total = 0 ;
+		$k = 0 ;
+		for ($i = 0 , $n = count($this->items) ; $i < $n; $i++)
+		{
+			$item = $this->items[$i];
+			if ($this->config->show_discounted_price)
+			{
+				$item->rate = $item->discounted_rate;
+			}
+			$total += $item->quantity*$item->rate ;
+			$url = JRoute::_('index.php?option=com_eventbooking&view=event&id='.$item->id.'&tmpl=component&Itemid='.$this->Itemid);
+		?>
+		<div class="well clearfix">
+			<div class="row-fluid">
+				<div class="<?php echo $span12; ?> eb-mobile-event-title">
+					<a href="<?php echo $url; ?>" <?php echo $popup; ?>><?php echo $item->title; ?></a>
+				</div>
 				<?php
-				}
-				if ($this->config->show_event_date)
-				{
-					$cols = 6 ;
-				}
-				else
-				{
-					$cols = 5 ;
-				}
+					if ($this->config->show_event_date)
+					{
+					?>
+						<div class="<?php echo $span12; ?> eb-mobile-event-date">
+							<strong><?php echo JText::_('EB_EVENT_DATE'); ?>: </strong>
+							<?php
+								if ($item->event_date == EB_TBC_DATE)
+								{
+									echo JText::_('EB_TBC');
+								}
+								else
+								{
+									echo JHtml::_('date', $item->event_date, $this->config->event_date_format, null);
+								}
+							?>
+						</div>
+					<?php
+					}
 				?>
-				<tr>
-					<td colspan="<?php echo $cols - 1 ; ?>" class="eb-right-align">
-						<span class="total_amount"><?php echo JText::_('EB_TOTAL'); ?></span>
-					</td>
-					<td class="eb-right-align">
-						<?php echo EventbookingHelper::formatCurrency($total, $this->config); ?>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+				<div class="<?php echo $span12; ?> eb-mobile-event-price">
+					<strong><?php echo JText::_('EB_PRICE'); ?> :</strong>
+					<?php echo EventbookingHelper::formatAmount($item->rate, $this->config); ?>
+				</div>
+				<div class="<?php echo $span12; ?> eb-mobile-quantity">
+					<strong><?php echo JText::_('EB_QUANTITY'); ?> :</strong>
+					<input type="text" class="input-mini inputbox quantity_box" size="3" value="<?php echo $item->quantity ; ?>" name="quantity[]" <?php echo $readOnly ; ?> />
+					<a href="javascript:updateCart()"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/assets/images/update_quantity.png' ?>" title="<?php echo JText::_("EB_UPDATE_QUANTITY"); ?>" align="top" /></a>
+					<a href="javascript:removeItem(<?php echo $item->id; ?>)"><img src="<?php echo JUri::base().'media/com_eventbooking/assets/images/remove_from_cart.png'; ?>" border="0" /></a>
+					<input type="hidden" name="event_id[]" value="<?php echo $item->id; ?>" />
+				</div>
+				<div class="<?php echo $span12; ?> eb-mobile-sub-total">
+					<strong><?php echo JText::_('EB_SUB_TOTAL'); ?> :</strong>
+					<?php echo EventbookingHelper::formatAmount($item->rate*$item->quantity, $this->config); ?>
+				</div>
+			</div>
+		</div>
+		<?php
+		}
+		?>
+		<div class="well clearfix">
+			<strong><span class="total_amount"><?php echo JText::_('EB_TOTAL'); ?></span></strong>
+				<?php echo EventbookingHelper::formatCurrency($total, $this->config); ?>
+		</div>
 		<div class="form-actions">
 			<input type="button" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_ADD_MORE_EVENTS'); ?>" onclick="continueShopping();" />
 			<input type="button" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_UPDATE'); ?>" onclick="updateCart();" />

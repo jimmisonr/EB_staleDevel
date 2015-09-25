@@ -31,7 +31,14 @@ class EventbookingViewSearchHtml extends RADViewHtml
 		}
 		if ($config->multiple_booking)
 		{
-			EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
+			if ($this->deviceType == 'mobile')
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '100%', '450px', 'false', 'false');
+			}
+			else
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
+			}
 		}
 		if ($config->show_list_of_registrants)
 		{

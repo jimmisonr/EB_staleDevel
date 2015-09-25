@@ -46,6 +46,18 @@ class EventbookingViewLocationHtml extends RADViewHtml
 			EventbookingHelperData::prepareCustomFieldsData($items);
 		}
 
+		if ($config->multiple_booking)
+		{
+			if ($this->deviceType == 'mobile')
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '100%', '450px', 'false', 'false');
+			}
+			else
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
+			}
+		}
+		
 		if ($config->show_location_in_category_view)
 		{
 			$width  = (int) $config->get('map_width', 800);

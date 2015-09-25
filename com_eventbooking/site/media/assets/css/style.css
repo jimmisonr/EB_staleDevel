@@ -1060,3 +1060,25 @@ span.eb-time
 {
     width: 530px !important;
 }
+
+@media screen and (min-width: 768px) {
+    .event-property-fixed {
+        float: right;
+        position: relative;
+        top: 0;
+        margin: 0 0 10px 10px;
+    }
+}
+
+td.eb-event-property-label {
+    white-space: nowrap;
+    width: auto;
+}
+
+#eb-mini-cart-page.eb-container {
+    padding: 15px;
+}
+
+.input-mini.inputbox.quantity_box {
+    width: auto;
+}
