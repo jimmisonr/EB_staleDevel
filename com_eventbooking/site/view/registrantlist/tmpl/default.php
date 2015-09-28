@@ -50,6 +50,20 @@ if (count($this->items))
 			?>
 		</tr>
 	</thead>
+		<tfoot>
+			<tr>
+				<?php
+				if ($this->pagination->total > $this->pagination->limit)
+				{
+				?>
+					<td colspan="<?php echo $cols; ?>">
+						<?php echo $this->pagination->getListFooter(); ?>
+					</td>
+				<?php
+				}
+				?>
+			</tr>
+		</tfoot>
 	<tbody>
 	<?php
 	$k = 0;
