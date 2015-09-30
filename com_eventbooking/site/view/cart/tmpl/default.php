@@ -29,7 +29,7 @@ else
 }
 $btnClass = $this->bootstrapHelper->getClassMapping('btn');
 ?>
-<div id="eb-cart-page" class="eb-container">
+<div id="eb-cart-page" class="eb-container eb-cart-container">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_ADDED_EVENTS'); ?></h1>
 <?php
 if (count($this->items))
@@ -52,16 +52,13 @@ if (count($this->items))
 						<?php
 						}
 					?>
-					<th class="col_action">
-						<?php echo JText::_('EB_REMOVE'); ?>
-					</th>
 					<th class="col_price">
 						<?php echo JText::_('EB_PRICE'); ?>
 					</th>
 					<th class="col_quantity">
-						<?php echo JText::_('EB_QUANTITY'); ?><a href="javascript:updateCart()"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/assets/images/update_quantity.png' ?>" title="<?php echo JText::_("EB_UPDATE_QUANTITY"); ?>" align="top" /></a>
+						<?php echo JText::_('EB_QUANTITY'); ?>
 					</th>
-					<th class="col_subtotal eb-right-align">
+					<th class="col_price">
 						<?php echo JText::_('EB_SUB_TOTAL'); ?>
 					</th>
 				</tr>
@@ -69,7 +66,6 @@ if (count($this->items))
 			<tbody>
 			<?php
 				$total = 0 ;
-				$k = 0 ;
 				for ($i = 0 , $n = count($this->items) ; $i < $n; $i++)
 				{
 					$item = $this->items[$i];
@@ -85,7 +81,8 @@ if (count($this->items))
 							<a href="<?php echo $url; ?>" <?php echo $popup; ?>><?php echo $item->title; ?></a>
 						</td>
 						<?php
-							if ($this->config->show_event_date) {
+							if ($this->config->show_event_date)
+							{
 							?>
 								<td class="col_event_date">
 									<?php
@@ -102,45 +99,50 @@ if (count($this->items))
 							<?php
 							}
 						?>
-						<td align="center" class="col_action">
-							<a href="javascript:removeItem(<?php echo $item->id; ?>)"><img src="<?php echo JUri::base().'media/com_eventbooking/assets/images/remove_from_cart.png'; ?>" border="0" /></a>
-							<input type="hidden" name="event_id[]" value="<?php echo $item->id; ?>" />
-						</td>
 						<td class="col_price">
-							<?php echo EventbookingHelper::formatAmount($item->rate, $this->config); ?>
+							<?php echo EventbookingHelper::formatCurrency($item->rate, $this->config); ?>
 						</td>
 						<td class="col_quantity">
-							<input type="text" class="input-mini inputbox quantity_box" size="3" value="<?php echo $item->quantity ; ?>" name="quantity[]" <?php echo $readOnly ; ?> />
+							<div class="btn-wrapper input-append">
+								<input type="text" class="input-mini inputbox quantity_box" size="3" value="<?php echo $item->quantity ; ?>" name="quantity[]" <?php echo $readOnly ; ?> />
+								<a class="btn btn-default fa fa-refresh" href="javascript:updateCart()" title="" data-toggle="tooltip" data-original-title="Update"></a>
+								<a href="javascript:removeItem(<?php echo $item->id; ?>)" class="btn btn-default fa fa-times-circle" title="" data-toggle="tooltip" data-original-title="Remove"" border="0" /></a>
+								<input type="hidden" name="event_id[]" value="<?php echo $item->id; ?>" />
+							</div>
 						</td>
-						<td class="col_subtotal">
-							<?php echo EventbookingHelper::formatAmount($item->rate*$item->quantity, $this->config); ?>
+						<td class="col_price">
+							<?php echo EventbookingHelper::formatCurrency($item->rate*$item->quantity, $this->config); ?>
 						</td>
 					</tr>
 				<?php
 				}
 				if ($this->config->show_event_date)
 				{
-					$cols = 6 ;
+					$cols = 5 ;
 				}
 				else
 				{
-					$cols = 5 ;
+					$cols = 4 ;
 				}
 				?>
-				<tr>
-					<td colspan="<?php echo $cols - 1 ; ?>" class="eb-right-align">
-						<span class="total_amount"><?php echo JText::_('EB_TOTAL'); ?></span>
-					</td>
-					<td class="eb-right-align">
-						<?php echo EventbookingHelper::formatCurrency($total, $this->config); ?>
-					</td>
-				</tr>
+			<tr>
+				<td class="col_price" colspan="<?php echo $cols; ?>">
+					<span class="total_amount"><?php echo JText::_('EB_TOTAL'); ?>:  </span>
+					<?php echo EventBookingHelper::formatCurrency($total, $this->config); ?>
+				</td>
+			</tr>
 			</tbody>
 		</table>
-		<div class="form-actions">
-			<input type="button" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_ADD_MORE_EVENTS'); ?>" onclick="continueShopping();" />
-			<input type="button" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_UPDATE'); ?>" onclick="updateCart();" />
-			<input type="button" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_CHECKOUT'); ?>" onclick="checkout();" />
+		<div style="text-align: right;" class="form-actions">
+			<button class="<?php echo $btnClass; ?> btn-success" title="" type="button" onclick="continueShopping();">
+				<i class="icon-new"></i> <?php echo JText::_('EB_ADD_MORE_EVENTS'); ?>
+			</button>
+			<button class="<?php echo $btnClass; ?> btn-primary" type="button" onclick="updateCart();">
+				<i class="fa fa-refresh"></i> <?php echo JText::_('EB_UPDATE'); ?>
+			</button>
+			<button onclick="javascript:checkOut();" id="check_out" class="<?php echo $btnClass; ?> btn-primary" type="button">
+				<i class="fa fa-mail-forward"></i> <?php echo JText::_('EB_CHECKOUT'); ?>
+			</button>
 		</div>
 		<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
 		<input type="hidden" name="category_id" value="<?php echo $this->categoryId; ?>" />
@@ -149,7 +151,7 @@ if (count($this->items))
 		<input type="hidden" name="id" value="" />
 		<script type="text/javascript">
 			<?php echo $this->jsString ; ?>
-			function checkout() {
+			function checkOut() {
 				var form = document.adminForm ;
 				ret = checkQuantity() ;
 				if (ret) {

@@ -20,11 +20,11 @@ else
 $btnClass = $this->bootstrapHelper->getClassMapping('btn');
 $span12  = $this->bootstrapHelper->getClassMapping('span12');
 ?>
-<div id="eb-mini-cart-page" class="eb-container">
+<h1 class="eb-page-heading"><?php echo JText::_('EB_ADDED_EVENTS'); ?></h1>
+<div id="eb-mini-cart-page" class="eb-container eb-cart-content">
 <?php
 if (count($this->items)) {
 ?>
-	<h1 class="eb-page-heading"><?php echo JText::_('EB_ADDED_EVENTS'); ?></h1>
 	<form method="post" name="adminForm" id="adminForm" action="index.php">
 		<?php
 		$total = 0 ;
@@ -38,7 +38,7 @@ if (count($this->items)) {
 		?>
 		<div class="well clearfix">
 			<div class="row-fluid">
-				<div class="col_event_title col_event">
+				<div class="<?php echo $span12; ?> eb-mobile-event-title col_event_title col_event">
 					<a href="<?php echo $url; ?>"><?php echo $item->title; ?></a>
 				</div>
 				<?php
@@ -63,40 +63,43 @@ if (count($this->items)) {
 				?>
 				<div class="<?php echo $span12; ?> eb-mobile-event-price">
 					<strong><?php echo JText::_('EB_PRICE'); ?> :</strong>
-					<?php echo EventbookingHelper::formatAmount($rate, $this->config); ?>
+					<?php echo EventbookingHelper::formatCurrency($rate, $this->config); ?>
 				</div>
 				<div class="<?php echo $span12; ?> eb-mobile-quantity">
 					<strong><?php echo JText::_('EB_QUANTITY'); ?> :</strong>
-					<input id="quantity" type="text" class="input-mini inputbox quantity_box" size="3" value="<?php echo $item->quantity ; ?>" name="quantity[]" <?php echo $readOnly ; ?> />
-					<a id="update_cart_icon"><img onclick="javascript:updateCart();" src="<?php echo JUri::base(true).'/media/com_eventbooking/assets/images/update_quantity.png' ?>" title="<?php echo JText::_("EB_UPDATE_QUANTITY"); ?>" align="top" /></a>
-					<img onclick="javascript:removeCart(<?php echo $item->id; ?>);" class="eb-remove-item" id="<?php echo $item->id?>" src="<?php echo JUri::base().'media/com_eventbooking/assets/images/remove_from_cart.png'; ?>" border="0" />
-					<input id="event_id" type="hidden" name="event_id[]" value="<?php echo $item->id; ?>" />
+					<div class="btn-wrapper input-append">
+						<input id="quantity" type="text" class="input-mini inputbox quantity_box" size="3" value="<?php echo $item->quantity ; ?>" name="quantity[]" <?php echo $readOnly ; ?> />
+						<a class="btn btn-default fa fa-refresh" onclick="javascript:updateCart();" title="" data-toggle="tooltip" data-original-title="<?php echo JText::_("EB_UPDATE_QUANTITY"); ?>"></a>
+						<a onclick="javascript:removeCart(<?php echo $item->id; ?>);" class="btn btn-default fa fa-times-circle" title="" data-toggle="tooltip" data-original-title="Remove"" border="0" /></a>
+						<input id="event_id" type="hidden" name="event_id[]" value="<?php echo $item->id; ?>" />
+					</div>
 				</div>
 				<div class="<?php echo $span12; ?> eb-mobile-sub-total">
 					<strong><?php echo JText::_('EB_SUB_TOTAL'); ?> :</strong>
-					<?php echo EventbookingHelper::formatAmount($rate*$item->quantity, $this->config); ?>
+					<?php echo EventbookingHelper::formatCurrency($rate*$item->quantity, $this->config); ?>
 				</div>
 			</div>
 		</div>
 			<?php
 			}
 			?>
-			<div class="well clearfix">
-					<strong><span class="total_amount"><?php echo JText::_('EB_TOTAL'); ?></span></strong>
-					<?php echo EventBookingHelper::formatCurrency($total, $this->config); ?>
+			<div style="text-align: center" class="totals clearfix">
+				<div>
+					<?php echo JText::_('EB_TOTAL') .' '. EventBookingHelper::formatCurrency($total, $this->config); ?>
+				</div>
 			</div>
 			<?php
 			?>
-		<div class="well clearfix">
+		<div style="text-align: center;" class="form-actions bottom">
 			<div>
-				<button onclick="javascript:colorbox();" id="add_more_item" class="<?php echo $btnClass; ?> btn-primary" type="button">
-					<?php echo JText::_('EB_ADD_MORE_EVENTS'); ?>
+				<button onclick="javascript:colorbox();" id="add_more_item" class="<?php echo $btnClass; ?> btn-success" type="button">
+					<i class="icon-new"></i> <?php echo JText::_('EB_ADD_MORE_EVENTS'); ?>
 				</button>
 				<button onclick="javascript:updateCart();" id="update_cart" class="<?php echo $btnClass; ?> btn-primary" type="button">
-					<?php echo JText::_('EB_UPDATE'); ?>
+					<i class="fa fa-refresh"></i> <?php echo JText::_('EB_UPDATE'); ?>
 				</button>
 				<button onclick="javascript:checkOut();" id="check_out" class="<?php echo $btnClass; ?> btn-primary" type="button">
-					<?php echo JText::_('EB_CHECKOUT'); ?>
+					<i class="fa fa-mail-forward"></i> <?php echo JText::_('EB_CHECKOUT'); ?>
 				</button>
 			</div>
 		</div>
@@ -143,7 +146,7 @@ else
 					url  : 'index.php?option=com_eventbooking&task=cart.update_cart&Itemid=<?php echo $this->Itemid ?>&redirect=0&event_id=' + eventId + '&quantity=' + quantity,
 					dataType: 'html',
 					beforeSend: function() {
-					$('#add_more_item').before('<span class="wait"><img src="<?php echo JUri::base(true); ?>/media/com_eventbooking/ajax-loadding-animation.gif" alt="" /></span>');
+					$('#add_more_item').before('<span class="wait"><i class="fa fa-2x fa-refresh fa-spin"></i></span>');
 					},
 					success : function(html) {
 						$('#cboxLoadedContent').html(html);
@@ -165,7 +168,7 @@ else
 				url  : 'index.php?option=com_eventbooking&task=cart.remove_cart&id=' +  id + '&Itemid=<?php echo $this->Itemid ?>&redirect=0',
 				dataType: 'html',
 				beforeSend: function() {
-					$('#add_more_item').before('<span class="wait"><img src="<?php echo JUri::base(true); ?>/media/com_eventbooking/ajax-loadding-animation.gif" alt="" /></span>');
+					$('#add_more_item').before('<span class="wait"><i class="fa fa-2x fa-refresh fa-spin"></i></span>');
 				},
 				success : function(html) {
 					 $('#cboxLoadedContent').html(html);

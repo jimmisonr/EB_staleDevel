@@ -18,6 +18,9 @@ class EventbookingViewCartHtml extends RADViewHtml
 	 */
 	public function display()
 	{
+		$document = JFactory::getDocument();
+		$rootUrl = JUri::root(true);
+		$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/font-awesome.css');
 		$layout = $this->getLayout();
 		if ($layout != 'mini')
 		{
