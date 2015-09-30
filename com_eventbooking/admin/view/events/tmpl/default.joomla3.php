@@ -75,6 +75,9 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 					<?php echo JHtml::_('searchtools.sort',  JText::_('EB_EVENT_DATE'), 'tbl.event_date', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
 				<th class="title center" width="7%">
+					<?php echo JHtml::_('searchtools.sort', JText::_('EB_PRICE'), 'tbl.individual_price', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
+				</th>
+				<th class="title center" width="7%">
 					<?php echo JHtml::_('searchtools.sort', JText::_('EB_CAPACITY'), 'tbl.event_capacity', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
 				<th class="title" width="7%">
@@ -101,11 +104,11 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 			<?php
 			if ($this->config->activate_recurring_event)
 			{
-				$colspan = 10 ;
+				$colspan = 11 ;
 			}
 			else
 			{
-				$colspan = 9 ;
+				$colspan = 10 ;
 			}
 			?>
 			<tfoot>
@@ -154,6 +157,18 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 					</td>
 					<td class="center">
 						<?php echo JHtml::_('date', $row->event_date, $this->config->date_format, null); ?>
+					</td>
+					<td class="center">
+						<?php
+							if ($row->individual_price > 0)
+							{
+								echo EventbookingHelper::formatAmount($row->individual_price, $this->config);
+							}
+							else
+							{
+								echo JText::_('EB_FREE');
+							}
+						?>
 					</td>
 					<td class="center">
 						<?php echo $row->event_capacity; ?>
