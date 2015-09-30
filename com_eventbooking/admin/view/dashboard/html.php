@@ -39,6 +39,7 @@ class EventbookingViewDashboardHtml extends RADViewHtml
 			->getData();
 
 		$this->config = EventbookingHelper::getConfig();
+		$this->data   = EventbookingModelRegistrants::getStatisticsData();
 		parent::display();
 	}
 

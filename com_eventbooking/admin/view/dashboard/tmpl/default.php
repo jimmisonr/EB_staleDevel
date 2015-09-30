@@ -37,6 +37,8 @@ JToolBarHelper::title(JText::_('EB_DASHBOARD'), 'generic.png');
 		<td valign="top" width="55%">
 			<?php
 				echo JHtml::_('sliders.start', 'statistics_pane');
+				echo JHtml::_('sliders.panel', JText::_('EB_STATISTICS'), 'statistic');
+				echo $this->loadTemplate('statistics');
 				echo JHtml::_('sliders.panel', JText::_('EB_UPCOMING_EVENTS'), 'upcoming_events');
 				echo $this->loadTemplate('upcoming_events');
 				echo JHtml::_('sliders.panel', JText::_('EB_LASTEST_REGISTRANGS'), 'registrants');
