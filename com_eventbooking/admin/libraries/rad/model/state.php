@@ -134,11 +134,11 @@ class RADModelState
 		// Special code for handle ajax ordering in Joomla 3
 		if (!empty($data['filter_full_ordering']))
 		{
-			$parts                = explode(' ', $data['filter_full_ordering']);
-			$sort                 = $parts[0];
-			$direction            = isset($parts[1]) ? $parts[1] : '';
-			$data['filter_order'] = $sort;
-			$data['$sort']        = $direction;
+			$parts                    = explode(' ', $data['filter_full_ordering']);
+			$sort                     = $parts[0];
+			$direction                = isset($parts[1]) ? $parts[1] : '';
+			$data['filter_order']     = $sort;
+			$data['filter_order_Dir'] = $direction;
 		}
 
 		// Filter data
