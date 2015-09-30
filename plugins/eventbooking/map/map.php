@@ -87,6 +87,10 @@ class plgEventBookingMap extends JPlugin
 			(function ($) {
 				$(document).ready(function () {
 					function initialize() {
+					 	var height = $(window).height() - 50;
+				        var width = $(window).width() - 50;
+				        $("#map_canvas").height(height);
+				        $("#map_canvas").width(width);
 						var latlng = new google.maps.LatLng(<?php echo $location->lat ?>, <?php echo $location->long; ?>);
 						var myOptions = {
 							zoom: <?php echo $zoomLevel; ?>,
@@ -94,14 +98,14 @@ class plgEventBookingMap extends JPlugin
 							mapTypeId: google.maps.MapTypeId.ROADMAP
 						};
 						var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-
+						
 
 						var marker = new google.maps.Marker({
 							position: latlng,
 							map: map,
 							title: "<?php echo $location->name ; ?>"
 						});
-
+						google.maps.event.trigger(map, "resize");
 						var contentString = '<?php echo $bubbleText ; ?>';
 						var infowindow = new google.maps.InfoWindow({
 							content: contentString,
