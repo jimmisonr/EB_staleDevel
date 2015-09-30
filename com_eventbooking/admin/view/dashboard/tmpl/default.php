@@ -43,8 +43,6 @@ JToolBarHelper::title(JText::_('EB_DASHBOARD'), 'generic.png');
 				echo $this->loadTemplate('registrants');
 				echo JHtml::_('sliders.panel', JText::_('EB_USEFUL_LINKS'), 'links_panel');
 				echo $this->loadTemplate('useful_links');
-                echo JHtml::_('sliders.panel', JText::_('EB_CREDITS'), 'links_panel');
-                echo $this->loadTemplate('credits');
 				echo JHtml::_('sliders.end');
 			?>
 		</td>
