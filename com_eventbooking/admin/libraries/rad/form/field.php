@@ -390,7 +390,7 @@ abstract class RADFormField
 			if (version_compare(JVERSION, '3.0', 'ge'))
 			{
 				return '<div class="' . $controlGroupClass . $class . '" ' . $controlGroupAttributes . '>' . '<div class="' . $controlLabelClass . '">' . $this->getLabel() . '</div>' . '<div class="' . $controlsClass . '">' .
-				$this->getInput() . '</div>' . '</div>';
+				$this->getInput($bootstrapHelper) . '</div>' . '</div>';
 			}
 			else
 			{

@@ -408,12 +408,12 @@ class RADForm
 						{
 							JFolder::create($pathUpload);
 						}
-						$allowedExtensions = EventbookingHelper::getConfigValue('allowed_file_types');
+						$allowedExtensions = $config->attachment_file_types;
 						if (!$allowedExtensions)
 						{
-							$allowedExtensions = 'doc, docx, ppt, pptx, pdf, zip, rar, jpg, jepg, png, zipx';
+							$allowedExtensions = 'doc|docx|ppt|pptx|pdf|zip|rar|bmp|gif|jpg|jepg|png|swf|zipx';
 						}
-						$allowedExtensions = explode(',', $allowedExtensions);
+						$allowedExtensions = explode('|', $allowedExtensions);
 						$allowedExtensions = array_map('trim', $allowedExtensions);
 						$fileName          = $_FILES[$field->name]['name'];
 						$fileExt           = JFile::getExt($fileName);

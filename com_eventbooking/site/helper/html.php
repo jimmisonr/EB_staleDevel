@@ -13,10 +13,10 @@ abstract class EventbookingHelperHtml
 
 	public static function getCalendarSetupJs($fields)
 	{
-		$firstDay = JFactory::getLanguage()->getFirstDay();
+		$firstDay   = JFactory::getLanguage()->getFirstDay();
 		$config     = EventbookingHelper::getConfig();
 		$dateFormat = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
-		$output = array();
+		$output     = array();
 		foreach ($fields as $field)
 		{
 			$output[] = 'Calendar.setup({
@@ -155,6 +155,165 @@ abstract class EventbookingHelperHtml
 	}
 
 	/**
+	 * Converts a double colon seperated string or 2 separate strings to a string ready for bootstrap tooltips
+	 *
+	 * @param   string $title     The title of the tooltip (or combined '::' separated string).
+	 * @param   string $content   The content to tooltip.
+	 * @param   int    $translate If true will pass texts through JText.
+	 * @param   int    $escape    If true will pass texts through htmlspecialchars.
+	 *
+	 * @return  string  The tooltip string
+	 *
+	 * @since   2.0.5
+	 */
+	public static function tooltipText($title = '', $content = '', $translate = 1, $escape = 1)
+	{
+		// Initialise return value.
+		$result = '';
+
+		// Don't process empty strings
+		if ($content != '' || $title != '')
+		{
+			// Split title into title and content if the title contains '::' (old Mootools format).
+			if ($content == '' && !(strpos($title, '::') === false))
+			{
+				list($title, $content) = explode('::', $title, 2);
+			}
+
+			// Pass texts through JText if required.
+			if ($translate)
+			{
+				$title   = JText::_($title);
+				$content = JText::_($content);
+			}
+
+			// Use only the content if no title is given.
+			if ($title == '')
+			{
+				$result = $content;
+			}
+			// Use only the title, if title and text are the same.
+			elseif ($title == $content)
+			{
+				$result = '<strong>' . $title . '</strong>';
+			}
+			// Use a formatted string combining the title and content.
+			elseif ($content != '')
+			{
+				$result = '<strong>' . $title . '</strong><br />' . $content;
+			}
+			else
+			{
+				$result = $title;
+			}
+
+			// Escape everything, if required.
+			if ($escape)
+			{
+				$result = htmlspecialchars($result);
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get label of the field (including tooltip)
+	 *
+	 * @param        $name
+	 * @param        $title
+	 * @param string $tooltip
+	 *
+	 * @return string
+	 */
+	public static function getFieldLabel($name, $title, $tooltip = '')
+	{
+		$label = '';
+		$text  = $title;
+
+		// Build the class for the label.
+		$class = !empty($tooltip) ? 'hasTooltip hasTip' : '';
+
+		// Add the opening label tag and main attributes attributes.
+		$label .= '<label id="' . $name . '-lbl" for="' . $name . '" class="' . $class . '"';
+
+		// If a description is specified, use it to build a tooltip.
+		if (!empty($tooltip))
+		{
+			$label .= ' title="' . self::tooltipText(trim($text, ':'), $tooltip, 0) . '"';
+		}
+
+		$label .= '>' . $text . '</label>';
+
+		return $label;
+	}
+
+	/**
+	 * Get bootstrapped style boolean input
+	 *
+	 * @param $name
+	 * @param $value
+	 *
+	 * @return string
+	 */
+	public static function getBooleanInput($name, $value)
+	{
+		$html = array();
+
+		// Start the radio field output.
+		$html[] = '<fieldset id="' . $name . '" class="radio btn-group btn-group-yesno">';
+
+		// Yes Option
+		$checked = ($value == 1) ? ' checked="checked"' : '';
+		$html[]  = '<input type="radio" id="' . $name . '0" name="' . $name . '" value="1"' . $checked . ' />';
+		$html[]  = '<label for="' . $name . '0">' . JText::_('JYES') . '</label>';
+
+		// No Option
+		$checked = ($value == 0) ? ' checked="checked"' : '';
+		$html[]  = '<input type="radio" id="' . $name . '1" name="' . $name . '" value="0"' . $checked . ' />';
+		$html[]  = '<label for="' . $name . '1">' . JText::_('JNO') . '</label>';
+
+		// End the radio field output.
+		$html[] = '</fieldset>';
+
+		return implode($html);
+	}
+
+	/**
+	 * Get available fields tags using in the email messages & invoice
+	 *
+	 * @param bool $defaultTags
+	 *
+	 * @return array|string
+	 */
+	public static function getAvailableMessagesTags($defaultTags = true)
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('name')
+			->from('#__eb_fields')
+			->where('published = 1')
+			->order('ordering');
+		$db->setQuery($query);
+
+		if ($defaultTags)
+		{
+			$fields = array('registration_detail', 'date', 'event_title', 'event_date', 'event_end_date', 'short_description', 'description', 'total_amount', 'tax_amount', 'discount_amount', 'late_fee', 'payment_processing_fee', 'amount', 'location', 'number_registrants', 'invoice_number', 'transaction_id', 'id', 'payment_method');
+		}
+		else
+		{
+			$fields = array();
+		}
+
+		$fields = array_merge($fields, $db->loadColumn());
+
+		$fields = array_map('strtoupper', $fields);
+		$fields = '[' . implode('], [', $fields) . ']';
+
+		return $fields;
+	}
+
+	/**
 	 * Get URL to add the given event to Google Calendar
 	 *
 	 * @param $row
@@ -209,7 +368,7 @@ abstract class EventbookingHelperHtml
 		$query        = $db->getQuery(true);
 		$config       = JFactory::getConfig();
 		$dateFormat   = "Ymd\THis\Z";
-		$eventDate    =  JFactory::getDate($row->event_date, new DateTimeZone($config->get('offset')));
+		$eventDate    = JFactory::getDate($row->event_date, new DateTimeZone($config->get('offset')));
 		$eventEndDate = JFactory::getDate($row->event_end_date, new DateTimeZone($config->get('offset')));
 
 		$data['title']    = urlencode($row->title);
@@ -276,20 +435,20 @@ abstract class EventbookingHelperHtml
 	 *
 	 * @param array $values
 	 * @param array $quantityValues
-	 * @param int $eventId
-	 * @param int $fieldId
+	 * @param int   $eventId
+	 * @param int   $fieldId
 	 *
 	 * @return array
 	 */
 	public static function getAvailableQuantityOptions(&$values, $quantityValues, $eventId, $fieldId, $multiple = false)
 	{
-		$db = JFactory::getDbo();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 
 		// First, we need to get list of registration records of this event
 		$query->select('id')
 			->from('#__eb_registrants')
-			->where('event_id = '. $eventId)
+			->where('event_id = ' . $eventId)
 			->where('published = 1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3))');
 		$db->setQuery($query);
 		$registrantIds = $db->loadColumn();
@@ -302,13 +461,13 @@ abstract class EventbookingHelperHtml
 				$query->clear();
 				$query->select('field_value')
 					->from('#__eb_field_values')
-					->where('field_id = '. $fieldId)
-					->where('registrant_id IN ('.$registrantIds.')');
+					->where('field_id = ' . $fieldId)
+					->where('registrant_id IN (' . $registrantIds . ')');
 				$db->setQuery($query);
 				$rowFieldValues = $db->loadObjectList();
 				if (count($rowFieldValues))
 				{
-					foreach($rowFieldValues as $rowFieldValue)
+					foreach ($rowFieldValues as $rowFieldValue)
 					{
 						$fieldValue = $rowFieldValue->field_value;
 						if ($fieldValue)
@@ -322,7 +481,7 @@ abstract class EventbookingHelperHtml
 								$selectedOptions = array($fieldValue);
 							}
 
-							foreach($selectedOptions as $selectedOption)
+							foreach ($selectedOptions as $selectedOption)
 							{
 								if (isset($fieldValuesQuantity[$selectedOption]))
 								{
@@ -338,7 +497,7 @@ abstract class EventbookingHelperHtml
 				}
 			}
 
-			for ($i = 0, $n = count($values) ; $i < $n; $i++)
+			for ($i = 0, $n = count($values); $i < $n; $i++)
 			{
 				$value = trim($values[$i]);
 				if ($multiple)
@@ -350,9 +509,9 @@ abstract class EventbookingHelperHtml
 					$query->clear();
 					$query->select('COUNT(*)')
 						->from('#__eb_field_values')
-						->where('field_id = '. $fieldId)
-						->where('registrant_id IN ('.$registrantIds.')')
-						->where('field_value='.$db->quote($value));
+						->where('field_id = ' . $fieldId)
+						->where('registrant_id IN (' . $registrantIds . ')')
+						->where('field_value=' . $db->quote($value));
 					$db->setQuery($query);
 					$total = $db->loadResult();
 				}

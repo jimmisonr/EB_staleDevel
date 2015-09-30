@@ -65,6 +65,13 @@ class RADViewHtml extends RADView
 	protected $hideButtons = array();
 
 	/**
+	 * The device type is accessing to the view, it can be desktop, tablet or mobile
+	 *
+	 * @var string
+	 */
+	protected $deviceType = 'desktop';
+
+	/**
 	 * Method to instantiate the view.
 	 *
 	 * @param array $config A named configuration array for object construction
@@ -106,6 +113,8 @@ class RADViewHtml extends RADView
 		{
 			$this->hideButtons = $config['hide_buttons'];
 		}
+
+		$this->deviceType = EventbookingHelper::getDeviceType();
 	}
 
 	/**
@@ -157,20 +166,27 @@ class RADViewHtml extends RADView
 	 */
 	public function getPath($layout)
 	{
-		// Try to find alternative layout for Joomla3
+		// Try to find the layout file with the following priority order: Device type, Joomla version, Default Layout
+		$filesToFind = array($layout);
+
 		if (version_compare(JVERSION, '3.0', 'ge'))
 		{
-			$file = JPath::clean($layout . '.joomla3.php');
-			$path = JPath::find($this->paths, $file);
+			array_unshift($filesToFind, $layout . '.joomla3');
 		}
 
-		// If no layout for Joomla3 found, use normal layout
-		if (empty($path))
+		if ($this->deviceType !== 'desktop')
 		{
-			// Get the layout file name.
-			$file = JPath::clean($layout . '.php');
-			// Find the layout file path.
+			array_unshift($filesToFind, $layout . '.' . $this->deviceType);
+		}
+
+		foreach ($filesToFind as $fileLayout)
+		{
+			$file = JPath::clean($fileLayout . '.php');
 			$path = JPath::find($this->paths, $file);
+			if ($path)
+			{
+				break;
+			}
 		}
 
 		return $path;

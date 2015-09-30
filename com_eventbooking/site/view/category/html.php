@@ -120,7 +120,14 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 
 		if ($config->multiple_booking)
 		{
-			EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
+			if ($this->deviceType == 'mobile')
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '100%', '450px', 'false', 'false');
+			}
+			else
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
+			}
 		}
 
 		if ($config->show_list_of_registrants)
@@ -132,7 +139,14 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		{
 			$width  = (int) $config->get('map_width', 800);
 			$height = (int) $config->get('map_height', 600);
-			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
+			if ($this->deviceType == 'mobile')
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-map', '100%', $height . 'px', 'true', 'false');
+			}
+			else
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
+			}
 		}
 
 		// Process page meta data

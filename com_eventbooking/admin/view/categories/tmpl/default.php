@@ -28,10 +28,6 @@ if (version_compare(JVERSION, '3.0', 'ge'))
 	<td style="float: right;">
 		<?php
 			echo $this->lists['filter_state'];
-			if (version_compare(JVERSION, '3.0', 'ge'))
-			{
-				echo $this->pagination->getLimitBox();
-			}
 		?>
 	</td>
 </tr>

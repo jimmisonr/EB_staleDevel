@@ -1,3 +1,17 @@
+form.form-horizontal div.control-label
+{
+    width: 28% !important;
+}
+form.form-horizontal div.control-label label
+{
+    font-weight: bold !important;
+}
+
+p.eb-available-tags
+{
+    margin-top: 20px;
+}
+
 .icon-32-export {
 	background-image:url("../icons/export.png");
 }

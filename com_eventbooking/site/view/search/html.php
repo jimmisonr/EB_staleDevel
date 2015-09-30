@@ -31,7 +31,14 @@ class EventbookingViewSearchHtml extends RADViewHtml
 		}
 		if ($config->multiple_booking)
 		{
-			EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
+			if ($this->deviceType == 'mobile')
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '100%', '450px', 'false', 'false');
+			}
+			else
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
+			}
 		}
 		if ($config->show_list_of_registrants)
 		{
@@ -39,17 +46,16 @@ class EventbookingViewSearchHtml extends RADViewHtml
 		}
 		if ($config->show_location_in_category_view)
 		{
-			$width = (int) $config->map_width;
-			if (!$width)
+			$width  = (int) $config->get('map_width', 800);
+			$height = (int) $config->get('map_height', 600);
+			if ($this->deviceType == 'mobile')
 			{
-				$width = 800;
+				EventbookingHelperJquery::colorbox('eb-colorbox-map', '100%', $height . 'px', 'true', 'false');
 			}
-			$height = (int) $config->map_height;
-			if (!$height)
+			else
 			{
-				$height = 600;
+				EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
 			}
-			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
 		}
 
 		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)

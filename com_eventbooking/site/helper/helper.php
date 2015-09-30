@@ -107,6 +107,44 @@ class EventbookingHelper
 		}
 	}
 
+	/**
+	 * Get the device type (desktop, tablet, mobile) accessing the extension
+	 *
+	 * @return string
+	 */
+	public static function getDeviceType()
+	{
+		$session    = JFactory::getSession();
+		$deviceType = $session->get('eb_device_type');
+
+		// If no data found from session, using mobile detect class to detect the device type
+		if (!$deviceType)
+		{
+			if (!class_exists('Mobile_Detect'))
+			{
+				require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/serbanghita/Mobile_Detect.php';
+			}
+
+			$mobileDetect = new Mobile_Detect();
+			$deviceType   = 'desktop';
+
+			if ($mobileDetect->isMobile())
+			{
+				$deviceType = 'mobile';
+			}
+
+			if ($mobileDetect->isTablet())
+			{
+				$deviceType = 'tablet';
+			}
+
+			// Store the device type into session so that we don't have to find it for next request
+			$session->set('eb_device_type', $deviceType);
+		}
+
+
+		return $deviceType;
+	}
 
 	/**
 	 * Get page params of the givem view

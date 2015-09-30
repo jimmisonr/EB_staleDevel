@@ -77,12 +77,12 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		if ($attachment['name'])
 		{
 			$pathUpload        = JPATH_ROOT . '/media/com_eventbooking';
-			$allowedExtensions = EventbookingHelper::getConfigValue('allowed_file_types');
+			$allowedExtensions = $config->attachment_file_types;
 			if (!$allowedExtensions)
 			{
-				$allowedExtensions = 'doc, docx, ppt, pptx, pdf, zip, rar, jpg, jepg, png, zipx';
+				$allowedExtensions = 'doc|docx|ppt|pptx|pdf|zip|rar|bmp|gif|jpg|jepg|png|swf|zipx';
 			}
-			$allowedExtensions = explode(',', $allowedExtensions);
+			$allowedExtensions = explode('|', $allowedExtensions);
 			$allowedExtensions = array_map('trim', $allowedExtensions);
 			$allowedExtensions = array_map('strtolower', $allowedExtensions);
 			$fileName          = $attachment['name'];

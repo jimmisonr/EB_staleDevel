@@ -22,29 +22,13 @@ class EventbookingViewRegistrantlistHtml extends RADViewHtml
 		$config  = EventbookingHelper::getConfig();
 		$db      = JFactory::getDbo();
 		$query   = $db->getQuery(true);
-		$eventId = $this->input->getInt('id', 0);
+		$state   = $this->model->getState();
+		$eventId = $state->id;
 		if ($eventId)
 		{
-			// Get list of registration records
-			$query->select('*')
-				->from('#__eb_registrants AS tbl')
-				->where('tbl.event_id=' . $eventId)
-				->where('(tbl.published =1 OR tbl.payment_method LIKE "os_offline%")')
-				->where('tbl.published NOT IN (2,3)');
-			if (isset($config->include_group_billing_in_registrants) && !$config->include_group_billing_in_registrants)
-			{
-				$query->where('tbl.is_group_billing = 0 ');
-			}
-			if (!$config->include_group_members_in_registrants)
-			{
-				$query->where('tbl.group_id = 0');
-			}
-			$query->order('register_date DESC');
-			$db->setQuery($query);
-			$rows = $db->loadObjectList();
+			$rows = $this->model->getData();
 
 			// Check to see whether we need to display custom fields data for this event
-			$query->clear();
 			$query->select('custom_field_ids')
 				->from('#__eb_events')
 				->where('id = ' . $eventId);
@@ -112,6 +96,7 @@ class EventbookingViewRegistrantlistHtml extends RADViewHtml
 				$displayCustomField = false;
 			}
 			$this->items              = $rows;
+			$this->pagination         = $this->model->getPagination();
 			$this->config             = $config;
 			$this->displayCustomField = $displayCustomField;
 			$this->bootstrapHelper    = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);

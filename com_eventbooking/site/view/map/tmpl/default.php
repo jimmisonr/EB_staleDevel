@@ -25,6 +25,10 @@ $doc->addScript($protocol . '://maps.google.com/maps/api/js?sensor=true');
 $doc->addScriptDeclaration('
 	var geocoder, map;
 	function initialize() {
+	    var height = jQuery(window).height() - 50;
+        var width = jQuery(window).width();
+        jQuery("#inline_map").height(height);
+        jQuery("#inline_map").width(width);
 		var latlng = new google.maps.LatLng("'.$this->location->lat.'", "'.$this->location->long.'");
 		var options = {
 			zoom: '.$zoomLevel.',
@@ -37,6 +41,7 @@ $doc->addScriptDeclaration('
 			map: map,
 			position: latlng,
 		});
+		google.maps.event.trigger(map, "resize");
 		var windowContent = "<h4>'.addslashes($this->location->name).'</h4>" +
 			"<ul>" +
 				"<li>'.$this->location->address . "  " . $this->location->city. "  " . $this->location->state."  " . $this->location->zip."  " . $this->location->country.'</li>" +
