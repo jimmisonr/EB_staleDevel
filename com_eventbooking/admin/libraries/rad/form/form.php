@@ -94,7 +94,7 @@ class RADForm
 			}
 			else
 			{
-				if ($useDefault)
+				if ($useDefault || ($field->type == 'Message'))
 				{
 					$field->setValue($field->row->default_values);
 				}
