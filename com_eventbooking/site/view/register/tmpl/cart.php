@@ -112,13 +112,13 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 						}
 					?>																				
 					<td class="col_price">
-						<?php echo EventbookingHelper::formatAmount($item->rate, $this->config); ?>
+						<?php echo EventbookingHelper::formatCurrency($item->rate, $this->config); ?>
 					</td>
 					<td class="col_quantity">
 						<?php echo $item->quantity ; ?>
 					</td>	
 					<td class="col_price">
-						<?php echo EventbookingHelper::formatAmount($item->rate*$item->quantity, $this->config); ?>
+						<?php echo EventbookingHelper::formatCurrency($item->rate*$item->quantity, $this->config); ?>
 					</td>					
 				</tr>
 			<?php				
