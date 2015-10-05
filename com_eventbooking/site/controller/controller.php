@@ -32,6 +32,12 @@ class EventbookingController extends RADController
 		}
 		$rootUrl = JUri::root(true);
 		$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/style.css');
+
+		if ($config->multiple_booking)
+		{
+			$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/font-awesome.css');
+		}
+
 		JHtml::_('script', EventbookingHelper::getURL() . 'media/com_eventbooking/assets/js/noconflict.js', false, false);
 
 		// Load bootstrap js
