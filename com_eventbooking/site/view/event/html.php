@@ -38,7 +38,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 		}
 
 		//Use short description in case user don't enter long description
-		if (strlen(trim(strip_tags($item->description))) == 0)
+		if (strlen(trim(strip_tags($item->description, '<img>'))) == 0)
 		{
 			$item->description = $item->short_description;
 		}

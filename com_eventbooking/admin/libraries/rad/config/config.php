@@ -41,7 +41,16 @@ class RADConfig
 		{
 			$row              = $rows[$i];
 			$key              = $row->config_key;
-			$value            = stripslashes($row->config_value);
+
+			if (version_compare(JVERSION, '3.0', 'ge'))
+			{
+				$value            = $row->config_value;
+			}
+			else
+			{
+				$value            = stripslashes($row->config_value);
+			}
+
 			$this->data[$key] = $value;
 		}
 	}
