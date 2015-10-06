@@ -44,6 +44,7 @@ class EventbookingViewEventHtml extends RADViewItem
 		}
 		$list    = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
 		$options = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_SELECT_CATEGORY'));
 		foreach ($list as $listItem)
 		{
 			$options[] = JHtml::_('select.option', $listItem->id, '&nbsp;&nbsp;&nbsp;' . $listItem->treename);
@@ -68,20 +69,23 @@ class EventbookingViewEventHtml extends RADViewItem
 		else
 		{
 			$mainCategoryId       = 0;
-			$additionalCategories = array();
+			$additionalCategories = array(0);
 		}
 		$this->lists['main_category_id']         = JHtml::_('select.genericlist', $options, 'main_category_id', array(
 			'option.text.toHtml' => false,
 			'option.text'        => 'text',
 			'option.value'       => 'value',
-			'list.attr'          => '',
+			'list.attr'          => 'class="advancedSelect input-xlarge"',
 			'list.select'        => $mainCategoryId
 		));
+
+		array_shift($options);
+
 		$this->lists['category_id']              = JHtml::_('select.genericlist', $options, 'category_id[]', array(
 			'option.text.toHtml' => false,
 			'option.text'        => 'text',
 			'option.value'       => 'value',
-			'list.attr'          => 'class="inputbox"  size="5" multiple="multiple"',
+			'list.attr'          => 'class="advancedSelect input-xlarge"  size="5" multiple="multiple"',
 			'list.select'        => $additionalCategories
 		));
 		$options                                 = array();

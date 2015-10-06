@@ -14,6 +14,10 @@ JHtml::_('behavior.tooltip');
 JHtml::_('behavior.modal');
 $format = 'Y-m-d';
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
+if (version_compare(JVERSION, '3.0', 'ge'))
+{
+	JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text_multiple' => JText::_('EB_SELECT_CATEGORIES')));
+}
 ?>
 <style>
 	.calendar {
@@ -74,12 +78,7 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 								<input type="text" name="alias" value="<?php echo $this->item->alias; ?>" class="input-xlarge" size="70" />
 							</td>
 						</tr>					
-						<tr>
-							<td class="key"><?php echo JText::_('EB_CREATED_BY') ; ?></td>
-							<td>
-								<?php echo EventbookingHelper::getUserInput($this->item->created_by, 'created_by', 1) ; ?>
-							</td>
-						</tr>
+
 						<tr>
 							<td class="key" valign="top"><?php echo JText::_('EB_MAIN_EVENT_CATEGORY') ; ?></td>
 							<td>
@@ -87,10 +86,12 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 							</td>
 						</tr>
 						<tr>
-							<td class="key" valign="top"><?php echo JText::_('EB_ADDITIONAL_CATEGORIES') ; ?></td>
+							<td class="key" valign="top">
+								<span class="editlinktip hasTip" title="Press <strong>Ctrl</strong> to select multiple categories"><?php echo JText::_('EB_ADDITIONAL_CATEGORIES') ; ?></span>
+							</td>
 							<td>
 								<div style="float: left;"><?php echo $this->lists['category_id'] ; ?></div>
-								<div style="float: left; padding-top: 25px; padding-left: 10px;">Press <strong>Ctrl</strong> to select multiple categories</div>
+								<div style="float: left; padding-top: 25px; padding-left: 10px;"></div>
 							</td>
 						</tr>
 						<tr>
@@ -309,11 +310,17 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 							</td>
 						</tr>
 						<tr>
+							<td class="key"><?php echo JText::_('EB_CREATED_BY') ; ?></td>
+							<td>
+								<?php echo EventbookingHelper::getUserInput($this->item->created_by, 'created_by', 1) ; ?>
+							</td>
+						</tr>
+						<tr>
 							<td class="key">
 								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_MIN_NUMBER_REGISTRANTS' );?>::<?php echo JText::_('EB_MIN_NUMBER_REGISTRANTS_EXPLAIN'); ?>"><?php echo JText::_('EB_MIN_NUMBER_REGISTRANTS'); ?></span>
 							</td>
 							<td>
-								<input type="text" name="min_group_number" id="min_group_number" class="input-small" size="10" value="<?php echo $this->item->min_group_number; ?>" />
+								<input type="text" name="min_group_number" id="min_group_number" class="input-mini" size="10" value="<?php echo $this->item->min_group_number; ?>" />
 							</td>
 						</tr>
 						<tr>
@@ -321,7 +328,7 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_MAX_NUMBER_REGISTRANTS' );?>::<?php echo JText::_('EB_MAX_NUMBER_REGISTRANTS_EXPLAIN'); ?>"><?php echo JText::_('EB_MAX_NUMBER_REGISTRANT_GROUP'); ?></span>
 							</td>
 							<td>
-								<input type="text" name="max_group_number" id="max_group_number" class="input-small" size="10" value="<?php echo $this->item->max_group_number; ?>" />
+								<input type="text" name="max_group_number" id="max_group_number" class="input-mini" size="10" value="<?php echo $this->item->max_group_number; ?>" />
 							</td>
 						</tr>
                         <tr>
@@ -376,7 +383,7 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 								<?php echo JText::_('EB_REMIND_BEFORE'); ?>
 							</td>
 							<td>
-								<input type="text" name="remind_before_x_days" class="inputbox" size="5" value="<?php echo $this->item->remind_before_x_days; ?>" /> days
+								<input type="text" name="remind_before_x_days" class="input-mini" size="5" value="<?php echo $this->item->remind_before_x_days; ?>" /> days
 							</td>
 						</tr>	
 						<?php

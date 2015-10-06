@@ -79,6 +79,12 @@ fieldset.adminform {
 	min-width: 40px;
 	display: inline-block; 
 }
+
+table.admintable tr td
+{
+    height: 32px;
+}
+
 .clearfloat {
 	float: none ;
 }
