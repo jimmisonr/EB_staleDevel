@@ -55,6 +55,7 @@ if (count($this->items))
 			<div class="btn-group pull-right hidden-phone">
 				<?php
 					echo $this->lists['filter_state'];
+					echo $this->lists['filter_access'];
 					echo $this->pagination->getLimitBox();
 				?>
 			</div>
@@ -74,6 +75,9 @@ if (count($this->items))
 				</th>
 				<th class="center title" width="15%">
 					<?php echo JText::_('EB_NUMBER_EVENTS'); ?>
+				</th>
+				<th width="8%" class="nowrap hidden-phone">
+					<?php echo JHtml::_('searchtools.sort',  'JGRID_HEADING_ACCESS', 'tbl.access', $listDirn, $listOrder); ?>
 				</th>
 				<th width="5%">
 					<?php echo JHtml::_('searchtools.sort',  JText::_('EB_PUBLISHED'), 'tbl.published', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
@@ -150,6 +154,9 @@ if (count($this->items))
 					</td>
 					<td class="center">
 						<?php echo $row->total_events; ?>
+					</td>
+					<td>
+						<?php echo $row->access_level; ?>
 					</td>
 					<td class="center">
 						<?php echo $published; ?>

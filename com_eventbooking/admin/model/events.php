@@ -59,7 +59,7 @@ class EventbookingModelEvents extends RADModelList
 	 */
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
-		$query->select('tbl.*,  SUM(rgt.number_registrants) AS total_registrants');
+		$query->select('tbl.*, vl.title AS access_level, SUM(rgt.number_registrants) AS total_registrants');
 
 		return $this;
 	}
@@ -69,7 +69,8 @@ class EventbookingModelEvents extends RADModelList
 	 */
 	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
-		$query->leftJoin('#__eb_registrants AS rgt ON (tbl.id = rgt.event_id AND rgt.group_id = 0 AND (rgt.published=1 OR (rgt.payment_method LIKE "os_offline%" AND rgt.published NOT IN (2,3))))');
+		$query->leftJoin('#__viewlevels AS vl ON vl.id = tbl.access')
+			->leftJoin('#__eb_registrants AS rgt ON (tbl.id = rgt.event_id AND rgt.group_id = 0 AND (rgt.published=1 OR (rgt.payment_method LIKE "os_offline%" AND rgt.published NOT IN (2,3))))');
 
 		return $this;
 	}

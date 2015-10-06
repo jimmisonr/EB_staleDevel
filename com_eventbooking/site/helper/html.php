@@ -94,7 +94,7 @@ abstract class EventbookingHelperHtml
 		}
 		$list      = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
 		$options   = array();
-		$options[] = JHtml::_('select.option', '0', JText::_('Top'));
+		$options[] = JHtml::_('select.option', '0', JText::_('EB_SELECT_CATEGORY'));
 		foreach ($list as $item)
 		{
 			$options[] = JHtml::_('select.option', $item->id, '&nbsp;&nbsp;&nbsp;' . $item->treename);

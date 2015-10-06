@@ -47,9 +47,10 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 			</div>
 			<div class="btn-group pull-right hidden-phone">
 				<?php
-					echo $this->lists['filter_category_id'] ;
-					echo $this->lists['filter_location_id'] ;
-					echo $this->lists['filter_state'] ;
+					echo $this->lists['filter_category_id'];
+					echo $this->lists['filter_location_id'];
+					echo $this->lists['filter_state'];
+					echo $this->lists['filter_access'];
 					echo $this->lists['filter_past_events'];
 					echo $this->pagination->getLimitBox();
 				?>
@@ -93,6 +94,9 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 				<?php
 				}
 				?>
+				<th width="5%" class="nowrap hidden-phone">
+					<?php echo JHtml::_('searchtools.sort',  'JGRID_HEADING_ACCESS', 'tbl.access', $listDirn, $listOrder); ?>
+				</th>
 				<th width="5%" nowrap="nowrap" class="center">
 					<?php echo JHtml::_('searchtools.sort', JText::_('EB_PUBLISHED'), 'tbl.published', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
@@ -104,11 +108,11 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 			<?php
 			if ($this->config->activate_recurring_event)
 			{
-				$colspan = 11 ;
+				$colspan = 12 ;
 			}
 			else
 			{
-				$colspan = 10 ;
+				$colspan = 11 ;
 			}
 			?>
 			<tfoot>
@@ -198,6 +202,9 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 					<?php
 					}
 					?>
+					<td>
+						<?php echo $row->access_level; ?>
+					</td>
 					<td class="center">
 						<?php echo $published; ?>
 					</td>

@@ -76,7 +76,7 @@ class EventbookingModelCategories extends RADModelList
 	 */
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
-		$query->select('tbl.*, tbl.parent AS parent_id, tbl.name AS title, COUNT(ec.id) AS total_events');
+		$query->select('tbl.*, tbl.parent AS parent_id, tbl.name AS title, vl.title AS access_level, COUNT(ec.id) AS total_events');
 
 		return $this;
 	}
@@ -86,7 +86,8 @@ class EventbookingModelCategories extends RADModelList
 	 */
 	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
-		$query->leftJoin('#__eb_event_categories AS ec ON tbl.id = ec.category_id');
+		$query->leftJoin('#__eb_event_categories AS ec ON tbl.id = ec.category_id')
+			->leftJoin('#__viewlevels AS vl ON vl.id = tbl.access');
 
 		return $this;
 	}
