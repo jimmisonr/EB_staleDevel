@@ -1338,6 +1338,7 @@ class EventbookingHelper
 					}
 				}
 			}
+
 			if (($event->early_bird_discount_date != $nullDate) && $event->date_diff >= 0 && $event->early_bird_discount_amount > 0)
 			{
 				if ($event->early_bird_discount_type == 1)
@@ -1346,10 +1347,9 @@ class EventbookingHelper
 				}
 				else
 				{
-					$registrantDiscount += $event->early_bird_discount_amount;
+					$registrantDiscount += $quantity * $event->early_bird_discount_amount;
 				}
 			}
-
 
 			// Coupon discount
 			if (!empty($coupon) && ($coupon->event_id == -1 || in_array($eventId, $couponDiscountedEventIds)))
