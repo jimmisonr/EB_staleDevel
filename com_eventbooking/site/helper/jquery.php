@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	2.0.5
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.0.5
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 defined('_JEXEC') or die;
 
@@ -24,16 +24,16 @@ abstract class EventbookingHelperJquery
 	 *
 	 * @return  void
 	 */
-	public static function colorbox($class = 'sr-iframe', $width = '80%', $height = '80%', $iframe = "true", $inline = "false")
+	public static function colorbox($class = 'sr-iframe', $width = '80%', $height = '80%', $iframe = "true", $inline = "false", $scrolling = "true")
 	{
 		static $loaded = false;
 		if (!$loaded)
 		{
 			$uncompressed = JFactory::getConfig()->get('debug') ? '' : '.min';
-			JHtml::_('stylesheet', EventbookingHelper::getSiteUrl().'media/com_eventbooking/assets/js/colorbox/colorbox.css', false, false);
-			JHtml::_('script', EventbookingHelper::getSiteUrl().'media/com_eventbooking/assets/js/colorbox/jquery.colorbox'.$uncompressed.'.js', false, false);
+			JHtml::_('stylesheet', EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/assets/js/colorbox/colorbox.css', false, false);
+			JHtml::_('script', EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/assets/js/colorbox/jquery.colorbox' . $uncompressed . '.js', false, false);
 
-			$activeLanguageTag = JFactory::getLanguage()->getTag();
+			$activeLanguageTag   = JFactory::getLanguage()->getTag();
 			$allowedLanguageTags = array('ar-AA', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'es-ES', 'et-EE',
 				'fa-IR', 'fi-FI', 'fr-FR', 'he-IL', 'hr-HR', 'hu-HU', 'it-IT', 'ja-JP', 'ko-KR', 'lv-LV', 'nb-NO', 'nl-NL',
 				'pl-PL', 'pt-BR', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'zh-CN', 'zh-TW'
@@ -42,20 +42,80 @@ abstract class EventbookingHelperJquery
 			// English is bundled into the source therefore we don't have to load it.
 			if (in_array($activeLanguageTag, $allowedLanguageTags))
 			{
-				JHtml::_('script', EventbookingHelper::getSiteUrl().'media/com_eventbooking/assets/js/colorbox/i18n/jquery.colorbox-' . $activeLanguageTag . '.js', false, false);
+				JHtml::_('script', EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/assets/js/colorbox/i18n/jquery.colorbox-' . $activeLanguageTag . '.js', false, false);
 			}
-			$script = 'Eb.jQuery(document).ready(function($){$(".'.$class.'").colorbox({iframe: '.$iframe.', fastIframe:false, inline: '.$inline.', width:"'.$width.'", height:"'.$height.'"});});';
-			JFactory::getDocument()->addScriptDeclaration($script);
+
+			$loaded = true;
 		}
-		else
-		{
-			$script = 'Eb.jQuery(document).ready(function($){$(".'.$class.'").colorbox({iframe: '.$iframe.',fastIframe:false, inline: '.$inline.', width:"'.$width.'", height:"'.$height.'"});});';
-			JFactory::getDocument()->addScriptDeclaration($script);
-			return;
-		}
-		$loaded = true;
+
+		$options = array(
+			'iframe'     => $iframe,
+			'fastIframe' => false,
+			'inline'     => $inline,
+			'width'      => $width,
+			'height'     => $height,
+			'scrolling'  => $scrolling
+		);
+		$script  = 'Eb.jQuery(document).ready(function($){$(".' . $class . '").colorbox(' . self::getJSObject($options) . ');});';
+		JFactory::getDocument()->addScriptDeclaration($script);
 	}
-	
+
+	/**
+	 * Convert an array to js object
+	 *
+	 * @param array $array
+	 *
+	 * @return string
+	 */
+	public static function getJSObject(array $array = array())
+	{
+		$object = '{';
+
+		// Iterate over array to build objects
+		foreach ((array) $array as $k => $v)
+		{
+			if (is_null($v))
+			{
+				continue;
+			}
+			if ($v == 'true')
+			{
+				$v = true;
+			}
+
+			if ($v == 'false')
+			{
+				$v = false;
+			}
+
+			if (is_bool($v))
+			{
+				$object .= ' ' . $k . ': ';
+				$object .= ($v) ? 'true' : 'false';
+				$object .= ',';
+			}
+			elseif (!is_array($v) && !is_object($v))
+			{
+				$object .= ' ' . $k . ': ';
+				$object .= (is_numeric($v) || strpos($v, '\\') === 0) ? (is_numeric($v)) ? $v : substr($v, 1) : "'" . $v . "'";
+				$object .= ',';
+			}
+			else
+			{
+				$object .= ' ' . $k . ': ' . self::getJSObject($v) . ',';
+			}
+		}
+
+		if (substr($object, -1) == ',')
+		{
+			$object = substr($object, 0, -1);
+		}
+
+		$object .= '}';
+
+		return $object;
+	}
+
 	/**
 	 * validate form
 	 */
@@ -94,14 +154,14 @@ abstract class EventbookingHelperJquery
 			$yearIndex  = array_search('Y', $dateParts);
 			$monthIndex = array_search('m', $dateParts);
 			$dayIndex   = array_search('d', $dateParts);
-			
-			$regex 	 = $dateFormat;
-			$regex   = str_replace($separator, '[\\' . $separator . ']', $regex);
-			$regex   = str_replace('d', '(0?[1-9]|[12][0-9]|3[01])', $regex);
-			$regex   = str_replace('Y', '(\d{4})', $regex);
-			$regex   = str_replace('m', '(0?[1-9]|1[012])', $regex);
-			$regex   = 'var pattern = new RegExp(/^' . $regex . '$/);';		
-			
+
+			$regex = $dateFormat;
+			$regex = str_replace($separator, '[\\' . $separator . ']', $regex);
+			$regex = str_replace('d', '(0?[1-9]|[12][0-9]|3[01])', $regex);
+			$regex = str_replace('Y', '(\d{4})', $regex);
+			$regex = str_replace('m', '(0?[1-9]|1[012])', $regex);
+			$regex = 'var pattern = new RegExp(/^' . $regex . '$/);';
+
 			$document = JFactory::getDocument();
 
 			$document->addScriptDeclaration("
@@ -123,7 +183,7 @@ abstract class EventbookingHelperJquery
 				                    "regex": "none",
 				                    "alertText": "' . JText::_('EB_VALIDATION_FIELD_REQUIRED') . '",
 				                    "alertTextCheckboxMultiple": "' .
-					 JText::_('EB_VALIDATION_PLEASE_SELECT_AN_OPTION') . '",
+				JText::_('EB_VALIDATION_PLEASE_SELECT_AN_OPTION') . '",
 				                    "alertTextCheckboxe": "' . JText::_('EB_VALIDATION_CHECKBOX_REQUIRED') . '",
 				                    "alertTextDateRange": "' . JText::_('EB_VALIDATION_BOTH_DATE_RANGE_FIELD_REQUIRED') . '"
 				                },
@@ -256,7 +316,7 @@ abstract class EventbookingHelperJquery
 				                },
 				                "ajaxEmailCall": {
 				                	"url": "' . EventbookingHelper::getSiteUrl() . 'index.php?option=com_eventbooking&task=validate_email&event_id=' .
-					 JRequest::getInt('event_id') . '",
+				JRequest::getInt('event_id') . '",
 				                    // you may want to pass extra data on the ajax call			                    
 				                    "alertText": "' . JText::_('EB_VALIDATION_INVALID_EMAIL') . '",
 				                },
@@ -279,27 +339,28 @@ abstract class EventbookingHelperJquery
 				    $.validationEngineLanguage.newLang();
 				});
 			');
-			JHtml::_('script', EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/assets/js/validate/js/jquery.validationEngine.js', false, false);		 
+			JHtml::_('script', EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/assets/js/validate/js/jquery.validationEngine.js', false, false);
 		}
 		$loaded = true;
 	}
+
 	/**
 	 * Equal Heights Plugin
 	 * Equalize the heights of elements. Great for columns or any elements
 	 * that need to be the same size (floats, etc).
-	 * 
+	 *
 	 * Version 1.0
 	 * Updated 12/10/2008
 	 *
-	 * Copyright (c) 2008 Rob Glazebrook (cssnewbie.com) 
+	 * Copyright (c) 2008 Rob Glazebrook (cssnewbie.com)
 	 *
 	 * Usage: $(object).equalHeights([minHeight], [maxHeight]);
-	 * 
+	 *
 	 * Example 1: $(".cols").equalHeights(); Sets all columns to the same height.
 	 * Example 2: $(".cols").equalHeights(400); Sets all cols to at least 400px tall.
 	 * Example 3: $(".cols").equalHeights(100,300); Cols are at least 100 but no more
 	 * than 300 pixels tall. Elements with too much content will gain a scrollbar.
-	 * 
+	 *
 	 */
 	public static function equalHeights()
 	{
@@ -311,5 +372,5 @@ abstract class EventbookingHelperJquery
 		}
 		$loaded = true;
 	}
-	
+
 }

@@ -205,6 +205,7 @@ else
 				},
 				success: function (html) {
 					$('#cboxLoadedContent').html(html);
+					jQuery.colorbox.resize();
 					$('.wait').remove();
 				},
 				error: function (xhr, ajaxOptions, thrownError) {

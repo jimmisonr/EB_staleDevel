@@ -74,7 +74,7 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 			}
 			else
 			{
-				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', '450px', 'false', 'false');
+				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', 'false', 'false', 'false', 'false');
 			}
 		}
 		if ($config->show_list_of_registrants)
