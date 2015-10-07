@@ -22,7 +22,8 @@ class EventbookingModelRegistrants extends RADModelList
 	public function __construct($config = array())
 	{
 		$config['search_fields'] = array('tbl.first_name', 'tbl.last_name', 'tbl.email', 'tbl.transaction_id');
-
+		$config['remember_states'] = true;
+		
 		parent::__construct($config);
 
 		$this->state->insert('filter_event_id', 'int', 0)
