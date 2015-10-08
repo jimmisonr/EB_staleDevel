@@ -56,7 +56,9 @@ abstract class EventbookingHelperJquery
 			'height'     => $height,
 			'scrolling'  => $scrolling
 		);
+		
 		$script  = 'Eb.jQuery(document).ready(function($){$(".' . $class . '").colorbox(' . self::getJSObject($options) . ');});';
+		
 		JFactory::getDocument()->addScriptDeclaration($script);
 	}
 
@@ -78,12 +80,13 @@ abstract class EventbookingHelperJquery
 			{
 				continue;
 			}
-			if ($v == 'true')
+			
+			if ($v === 'true')
 			{
 				$v = true;
 			}
 
-			if ($v == 'false')
+			if ($v === 'false')
 			{
 				$v = false;
 			}
