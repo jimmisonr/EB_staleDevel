@@ -63,7 +63,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_LAST_NAME'), 'tbl.last_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
 				<th class="list_event">
-					<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT'), 'b.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT'), 'ev.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
 				<?php
 					if ($this->config->show_event_date)
@@ -71,7 +71,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 						$cols++;
 					?>
 						<td class="list_event_date">
-							<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT_DATE'), 'b.event_date', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+							<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT_DATE'), 'ev.event_date', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 						</td>
 					<?php
 					}

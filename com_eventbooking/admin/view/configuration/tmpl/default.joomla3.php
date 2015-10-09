@@ -460,6 +460,14 @@ $config = $this->config;
 				</div>
 				<div class="control-group">
 					<div class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('dec_point', JText::_('EB_DECIMAL_POINT'), JText::_('EB_DECIMAL_POINT_EXPLAIN')); ?>
+					</div>
+					<div class="controls">
+						<input type="text" name="dec_point" class="inputbox" value="<?php echo $this->config->get('dec_point', '.');?>" size="10" />
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="control-label">
 						<?php echo EventbookingHelperHtml::getFieldLabel('thousands_sep', JText::_('EB_THOUNSANDS_SEP'), JText::_('EB_THOUNSANDS_SEP_EXPLAIN')); ?>
 					</div>
 					<div class="controls">
