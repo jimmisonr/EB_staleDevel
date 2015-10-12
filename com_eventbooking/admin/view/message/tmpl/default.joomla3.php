@@ -307,6 +307,17 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 			<div class="tab-pane" id="waitinglist-messages-page">
 				<div class="control-group">
 					<div class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('waitinglist_form_message', JText::_('EB_WAITINGLIST_FORM_MESSAGE'), JText::_('EB_WAITINGLIST_FORM_MESSAGE_EXPLAIN')); ?>
+						<p class="eb-available-tags">
+							<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[EVENT_TITLE]</strong>
+						</p>
+					</div>
+					<div class="controls">
+						<?php echo $editor->display( 'waitinglist_form_message',  $this->message->waitinglist_form_message , '100%', '250', '75', '8' ) ;?>
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="control-label">
 						<?php echo EventbookingHelperHtml::getFieldLabel('waitinglist_complete_message', JText::_('EB_WAITINGLIST_COMPLETE_MESSAGE'), JText::_('EB_WAITINGLIST_COMPLETE_MESSAGE_EXPLAIN')); ?>
 						<p class="eb-available-tags">
 							<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[EVENT_TITLE], [FIRST_NAME], [LAST_NAME]</strong>
