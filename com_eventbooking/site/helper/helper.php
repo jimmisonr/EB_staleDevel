@@ -349,106 +349,155 @@ class EventbookingHelper
 			foreach ($languages as $language)
 			{
 				$prefix = $language->sef;
-				if (!in_array('name_' . $prefix, $categoryTableFields))
+
+				$fieldName = 'name_' . $prefix;
+				if (!in_array($fieldName, $categoryTableFields))
 				{
-					$fieldName = 'name_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_categories` ADD  `$fieldName` VARCHAR( 255 );";
-					$db->setQuery($sql);
-					$db->execute();
-
-					$fieldName = 'alias_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_categories` ADD  `$fieldName` VARCHAR( 255 );";
-					$db->setQuery($sql);
-					$db->execute();
-
-					$fieldName = 'description_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_categories` ADD  `$fieldName` TEXT NULL;";
+					$sql = "ALTER TABLE  `#__eb_categories` ADD  `$fieldName` VARCHAR( 255 );";
 					$db->setQuery($sql);
 					$db->execute();
 				}
 
+				$fieldName = 'alias_' . $prefix;
+				if (!in_array($fieldName, $categoryTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_categories` ADD  `$fieldName` VARCHAR( 255 );";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				$fieldName = 'description_' . $prefix;
+				if (!in_array($fieldName, $categoryTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_categories` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				$fieldName = 'title_' . $prefix;
 				if (!in_array('title_' . $prefix, $eventTableFields))
 				{
-					$fieldName = 'title_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
-					$db->setQuery($sql);
-					$db->execute();
-
-					$fieldName = 'alias_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
-					$db->setQuery($sql);
-					$db->execute();
-
-					$fieldName = 'short_description_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-
-					$fieldName = 'description_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-
-					$fieldName = 'meta_keywords_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
-					$db->setQuery($sql);
-					$db->execute();
-
-					$fieldName = 'meta_description_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
-					$db->setQuery($sql);
-					$db->execute();
-
-					$fieldName = 'user_email_body_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-
-					$fieldName = 'user_email_body_offline_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-
-					$fieldName = 'thanks_message_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-
-					$fieldName = 'thanks_message_offline_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-
-					$fieldName = 'registration_approved_email_body_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
 					$db->setQuery($sql);
 					$db->execute();
 				}
 
-				if (!in_array('title_' . $prefix, $fieldTableFields))
+				$fieldName = 'alias_' . $prefix;
+				if (!in_array($fieldName, $eventTableFields))
 				{
-					$fieldName = 'title_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` VARCHAR( 255 );";
+					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
 					$db->setQuery($sql);
 					$db->execute();
+				}
 
-					$fieldName = 'description_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
+				$fieldName = 'short_description_' . $prefix;
+				if (!in_array($fieldName, $eventTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
 					$db->setQuery($sql);
 					$db->execute();
+				}
 
-					$fieldName = 'values_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
+				$fieldName = 'description_' . $prefix;
+				if (!in_array($fieldName, $eventTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
 					$db->setQuery($sql);
 					$db->execute();
+				}
 
-					$fieldName = 'default_values_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
+				$fieldName = 'meta_keywords_' . $prefix;
+				if (!in_array($fieldName, $eventTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
 					$db->setQuery($sql);
 					$db->execute();
+				}
 
-					$fieldName = 'depend_on_options_' . $prefix;
-					$sql       = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
+				$fieldName = 'meta_description_' . $prefix;
+				if (!in_array($fieldName, $eventTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				$fieldName = 'user_email_body_' . $prefix;
+				if (!in_array($fieldName, $eventTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				$fieldName = 'user_email_body_offline_' . $prefix;
+				if (!in_array($fieldName, $eventTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				$fieldName = 'thanks_message_' . $prefix;
+				if (!in_array($fieldName, $eventTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				$fieldName = 'thanks_message_offline_' . $prefix;
+				if (!in_array($fieldName, $eventTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				$fieldName = 'registration_approved_email_body_' . $prefix;
+				if (!in_array($fieldName, $eventTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				$fieldName = 'title_' . $prefix;
+				if (!in_array($fieldName, $fieldTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` VARCHAR( 255 );";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				$fieldName = 'description_' . $prefix;
+				if (!in_array($fieldName, $fieldTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				$fieldName = 'values_' . $prefix;
+				if (!in_array($fieldName, $fieldTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				$fieldName = 'default_values_' . $prefix;
+				if (!in_array($fieldName, $fieldTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+
+				$fieldName = 'depend_on_options_' . $prefix;
+				if (!in_array($fieldName, $fieldTableFields))
+				{
+					$sql = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
 					$db->setQuery($sql);
 					$db->execute();
 				}

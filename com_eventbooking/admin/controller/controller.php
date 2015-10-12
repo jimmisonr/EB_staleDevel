@@ -2283,6 +2283,14 @@ class EventbookingController extends RADControllerAdmin
 	}
 
 	/**
+	 * Setup multilingual fields
+	 */
+	public function setup_multilingual_fields()
+	{
+		EventbookingHelper::setupMultilingual();
+	}
+
+	/**
 	 * Process download a file
 	 */
 	public function download_file()
