@@ -28,7 +28,7 @@ class EventbookingHelperDatabase
 
 		if ($fieldSuffix)
 		{
-			self::getMultilingualFields($query, array('name'), $fieldSuffix);
+			self::getMultilingualFields($query, array('name', 'description'), $fieldSuffix);
 		}
 
 		$db->setQuery($query);

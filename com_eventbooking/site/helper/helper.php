@@ -3434,7 +3434,11 @@ class EventbookingHelper
 			{
 				$emailSubject = $message->reminder_email_subject;
 			}
-			$emailSubject = str_replace('[EVENT_TITLE]', $row->title . $fieldSuffix, $emailSubject);
+
+			$eventTitle = $row->{'title'.$fieldSuffix};
+
+			$emailSubject = str_replace('[EVENT_TITLE]', $eventTitle, $emailSubject);
+
 			if (strlen($message->{'reminder_email_body' . $fieldSuffix}))
 			{
 				$emailBody = $message->{'reminder_email_body' . $fieldSuffix};
@@ -3443,11 +3447,12 @@ class EventbookingHelper
 			{
 				$emailBody = $message->reminder_email_body;
 			}
+
 			$replaces                = array();
 			$replaces['event_date']  = JHtml::_('date', $row->event_date, $config->event_date_format, null);
 			$replaces['first_name']  = $row->first_name;
 			$replaces['last_name']   = $row->last_name;
-			$replaces['event_title'] = $row->event_title;
+			$replaces['event_title'] = $eventTitle;
 
 			// On process [REGISTRATION_DETAIL] tag if it is available in the email message
 			if (strpos($emailBody, '[REGISTRATION_DETAIL]') !== false)

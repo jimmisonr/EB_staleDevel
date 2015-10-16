@@ -80,6 +80,7 @@ class plgEventBookingMap extends JPlugin
 		$getDirectionLink = 'http://maps.google.com/maps?f=d&daddr=' . $location->lat . ',' . $location->long . '(' . addslashes($location->address . ', ' . $location->city . ', ' . $location->state . ', ' . $location->zip . ', ' . $location->country) . ')';
 		$bubbleText .= "<li class=\"address getdirection\"><a href=\"" . $getDirectionLink . "\" target=\"_blank\">" . JText::_('EB_GET_DIRECTION') . "</li>";
 		$bubbleText .= "</ul>";
+		$session = JFactory::getSession();
 		?>
 		<script type="text/javascript"
 		        src="<?php echo ($https) ? 'https' : 'http'?>://maps.google.com/maps/api/js?sensor=false"></script>
@@ -87,8 +88,13 @@ class plgEventBookingMap extends JPlugin
 			(function ($) {
 				$(document).ready(function () {
 					function initialize() {
-					 	var height = $(window).height() - 50;
-				        var width = $(window).width() - 50;
+						<?php if ($session->get('eb_device_type') == 'mobile') {?>
+					 	var height = $(window).height() - 80;
+				        var width = $(window).width() - 80;
+				        <?php }else{?>
+				    	var height = <?php echo $mapHeight;?>;
+				        var width = <?php echo $mapWidth;?>;
+				        <?php }?>
 				        $("#map_canvas").height(height);
 				        $("#map_canvas").width(width);
 						var latlng = new google.maps.LatLng(<?php echo $location->lat ?>, <?php echo $location->long; ?>);

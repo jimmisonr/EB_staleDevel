@@ -81,7 +81,7 @@ class RADViewList extends RADViewHtml
 		if ($this->isAdminView)
 		{
 			$this->lists['filter_state']    = str_replace('class="inputbox"', 'class="input-medium"', JHtml::_('grid.state', $this->state->filter_state));
-			$this->lists['filter_access']   = JHtml::_('access.level', 'filter_access', $this->state->filter_access, 'class="input-medium" onchange="submit();"', false);
+			$this->lists['filter_access']   = JHtml::_('access.level', 'filter_access', $this->state->filter_access, 'class="input-medium" onchange="submit();"', true);
 			$this->lists['filter_language'] = JHtml::_('select.genericlist', JHtml::_('contentlanguage.existing', true, true), 'filter_language',
 				' onchange="submit();" ', 'value', 'text', $this->state->filter_language);
 			if (version_compare(JVERSION, '3.0', 'ge'))
