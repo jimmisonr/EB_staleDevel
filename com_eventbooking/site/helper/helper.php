@@ -3377,7 +3377,7 @@ class EventbookingHelper
 			$fromEmail = JFactory::getConfig()->get('mailfrom');
 		}
 
-		$eventFields = array('b.id as event_id', 'b.event_date');
+		$eventFields = array('b.id as event_id', 'b.event_date', 'b.title');
 
 		if (JLanguageMultilang::isEnabled())
 		{
@@ -3389,14 +3389,6 @@ class EventbookingHelper
 					$eventFields[] = 'b.title_' . $language->sef;
 				}
 			}
-			else
-			{
-				$eventFields[] = 'b.title';
-			}
-		}
-		else
-		{
-			$eventFields[] = 'b.title';
 		}
 
 		$query->select('a.*')
