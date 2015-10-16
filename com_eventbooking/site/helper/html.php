@@ -448,7 +448,7 @@ abstract class EventbookingHelperHtml
 		$query->select('id')
 			->from('#__eb_registrants')
 			->where('event_id = ' . $eventId)
-			->where('published = 1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3))');
+			->where('(published = 1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 		$db->setQuery($query);
 		$registrantIds = $db->loadColumn();
 		if (count($registrantIds))
