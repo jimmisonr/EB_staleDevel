@@ -393,6 +393,7 @@ class EventbookingController extends RADControllerAdmin
 		$db->setQuery($sql);
 		$db->execute();
 		##Locations table
+
 		$fields = array_keys($db->getTableColumns('#__eb_locations'));
 		if (!in_array('user_id', $fields))
 		{
@@ -400,6 +401,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
+
 		if (!in_array('language', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_locations` ADD  `language` VARCHAR( 50 ) NULL DEFAULT  '*';";
@@ -407,6 +409,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 
 			$sql = 'UPDATE #__eb_locations SET `language`="*" ';
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('layout', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_locations` ADD  `layout` VARCHAR( 50 ) NULL DEFAULT  NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}

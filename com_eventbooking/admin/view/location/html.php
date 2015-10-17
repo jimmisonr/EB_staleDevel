@@ -26,5 +26,10 @@ class EventbookingViewLocationHtml extends RADViewItem
 		}
 		$this->lists['country'] = JHtml::_('select.genericlist', $options, 'country', ' class="inputbox" ', 'value', 'text', $this->item->country);
 
+		$options               = array();
+		$options[]             = JHtml::_('select.option', '', JText::_('Default Layout'));
+		$options[]             = JHtml::_('select.option', 'table', JText::_('Table Layout'));
+		$options[]             = JHtml::_('select.option', 'timeline', JText::_('Timeline Layout'));
+		$this->lists['layout'] = JHtml::_('select.genericlist', $options, 'layout', ' class="inputbox" ', 'value', 'text', $this->item->layout);
 	}
 }

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-    <layout title="Location Default Layout">
+    <layout title="Location Table Layout">
         <message>
-            Displays a list of events from a location using default Layout
+            Displays a list of events from a location using table layout
         </message>
     </layout>
     <state>
-        <name>Location Default Layout</name>
-        <description>Displays a list of events from a location using default Layout</description>
+        <name>Location Table Layout</name>
+        <description>Displays a list of events from a location using table layout</description>
         <fields name="request">
             <fieldset name="request"
                       addfieldpath="/administrator/components/com_eventbooking/elements">

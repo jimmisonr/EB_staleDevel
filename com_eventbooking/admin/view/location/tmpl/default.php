@@ -155,6 +155,17 @@ else
 			</tr>
 			<tr>
 				<td class="key">
+					<?php echo JText::_('EB_LAYOUT'); ?>
+				</td>
+				<td>
+					<?php echo $this->lists['layout']; ?>
+				</td>
+				<td>
+					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td class="key">
 					<?php echo JText::_('EB_CREATED_BY'); ?>
 				</td>
 				<td>

@@ -83,6 +83,16 @@ class EventbookingViewLocationHtml extends RADViewHtml
 		}
 		EventbookingHelperHtml::prepareDocument($params, $location);
 
+		// Set the layout to display events from this location
+		$layout = $this->getLayout();
+		if ($layout == '' || $layout == 'default')
+		{
+			if (!empty($location->layout))
+			{
+				$this->setLayout($location->layout);
+			}
+		}
+
 		$user                  = JFactory::getUser();
 		$this->items           = $items;
 		$this->config          = $config;
