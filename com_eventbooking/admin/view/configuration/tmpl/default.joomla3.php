@@ -348,10 +348,10 @@ $config = $this->config;
 				</div>
 				<div class="control-group">
 					<div class="control-label">
-						<?php echo EventbookingHelperHtml::getFieldLabel('active_term', JText::_('EB_SHOW_TERM_AND_CONDITION'), JText::_('EB_SHOW_TERM_AND_CONDITION_EXPLAIN')); ?>
+						<?php echo EventbookingHelperHtml::getFieldLabel('accept_term', JText::_('EB_SHOW_TERM_AND_CONDITION'), JText::_('EB_SHOW_TERM_AND_CONDITION_EXPLAIN')); ?>
 					</div>
 					<div class="controls">
-						<?php echo EventbookingHelperHtml::getBooleanInput('active_term', $config->active_term); ?>
+						<?php echo EventbookingHelperHtml::getBooleanInput('accept_term', $config->accept_term); ?>
 					</div>
 				</div>
 				<div class="control-group">
