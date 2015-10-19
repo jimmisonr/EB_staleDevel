@@ -12,6 +12,7 @@ defined('_JEXEC') or die;
 $controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
 $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
 $controlsClass     = $bootstrapHelper->getClassMapping('controls');
+$nullDate          = JFactory::getDbo()->getNullDate();
 ?>
 <form id="adminForm" class="form form-horizontal">
     <div class="<?php echo $controlGroupClass; ?>">
@@ -44,6 +45,19 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
             </div>
         </div>
         <?php
+	        if ($rowEvent->event_end_date != $nullDate)
+	        {
+		    ?>
+		        <div class="<?php echo $controlGroupClass; ?>">
+			        <label class="<?php echo $controlLabelClass; ?>">
+				        <?php echo JText::_('EB_EVENT_END_DATE') ?>
+			        </label>
+			        <div class="<?php echo $controlsClass; ?>">
+				        <?php echo JHtml::_('date', $rowEvent->event_end_date, $config->event_date_format, null); ?>
+			        </div>
+		        </div>
+	        <?php
+	        }
         }
         if ($config->show_event_location_in_email && $rowLocation)
         {

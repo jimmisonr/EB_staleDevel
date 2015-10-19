@@ -8,6 +8,7 @@
  * @license        	GNU/GPL, see LICENSE.php
  */
 defined('_JEXEC') or die;
+$nullDate = JFactory::getDbo()->getNullDate();
 ?>
 <table width="100%" class="os_table" cellspacing="2" cellpadding="2">				
 	<tr>			
@@ -19,27 +20,40 @@ defined('_JEXEC') or die;
 		</td>
 	</tr>
 	<?php
-		if ($config->show_event_date) 
+	if ($config->show_event_date)
+	{
+	?>
+	<tr>
+		<td class="title_cell">
+			<?php echo  JText::_('EB_EVENT_DATE') ?>
+		</td>
+		<td class="field_cell">
+			<?php
+			    if ($rowEvent->event_date == EB_TBC_DATE)
+                {
+			        echo JText::_('EB_TBC');
+			    }
+                else
+                {
+			        echo JHtml::_('date', $rowEvent->event_date, $config->event_date_format, null) ;
+			    }
+			?>
+		</td>
+	</tr>
+	<?php
+		if ($rowEvent->event_end_date != $nullDate)
 		{
 		?>
-		<tr>			
-			<td class="title_cell">
-				<?php echo  JText::_('EB_EVENT_DATE') ?>
-			</td>
-			<td class="field_cell">
-				<?php 
-				    if ($rowEvent->event_date == EB_TBC_DATE)
-                    {
-				        echo JText::_('EB_TBC');
-				    }
-                    else
-                    {
-				        echo JHTML::_('date', $rowEvent->event_date, $config->event_date_format, null) ;
-				    }
-				?>				
-			</td>
-		</tr>	
-		<?php	
+			<tr>
+				<td class="title_cell">
+					<?php echo  JText::_('EB_EVENT_END_DATE') ?>
+				</td>
+				<td class="field_cell">
+					<?php echo JHtml::_('date', $rowEvent->event_end_date, $config->event_date_format, null); ?>
+				</td>
+			</tr>
+		<?php
+		}
 	}
 	if ($config->show_event_location_in_email && $rowLocation) 
 	{

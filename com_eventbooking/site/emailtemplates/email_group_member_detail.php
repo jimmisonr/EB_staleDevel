@@ -8,6 +8,7 @@
  * @license        	GNU/GPL, see LICENSE.php
  */
 defined('_JEXEC') or die;
+$nullDate = JFactory::getDbo()->getNullDate();
 ?>
 <table class="os_table" width="100%" cellspacing="3" cellpadding="3">
     <tr>
@@ -19,7 +20,8 @@ defined('_JEXEC') or die;
         </td>
     </tr>
     <?php
-    if ($config->show_event_date) {
+    if ($config->show_event_date)
+    {
     ?>
         <tr>
             <td class="title_cell">
@@ -39,6 +41,19 @@ defined('_JEXEC') or die;
             </td>
         </tr>
     <?php
+	    if ($rowEvent->event_end_date != $nullDate)
+	    {
+		?>
+		    <tr>
+			    <td class="title_cell">
+				    <?php echo  JText::_('EB_EVENT_END_DATE') ?>
+			    </td>
+			    <td class="field_cell">
+				    <?php echo JHtml::_('date', $rowEvent->event_end_date, $config->event_date_format, null); ?>
+			    </td>
+		    </tr>
+	    <?php
+	    }
     }
     if ($config->show_event_location_in_email && $rowLocation) 
 	{

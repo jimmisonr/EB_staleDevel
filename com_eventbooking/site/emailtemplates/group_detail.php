@@ -14,6 +14,7 @@ $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
 $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 $rowFluidClass     = $bootstrapHelper->getClassMapping('row-fluid');
 $span6Class        = $bootstrapHelper->getClassMapping('span6');
+$nullDate          = JFactory::getDbo()->getNullDate();
 ?>
 <form id="adminForm" class="form form-horizontal">
     <div class="<?php echo $controlGroupClass;  ?>">
@@ -37,18 +38,31 @@ $span6Class        = $bootstrapHelper->getClassMapping('span6');
             </label>
             <div class="<?php echo $controlsClass;  ?>">
                 <?php
-                        if ($rowEvent->event_date == EB_TBC_DATE)
-                        {
-                            echo JText::_('EB_TBC');
-                        }
-                        else
-                        {
-                            echo JHtml::_('date', $rowEvent->event_date, $config->event_date_format, null) ;
-                        }
-                    ?>
+                    if ($rowEvent->event_date == EB_TBC_DATE)
+                    {
+                        echo JText::_('EB_TBC');
+                    }
+                    else
+                    {
+                        echo JHtml::_('date', $rowEvent->event_date, $config->event_date_format, null) ;
+                    }
+                ?>
             </div>
         </div>
         <?php
+	        if ($rowEvent->event_end_date != $nullDate)
+	        {
+		    ?>
+		        <div class="<?php echo $controlGroupClass; ?>">
+			        <label class="<?php echo $controlLabelClass; ?>">
+				        <?php echo JText::_('EB_EVENT_END_DATE') ?>
+			        </label>
+			        <div class="<?php echo $controlsClass; ?>">
+				        <?php echo JHtml::_('date', $rowEvent->event_end_date, $config->event_date_format, null); ?>
+			        </div>
+		        </div>
+	        <?php
+	        }
         }
         if ($config->show_event_location_in_email && $rowLocation)
         {

@@ -2129,7 +2129,7 @@ class EventbookingHelper
 			$data['row']    = $row;
 			$data['config'] = $config;
 			$data['Itemid'] = $Itemid;
-			$sql            = 'SELECT a.*, b.event_date, b.title' . $fieldSuffix . ' AS title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id=b.id WHERE a.id=' .
+			$sql            = 'SELECT a.*, b.event_date, b.event_end_date, b.title' . $fieldSuffix . ' AS title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id=b.id WHERE a.id=' .
 				$row->id . ' OR a.cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$rows = $db->loadObjectList();
