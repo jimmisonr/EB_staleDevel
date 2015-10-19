@@ -30,6 +30,15 @@ $iconRemoveClass   = $bootstrapHelper->getClassMapping('icon-remove');
 $iconDownloadClass = $bootstrapHelper->getClassMapping('icon-download');
 $btnClass          = $bootstrapHelper->getClassMapping('btn');
 $return = base64_encode(JUri::getInstance()->toString());
+
+if ($item->cut_off_date != JFactory::getDbo()->getNullDate())
+{
+	$registrationOpen = ($item->cut_off_minutes < 0);
+}
+else
+{
+	$registrationOpen = ($item->number_event_dates > 0);
+}
 ?>
 <div id="eb-event-page" class="eb-container eb-event">
 	<div class="eb-box-heading clearfix">
@@ -396,7 +405,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 		</table>
 		<?php
 			$activateWaitingList = $this->config->activate_waitinglist_feature ;
-			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !@$item->user_registered && ($item->number_event_dates > 0 || $item->cut_off_minutes < 0))
+			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !@$item->user_registered && $registrationOpen)
 			{
 				$waitingList = true ;
 			}
@@ -562,7 +571,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 						</li>
 					<?php
 					}
-					if ($this->config->show_invite_friend && $item->number_event_dates > 0)
+					if ($this->config->show_invite_friend && $registrationOpen)
 					{
 					?>
 						<li>

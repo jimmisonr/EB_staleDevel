@@ -82,7 +82,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 			<?php
 			}
 			?>
-			<th class="center actions-col <?php echo $hiddenPhoneClass; ?>">
+			<th class="center actions-col">
 				<?php echo JText::_('EB_REGISTER'); ?>
 			</th>
 		</tr>
@@ -92,8 +92,18 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 		for ($i = 0 , $n = count($items) ; $i < $n; $i++)
 		{
 			$item = $items[$i] ;
-			$canRegister = EventbookingHelper::acceptRegistration($item) ;
-			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !$item->user_registered && ($item->number_event_dates > 0 || $item->cut_off_minutes < 0))
+			$canRegister = EventbookingHelper::acceptRegistration($item);
+
+			if ($item->cut_off_date != $nullDate)
+			{
+				$registrationOpen = ($item->cut_off_minutes < 0);
+			}
+			else
+			{
+				$registrationOpen = ($item->number_event_dates > 0);
+			}
+
+			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !$item->user_registered && $registrationOpen)
 			{
 				$waitingList = true ;
 			}
@@ -125,7 +135,18 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 					}
 				?>
 				<td>
-					<a href="<?php echo JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, $categoryId, $Itemid));?>" class="eb-event-link"><?php echo $item->title ; ?></a>
+					<?php
+						if ($config->hide_detail_button !== '1')
+						{
+						?>
+							<a href="<?php echo JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, $categoryId, $Itemid));?>" class="eb-event-link"><?php echo $item->title ; ?></a>
+						<?php
+						}
+						else
+						{
+							echo $item->title;
+						}
+					?>
 				</td>
 				<td>
 					<?php
@@ -250,7 +271,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 					<?php
 					}
 				?>
-					<td class="center <?php echo $hiddenPhoneClass; ?>">
+					<td class="center">
 						<?php
 							if ($waitingList || $canRegister || ($item->registration_type != 3 && $config->display_message_for_full_event))
 							{

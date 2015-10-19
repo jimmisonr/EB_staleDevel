@@ -26,8 +26,19 @@ $return = base64_encode(JUri::getInstance()->toString());
 		{
 			$event = $events[$i] ;
 			$canRegister = EventbookingHelper::acceptRegistration($event);
+
+			if ($event->cut_off_date != $nullDate)
+			{
+				$registrationOpen = ($event->cut_off_minutes < 0);
+			}
+			else
+			{
+				$registrationOpen = ($event->number_event_dates > 0);
+			}
+
 			$detailUrl = JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, @$category->id, $Itemid));
-			if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants) && $activateWaitingList && !@$event->user_registered && ($event->number_event_dates > 0 || $event->cut_off_minutes < 0))
+
+			if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants) && $activateWaitingList && !@$event->user_registered && $registrationOpen)
 			{
 				$waitingList = true ;
 			}
@@ -39,9 +50,22 @@ $return = base64_encode(JUri::getInstance()->toString());
 			<div class="eb-event clearfix">
 				<div class="eb-box-heading clearfix">
 					<h2 class="eb-event-title pull-left">
-						<a href="<?php echo $detailUrl; ?>" title="<?php echo $event->title; ?>" class="eb-event-title-link">
+						<?php
+						if ($config->hide_detail_button !== '1')
+						{
+						?>
+							<a href="<?php echo $detailUrl; ?>" title="<?php echo $event->title; ?>" class="eb-event-title-link">
+								<?php echo $event->title; ?>
+							</a>
+						<?php
+						}
+						else
+						{
+						?>
 							<?php echo $event->title; ?>
-						</a>
+						<?php
+						}
+						?>
 					</h2>
 				</div>
 				<div class="eb-description clearfix">
