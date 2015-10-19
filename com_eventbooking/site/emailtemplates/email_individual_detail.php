@@ -10,8 +10,8 @@
 defined('_JEXEC') or die;
 $nullDate = JFactory::getDbo()->getNullDate();
 ?>
-<table width="100%" class="os_table" cellspacing="2" cellpadding="2">				
-	<tr>			
+<table width="100%" class="os_table" cellspacing="2" cellpadding="2">
+	<tr>
 		<td class="title_cell">
 			<?php echo  JText::_('EB_EVENT_TITLE') ?>
 		</td>
@@ -29,14 +29,14 @@ $nullDate = JFactory::getDbo()->getNullDate();
 		</td>
 		<td class="field_cell">
 			<?php
-			    if ($rowEvent->event_date == EB_TBC_DATE)
-                {
-			        echo JText::_('EB_TBC');
-			    }
-                else
-                {
-			        echo JHtml::_('date', $rowEvent->event_date, $config->event_date_format, null) ;
-			    }
+				if ($rowEvent->event_date == EB_TBC_DATE)
+				{
+					echo JText::_('EB_TBC');
+				}
+				else
+				{
+					echo JHtml::_('date', $rowEvent->event_date, $config->event_date_format, null) ;
+				}
 			?>
 		</td>
 	</tr>
@@ -55,7 +55,7 @@ $nullDate = JFactory::getDbo()->getNullDate();
 		<?php
 		}
 	}
-	if ($config->show_event_location_in_email && $rowLocation) 
+	if ($config->show_event_location_in_email && $rowLocation)
 	{
 		$location = $rowLocation ;
 		$locationInformation = array();
@@ -80,15 +80,15 @@ $nullDate = JFactory::getDbo()->getNullDate();
 			$locationInformation[] = $location->country;
 		}
 	?>
-		<tr>			
+		<tr>
 			<td class="title_cell">
 				<?php echo  JText::_('EB_LOCATION') ?>
 			</td>
-			<td class="field_cell">				
+			<td class="field_cell">
 				<?php echo $location->name.' ('.implode(', ', $locationInformation).')' ; ?>
 			</td>
 		</tr>
-	<?php	
+	<?php
 	}
 	$fields = $form->getFields();
 	foreach ($fields as $field)
@@ -97,7 +97,7 @@ $nullDate = JFactory::getDbo()->getNullDate();
 		{
 			continue;
 		}
-		echo $field->getOutput(false);						
+		echo $field->getOutput(false);
 	}
 	if ($row->total_amount > 0)
 	{
@@ -110,7 +110,7 @@ $nullDate = JFactory::getDbo()->getNullDate();
 			<?php echo EventbookingHelper::formatCurrency($row->total_amount, $config, $rowEvent->currency_symbol); ?>
 		</td>
 	</tr>
-	<?php	
+	<?php
 		if ($row->discount_amount > 0)
 		{
 		?>
@@ -165,7 +165,7 @@ $nullDate = JFactory::getDbo()->getNullDate();
 		}
 		if ($row->discount_amount > 0 || $row->tax_amount > 0 || $row->payment_processing_fee > 0 || $row->late_fee > 0)
 		{
-		?>                
+		?>
 			<tr>
 				<td class="title_cell">
 					<?php echo  JText::_('EB_GROSS_AMOUNT'); ?>
@@ -175,7 +175,7 @@ $nullDate = JFactory::getDbo()->getNullDate();
 				</td>
 			</tr>
 		<?php
-		}            
+		}
 	}
 	if ($row->deposit_amount > 0)
 	{
@@ -239,6 +239,6 @@ $nullDate = JFactory::getDbo()->getNullDate();
 		</td>
 	</tr>
 	<?php
-	}       	
-?>										
-</table>	
+	}
+?>
+</table>

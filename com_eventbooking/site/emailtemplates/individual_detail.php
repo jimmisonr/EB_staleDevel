@@ -15,107 +15,107 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 $nullDate          = JFactory::getDbo()->getNullDate();
 ?>
 <form id="adminForm" class="form form-horizontal">
-    <div class="<?php echo $controlGroupClass; ?>">
-        <label class="<?php echo $controlLabelClass; ?>">
-            <?php echo  JText::_('EB_EVENT_TITLE') ?>
-        </label>
-        <div class="<?php echo $controlsClass; ?>">
-            <?php echo $rowEvent->title ; ?>
-        </div>
-    </div>
-    <?php
-        if ($config->show_event_date)
-        {
-        ?>
-        <div class="<?php echo $controlGroupClass; ?>">
-            <label class="<?php echo $controlLabelClass; ?>">
-                <?php echo  JText::_('EB_EVENT_DATE') ?>
-            </label>
-            <div class="<?php echo $controlsClass; ?>">
-                <?php
-                    if ($rowEvent->event_date == EB_TBC_DATE)
-                    {
-                        echo JText::_('EB_TBC');
-                    }
-                    else
-                    {
-                        echo JHtml::_('date', $rowEvent->event_date, $config->event_date_format, null) ;
-                    }
-                ?>
-            </div>
-        </div>
-        <?php
-	        if ($rowEvent->event_end_date != $nullDate)
-	        {
-		    ?>
-		        <div class="<?php echo $controlGroupClass; ?>">
-			        <label class="<?php echo $controlLabelClass; ?>">
-				        <?php echo JText::_('EB_EVENT_END_DATE') ?>
-			        </label>
-			        <div class="<?php echo $controlsClass; ?>">
-				        <?php echo JHtml::_('date', $rowEvent->event_end_date, $config->event_date_format, null); ?>
-			        </div>
-		        </div>
-	        <?php
-	        }
-        }
-        if ($config->show_event_location_in_email && $rowLocation)
-        {
-            $location = $rowLocation ;
-            $locationInformation = array();
-            if ($location->address)
-            {
-            	$locationInformation[] = $location->address;
-            }
-            if ($location->city)
-            {
-            	$locationInformation[] = $location->city;
-            }
-            if ($location->state)
-            {
-            	$locationInformation[] = $location->state;
-            }
-            if ($location->zip)
-            {
-            	$locationInformation[] = $location->zip;
-            }
-            if ($location->country)
-            {
-            	$locationInformation[] = $location->country;
-            }
-        ?>
-            <div class="<?php echo $controlGroupClass; ?>">
-                <label class="<?php echo $controlLabelClass; ?>">
-                    <?php echo  JText::_('EB_LOCATION') ?>
-                </label>
-                <div class="<?php echo $controlsClass; ?>">
-                    <?php echo $location->name.' ('.implode(', ', $locationInformation).')' ; ?>
-                </div>
-            </div>
-        <?php
-        }        
-        //Show data for form
-        $fields = $form->getFields();
-        foreach ($fields as $field)
-        {
-	        if ($field->hideOnDisplay)
-	        {
-		        continue;
-	        }
-        	echo $field->getOutput(true, $bootstrapHelper);
-		}		    
-        if ($row->total_amount > 0)
-        {
-        ?>
-        <div class="<?php echo $controlGroupClass; ?>">
+	<div class="<?php echo $controlGroupClass; ?>">
+		<label class="<?php echo $controlLabelClass; ?>">
+			<?php echo  JText::_('EB_EVENT_TITLE') ?>
+		</label>
+		<div class="<?php echo $controlsClass; ?>">
+			<?php echo $rowEvent->title ; ?>
+		</div>
+	</div>
+	<?php
+		if ($config->show_event_date)
+		{
+		?>
+		<div class="<?php echo $controlGroupClass; ?>">
+			<label class="<?php echo $controlLabelClass; ?>">
+				<?php echo  JText::_('EB_EVENT_DATE') ?>
+			</label>
+			<div class="<?php echo $controlsClass; ?>">
+				<?php
+					if ($rowEvent->event_date == EB_TBC_DATE)
+					{
+						echo JText::_('EB_TBC');
+					}
+					else
+					{
+						echo JHtml::_('date', $rowEvent->event_date, $config->event_date_format, null) ;
+					}
+				?>
+			</div>
+		</div>
+		<?php
+			if ($rowEvent->event_end_date != $nullDate)
+			{
+			?>
+				<div class="<?php echo $controlGroupClass; ?>">
+					<label class="<?php echo $controlLabelClass; ?>">
+						<?php echo JText::_('EB_EVENT_END_DATE') ?>
+					</label>
+					<div class="<?php echo $controlsClass; ?>">
+						<?php echo JHtml::_('date', $rowEvent->event_end_date, $config->event_date_format, null); ?>
+					</div>
+				</div>
+			<?php
+			}
+		}
+		if ($config->show_event_location_in_email && $rowLocation)
+		{
+			$location = $rowLocation ;
+			$locationInformation = array();
+			if ($location->address)
+			{
+				$locationInformation[] = $location->address;
+			}
+			if ($location->city)
+			{
+				$locationInformation[] = $location->city;
+			}
+			if ($location->state)
+			{
+				$locationInformation[] = $location->state;
+			}
+			if ($location->zip)
+			{
+				$locationInformation[] = $location->zip;
+			}
+			if ($location->country)
+			{
+				$locationInformation[] = $location->country;
+			}
+		?>
+			<div class="<?php echo $controlGroupClass; ?>">
+				<label class="<?php echo $controlLabelClass; ?>">
+					<?php echo  JText::_('EB_LOCATION') ?>
+				</label>
+				<div class="<?php echo $controlsClass; ?>">
+					<?php echo $location->name.' ('.implode(', ', $locationInformation).')' ; ?>
+				</div>
+			</div>
+		<?php
+		}
+		//Show data for form
+		$fields = $form->getFields();
+		foreach ($fields as $field)
+		{
+			if ($field->hideOnDisplay)
+			{
+				continue;
+			}
+			echo $field->getOutput(true, $bootstrapHelper);
+		}
+		if ($row->total_amount > 0)
+		{
+		?>
+		<div class="<?php echo $controlGroupClass; ?>">
 			<label class="<?php echo $controlLabelClass; ?>">
 				<?php echo JText::_('EB_AMOUNT'); ?>
 			</label>
 			<div class="<?php echo $controlsClass; ?>">
 				<?php echo EventbookingHelper::formatCurrency($row->total_amount, $config, $rowEvent->currency_symbol); ?>
 			</div>
-        </div>
-        <?php	
+		</div>
+		<?php
 			if ($row->discount_amount > 0)
 			{
 			?>
@@ -129,19 +129,19 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 				</div>
 			<?php
 			}
-	        if ($row->late_fee > 0)
-	        {
-		    ?>
-		        <div class="<?php echo $controlGroupClass; ?>">
-			        <label class="<?php echo $controlLabelClass; ?>">
-				        <?php echo  JText::_('EB_LATE_FEE'); ?>
-			        </label>
-			        <div class="<?php echo $controlsClass; ?>">
-				        <?php echo EventbookingHelper::formatCurrency($row->late_fee, $config, $rowEvent->currency_symbol); ?>
-			        </div>
-		        </div>
-	        <?php
-	        }
+			if ($row->late_fee > 0)
+			{
+			?>
+				<div class="<?php echo $controlGroupClass; ?>">
+					<label class="<?php echo $controlLabelClass; ?>">
+						<?php echo  JText::_('EB_LATE_FEE'); ?>
+					</label>
+					<div class="<?php echo $controlsClass; ?>">
+						<?php echo EventbookingHelper::formatCurrency($row->late_fee, $config, $rowEvent->currency_symbol); ?>
+					</div>
+				</div>
+			<?php
+			}
 			if ($row->tax_amount > 0)
 			{
 			?>
@@ -155,22 +155,22 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 				</div>
 			<?php
 			}
-	        if ($row->payment_processing_fee > 0)
-	        {
-		    ?>
-		        <div class="<?php echo $controlGroupClass; ?>">
-			        <label class="<?php echo $controlLabelClass; ?>">
-				        <?php echo  JText::_('EB_PAYMENT_FEE'); ?>
-			        </label>
-			        <div class="<?php echo $controlsClass; ?>">
-				        <?php echo EventbookingHelper::formatCurrency($row->payment_processing_fee, $config, $rowEvent->currency_symbol); ?>
-			        </div>
-		        </div>
-	        <?php
-	        }
+			if ($row->payment_processing_fee > 0)
+			{
+			?>
+				<div class="<?php echo $controlGroupClass; ?>">
+					<label class="<?php echo $controlLabelClass; ?>">
+						<?php echo  JText::_('EB_PAYMENT_FEE'); ?>
+					</label>
+					<div class="<?php echo $controlsClass; ?>">
+						<?php echo EventbookingHelper::formatCurrency($row->payment_processing_fee, $config, $rowEvent->currency_symbol); ?>
+					</div>
+				</div>
+			<?php
+			}
 			if ($row->discount_amount > 0 || $row->tax_amount > 0 || $row->payment_processing_fee > 0 || $row->late_fee > 0)
 			{
-			?>                
+			?>
 				<div class="<?php echo $controlGroupClass; ?>">
 					<label class="<?php echo $controlLabelClass; ?>">
 						<?php echo  JText::_('EB_GROSS_AMOUNT'); ?>
@@ -180,32 +180,32 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 					</div>
 				</div>
 			<?php
-			}            
-        }
-        if ($row->deposit_amount > 0)
-        {
-        ?>
-        <div class="<?php echo $controlGroupClass; ?>">
-            <label class="<?php echo $controlLabelClass; ?>">
-                <?php echo JText::_('EB_DEPOSIT_AMOUNT'); ?>
-            </label>
-            <div class="<?php echo $controlsClass; ?>">
-                <?php echo EventbookingHelper::formatCurrency($row->deposit_amount, $config, $rowEvent->currency_symbol); ?>
-            </div>
-        </div>
-        <div class="<?php echo $controlGroupClass; ?>">
-            <label class="<?php echo $controlLabelClass; ?>">
-                <?php echo JText::_('EB_DUE_AMOUNT'); ?>
-            </label>
-            <div class="<?php echo $controlsClass; ?>">
-                <?php echo EventbookingHelper::formatCurrency($row->amount - $row->deposit_amount, $config, $rowEvent->currency_symbol); ?>
-            </div>
-        </div>
-        <?php
-        }
-        if ($row->amount > 0 && $row->published != 3)
-        {
-        ?>
+			}
+		}
+		if ($row->deposit_amount > 0)
+		{
+		?>
+		<div class="<?php echo $controlGroupClass; ?>">
+			<label class="<?php echo $controlLabelClass; ?>">
+				<?php echo JText::_('EB_DEPOSIT_AMOUNT'); ?>
+			</label>
+			<div class="<?php echo $controlsClass; ?>">
+				<?php echo EventbookingHelper::formatCurrency($row->deposit_amount, $config, $rowEvent->currency_symbol); ?>
+			</div>
+		</div>
+		<div class="<?php echo $controlGroupClass; ?>">
+			<label class="<?php echo $controlLabelClass; ?>">
+				<?php echo JText::_('EB_DUE_AMOUNT'); ?>
+			</label>
+			<div class="<?php echo $controlsClass; ?>">
+				<?php echo EventbookingHelper::formatCurrency($row->amount - $row->deposit_amount, $config, $rowEvent->currency_symbol); ?>
+			</div>
+		</div>
+		<?php
+		}
+		if ($row->amount > 0 && $row->published != 3)
+		{
+		?>
 		<div class="<?php echo $controlGroupClass; ?>">
 			<label class="<?php echo $controlLabelClass; ?>">
 				<?php echo  JText::_('EB_PAYMEMNT_METHOD'); ?>
@@ -228,7 +228,7 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 				<?php echo $row->transaction_id ; ?>
 			</div>
 		</div>
-        <?php
-        }       
-    ?>
+		<?php
+		}
+	?>
 </form>
