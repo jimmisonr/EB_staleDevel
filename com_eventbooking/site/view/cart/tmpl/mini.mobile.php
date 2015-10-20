@@ -69,8 +69,12 @@ if (count($this->items)) {
 					<strong><?php echo JText::_('EB_QUANTITY'); ?> :</strong>
 					<div class="btn-wrapper input-append">
 						<input id="quantity" type="text" class="input-mini inputbox quantity_box" size="3" value="<?php echo $item->quantity ; ?>" name="quantity[]" <?php echo $readOnly ; ?> />
-						<a class="btn btn-default fa fa-refresh" onclick="javascript:updateCart();" title="" data-toggle="tooltip" data-original-title="<?php echo JText::_("EB_UPDATE_QUANTITY"); ?>"></a>
-						<a onclick="javascript:removeCart(<?php echo $item->id; ?>);" class="btn btn-default fa fa-times-circle" title="" data-toggle="tooltip" data-original-title="Remove"" border="0" /></a>
+						<button onclick="javascript:updateCart();" id="update_cart" class="<?php echo $btnClass; ?> btn-default" type="button">
+							<i class="fa fa-refresh"></i>
+						</button>
+						<button onclick="javascript:removeCart(<?php echo $item->id; ?>);" id="update_cart" class="<?php echo $btnClass; ?> btn-default" type="button">
+							<i class="fa fa-times-circle"></i>
+						</button>
 						<input id="event_id" type="hidden" name="event_id[]" value="<?php echo $item->id; ?>" />
 					</div>
 				</div>
