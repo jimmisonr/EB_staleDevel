@@ -55,7 +55,7 @@ foreach ($replaces as $key => $value)
 	{
 		$key        = strtoupper($key);
 		$msg        = str_replace("[$key]", $value, $msg);
-		$headerText = str_replace("[$key]", $headerText, $headerText);
+		$headerText = str_replace("[$key]", $value, $headerText);
 	}
 }
 ?>
