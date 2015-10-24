@@ -11,11 +11,11 @@
 defined( '_JEXEC' ) or die ;
 if ($this->item->id)
 {
-    $coordinates = $this->item->lat.','.$this->item->long;
+	$coordinates = $this->item->lat.','.$this->item->long;
 }
 else
 {
-    $coordinates = '40.992954,29.042092';
+	$coordinates = '40.992954,29.042092';
 }
 ?>
 <script type="text/javascript">
@@ -23,14 +23,14 @@ else
 		var form = document.adminForm;
 		if (pressbutton == 'cancel') {
 			Joomla.submitform( pressbutton );
-			return;				
+			return;
 		} else {
 			//Should validate the information here
 			if (form.name.value == "") {
 				alert("<?php echo JText::_('EN_ENTER_LOCATION'); ?>");
 				form.name.focus();
 				return ;
-			}					
+			}
 			Joomla.submitform( pressbutton );
 		}
 	}
@@ -40,19 +40,19 @@ else
 	var map;
 	var geocoder;
 	var marker;
-	
+
 	Joomla.submitbutton = function(pressbutton) {
 		var form = document.adminForm;
 		if (pressbutton == 'cancel') {
 			Joomla.submitform( pressbutton );
-			return;				
+			return;
 		} else {
 			//Should validate the information here
 			if (form.name.value == "") {
 				alert("<?php echo JText::_('EN_ENTER_LOCATION'); ?>");
 				form.name.focus();
 				return ;
-			}					
+			}
 			Joomla.submitform( pressbutton );
 		}
 	}
@@ -139,11 +139,11 @@ else
 	}
 </script>
 <form action="index.php?option=com_eventbooking&view=location" method="post" name="adminForm" id="adminForm">
-<div class="row-fluid">	
+<div class="row-fluid">
 	<div class="span5">
-		<table class="admintable adminform">		
+		<table class="admintable adminform">
 			<tr>
-				<td class="key"> 
+				<td class="key">
 					<?php echo JText::_('EB_NAME'); ?>
 				</td>
 				<td>
@@ -174,9 +174,9 @@ else
 				<td>
 					&nbsp;
 				</td>
-			</tr>			
+			</tr>
 			<tr>
-				<td class="key"> 
+				<td class="key">
 					<?php echo JText::_('EB_ADDRESS'); ?>
 				</td>
 				<td>
@@ -186,9 +186,9 @@ else
 				<td>
 					&nbsp;
 				</td>
-			</tr>		
+			</tr>
 			<tr>
-				<td class="key"> 
+				<td class="key">
 					<?php echo JText::_('EB_CITY'); ?>
 				</td>
 				<td>
@@ -199,7 +199,7 @@ else
 				</td>
 			</tr>
 			<tr>
-				<td class="key"> 
+				<td class="key">
 					<?php echo JText::_('EB_STATE'); ?>
 				</td>
 				<td>
@@ -210,7 +210,7 @@ else
 				</td>
 			</tr>
 			<tr>
-				<td class="key"> 
+				<td class="key">
 					<?php echo JText::_('EB_ZIP'); ?>
 				</td>
 				<td>
@@ -219,9 +219,9 @@ else
 				<td>
 					&nbsp;
 				</td>
-			</tr>		
+			</tr>
 			<tr>
-				<td class="key"> 
+				<td class="key">
 					<?php echo JText::_('EB_COUNTRY'); ?>
 				</td>
 				<td>
@@ -230,15 +230,15 @@ else
 				<td>
 					&nbsp;
 				</td>
-			</tr>	
+			</tr>
 			<tr>
-                <td class="key">
-                    <?php echo JText::_('EB_COORDINATES'); ?>
-                </td>
-                <td>
-                    <input class="text_area" type="text" name="coordinates" id="coordinates" size="30" maxlength="250" value="<?php echo $this->item->lat.','.$this->item->long;?>" />
-                </td>
-            </tr>
+				<td class="key">
+					<?php echo JText::_('EB_COORDINATES'); ?>
+				</td>
+				<td>
+					<input class="text_area" type="text" name="coordinates" id="coordinates" size="30" maxlength="250" value="<?php echo $this->item->lat.','.$this->item->long;?>" />
+				</td>
+			</tr>
 			<?php
 				if (JLanguageMultilang::isEnabled())
 				{
@@ -260,7 +260,7 @@ else
 				</td>
 				<td>
 					<?php echo $this->lists['published']; ?>
-				</td>	
+				</td>
 			</tr>
 		</table>
 	</div>
@@ -269,18 +269,16 @@ else
 			<tr>
 				<td>
 					<input type="button" onclick="getLocationFromAddress();" value="<?php echo JText::_('EB_PINPOINT'); ?> &raquo;" />
-			        <br/><br/>
+					<br/><br/>
 					<div id="map-canvas" style="width: 95%; height: 400px"></div>
 				</td>
 			</tr>
 		</table>
 	</div>
-	<div class="clearfix"></div>
-	</div>			
-</div>		
+</div>
 <div class="clearfix"></div>
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
-	<input type="hidden" name="task" value="" />	
+	<input type="hidden" name="task" value="" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 </form>
 <style>

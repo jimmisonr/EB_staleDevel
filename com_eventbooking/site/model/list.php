@@ -176,7 +176,7 @@ class EventbookingModelList extends RADModelList
 		elseif ($config->hide_past_events || ($name == 'upcomingevents'))
 		{
 			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
-			$query->where('DATE(tbl.event_date) >= "' . $currentDate . '"');
+			$query->where('(DATE(tbl.event_date) >= "' . $currentDate . '" OR DATE(tbl.cut_off_date) >= "' . $currentDate . '")');
 		}
 
 		return $this;
