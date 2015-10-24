@@ -58,4 +58,16 @@ class EventbookingViewCouponHtml extends RADViewItem
 		$this->lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id[]', 'class="input-xlarge" multiple="multiple" ', 'id', 'title', $selectedEventIds);
 		$this->nullDate          = JFactory::getDbo()->getNullDate();
 	}
+
+	/**
+	 * Override addToolbar function to allow generating custom buttons for import & batch coupon feature
+	 */
+	protected function addToolbar()
+	{
+		$layout = $this->getLayout();
+		if ($layout == 'default')
+		{
+			parent::addToolbar();
+		}
+	}
 }
