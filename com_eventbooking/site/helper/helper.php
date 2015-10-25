@@ -4061,6 +4061,13 @@ class EventbookingHelper
 			$invoiceOutput = $config->invoice_format;
 		}
 
+		if (strpos($invoiceOutput, '[QRCODE]') !== false)
+		{
+			EventbookingHelper::generateQrcode($row->id);
+			$imgTag = '<img src="media/com_eventbooking/qrcodes/'.$row->id.'.png" border="0" />';
+			$invoiceOutput = str_replace("[QRCODE]", $imgTag, $invoiceOutput);
+		}
+
 		if ($config->multiple_booking)
 		{
 			$rowFields = self::getFormFields($row->id, 4);
@@ -4149,6 +4156,25 @@ class EventbookingHelper
 		//Filename
 		$filePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . $replaces['invoice_number'] . '.pdf';
 		$pdf->Output($filePath, 'F');
+	}
+
+	/**
+	 * Generate QRcode for a transaction
+	 *
+	 * @param $registrantId
+	 */
+	public static function generateQrcode($registrantId)
+	{
+		$filename = $registrantId.'.png';
+		if (!file_exists(JPATH_ROOT.'/media/com_eventbooking/qrcodes/'.$filename))
+		{
+			require_once JPATH_ADMINISTRATOR.'/components/com_eventbooking/libraries/vendor/phpqrcode/qrlib.php';
+			$Itemid = EventbookingHelperRoute::findView('registrants', EventbookingHelper::getItemid());
+			$checkinUrl = JUri::base(). 'index.php?option=com_eventbooking&task=registrant.checkin&transaction_id='.$registrantId.'&Itemid='.$Itemid;
+			QRcode::png($checkinUrl, JPATH_ROOT.'/media/com_eventbooking/qrcodes/'.$filename);
+
+			echo $checkinUrl;
+		}
 	}
 
 	public static function downloadInvoice($id)
