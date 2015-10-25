@@ -1,12 +1,14 @@
 <?php
 /**
- * @version        2.0.0
- * @package        Joomla
- * @subpackage     Event Booking
- * @author         Tuan Pham Ngoc
- * @copyright      Copyright (C) 2010 - 2015 Ossolution Team
- * @license        GNU/GPL, see LICENSE.php
+ * @version            2.0.5
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
+// no direct access
+defined('_JEXEC') or die;
 
 // no direct access
 defined('_JEXEC') or die;
@@ -28,7 +30,7 @@ if (!$itemId)
 	$itemId = EventbookingHelper::getItemid();
 }
 $fieldSuffix  = EventbookingHelper::getFieldSuffix();
-$currentDate  = JHtml::_('date', 'Now', 'Y-m-d');
+$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
 $numberEvents = $params->get('number_events', 6);
 $categoryIds  = trim($params->get('category_ids', ''));
 $showCategory = $params->get('show_category', 1);
@@ -39,7 +41,7 @@ $query->select('a.*, c.name AS location_name')
 	->leftJoin('#__eb_locations AS c ON a.location_id = c.id')
 	->where('a.published = 1')
 	->where('a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
-	->where('(DATE(a.event_date) >= ' . $db->quote($currentDate).' OR DATE(a.cut_off_date) >= '.$db->quote($currentDate).')')
+	->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')')
 	->order('a.event_date');
 
 if ($fieldSuffix)
