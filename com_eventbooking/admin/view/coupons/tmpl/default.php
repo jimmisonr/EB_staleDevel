@@ -9,6 +9,7 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
+JToolBarHelper::custom('export', 'download', 'download', 'Export Coupons', false);
 ?>
 <form action="index.php?option=com_eventbooking&view=coupons" method="post" name="adminForm" id="adminForm">
 <table width="100%">
@@ -96,7 +97,7 @@ defined( '_JEXEC' ) or die ;
 				<?php
 					if ($row->valid_from != $this->nullDate)
 					{
-						echo JHtml::_('date', $row->valid_from, $this->dateFormat);
+						echo JHtml::_('date', $row->valid_from, $this->dateFormat, null);
 					}
 				?>
 			</td>	
@@ -104,7 +105,7 @@ defined( '_JEXEC' ) or die ;
 				<?php
 					if ($row->valid_to != $this->nullDate)
 					{
-						echo JHtml::_('date', $row->valid_to, $this->dateFormat);
+						echo JHtml::_('date', $row->valid_to, $this->dateFormat, null);
 					}
 				?>
 			</td>										

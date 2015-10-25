@@ -84,4 +84,241 @@ class EventbookingModelCoupon extends RADModelAdmin
 
 		return true;
 	}
+
+	/**
+	 * @param $input
+	 *
+	 * @return int
+	 * @throws Exception
+	 */
+	public function import($input)
+	{
+		$db      = JFactory::getDbo();
+		$query   = $db->getQuery(true);
+		$coupons = $this->getCouponCSV($input);
+
+		if (count($coupons))
+		{
+			$imported = 0;
+			foreach ($coupons as $coupon)
+			{
+				$row = $this->getTable();
+
+				$eventIds = $coupon['event'];
+				if (!$eventIds)
+				{
+					$coupon['event_id'] = 1;
+				}
+				else
+				{
+					$coupon['event_id'] = -1;
+				}
+
+				if ($coupon['valid_from'])
+				{
+					$coupon ['valid_from'] = JHtml::date($coupon['valid_from'], 'Y-m-d', null);
+				}
+				else
+				{
+					$coupon ['valid_from'] = '';
+				}
+
+				if ($coupon['valid_to'])
+				{
+					$coupon ['valid_to'] = JHtml::date($coupon['valid_to'], 'Y-m-d', null);
+				}
+				else
+				{
+					$coupon ['valid_to'] = '';
+				}
+				$row->bind($coupon);
+				$row->store();
+				$couponId = $row->id;
+
+				if ($eventIds)
+				{
+					$eventIds = explode(',', $eventIds);
+					$query->clear();
+					$query->insert('#__eb_coupon_events')->columns('coupon_id, event_id');
+					for ($i = 0, $n = count($eventIds); $i < $n; $i++)
+					{
+						$eventId = (int) $eventIds[$i];
+						if ($eventId > 0)
+						{
+							$query->values("$couponId, $eventId");
+						}
+					}
+					$db->setQuery($query);
+					$db->execute();
+				}
+				$imported++;
+			}
+		}
+
+		return $imported;
+	}
+
+	/**
+	 * Generate batch coupon
+	 *
+	 * @param RADInput $input
+	 */
+	public function batch($input)
+	{
+		$db                  = JFactory::getDbo();
+		$query               = $db->getQuery(true);
+		$numberCoupon        = $input->getInt('number_coupon', 50);
+		$charactersSet       = $input->getString('characters_set');
+		$prefix              = $input->getString('prefix');
+		$length              = $input->getInt('length', 20);
+		$data                = array();
+		$data['discount']    = $input->getFloat('discount', 0);
+		$data['coupon_type'] = $input->getInt('coupon_type', 0);
+		$data['times']       = $input->getInt('times');
+		$eventIds            = $input->get('event_id', array(), 'array');
+
+		if (count($eventIds) == 0 || $eventIds[0] == -1)
+		{
+			$data['event_id'] = -1;
+		}
+		else
+		{
+			$data['event_id'] = 1;
+		}
+
+		if ($input->getString('valid_from'))
+		{
+			$data ['valid_from'] = JHtml::date($input->getString('valid_from'), 'Y-m-d', null);
+		}
+		else
+		{
+			$data ['valid_from'] = '';
+		}
+
+		if ($input->getString('valid_to'))
+		{
+			$data ['valid_to'] = JHtml::date($input->getString('valid_to'), 'Y-m-d', null);
+		}
+		else
+		{
+			$data ['valid_to'] = '';
+		}
+		$data['used']       = 0;
+		$data ['published'] = $input->getInt('published');
+
+		for ($i = 0; $i < $numberCoupon; $i++)
+		{
+			$salt         = $this->genRandomCoupon($length, $charactersSet);
+			$couponCode   = $prefix . $salt;
+			$row          = $this->getTable();
+			$data['code'] = $couponCode;
+
+			$row->bind($data);
+			$row->store();
+
+			if ($row->event_id != -1)
+			{
+				$couponId = $row->id;
+				$query->clear();
+				$query->insert('#__eb_coupon_events')->columns('coupon_id, event_id');
+				for ($j = 0, $n = count($eventIds); $j < $n; $j++)
+				{
+					$eventId = (int) $eventIds[$j];
+					if ($eventId > 0)
+					{
+						$query->values("$couponId, $eventId");
+					}
+				}
+				$db->setQuery($query);
+				$db->execute();
+			}
+		}
+	}
+
+	/**
+	 * Get subscribers data from csv file
+	 *
+	 * @param $input
+	 *
+	 * @return array
+	 */
+	private function getCouponCSV($input)
+	{
+		$keys        = array();
+		$coupons     = array();
+		$coupon      = array();
+		$allowedExts = array('csv');
+		$csvFile     = $input->files->get('csv_coupons');
+		$csvFileName = $csvFile ['tmp_name'];
+		$fileName    = $csvFile ['name'];
+		$fileExt     = strtolower(JFile::getExt($fileName));
+		if (in_array($fileExt, $allowedExts))
+		{
+			$line = 0;
+			$fp   = fopen($csvFileName, 'r');
+			while (($cells = fgetcsv($fp)) !== false)
+			{
+				if ($line == 0)
+				{
+					foreach ($cells as $key)
+					{
+						$keys [] = $key;
+					}
+					$line++;
+				}
+				else
+				{
+					$i = 0;
+					foreach ($cells as $cell)
+					{
+						$coupon [$keys [$i]] = $cell;
+						$i++;
+					}
+					$coupons [] = $coupon;
+				}
+			}
+			fclose($fp);
+		}
+
+		return $coupons;
+	}
+
+	/**
+	 * Generate random Coupon
+	 *
+	 * @param int $length
+	 * @param string    $charactersSet
+	 *
+	 * @return string
+	 */
+	public static function genRandomCoupon($length = 8, $charactersSet)
+	{
+		$salt = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+		if ($charactersSet)
+		{
+			$salt = $charactersSet;
+		}
+
+		$base     = strlen($salt);
+		$makePass = '';
+
+		/*
+		 * Start with a cryptographic strength random string, then convert it to
+		 * a string with the numeric base of the salt.
+		 * Shift the base conversion on each character so the character
+		 * distribution is even, and randomize the start shift so it's not
+		 * predictable.
+		 */
+		$random = JCrypt::genRandomBytes($length + 1);
+		$shift  = ord($random[0]);
+
+		for ($i = 1; $i <= $length; ++$i)
+		{
+			$makePass .= $salt[($shift + ord($random[$i])) % $base];
+			$shift += ord($random[$i]);
+		}
+
+		return $makePass;
+	}
 }

@@ -11,6 +11,7 @@
 // no direct access
 defined( '_JEXEC' ) or die ;
 JHtml::_('formbehavior.chosen', 'select');
+JToolBarHelper::custom('export', 'download', 'download', 'Export Coupons', false);
 ?>
 <form action="index.php?option=com_eventbooking&view=coupons" method="post" name="adminForm" id="adminForm">
 	<div id="j-main-container">
@@ -100,7 +101,7 @@ JHtml::_('formbehavior.chosen', 'select');
 						<?php
 						if ($row->valid_from != $this->nullDate)
 						{
-							echo JHtml::_('date', $row->valid_from, $this->dateFormat);
+							echo JHtml::_('date', $row->valid_from, $this->dateFormat, null);
 						}
 						?>
 					</td>
@@ -108,7 +109,7 @@ JHtml::_('formbehavior.chosen', 'select');
 						<?php
 						if ($row->valid_to != $this->nullDate)
 						{
-							echo JHtml::_('date', $row->valid_to, $this->dateFormat);
+							echo JHtml::_('date', $row->valid_to, $this->dateFormat, null);
 						}
 						?>
 					</td>
