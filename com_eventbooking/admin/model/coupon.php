@@ -107,11 +107,11 @@ class EventbookingModelCoupon extends RADModelAdmin
 				$eventIds = $coupon['event'];
 				if (!$eventIds)
 				{
-					$coupon['event_id'] = 1;
+					$coupon['event_id'] = -1;
 				}
 				else
 				{
-					$coupon['event_id'] = -1;
+					$coupon['event_id'] = 1;
 				}
 
 				if ($coupon['valid_from'])

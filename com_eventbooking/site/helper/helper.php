@@ -234,13 +234,23 @@ class EventbookingHelper
 		$prefix = '';
 		if (JLanguageMultilang::isEnabled())
 		{
-			if (!$activeLanguage || $activeLanguage == '*')
+			if (!$activeLanguage)
 			{
 				$activeLanguage = JFactory::getLanguage()->getTag();
 			}
 			if ($activeLanguage != self::getDefaultLanguage())
 			{
-				$prefix = '_' . substr($activeLanguage, 0, 2);
+				$db    = JFactory::getDbo();
+				$query = $db->getQuery(true);
+				$query->select('`sef`')
+					->from('#__languages')
+					->where('lang_code = ' . $db->quote($activeLanguage));
+				$db->setQuery($query);
+				$sef = $db->loadResult();
+				if ($sef)
+				{
+					$prefix = '_' . $sef;
+				}
 			}
 		}
 
