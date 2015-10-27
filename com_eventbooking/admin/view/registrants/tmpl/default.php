@@ -9,25 +9,7 @@
  */
 // no direct access
 defined('_JEXEC') or die;
-
 $colSpan = 11;
-if ($this->config->show_event_date)
-{
-	$colSpan++;
-}    
-if ($this->config->activate_deposit_feature)
-{
-	$colSpan++;
-}    
-if ($this->totalPlugins > 1) 
-{
-	$colSpan++ ;
-}
-
-if ($this->config->activate_invoice_feature)
-{
-	$colSpan++;
-}
 ?>
 <form action="index.php?option=com_eventbooking&view=registrants" method="post" name="adminForm" id="adminForm">
 <table width="100%">
@@ -40,12 +22,8 @@ if ($this->config->activate_invoice_feature)
 	</td >	
 	<td style="float:right;">
 		<?php
-		echo $this->lists['filter_published'];
-		echo $this->lists['filter_event_id'];
-		if (version_compare(JVERSION, '3.0', 'ge'))
-		{
-			echo $this->pagination->getLimitBox();
-		}
+			echo $this->lists['filter_event_id'];
+			echo $this->lists['filter_published'];
 		?>
 	</td>
 </tr>
@@ -67,7 +45,9 @@ if ($this->config->activate_invoice_feature)
 				<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT'), 'ev.title', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 			</th>
 			<?php
-				if ($this->config->show_event_date) {
+				if ($this->config->show_event_date)
+				{
+					$colSpan++;
 				?>
 					<th width="7%" class="title" nowrap="nowrap">
 						<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT_DATE'), 'ev.event_date', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
@@ -90,6 +70,7 @@ if ($this->config->activate_invoice_feature)
 				<?php
 				    if ($this->config->activate_deposit_feature) 
 					{
+						$colSpan++;
 				    ?>
 				    	<th width="5%" class="title" nowrap="nowrap">
             				<?php echo JHtml::_('grid.sort',  JText::_('EB_PAYMENT_STATUS'), 'tbl.payment_status', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
@@ -98,6 +79,7 @@ if ($this->config->activate_invoice_feature)
 				    }
 				    if ($this->config->show_coupon_code_in_registrant_list)
 				    {
+					    $colSpan++;
 				    ?>
 				    	<th width="7%" class="title" nowrap="nowrap">
             				<?php echo JHtml::_('grid.sort',  JText::_('EB_COUPON'), 'cp.code', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
@@ -106,6 +88,7 @@ if ($this->config->activate_invoice_feature)
 				    } 
 				    if ($this->totalPlugins > 1)
 				    {
+					    $colSpan++;
 				    ?>
     					<th width="5%" class="title" nowrap="nowrap">
     						<?php echo JHtml::_('grid.sort',  JText::_('EB_PAYMENT_METHOD'), 'tbl.payment_method', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
@@ -117,8 +100,18 @@ if ($this->config->activate_invoice_feature)
 				<?php echo JHtml::_('grid.sort',  JText::_('EB_REGISTRATION_STATUS'), 'tbl.published', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 			</th>				
 			<?php
+			if ($this->config->activate_checkin_registrants)
+			{
+				$colSpan++;
+			?>
+				<th width="8%" class="center">
+					<?php echo JHtml::_('grid.sort',  JText::_('EB_CHECKED_IN'), 'tbl.checked_in', $this->state->filter_order_Dir, $this->state->filter_order); ?>
+				</th>
+			<?php
+			}
 			if ($this->config->activate_invoice_feature) 
-			{				
+			{
+				$colSpan++;
 			?>
 				<th width="8%" class="center">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_INVOICE_NUMBER'), 'tbl.invoice_number', $this->state->filter_order_Dir, $this->state->filter_order); ?>
@@ -164,7 +157,11 @@ if ($this->config->activate_invoice_feature)
 		if ($isMember) 
 		{
 			$groupLink = JRoute::_( 'index.php?option=com_eventbooking&view=registrant&id='. $row->group_id );			
-		}							
+		}
+
+		$img 	= $row->checked_in ? 'tick.png' : 'publish_x.png';
+		$alt 	= $row->checked_in ? JText::_( 'EB_CHECKED_IN' ) : JText::_( 'EB_NOT_CHECKED_IN');
+		$img = JHtml::_('image','admin/'.$img, $alt, array('border' => 0), true) ;
 		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td class="text_center">
@@ -259,6 +256,12 @@ if ($this->config->activate_invoice_feature)
 				?>
 			</td>				
 			<?php
+				if ($this->config->activate_checkin_registrants)
+				{
+				?>
+					<td class="center"><?php echo $img; ?></td>
+				<?php
+				}
 				if ($this->config->activate_invoice_feature)
 				{
 				?>

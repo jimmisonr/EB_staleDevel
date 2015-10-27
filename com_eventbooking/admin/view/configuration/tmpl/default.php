@@ -375,6 +375,17 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_SHOW_BILLING_STEP_FOR_FREE_EVENTS_EXPLAIN'); ?>
 						</td>
 					</tr>
+					<tr>
+						<td  class="key">
+							<?php echo JText::_('EB_ACTIVATE_CHECKIN_REGISTRANTS')?>
+						</td>
+						<td>
+							<?php echo $this->lists['activate_checkin_registrants']; ?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_ACTIVATE_CHECKIN_REGISTRANTS_EXPLAIN');?>
+						</td>
+					</tr>
 					<tr>				
 						<td class="key">
 							<?php echo JText::_('EB_ZOOM_LEVEL'); ?>

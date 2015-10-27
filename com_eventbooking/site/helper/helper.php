@@ -4170,10 +4170,8 @@ class EventbookingHelper
 		{
 			require_once JPATH_ADMINISTRATOR.'/components/com_eventbooking/libraries/vendor/phpqrcode/qrlib.php';
 			$Itemid = EventbookingHelperRoute::findView('registrants', EventbookingHelper::getItemid());
-			$checkinUrl = JUri::base(). 'index.php?option=com_eventbooking&task=registrant.checkin&transaction_id='.$registrantId.'&Itemid='.$Itemid;
+			$checkinUrl = JUri::root(). '/index.php?option=com_eventbooking&task=registrant.checkin&id='.$registrantId.'&Itemid='.$Itemid;
 			QRcode::png($checkinUrl, JPATH_ROOT.'/media/com_eventbooking/qrcodes/'.$filename);
-
-			echo $checkinUrl;
 		}
 	}
 

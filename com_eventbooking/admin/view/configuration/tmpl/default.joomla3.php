@@ -284,6 +284,14 @@ $config = $this->config;
 				</div>
 				<div class="control-group">
 					<div class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('activate_checkin_registrants', JText::_('EB_ACTIVATE_CHECKIN_REGISTRANTS'), JText::_('EB_ACTIVATE_CHECKIN_REGISTRANTS_EXPLAIN')); ?>
+					</div>
+					<div class="controls">
+						<?php echo EventbookingHelperHtml::getBooleanInput('activate_checkin_registrants', $config->activate_checkin_registrants); ?>
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="control-label">
 						<?php echo EventbookingHelperHtml::getFieldLabel('zoom_level', JText::_('EB_ZOOM_LEVEL'), JText::_('EB_ZOOM_LEVEL_EXPLAIN')); ?>
 					</div>
 					<div class="controls">

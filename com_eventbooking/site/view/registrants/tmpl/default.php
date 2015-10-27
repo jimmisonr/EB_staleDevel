@@ -100,8 +100,18 @@ $return = base64_encode(JUri::getInstance()->toString());
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_REGISTRATION_STATUS'), 'tbl.published', $this->lists['order_Dir'], $this->lists['order']); ?>
 				</th>
 				<?php
+				if ($this->config->activate_checkin_registrants)
+				{
+					$cols++;
+				?>
+					<th class="list_id">
+						<?php echo JHtml::_('grid.sort',  JText::_('EB_CHECKED_IN'), 'tbl.checked_in', $this->lists['order_Dir'], $this->lists['order']); ?>
+					</th>
+				<?php
+				}
 				if ($this->config->activate_invoice_feature)
 				{
+					$cols++;
 				?>
 					<th width="8%">
 						<?php echo JHtml::_('grid.sort',  JText::_('EB_INVOICE_NUMBER'), 'tbl.invoice_number', $this->lists['order_Dir'], $this->lists['order']); ?>
@@ -136,6 +146,9 @@ $return = base64_encode(JUri::getInstance()->toString());
 			{
 				$groupLink = JRoute::_( 'index.php?option=com_eventbooking&task=edit_registrant&cid[]='. $row->group_id.'&Itemid='.$this->Itemid);
 			}
+
+			$img 	= $row->checked_in ? 'tick.png' : 'publish_x.png';
+			$alt 	= $row->checked_in ? JText::_( 'EB_CHECKED_IN' ) : JText::_( 'EB_NOT_CHECKED_IN');
 			?>
 			<tr>
 				<td>
@@ -223,6 +236,14 @@ $return = base64_encode(JUri::getInstance()->toString());
 					?>
 				</td>
 				<?php
+				if ($this->config->activate_checkin_registrants)
+				{
+				?>
+					<td class="center">
+						<img src="media/com_eventbooking/assets/images/<?php echo $img; ?>" alt="<?php echo $alt; ?>" />
+					</td>
+				<?php
+				}
 				if ($this->config->activate_invoice_feature)
 				{
 				?>

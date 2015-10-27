@@ -200,6 +200,8 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 
 		$lists['show_thumb_in_calendar'] = JHtml::_('select.booleanlist', 'show_thumb_in_calendar', '',
 			$config->show_thumb_in_calendar);
+		$lists['activate_checkin_registrants'] = JHtml::_('select.booleanlist', 'activate_checkin_registrants', '',
+			$config->activate_checkin_registrants);
 
 		$options                           = array();
 		$options[]                         = JHtml::_('select.option', '', JText::_('EB_SELECT_POSITION'));
