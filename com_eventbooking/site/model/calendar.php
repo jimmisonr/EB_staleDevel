@@ -96,7 +96,7 @@ class EventbookingModelCalendar extends RADModel
 
 		if ($config->hide_past_events)
 		{
-			$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
 			$query->where('DATE(event_date) >= ' . $db->quote($currentDate));
 		}
 		$db->setQuery($query);
