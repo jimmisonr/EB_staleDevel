@@ -68,63 +68,77 @@ foreach ($replaces as $key => $value)
 		<div class="eb-message"><?php echo $msg ; ?></div>
 	<?php
 	}
+
+	if (!$this->bypassNumberMembersStep)
+	{
 	?>
-	<div id="eb-number-group-members">
-		<div class="eb-form-heading">
-			<?php echo JText::_('EB_NUMBER_MEMBERS'); ?>
-		</div>
-		<div class="eb-form-content">
+		<div id="eb-number-group-members">
+			<div class="eb-form-heading">
+				<?php echo JText::_('EB_NUMBER_MEMBERS'); ?>
+			</div>
+			<div class="eb-form-content">
 
+			</div>
 		</div>
-	</div>
 	<?php
-		if ($this->config->collect_member_information)
-		{
-		?>
-			<div id="eb-group-members-information">
-				<div class="eb-form-heading">
-					<?php echo JText::_('EB_MEMBERS_INFORMATION'); ?>
-				</div>
-				<div class="eb-form-content"></div>
+	}
+	if ($this->config->collect_member_information)
+	{
+	?>
+		<div id="eb-group-members-information">
+			<div class="eb-form-heading">
+				<?php echo JText::_('EB_MEMBERS_INFORMATION'); ?>
 			</div>
-		<?php
-		}
-		if($this->showBillingStep)
-		{
+			<div class="eb-form-content"></div>
+		</div>
+	<?php
+	}
+	if($this->showBillingStep)
+	{
 		?>
-			<div id="eb-group-billing">
-				<div class="eb-form-heading">
-					<?php echo JText::_('EB_BILLING_INFORMATION'); ?>
-				</div>
-				<div class="eb-form-content">
+		<div id="eb-group-billing">
+			<div class="eb-form-heading">
+				<?php echo JText::_('EB_BILLING_INFORMATION'); ?>
+			</div>
+			<div class="eb-form-content">
 
-				</div>
 			</div>
-		<?php
-		}
+		</div>
+	<?php
+	}
 	?>
 	<script type="text/javascript">
 		<?php
-			if ($this->captchaInvalid && $this->showBillingStep)
+		$defaultStep = '';
+		if ($this->captchaInvalid)
+		{
+			if ($this->showBillingStep)
 			{
-			?>
-				var step = 'group_billing';
-			<?php
-			}
-			elseif ($this->captchaInvalid && !$this->showBillingStep)
-			{
-			?>
-				var step = 'group_members';
-			<?php
+				$defaultStep = 'group_billing';
 			}
 			else
 			{
-			?>
-				var step = window.location.hash.substr(1);
-			<?php
+				$defaultStep = 'group_members';
 			}
+		}
+		elseif($this->bypassNumberMembersStep)
+		{
+			if ($this->config->collect_member_information)
+			{
+				$defaultStep = 'group_members';
+			}
+			else
+			{
+				$defaultStep = 'group_billing';
+			}
+		}
 		?>
-		var returnUrl = "<?php echo base64_encode(JFactory::getURI()->toString().'#group_billing'); ?>";
+		var step = window.location.hash.substr(1);
+		if (!step)
+		{
+			step = '<?php echo $defaultStep; ?>';
+		}
+		var returnUrl = "<?php echo base64_encode(JUri::getInstance()->toString().'#group_billing'); ?>";
 		Eb.jQuery(document).ready(function($)
 		{
 			if (step == 'group_billing')
