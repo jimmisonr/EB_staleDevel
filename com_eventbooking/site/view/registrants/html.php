@@ -66,6 +66,10 @@ class EventbookingViewRegistrantsHtml extends RADViewHtml
 		$options[]                 = JHtml::_('select.option', -1, JText::_('EB_REGISTRATION_STATUS'));
 		$options[]                 = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
 		$options[]                 = JHtml::_('select.option', 1, JText::_('EB_PAID'));
+		if ($config->activate_waitinglist_feature)
+		{
+			$options[] = JHtml::_('select.option', 3, JText::_('EB_WAITING_LIST'));
+		}
 		$options[]                 = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
 		$lists['filter_published'] = JHtml::_('select.genericlist', $options, 'filter_published', ' class="input-medium" onchange="submit()" ', 'value', 'text',
 			$state->filter_published);
