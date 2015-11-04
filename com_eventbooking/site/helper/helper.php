@@ -643,6 +643,18 @@ class EventbookingHelper
 					$fieldValue = $field->value;
 				}
 			}
+
+			if ($fieldValue && $field->type == 'Date')
+			{
+				$date = JFactory::getDate($fieldValue);
+				if ($date)
+				{
+					$dateFormat  = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
+					$dateFormat  = str_replace('%', '', $dateFormat);
+					$fieldValue = $date->format($dateFormat);
+				}
+			}
+
 			$replaces[$field->name] = $fieldValue;
 		}
 
