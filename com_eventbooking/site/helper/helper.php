@@ -1510,6 +1510,10 @@ class EventbookingHelper
 
 	/**
 	 * Get URL of the site, using for Ajax request
+	 *
+	 * @return string
+	 *
+	 * @throws Exception
 	 */
 	public static function getSiteUrl()
 	{
@@ -1526,12 +1530,19 @@ class EventbookingHelper
 		$path = rtrim(dirname($script_name), '/\\');
 		if ($path)
 		{
-			return $base . $path . '/';
+			$siteUrl = $base . $path . '/';
 		}
 		else
 		{
-			return $base . '/';
+			$siteUrl = $base . '/';
 		}
+		if (JFactory::getApplication()->isAdmin())
+		{
+			$adminPos = strrpos($siteUrl, 'administrator/');
+			$siteUrl  = substr_replace($siteUrl, '', $adminPos, 14);
+		}
+
+		return $siteUrl;
 	}
 
 	/**
@@ -4165,16 +4176,21 @@ class EventbookingHelper
 	 */
 	public static function generateQrcode($registrantId)
 	{
-		$filename = $registrantId.'.png';
-		if (!file_exists(JPATH_ROOT.'/media/com_eventbooking/qrcodes/'.$filename))
+		$filename = $registrantId . '.png';
+		if (!file_exists(JPATH_ROOT . '/media/com_eventbooking/qrcodes/' . $filename))
 		{
-			require_once JPATH_ADMINISTRATOR.'/components/com_eventbooking/libraries/vendor/phpqrcode/qrlib.php';
-			$Itemid = EventbookingHelperRoute::findView('registrants', EventbookingHelper::getItemid());
-			$checkinUrl = JUri::root(). '/index.php?option=com_eventbooking&task=registrant.checkin&id='.$registrantId.'&Itemid='.$Itemid;
-			QRcode::png($checkinUrl, JPATH_ROOT.'/media/com_eventbooking/qrcodes/'.$filename);
+			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/phpqrcode/qrlib.php';
+			$Itemid     = EventbookingHelperRoute::findView('registrants', EventbookingHelper::getItemid());
+			$checkinUrl = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=registrant.checkin&id=' . $registrantId . '&Itemid=' . $Itemid;
+			QRcode::png($checkinUrl, JPATH_ROOT . '/media/com_eventbooking/qrcodes/' . $filename);
 		}
 	}
 
+	/**
+	 * Generate and download invoice of given registration record
+	 *
+	 * @param int $id
+	 */
 	public static function downloadInvoice($id)
 	{
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_eventbooking/table');
@@ -4201,7 +4217,9 @@ class EventbookingHelper
 	/**
 	 * Convert all img tags to use absolute URL
 	 *
-	 * @param string $html_content
+	 * @param $html_content
+	 *
+	 * @return string
 	 */
 	public static function convertImgTags($html_content)
 	{
