@@ -311,7 +311,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 					break;
 			}
 
-			$this->setRedirect(JRoute::_(EventbookingHelperRoute::findView('registrants', null)), $message);
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', null)), $message);
 		}
 	}
 }
