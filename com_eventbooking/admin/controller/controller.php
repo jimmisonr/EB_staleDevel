@@ -2188,6 +2188,11 @@ class EventbookingController extends RADControllerAdmin
 			}
 		}
 
+		if (JLanguageMultilang::isEnabled())
+		{
+			EventbookingHelper::setupMultilingual();
+		}
+
 		// Files, Folders clean up
 		$deleteFiles = array(
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php',
@@ -2423,5 +2428,57 @@ class EventbookingController extends RADControllerAdmin
 		}
 		echo json_encode($data);
 		JFactory::getApplication()->close();
+	}
+
+	/**
+	 * Method to allow sharing language files for Events Booking
+	 */
+	public function share_translation()
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('lang_code')
+			->from('#__languages')
+			->where('published = 1')
+			->where('lang_code != "en-GB"')
+			->order('ordering');
+		$db->setQuery($query);
+		$languages = $db->loadObjectList();
+
+		if (count($languages))
+		{
+			$mailer   = JFactory::getMailer();
+			$jConfig  = JFactory::getConfig();
+			$mailFrom = $jConfig->get('mailfrom');
+			$fromName = $jConfig->get('fromname');
+			$mailer->setSender(array($mailFrom, $fromName));
+			$mailer->addRecipient('tuanpn@joomdonation.com');
+			$mailer->setSubject('Language Packages for Events Booking shared by ' . JUri::root());
+			$mailer->setBody('Dear Tuan \n. I am happy to share my language packages for Events Booking.\n Enjoy!');
+			foreach ($languages as $language)
+			{
+				$tag = $language->lang_code;
+				if (file_exists(JPATH_ROOT . '/language/' . $tag . '/' . $tag . '.com_eventbooking.ini'))
+				{
+					$mailer->addAttachment(JPATH_ROOT . '/language/' . $tag . '/' . $tag . '.com_eventbooking.ini', $tag . '.com_eventbooking.ini');
+				}
+
+				if (file_exists(JPATH_ADMINISTRATOR . '/language/' . $tag . '/' . $tag . '.com_eventbooking.ini'))
+				{
+					echo JPATH_ADMINISTRATOR . '/language/' . $tag . '/' . $tag . '.com_eventbooking.ini';
+					$mailer->addAttachment(JPATH_ADMINISTRATOR . '/language/' . $tag . '/' . $tag . '.com_eventbooking.ini', 'admin.' . $tag . '.com_eventbooking.ini');
+				}
+			}
+
+			//$mailer->Send();
+
+			$msg = 'Thanks so much for sharing your language files to Events Booking Community';
+		}
+		else
+		{
+			$msg = 'Thanks so willing to share your language files to Events Booking Community. However, you don"t have any none English langauge file to share';
+		}
+
+		$this->setRedirect('index.php?option=com_eventbooking&view=dashboard', $msg);
 	}
 }
