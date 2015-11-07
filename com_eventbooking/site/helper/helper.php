@@ -5116,6 +5116,33 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Calculate level for categories, used when upgrade from old version to new version
+	 *
+	 * @param     $id
+	 * @param     $list
+	 * @param     $children
+	 * @param int $maxlevel
+	 * @param int $level
+	 *
+	 * @return mixed
+	 */
+	public static function calculateCategoriesLevel($id, $list, &$children, $maxlevel = 9999, $level = 1)
+	{
+		if (@$children[$id] && $level <= $maxlevel)
+		{
+			foreach ($children[$id] as $v)
+			{
+				$id = $v->id;
+				$v->level = $level;
+				$list[$id] = $v;
+				$list = self::calculateCategoriesLevel($id, $list, $children, $maxlevel, $level + 1);
+			}
+		}
+
+		return $list;
+	}
+
+	/**
 	 *
 	 * @param string $vName
 	 */
