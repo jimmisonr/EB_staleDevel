@@ -2452,8 +2452,7 @@ class EventbookingController extends RADControllerAdmin
 			$mailFrom = $jConfig->get('mailfrom');
 			$fromName = $jConfig->get('fromname');
 			$mailer->setSender(array($mailFrom, $fromName));
-			//$mailer->addRecipient('tuanpn@joomdonation.com');
-			$mailer->addRecipient('os.tuanpn@gmail.com');
+			$mailer->addRecipient('tuanpn@joomdonation.com');			
 			$mailer->setSubject('Language Packages for Events Booking shared by ' . JUri::root());
 			$mailer->setBody('Dear Tuan \n. I am happy to share my language packages for Events Booking.\n Enjoy!');
 			foreach ($languages as $language)
