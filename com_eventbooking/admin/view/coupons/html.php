@@ -18,7 +18,7 @@ class EventbookingViewCouponsHtml extends RADViewList
 		parent::prepareView();
 
 		$config              = EventbookingHelper::getConfig();
-		$rows      = EventbookingHelperDatabase::getAllEvents();
+		$rows      = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
 		$options   = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_ALL_EVENTS'), 'id', 'title');
 		if ($config->show_event_date)

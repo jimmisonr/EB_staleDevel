@@ -28,6 +28,7 @@ class EventbookingModelRegistrants extends RADModelList
 
 		$this->state->insert('filter_event_id', 'int', 0)
 			->insert('filter_published', 'int', -1)
+			->insert('filter_checked_in', 'int', -1)
 			->insert('filter_order_Dir', 'word', 'DESC');
 	}
 
@@ -112,6 +113,12 @@ class EventbookingModelRegistrants extends RADModelList
 		{
 			$query->where(' tbl.published = ' . $this->state->filter_published);
 		}
+
+		if ($this->state->filter_checked_in != -1)
+		{
+			$query->where(' tbl.checked_in = ' . $this->state->filter_checked_in);
+		}
+
 		if ($this->state->filter_event_id)
 		{
 			$query->where(' tbl.event_id = ' . $this->state->filter_event_id);

@@ -115,10 +115,17 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 			$key          = strtoupper($key);
 			$thankMessage = str_replace("[$key]", $value, $thankMessage);
 		}
+
+		if (strpos($thankMessage, '[QRCODE]') !== false)
+		{
+			EventbookingHelper::generateQrcode($rowRegistrant->transaction_id);
+			$imgTag = '<img src="media/com_eventbooking/qrcodes/'.$rowRegistrant->transaction_id.'.png" border="0" />';
+			$thankMessage = str_replace("[QRCODE]", $imgTag, $thankMessage);
+		}
+
 		$this->message          = $thankMessage;
 		$this->registrationCode = $registrationCode;
-		$this->tmpl             = JRequest::getVar('tmpl', '');
-		$this->Itemid           = JRequest::getInt('Itemid', 0);
+		$this->tmpl             = $this->input->getString('tmpl');
 		$this->conversionTrackingCode = $config->conversion_tracking_code;
 
 		parent::display();

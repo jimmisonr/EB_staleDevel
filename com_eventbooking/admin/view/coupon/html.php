@@ -24,7 +24,7 @@ class EventbookingViewCouponHtml extends RADViewItem
 		$this->lists['coupon_type'] = JHtml::_('select.genericlist', $options, 'coupon_type', 'class="input-mini"', 'value', 'text', $this->item->coupon_type);
 		$options                    = array();
 		$options[]                  = JHtml::_('select.option', -1, JText::_('EB_ALL_EVENTS'), 'id', 'title');
-		$rows                       = EventbookingHelperDatabase::getAllEvents('title, ordering');
+		$rows                       = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
 
 		if ($config->show_event_date)
 		{

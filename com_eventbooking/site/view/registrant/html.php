@@ -128,6 +128,11 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			$this->memberFormFields = EventbookingHelper::getFormFields($item->event_id, 2, $item->language);
 		}
 
+		if ($config->activate_checkin_registrants)
+		{
+			$lists['checked_in'] = JHtml::_('select.booleanlist', 'checked_in', ' class="inputbox" ', $item->checked_in);
+		}
+
 		$this->item            = $item;
 		$this->config          = $config;
 		$this->lists           = $lists;

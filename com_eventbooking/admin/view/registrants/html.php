@@ -21,7 +21,7 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 		$db     = JFactory::getDBO();
 		$query  = $db->getQuery(true);
 
-		$rows      = EventbookingHelperDatabase::getAllEvents();
+		$rows      = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
 		$options   = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_SELECT_EVENT'), 'id', 'title');
 		if ($config->show_event_date)
@@ -50,6 +50,16 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 
 		$this->lists['filter_published'] = JHtml::_('select.genericlist', $options, 'filter_published', ' class="inputbox" onchange="submit()" ', 'value', 'text',
 			$this->state->filter_published);
+
+		if ($config->activate_checkin_registrants)
+		{
+			$options                        = array();
+			$options[]                      = JHtml::_('select.option', -1, JText::_('EB_CHECKIN_STATUS'));
+			$options[]                      = JHtml::_('select.option', 0, JText::_('EB_CHECKED_IN'));
+			$options[]                      = JHtml::_('select.option', 1, JText::_('EB_NOT_CHECKED_IN'));
+			$this->lists['filter_checked_in'] = JHtml::_('select.genericlist', $options, 'filter_checked_in', ' class="inputbox" onchange="submit()" ', 'value', 'text',
+				$this->state->filter_checked_in);
+		}
 
 		$query->select('COUNT(*)')
 			->from('#__eb_payment_plugins')

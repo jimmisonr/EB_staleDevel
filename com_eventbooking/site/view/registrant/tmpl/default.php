@@ -91,7 +91,16 @@ $selectedState = '';
 		}
 		if ($this->canChangeStatus)
 		{
-			?>
+		?>
+			<tr>
+				<td class="title_cell">
+					<?php echo JText::_('EB_CHECKED_IN'); ?>
+				</td>
+				<td>
+					<?php echo $this->lists['checked_in']; ?>
+				</td>
+			</tr>
+
 			<tr>
 				<td class="title_cell">
 					<?php echo JText::_('EB_REGISTRATION_STATUS'); ?>

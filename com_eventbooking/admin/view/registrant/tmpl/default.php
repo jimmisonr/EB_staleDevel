@@ -253,6 +253,19 @@ $selectedState = '';
 				</tr>
 			<?php
 			}
+			if ($this->config->activate_checkin_registrants)
+			{
+			?>
+				<tr>
+					<td width="100" class="key">
+						<?php echo  JText::_('EB_CHECKED_IN'); ?>
+					</td>
+					<td>
+						<?php echo $this->lists['checked_in'] ; ?>
+					</td>
+				</tr>
+			<?php
+			}
 		?>
 		<tr>
 			<td width="100" class="key">

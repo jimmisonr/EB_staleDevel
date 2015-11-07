@@ -39,16 +39,16 @@ class RADConfig
 		$rows = $db->loadObjectList();
 		for ($i = 0, $n = count($rows); $i < $n; $i++)
 		{
-			$row              = $rows[$i];
-			$key              = $row->config_key;
+			$row = $rows[$i];
+			$key = $row->config_key;
 
 			if (version_compare(JVERSION, '3.0', 'ge'))
 			{
-				$value            = $row->config_value;
+				$value = $row->config_value;
 			}
 			else
 			{
-				$value            = stripslashes($row->config_value);
+				$value = stripslashes($row->config_value);
 			}
 
 			$this->data[$key] = $value;
@@ -76,6 +76,21 @@ class RADConfig
 	}
 
 	/**
+	 * Set data for a config option
+	 *
+	 * @param string $name The name of config option
+	 * @param mixed  $value
+	 *
+	 * @return $this
+	 */
+	public function set($name, $value)
+	{
+		$this->data[$name] = $value;
+
+		return $this;
+	}
+
+	/**
 	 * Magic method to get a config option value
 	 *
 	 * @param string
@@ -85,6 +100,20 @@ class RADConfig
 	public function __get($name)
 	{
 		return $this->get($name);
+	}
+
+	/**
+	 * Set config option value
+	 *
+	 * @param string The user-specified config option
+	 *
+	 * @param mixed  The user-specified config option value.
+	 *
+	 * @return void
+	 */
+	public function __set($name, $value)
+	{
+		$this->set($name, $value);
 	}
 
 	/**

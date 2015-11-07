@@ -38,6 +38,12 @@ class EventbookingModelCoupon extends RADModelAdmin
 		if (!$isNew)
 		{
 			$query->delete('#__eb_coupon_events')->where('coupon_id = ' . $couponId);
+			$config = EventbookingHelper::getConfig();
+			if ($config->hide_past_events_from_events_dropdown)
+			{
+				$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+				$query->where('event_id IN (SELECT id FROM #__eb_events AS a WHERE a.published = 1 AND (DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.event_end_date) >= ' . $currentDate . '))');
+			}
 			$db->setQuery($query);
 			$db->execute();
 		}

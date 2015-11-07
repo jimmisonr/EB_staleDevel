@@ -284,6 +284,14 @@ $config = $this->config;
 				</div>
 				<div class="control-group">
 					<div class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('activate_checkin_registrants', JText::_('EB_ACTIVATE_CHECKIN_REGISTRANTS'), JText::_('EB_ACTIVATE_CHECKIN_REGISTRANTS_EXPLAIN')); ?>
+					</div>
+					<div class="controls">
+						<?php echo EventbookingHelperHtml::getBooleanInput('activate_checkin_registrants', $config->activate_checkin_registrants); ?>
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="control-label">
 						<?php echo EventbookingHelperHtml::getFieldLabel('zoom_level', JText::_('EB_ZOOM_LEVEL'), JText::_('EB_ZOOM_LEVEL_EXPLAIN')); ?>
 					</div>
 					<div class="controls">
@@ -344,6 +352,14 @@ $config = $this->config;
 					</div>
 					<div class="controls">
 						<?php echo EventbookingHelperHtml::getBooleanInput('hide_past_events', $config->hide_past_events); ?>
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('hide_past_events_from_events_dropdown', JText::_('EB_HIDE_PAST_EVENTS_FROM_DROPDOWN'), JText::_('EB_HIDE_PAST_EVENTS_FROM_DROPDOWN_EXPLAIN')); ?>
+					</div>
+					<div class="controls">
+						<?php echo EventbookingHelperHtml::getBooleanInput('hide_past_events_from_events_dropdown', $config->hide_past_events_from_events_dropdown); ?>
 					</div>
 				</div>
 				<div class="control-group">

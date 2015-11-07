@@ -286,4 +286,32 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues, $groupNames);
 	}
+
+	/**
+	 * Checkin registrant from given ID
+	 */
+	public function checkin()
+	{
+		$user = JFactory::getUser();
+		if ($user->authorise('eventbooking.registrants_management', 'com_eventbooking'))
+		{
+			$model = $this->getModel();
+			$id = $this->input->getInt('id');
+			$result = $model->checkin($id);
+			switch($result)
+			{
+				case 0:
+					$message = JText::_('EB_INVALID_REGISTRATION_RECORD');
+					break;
+				case 1:
+					$message = JText::_('EB_REGISTRANT_ALREADY_CHECKED_IN');
+					break;
+				case 2:
+					$message = JText::_('EB_CHECKED_IN_SUCCESSFULLY');
+					break;
+			}
+
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', null)), $message);
+		}
+	}
 }

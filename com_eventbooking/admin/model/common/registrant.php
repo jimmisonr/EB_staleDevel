@@ -51,13 +51,13 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	 *
 	 * @return    boolean    True on success
 	 */
-	function store($input, $ignore = array())
+	public function store($input, $ignore = array())
 	{
 		$config = EventbookingHelper::getConfig();
 		$db     = $this->getDbo();
 		$query  = $db->getQuery(true);
 		$row    = $this->getTable();
-		$data   = $input->getData();	
+		$data   = $input->getData();
 		if ($data['id'])
 		{
 			//We will need to calculate total amount here now
@@ -75,16 +75,30 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			$row->store();
 			$form = new RADForm($rowFields);
 			$form->storeData($row->id, $data);
-			//Update status of the record			
-			if ($row->is_group_billing && (strpos($row->payment_method, 'os_offline') !== false))
+
+			//Update group members records according to grop billing record
+			if ($row->is_group_billing)
 			{
+				if (strpos($row->payment_method, 'os_offline') !== false)
+				{
+					$query->update('#__eb_registrants')
+						->set('published=' . (int) $row->published)
+						->where('group_id=' . $row->id);
+					$db->setQuery($query);
+					$db->execute();
+					$query->clear();
+				}
+
+				// Update checked_in status
 				$query->update('#__eb_registrants')
-					->set('published=' . (int) $row->published)
+					->set('checked_in=' . (int) $row->checked_in)
+					->set('event_id=' . (int) $row->event_id)
 					->where('group_id=' . $row->id);
 				$db->setQuery($query);
 				$db->execute();
 				$query->clear();
 			}
+
 			//Store group members data
 			if ($row->number_registrants > 1 && $config->collect_member_information)
 			{
@@ -166,5 +180,48 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 		}
 
 		return true;
+	}
+
+	/**
+	 * Checkin a registration record
+	 *
+	 * @param $id
+	 *
+	 * @return int
+	 */
+	public function checkin($id)
+	{
+		$row = $this->getTable();
+		$row->load($id);
+
+		if (empty($row))
+		{
+			return 0;
+		}
+
+		if ($row->checked_in)
+		{
+			return 1;
+		}
+
+		$row->checked_in = 1;
+		$row->store();
+
+		if ($row->is_group_billing)
+		{
+			$config = EventbookingHelper::getConfig();
+			if ($config->collect_member_information)
+			{
+				$db    = $this->getDbo();
+				$query = $db->getQuery(true);
+				$query->update('#__eb_registrants')
+					->set('checked_in = 1')
+					->where('group_id = ' . $row->id);
+				$db->setQuery($query);
+				$db->execute();
+			}
+		}
+
+		return 2;
 	}
 }

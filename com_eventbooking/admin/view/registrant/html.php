@@ -19,7 +19,7 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 
 		$db        = JFactory::getDbo();
 		$config    = EventbookingHelper::getConfig();
-		$rows      = EventbookingHelperDatabase::getAllEvents();
+		$rows      = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
 		$options[] = JHtml::_('select.option', 0, JText::_('Select Event'), 'id', 'title');
 		if ($config->show_event_date)
 		{
@@ -109,6 +109,11 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		if (count($rowMembers))
 		{
 			$this->memberFormFields = EventbookingHelper::getFormFields($this->item->event_id, 2, $this->item->language);
+		}
+
+		if ($config->activate_checkin_registrants)
+		{
+			$this->lists['checked_in'] = JHtml::_('select.booleanlist', 'checked_in', ' class="inputbox" ', $this->item->checked_in);
 		}
 
 		$this->config     = $config;

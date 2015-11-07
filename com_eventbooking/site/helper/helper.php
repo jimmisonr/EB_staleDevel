@@ -24,15 +24,25 @@ class EventbookingHelper
 	/**
 	 * Get configuration data and store in config object
 	 *
-	 * @return object
+	 * @return RADConfig
 	 */
 	public static function getConfig()
 	{
 		static $config;
+
 		if (!$config)
 		{
 			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/config/config.php';
 			$config = new RADConfig('#__eb_configs');
+
+			if ($config->show_event_date)
+			{
+				$config->set('sort_events_dropdown', 'event_date, title');
+			}
+			else
+			{
+				$config->set('sort_events_dropdown', 'title');
+			}
 		}
 
 		return $config;
@@ -653,6 +663,18 @@ class EventbookingHelper
 					$fieldValue = $field->value;
 				}
 			}
+
+			if ($fieldValue && $field->type == 'Date')
+			{
+				$date = JFactory::getDate($fieldValue);
+				if ($date)
+				{
+					$dateFormat  = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
+					$dateFormat  = str_replace('%', '', $dateFormat);
+					$fieldValue = $date->format($dateFormat);
+				}
+			}
+
 			$replaces[$field->name] = $fieldValue;
 		}
 
@@ -1520,6 +1542,10 @@ class EventbookingHelper
 
 	/**
 	 * Get URL of the site, using for Ajax request
+	 *
+	 * @return string
+	 *
+	 * @throws Exception
 	 */
 	public static function getSiteUrl()
 	{
@@ -1536,12 +1562,19 @@ class EventbookingHelper
 		$path = rtrim(dirname($script_name), '/\\');
 		if ($path)
 		{
-			return $base . $path . '/';
+			$siteUrl = $base . $path . '/';
 		}
 		else
 		{
-			return $base . '/';
+			$siteUrl = $base . '/';
 		}
+		if (JFactory::getApplication()->isAdmin())
+		{
+			$adminPos = strrpos($siteUrl, 'administrator/');
+			$siteUrl  = substr_replace($siteUrl, '', $adminPos, 14);
+		}
+
+		return $siteUrl;
 	}
 
 	/**
@@ -4071,6 +4104,13 @@ class EventbookingHelper
 			$invoiceOutput = $config->invoice_format;
 		}
 
+		if (strpos($invoiceOutput, '[QRCODE]') !== false)
+		{
+			EventbookingHelper::generateQrcode($row->id);
+			$imgTag = '<img src="media/com_eventbooking/qrcodes/'.$row->id.'.png" border="0" />';
+			$invoiceOutput = str_replace("[QRCODE]", $imgTag, $invoiceOutput);
+		}
+
 		if ($config->multiple_booking)
 		{
 			$rowFields = self::getFormFields($row->id, 4);
@@ -4161,6 +4201,28 @@ class EventbookingHelper
 		$pdf->Output($filePath, 'F');
 	}
 
+	/**
+	 * Generate QRcode for a transaction
+	 *
+	 * @param $registrantId
+	 */
+	public static function generateQrcode($registrantId)
+	{
+		$filename = $registrantId . '.png';
+		if (!file_exists(JPATH_ROOT . '/media/com_eventbooking/qrcodes/' . $filename))
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/phpqrcode/qrlib.php';
+			$Itemid     = EventbookingHelperRoute::findView('registrants', EventbookingHelper::getItemid());
+			$checkinUrl = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=registrant.checkin&id=' . $registrantId . '&Itemid=' . $Itemid;
+			QRcode::png($checkinUrl, JPATH_ROOT . '/media/com_eventbooking/qrcodes/' . $filename);
+		}
+	}
+
+	/**
+	 * Generate and download invoice of given registration record
+	 *
+	 * @param int $id
+	 */
 	public static function downloadInvoice($id)
 	{
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_eventbooking/table');
@@ -4187,7 +4249,9 @@ class EventbookingHelper
 	/**
 	 * Convert all img tags to use absolute URL
 	 *
-	 * @param string $html_content
+	 * @param $html_content
+	 *
+	 * @return string
 	 */
 	public static function convertImgTags($html_content)
 	{
@@ -5069,6 +5133,33 @@ class EventbookingHelper
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/linkedin.png";
 
 		return '<a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=' . $link . '&amp;title=' . $title . '" title="Submit ' . $title . ' in LinkedIn" target="_blank" ><img src="' . $img_url . '" alt="Submit ' . $title . ' in LinkedIn" /></a>';
+	}
+
+	/**
+	 * Calculate level for categories, used when upgrade from old version to new version
+	 *
+	 * @param     $id
+	 * @param     $list
+	 * @param     $children
+	 * @param int $maxlevel
+	 * @param int $level
+	 *
+	 * @return mixed
+	 */
+	public static function calculateCategoriesLevel($id, $list, &$children, $maxlevel = 9999, $level = 1)
+	{
+		if (@$children[$id] && $level <= $maxlevel)
+		{
+			foreach ($children[$id] as $v)
+			{
+				$id = $v->id;
+				$v->level = $level;
+				$list[$id] = $v;
+				$list = self::calculateCategoriesLevel($id, $list, $children, $maxlevel, $level + 1);
+			}
+		}
+
+		return $list;
 	}
 
 	/**
