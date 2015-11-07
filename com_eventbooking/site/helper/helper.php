@@ -24,15 +24,25 @@ class EventbookingHelper
 	/**
 	 * Get configuration data and store in config object
 	 *
-	 * @return object
+	 * @return RADConfig
 	 */
 	public static function getConfig()
 	{
 		static $config;
+
 		if (!$config)
 		{
 			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/config/config.php';
 			$config = new RADConfig('#__eb_configs');
+
+			if ($config->show_event_date)
+			{
+				$config->set('sort_events_dropdown', 'event_date, title');
+			}
+			else
+			{
+				$config->set('sort_events_dropdown', 'title');
+			}
 		}
 
 		return $config;

@@ -86,7 +86,7 @@ class EventbookingViewFieldHtml extends RADViewItem
 		{
 			$options   = array();
 			$options[] = JHtml::_('select.option', -1, JText::_('EB_ALL_EVENTS'), 'id', 'title');
-			$rows      = EventbookingHelperDatabase::getAllEvents();
+			$rows      = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
 			if ($config->show_event_date)
 			{
 				for ($i = 0, $n = count($rows); $i < $n; $i++)

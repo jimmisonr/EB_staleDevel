@@ -465,10 +465,21 @@ $editor = JFactory::getEditor();
 					</tr>			
 					<tr>
 						<td class="key">
-							<?php echo JText::_('EB_HIDE_PAST_EVENTS'); ?>
+							<?php echo JText::_('EB_HIDE_PAST_EVENTS_FROM_DROPDOWN'); ?>
 						</td>
 						<td>
 							<?php echo $this->lists['hide_past_events']; ?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_HIDE_PAST_EVENTS_FROM_DROPDOWN_EXPLAIN'); ?>
+						</td>
+					</tr>
+					<tr>
+						<td class="key">
+							<?php echo JText::_('EB_HIDE_PAST_EVENTS'); ?>
+						</td>
+						<td>
+							<?php echo $this->lists['hide_past_events_from_events_dropdown']; ?>
 						</td>
 						<td>
 							<?php echo JText::_('EB_HIDE_PAST_EVENTS_EXPLAIN'); ?>

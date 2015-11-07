@@ -356,6 +356,14 @@ $config = $this->config;
 				</div>
 				<div class="control-group">
 					<div class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('hide_past_events_from_events_dropdown', JText::_('EB_HIDE_PAST_EVENTS_FROM_DROPDOWN'), JText::_('EB_HIDE_PAST_EVENTS_FROM_DROPDOWN_EXPLAIN')); ?>
+					</div>
+					<div class="controls">
+						<?php echo EventbookingHelperHtml::getBooleanInput('hide_past_events_from_events_dropdown', $config->hide_past_events_from_events_dropdown); ?>
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="control-label">
 						<?php echo EventbookingHelperHtml::getFieldLabel('accept_term', JText::_('EB_SHOW_TERM_AND_CONDITION'), JText::_('EB_SHOW_TERM_AND_CONDITION_EXPLAIN')); ?>
 					</div>
 					<div class="controls">

@@ -34,11 +34,19 @@ class EventbookingViewRegistrantsHtml extends RADViewHtml
 		$config      = EventbookingHelper::getConfig();
 		$model       = $this->getModel();
 		$state       = $model->getState();
+
+		//Get list of events
 		$query->select('id, title' . $fieldSuffix . ' AS title, event_date')
 			->from('#__eb_events')
 			->where('published = 1')
-			->order('title');
-		//Get list of events				
+			->order($config->sort_events_dropdown);
+
+		if ($config->hide_past_events_from_events_dropdown)
+		{
+			$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$query->where('(DATE(event_date) >= ' . $currentDate . ' OR DATE(event_end_date) >= ' . $currentDate . ')');
+		}
+
 		if ($config->only_show_registrants_of_event_owner)
 		{
 			$query->where('created_by = ' . (int) $user->id);

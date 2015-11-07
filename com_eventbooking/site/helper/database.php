@@ -136,7 +136,7 @@ class EventbookingHelperDatabase
 	 *
 	 * @return mixed
 	 */
-	public static function getAllEvents($order = 'title')
+	public static function getAllEvents($order = 'title', $hidePastEvents = false)
 	{
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
@@ -144,6 +144,11 @@ class EventbookingHelperDatabase
 			->from('#__eb_events')
 			->where('published=1')
 			->order($order);
+		if ($hidePastEvents)
+		{
+			$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$query->where('(DATE(event_date) >= ' . $currentDate . ' OR DATE(event_end_date) >= ' . $currentDate . ')');
+		}
 		$db->setQuery($query);
 
 		return $db->loadObjectList();

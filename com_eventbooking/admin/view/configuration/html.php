@@ -95,6 +95,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['active_term']                 = JHtml::_('select.booleanlist', 'accept_term', '', $config->accept_term);
 		$lists['term_condition_by_event']     = JHtml::_('select.booleanlist', 'term_condition_by_event', '', $config->term_condition_by_event);
 		$lists['hide_past_events']            = JHtml::_('select.booleanlist', 'hide_past_events', '', $config->hide_past_events);
+		$lists['hide_past_events_from_events_dropdown']            = JHtml::_('select.booleanlist', 'hide_past_events_from_events_dropdown', '', $config->hide_past_events_from_events_dropdown);
 		$lists['send_email_to_group_members'] = JHtml::_('select.booleanlist', 'send_email_to_group_members', '',
 			$config->send_email_to_group_members);
 		$lists['enable_coupon']               = JHtml::_('select.booleanlist', 'enable_coupon', '', $config->enable_coupon);
