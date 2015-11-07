@@ -86,7 +86,14 @@ if ($this->showCaptcha)
 }
 ?>
 	<div class="form-actions">
-		<input type="button" id="btn-group-members-back" name="btn-group-members-back" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_BACK'); ?>"/>
+		<?php
+			if (!$this->bypassNumberMembersStep)
+			{
+			?>
+				<input type="button" id="btn-group-members-back" name="btn-group-members-back" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_BACK'); ?>"/>
+			<?php
+			}
+		?>
 		<input type="<?php echo $this->showBillingStep ? "button" : "submit";?>" id="btn-process-group-members" name="btn-process-group-members" class="<?php echo $btnClass; ?> btn-primary" value="<?php echo JText::_('EB_NEXT'); ?>" />
 	</div>
 	<input type="hidden" name="task" value="register.store_group_members_data" />

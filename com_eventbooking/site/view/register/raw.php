@@ -151,6 +151,12 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 			$waitingList = false;
 		}
 
+		$this->bypassNumberMembersStep = false;
+		if ($event->max_group_number > 0 && ($event->max_group_number == $event->min_group_number))
+		{
+			$this->bypassNumberMembersStep = true;
+		}
+
 		$this->numberRegistrants = $numberRegistrants;
 		$this->membersData       = $membersData;
 		$this->eventId           = $event->id;
