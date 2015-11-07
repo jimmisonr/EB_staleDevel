@@ -2452,7 +2452,8 @@ class EventbookingController extends RADControllerAdmin
 			$mailFrom = $jConfig->get('mailfrom');
 			$fromName = $jConfig->get('fromname');
 			$mailer->setSender(array($mailFrom, $fromName));
-			$mailer->addRecipient('tuanpn@joomdonation.com');
+			//$mailer->addRecipient('tuanpn@joomdonation.com');
+			$mailer->addRecipient('os.tuanpn@gmail.com');
 			$mailer->setSubject('Language Packages for Events Booking shared by ' . JUri::root());
 			$mailer->setBody('Dear Tuan \n. I am happy to share my language packages for Events Booking.\n Enjoy!');
 			foreach ($languages as $language)
@@ -2470,7 +2471,33 @@ class EventbookingController extends RADControllerAdmin
 				}
 			}
 
-			//$mailer->Send();
+			require_once JPATH_COMPONENT . '/libraries/vendor/dbexporter/dumper.php';
+
+			$tables = array($db->replacePrefix('#__eb_fields'), $db->replacePrefix('#__eb_messages'));
+
+			try
+			{
+
+				$sqlFile = $tag . '.com_eventbooking.sql';
+				$options = array(
+					'host'           => $jConfig->get('host'),
+					'username'       => $jConfig->get('user'),
+					'password'       => $jConfig->get('password'),
+					'db_name'        => $jConfig->get('db'),
+					'include_tables' => $tables
+				);
+				$dumper  = Shuttle_Dumper::create($options);
+				$dumper->dump(JPATH_ROOT . '/tmp/' . $sqlFile);
+
+				$mailer->addAttachment(JPATH_ROOT . '/tmp/' . $sqlFile, $sqlFile);
+
+			}
+			catch (Exception $e)
+			{
+				//Do nothing
+			}
+
+			$mailer->Send();
 
 			$msg = 'Thanks so much for sharing your language files to Events Booking Community';
 		}
