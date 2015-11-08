@@ -4876,7 +4876,7 @@ class EventbookingHelper
 				$currentYear  = $date->format('Y');
 				$timeString = "$n $day";
 				$timeString .= " of $currentMonth $currentYear";
-				$date->setTimestamp(strtotime($timeString));
+				$date->modify($timeString);
 				$date->setTime($recurringStartDate->format('H'), $recurringStartDate->format('i'), 0);
 				if (($date >= $recurringStartDate) && ($count < $numberOccurrences))
 				{
@@ -4896,7 +4896,7 @@ class EventbookingHelper
 				$currentYear  = $date->format('Y');
 				$timeString = "$n $day";
 				$timeString .= " of $currentMonth $currentYear";
-				$date->setTimestamp(strtotime($timeString));
+				$date->modify($timeString);
 				$date->setTime($recurringStartDate->format('H'), $recurringStartDate->format('i'), 0);
 				if (($date >= $recurringStartDate) && ($date <= $recurringEndDate))
 				{
