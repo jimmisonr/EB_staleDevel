@@ -5031,5 +5031,3 @@ class EventbookingHelper
 		JSubMenuHelper::addEntry(JText::_('Configuration'), 'index.php?option=com_eventbooking&view=configuration', $vName == 'configuration');
 	}
 }
-
-?>
