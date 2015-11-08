@@ -206,11 +206,14 @@ class EventbookingControllerRegister extends EventbookingController
 			else
 			{
 				$input->set('captcha_invalid', 1);
-				$this->execute('individual_registration');
+				$input->set('view', 'register');
+				$input->set('layout', 'default');
+				$this->display();
 
 				return;
 			}
 		}
+
 		$session->clear('eb_catpcha_invalid');
 		$data   = $input->post->getData();
 		$model  = $this->getModel('Register');
