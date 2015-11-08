@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>contact@joomdonation.com</authorEmail>
 	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>2.0.6</version>
+	<version>2.1.0</version>
 	<description>Display a button to make it possible to insert registration form of an event into an article.</description>
 	<files>
 		<filename plugin="ebregister">ebregister.php</filename>
