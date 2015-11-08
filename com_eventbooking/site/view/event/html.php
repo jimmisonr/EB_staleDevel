@@ -321,6 +321,20 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$lists['event_end_date_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'event_end_date_minute', ' class="input-mini" ', $selectedMinute,
 			'%02d');
 
+		// Cut off time
+		if ($item->cut_off_date != $db->getNullDate())
+		{
+			$selectedHour   = date('G', strtotime($item->cut_off_date));
+			$selectedMinute = date('i', strtotime($item->cut_off_date));
+		}
+		else
+		{
+			$selectedHour   = 0;
+			$selectedMinute = 0;
+		}
+		$lists['cut_off_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'cut_off_hour', ' class="inputbox input-mini" ', $selectedHour);
+		$lists['cut_off_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'cut_off_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d');
+
 		// Registration start time
 		if ($item->registration_start_date != $db->getNullDate())
 		{

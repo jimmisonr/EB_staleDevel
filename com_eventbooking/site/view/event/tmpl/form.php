@@ -214,10 +214,27 @@ $format = 'Y-m-d' ;
 				</tr>
 				<tr>
 					<td class="key">
+						<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_CUT_OFF_DATE' );?>::<?php echo JText::_('EB_CUT_OFF_DATE_EXPLAIN'); ?>"><?php echo JText::_('EB_CUT_OFF_DATE') ; ?></span>
+					</td>
+					<td>
+						<?php echo JHtml::_('calendar', ($this->item->cut_off_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->cut_off_date, $format, null), 'cut_off_date', 'cut_off_date') ; ?>
+						<?php echo $this->lists['cut_off_hour'].' '.$this->lists['cut_off_minute']; ?>
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
 						<?php echo JText::_('EB_PRICE'); ?>
 					</td>
 					<td>
 						<input type="text" name="individual_price" id="individual_price" class="input-mini" size="10" value="<?php echo $this->item->individual_price; ?>" />
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<?php echo JText::_('EB_TAX_RATE'); ?>
+					</td>
+					<td>
+						<input type="text" name="tax_rate" id="tax_rate" class="input-small" size="10" value="<?php echo $this->item->tax_rate; ?>" />
 					</td>
 				</tr>
 				<tr>
@@ -234,14 +251,7 @@ $format = 'Y-m-d' ;
 						<?php echo $this->lists['registration_type'] ; ?>
 					</td>
 				</tr>
-				<tr>
-					<td class="key">
-						<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_CUT_OFF_DATE' );?>::<?php echo JText::_('EB_CUT_OFF_DATE_EXPLAIN'); ?>"><?php echo JText::_('EB_CUT_OFF_DATE') ; ?></span>
-					</td>
-					<td>
-						<?php echo JHtml::_('calendar', ($this->item->cut_off_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->cut_off_date, $format, null), 'cut_off_date', 'cut_off_date') ; ?>
-					</td>
-				</tr>
+
 				<tr>
 					<td class="key">
 						<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_MAX_NUMBER_REGISTRANTS' );?>::<?php echo JText::_('EB_MAX_NUMBER_REGISTRANTS_EXPLAIN'); ?>"><?php echo JText::_('EB_MAX_NUMBER_REGISTRANTS'); ?></span>
