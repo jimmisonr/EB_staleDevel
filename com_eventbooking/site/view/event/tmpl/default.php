@@ -260,7 +260,7 @@ else
 											if ($item->discounted_price > 0)
 											{
 												echo EventbookingHelper::formatCurrency($item->discounted_price, $this->config, $item->currency_symbol);
-												if ($item->early_bird_discount_date != $nullDate)
+												if ($item->early_bird_discount_amount > 0 && $item->early_bird_discount_date != $this->nullDate)
 												{
 													echo ' <em> '.JText::sprintf('EB_UNTIl_DATE', JHtml::_('date', $item->early_bird_discount_date, $this->config->date_format, null)).'</em>';
 												}
