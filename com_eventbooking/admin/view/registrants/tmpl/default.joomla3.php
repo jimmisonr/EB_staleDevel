@@ -104,7 +104,7 @@ $colSpan = 11;
 				<?php
 				}
 				?>
-				<th width="5%" class="title" nowrap="nowrap">
+				<th width="5%" class="title">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_REGISTRATION_STATUS'), 'tbl.published', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
 				<?php
@@ -112,7 +112,7 @@ $colSpan = 11;
 				{
 					$colSpan++;
 				?>
-					<th width="5%" class="title" nowrap="nowrap">
+					<th width="8%" class="title">
 						<?php echo JHtml::_('grid.sort',  JText::_('EB_CHECKED_IN'), 'tbl.checked_in', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 					</th>
 				<?php

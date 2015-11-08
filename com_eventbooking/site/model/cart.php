@@ -269,7 +269,7 @@ class EventbookingModelCart extends RADModel
 				$row->rate = round($row->rate * (1 + $taxRate / 100), 2);
 				if ($config->show_discounted_price)
 				{
-					$row->discounted_price = round($row->discounted_price * (1 + $taxRate / 100), 2);
+					$row->discounted_rate = round($row->discounted_rate * (1 + $taxRate / 100), 2);
 				}
 			}
 		}

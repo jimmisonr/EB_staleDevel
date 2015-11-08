@@ -130,6 +130,14 @@ abstract class EventbookingHelperJquery
 			JHtml::_('stylesheet', EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/assets/js/validate/css/validationEngine.jquery.css', false, false);
 
 			$config      = EventbookingHelper::getConfig();
+			if ($config->multiple_booking)
+			{
+				$eventId = 0;
+			}
+			else
+			{
+				$eventId = JFactory::getApplication()->input->getInt('event_id', 0);
+			}
 			$dateFormat  = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
 			$dateFormat  = str_replace('%', '', $dateFormat);
 			$humanFormat = str_replace('Y', 'YYYY', $dateFormat);
@@ -319,7 +327,7 @@ abstract class EventbookingHelperJquery
 				                },
 				                "ajaxEmailCall": {
 				                	"url": "' . EventbookingHelper::getSiteUrl() . 'index.php?option=com_eventbooking&task=validate_email&event_id=' .
-				JRequest::getInt('event_id') . '",
+				$eventId . '",
 				                    // you may want to pass extra data on the ajax call			                    
 				                    "alertText": "' . JText::_('EB_VALIDATION_INVALID_EMAIL') . '",
 				                },
