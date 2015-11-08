@@ -201,7 +201,7 @@ else
 				availableQuantity = arrQuantities[index] ;
 				if ((availableQuantity != -1) && (enteredQuantity >availableQuantity)) {
 					alert("<?php echo JText::_("EB_INVALID_QUANTITY"); ?>" + availableQuantity);
-					a.push(jQuery('input[name="event_id[]"]')[i].focus());
+					jQuery('input[name="event_id[]"]')[i].focus();
 					return false ;
 				}
 			}
