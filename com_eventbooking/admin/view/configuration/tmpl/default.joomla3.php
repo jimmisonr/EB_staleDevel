@@ -522,6 +522,14 @@ $config = $this->config;
 						<textarea name="conversion_tracking_code" class="input-xlarge" rows="10"><?php echo $config->conversion_tracking_code;?></textarea>
 					</div>
 				</div>
+				<div class="control-group">
+					<div class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('debug', JText::_('EB_DEBUG'), JText::_('EB_DEBUG_EXPLAIN')); ?>
+					</div>
+					<div class="controls">
+						<?php echo EventbookingHelperHtml::getBooleanInput('debug', $config->debug); ?>
+					</div>
+				</div>
 			</div>			
 			<div class="tab-pane" id="theme-page">
 				<div class="control-group">

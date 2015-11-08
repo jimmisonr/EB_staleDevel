@@ -716,7 +716,17 @@ $editor = JFactory::getEditor();
 							<?php echo JText::_('EB_CONVERSION_TRACKING_CODE_EXPLAIN');?>
 						</td>
 					</tr>
-					
+					<tr>
+						<td class="key">
+							<?php echo JText::_('EB_DEBUG'); ?>
+						</td>
+						<td>
+							<?php echo $this->lists['debug']; ?>
+						</td>
+						<td>
+							<?php echo JText::_('EB_DEBUG_EXPLAIN');?>
+						</td>
+					</tr>
 				</table>		
 			</div>			
 			<div class="tab-pane" id="theme-page">

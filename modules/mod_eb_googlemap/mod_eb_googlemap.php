@@ -1,23 +1,31 @@
 <?php
 /**
- * @version        2.0.0
- * @package        Joomla
- * @subpackage     Event Booking
- * @author         Tuan Pham Ngoc
- * @copyright      Copyright (C) 2010 - 2015 Ossolution Team
- * @license        GNU/GPL, see LICENSE.php
+ * @version            2.0.6
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 
 // no direct access
 defined('_JEXEC') or die;
 
-error_reporting(0);
 $document = JFactory::getDocument();
 $document->addStyleSheet(JUri::root().'modules/mod_eb_googlemap/asset/style.css');
 $document->addStyleSheet(JUri::root().'media/com_eventbooking/assets/css/style.css');
 require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
 require_once dirname(__FILE__).'/helper.php';
 $config = EventbookingHelper::getConfig();
+if ($config->debug)
+{
+	error_reporting(E_ALL);
+}
+else
+{
+	error_reporting(0);
+}
+
 if ($config->load_jquery !== '0')
 {
 	EventbookingHelper::loadJQuery();

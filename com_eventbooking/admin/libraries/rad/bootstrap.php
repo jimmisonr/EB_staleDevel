@@ -4,7 +4,7 @@
  */
 defined('_JEXEC') or die();
 
-error_reporting(0);
+
 define('EB_TBC_DATE', '2099-12-31 00:00:00');
 
 JLoader::registerPrefix('RAD', dirname(__FILE__));
@@ -29,7 +29,15 @@ else
 JLoader::register('os_payments', JPATH_ROOT . '/components/com_eventbooking/payments/os_payments.php');
 JLoader::register('os_payment', JPATH_ROOT . '/components/com_eventbooking/payments/os_payment.php');
 JLoader::register('JFile', JPATH_LIBRARIES . '/joomla/filesystem/file.php');
+$config = EventbookingHelper::getConfig();
 
-
+if ($config->debug)
+{
+	error_reporting(E_ALL);
+}
+else
+{
+	error_reporting(0);
+}
 
 

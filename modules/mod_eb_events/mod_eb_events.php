@@ -13,12 +13,21 @@ defined('_JEXEC') or die;
 // no direct access
 defined('_JEXEC') or die;
 
-error_reporting(0);
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/route.php';
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/jquery.php';
 $user     = JFactory::getUser();
 $config   = EventbookingHelper::getConfig();
+
+if ($config->debug)
+{
+	error_reporting(E_ALL);
+}
+else
+{
+	error_reporting(0);
+}
+
 $document = JFactory::getDocument();
 EventbookingHelper::loadLanguage();
 $db      = JFactory::getDbo();

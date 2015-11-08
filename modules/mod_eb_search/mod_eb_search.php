@@ -8,9 +8,20 @@
  * @license        GNU/GPL, see LICENSE.php
  */
 defined('_JEXEC') or die ('');
-error_reporting(0);
+
 JFactory::getDocument()->addStylesheet(JUri::base(true) . '/media/com_eventbooking/assets/css/style.css', 'text/css', null, null);
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
+
+$config = EventbookingHelper::getConfig();
+if ($config->debug)
+{
+	error_reporting(E_ALL);
+}
+else
+{
+	error_reporting(0);
+}
+
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/database.php';
 EventbookingHelper::loadLanguage();
 
