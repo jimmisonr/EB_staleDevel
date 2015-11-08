@@ -168,6 +168,7 @@ class EventbookingModelCalendar extends RADModel
 		$date->setTime(0, 0, 0);
 		$startDate = $date->toSql(true);
 		$date->modify('+6 day');
+		$date->setTime(23, 59, 59);
 		$endDate = $date->toSql(true);
 		$query->select('a.*')
 			->select('b.name AS location_name')
