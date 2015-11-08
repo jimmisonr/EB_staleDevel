@@ -4678,69 +4678,31 @@ class EventbookingHelper
 	 */
 	public static function getDailyRecurringEventDates($startDate, $endDate, $dailyFrequency, $numberOccurencies)
 	{
-		$eventDates = array($startDate);
-		if (version_compare(PHP_VERSION, '5.3.0', 'ge'))
+		$eventDates   = array($startDate);
+		$timeZone     = new DateTimeZone(JFactory::getConfig()->get('offset'));
+		$date         = new DateTime($startDate, $timeZone);
+		$dateInterval = new DateInterval('P' . $dailyFrequency . 'D');
+		if ($numberOccurencies)
 		{
-			$timeZone     = new DateTimeZone(JFactory::getConfig()->get('offset'));
-			$date         = new DateTime($startDate, $timeZone);
-			$dateInterval = new DateInterval('P' . $dailyFrequency . 'D');
-			if ($numberOccurencies)
+			for ($i = 1; $i < $numberOccurencies; $i++)
 			{
-				for ($i = 1; $i < $numberOccurencies; $i++)
-				{
-					$date->add($dateInterval);
-					$eventDates[] = $date->format('Y-m-d H:i:s');
-				}
-			}
-			else
-			{
-				$recurringEndDate = new DateTime($endDate . ' 23:59:59', $timeZone);
-				while (true)
-				{
-					$date->add($dateInterval);
-					if ($date <= $recurringEndDate)
-					{
-						$eventDates[] = $date->format('Y-m-d H:i:s');
-					}
-					else
-					{
-						break;
-					}
-				}
+				$date->add($dateInterval);
+				$eventDates[] = $date->format('Y-m-d H:i:s');
 			}
 		}
 		else
 		{
-			// Convert to unix timestamp for easili maintenance
-			$startTime = strtotime($startDate);
-			$endTime   = strtotime($endDate . ' 23:59:59');
-			if ($numberOccurencies)
+			$recurringEndDate = new DateTime($endDate . ' 23:59:59', $timeZone);
+			while (true)
 			{
-				$count = 1;
-				$i     = 1;
-				while ($count < $numberOccurencies)
+				$date->add($dateInterval);
+				if ($date <= $recurringEndDate)
 				{
-					$i++;
-					$count++;
-					$nextEventDate = $startTime + ($i - 1) * $dailyFrequency * 24 * 3600;
-					$eventDates[]  = strftime('%Y-%m-%d %H:%M:%S', $nextEventDate);
+					$eventDates[] = $date->format('Y-m-d H:i:s');
 				}
-			}
-			else
-			{
-				$i = 1;
-				while (true)
+				else
 				{
-					$i++;
-					$nextEventDate = $startTime + ($i - 1) * 24 * $dailyFrequency * 3600;
-					if ($nextEventDate <= $endTime)
-					{
-						$eventDates[] = strftime('%Y-%m-%d %H:%M:%S', $nextEventDate);
-					}
-					else
-					{
-						break;
-					}
+					break;
 				}
 			}
 		}
@@ -4762,110 +4724,58 @@ class EventbookingHelper
 	public static function getWeeklyRecurringEventDates($startDate, $endDate, $weeklyFrequency, $numberOccurrences, $weekDays)
 	{
 		$eventDates = array();
-		if (version_compare(PHP_VERSION, '5.3.0', 'ge'))
-		{
-			$timeZone           = new DateTimeZone(JFactory::getConfig()->get('offset'));
-			$recurringStartDate = new Datetime($startDate, $timeZone);
-			$hour               = $recurringStartDate->format('H');
-			$minutes            = $recurringStartDate->format('i');
-			$startWeek          = clone $recurringStartDate->modify(('Sunday' == $recurringStartDate->format('l')) ? 'Sunday this week' : 'Sunday last week');
-			$startWeek->setTime($hour, $minutes, 0);
-			$dateInterval = new DateInterval('P' . $weeklyFrequency . 'W');
-			if ($numberOccurrences)
-			{
-				$count = 0;
-				while ($count < $numberOccurrences)
-				{
-					foreach ($weekDays as $weekDay)
-					{
-						$date = clone $startWeek;
-						if ($weekDay > 0)
-						{
-							$date->add(new DateInterval('P' . $weekDay . 'D'));
-						}
-						if (($date >= $recurringStartDate) && ($count < $numberOccurrences))
-						{
-							$eventDates[] = $date->format('Y-m-d H:i:s');
-							$count++;
-						}
-					}
-					$startWeek->add($dateInterval);
-				}
-			}
-			else
-			{
-				$recurringEndDate = new DateTime($endDate . ' 23:59:59', $timeZone);
-				while (true)
-				{
-					foreach ($weekDays as $weekDay)
-					{
-						$date = clone $startWeek;
-						if ($weekDay > 0)
-						{
-							$date->add(new DateInterval('P' . $weekDay . 'D'));
-						}
-						if (($date >= $recurringStartDate) && ($date <= $recurringEndDate))
-						{
-							$eventDates[] = $date->format('Y-m-d H:i:s');
-						}
-					}
-					if ($date > $recurringEndDate)
-					{
-						break;
-					}
 
-					$startWeek->add($dateInterval);
+		$timeZone           = new DateTimeZone(JFactory::getConfig()->get('offset'));
+		$recurringStartDate = new Datetime($startDate, $timeZone);
+		$hour               = $recurringStartDate->format('H');
+		$minutes            = $recurringStartDate->format('i');
+		$startWeek          = clone $recurringStartDate->modify(('Sunday' == $recurringStartDate->format('l')) ? 'Sunday this week' : 'Sunday last week');
+		$startWeek->setTime($hour, $minutes, 0);
+		$dateInterval = new DateInterval('P' . $weeklyFrequency . 'W');
+		if ($numberOccurrences)
+		{
+			$count = 0;
+			while ($count < $numberOccurrences)
+			{
+				foreach ($weekDays as $weekDay)
+				{
+					$date = clone $startWeek;
+					if ($weekDay > 0)
+					{
+						$date->add(new DateInterval('P' . $weekDay . 'D'));
+					}
+					if (($date >= $recurringStartDate) && ($count < $numberOccurrences))
+					{
+						$eventDates[] = $date->format('Y-m-d H:i:s');
+						$count++;
+					}
 				}
+				$startWeek->add($dateInterval);
 			}
 		}
 		else
 		{
-			$startTime         = strtotime($startDate);
-			$originalStartTime = $startTime;
-			$endTime           = strtotime($endDate . ' 23:59:59');
-			if ($numberOccurrences)
+			$recurringEndDate = new DateTime($endDate . ' 23:59:59', $timeZone);
+			while (true)
 			{
-				$count     = 0;
-				$i         = 0;
-				$weekDay   = date('w', $startTime);
-				$startTime = $startTime - $weekDay * 24 * 3600;
-				while ($count < $numberOccurrences)
+				foreach ($weekDays as $weekDay)
 				{
-					$i++;
-					$startWeekTime = $startTime + ($i - 1) * $weeklyFrequency * 7 * 24 * 3600;
-					foreach ($weekDays as $weekDay)
+					$date = clone $startWeek;
+					if ($weekDay > 0)
 					{
-						$nextEventDate = $startWeekTime + $weekDay * 24 * 3600;
-						if (($nextEventDate >= $originalStartTime) && ($count < $numberOccurrences))
-						{
-							$eventDates[] = strftime('%Y-%m-%d %H:%M:%S', $nextEventDate);
-							$count++;
-						}
+						$date->add(new DateInterval('P' . $weekDay . 'D'));
+					}
+					if (($date >= $recurringStartDate) && ($date <= $recurringEndDate))
+					{
+						$eventDates[] = $date->format('Y-m-d H:i:s');
 					}
 				}
-			}
-			else
-			{
-				$weekDay   = date('w', $startTime);
-				$startTime = $startTime - $weekDay * 24 * 3600;
-				while ($startTime < $endTime)
+				if ($date > $recurringEndDate)
 				{
-					foreach ($weekDays as $weekDay)
-					{
-						$nextEventDate = $startTime + $weekDay * 24 * 3600;;
-						if ($nextEventDate < $originalStartTime)
-							continue;
-						if ($nextEventDate <= $endTime)
-						{
-							$eventDates[] = strftime('%Y-%m-%d %H:%M:%S', $nextEventDate);
-						}
-						else
-						{
-							break;
-						}
-					}
-					$startTime += $weeklyFrequency * 7 * 24 * 3600;
+					break;
 				}
+
+				$startWeek->add($dateInterval);
 			}
 		}
 
@@ -4886,112 +4796,52 @@ class EventbookingHelper
 	public static function getMonthlyRecurringEventDates($startDate, $endDate, $monthlyFrequency, $numberOccurrences, $monthDays)
 	{
 		$eventDates = array();
-		if (version_compare(PHP_VERSION, '5.3.0', 'ge'))
+		$timeZone           = new DateTimeZone(JFactory::getConfig()->get('offset'));
+		$recurringStartDate = new Datetime($startDate, $timeZone);
+		$date               = clone $recurringStartDate;
+		$dateInterval       = new DateInterval('P' . $monthlyFrequency . 'M');
+		$monthDays          = explode(',', $monthDays);
+		if ($numberOccurrences)
 		{
-			$timeZone           = new DateTimeZone(JFactory::getConfig()->get('offset'));
-			$recurringStartDate = new Datetime($startDate, $timeZone);
-			$date               = clone $recurringStartDate;
-			$dateInterval       = new DateInterval('P' . $monthlyFrequency . 'M');
-			$monthDays          = explode(',', $monthDays);
-			if ($numberOccurrences)
+			$count = 0;
+			while ($count < $numberOccurrences)
 			{
-				$count = 0;
-				while ($count < $numberOccurrences)
+				$currentMonth = $date->format('m');
+				$currentYear  = $date->format('Y');
+				foreach ($monthDays as $day)
 				{
-					$currentMonth = $date->format('m');
-					$currentYear  = $date->format('Y');
-					foreach ($monthDays as $day)
+					$date->setDate($currentYear, $currentMonth, $day);
+					if (($date >= $recurringStartDate) && ($count < $numberOccurrences))
 					{
-						$date->setDate($currentYear, $currentMonth, $day);
-						if (($date >= $recurringStartDate) && ($count < $numberOccurrences))
-						{
-							$eventDates[] = $date->format('Y-m-d H:i:s');
-							$count++;
-						}
+						$eventDates[] = $date->format('Y-m-d H:i:s');
+						$count++;
 					}
-					$date->add($dateInterval);
 				}
-			}
-			else
-			{
-				$recurringEndDate = new DateTime($endDate . ' 23:59:59', $timeZone);
-				while (true)
-				{
-					$currentMonth = $date->format('m');
-					$currentYear  = $date->format('Y');
-					foreach ($monthDays as $day)
-					{
-						$date->setDate($currentYear, $currentMonth, $day);
-						if (($date >= $recurringStartDate) && ($date <= $recurringEndDate))
-						{
-							$eventDates[] = $date->format('Y-m-d H:i:s');
-						}
-					}
-					if ($date > $recurringEndDate)
-					{
-						break;
-					}
-					$date->add(new DateInterval('P' . $monthlyFrequency . 'M'));
-				}
+				$date->add($dateInterval);
 			}
 		}
 		else
 		{
-			$startTime         = strtotime($startDate);
-			$hour              = date('H', $startTime);
-			$minute            = date('i', $startTime);
-			$originalStartTime = $startTime;
-			$endTime           = strtotime($endDate . ' 23:59:59');
-			$monthDays         = explode(',', $monthDays);
-			if ($numberOccurrences)
+			$recurringEndDate = new DateTime($endDate . ' 23:59:59', $timeZone);
+			while (true)
 			{
-				$count        = 0;
-				$currentMonth = date('m', $startTime);
-				$currentYear  = date('Y', $startTime);
-				while ($count < $numberOccurrences)
+				$currentMonth = $date->format('m');
+				$currentYear  = $date->format('Y');
+				foreach ($monthDays as $day)
 				{
-					foreach ($monthDays as $day)
+					$date->setDate($currentYear, $currentMonth, $day);
+					if (($date >= $recurringStartDate) && ($date <= $recurringEndDate))
 					{
-						$nextEventDate = mktime($hour, $minute, 0, $currentMonth, $day, $currentYear);
-						if (($nextEventDate >= $originalStartTime) && ($count < $numberOccurrences))
-						{
-							$eventDates[] = strftime('%Y-%m-%d %H:%M:%S', $nextEventDate);
-							$count++;
-						}
-					}
-					$currentMonth += $monthlyFrequency;
-					if ($currentMonth > 12)
-					{
-						$currentMonth -= 12;
-						$currentYear++;
+						$eventDates[] = $date->format('Y-m-d H:i:s');
 					}
 				}
-			}
-			else
-			{
-				$currentMonth = date('m', $startTime);
-				$currentYear  = date('Y', $startTime);
-				while ($startTime < $endTime)
+				if ($date > $recurringEndDate)
 				{
-					foreach ($monthDays as $day)
-					{
-						$nextEventDate = mktime($hour, $minute, 0, $currentMonth, $day, $currentYear);
-						if (($nextEventDate >= $originalStartTime) && ($nextEventDate <= $endTime))
-						{
-							$eventDates[] = strftime('%Y-%m-%d %H:%M:%S', $nextEventDate);
-						}
-					}
-					$currentMonth += $monthlyFrequency;
-					if ($currentMonth > 12)
-					{
-						$currentMonth -= 12;
-						$currentYear++;
-					}
-					$startTime = mktime(0, 0, 0, $currentMonth, 1, $currentYear);
+					break;
 				}
+				$date->add(new DateInterval('P' . $monthlyFrequency . 'M'));
 			}
 		}
-
 
 		return $eventDates;
 	}
