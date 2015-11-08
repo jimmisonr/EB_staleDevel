@@ -152,6 +152,7 @@ class EventbookingModelCalendar extends RADModel
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$db          = $this->getDbo();
 		$query       = $db->getQuery(true);
+		$startDay    = (int)$config->calendar_start_date;
 
 		// get first day of week of today
 		$currentDateData = self::getCurrentDateData();
@@ -193,7 +194,8 @@ class EventbookingModelCalendar extends RADModel
 		$eventArr = array();
 		foreach ($events as $event)
 		{
-			$eventArr[date('w', strtotime($event->event_date))][] = $event;
+			$weekDay              = (date('w', strtotime($event->event_date)) - $startDay + 7) % 7;
+			$eventArr[$weekDay][] = $event;
 		}
 
 		return $eventArr;
