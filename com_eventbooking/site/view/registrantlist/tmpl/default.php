@@ -10,6 +10,7 @@
 // no direct access
 defined('_JEXEC') or die;
 $hiddenPhoneClass = $this->bootstrapHelper->getClassMapping('hidden-phone');
+$cols = 5;
 ?>
 <div id="eb-registrants-list-page" class="eb-container">
 <h1 class="eb_title"><?php echo JText::_('EB_REGISTRANT_LIST'); ?></h1>
@@ -40,6 +41,7 @@ if (count($this->items))
 				{
 					foreach($this->fields as $fieldId)
 					{
+						$cols++;
 					?>
 						<th class="hidden-phone">
 							<?php echo $this->fieldTitles[$fieldId] ; ?>
@@ -65,8 +67,7 @@ if (count($this->items))
 			</tr>
 		</tfoot>
 	<tbody>
-	<?php
-	$k = 0;
+	<?php	
 	for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 	{
 		$row = $this->items[$i];
@@ -109,8 +110,7 @@ if (count($this->items))
 				}
 			?>
 		</tr>
-		<?php
-		$k = 1 - $k;
+		<?php		
 	}
 	?>
 	</tbody>
