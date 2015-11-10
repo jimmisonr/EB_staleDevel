@@ -59,7 +59,7 @@ if (count($this->items))
 				{
 				?>
 					<td colspan="<?php echo $cols; ?>">
-						<?php echo $this->pagination->getListFooter(); ?>
+						<?php echo $this->pagination->getPagesLinks();?>
 					</td>
 				<?php
 				}
