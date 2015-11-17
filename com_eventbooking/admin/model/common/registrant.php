@@ -191,6 +191,10 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	 */
 	public function checkin($id)
 	{
+		$config = EventbookingHelper::getConfig();
+		$db     = $this->getDbo();
+		$query  = $db->getQuery(true);
+
 		$row = $this->getTable();
 		$row->load($id);
 
@@ -207,19 +211,24 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 		$row->checked_in = 1;
 		$row->store();
 
-		if ($row->is_group_billing)
+		if ($row->is_group_billing && $config->collect_member_information)
 		{
-			$config = EventbookingHelper::getConfig();
-			if ($config->collect_member_information)
-			{
-				$db    = $this->getDbo();
-				$query = $db->getQuery(true);
-				$query->update('#__eb_registrants')
-					->set('checked_in = 1')
-					->where('group_id = ' . $row->id);
-				$db->setQuery($query);
-				$db->execute();
-			}
+			$query->update('#__eb_registrants')
+				->set('checked_in = 1')
+				->where('group_id = ' . $row->id);
+			$db->setQuery($query);
+			$db->execute();
+
+			$query->clear();
+		}
+
+		if ($config->multiple_booking)
+		{
+			$query->update('#__eb_registrants')
+				->set('checked_in = 1')
+				->where('cart_id = ' . (int) $row->id);
+			$db->setQuery($query);
+			$db->execute();
 		}
 
 		return 2;
