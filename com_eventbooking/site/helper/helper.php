@@ -2959,7 +2959,7 @@ class EventbookingHelper
 		if (strpos($body, '[QRCODE]') !== false)
 		{
 			EventbookingHelper::generateQrcode($row->transaction_id);
-			$imgTag = '<img src="media/com_eventbooking/qrcodes/'.$row->transaction_id.'.png" border="0" />';
+			$imgTag = '<img src="'.EventbookingHelper::getSiteUrl().'media/com_eventbooking/qrcodes/'.$row->transaction_id.'.png" border="0" />';
 			$body = str_replace("[QRCODE]", $imgTag, $body);
 		}
 
