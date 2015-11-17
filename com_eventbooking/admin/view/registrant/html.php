@@ -26,7 +26,7 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 			for ($i = 0, $n = count($rows); $i < $n; $i++)
 			{
 				$row       = $rows[$i];
-				$options[] = JHtml::_('select.option', $row->id, $row->title . ' (' . JHtml::_('date', $row->event_date, $config->date_format) . ')' .
+				$options[] = JHtml::_('select.option', $row->id, $row->title . ' (' . JHtml::_('date', $row->event_date, $config->date_format, null) . ')' .
 					'', 'id', 'title');
 			}
 		}

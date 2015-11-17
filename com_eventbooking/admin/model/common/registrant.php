@@ -153,7 +153,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			$form      = new RADForm($rowFields);
 			$form->bind($data);
 			$row->payment_method = 'os_offline';
-			$row->register_date  = gmdate('Y-m-d');
+			$row->register_date  = JFactory::getDate()->toSql();
 			$rate                = EventbookingHelper::getRegistrationRate($data['event_id'], $data['number_registrants']);
 			$row->total_amount   = $row->amount = $rate * $data['number_registrants'] + $form->calculateFee();
 			if ($row->number_registrants > 1)

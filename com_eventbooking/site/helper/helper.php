@@ -2955,6 +2955,14 @@ class EventbookingHelper
 			$body    = str_replace("[$key]", $value, $body);
 		}
 		$body        = self::convertImgTags($body);
+
+		if (strpos($body, '[QRCODE]') !== false)
+		{
+			EventbookingHelper::generateQrcode($row->transaction_id);
+			$imgTag = '<img src="media/com_eventbooking/qrcodes/'.$row->transaction_id.'.png" border="0" />';
+			$body = str_replace("[QRCODE]", $imgTag, $body);
+		}
+
 		$attachments = array();
 		if ($config->activate_invoice_feature && $config->send_invoice_to_customer && EventbookingHelper::needInvoice($row))
 		{
@@ -3251,6 +3259,15 @@ class EventbookingHelper
 			$body    = str_replace("[$key]", $value, $body);
 		}
 		$body = self::convertImgTags($body);
+
+
+		if (strpos($body, '[QRCODE]') !== false)
+		{
+			EventbookingHelper::generateQrcode($row->transaction_id);
+			$imgTag = '<img src="'.EventbookingHelper::getSiteUrl().'media/com_eventbooking/qrcodes/'.$row->transaction_id.'.png" border="0" />';
+			$body = str_replace("[QRCODE]", $imgTag, $body);
+		}
+
 		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
 	}
 
