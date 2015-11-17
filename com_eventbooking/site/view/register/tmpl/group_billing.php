@@ -509,25 +509,6 @@ else
 						   value="<?php echo JRequest::getVar('card_holder_name'); ?>"/>
 				</div>
 			</div>
-			<?php
-			if ($method->getName() == 'os_ideal')
-			{
-				$style = '';
-			}
-			else
-			{
-				$style = ' style = "display:none;" ';
-			}
-			?>
-			<div class="<?php echo $controlGroupClass; ?> payment_information" id="tr_bank_list" <?php echo $style; ?>>
-				<label class="<?php echo $controlLabelClass; ?>" for="bank_id">
-					<?php echo JText::_('EB_BANK_LIST'); ?><span class="required">*</span>
-				</label>
-
-				<div class="<?php echo $controlsClass; ?>">
-					<?php echo isset($this->lists['bank_id']) ? $this->lists['bank_id'] : ''; ?>
-				</div>
-			</div>
 		<?php
 		}
 	}

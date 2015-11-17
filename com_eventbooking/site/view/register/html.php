@@ -169,19 +169,6 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			$enableCoupon = 0;
 		}
 
-		$idealEnabled = EventbookingHelper::idealEnabled();
-		if ($idealEnabled)
-		{
-			$bankLists = EventbookingHelper::getBankLists();
-			$options   = array();
-			foreach ($bankLists as $bankId => $bankName)
-			{
-				$options[] = JHtml::_('select.option', $bankId, $bankName);
-			}
-			$lists['bank_id'] = JHtml::_('select.genericlist', $options, 'bank_id', ' class="inputbox" ', 'value', 'text',
-				$input->post->getInt('bank_id'));
-		}
-
 		// Check to see if there is payment processing fee or not
 		$showPaymentFee = false;
 		foreach ($methods as $method)
@@ -254,7 +241,6 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$this->enableCoupon         = $enableCoupon;
 		$this->userId               = $userId;
 		$this->lists                = $lists;
-		$this->idealEnabled         = $idealEnabled;
 		$this->depositPayment       = $depositPayment;
 		$this->paymentType          = $paymentType;
 		$this->message              = EventbookingHelper::getMessages();
@@ -442,18 +428,6 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 				break;
 			}
 		}
-		$idealEnabled = EventbookingHelper::idealEnabled();
-		if ($idealEnabled)
-		{
-			$bankLists = EventbookingHelper::getBankLists();
-			$options   = array();
-			foreach ($bankLists as $bankId => $bankName)
-			{
-				$options[] = JHtml::_('select.option', $bankId, $bankName);
-			}
-			$lists['bank_id'] = JHtml::_('select.genericlist', $options, 'bank_id', ' class="inputbox" ', 'value', 'text',
-				$input->post->getInt('bank_id'));
-		}
 		##Add support for deposit payment
 		$paymentType = $input->post->getInt('payment_type', 0);
 		if ($config->activate_deposit_feature)
@@ -518,7 +492,6 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$this->enableCoupon         = $enableCoupon;
 		$this->userId               = $userId;
 		$this->lists                = $lists;
-		$this->idealEnabled         = $idealEnabled;
 		$this->depositPayment       = $depositPayment;
 		$this->message              = $message;
 		$this->fieldSuffix          = $fieldSuffix;

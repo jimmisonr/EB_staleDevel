@@ -130,14 +130,6 @@ function updatePaymentMethod()
             $('#tr_card_type').hide();
             $('#tr_card_holder_name').hide();
         }
-        if (paymentMethod == 'os_ideal')
-        {
-            $('#tr_bank_list').show();
-        }
-        else
-        {
-            $('#tr_bank_list').hide();
-        }
     });
 }
 

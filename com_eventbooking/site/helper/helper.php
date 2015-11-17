@@ -2712,42 +2712,6 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Get list of banks for ideal payment plugin
-	 * @return array
-	 */
-	public static function getBankLists()
-	{
-		$idealPlugin = os_payments::loadPaymentMethod('os_ideal');
-		$params      = new JRegistry($idealPlugin->params);
-		if (file_exists(JPATH_ROOT . '/components/com_eventbooking/payments/Mollie/API/Autoloader.php'))
-		{
-			$mollie = new Mollie_API_Client();
-			$mollie->setApiKey($params->get('api_key'));
-			$bankLists = array();
-			$issuers   = $mollie->issuers->all();
-			foreach ($issuers as $issuer)
-			{
-				if ($issuer->method == Mollie_API_Object_Method::IDEAL)
-				{
-					$bankLists[$issuer->id] = $issuer->name;
-				}
-			}
-		}
-		else
-		{
-			$partnerId = $params->get('partner_id');
-			$ideal     = new iDEAL_Payment($partnerId);
-			if (!$params->get('ideal_mode', 0))
-			{
-				$ideal->setTestmode(true);
-			}
-			$bankLists = $ideal->getBanks();
-		}
-
-		return $bankLists;
-	}
-
-	/**
 	 * Send notification emails to waiting list users when someone cancel registration
 	 *
 	 * @param $row

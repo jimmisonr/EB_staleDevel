@@ -278,18 +278,6 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		{
 			$enableCoupon = 0;
 		}
-		$idealEnabled = EventbookingHelper::idealEnabled();
-		if ($idealEnabled)
-		{
-			$bankLists = EventbookingHelper::getBankLists();
-			$options   = array();
-			foreach ($bankLists as $bankId => $bankName)
-			{
-				$options[] = JHtml::_('select.option', $bankId, $bankName);
-			}
-			$lists['bank_id'] = JHtml::_('select.genericlist', $options, 'bank_id', ' class="inputbox" ', 'value', 'text',
-				$input->post->getInt('bank_id'));
-		}
 
 		// Add support for deposit payment
 		$paymentType = $input->post->getInt('payment_type', 0);
@@ -341,7 +329,6 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		if ($waitingList)
 		{
 			$enableCoupon   = false;
-			$idealEnabled   = false;
 			$depositPayment = false;
 			$paymentType    = false;
 			$showPaymentFee = false;
@@ -350,6 +337,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		{
 			$form->setEventId($eventId);
 		}
+
 		// Assign these parameters
 		$this->paymentMethod        = $paymentMethod;
 		$this->lists                = $lists;
@@ -359,7 +347,6 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$this->enableCoupon         = $enableCoupon;
 		$this->userId               = $userId;
 		$this->lists                = $lists;
-		$this->idealEnabled         = $idealEnabled;
 		$this->depositPayment       = $depositPayment;
 		$this->paymentType          = $paymentType;
 		$this->showCaptcha          = $showCaptcha;
