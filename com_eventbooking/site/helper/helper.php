@@ -4992,23 +4992,4 @@ class EventbookingHelper
 
 		return $list;
 	}
-
-	/**
-	 *
-	 * @param string $vName
-	 */
-	public static function addSubMenus($vName = 'dashboard')
-	{
-		JSubMenuHelper::addEntry(JText::_('Dashboard'), 'index.php?option=com_eventbooking&view=dashboard', $vName == 'dashboard');
-		JSubMenuHelper::addEntry(JText::_('Categories'), 'index.php?option=com_eventbooking&view=categories', $vName == 'categories');
-		JSubMenuHelper::addEntry(JText::_('Events'), 'index.php?option=com_eventbooking&view=events', $vName == 'events');
-		JSubMenuHelper::addEntry(JText::_('Registrants'), 'index.php?option=com_eventbooking&view=registrants', $vName == 'registrants');
-		JSubMenuHelper::addEntry(JText::_('Custom Fields'), 'index.php?option=com_eventbooking&view=fields', $vName == 'fields');
-		JSubMenuHelper::addEntry(JText::_('Locations'), 'index.php?option=com_eventbooking&view=locations', $vName == 'locations');
-		JSubMenuHelper::addEntry(JText::_('Coupons'), 'index.php?option=com_eventbooking&view=coupons', $vName == 'coupons');
-		JSubMenuHelper::addEntry(JText::_('Payment Plugins'), 'index.php?option=com_eventbooking&view=plugins', $vName == 'plugins');
-		JSubMenuHelper::addEntry(JText::_('Emails & Messages'), 'index.php?option=com_eventbooking&view=message', $vName == 'language');
-		JSubMenuHelper::addEntry(JText::_('Translation'), 'index.php?option=com_eventbooking&view=language', $vName == 'language');
-		JSubMenuHelper::addEntry(JText::_('Configuration'), 'index.php?option=com_eventbooking&view=configuration', $vName == 'configuration');
-	}
 }

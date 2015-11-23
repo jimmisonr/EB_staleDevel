@@ -84,14 +84,10 @@ class RADViewList extends RADViewHtml
 			$this->lists['filter_access']   = JHtml::_('access.level', 'filter_access', $this->state->filter_access, 'class="input-medium" onchange="submit();"', true);
 			$this->lists['filter_language'] = JHtml::_('select.genericlist', JHtml::_('contentlanguage.existing', true, true), 'filter_language',
 				' onchange="submit();" ', 'value', 'text', $this->state->filter_language);
-			if (version_compare(JVERSION, '3.0', 'ge'))
-			{
-				EventbookingHelperHtml::renderSubmenu($this->name);
-			}
-			else
-			{
-				EventbookingHelper::addSubMenus($this->name);
-			}
+
+			// Render sub-menus
+			EventbookingHelperHtml::renderSubmenu($this->name);
+
 			$this->addToolbar();
 		}
 	}
