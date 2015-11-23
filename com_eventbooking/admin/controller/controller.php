@@ -18,13 +18,7 @@ class EventbookingController extends RADControllerAdmin
 		JFactory::getDocument()->addStyleSheet(JURI::base(true) . '/components/com_eventbooking/assets/css/style.css');
 
 		parent::display($cachable, $urlparams);
-
-		if (version_compare(JVERSION, '3.0', 'le'))
-		{
-			EventbookingHelper::loadJQuery();
-			EventbookingHelper::loadBootstrap();
-		}
-
+		
 		if ($this->input->getCmd('format', 'html') != 'raw')
 		{
 			EventbookingHelper::displayCopyRight();
