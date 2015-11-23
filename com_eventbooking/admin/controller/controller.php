@@ -2217,7 +2217,8 @@ class EventbookingController extends RADControllerAdmin
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waiting',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waitings',
 			JPATH_ROOT . '/components/com_eventbooking/models',
-			JPATH_ROOT . '/components/com_eventbooking/assets'
+			JPATH_ROOT . '/components/com_eventbooking/assets',
+			JPATH_ROOT . '/components/com_eventbooking/views'
 		);
 
 		foreach ($deleteFiles as $file)
@@ -2234,16 +2235,8 @@ class EventbookingController extends RADControllerAdmin
 			{
 				JFolder::delete(JPATH_ROOT . $folder);
 			}
-		}
-
-		// We don't need views folder for Joomla 3
-		if (version_compare(JVERSION, '3.0', 'ge'))
-		{
-			if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/views'))
-			{
-				JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/views');
-			}
-		}
+		}		
+		
 		// Redirect to dashboard view
 		$installType = $this->input->getCmd('install_type', '');
 		if ($installType == 'install')
@@ -2254,6 +2247,7 @@ class EventbookingController extends RADControllerAdmin
 		{
 			$msg = JText::_('The extension was successfully updated');
 		}
+		
 		//Redirecting users to dasdboard
 		JFactory::getApplication()->redirect('index.php?option=com_eventbooking&view=dashboard', $msg);
 	}

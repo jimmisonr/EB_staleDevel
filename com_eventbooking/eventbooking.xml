@@ -41,8 +41,7 @@
     <filename>fields.xml</filename>
     <folder>controller</folder>	
     <folder>model</folder>		    
-    <folder>view</folder>
-	<folder>views</folder>	
+    <folder>view</folder>	
     <folder>helper</folder>
     <folder>payments</folder>     
     <folder>emailtemplates</folder>
