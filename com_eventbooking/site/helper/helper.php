@@ -3631,23 +3631,7 @@ class EventbookingHelper
 			self::getInstalledVersion() . ', Copyright (C) 2010 - ' . date('Y') .
 			' <a href="http://joomdonation.com" target="_blank"><strong>Ossolution Team</strong></a></div>';
 	}
-
-	/**
-	 * Load jquery library
-	 */
-	public static function loadJQuery()
-	{
-		JHtml::_('jquery.framework');
-	}
-
-	/**
-	 * Load bootstrap css and javascript file
-	 */
-	public static function loadBootstrap($loadJs = true)
-	{
-		JFactory::getDocument()->addStyleSheet(JUri::root(true) . '/media/com_eventbooking/assets/bootstrap/css/bootstrap.css');
-	}	
-	
+		
 	/**
 	 * Get version number of GD version installed
 	 * Enter description here ...

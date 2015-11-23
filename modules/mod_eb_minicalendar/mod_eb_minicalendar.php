@@ -22,7 +22,7 @@ if ($option != 'com_eventbooking')
 	$document->addStyleSheet($rootUrl . "/media/com_eventbooking/assets/css/style.css");
 	if ($config->load_jquery !== '0')
 	{
-		EventbookingHelper::loadJQuery();
+		JHtml::_('jquery.framework');
 	}
 	JHtml::_('script', JUri::root() . '/media/com_eventbooking/assets/js/noconflict.js', false, false);
 
