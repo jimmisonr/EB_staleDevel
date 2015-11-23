@@ -22,15 +22,23 @@ class EventbookingController extends RADController
 		$task     = $this->getTask();
 		$document = JFactory::getDocument();
 		$config   = EventbookingHelper::getConfig();
-		if ($config->load_jquery !== '0')
+
+		if ($config->show_save_to_personal_calendar)
 		{
-			EventbookingHelper::loadJQuery();
+			JHtml::_('bootstrap.framework');
 		}
+		else
+		{
+			JHtml::_('jquery.framework');
+		}
+
+		$rootUrl = JUri::root(true);
+
 		if ($config->load_bootstrap_css_in_frontend !== '0')
 		{
-			EventbookingHelper::loadBootstrap();
+			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap.css');
 		}
-		$rootUrl = JUri::root(true);
+
 		$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/style.css');
 
 		if ($config->multiple_booking)
@@ -39,12 +47,6 @@ class EventbookingController extends RADController
 		}
 
 		JHtml::_('script', EventbookingHelper::getURL() . 'media/com_eventbooking/assets/js/noconflict.js', false, false);
-
-		// Load bootstrap js
-		if ($config->show_save_to_personal_calendar)
-		{
-			EventbookingHelper::loadBootstrapJs();
-		}
 
 		if ($config->calendar_theme)
 		{

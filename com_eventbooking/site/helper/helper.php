@@ -3637,16 +3637,7 @@ class EventbookingHelper
 	 */
 	public static function loadJQuery()
 	{
-		if (version_compare(JVERSION, '3.0', 'ge'))
-		{
-			JHtml::_('jquery.framework');
-		}
-		else
-		{
-			$document = JFactory::getDocument();
-			$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/bootstrap/js/jquery.min.js');
-			$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/bootstrap/js/jquery-noconflict.js');
-		}
+		JHtml::_('jquery.framework');
 	}
 
 	/**
@@ -3654,44 +3645,7 @@ class EventbookingHelper
 	 */
 	public static function loadBootstrap($loadJs = true)
 	{
-		$app      = JFactory::getApplication();
-		$document = JFactory::getDocument();
-		$rootUrl  = JUri::root(true);
-		$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap.css');
-
-		// Load bootstrap tabs css
-		if ($app->isAdmin())
-		{
-			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap-tabs-backend.css');
-		}
-		else
-		{
-			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap-tabs.css');
-		}
-		if (version_compare(JVERSION, '3.0', 'ge'))
-		{
-			if ($loadJs && $app->isAdmin())
-			{
-				JHtml::_('bootstrap.framework');
-			}
-			elseif ($loadJs && $app->isSite())
-			{
-				JHtml::_('script', 'jui/bootstrap.min.js', false, true, false, false, false);
-			}
-		}
-		else
-		{
-			if ($loadJs && $app->isAdmin())
-			{
-				$document->addScript($rootUrl . '/media/com_eventbooking/assets/bootstrap/js/jquery.min.js');
-				$document->addScript($rootUrl . '/media/com_eventbooking/assets/bootstrap/js/jquery-noconflict.js');
-				$document->addScript($rootUrl . '/media/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
-			}
-			elseif ($loadJs && $app->isSite())
-			{
-				$document->addScript($rootUrl . '/media/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
-			}
-		}
+		JFactory::getDocument()->addStyleSheet(JUri::root(true) . '/media/com_eventbooking/assets/bootstrap/css/bootstrap.css');
 	}
 
 	/**
@@ -3699,14 +3653,7 @@ class EventbookingHelper
 	 */
 	public static function loadBootstrapJs()
 	{
-		if (version_compare(JVERSION, '3.0.0', 'ge'))
-		{
-			JHtml::_('script', 'jui/bootstrap.min.js', false, true, false, false, false);
-		}
-		else
-		{
-			JFactory::getDbo()->addScript(JUri::root(true) . '/media/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
-		}
+		JHtml::_('script', 'jui/bootstrap.min.js', false, true, false, false, false);
 	}
 
 	/**
