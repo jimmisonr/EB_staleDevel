@@ -23,14 +23,8 @@ class EventbookingController extends RADController
 		$document = JFactory::getDocument();
 		$config   = EventbookingHelper::getConfig();
 
-		if ($config->show_save_to_personal_calendar)
-		{
-			JHtml::_('bootstrap.framework');
-		}
-		else
-		{
-			JHtml::_('jquery.framework');
-		}
+		// Always load jquery
+		JHtml::_('jquery.framework');
 
 		$rootUrl = JUri::root(true);
 
@@ -56,6 +50,7 @@ class EventbookingController extends RADController
 		{
 			$theme = 'default';
 		}
+
 		$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/themes/' . $theme . '.css');
 
 		if (file_exists(JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css') && filesize(JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css') > 0)
