@@ -2217,7 +2217,8 @@ class EventbookingController extends RADControllerAdmin
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waiting',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waitings',
 			JPATH_ROOT . '/components/com_eventbooking/models',
-			JPATH_ROOT . '/components/com_eventbooking/assets'
+			JPATH_ROOT . '/components/com_eventbooking/assets',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/serbanghita',
 		);
 
 		foreach ($deleteFiles as $file)
