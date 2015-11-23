@@ -7,8 +7,6 @@
  * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
-defined('_JEXEC') or die;
 
 // no direct access
 defined('_JEXEC') or die;
@@ -16,8 +14,8 @@ defined('_JEXEC') or die;
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/route.php';
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/jquery.php';
-$user     = JFactory::getUser();
-$config   = EventbookingHelper::getConfig();
+$user   = JFactory::getUser();
+$config = EventbookingHelper::getConfig();
 
 if ($config->debug)
 {
@@ -100,7 +98,7 @@ else
 {
 	if ($config->load_bootstrap_css_in_frontend !== '0')
 	{
-		EventbookingHelper::loadBootstrap();
+		$document->addStyleSheet($baseUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap.css');
 	}
 	$document->addStyleSheet($baseUrl . '/modules/mod_eb_events/css/improved.css');
 }
