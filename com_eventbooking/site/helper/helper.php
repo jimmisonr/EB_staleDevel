@@ -130,12 +130,12 @@ class EventbookingHelper
 		// If no data found from session, using mobile detect class to detect the device type
 		if (!$deviceType)
 		{
-			if (!class_exists('Mobile_Detect'))
+			if (!class_exists('EB_Mobile_Detect'))
 			{
 				require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/serbanghita/Mobile_Detect.php';
 			}
 
-			$mobileDetect = new Mobile_Detect();
+			$mobileDetect = new EB_Mobile_Detect();
 			$deviceType   = 'desktop';
 
 			if ($mobileDetect->isMobile())
