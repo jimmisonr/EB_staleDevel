@@ -25,7 +25,7 @@
  * @version     2.8.17
  */
 
-class Mobile_Detect
+class EB_Mobile_Detect
 {
     /**
      * Mobile detection type.
