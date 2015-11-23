@@ -499,7 +499,7 @@ $format = 'Y-m-d' ;
 						<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_MEMBER_DISCOUNT' );?>::<?php echo JText::_('EB_MEMBER_DISCOUNT_EXPLAIN'); ?>"><?php echo JText::_('EB_MEMBER_DISCOUNT'); ?></span>
 					</td>
 					<td>
-						<input type="text" name="discount" id="discount" class="input-mini" size="5" value="<?php echo $this->item->discount; ?>" />&nbsp;&nbsp;<?php echo $this->lists['discount_type'] ; ?>
+						<input type="text" name="discount_amounts" id="discount_amounts" class="input-mini" size="5" value="<?php echo $this->item->discount_amounts; ?>" />&nbsp;&nbsp;<?php echo $this->lists['discount_type'] ; ?>
 					</td>
 				</tr>
 				<tr>
