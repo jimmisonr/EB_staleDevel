@@ -18,14 +18,8 @@ $config = $this->config;
 ?>
 <form action="index.php?option=com_eventbooking&view=configuration" method="post" name="adminForm" id="adminForm" class="form-horizontal eb-configuration">
 	<div class="row-fluid">
-		<ul class="nav nav-tabs">
-			<li class="active"><a href="#general-page" data-toggle="tab"><?php echo JText::_('EB_GENERAL');?></a></li>					
-			<li><a href="#theme-page" data-toggle="tab"><?php echo JText::_('EB_THEMES');?></a></li>
-			<li><a href="#sef-setting-page" data-toggle="tab"><?php echo JText::_('EB_SEF_SETTING');?></a></li>						
-			<li><a href="#invoice-page" data-toggle="tab"><?php echo JText::_('EB_INVOICE_SETTINGS');?></a></li>
-		</ul>
-		<div class="tab-content">			
-			<div class="tab-pane active" id="general-page">
+		<?php echo JHtml::_('bootstrap.startTabSet', 'configuration', array('active' => 'general-page')); ?>
+			<?php echo JHtml::_('bootstrap.addTab', 'configuration', 'general-page', JText::_('EB_GENERAL', true)); ?>
 				<div class="control-group">
 					<div class="control-label">
 						<?php echo EventbookingHelperHtml::getFieldLabel('custom_field_by_category', JText::_('EB_CUSTOM_FIELD_BY_CATEGORY'), JText::_('EB_CUSTOM_FIELD_BY_CATEGORY_EXPLAIN')); ?>
@@ -530,8 +524,8 @@ $config = $this->config;
 						<?php echo EventbookingHelperHtml::getBooleanInput('debug', $config->debug); ?>
 					</div>
 				</div>
-			</div>			
-			<div class="tab-pane" id="theme-page">
+			<?php echo JHtml::_('bootstrap.endTab'); ?>
+			<?php echo JHtml::_('bootstrap.addTab', 'configuration', 'theme-page', JText::_('EB_THEMES', true)); ?>
 				<div class="control-group">
 					<div class="control-label">
 						<?php echo EventbookingHelperHtml::getFieldLabel('calendar_theme', JText::_('EB_CALENDAR_THEME')); ?>
@@ -836,8 +830,8 @@ $config = $this->config;
 						<?php echo EventbookingHelperHtml::getBooleanInput('show_coupon_code_in_registrant_list', $config->show_coupon_code_in_registrant_list); ?>
 					</div>
 				</div>
-			</div>
-			<div class="tab-pane" id="sef-setting-page">
+			<?php echo JHtml::_('bootstrap.endTab'); ?>
+			<?php echo JHtml::_('bootstrap.addTab', 'configuration', 'sef-setting-page', JText::_('EB_SEF_SETTING', true)); ?>
 				<p class="message"><strong><?php echo JText::_('EB_SEF_SETTING_EXPLAIN'); ?></strong></p>
 				<div class="control-group">
 					<div class="control-label">
@@ -855,8 +849,8 @@ $config = $this->config;
 						<?php echo $this->lists['insert_category']; ?>
 					</div>
 				</div>
-			</div>
-			<div class="tab-pane" id="invoice-page">
+			<?php echo JHtml::_('bootstrap.endTab'); ?>
+			<?php echo JHtml::_('bootstrap.addTab', 'configuration', 'invoice-page', JText::_('EB_INVOICE_SETTINGS', true)); ?>
 				<div class="control-group">
 					<div class="control-label">
 						<?php echo EventbookingHelperHtml::getFieldLabel('activate_invoice_feature', JText::_('EB_ACTIVATE_INVOICE_FEATURE'), JText::_('EB_ACTIVATE_INVOICE_FEATURE_EXPLAIN')); ?>
@@ -921,8 +915,8 @@ $config = $this->config;
 						<?php echo $editor->display( 'invoice_format_cart',  $config->invoice_format_cart , '100%', '550', '75', '8' ) ;?>
 					</div>
 				</div>
-			</div>		
-		</div>		
+			<?php echo JHtml::_('bootstrap.endTab'); ?>
+		<?php echo JHtml::_('bootstrap.endTabSet'); ?>
 	</div>													
 	<div class="clearfix"></div>		
 	<input type="hidden" name="task" value="" />				
