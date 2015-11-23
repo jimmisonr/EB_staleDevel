@@ -13,7 +13,7 @@ JHtml::_('bootstrap.tooltip');
 $document = JFactory::getDocument();
 $document->addStyleDeclaration(".hasTip{display:block !important}");
 
-$editor = JFactory::getEditor();
+$editor = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 $config = $this->config;
 ?>
 <form action="index.php?option=com_eventbooking&view=configuration" method="post" name="adminForm" id="adminForm" class="form-horizontal eb-configuration">

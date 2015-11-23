@@ -3646,16 +3646,8 @@ class EventbookingHelper
 	public static function loadBootstrap($loadJs = true)
 	{
 		JFactory::getDocument()->addStyleSheet(JUri::root(true) . '/media/com_eventbooking/assets/bootstrap/css/bootstrap.css');
-	}
-
-	/**
-	 * Helper method to load bootstrap js using for bootstrap dropdown
-	 */
-	public static function loadBootstrapJs()
-	{
-		JHtml::_('script', 'jui/bootstrap.min.js', false, true, false, false, false);
-	}
-
+	}	
+	
 	/**
 	 * Get version number of GD version installed
 	 * Enter description here ...

@@ -9,15 +9,13 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
-$editor = JFactory::getEditor() ;
+$editor = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 JHtml::_('behavior.tooltip');
 JHtml::_('behavior.modal');
 $format = 'Y-m-d';
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
-if (version_compare(JVERSION, '3.0', 'ge'))
-{
-	JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text_multiple' => JText::_('EB_SELECT_CATEGORIES')));
-}
+
+JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text_multiple' => JText::_('EB_SELECT_CATEGORIES')));
 ?>
 <style>
 	.calendar {
