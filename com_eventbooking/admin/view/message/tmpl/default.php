@@ -782,8 +782,8 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 	}
 	echo JHtml::_('bootstrap.endTabSet');
 	?>
-	</div>		
-	<div class="clearfix"></div>	
-	<input type="hidden" name="task" value="" />	
+	</div>
+	<div class="clearfix"></div>
+	<input type="hidden" name="task" value="" />
 </form>
 </div>

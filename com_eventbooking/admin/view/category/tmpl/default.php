@@ -21,7 +21,7 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 		if (pressbutton == 'cancel')
 		{
 			Joomla.submitform( pressbutton );
-			return;				
+			return;
 		}
 		else
 		{
@@ -31,7 +31,7 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 	}
 </script>
 <div class="row-fluid">
-	<form action="index.php?option=com_eventbooking&view=category" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_eventbooking&view=category" method="post" name="adminForm" id="adminForm">
 <?php
 if ($translatable)
 {
@@ -47,7 +47,7 @@ if ($translatable)
 			<td>
 				<input class="text_area" type="text" name="name" id="name" size="40" maxlength="250" value="<?php echo $this->item->name;?>" />
 			</td>
-		</tr>	
+		</tr>
 		<tr>
 			<td width="100" class="key">
 				<?php echo  JText::_('EB_ALIAS'); ?>
@@ -55,56 +55,56 @@ if ($translatable)
 			<td>
 				<input class="text_area" type="text" name="alias" id="alias" maxlength="250" value="<?php echo $this->item->alias;?>" />
 			</td>
-		</tr>			
+		</tr>
 		<tr>
 			<td class="key">
 				<?php echo  JText::_('EB_PARENT'); ?>
 			</td>
 			<td>
-				<?php echo $this->lists['parent']; ?>	
-			</td>				
+				<?php echo $this->lists['parent']; ?>
+			</td>
 		</tr>
 		<tr>
 			<td class="key">
 				<?php echo  JText::_('EB_LAYOUT'); ?>
 			</td>
 			<td>
-				<?php echo $this->lists['layout']; ?>	
-			</td>				
-		</tr>	
+				<?php echo $this->lists['layout']; ?>
+			</td>
+		</tr>
 		<tr>
 			<td class="key">
 				<?php echo  JText::_('EB_ACCESS_LEVEL'); ?>
 			</td>
 			<td>
-				<?php echo $this->lists['access']; ?>	
-			</td>				
+				<?php echo $this->lists['access']; ?>
+			</td>
 		</tr>
 		<tr>
 			<td class="key">
 				<?php echo JText::_('EB_COLOR'); ?>
 			</td>
 			<td>
-				<input type="text" name="color_code" class="inputbox color {required:false}" value="<?php echo $this->item->color_code; ?>" size="10" />						
-				<?php echo JText::_('EB_COLOR_EXPLAIN'); ?> 
+				<input type="text" name="color_code" class="inputbox color {required:false}" value="<?php echo $this->item->color_code; ?>" size="10" />
+				<?php echo JText::_('EB_COLOR_EXPLAIN'); ?>
 			</td>
 		</tr>
-        <tr>
-            <td width="100" class="key">
-                <?php echo  JText::_('EB_META_KEYWORDS'); ?>
-            </td>
-            <td>
-                <textarea rows="5" cols="30" class="input-lage" name="meta_keywords"><?php echo $this->item->meta_keywords; ?></textarea>
-            </td>
-        </tr>
-        <tr>
-            <td width="100" class="key">
-                <?php echo  JText::_('EB_META_DESCRIPTION'); ?>
-            </td>
-            <td>
-                <textarea rows="5" cols="30" class="input-lage" name="meta_description"><?php echo $this->item->meta_description; ?></textarea>
-            </td>
-        </tr>
+		<tr>
+			<td width="100" class="key">
+				<?php echo  JText::_('EB_META_KEYWORDS'); ?>
+			</td>
+			<td>
+				<textarea rows="5" cols="30" class="input-lage" name="meta_keywords"><?php echo $this->item->meta_keywords; ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td width="100" class="key">
+				<?php echo  JText::_('EB_META_DESCRIPTION'); ?>
+			</td>
+			<td>
+				<textarea rows="5" cols="30" class="input-lage" name="meta_description"><?php echo $this->item->meta_description; ?></textarea>
+			</td>
+		</tr>
 		<tr>
 			<td class="key">
 				<?php echo JText::_('EB_DESCRIPTION'); ?>
@@ -112,7 +112,7 @@ if ($translatable)
 			<td>
 				<?php echo $editor->display( 'description',  $this->item->description , '100%', '250', '75', '10' ) ; ?>
 			</td>
-		</tr>				
+		</tr>
 		<tr>
 			<td class="key">
 				<?php echo JText::_('EB_PUBLISHED'); ?>
@@ -167,7 +167,7 @@ if ($translatable)
 	echo JHtml::_('bootstrap.endTabSet');
 }
 ?>
-<div class="clearfix"></div>	
+<div class="clearfix"></div>
 <?php echo JHtml::_( 'form.token' ); ?>
 <input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 <input type="hidden" name="task" value="" />

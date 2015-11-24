@@ -296,28 +296,28 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 							<input type="text" name="max_group_number" id="max_group_number" class="input-mini" size="10" value="<?php echo $this->item->max_group_number; ?>" />
 						</td>
 					</tr>
-                    <tr>
-                        <td class="key">
-                            <?php echo JText::_('ENABLE_COUPON'); ?>
-                        </td>
-                        <td>
-                            <?php echo $this->lists['enable_coupon']; ?>
-                        </td>
-                    </tr>
+					<tr>
+						<td class="key">
+							<?php echo JText::_('ENABLE_COUPON'); ?>
+						</td>
+						<td>
+							<?php echo $this->lists['enable_coupon']; ?>
+						</td>
+					</tr>
 					<?php
-					    if ($this->config->activate_deposit_feature)
-					    {
-					    ?>
-					        <tr>
-		                        <td class="key" width="30%">
-		                            <span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_DEPOSIT_AMOUNT' );?>::<?php echo JText::_('EB_DEPOSIT_AMOUNT_EXPLAIN'); ?>"><?php echo JText::_('EB_DEPOSIT_AMOUNT'); ?></span>
-		                        </td>
-		                        <td>
-		                            <input type="text" name="deposit_amount" id="deposit_amount" class="input-mini" size="5" value="<?php echo $this->item->deposit_amount; ?>" />&nbsp;&nbsp;<?php echo $this->lists['deposit_type'] ; ?>
-		                        </td>
-		                    </tr>
-					    <?php
-					    }
+						if ($this->config->activate_deposit_feature)
+						{
+						?>
+							<tr>
+								<td class="key" width="30%">
+									<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_DEPOSIT_AMOUNT' );?>::<?php echo JText::_('EB_DEPOSIT_AMOUNT_EXPLAIN'); ?>"><?php echo JText::_('EB_DEPOSIT_AMOUNT'); ?></span>
+								</td>
+								<td>
+									<input type="text" name="deposit_amount" id="deposit_amount" class="input-mini" size="5" value="<?php echo $this->item->deposit_amount; ?>" />&nbsp;&nbsp;<?php echo $this->lists['deposit_type'] ; ?>
+								</td>
+							</tr>
+						<?php
+						}
 					?>
 					<tr>
 						<td class="key" style="width: 160px;">
@@ -393,26 +393,26 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 										</tr>
 										<tr>
 											<td>
-		                                            <input type="radio" name="recurring_type" value="2" <?php if ($this->item->recurring_type == 2) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" /> <?php echo JText::_('EB_REPEAT_EVERY'); ?> <input type="text" name="number_weeks" size="5" class="input-mini clearfloat" value="<?php echo $this->item->number_weeks ; ?>" /> <?php echo JText::_('EB_WEEKS'); ?>
-		                                            <br />
-		                                            <strong><?php echo JText::_('EB_ON'); ?></strong>
-		                                            <?php
-		                                                $weekDays = explode(',', $this->item->weekdays) ;
-		                                                $daysOfWeek = array(0=> 'EB_SUN', 1 => 'EB_MON', 2=> 'EB_TUE', 3=>'EB_WED', 4 => 'EB_THUR', 5=>'EB_FRI', 6=> 'EB_SAT') ;
-		                                                foreach ($daysOfWeek as $key=>$value) {
-		                                                ?>
-		                                                    <input type="checkbox" class="inputbox clearfloat" value="<?php echo $key; ?>" name="weekdays[]" <?php if (in_array($key, $weekDays)) echo ' checked="checked"' ; ?> /> <?php echo JText::_($value); ?>&nbsp;&nbsp;
-		                                                <?php
-		                                                    if ($key == 4)
-		                                                        echo '<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' ;
-		                                                }
-		                                            ?>
+													<input type="radio" name="recurring_type" value="2" <?php if ($this->item->recurring_type == 2) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" /> <?php echo JText::_('EB_REPEAT_EVERY'); ?> <input type="text" name="number_weeks" size="5" class="input-mini clearfloat" value="<?php echo $this->item->number_weeks ; ?>" /> <?php echo JText::_('EB_WEEKS'); ?>
+													<br />
+													<strong><?php echo JText::_('EB_ON'); ?></strong>
+													<?php
+														$weekDays = explode(',', $this->item->weekdays) ;
+														$daysOfWeek = array(0=> 'EB_SUN', 1 => 'EB_MON', 2=> 'EB_TUE', 3=>'EB_WED', 4 => 'EB_THUR', 5=>'EB_FRI', 6=> 'EB_SAT') ;
+														foreach ($daysOfWeek as $key=>$value) {
+														?>
+															<input type="checkbox" class="inputbox clearfloat" value="<?php echo $key; ?>" name="weekdays[]" <?php if (in_array($key, $weekDays)) echo ' checked="checked"' ; ?> /> <?php echo JText::_($value); ?>&nbsp;&nbsp;
+														<?php
+															if ($key == 4)
+																echo '<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' ;
+														}
+													?>
 											</td>
 										</tr>
 										<tr>
 											<td>
 												<input type="radio" name="recurring_type" value="3" <?php if ($this->item->recurring_type == 3) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" /> <?php echo JText::_('EB_REPEAT_EVERY'); ?> <input type="text" name="number_months" size="5" class="input-mini clearfloat" value="<?php echo $this->item->number_months ; ?>" /> <?php echo JText::_('EB_MONTHS'); ?>
-										        <?php echo JText::_('EB_ON'); ?> <input type="text" name="monthdays" class="input-mini clearfloat" size="10" value="<?php echo $this->item->monthdays; ?>" />
+												<?php echo JText::_('EB_ON'); ?> <input type="text" name="monthdays" class="input-mini clearfloat" size="10" value="<?php echo $this->item->monthdays; ?>" />
 											</td>
 										</tr>
 
@@ -474,28 +474,28 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 				<?php
 				}
 			?>
-            <div class="clearfix"></div>
-            <fieldset class="adminform">
-                <legend class="adminform"><?php echo JText::_('EB_META_DATA'); ?></legend>
-                <table class="admintable">
-                    <tr>
-                        <td width="100" class="key">
-                            <?php echo  JText::_('EB_META_KEYWORDS'); ?>
-                        </td>
-                        <td>
-                            <textarea rows="5" cols="30" class="input-lage" name="meta_keywords"><?php echo $this->item->meta_keywords; ?></textarea>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td width="100" class="key">
-                            <?php echo  JText::_('EB_META_DESCRIPTION'); ?>
-                        </td>
-                        <td>
-                            <textarea rows="5" cols="30" class="input-lage" name="meta_description"><?php echo $this->item->meta_description; ?></textarea>
-                        </td>
-                    </tr>
-                </table>
-            </fieldset>
+			<div class="clearfix"></div>
+			<fieldset class="adminform">
+				<legend class="adminform"><?php echo JText::_('EB_META_DATA'); ?></legend>
+				<table class="admintable">
+					<tr>
+						<td width="100" class="key">
+							<?php echo  JText::_('EB_META_KEYWORDS'); ?>
+						</td>
+						<td>
+							<textarea rows="5" cols="30" class="input-lage" name="meta_keywords"><?php echo $this->item->meta_keywords; ?></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td width="100" class="key">
+							<?php echo  JText::_('EB_META_DESCRIPTION'); ?>
+						</td>
+						<td>
+							<textarea rows="5" cols="30" class="input-lage" name="meta_description"><?php echo $this->item->meta_description; ?></textarea>
+						</td>
+					</tr>
+				</table>
+			</fieldset>
 		</div>
 	</div>
 	<div class="clearfix"></div>
@@ -810,18 +810,18 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 			}
 		}
 		echo JHtml::_('bootstrap.endTabSet');
-	?>	
-</div>			
-	<input type="hidden" name="option" value="com_eventbooking" />	
+	?>
+</div>
+	<input type="hidden" name="option" value="com_eventbooking" />
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
-	<input type="hidden" name="task" value="" />	
+	<input type="hidden" name="task" value="" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 	<script type="text/javascript">
 		Joomla.submitbutton = function(pressbutton) {
 			var form = document.adminForm;
 			if (pressbutton == 'cancel') {
 				Joomla.submitform( pressbutton );
-				return;				
+				return;
 			} else {
 				//Should have some validations rule here
 				//Check something here
@@ -830,36 +830,36 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 					form.title.focus();
 					return ;
 				}
-				if (form.main_category_id.value == 0) 
+				if (form.main_category_id.value == 0)
 				{
 					alert("<?php echo JText::_("EB_CHOOSE_CATEGORY"); ?>");
 					form.category_id.focus();
 					return ;
-				}			
+				}
 				if (form.event_date.value == '') {
 					alert("<?php echo JText::_('EB_ENTER_EVENT_DATE'); ?>");
 					form.event_date.focus();
 					return ;
 				}
 				if (form.recurring_type) {
-					//Check the recurring setting				
+					//Check the recurring setting
 					if (form.recurring_type[1].checked) {
 						if (form.number_days.value == '') {
 							alert("<?php echo JText::_("EB_ENTER_NUMBER_OF_DAYS"); ?>");
 							form.number_days.focus();
 							return ;
-						}			
+						}
 						if (!parseInt(form.number_days.value)) {
 							alert("<?php echo JText::_("EB_NUMBER_DAY_INTEGER"); ?>");
 							form.number_days.focus();
 							return ;
-						}		
+						}
 					}else if (form.recurring_type[2].checked) {
 						if (form.number_weeks.value == '') {
 							alert("<?php echo JText::_("EB_ENTER_NUMBER_OF_WEEKS"); ?>");
 							form.number_weeks.focus();
 							return ;
-						}			
+						}
 						if (!parseInt(form.number_weeks.value)) {
 							alert("<?php echo JText::_("EB_NUMBER_WEEKS_INTEGER"); ?>");
 							form.number_weeks.focus();
@@ -869,19 +869,19 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 						var checked = false ;
 						for (var i = 0 ; i < form['weekdays[]'].length ; i++) {
 							if (form['weekdays[]'][i].checked)
-								checked = true ;						
+								checked = true ;
 						}
 						if (!checked) {
 							alert("<?php echo JText::_("EB_CHOOSE_ONEDAY"); ?>");
 							form['weekdays[]'][0].focus();
 							return ;
-						}										
+						}
 					} else if (form.recurring_type[3].checked) {
 						if (form.number_months.value == '') {
 							alert("<?php echo JText::_("EB_ENTER_NUMBER_MONTHS"); ?>");
 							form.number_months.focus();
 							return ;
-						}			
+						}
 						if (!parseInt(form.number_months.value)) {
 							alert("<?php echo JText::_("EB_NUMBER_MONTH_INTEGER"); ?>");
 							form.number_months.focus();
@@ -893,27 +893,27 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 							return ;
 						}
 					}
-				}			
+				}
 
-				<?php 
+				<?php
 					$editorFields = array('short_description', 'description', 'user_email_body', 'user_email_body_offline', 'thanks_message', 'thanks_message_offline', 'registration_approved_email_body');
 					foreach ($editorFields as $editorField) {
 						echo $editor->save($editorField);
 					}
-					
-				?>							 
+
+				?>
 				Joomla.submitform( pressbutton );
 			}
 		}
 		function addRow() {
 			var table = document.getElementById('price_list');
 			var newRowIndex = table.rows.length - 1 ;
-			var row = table.insertRow(newRowIndex);			
-			var registrantNumber = row.insertCell(0);							
-			var price = row.insertCell(1);						
+			var row = table.insertRow(newRowIndex);
+			var registrantNumber = row.insertCell(0);
+			var price = row.insertCell(1);
 			registrantNumber.innerHTML = '<input type="text" class="input-mini" name="registrant_number[]" size="10" />';
 			price.innerHTML = '<input type="text" class="input-mini" name="price[]" size="10" />';
-			
+
 		}
 		function removeRow() {
 			var table = document.getElementById('price_list');
@@ -944,7 +944,7 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 					form.number_months.value = 1 ;
 				}
 			}
-		}	
+		}
 	</script>
 </form>
 </div>
