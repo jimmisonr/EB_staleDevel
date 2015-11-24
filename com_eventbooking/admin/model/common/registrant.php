@@ -127,8 +127,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			{
 				//Change from pending to paid, trigger event, send emails
 				JPluginHelper::importPlugin('eventbooking');
-				$dispatcher = JDispatcher::getInstance();
-				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
+				JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));
 				EventbookingHelper::sendRegistrationApprovedEmail($row, $config);
 			}
 			elseif ($row->published == 2 && $published != 2 && $config->activate_waitinglist_feature)
@@ -171,8 +170,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			{
 				// Trigger event and send emails
 				JPluginHelper::importPlugin('eventbooking');
-				$dispatcher = JDispatcher::getInstance();
-				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
+				JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));
 			}
 			$input->set('id', $row->id);
 

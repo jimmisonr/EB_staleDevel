@@ -323,11 +323,10 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				}
 			}
 			$input->set('id', $row->id);
+
 			//Trigger event which allows plugins to save it own data
 			JPluginHelper::importPlugin('eventbooking');
-			$dispatcher = JDispatcher::getInstance();
-			//Trigger plugins
-			$dispatcher->trigger('onAfterSaveEvent', array($row, $data, $isNew));
+			JFactory::getApplication()->triggerEvent('onAfterSaveEvent', array($row, $data, $isNew));
 		}
 	}
 
