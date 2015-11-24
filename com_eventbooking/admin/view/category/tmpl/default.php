@@ -163,6 +163,7 @@ if ($translatable)
 		echo JHtml::_('bootstrap.endTab');
 	}
 	echo JHtml::_('bootstrap.endTabSet');
+	echo JHtml::_('bootstrap.endTab');
 	echo JHtml::_('bootstrap.endTabSet');
 }
 ?>
