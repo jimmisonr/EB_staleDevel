@@ -223,9 +223,7 @@ class EventbookingViewEventHtml extends RADViewItem
 
 		#Plugin support
 		JPluginHelper::importPlugin('eventbooking');
-		$dispatcher = JDispatcher::getInstance();
-		//Trigger plugins
-		$results = $dispatcher->trigger('onEditEvent', array($item));
+		$results = JFactory::getApplication()->triggerEvent('onEditEvent', array($item));
 
 		$this->prices   = $prices;
 		$this->nullDate = $nullDate;
