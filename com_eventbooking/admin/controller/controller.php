@@ -2200,10 +2200,22 @@ class EventbookingController extends RADControllerAdmin
 			JPATH_ROOT . '/components/com_eventbooking/models/waitinglist.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waitings.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waiting.php',
-			JPATH_ROOT . '/media/com_eventbooking/.htaccess'
+			JPATH_ROOT . '/media/com_eventbooking/.htaccess',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/categories/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/configuration/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/registrants/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/states/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/fields/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/message/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/plugins/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/countries/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/coupons/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/events/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/locations/tmpl/default.joomla3.php'
 		);
 
 		$deleteFolders = array(
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/assets/chosen',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/models',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/views',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/daylightsaving',
