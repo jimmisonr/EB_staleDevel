@@ -33,34 +33,8 @@ abstract class EventbookingHelperHtml
 		}
 
 		return implode("\n", $output);
-	}
-
-	/**
-	 * Load chosen library, used in several view in back-end
-	 */
-	public static function chosen()
-	{
-		static $chosenLoaded;
-		if (!$chosenLoaded)
-		{
-			if (version_compare(JVERSION, '3.0', 'ge'))
-			{
-				JHtml::_('formbehavior.chosen', 'select');
-			}
-			else
-			{
-				$document = JFactory::getDocument();
-				$document->addScript(JURI::base() . 'media/com_eventbooking/assets/chosen/chosen.jquery.js');
-				$document->addStyleSheet(JURI::base() . 'media/com_eventbooking/assets/chosen/chosen.css');
-				$document->addScriptDeclaration(
-					"jQuery(document).ready(function(){
-                            jQuery(\"select\").chosen();
-                        });");
-			}
-			$chosenLoaded = true;
-		}
-	}
-
+	}	
+	
 	/**
 	 * Build category dropdown
 	 *
