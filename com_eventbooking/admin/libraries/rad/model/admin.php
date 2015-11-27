@@ -324,11 +324,16 @@ class RADModelAdmin extends RADModel
 		$row = $this->getTable();
 		$pks = (array) $pks;
 
+		$this->beforePublish($pks, $value);
+
 		// Attempt to change the state of the records.
 		if (!$row->publish($pks, $value, JFactory::getUser()->get('id')))
 		{
 			throw new Exception($row->getError());
 		}
+
+		$this->afterPublish($pks, $value);
+
 		if ($this->triggerEvents)
 		{
 			// Trigger the eventChangeState event.
@@ -671,6 +676,28 @@ class RADModelAdmin extends RADModel
 	 * @param array $cid Ids of deleted record
 	 */
 	protected function afterDelete($cid)
+	{
+
+	}
+
+	/**
+	 * Give a chance for child class to pre-process the publish.
+	 *
+	 * @param array $cid
+	 * @param int   $state
+	 */
+	protected function beforePublish($cid, $state)
+	{
+
+	}
+
+	/**
+	 * Give a chance for child class to post-process the publish.
+	 *
+	 * @param array $cid
+	 * @param int   $state
+	 */
+	protected function afterPublish($cid, $state)
 	{
 
 	}
