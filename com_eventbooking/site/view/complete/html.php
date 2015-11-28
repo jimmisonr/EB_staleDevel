@@ -97,7 +97,7 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		{
 			$rowFields = EventbookingHelper::getFormFields($rowRegistrant->id, 4);
 		}
-		elseif (EventbookingHelper::isGroupRegistration($rowRegistrant->id))
+		elseif ($rowRegistrant->is_group_billing)
 		{
 			$rowFields = EventbookingHelper::getFormFields($rowEvent->id, 1);
 		}

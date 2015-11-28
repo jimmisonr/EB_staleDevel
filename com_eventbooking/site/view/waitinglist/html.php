@@ -48,7 +48,7 @@ class EventbookingViewWaitinglistHtml extends RADViewHtml
 			$msg = $message->waitinglist_complete_message;
 		}
 
-		if (EventbookingHelper::isGroupRegistration($rowRegistrant->id))
+		if ($rowRegistrant->is_group_billing)
 		{
 			$rowFields = EventbookingHelper::getFormFields($rowEvent->id, 1);
 		}
@@ -56,6 +56,7 @@ class EventbookingViewWaitinglistHtml extends RADViewHtml
 		{
 			$rowFields = EventbookingHelper::getFormFields($rowEvent->id, 0);
 		}
+
 		$form = new RADForm($rowFields);
 		$data = EventbookingHelper::getRegistrantData($rowRegistrant, $rowFields);
 		$form->bind($data);

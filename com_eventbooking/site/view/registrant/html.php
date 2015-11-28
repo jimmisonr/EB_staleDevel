@@ -38,7 +38,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			$this->event = $event;
 		}
 
-		if ($item->id && EventbookingHelper::isGroupRegistration($item->id))
+		if ($item->id && $item->is_group_billing)
 		{
 			$rowFields = EventbookingHelper::getFormFields($item->event_id, 1, $item->language);
 			$query->clear();
