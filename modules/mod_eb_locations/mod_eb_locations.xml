@@ -9,11 +9,9 @@
 	<authorUrl>www.joomdonation.com</authorUrl>
 	<version>2.1.0</version>
 	<description>This module is used to display locations in Event Booking Extension so that users can browse events by location</description>
-	<files>
-		<filename module="mod_eb_locations">index.html</filename>
+	<files>		
 		<filename module="mod_eb_locations">mod_eb_locations.php</filename>		
-		<filename module="mod_eb_locations">tmpl/default.php</filename>
-		<filename module="mod_eb_locations">tmpl/index.html</filename>		
+		<filename module="mod_eb_locations">tmpl/default.php</filename>		
 	</files>			
 	<config>
 		<fields name="params">

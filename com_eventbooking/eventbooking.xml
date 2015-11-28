@@ -28,14 +28,12 @@
 	<folder>assets</folder>
 	<folder>qrcodes</folder>
 	<filename>ajax-loadding-animation.gif</filename>
-	<filename>invoice_logo.png</filename>	
-	<filename>index.html</filename>	
+	<filename>invoice_logo.png</filename>		
   </media>
   <languages>
 	<language tag="en-GB">site/languages/en-GB/en-GB.com_eventbooking.ini</language>
   </languages>
-  <files folder="site">  
-    <filename>index.html</filename>
+  <files folder="site">      
     <filename>eventbooking.php</filename>
     <filename>router.php</filename>
     <filename>fields.xml</filename>
@@ -70,8 +68,7 @@
 	<language tag="en-GB">admin/languages/en-GB/en-GB.com_eventbooking.sys.ini</language>      
 	<language tag="en-GB">admin/languages/en-GB/en-GB.com_eventbooking.ini</language>
   </languages>
-    <files folder="admin">
-		<filename>index.html</filename>
+    <files folder="admin">		
 		<filename>eventbooking.php</filename>		
 		<filename>config.xml</filename>
 		<filename>access.xml</filename>

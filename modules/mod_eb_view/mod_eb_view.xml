@@ -10,8 +10,7 @@
 	<version>2.1.0</version>
 	<description>This module is used to display any view in Events Booking extension.</description>
 	<files>
-		<filename module="mod_eb_view">mod_eb_view.php</filename>
-		<filename>index.html</filename>		
+		<filename module="mod_eb_view">mod_eb_view.php</filename>		
 	</files>
 	<config>
 		<fields name="params">

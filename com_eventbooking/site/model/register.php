@@ -615,6 +615,7 @@ class EventBookingModelRegister extends RADModel
 		foreach ($replaces as $key => $value)
 		{
 			$key  = strtoupper($key);
+			$subject = str_replace("[$key]", $value, $subject);
 			$body = str_replace("[$key]", $value, $body);
 		}
 		//Send emails to notification emails

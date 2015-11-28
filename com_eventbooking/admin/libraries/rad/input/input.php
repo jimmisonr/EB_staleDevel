@@ -34,11 +34,6 @@ class RADInput extends JInput
 		}
 
 		parent::__construct($source, $options);
-
-		if (get_magic_quotes_gpc())
-		{
-			$this->data = self::stripSlashesRecursive($this->data);
-		}
 	}
 
 	/**
@@ -120,19 +115,5 @@ class RADInput extends JInput
 		}
 
 		return false;
-	}
-
-	/**
-	 * Helper method to Un-quotes a quoted string
-	 *
-	 * @param string $value
-	 *
-	 * @return Ambigous <multitype:, string>
-	 */
-	protected static function stripSlashesRecursive($value)
-	{
-		$value = is_array($value) ? array_map(array('RADInput', 'stripSlashesRecursive'), $value) : stripslashes($value);
-
-		return $value;
 	}
 }
