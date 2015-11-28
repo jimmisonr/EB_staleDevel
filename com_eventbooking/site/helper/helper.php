@@ -4473,23 +4473,31 @@ class EventbookingHelper
 	 */
 	public static function checkEditEvent($eventId)
 	{
-		$user = JFactory::getUser();
-		$db   = JFactory::getDbo();
+		$user  = JFactory::getUser();
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+
 		if (!$eventId)
 		{
 			return false;
 		}
-		$sql = 'SELECT * FROM #__eb_events WHERE id=' . $eventId;
-		$db->setQuery($sql);
+
+		$query->select('*')
+			->from('#__eb_events')
+			->where('id = ' . $eventId);
+		$db->setQuery($query);
 		$rowEvent = $db->loadObject();
+
 		if (!$rowEvent)
 		{
 			return false;
 		}
+
 		if ($user->get('guest'))
 		{
 			return false;
 		}
+
 		if ($user->authorise('core.edit', 'com_eventbooking') || ($rowEvent->created_by == $user->get('id')))
 		{
 			return true;
@@ -4500,18 +4508,11 @@ class EventbookingHelper
 		}
 	}
 
-	public static function isGroupRegistration($id)
-	{
-		if (!$id)
-			return false;
-		$db  = JFactory::getDbo();
-		$sql = 'SELECT is_group_billing FROM #__eb_registrants WHERE id=' . $id;
-		$db->setQuery($sql);
-		$isGroupBilling = (int) $db->loadResult();
-
-		return $isGroupBilling > 0 ? true : false;
-	}
-
+	/**
+	 * Update Group Members record to have same information with billing record
+	 *
+	 * @param int $groupId
+	 */
 	public static function updateGroupRegistrationRecord($groupId)
 	{
 		$db     = JFactory::getDbo();
@@ -4522,9 +4523,14 @@ class EventbookingHelper
 			$row->load($groupId);
 			if ($row->id)
 			{
-				$sql = "UPDATE #__eb_registrants SET published=$row->published, transaction_id='$row->transaction_id', payment_method='$row->payment_method' WHERE group_id=" .
-					$row->id;
-				$db->setQuery($sql);
+				$query = $db->getQuery(true);
+				$query->update('#__eb_registrants')
+					->set('published = ' . $row->published)
+					->set('transaction_id = ' . $db->quote($row->transaction_id))
+					->set('payment_method = ' . $db->quote($row->payment_method))
+					->where('group_id = ' . $row->id);
+
+				$db->setQuery($query);
 				$db->execute();
 			}
 		}
