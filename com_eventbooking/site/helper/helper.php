@@ -85,7 +85,13 @@ class EventbookingHelper
 	 */
 	public static function needInvoice($row)
 	{
+		if ($row->amount > 0 || $row->total_amount > 0)
+		{
+			return true;
+		}
+
 		$config = self::getConfig();
+
 		if ($config->multiple_booking)
 		{
 			$db    = JFactory::getDbo();
@@ -99,22 +105,9 @@ class EventbookingHelper
 			{
 				return true;
 			}
-			else
-			{
-				return false;
-			}
 		}
-		else
-		{
-			if ($row->amount > 0 || $row->total_amount > 0)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
+
+		return false;
 	}
 
 	/**
