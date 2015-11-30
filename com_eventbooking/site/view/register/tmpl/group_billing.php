@@ -690,6 +690,7 @@ else
 					 iframe: true,
 					 opacity: 0.3
 				});
+				$('html, body').animate({scrollTop:$('#eb-group-members-information').position().top}, 'slow');
 			})
 	</script>
 </form>
