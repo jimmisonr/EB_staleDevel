@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @version            2.1.0
  * @package            Joomla
@@ -381,7 +380,6 @@ class EventbookingHelperData
 	 */
 	public static function prepareCustomFieldsData($items)
 	{
-		$params       = new JRegistry();
 		$xml          = JFactory::getXML(JPATH_ROOT . '/components/com_eventbooking/fields.xml');
 		$fields       = $xml->fields->fieldset->children();
 		$customFields = array();
@@ -393,7 +391,8 @@ class EventbookingHelperData
 		}
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
-			$item = $items[$i];
+			$item   = $items[$i];
+			$params = new JRegistry();
 			$params->loadString($item->custom_fields, 'JSON');
 			$paramData = array();
 			foreach ($customFields as $name => $label)
