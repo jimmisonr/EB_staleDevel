@@ -118,8 +118,8 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 
 		if (strpos($thankMessage, '[QRCODE]') !== false)
 		{
-			EventbookingHelper::generateQrcode($rowRegistrant->transaction_id);
-			$imgTag = '<img src="media/com_eventbooking/qrcodes/'.$rowRegistrant->transaction_id.'.png" border="0" />';
+			EventbookingHelper::generateQrcode($rowRegistrant->id);
+			$imgTag = '<img src="media/com_eventbooking/qrcodes/'.$rowRegistrant->id.'.png" border="0" />';
 			$thankMessage = str_replace("[QRCODE]", $imgTag, $thankMessage);
 		}
 
