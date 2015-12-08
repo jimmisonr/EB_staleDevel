@@ -172,6 +172,13 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				JPluginHelper::importPlugin('eventbooking');
 				JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));
 			}
+
+			// In case individual registration, we will send notification email to registrant
+			if ($row->number_registrants == 1)
+			{
+				EventbookingHelper::sendEmails($row, $config);
+			}
+
 			$input->set('id', $row->id);
 
 			return true;
