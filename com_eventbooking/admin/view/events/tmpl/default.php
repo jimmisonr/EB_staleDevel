@@ -178,7 +178,7 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 						<?php echo $row->event_capacity; ?>
 					</td>
 					<td class="center">
-						<?php echo (int) $row->total_registrants ; ?>
+						<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=registrants&filter_event_id='.$row->id);?>"> <?php echo $row->total_registrants; ?></a>						
 					</td>
 					<?php
 					if ($this->config->activate_recurring_event)

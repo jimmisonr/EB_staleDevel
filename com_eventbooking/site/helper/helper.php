@@ -247,7 +247,8 @@ class EventbookingHelper
 				$query = $db->getQuery(true);
 				$query->select('`sef`')
 					->from('#__languages')
-					->where('lang_code = ' . $db->quote($activeLanguage));
+					->where('lang_code = ' . $db->quote($activeLanguage))
+					->where('published = 1');
 				$db->setQuery($query);
 				$sef = $db->loadResult();
 				if ($sef)
