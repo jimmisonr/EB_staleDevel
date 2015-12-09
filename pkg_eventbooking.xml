@@ -33,6 +33,7 @@
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_userprofile.zip</file>
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_easyprofile.zip</file>
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_contactenhanced.zip</file>
+	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_easysocial.zip</file>
 	   <file type="plugin" id="eventbooking" group="content">plug_content_ebevent.zip</file>
 	   <file type="plugin" id="eventbooking" group="content">plug_content_ebregister.zip</file>	   
 	   <file type="plugin" id="eventbooking" group="content">plug_content_ebcategory.zip</file>	   
