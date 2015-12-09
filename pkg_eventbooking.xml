@@ -30,7 +30,8 @@
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_mailchimp.zip</file>		   	     
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_moveregistrants.zip</file>
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_unpublishevents.zip</file>	      	   	
-	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_userprofile.zip</file>	      	   	
+	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_userprofile.zip</file>
+	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_easyprofile.zip</file>
 	   <file type="plugin" id="eventbooking" group="content">plug_content_ebevent.zip</file>
 	   <file type="plugin" id="eventbooking" group="content">plug_content_ebregister.zip</file>	   
 	   <file type="plugin" id="eventbooking" group="content">plug_content_ebcategory.zip</file>	   

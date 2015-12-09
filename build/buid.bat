@@ -59,6 +59,8 @@ cd E:\www\eventbooking\plugins\eventbooking\unpublishevents\
 7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_unpublishevents.zip *
 cd E:\www\eventbooking\plugins\eventbooking\userprofile\
 7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_userprofile.zip *
+cd E:\www\eventbooking\plugins\eventbooking\easyprofile\
+7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_easyprofile.zip *
 cd E:\www\eventbooking\plugins\search\eventbooking\
 7z a -tzip E:\www\eventbooking\build/packages/plug_search_eventbooking.zip *
 cd E:\www\eventbooking\plugins\system\ebreminder\
