@@ -18,33 +18,6 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$db        = JFactory::getDbo();
 		$query     = $db->getQuery(true);
 		$config    = EventbookingHelper::getConfig();
-		$options   = array();
-		$options[] = JHtml::_('select.option', 0, JText::_('EB_NO_INTEGRATION'));
-		if (file_exists(JPATH_ROOT . '/components/com_comprofiler/comprofiler.php'))
-		{
-			$options[] = JHtml::_('select.option', 1, JText::_('EB_CB'));
-		}
-		if (file_exists(JPATH_ROOT . '/components/com_community/community.php'))
-		{
-			$options[] = JHtml::_('select.option', 2, JText::_('EB_JS'));
-		}
-		if (file_exists(JPATH_ROOT . '/components/com_osmembership/osmembership.php'))
-		{
-			$options[] = JHtml::_('select.option', 3, JText::_('EB_MEMBERSHIP_PRO'));
-		}
-
-		if (JPluginHelper::isEnabled('user', 'profile'))
-		{
-			$options[] = JHtml::_('select.option', 4, JText::_('EB_JOOMLA_PROFILE'));
-		}
-
-		if (file_exists(JPATH_ROOT . '/components/com_contactenhanced/contactenhanced.php'))
-		{
-			$options[] = JHtml::_('select.option', 5, JText::_('EB_CONTACT_ENHANCED'));
-		}
-
-		$lists['cb_integration']                 = JHtml::_('select.genericlist', $options, 'cb_integration', ' class="inputbox" ', 'value', 'text',
-			$config->cb_integration);
 
 		$options                            = array();
 		$options[]                          = JHtml::_('select.option', 2, JText::_('EB_VERSION_2'));

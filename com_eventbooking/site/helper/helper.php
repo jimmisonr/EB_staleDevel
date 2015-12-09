@@ -1675,78 +1675,36 @@ class EventbookingHelper
 	 */
 	public static function getFormData($rowFields, $eventId, $userId, $config)
 	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
 		$data  = array();
 		if ($userId)
 		{
-			if ($config->cb_integration == 1)
+			$mappings = array();
+			foreach ($rowFields as $rowField)
 			{
-				$syncronizer = new RADSynchronizerCommunitybuilder();
-				$mappings    = array();
-				foreach ($rowFields as $rowField)
+				if ($rowField->field_mapping)
 				{
-					if ($rowField->field_mapping)
+					$mappings[$rowField->name] = $rowField->field_mapping;
+				}
+			}
+
+			JPluginHelper::importPlugin('eventbooking');
+			$results = JFactory::getApplication()->triggerEvent('onGetProfileData', array($userId, $mappings));
+			if (count($results))
+			{
+				foreach ($results as $res)
+				{
+					if (is_array($res) && count($res))
 					{
-						$mappings[$rowField->name] = $rowField->field_mapping;
+						$data = $res;
+						break;
 					}
 				}
-				$data = $syncronizer->getData($userId, $mappings);
 			}
-			elseif ($config->cb_integration == 2)
+
+			if (!count($data))
 			{
-				$syncronizer = new RADSynchronizerJomsocial();
-				$mappings    = array();
-				foreach ($rowFields as $rowField)
-				{
-					if ($rowField->field_mapping)
-					{
-						$mappings[$rowField->name] = $rowField->field_mapping;
-					}
-				}
-				$data = $syncronizer->getData($userId, $mappings);
-			}
-			elseif ($config->cb_integration == 3)
-			{
-				$syncronizer = new RADSynchronizerMembershippro();
-				$mappings    = array();
-				foreach ($rowFields as $rowField)
-				{
-					if ($rowField->field_mapping)
-					{
-						$mappings[$rowField->name] = $rowField->field_mapping;
-					}
-				}
-				$data = $syncronizer->getData($userId, $mappings);
-			}
-			elseif ($config->cb_integration == 4)
-			{
-				$syncronizer = new RADSynchronizerJoomla();
-				$mappings    = array();
-				foreach ($rowFields as $rowField)
-				{
-					if ($rowField->field_mapping)
-					{
-						$mappings[$rowField->name] = $rowField->field_mapping;
-					}
-				}
-				$data = $syncronizer->getData($userId, $mappings);
-			}
-			elseif ($config->cb_integration == 5)
-			{
-				$syncronizer = new RADSynchronizerContactenhanced();
-				$mappings    = array();
-				foreach ($rowFields as $rowField)
-				{
-					if ($rowField->field_mapping)
-					{
-						$mappings[$rowField->name] = $rowField->field_mapping;
-					}
-				}
-				$data = $syncronizer->getData($userId, $mappings);
-			}
-			else
-			{
+				$db    = JFactory::getDbo();
+				$query = $db->getQuery(true);
 				$query->select('*')
 					->from('#__eb_registrants')
 					->where('user_id=' . $userId . ' AND event_id=' . $eventId . ' AND first_name != "" AND group_id=0')

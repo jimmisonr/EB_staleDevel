@@ -86,14 +86,6 @@ $config = $this->config;
 			</div>
 			<div class="control-group">
 				<div class="control-label">
-					<?php echo EventbookingHelperHtml::getFieldLabel('cb_integration', JText::_('EB_INTEGRATION')); ?>
-				</div>
-				<div class="controls">
-					<?php echo $this->lists['cb_integration']; ?>
-				</div>
-			</div>
-			<div class="control-group">
-				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('calendar_start_date', JText::_('EB_CALENDAR_START_DATE')); ?>
 				</div>
 				<div class="controls">
