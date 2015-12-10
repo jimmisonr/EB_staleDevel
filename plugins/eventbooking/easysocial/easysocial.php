@@ -70,7 +70,7 @@ class plgEventbookingEasySocial extends JPlugin
 	 *
 	 * @return bool
 	 */
-	public function onAfterStoreRegistrant($row)
+	/*public function onAfterStoreRegistrant($row)
 	{
 		if (!$this->canRun)
 		{
@@ -103,15 +103,15 @@ class plgEventbookingEasySocial extends JPlugin
 			$config = EventbookingHelper::getConfig();
 			if ($config->multiple_booking)
 			{
-				$rowFields = self::getFormFields($row->id, 4);
+				$rowFields = EventbookingHelper::getFormFields($row->id, 4);
 			}
 			elseif ($row->is_group_billing)
 			{
-				$rowFields = self::getFormFields($row->event_id, 1);
+				$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
 			}
 			else
 			{
-				$rowFields = self::getFormFields($row->event_id, 0);
+				$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
 			}
 
 			$data = EventbookingHelper::getRegistrantData($row, $rowFields);
@@ -154,5 +154,5 @@ class plgEventbookingEasySocial extends JPlugin
 		}
 
 		return true;
-	}
+	}*/
 }	

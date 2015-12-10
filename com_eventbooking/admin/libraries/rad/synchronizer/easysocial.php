@@ -13,10 +13,10 @@ class RADSynchronizerEasysocial
 	{
 		$data = array();
 		$db   = JFactory::getDbo();
-		$sql  = 'SELECT cf.title , fv.data FROM #__social_fields AS cf ' . ' INNER JOIN #__social_fields_data AS fv ' .
+		$sql  = 'SELECT cf.unique_key , fv.data FROM #__social_fields AS cf ' . ' INNER JOIN #__social_fields_data AS fv ' .
 			' ON cf.id = fv.field_id ' . ' WHERE fv.uid = ' . $userId;
 		$db->setQuery($sql);
-		$rows = $db->loadObjectList('title');
+		$rows = $db->loadObjectList('unique_key');		
 		foreach ($mappings as $fieldName => $mappingFieldName)
 		{
 			if ($mappingFieldName && isset($rows[$mappingFieldName]))
@@ -26,9 +26,12 @@ class RADSynchronizerEasysocial
 					$rows[$mappingFieldName]->data = explode(',', $rows[$mappingFieldName]->data);
 				}
 				$data[$fieldName] = $rows[$mappingFieldName]->data;
+				if ($fieldName == 'address' && is_array($data[$fieldName]))
+				{
+					$data[$fieldName] = implode(',', $data[$fieldName]);
+				}				
 			}
-		}
-
+		}		
 		return $data;
 	}
 }

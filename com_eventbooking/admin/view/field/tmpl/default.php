@@ -396,7 +396,7 @@ if ($translatable)
 	</tr>
 	 -->
 	<?php
-		if ($this->integration)
+		if (isset($this->lists['field_mapping']))
 		{
 		?>
 			<tr>

@@ -94,34 +94,31 @@ class plgEventbookingJomSocial extends JPlugin
 
 			$sql = 'SELECT id, fieldcode FROM #__community_fields WHERE published=1 AND fieldcode != ""';
 			$db->setQuery($sql);
-			$rowFields = $db->loadObjectList();
-			$fieldList = array();
-			foreach ($rowFields as $rowField)
-			{
-				$fieldList[$rowField->fieldcode] = $rowField->id;
-			}
+			$fieldList = $db->loadObjectList('fieldcode');
 
 
 			$config = EventbookingHelper::getConfig();
 			if ($config->multiple_booking)
 			{
-				$rowFields = self::getFormFields($row->id, 4);
+				$rowFields = EventbookingHelper::getFormFields($row->id, 4);
 			}
 			elseif ($row->is_group_billing)
 			{
-				$rowFields = self::getFormFields($row->event_id, 1);
+				$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
 			}
 			else
 			{
-				$rowFields = self::getFormFields($row->event_id, 0);
+				$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
 			}
 
 			$data = EventbookingHelper::getRegistrantData($row, $rowFields);
 
 			$fieldValues = array();
+
 			foreach ($rowFields as $rowField)
 			{
-				if ($rowField->field_mapping && in_array($rowField->field_mapping, $fieldList) && isset($data[$rowField->name]))
+
+				if ($rowField->field_mapping && isset($rowField->field_mapping, $fieldList) && isset($data[$rowField->name]))
 				{
 					$fieldValue = $data[$rowField->name];
 					if (is_string($fieldValue) && is_array(json_decode($fieldValue)))
@@ -133,22 +130,19 @@ class plgEventbookingJomSocial extends JPlugin
 						$fieldValues[$rowField->field_mapping] = $fieldValue;
 					}
 				}
-			}
 
+			}
 			if (count($fieldValues))
 			{
 				foreach ($fieldValues as $fieldCode => $fieldValue)
 				{
-					if (isset($fieldList[$fieldCode]))
+					$fieldId = $fieldList[$fieldCode]->id;
+					if ($fieldId)
 					{
-						$fieldId = $fieldList[$fieldCode];
-						if ($fieldId)
-						{
-							$fieldValue = $db->quote($fieldValue);
-							$sql        = "INSERT INTO #__community_fields_values(user_id, field_id, `value`, `access`) VALUES($row->user_id, $fieldId, $fieldValue, 1)";
-							$db->setQuery($sql);
-							$db->execute();
-						}
+						$fieldValue = $db->quote($fieldValue);
+						$sql        = "INSERT INTO #__community_fields_values(user_id, field_id, `value`, `access`) VALUES($row->user_id, $fieldId, $fieldValue, 1)";
+						$db->setQuery($sql);
+						$db->execute();
 					}
 				}
 			}
@@ -157,4 +151,4 @@ class plgEventbookingJomSocial extends JPlugin
 
 		return true;
 	}
-}	
+}
