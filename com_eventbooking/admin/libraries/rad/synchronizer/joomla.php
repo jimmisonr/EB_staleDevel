@@ -19,7 +19,7 @@ class RADSynchronizerJoomla
 
 			if ($mappingFieldName && isset($rows[$key]))
 			{
-				$data[$fieldName] = $rows[$key]->profile_value;
+				$data[$fieldName] = json_decode($rows[$key]->profile_value, true);
 			}
 		}
 
