@@ -14,7 +14,7 @@ defined('_JEXEC') or die;
 	<tbody>	
 		<tr>
 			<td>
-				<a href="http://documentation.joomdonation.com" target="_blank" title="Learn How to use the extension">Using Events Booking</a>
+				<a href="http://eventbookingdoc.joomservices.com" target="_blank" title="Learn How to use the extension">Using Events Booking</a>
 			</td>
 		</tr>
 		<tr>
