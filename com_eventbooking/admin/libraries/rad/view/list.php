@@ -109,15 +109,8 @@ class RADViewList extends RADViewHtml
 		}
 		
 		$languagePrefix = $this->viewConfig['language_prefix'];
-		if (version_compare(JVERSION, '3.0', 'ge'))
-		{
-			JToolBarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')), 'link ' . $this->name);
-		}
-		else 
-		{
-			JToolBarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')));
-		}
-		
+		JToolBarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')), 'link ' . $this->name);
+
 		if ($canDo->get('core.create') && !in_array('add', $this->hideButtons))
 		{
 			JToolBarHelper::addNew('add', 'JTOOLBAR_NEW');

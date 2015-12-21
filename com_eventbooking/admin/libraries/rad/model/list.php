@@ -201,13 +201,8 @@ class RADModelList extends RADModel
 				->clear('group')
 				->clear('having')
 				->clear('order')
+				->clear('limit')
 				->select('COUNT(*)');
-
-			// Limit, offset is only available in Joomla 3.x
-			if (version_compare(JVERSION, '3.0', 'ge'))
-			{
-				$query->clear('limit');
-			}
 
 			// Clear join clause if needed
 			if ($this->clearJoin)
