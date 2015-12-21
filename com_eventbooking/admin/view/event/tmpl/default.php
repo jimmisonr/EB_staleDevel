@@ -558,7 +558,7 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 	echo JHtml::_('bootstrap.endTab');
 	if ($this->config->event_custom_field)
 	{
-		echo JHtml::_('bootstrap.addTab', 'event', 'extra-information-page', JText::_('EB_DISCOUNT_SETTING', true));
+		echo JHtml::_('bootstrap.addTab', 'event', 'extra-information-page', JText::_('EB_EXTRA_INFORMATION', true));
 	?>
 		<table class="admintable" width="100%">
 			<?php
