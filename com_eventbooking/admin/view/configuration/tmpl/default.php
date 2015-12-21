@@ -406,10 +406,18 @@ $config = $this->config;
 			</div>
 			<div class="control-group">
 				<div class="control-label">
-					<?php echo EventbookingHelperHtml::getFieldLabel('default_event_status', JText::_('EB_ATTACHMENT_FILE_TYPES'), JText::_('EB_ATTACHMENT_FILE_TYPES_EXPLAIN')); ?>
+					<?php echo EventbookingHelperHtml::getFieldLabel('attachment_file_types', JText::_('EB_ATTACHMENT_FILE_TYPES'), JText::_('EB_ATTACHMENT_FILE_TYPES_EXPLAIN')); ?>
 				</div>
 				<div class="controls">
 					<input type="text" name="attachment_file_types" class="inputbox" value="<?php echo strlen($config->attachment_file_types) ? $config->attachment_file_types : 'bmp|gif|jpg|png|swf|zip|doc|pdf|xls'; ?>" size="60" />
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('send_attachments_to_admin', JText::_('EB_SEND_ATTACHMENTS_TO_ADMIN'), JText::_('EB_SEND_ATTACHMENTS_TO_ADMIN_EXPLAIN')); ?>
+				</div>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('send_attachments_to_admin', $config->send_attachments_to_admin); ?>
 				</div>
 			</div>
 			<div class="control-group">

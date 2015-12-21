@@ -3026,13 +3026,43 @@ class EventbookingHelper
 		// Clear attachments
 		$mailer->ClearAttachments();
 
-		// Add attachment to admin email if needed
+		// Add invoice to admin email if needed
 		if ($config->send_invoice_to_admin)
 		{
 			$invoiceFilePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
 			if (file_exists($invoiceFilePath))
 			{
 				$mailer->addAttachment($invoiceFilePath);
+			}
+		}
+
+		// Send attachment to admin email if needed
+		if ($config->send_attachments_to_admin)
+		{
+			$attachmentsPath = JPATH_ROOT . '/media/com_eventbooking/files/';
+			for ($i = 0, $n = count($rowFields); $i < $n; $i++)
+			{
+				$rowField = $rowFields[$i];
+				if ($rowField->fieldtype == 'File')
+				{
+					if (isset($replaces[$rowField->name]))
+					{
+						$fileName = $replaces[$rowField->name];
+						if ($fileName && file_exists($attachmentsPath . '/' . $fileName))
+						{
+							$pos = strpos($fileName, '_');
+							if ($pos !== false)
+							{
+								$originalFilename = substr($fileName, $pos + 1);
+							}
+							else
+							{
+								$originalFilename = $fileName;
+							}
+							$mailer->addAttachment($attachmentsPath . '/' . $fileName, $originalFilename);
+						}
+					}
+				}
 			}
 		}
 
