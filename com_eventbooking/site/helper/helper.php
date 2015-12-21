@@ -2326,31 +2326,18 @@ class EventbookingHelper
 				'list.select'        => $row->parent));
 	}
 
-	public static function attachmentList($attachment, $config)
-	{
-		jimport('joomla.filesystem.folder');
-		$path      = JPATH_ROOT . '/media/com_eventbooking';
-		$files     = JFolder::files($path,
-			strlen(trim($config->attachment_file_types)) ? $config->attachment_file_types : 'bmp|gif|jpg|png|swf|zip|doc|pdf|xls');
-		$options   = array();
-		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_ATTACHMENT'));
-		for ($i = 0, $n = count($files); $i < $n; $i++)
-		{
-			$file      = $files[$i];
-			$options[] = JHtml::_('select.option', $file, $file);
-		}
-
-		return JHtml::_('select.genericlist', $options, 'attachment', 'class="inputbox"', 'value', 'text', $attachment);
-	}
 
 	/**
-	 * Get total document of a category
+	 * Get total events of a category
 	 *
-	 * @param int $categoryId
+	 * @param int     $categoryId
+	 * @param bool $includeChildren
+	 *
+	 * @return int
+	 * @throws Exception
 	 */
 	public static function getTotalEvent($categoryId, $includeChildren = true)
 	{
-		$app            = JFactory::getApplication();
 		$user           = JFactory::getUser();
 		$hidePastEvents = EventbookingHelper::getConfigValue('hide_past_events');
 		$db             = JFactory::getDbo();
