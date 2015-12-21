@@ -251,6 +251,46 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 		$config = EventbookingHelper::getConfig();
+
+		// Publish the necessary plugin based on cb_integration config option value in older version
+		if (!empty($config->cb_integration))
+		{
+			$plugin = '';
+			switch ($config->cb_integration)
+			{
+				case '1':
+					$plugin = 'cb';
+					break;
+				case '2':
+					$plugin = 'jomsocial';
+					break;
+				case '3':
+					$plugin = 'membershippro';
+					break;
+				case '4':
+					$plugin = 'userprofile';
+					break;
+				case '5':
+					$plugin = 'contactenhanced';
+					break;
+			}
+
+			$query = $db->getQuery();
+			$query->update('#__extensions')
+				->set('`enabled`= 1')
+				->where('`element`=' . $db->quote($plugin))
+				->where('`folder`="eventbooking"');
+			$db->setQuery($query);
+			$db->execute();
+
+			$query->clear();
+			$query->delete('#__eb_configs')
+				->where('config_key = ' . $db->quote('cb_integration'));
+			$db->setQuery($query);
+			$db->execute();
+		}
+
+
 		//Set up default payment plugins table
 		$sql = 'SELECT COUNT(*) FROM #__eb_payment_plugins';
 		$db->setQuery($sql);
