@@ -212,7 +212,7 @@ class RADModelAdmin extends RADModel
 	{
 		if ($this->triggerEvents)
 		{
-			$dispatcher = JDispatcher::getInstance();;
+			$dispatcher = JEventDispatcher::getInstance();
 			JPluginHelper::importPlugin($this->pluginGroup);
 		}
 		$row   = $this->getTable();
@@ -270,7 +270,7 @@ class RADModelAdmin extends RADModel
 		{
 			if ($this->triggerEvents)
 			{
-				$dispatcher = JDispatcher::getInstance();;
+				$dispatcher = JEventDispatcher::getInstance();;
 				JPluginHelper::importPlugin($this->pluginGroup);
 			}
 
@@ -338,7 +338,7 @@ class RADModelAdmin extends RADModel
 		{
 			// Trigger the eventChangeState event.
 			JPluginHelper::importPlugin($this->pluginGroup);
-			JDispatcher::getInstance()->trigger($this->eventChangeState, array($this->context, $pks, $value));
+			JEventDispatcher::getInstance()->trigger($this->eventChangeState, array($this->context, $pks, $value));
 		}
 
 		// Clear the component's cache
