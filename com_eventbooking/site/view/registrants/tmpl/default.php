@@ -10,10 +10,7 @@
 // no direct access
 defined('_JEXEC') or die;
 $cols = 8;
-if (version_compare(JVERSION, '3.0', 'ge'))
-{
-	JHtml::_('formbehavior.chosen', 'select');
-}
+JHtml::_('formbehavior.chosen', 'select');
 $return = base64_encode(JUri::getInstance()->toString());
 ?>
 <script type="text/javascript">

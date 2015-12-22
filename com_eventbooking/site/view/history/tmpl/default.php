@@ -11,10 +11,7 @@
 defined('_JEXEC') or die;
 $cols = 6;
 $return = base64_encode(JUri::getInstance()->toString());
-if (version_compare(JVERSION, '3.0', 'ge'))
-{
-	JHtml::_('formbehavior.chosen', 'select');
-}
+JHtml::_('formbehavior.chosen', 'select');
 ?>
 <div id="eb-registration-history-page" class="eb-container row-fluid eb-event">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_REGISTRATION_HISTORY'); ?></h1>

@@ -9,10 +9,7 @@
  */
 // no direct access
 defined('_JEXEC') or die;
-if (version_compare(JVERSION, '3.0', 'ge'))
-{
-	JHtml::_('formbehavior.chosen', 'select');
-}
+JHtml::_('formbehavior.chosen', 'select');
 $return = base64_encode(JUri::getInstance()->toString());
 ?>
 <h1 class="eb-page-heading"><?php echo JText::_('EB_USER_EVENTS'); ?></h1>
