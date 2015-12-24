@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.1.0
+ * @version            2.2.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -615,6 +615,7 @@ class EventBookingModelRegister extends RADModel
 		foreach ($replaces as $key => $value)
 		{
 			$key  = strtoupper($key);
+			$subject = str_replace("[$key]", $value, $subject);
 			$body = str_replace("[$key]", $value, $body);
 		}
 		//Send emails to notification emails

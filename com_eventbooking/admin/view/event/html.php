@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.1.0
+ * @version            2.2.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -223,9 +223,7 @@ class EventbookingViewEventHtml extends RADViewItem
 
 		#Plugin support
 		JPluginHelper::importPlugin('eventbooking');
-		$dispatcher = JDispatcher::getInstance();
-		//Trigger plugins
-		$results = $dispatcher->trigger('onEditEvent', array($item));
+		$results = JFactory::getApplication()->triggerEvent('onEditEvent', array($item));
 
 		$this->prices   = $prices;
 		$this->nullDate = $nullDate;

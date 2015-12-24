@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.1.0
+ * @version            2.2.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -124,78 +124,31 @@ class EventbookingViewFieldHtml extends RADViewItem
 		$this->lists['only_show_for_first_member'] = JHtml::_('select.booleanlist', 'only_show_for_first_member', '', $this->item->only_show_for_first_member);
 		$this->lists['only_require_for_first_member'] = JHtml::_('select.booleanlist', 'only_require_for_first_member', '', $this->item->only_require_for_first_member);
 		$this->lists['multiple']       = JHtml::_('select.booleanlist', 'multiple', ' class="inputbox" ', $this->item->multiple);
-		$integration                   = $config->cb_integration;
-		if ($integration)
-		{
-			$options   = array();
-			$options[] = JHtml::_('select.option', '', JText::_('Select Field'));
-			if ($integration == 1 || $integration == 2)
-			{
-				$query->clear();
-				if ($integration == 1)
-				{
-					$query->select('name AS `value`, name AS `text`')
-						->from('#__comprofiler_fields')
-						->where('`table`="#__comprofiler"');
-				}
-				else
-				{
-					$query->select('fieldcode AS `value`, fieldcode AS `text`')
-						->from('#__community_fields')
-						->where('published = 1')
-						->where('fieldcode != ""');
-				}
-				$db->setQuery($query);
-				$options                      = array_merge($options, $db->loadObjectList());
-				$this->lists['field_mapping'] = JHtml::_('select.genericlist', $options, 'field_mapping', ' class="inputbox" ', 'value', 'text',
-					$this->item->field_mapping);
-			}
-			elseif ($integration == 3)
-			{
-				//Get list of profiles file from Membership Pro
-				require_once JPATH_ROOT . '/components/com_osmembership/helper/helper.php';
-				$fields = OSMembershipHelper::getProfileFields(0);
-				foreach ($fields as $field)
-				{
-					$options[] = JHtml::_('select.option', $field->name, $field->title);
-				}
-				$this->lists['field_mapping'] = JHtml::_('select.genericlist', $options, 'field_mapping', ' class="inputbox" ', 'value', 'text',
-					$this->item->field_mapping);
-			}
-			elseif ($integration == 4)
-			{
-				$fields = array(
-					'address1',
-					'address2',
-					'city',
-					'region',
-					'country',
-					'postal_code',
-					'phone',
-					'website',
-					'favoritebook',
-					'aboutme',
-					'dob');
-				foreach ($fields as $field)
-				{
-					$options[] = JHtml::_('select.option', $field, $field);
-				}
-				$this->lists['field_mapping'] = JHtml::_('select.genericlist', $options, 'field_mapping', ' class="inputbox" ', 'value', 'text',
-					$this->item->field_mapping);
-			}
-			elseif ($integration == 5)
-			{
-				$fields = array_keys($db->getTableColumns('#__ce_details'));
 
-				// Remove some system fields
-				$fields = array_diff($fields, array('id', 'alias', 'ordering', 'checked_out', 'checked_out_time', 'user_id', 'catid', 'hits', 'params'));
-				foreach ($fields as $field)
+		// Trigger plugins to get list of fields for mapping
+		JPluginHelper::importPlugin( 'eventbooking');
+
+		$results = JFactory::getApplication()->triggerEvent( 'onGetFields', array());
+		$fields = array();
+		if (count($results))
+		{
+			foreach($results as $res)
+			{
+				if (is_array($res) && count($res))
 				{
-					$options[] = JHtml::_('select.option', $field, $field);
+					$fields = $res;
+					break;
 				}
-				$this->lists['field_mapping'] = JHtml::_('select.genericlist', $options, 'field_mapping', ' class="inputbox" ', 'value', 'text',
-					$this->item->field_mapping);
 			}
+		}
+
+		if (count($fields))
+		{
+			$options = array();
+			$options[] = JHtml::_('select.option', '', JText::_('Select Field'));
+			$options = array_merge($options, $fields);
+			$this->lists['field_mapping'] = JHtml::_('select.genericlist', $options, 'field_mapping', ' class="inputbox" ', 'value', 'text',
+				$this->item->field_mapping);
 		}
 
 		$options                            = array();
@@ -246,7 +199,7 @@ class EventbookingViewFieldHtml extends RADViewItem
 			$this->dependOptions = explode("\r\n", $db->loadResult());
 		}
 
-		$this->integration = $integration;
+		//$this->integration = $integration;
 		$this->config      = $config;
 	}
 }

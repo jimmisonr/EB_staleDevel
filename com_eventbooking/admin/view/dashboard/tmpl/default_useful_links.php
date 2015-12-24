@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	2.0.5
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.2.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 defined('_JEXEC') or die;
 ?>
@@ -14,7 +14,7 @@ defined('_JEXEC') or die;
 	<tbody>	
 		<tr>
 			<td>
-				<a href="http://documentation.joomdonation.com" target="_blank" title="Learn How to use the extension">Using Events Booking</a>
+				<a href="http://eventbookingdoc.joomservices.com" target="_blank" title="Learn How to use the extension">Using Events Booking</a>
 			</td>
 		</tr>
 		<tr>

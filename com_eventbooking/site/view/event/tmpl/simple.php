@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.1.0
+ * @version            2.2.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -193,22 +193,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			<label class="<?php echo $controlLabelClass; ?>">
 				<?php echo JText::_('EB_PUBLISHED'); ?>
 			</label>
-			<?php
-				if (version_compare(JVERSION, '3.0', 'ge'))
-				{
-				?>
-					<?php echo $this->lists['published']; ?>
-				<?php
-				}
-				else
-				{
-				?>
-					<div class="<?php echo $controlsClass; ?>">
-						<?php echo $this->lists['published']; ?>
-					</div>
-				<?php
-				}
-			?>
+			<?php echo $this->lists['published']; ?>
 		</div>
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>">

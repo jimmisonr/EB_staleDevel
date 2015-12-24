@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.1.0
+ * @version            2.2.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -150,7 +150,6 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 		if (($state == 1) && count($cid))
 		{
 			JPluginHelper::importPlugin('eventbooking');
-			$dispatcher = JDispatcher::getInstance();
 			$config     = EventbookingHelper::getConfig();
 			$row        = new RADTable('#__eb_registrants', 'id', $db);
 			foreach ($cid as $registrantId)
@@ -161,7 +160,7 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 					EventbookingHelper::sendRegistrationApprovedEmail($row, $config);
 
 					// Trigger event
-					$dispatcher->trigger('onAfterPaymentSuccess', array($row));
+					JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));
 				}
 			}
 		}

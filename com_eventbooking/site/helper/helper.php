@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.1.0
+ * @version            2.2.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -18,7 +18,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '2.1.0';
+		return '2.2.0';
 	}
 
 	/**
@@ -85,7 +85,13 @@ class EventbookingHelper
 	 */
 	public static function needInvoice($row)
 	{
+		if ($row->amount > 0 || $row->total_amount > 0)
+		{
+			return true;
+		}
+
 		$config = self::getConfig();
+
 		if ($config->multiple_booking)
 		{
 			$db    = JFactory::getDbo();
@@ -99,22 +105,9 @@ class EventbookingHelper
 			{
 				return true;
 			}
-			else
-			{
-				return false;
-			}
 		}
-		else
-		{
-			if ($row->amount > 0 || $row->total_amount > 0)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
+
+		return false;
 	}
 
 	/**
@@ -130,12 +123,12 @@ class EventbookingHelper
 		// If no data found from session, using mobile detect class to detect the device type
 		if (!$deviceType)
 		{
-			if (!class_exists('Mobile_Detect'))
+			if (!class_exists('EB_Mobile_Detect'))
 			{
 				require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/serbanghita/Mobile_Detect.php';
 			}
 
-			$mobileDetect = new Mobile_Detect();
+			$mobileDetect = new EB_Mobile_Detect();
 			$deviceType   = 'desktop';
 
 			if ($mobileDetect->isMobile())
@@ -254,7 +247,8 @@ class EventbookingHelper
 				$query = $db->getQuery(true);
 				$query->select('`sef`')
 					->from('#__languages')
-					->where('lang_code = ' . $db->quote($activeLanguage));
+					->where('lang_code = ' . $db->quote($activeLanguage))
+					->where('published = 1');
 				$db->setQuery($query);
 				$sef = $db->loadResult();
 				if ($sef)
@@ -1681,78 +1675,36 @@ class EventbookingHelper
 	 */
 	public static function getFormData($rowFields, $eventId, $userId, $config)
 	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
 		$data  = array();
 		if ($userId)
 		{
-			if ($config->cb_integration == 1)
+			$mappings = array();
+			foreach ($rowFields as $rowField)
 			{
-				$syncronizer = new RADSynchronizerCommunitybuilder();
-				$mappings    = array();
-				foreach ($rowFields as $rowField)
+				if ($rowField->field_mapping)
 				{
-					if ($rowField->field_mapping)
+					$mappings[$rowField->name] = $rowField->field_mapping;
+				}
+			}
+
+			JPluginHelper::importPlugin('eventbooking');
+			$results = JFactory::getApplication()->triggerEvent('onGetProfileData', array($userId, $mappings));
+			if (count($results))
+			{
+				foreach ($results as $res)
+				{
+					if (is_array($res) && count($res))
 					{
-						$mappings[$rowField->name] = $rowField->field_mapping;
+						$data = $res;
+						break;
 					}
 				}
-				$data = $syncronizer->getData($userId, $mappings);
 			}
-			elseif ($config->cb_integration == 2)
+
+			if (!count($data))
 			{
-				$syncronizer = new RADSynchronizerJomsocial();
-				$mappings    = array();
-				foreach ($rowFields as $rowField)
-				{
-					if ($rowField->field_mapping)
-					{
-						$mappings[$rowField->name] = $rowField->field_mapping;
-					}
-				}
-				$data = $syncronizer->getData($userId, $mappings);
-			}
-			elseif ($config->cb_integration == 3)
-			{
-				$syncronizer = new RADSynchronizerMembershippro();
-				$mappings    = array();
-				foreach ($rowFields as $rowField)
-				{
-					if ($rowField->field_mapping)
-					{
-						$mappings[$rowField->name] = $rowField->field_mapping;
-					}
-				}
-				$data = $syncronizer->getData($userId, $mappings);
-			}
-			elseif ($config->cb_integration == 4)
-			{
-				$syncronizer = new RADSynchronizerJoomla();
-				$mappings    = array();
-				foreach ($rowFields as $rowField)
-				{
-					if ($rowField->field_mapping)
-					{
-						$mappings[$rowField->name] = $rowField->field_mapping;
-					}
-				}
-				$data = $syncronizer->getData($userId, $mappings);
-			}
-			elseif ($config->cb_integration == 5)
-			{
-				$syncronizer = new RADSynchronizerContactenhanced();
-				$mappings    = array();
-				foreach ($rowFields as $rowField)
-				{
-					if ($rowField->field_mapping)
-					{
-						$mappings[$rowField->name] = $rowField->field_mapping;
-					}
-				}
-				$data = $syncronizer->getData($userId, $mappings);
-			}
-			else
-			{
+				$db    = JFactory::getDbo();
+				$query = $db->getQuery(true);
 				$query->select('*')
 					->from('#__eb_registrants')
 					->where('user_id=' . $userId . ' AND event_id=' . $eventId . ' AND first_name != "" AND group_id=0')
@@ -2374,31 +2326,18 @@ class EventbookingHelper
 				'list.select'        => $row->parent));
 	}
 
-	public static function attachmentList($attachment, $config)
-	{
-		jimport('joomla.filesystem.folder');
-		$path      = JPATH_ROOT . '/media/com_eventbooking';
-		$files     = JFolder::files($path,
-			strlen(trim($config->attachment_file_types)) ? $config->attachment_file_types : 'bmp|gif|jpg|png|swf|zip|doc|pdf|xls');
-		$options   = array();
-		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_ATTACHMENT'));
-		for ($i = 0, $n = count($files); $i < $n; $i++)
-		{
-			$file      = $files[$i];
-			$options[] = JHtml::_('select.option', $file, $file);
-		}
-
-		return JHtml::_('select.genericlist', $options, 'attachment', 'class="inputbox"', 'value', 'text', $attachment);
-	}
 
 	/**
-	 * Get total document of a category
+	 * Get total events of a category
 	 *
-	 * @param int $categoryId
+	 * @param int     $categoryId
+	 * @param bool $includeChildren
+	 *
+	 * @return int
+	 * @throws Exception
 	 */
 	public static function getTotalEvent($categoryId, $includeChildren = true)
 	{
-		$app            = JFactory::getApplication();
 		$user           = JFactory::getUser();
 		$hidePastEvents = EventbookingHelper::getConfigValue('hide_past_events');
 		$db             = JFactory::getDbo();
@@ -2922,8 +2861,8 @@ class EventbookingHelper
 
 		if (strpos($body, '[QRCODE]') !== false)
 		{
-			EventbookingHelper::generateQrcode($row->transaction_id);
-			$imgTag = '<img src="'.EventbookingHelper::getSiteUrl().'media/com_eventbooking/qrcodes/'.$row->transaction_id.'.png" border="0" />';
+			EventbookingHelper::generateQrcode($row->id);
+			$imgTag = '<img src="'.EventbookingHelper::getSiteUrl().'media/com_eventbooking/qrcodes/'.$row->id.'.png" border="0" />';
 			$body = str_replace("[QRCODE]", $imgTag, $body);
 		}
 
@@ -3074,13 +3013,43 @@ class EventbookingHelper
 		// Clear attachments
 		$mailer->ClearAttachments();
 
-		// Add attachment to admin email if needed
+		// Add invoice to admin email if needed
 		if ($config->send_invoice_to_admin)
 		{
 			$invoiceFilePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
 			if (file_exists($invoiceFilePath))
 			{
 				$mailer->addAttachment($invoiceFilePath);
+			}
+		}
+
+		// Send attachment to admin email if needed
+		if ($config->send_attachments_to_admin)
+		{
+			$attachmentsPath = JPATH_ROOT . '/media/com_eventbooking/files/';
+			for ($i = 0, $n = count($rowFields); $i < $n; $i++)
+			{
+				$rowField = $rowFields[$i];
+				if ($rowField->fieldtype == 'File')
+				{
+					if (isset($replaces[$rowField->name]))
+					{
+						$fileName = $replaces[$rowField->name];
+						if ($fileName && file_exists($attachmentsPath . '/' . $fileName))
+						{
+							$pos = strpos($fileName, '_');
+							if ($pos !== false)
+							{
+								$originalFilename = substr($fileName, $pos + 1);
+							}
+							else
+							{
+								$originalFilename = $fileName;
+							}
+							$mailer->addAttachment($attachmentsPath . '/' . $fileName, $originalFilename);
+						}
+					}
+				}
 			}
 		}
 
@@ -3227,8 +3196,8 @@ class EventbookingHelper
 
 		if (strpos($body, '[QRCODE]') !== false)
 		{
-			EventbookingHelper::generateQrcode($row->transaction_id);
-			$imgTag = '<img src="'.EventbookingHelper::getSiteUrl().'media/com_eventbooking/qrcodes/'.$row->transaction_id.'.png" border="0" />';
+			EventbookingHelper::generateQrcode($row->id);
+			$imgTag = '<img src="'.EventbookingHelper::getSiteUrl().'media/com_eventbooking/qrcodes/'.$row->id.'.png" border="0" />';
 			$body = str_replace("[QRCODE]", $imgTag, $body);
 		}
 
@@ -3631,84 +3600,7 @@ class EventbookingHelper
 			self::getInstalledVersion() . ', Copyright (C) 2010 - ' . date('Y') .
 			' <a href="http://joomdonation.com" target="_blank"><strong>Ossolution Team</strong></a></div>';
 	}
-
-	/**
-	 * Load jquery library
-	 */
-	public static function loadJQuery()
-	{
-		if (version_compare(JVERSION, '3.0', 'ge'))
-		{
-			JHtml::_('jquery.framework');
-		}
-		else
-		{
-			$document = JFactory::getDocument();
-			$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/bootstrap/js/jquery.min.js');
-			$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/bootstrap/js/jquery-noconflict.js');
-		}
-	}
-
-	/**
-	 * Load bootstrap css and javascript file
-	 */
-	public static function loadBootstrap($loadJs = true)
-	{
-		$app      = JFactory::getApplication();
-		$document = JFactory::getDocument();
-		$rootUrl  = JUri::root(true);
-		$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap.css');
-
-		// Load bootstrap tabs css
-		if ($app->isAdmin())
-		{
-			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap-tabs-backend.css');
-		}
-		else
-		{
-			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap-tabs.css');
-		}
-		if (version_compare(JVERSION, '3.0', 'ge'))
-		{
-			if ($loadJs && $app->isAdmin())
-			{
-				JHtml::_('bootstrap.framework');
-			}
-			elseif ($loadJs && $app->isSite())
-			{
-				JHtml::_('script', 'jui/bootstrap.min.js', false, true, false, false, false);
-			}
-		}
-		else
-		{
-			if ($loadJs && $app->isAdmin())
-			{
-				$document->addScript($rootUrl . '/media/com_eventbooking/assets/bootstrap/js/jquery.min.js');
-				$document->addScript($rootUrl . '/media/com_eventbooking/assets/bootstrap/js/jquery-noconflict.js');
-				$document->addScript($rootUrl . '/media/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
-			}
-			elseif ($loadJs && $app->isSite())
-			{
-				$document->addScript($rootUrl . '/media/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
-			}
-		}
-	}
-
-	/**
-	 * Helper method to load bootstrap js using for bootstrap dropdown
-	 */
-	public static function loadBootstrapJs()
-	{
-		if (version_compare(JVERSION, '3.0.0', 'ge'))
-		{
-			JHtml::_('script', 'jui/bootstrap.min.js', false, true, false, false, false);
-		}
-		else
-		{
-			JFactory::getDbo()->addScript(JUri::root(true) . '/media/com_eventbooking/assets/bootstrap/js/bootstrap.min.js');
-		}
-	}
-
+		
 	/**
 	 * Get version number of GD version installed
 	 * Enter description here ...
@@ -3942,7 +3834,7 @@ class EventbookingHelper
 		// Build the script.
 		$script   = array();
 		$script[] = '	function jSelectUser_user_id(id, title) {';
-		$script[] = '		var old_id = document.getElementById("'.$fieldName.'").value;';
+		$script[] = '		var old_id = document.getElementById("' . $fieldName . '").value;';
 		$script[] = '		if (old_id != id) {';
 		$script[] = '			document.getElementById("' . $fieldName . '").value = id;';
 		$script[] = '			document.getElementById("user_id_name").value = title;';
@@ -3966,33 +3858,17 @@ class EventbookingHelper
 			$table->name = '';
 		}
 
-		if (version_compare(JVERSION, '3.0', 'ge'))
-		{
-			$html[] = '<div class="input-append">';
-			$html[] = '	<input type="text" id="user_id_name"' . ' value="' . htmlspecialchars($table->name, ENT_COMPAT, 'UTF-8') . '"' .
-				' disabled="disabled"' . $attr . ' />';
-			// Create the user select button.
-			$html[] = '<a class="btn btn-primary modal_user_id" title="' . JText::_('JLIB_FORM_CHANGE_USER') . '"' . ' href="' . $link . '"' .
-				' rel="{handler: \'iframe\', size: {x: 800, y: 500}}">';
 
-			$html[] = '<span class="icon-user"></span></a>';
-			$html[] = '</div>';
-		}
-		else
-		{
-			$html[] = '<div class="fltlft">';
-			$html[] = '	<input type="text" id="user_id_name"' . ' value="' . htmlspecialchars($table->name, ENT_COMPAT, 'UTF-8') . '"' .
-				' disabled="disabled"' . $attr . ' />';
-			$html[] = '</div>';
-			// Create the user select button.
-			$html[] = '<div class="button2-left">';
-			$html[] = '<div class="blank">';
-			$html[] = '<a class="modal_user_id" title="' . JText::_('JLIB_FORM_CHANGE_USER') . '"' . ' href="' . $link . '"' .
-				' rel="{handler: \'iframe\', size: {x: 800, y: 500}}">';
-			$html[] = '	' . JText::_('JLIB_FORM_CHANGE_USER') . '</a>';
-			$html[] = '</div>';
-			$html[] = '</div>';
-		}
+		$html[] = '<div class="input-append">';
+		$html[] = '	<input type="text" id="user_id_name"' . ' value="' . htmlspecialchars($table->name, ENT_COMPAT, 'UTF-8') . '"' .
+			' disabled="disabled"' . $attr . ' />';
+		// Create the user select button.
+		$html[] = '<a class="btn btn-primary modal_user_id" title="' . JText::_('JLIB_FORM_CHANGE_USER') . '"' . ' href="' . $link . '"' .
+			' rel="{handler: \'iframe\', size: {x: 800, y: 500}}">';
+
+		$html[] = '<span class="icon-user"></span></a>';
+		$html[] = '</div>';
+
 
 		// Create the real field, hidden, that stored the user id.
 		$html[] = '<input type="hidden" id="' . $fieldName . '" name="' . $fieldName . '" value="' . $userId . '" />';
@@ -4550,23 +4426,31 @@ class EventbookingHelper
 	 */
 	public static function checkEditEvent($eventId)
 	{
-		$user = JFactory::getUser();
-		$db   = JFactory::getDbo();
+		$user  = JFactory::getUser();
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+
 		if (!$eventId)
 		{
 			return false;
 		}
-		$sql = 'SELECT * FROM #__eb_events WHERE id=' . $eventId;
-		$db->setQuery($sql);
+
+		$query->select('*')
+			->from('#__eb_events')
+			->where('id = ' . $eventId);
+		$db->setQuery($query);
 		$rowEvent = $db->loadObject();
+
 		if (!$rowEvent)
 		{
 			return false;
 		}
+
 		if ($user->get('guest'))
 		{
 			return false;
 		}
+
 		if ($user->authorise('core.edit', 'com_eventbooking') || ($rowEvent->created_by == $user->get('id')))
 		{
 			return true;
@@ -4577,18 +4461,11 @@ class EventbookingHelper
 		}
 	}
 
-	public static function isGroupRegistration($id)
-	{
-		if (!$id)
-			return false;
-		$db  = JFactory::getDbo();
-		$sql = 'SELECT is_group_billing FROM #__eb_registrants WHERE id=' . $id;
-		$db->setQuery($sql);
-		$isGroupBilling = (int) $db->loadResult();
-
-		return $isGroupBilling > 0 ? true : false;
-	}
-
+	/**
+	 * Update Group Members record to have same information with billing record
+	 *
+	 * @param int $groupId
+	 */
 	public static function updateGroupRegistrationRecord($groupId)
 	{
 		$db     = JFactory::getDbo();
@@ -4599,9 +4476,14 @@ class EventbookingHelper
 			$row->load($groupId);
 			if ($row->id)
 			{
-				$sql = "UPDATE #__eb_registrants SET published=$row->published, transaction_id='$row->transaction_id', payment_method='$row->payment_method' WHERE group_id=" .
-					$row->id;
-				$db->setQuery($sql);
+				$query = $db->getQuery(true);
+				$query->update('#__eb_registrants')
+					->set('published = ' . $row->published)
+					->set('transaction_id = ' . $db->quote($row->transaction_id))
+					->set('payment_method = ' . $db->quote($row->payment_method))
+					->where('group_id = ' . $row->id);
+
+				$db->setQuery($query);
 				$db->execute();
 			}
 		}
@@ -4991,24 +4873,5 @@ class EventbookingHelper
 		}
 
 		return $list;
-	}
-
-	/**
-	 *
-	 * @param string $vName
-	 */
-	public static function addSubMenus($vName = 'dashboard')
-	{
-		JSubMenuHelper::addEntry(JText::_('Dashboard'), 'index.php?option=com_eventbooking&view=dashboard', $vName == 'dashboard');
-		JSubMenuHelper::addEntry(JText::_('Categories'), 'index.php?option=com_eventbooking&view=categories', $vName == 'categories');
-		JSubMenuHelper::addEntry(JText::_('Events'), 'index.php?option=com_eventbooking&view=events', $vName == 'events');
-		JSubMenuHelper::addEntry(JText::_('Registrants'), 'index.php?option=com_eventbooking&view=registrants', $vName == 'registrants');
-		JSubMenuHelper::addEntry(JText::_('Custom Fields'), 'index.php?option=com_eventbooking&view=fields', $vName == 'fields');
-		JSubMenuHelper::addEntry(JText::_('Locations'), 'index.php?option=com_eventbooking&view=locations', $vName == 'locations');
-		JSubMenuHelper::addEntry(JText::_('Coupons'), 'index.php?option=com_eventbooking&view=coupons', $vName == 'coupons');
-		JSubMenuHelper::addEntry(JText::_('Payment Plugins'), 'index.php?option=com_eventbooking&view=plugins', $vName == 'plugins');
-		JSubMenuHelper::addEntry(JText::_('Emails & Messages'), 'index.php?option=com_eventbooking&view=message', $vName == 'language');
-		JSubMenuHelper::addEntry(JText::_('Translation'), 'index.php?option=com_eventbooking&view=language', $vName == 'language');
-		JSubMenuHelper::addEntry(JText::_('Configuration'), 'index.php?option=com_eventbooking&view=configuration', $vName == 'configuration');
 	}
 }

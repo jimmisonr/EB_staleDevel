@@ -9,6 +9,7 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die;
+JHtml::_('bootstrap.dropdown');
 ?>
 <div class="btn-group">
 	<button class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-plus"></i> <?php echo JText::_('EB_SAVE_TO'); ?> <span class="caret"></span></button>

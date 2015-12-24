@@ -9,11 +9,9 @@
 	<authorUrl>www.joomdonation.com</authorUrl>
 	<version>1.6.1</version>
 	<description>This module is used to display categories in Event Booking Extension</description>
-	<files>
-		<filename module="mod_eb_category">index.html</filename>
+	<files>		
 		<filename module="mod_eb_category">mod_eb_category.php</filename>		
-		<filename module="mod_eb_category">tmpl/default.php</filename>
-		<filename module="mod_eb_category">tmpl/index.html</filename>		
+		<filename module="mod_eb_category">tmpl/default.php</filename>		
 	</files>		
 	<config>
 		<fields name="params">

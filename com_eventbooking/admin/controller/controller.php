@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.1.0
+ * @version            2.2.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -18,13 +18,7 @@ class EventbookingController extends RADControllerAdmin
 		JFactory::getDocument()->addStyleSheet(JURI::base(true) . '/components/com_eventbooking/assets/css/style.css');
 
 		parent::display($cachable, $urlparams);
-
-		if (version_compare(JVERSION, '3.0', 'le'))
-		{
-			EventbookingHelper::loadJQuery();
-			EventbookingHelper::loadBootstrap();
-		}
-
+		
 		if ($this->input->getCmd('format', 'html') != 'raw')
 		{
 			EventbookingHelper::displayCopyRight();
@@ -257,6 +251,46 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 		$config = EventbookingHelper::getConfig();
+
+		// Publish the necessary plugin based on cb_integration config option value in older version
+		if (!empty($config->cb_integration))
+		{
+			$plugin = '';
+			switch ($config->cb_integration)
+			{
+				case '1':
+					$plugin = 'cb';
+					break;
+				case '2':
+					$plugin = 'jomsocial';
+					break;
+				case '3':
+					$plugin = 'membershippro';
+					break;
+				case '4':
+					$plugin = 'userprofile';
+					break;
+				case '5':
+					$plugin = 'contactenhanced';
+					break;
+			}
+
+			$query = $db->getQuery();
+			$query->update('#__extensions')
+				->set('`enabled`= 1')
+				->where('`element`=' . $db->quote($plugin))
+				->where('`folder`="eventbooking"');
+			$db->setQuery($query);
+			$db->execute();
+
+			$query->clear();
+			$query->delete('#__eb_configs')
+				->where('config_key = ' . $db->quote('cb_integration'));
+			$db->setQuery($query);
+			$db->execute();
+		}
+
+
 		//Set up default payment plugins table
 		$sql = 'SELECT COUNT(*) FROM #__eb_payment_plugins';
 		$db->setQuery($sql);
@@ -2164,6 +2198,48 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		// Publish necessary plugin when updating from older version to 2.2.0
+		if ($config->cb_integration)
+		{
+			$plugin = '';
+
+			if ($config->cb_integration == 1)
+			{
+				$plugin = 'cb';
+			}
+
+			if ($config->cb_integration == 2)
+			{
+				$plugin = 'jomsocial';
+			}
+
+			if ($config->cb_integration == 3)
+			{
+				$plugin = 'membershippro';
+			}
+
+			if ($config->cb_integration == 4)
+			{
+				$plugin = 'userprofile';
+			}
+
+			if ($config->cb_integration == 5)
+			{
+				$plugin = 'contactenhanced';
+			}
+
+			if ($plugin)
+			{
+				$query->clear();
+				$query->update('#__extensions')
+					->set('`enabled`= 1')
+					->where('`element`=' . $db->quote($plugin))
+					->where('`folder`="eventbooking"');
+				$db->setQuery($query);
+				$db->execute();
+			}
+		}
+
 		// Try to delete the file com_eventbooking.zip from tmp folder
 		$tmpFolder = JFactory::getConfig()->get('tmp_path');
 		if (!JFolder::exists($tmpFolder))
@@ -2206,10 +2282,22 @@ class EventbookingController extends RADControllerAdmin
 			JPATH_ROOT . '/components/com_eventbooking/models/waitinglist.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waitings.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waiting.php',
-			JPATH_ROOT . '/media/com_eventbooking/.htaccess'
+			JPATH_ROOT . '/media/com_eventbooking/.htaccess',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/categories/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/configuration/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/registrants/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/states/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/fields/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/message/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/plugins/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/countries/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/coupons/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/events/tmpl/default.joomla3.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/locations/tmpl/default.joomla3.php'
 		);
 
 		$deleteFolders = array(
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/assets/chosen',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/models',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/views',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/daylightsaving',
@@ -2217,7 +2305,8 @@ class EventbookingController extends RADControllerAdmin
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waiting',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waitings',
 			JPATH_ROOT . '/components/com_eventbooking/models',
-			JPATH_ROOT . '/components/com_eventbooking/assets'
+			JPATH_ROOT . '/components/com_eventbooking/assets',
+			JPATH_ROOT . '/components/com_eventbooking/views'
 		);
 
 		foreach ($deleteFiles as $file)
@@ -2234,16 +2323,8 @@ class EventbookingController extends RADControllerAdmin
 			{
 				JFolder::delete(JPATH_ROOT . $folder);
 			}
-		}
-
-		// We don't need views folder for Joomla 3
-		if (version_compare(JVERSION, '3.0', 'ge'))
-		{
-			if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/views'))
-			{
-				JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/views');
-			}
-		}
+		}		
+		
 		// Redirect to dashboard view
 		$installType = $this->input->getCmd('install_type', '');
 		if ($installType == 'install')
@@ -2254,6 +2335,7 @@ class EventbookingController extends RADControllerAdmin
 		{
 			$msg = JText::_('The extension was successfully updated');
 		}
+		
 		//Redirecting users to dasdboard
 		JFactory::getApplication()->redirect('index.php?option=com_eventbooking&view=dashboard', $msg);
 	}

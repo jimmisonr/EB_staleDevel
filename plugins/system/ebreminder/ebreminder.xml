@@ -10,8 +10,7 @@
 	<version>1.7.4</version>
 	<description>This plugin check and send reminder emails to registrants automatically</description>
 	<files>
-		<filename plugin="ebreminder">ebreminder.php</filename>
-		<filename>index.html</filename>
+		<filename plugin="ebreminder">ebreminder.php</filename>		
 	</files>	
 	<config>
 		<fields name="params">

@@ -8,12 +8,10 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>	
 	<version>1.6.8</version>
 	<description>Search Module for Event Booking</description>
-	<files>
-		<filename module="mod_eb_search">index.html</filename>
+	<files>		
 		<filename module="mod_eb_search">mod_eb_search.php</filename>		
 		<filename module="mod_eb_search">tmpl/default.php</filename>
-		<filename module="mod_eb_search">tmpl/horizontal.php</filename>
-		<filename module="mod_eb_search">tmpl/index.html</filename>		
+		<filename module="mod_eb_search">tmpl/horizontal.php</filename>		
 	</files>			
 	<config>	
 		<fields name="params">

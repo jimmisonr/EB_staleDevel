@@ -7,7 +7,7 @@
   <authorUrl>http://www.joomdonation.com</authorUrl>
   <copyright>Copyright (C) 2010 - 2015 Ossolution Team</copyright>
   <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
-  <version>2.1.0</version>
+  <version>2.2.0</version>  
   <description>Event Booking is a simple, secure, extendable, intuititive event registration extension for Joomla 2.5 and Joomla 3.x</description> 
   <scriptfile>install.eventbooking.php</scriptfile>
   <install>
@@ -28,21 +28,18 @@
 	<folder>assets</folder>
 	<folder>qrcodes</folder>
 	<filename>ajax-loadding-animation.gif</filename>
-	<filename>invoice_logo.png</filename>	
-	<filename>index.html</filename>	
+	<filename>invoice_logo.png</filename>		
   </media>
   <languages>
 	<language tag="en-GB">site/languages/en-GB/en-GB.com_eventbooking.ini</language>
   </languages>
-  <files folder="site">  
-    <filename>index.html</filename>
+  <files folder="site">      
     <filename>eventbooking.php</filename>
     <filename>router.php</filename>
     <filename>fields.xml</filename>
     <folder>controller</folder>	
     <folder>model</folder>		    
-    <folder>view</folder>
-	<folder>views</folder>	
+    <folder>view</folder>	
     <folder>helper</folder>
     <folder>payments</folder>     
     <folder>emailtemplates</folder>
@@ -71,8 +68,7 @@
 	<language tag="en-GB">admin/languages/en-GB/en-GB.com_eventbooking.sys.ini</language>      
 	<language tag="en-GB">admin/languages/en-GB/en-GB.com_eventbooking.ini</language>
   </languages>
-    <files folder="admin">
-		<filename>index.html</filename>
+    <files folder="admin">		
 		<filename>eventbooking.php</filename>		
 		<filename>config.xml</filename>
 		<filename>access.xml</filename>

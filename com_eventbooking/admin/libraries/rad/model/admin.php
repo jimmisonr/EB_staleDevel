@@ -212,7 +212,7 @@ class RADModelAdmin extends RADModel
 	{
 		if ($this->triggerEvents)
 		{
-			$dispatcher = JDispatcher::getInstance();;
+			$dispatcher = JEventDispatcher::getInstance();
 			JPluginHelper::importPlugin($this->pluginGroup);
 		}
 		$row   = $this->getTable();
@@ -270,7 +270,7 @@ class RADModelAdmin extends RADModel
 		{
 			if ($this->triggerEvents)
 			{
-				$dispatcher = JDispatcher::getInstance();;
+				$dispatcher = JEventDispatcher::getInstance();;
 				JPluginHelper::importPlugin($this->pluginGroup);
 			}
 
@@ -324,16 +324,21 @@ class RADModelAdmin extends RADModel
 		$row = $this->getTable();
 		$pks = (array) $pks;
 
+		$this->beforePublish($pks, $value);
+
 		// Attempt to change the state of the records.
 		if (!$row->publish($pks, $value, JFactory::getUser()->get('id')))
 		{
 			throw new Exception($row->getError());
 		}
+
+		$this->afterPublish($pks, $value);
+
 		if ($this->triggerEvents)
 		{
 			// Trigger the eventChangeState event.
 			JPluginHelper::importPlugin($this->pluginGroup);
-			JDispatcher::getInstance()->trigger($this->eventChangeState, array($this->context, $pks, $value));
+			JEventDispatcher::getInstance()->trigger($this->eventChangeState, array($this->context, $pks, $value));
 		}
 
 		// Clear the component's cache
@@ -671,6 +676,28 @@ class RADModelAdmin extends RADModel
 	 * @param array $cid Ids of deleted record
 	 */
 	protected function afterDelete($cid)
+	{
+
+	}
+
+	/**
+	 * Give a chance for child class to pre-process the publish.
+	 *
+	 * @param array $cid
+	 * @param int   $state
+	 */
+	protected function beforePublish($cid, $state)
+	{
+
+	}
+
+	/**
+	 * Give a chance for child class to post-process the publish.
+	 *
+	 * @param array $cid
+	 * @param int   $state
+	 */
+	protected function afterPublish($cid, $state)
 	{
 
 	}

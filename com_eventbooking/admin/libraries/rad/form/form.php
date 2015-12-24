@@ -531,6 +531,7 @@ class RADForm
 		{
 			if ($field->hideOnDisplay)
 			{
+				$fieldsFee[$fieldName] = 0;
 				continue;
 			}
 			$fieldsFee[$fieldName] = 0;

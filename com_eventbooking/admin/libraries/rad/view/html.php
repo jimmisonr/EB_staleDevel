@@ -169,11 +169,6 @@ class RADViewHtml extends RADView
 		// Try to find the layout file with the following priority order: Device type, Joomla version, Default Layout
 		$filesToFind = array($layout);
 
-		if (version_compare(JVERSION, '3.0', 'ge'))
-		{
-			array_unshift($filesToFind, $layout . '.joomla3');
-		}
-
 		if ($this->deviceType !== 'desktop')
 		{
 			array_unshift($filesToFind, $layout . '.' . $this->deviceType);

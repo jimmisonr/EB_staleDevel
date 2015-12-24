@@ -1,14 +1,14 @@
 <?php
 /**
- * @version        2.0.8
- * @package        Joomla
- * @subpackage     Membership Pro
- * @author         Tuan Pham Ngoc
- * @copyright	Copyright (C) 2011 Ossolution Team
- * @license        GNU/GPL, see LICENSE.php
+ * @version            2.2.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 
-// no direct access
+ // no direct access
 defined( '_JEXEC' ) or die;
 $config = $this->config;
 ?>

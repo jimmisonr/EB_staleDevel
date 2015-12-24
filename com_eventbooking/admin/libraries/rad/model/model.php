@@ -448,7 +448,7 @@ class RADModel
 		// Trigger the onContentCleanCache event.
 		if (!empty($this->eventCleanCache))
 		{
-			$dispatcher = JDispatcher::getInstance();;
+			$dispatcher = JEventDispatcher::getInstance();;
 			$dispatcher->trigger($this->event_clean_cache, $options);
 		}
 	}

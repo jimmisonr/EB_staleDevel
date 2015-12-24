@@ -1,5 +1,4 @@
 <?php
-
 class RADSynchronizerJomsocial
 {
 
@@ -19,10 +18,5 @@ class RADSynchronizerJomsocial
 			}
 		}		
 		return $data;
-	}
-
-	public function saveData($userId, $data, $config)
-	{
-		
 	}
 }

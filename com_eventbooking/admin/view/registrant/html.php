@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.1.0
+ * @version            2.2.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -39,7 +39,7 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		$event                   = EventbookingHelperDatabase::getEvent((int) $this->item->event_id);
 		if ($this->item->id)
 		{
-			if (EventbookingHelper::isGroupRegistration($this->item->id))
+			if ($this->item->is_group_billing)
 			{
 				$rowFields = EventbookingHelper::getFormFields($this->item->event_id, 1, $this->item->language);
 			}
