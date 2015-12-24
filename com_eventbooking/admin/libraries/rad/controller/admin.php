@@ -126,6 +126,7 @@ class RADControllerAdmin extends RADController
 		$task  = $this->getTask();
 		if ($task == 'save2copy')
 		{
+			$input->set('source_id', $input->getInt('id', 0));
 			$input->set('id', 0);
 			$task = 'apply';
 		}

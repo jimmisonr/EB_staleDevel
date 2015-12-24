@@ -101,64 +101,29 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		}
 
 		//Init default data
-		if (!isset($data['weekdays']))
-		{
-			$data['weekdays'] = array();
-		}
-		if (!isset($data['monthdays']))
-		{
-			$data['monthdays'] = '';
-		}
-		if (!$data['number_days'])
-		{
-			$data['number_days'] = 1;
-		}
-		if (!$data['number_weeks'])
-		{
-			$data['number_week'] = 1;
-		}
-		if (!$data['recurring_occurrencies'])
-		{
-			$data['recurring_occurrencies'] = 0;
-		}
-		if (!$data['recurring_end_date'])
-		{
-			$data['recurring_end_date'] = $db->getNullDate();
-		}
+		$this->sanitizeData($data);
 
-		if (!$data['weekly_number_months'])
+		if ($input->getCmd('task') == 'save2copy')
 		{
-			$data['weekly_number_months'] = 1;
-		}
+			$sourceRow = $this->getTable();
+			$sourceRow->load($input->getInt('source_id'));
+			if ($sourceRow)
+			{
+				if (empty($data['attachment']))
+				{
+					$data['attachment'] = $sourceRow->attachment;
+				}
 
-		if (isset($data['payment_methods']))
-		{
-			$data['payment_methods'] = implode(',', $data['payment_methods']);
-		}
-
-		if (empty($data['event_date_hour'] ))
-		{
-			$data['event_date_hour'] = '00';
-		}
-
-		if (empty($data['event_date_minute'] ))
-		{
-			$data['event_date_minute'] = '00';
-		}
-
-		if (empty($data['cut_off_hour'] ))
-		{
-			$data['cut_off_hour'] = '00';
-		}
-
-		if (empty($data['cut_off_minute'] ))
-		{
-			$data['cut_off_minute'] = '00';
+				if (empty($data['thumb']))
+				{
+					$data['thumb'] = $sourceRow->thumb;
+				}
+			}
 		}
 
 		if (isset($data['recurring_type']) && $data['recurring_type'])
 		{
-			$this->_storeRecurringEvent($data);
+			$this->storeRecurringEvent($data);
 			$input->set('id', $data['id']);
 		}
 		else
@@ -221,107 +186,17 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					$row->custom_fields = json_encode($data['params']);
 				}
 			}
-			//Check ordering of the fieds
-			if (!$row->id)
-			{
-				$row->ordering = $row->getNextOrder();
-			}
-			if (!$row->alias)
-			{
-				$row->alias = JApplication::stringURLSafe($row->title);
-			}
 
-			// Build alias for other languages
-			if (JLanguageMultilang::isEnabled())
-			{
-				$languages = EventbookingHelper::getLanguages();
-				if (count($languages))
-				{
-					foreach ($languages as $language)
-					{
-						$sef = $language->sef;
-						if (!$row->{'alias_' . $sef})
-						{
-							$row->{'alias_' . $sef} = JApplication::stringURLSafe($row->{'title_' . $sef});
-						}
-						else
-						{
-							$row->{'alias_' . $sef} = JApplication::stringURLSafe($row->{'alias_' . $sef});
-						}
-					}
-				}
-			}
+			$this->prepareTable($row, $input->getCmd('task'));
 
 			if (!$row->store())
 			{
 				throw new Exception($db->getErrorMsg());
 			}
-			//Adjust alias if needed
-			$query = $db->getQuery(true);
-			$query->select('COUNT(*)')
-				->from('#__eb_events')
-				->where('alias=' . $db->quote($row->alias))
-				->where('id !=' . $row->id);
-			$db->setQuery($query);
-			$total = $db->loadResult();
-			if ($total)
-			{
-				$alias = $row->id . '-' . $row->alias;
-				$query->clear();
-				$query->update('#__eb_events')
-					->set('alias=' . $db->quote($alias))
-					->where('id=' . $row->id);
-				$db->setQuery($query);
-				$db->execute();
-			}
-			$query->clear();
-			$query->delete('#__eb_event_group_prices')->where('event_id=' . $row->id);
-			$db->setQuery($query);
-			$db->execute();
-			$prices            = $data['price'];
-			$registrantNumbers = $data['registrant_number'];
-			for ($i = 0, $n = count($prices); $i < $n; $i++)
-			{
-				$price            = $prices[$i];
-				$registrantNumber = $registrantNumbers[$i];
-				if (($registrantNumber > 0) && ($price > 0))
-				{
-					$query->clear();
-					$query->insert('#__eb_event_group_prices')
-						->columns('event_id, registrant_number, price')
-						->values("$row->id, $registrantNumber, $price");
-					$db->setQuery($query);
-					$db->execute();
-				}
-			}
-			$query->clear();
-			$query->delete('#__eb_event_categories')->where('event_id=' . $row->id);
-			$db->setQuery($query);
-			$db->execute();
-			$mainCategoryId = (int) $data['main_category_id'];
-			if ($mainCategoryId)
-			{
-				$query->clear();
-				$query->insert('#__eb_event_categories')
-					->columns('event_id, category_id, main_category')
-					->values("$row->id, $mainCategoryId, 1");
-				$db->setQuery($query);
-				$db->execute();
-			}
-			$categories = isset($data['category_id']) ? $data['category_id'] : array();
-			for ($i = 0, $n = count($categories); $i < $n; $i++)
-			{
-				$categoryId = (int) $categories[$i];
-				if ($categoryId && ($categoryId != $mainCategoryId))
-				{
-					$query->clear();
-					$query->insert('#__eb_event_categories')
-						->columns('event_id, category_id, main_category')
-						->values("$row->id, $categoryId, 0");
-					$db->setQuery($query);
-					$db->execute();
-				}
-			}
+
+			$this->storeEventGroupRegistrationRates($row->id, $data, $isNew);
+			$this->storeEventCategories($row->id, $data, $isNew);
+
 			$input->set('id', $row->id);
 
 			//Trigger event which allows plugins to save it own data
@@ -337,12 +212,14 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 	 *
 	 * @throws Exception
 	 */
-	function _storeRecurringEvent(&$data)
+	protected function storeRecurringEvent(&$data)
 	{
 		$db       = $this->getDbo();
+		$query    = $db->getQuery(true);
 		$config   = EventbookingHelper::getConfig();
 		$row      = $this->getTable();
 		$nullDate = $db->getNullDate();
+
 		if ($this->state->id)
 		{
 			$row->load($this->state->id);
@@ -353,44 +230,13 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			$isNew = true;
 		}
 
-		if (!$data['alias'])
-		{
-			$data['alias'] = JApplication::stringURLSafe($data['title']);
-		}
+		$task = isset($data['task']) ? $data['task'] : '';
 
 		if (!$row->bind($data, array('category_id', 'params')))
 		{
 			throw new Exception($db->getErrorMsg());
 		}
 
-
-		// Build alias for other languages
-		if (JLanguageMultilang::isEnabled())
-		{
-			$languages = EventbookingHelper::getLanguages();
-			if (count($languages))
-			{
-				foreach ($languages as $language)
-				{
-					$sef = $language->sef;
-					if (!$row->{'alias_' . $sef})
-					{
-						$row->{'alias_' . $sef} = JApplication::stringURLSafe($row->{'title_' . $sef});
-					}
-					else
-					{
-						$row->{'alias_' . $sef} = JApplication::stringURLSafe($row->{'alias_' . $sef});
-					}
-				}
-			}
-		}
-
-
-		if (!$row->created_by)
-		{
-			$user            = JFactory::getUser();
-			$row->created_by = $user->get('id');
-		}
 
 		$row->event_type = 1;
 		$eventDateHour   = $data['event_date_hour'];
@@ -501,88 +347,24 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				$row->custom_fields = json_encode($params);
 			}
 		}
-		//Check ordering of the fieds
-		if (!$row->id)
-		{
-			$row->ordering = $row->getNextOrder();
-		}
+
+		$this->prepareTable($row, $task);
 
 		if (!$row->store())
 		{
 			throw new Exception($db->getErrorMsg());
 		}
 
-		$query = $db->getQuery(true);
-		$query->select('COUNT(*)')
-			->from('#__eb_events')
-			->where('alias=' . $db->quote($row->alias))
-			->where('id !=' . $row->id);
-		$db->setQuery($query);
-		$total = $db->loadResult();
-		if ($total)
-		{
-			$alias = $row->id . '-' . $row->alias;
-			$query->clear();
-			$query->update('#__eb_events')
-				->set('alias=' . $db->quote($alias))
-				->where('id=' . $row->id);
-			$db->setQuery($query);
-			$db->execute();
-		}
-
 		$data['id'] = $row->id;
-		$query->clear();
-		$query->delete('#__eb_event_group_prices')->where('event_id=' . $row->id);
-		$db->setQuery($query);
-		$db->execute();
 
-		$prices            = $data['price'];
-		$registrantNumbers = $data['registrant_number'];
-		for ($i = 0, $n = count($prices); $i < $n; $i++)
-		{
-			$price            = $prices[$i];
-			$registrantNumber = $registrantNumbers[$i];
-			if (($registrantNumber > 0) && ($price > 0))
-			{
-				$query->clear();
-				$query->insert('#__eb_event_group_prices')
-					->columns('event_id, registrant_number, price')
-					->values("$row->id, $registrantNumber, $price");
-				$db->setQuery($query);
-				$db->execute();
-			}
-		}
-		$query->clear();
-		$query->delete('#__eb_event_categories')->where('event_id=' . $row->id);
-		$db->setQuery($query);
-		$db->execute();
-		$mainCategoryId = (int) $data['main_category_id'];
-		if ($mainCategoryId)
-		{
-			$query->clear();
-			$query->insert('#__eb_event_categories')
-				->columns('event_id, category_id, main_category')
-				->values("$row->id, $mainCategoryId, 1");
-			$db->setQuery($query);
-			$db->execute();
-		}
-		$categories = isset($data['category_id']) ? $data['category_id'] : array();
-		for ($i = 0, $n = count($categories); $i < $n; $i++)
-		{
-			$categoryId = (int) $categories[$i];
-			if ($categoryId && ($categoryId != $mainCategoryId))
-			{
-				$query->clear();
-				$query->insert('#__eb_event_categories')
-					->columns('event_id, category_id, main_category')
-					->values("$row->id, $categoryId, 0");
-				$db->setQuery($query);
-				$db->execute();
-			}
-		}
-		/**
-		 * In case creating new event, we will create children events
-		 */
+		// Store group registration rates
+		$this->storeEventGroupRegistrationRates($row->id, $data, $isNew);
+
+		// Store event categories
+		$this->storeEventCategories($row->id, $data, $isNew);
+
+		// Create children events
+
 		if (!$this->state->id)
 		{
 			for ($i = 1, $n = count($eventDates); $i < $n; $i++)
@@ -627,55 +409,13 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				$rowChildEvent->alias                  = JApplication::stringURLSafe(
 					$rowChildEvent->title . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null));
 
-				// Build alias for other languages
-				if (JLanguageMultilang::isEnabled())
-				{
-					if (count($languages))
-					{
-						foreach ($languages as $language)
-						{
-							$sef                              = $language->sef;
-							$rowChildEvent->{'alias_' . $sef} = JApplication::stringURLSafe(
-								$rowChildEvent->{'alias_' . $sef} . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null));
-						}
-					}
-				}
+				$this->prepareTable($rowChildEvent, $task);
 
 				$rowChildEvent->store();
-				//Generate alias
-				$query->clear();
-				$query->select('COUNT(*)')
-					->from('#__eb_events')
-					->where('alias=' . $db->quote($rowChildEvent->alias))
-					->where('id !=' . $rowChildEvent->id);
-				$db->setQuery($query);
-				$total = $db->loadResult();
-				if ($total)
-				{
-					$alias = $rowChildEvent->id . '-' . $rowChildEvent->alias;
-					$query->clear();
-					$query->update('#__eb_events')
-						->set('alias=' . $db->quote($alias))
-						->where('id=' . $rowChildEvent->id);
-					$db->setQuery($query);
-					$db->execute();
-				}
 
-				//Event Price
-				for ($j = 0, $m = count($prices); $j < $m; $j++)
-				{
-					$price            = $prices[$j];
-					$registrantNumber = $registrantNumbers[$j];
-					if (($registrantNumber > 0) && ($price > 0))
-					{
-						$query->clear();
-						$query->insert('#__eb_event_group_prices')
-							->columns('event_id, registrant_number, price')
-							->values("$rowChildEvent->id, $registrantNumber, $price");
-						$db->setQuery($query);
-						$db->execute();
-					}
-				}
+				$this->storeEventGroupRegistrationRates($rowChildEvent->id, $data, false);
+
+
 				$sql = 'INSERT INTO #__eb_event_categories(event_id, category_id, main_category) '
 					. "SELECT $rowChildEvent->id, category_id, main_category FROM #__eb_event_categories WHERE event_id=$row->id";
 				$db->setQuery($sql);
@@ -808,29 +548,8 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					}
 
 					$rowChildEvent->store();
-					$query->clear();
-					$query->delete('#__eb_event_group_prices')->where('event_id=' . $rowChildEvent->id);
-					$db->setQuery($query);
-					$db->execute();
+					$this->storeEventGroupRegistrationRates($rowChildEvent->id, $data, false);
 
-					for ($i = 0, $n = count($prices); $i < $n; $i++)
-					{
-						$price            = $prices[$i];
-						$registrantNumber = $registrantNumbers[$i];
-						if (($registrantNumber > 0) && ($price > 0))
-						{
-							$query->clear();
-							$query->insert('#__eb_event_group_prices')
-								->columns('event_id, registrant_number, price')
-								->values("$rowChildEvent->id, $registrantNumber, $price");
-							$db->setQuery($query);
-							$db->execute();
-						}
-					}
-					$query->clear();
-					$query->delete('#__eb_event_categories')->where('event_id=' . $rowChildEvent->id);
-					$db->setQuery($query);
-					$db->execute();
 					$sql = 'INSERT INTO #__eb_event_categories(event_id, category_id, main_category) '
 						. "SELECT $rowChildEvent->id, category_id, main_category FROM #__eb_event_categories WHERE event_id=$row->id";
 					$db->setQuery($sql);
@@ -884,55 +603,13 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					$rowChildEvent->alias                  = JApplication::stringURLSafe(
 						$rowChildEvent->title . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null));
 
-					// Build alias for other languages
-					if (JLanguageMultilang::isEnabled())
-					{
-						if (count($languages))
-						{
-							foreach ($languages as $language)
-							{
-								$sef                              = $language->sef;
-								$rowChildEvent->{'alias_' . $sef} = JApplication::stringURLSafe(
-									$rowChildEvent->{'alias_' . $sef} . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null));
-							}
-						}
-					}
+					$this->prepareTable($rowChildEvent, $task);
 
 					$rowChildEvent->store();
-					//Generate alias
-					$query->clear();
-					$query->select('COUNT(*)')
-						->from('#__eb_events')
-						->where('alias=' . $db->quote($rowChildEvent->alias))
-						->where('id !=' . $rowChildEvent->id);
-					$db->setQuery($query);
-					$total = $db->loadResult();
-					if ($total)
-					{
-						$alias = $rowChildEvent->id . '-' . $rowChildEvent->alias;
-						$query->clear();
-						$query->update('#__eb_events')
-							->set('alias=' . $db->quote($alias))
-							->where('id=' . $rowChildEvent->id);
-						$db->setQuery($query);
-						$db->execute();
-					}
 
 					//Event Price
-					for ($j = 0, $m = count($prices); $j < $m; $j++)
-					{
-						$price            = $prices[$j];
-						$registrantNumber = $registrantNumbers[$j];
-						if (($registrantNumber > 0) && ($price > 0))
-						{
-							$query->clear();
-							$query->insert('#__eb_event_group_prices')
-								->columns('event_id, registrant_number, price')
-								->values("$rowChildEvent->id, $registrantNumber, $price");
-							$db->setQuery($query);
-							$db->execute();
-						}
-					}
+					$this->storeEventGroupRegistrationRates($rowChildEvent->id, $data, false);
+
 					$sql = 'INSERT INTO #__eb_event_categories(event_id, category_id, main_category) '
 						. "SELECT $rowChildEvent->id, category_id, main_category FROM #__eb_event_categories WHERE event_id=$row->id";
 					$db->setQuery($sql);
@@ -966,6 +643,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 		JPluginHelper::importPlugin('eventbooking');
 		$dispatcher = JDispatcher::getInstance();
+
 		//Trigger plugins
 		$dispatcher->trigger('onAfterSaveEvent', array($row, $data, $isNew));
 	}
@@ -974,7 +652,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 	 * Init event data
 	 *
 	 */
-	function initData()
+	public function initData()
 	{
 		parent::initData();
 		$db                                   = $this->getDbo();
@@ -1005,7 +683,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 	 *
 	 * @see RADModelAdmin::loadData()
 	 */
-	function loadData()
+	public function loadData()
 	{
 		parent::loadData();
 		$activateRecurringEvent = EventbookingHelper::getConfigValue('activate_recurring_event');
@@ -1112,5 +790,150 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		}
 
 		return $prices;
+	}
+
+	/**
+	 * Sanitize data to meet the requested format of the event
+	 *
+	 * @param $data
+	 */
+	protected function sanitizeData(&$data)
+	{
+		if (!isset($data['weekdays']))
+		{
+			$data['weekdays'] = array();
+		}
+		if (!isset($data['monthdays']))
+		{
+			$data['monthdays'] = '';
+		}
+		if (!$data['number_days'])
+		{
+			$data['number_days'] = 1;
+		}
+		if (!$data['number_weeks'])
+		{
+			$data['number_week'] = 1;
+		}
+		if (!$data['recurring_occurrencies'])
+		{
+			$data['recurring_occurrencies'] = 0;
+		}
+		if (!$data['recurring_end_date'])
+		{
+			$data['recurring_end_date'] = $this->getDbo()->getNullDate();
+		}
+
+		if (!$data['weekly_number_months'])
+		{
+			$data['weekly_number_months'] = 1;
+		}
+
+		if (isset($data['payment_methods']))
+		{
+			$data['payment_methods'] = implode(',', $data['payment_methods']);
+		}
+
+		if (empty($data['event_date_hour'] ))
+		{
+			$data['event_date_hour'] = '00';
+		}
+
+		if (empty($data['event_date_minute'] ))
+		{
+			$data['event_date_minute'] = '00';
+		}
+
+		if (empty($data['cut_off_hour'] ))
+		{
+			$data['cut_off_hour'] = '00';
+		}
+
+		if (empty($data['cut_off_minute'] ))
+		{
+			$data['cut_off_minute'] = '00';
+		}
+	}
+
+	/**
+	 * Store categories of an event
+	 *
+	 * @param $eventId
+	 * @param $data
+	 * @param $isNew
+	 */
+	protected function storeEventCategories($eventId, $data, $isNew)
+	{
+		$db = $this->getDbo();
+		$query = $db->getQuery(true);
+		if ($isNew)
+		{
+			$query->delete('#__eb_event_categories')->where('event_id=' . $eventId);
+			$db->setQuery($query);
+			$db->execute();
+		}
+		$mainCategoryId = (int) $data['main_category_id'];
+
+		if ($mainCategoryId)
+		{
+			$query->clear();
+			$query->insert('#__eb_event_categories')
+				->columns('event_id, category_id, main_category')
+				->values("$eventId, $mainCategoryId, 1");
+			$db->setQuery($query);
+			$db->execute();
+		}
+
+		$categories = isset($data['category_id']) ? $data['category_id'] : array();
+
+		for ($i = 0, $n = count($categories); $i < $n; $i++)
+		{
+			$categoryId = (int) $categories[$i];
+			if ($categoryId && ($categoryId != $mainCategoryId))
+			{
+				$query->clear();
+				$query->insert('#__eb_event_categories')
+					->columns('event_id, category_id, main_category')
+					->values("$eventId, $categoryId, 0");
+				$db->setQuery($query);
+				$db->execute();
+			}
+		}
+	}
+
+	/**
+	 * Store group registration rates of an event
+	 *
+	 * @param $eventId
+	 * @param $data
+	 * @param $isNew
+	 */
+	protected function storeEventGroupRegistrationRates($eventId, $data, $isNew)
+	{
+		$db    = $this->getDbo();
+		$query = $db->getQuery(true);
+		if (!$isNew)
+		{
+			$query->delete('#__eb_event_group_prices')->where('event_id=' . $eventId);
+			$db->setQuery($query);
+			$db->execute();
+		}
+
+		$prices            = $data['price'];
+		$registrantNumbers = $data['registrant_number'];
+		for ($i = 0, $n = count($prices); $i < $n; $i++)
+		{
+			$price            = $prices[$i];
+			$registrantNumber = $registrantNumbers[$i];
+			if (($registrantNumber > 0) && ($price > 0))
+			{
+				$query->clear();
+				$query->insert('#__eb_event_group_prices')
+					->columns('event_id, registrant_number, price')
+					->values("$eventId, $registrantNumber, $price");
+				$db->setQuery($query);
+				$db->execute();
+			}
+		}
 	}
 }
