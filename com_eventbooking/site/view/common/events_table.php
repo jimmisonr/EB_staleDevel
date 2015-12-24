@@ -122,7 +122,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 							if ($item->thumb)
 							{
 							?>
-								<img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$item->thumb; ?>" class="eb_thumb-left"/>
+								<a href="<?php echo JUri::base(true).'/media/com_eventbooking/images/'.$item->thumb; ?>" class="eb-modal"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$item->thumb; ?>" class="eb_thumb-left"/></a>
 							<?php
 							}
 							else
