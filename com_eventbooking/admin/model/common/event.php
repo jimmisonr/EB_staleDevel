@@ -406,8 +406,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				$rowChildEvent->recurring_end_date     = $db->getNullDate();
 				$rowChildEvent->recurring_occurrencies = 0;
 				$rowChildEvent->created_by             = $row->created_by;
-				$rowChildEvent->alias                  = JApplication::stringURLSafe(
-					$rowChildEvent->title . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null));
+				$rowChildEvent->alias                  = $rowChildEvent->title . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null);
 
 				$this->prepareTable($rowChildEvent, $task);
 
@@ -600,8 +599,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					$rowChildEvent->recurring_end_date     = $db->getNullDate();
 					$rowChildEvent->recurring_occurrencies = 0;
 					$rowChildEvent->created_by             = $row->created_by;
-					$rowChildEvent->alias                  = JApplication::stringURLSafe(
-						$rowChildEvent->title . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null));
+					$rowChildEvent->alias                  = $rowChildEvent->title . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null);
 
 					$this->prepareTable($rowChildEvent, $task);
 
