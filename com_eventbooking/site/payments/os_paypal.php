@@ -44,9 +44,9 @@ class os_paypal extends os_payment
 	/**
 	 * Constructor functions, init some parameter
 	 *
-	 * @param object $config
+	 * @param object $params
 	 */
-	function os_paypal($params)
+	public function os_paypal($params)
 	{
 		parent::setName('os_paypal');
 		parent::os_payment();
@@ -54,8 +54,7 @@ class os_paypal extends os_payment
 		parent::setCardType(false);
 		parent::setCardCvv(false);
 		parent::setCardHolderName(false);
-		$this->ipn_log = true;
-		$this->ipn_log_file = JPATH_COMPONENT . '/ipn_logs.txt';
+
 		$this->_mode = $params->get('paypal_mode');
 		if ($this->_mode)
 		{
@@ -74,41 +73,20 @@ class os_paypal extends os_payment
 		$this->setParam('currency_code', $params->get('paypal_currency', 'USD'));
         $this->setParam('charset', 'utf-8');
 		$this->setParam('tax', 0);
-	}
 
-	/**
-	 * Set param value
-	 *
-	 * @param string $name
-	 * @param string $val
-	 */
-	function setParam($name, $val)
-	{
-		$this->_params[$name] = $val;
-	}
-
-	/**
-	 * Setup payment parameter
-	 *
-	 * @param array $params
-	 */
-	function setParams($params)
-	{
-		foreach ($params as $key => $value)
-		{
-			$this->_params[$key] = $value;
-		}
+		$this->ipn_log = $params->get('ipn_log', 0);
+		$this->ipn_log_file = JPATH_COMPONENT . '/ipn_logs.txt';
 	}
 
 	/**
 	 * Process Payment
 	 *
 	 * @param object $row
-	 * @param array $params
+	 * @param array  $data
 	 */
-	function processPayment($row, $data)
+	public function processPayment($row, $data)
 	{
-		$Itemid = JRequest::getInt('Itemid', 0);
+		$Itemid = JFactory::getApplication()->input->getInt('Itemid', 0);
 		$siteUrl = JUri::base();
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
@@ -143,39 +121,100 @@ class os_paypal extends os_payment
 		$this->setParam('zip', $row->zip);
 		$this->setParam('email', $row->email);
 		$this->submitPost();
-	}	
+	}
+
 	/**
-	 * Submit post to paypal server
+	 * Verify payment
+	 *
+	 * @return bool
+	 */
+	public function verifyPayment()
+	{
+		$ret = $this->_validate();
+		if ($ret)
+		{
+			$config = EventbookingHelper::getConfig();
+			$id = $this->_data['custom'];
+			$transactionId = $this->_data['txn_id'];
+			$amount = $this->_data['mc_gross'];
+			if ($amount < 0)
+			{
+				return false;
+			}					
+			$row = JTable::getInstance('EventBooking', 'Registrant');
+			$row->load($id);
+			if (!$row->id)
+			{
+				return false;
+			}					
+			if ($row->published)
+			{
+				return false;
+			}					
+			$row->transaction_id = $transactionId;
+			$row->payment_date = gmdate('Y-m-d H:i:s');
+			$row->published = true;
+			$row->store();
+			if ($row->is_group_billing)
+			{
+				EventbookingHelper::updateGroupRegistrationRecord($row->id);
+			}
+			EventbookingHelper::sendEmails($row, $config);
+			JPluginHelper::importPlugin('eventbooking');
+			$dispatcher = JEventDispatcher::getInstance();
+			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Set param value
+	 *
+	 * @param string $name
+	 * @param string $val
+	 */
+	protected function setParam($name, $val)
+	{
+		$this->_params[$name] = $val;
+	}
+
+	/***
+	 * Redirect users to Paypal for processing payment
 	 *
 	 */
-	function submitPost() {
+	protected function submitPost()
+	{
 	?>
 		<div class="contentheading"><?php echo  JText::_('EB_WAIT_PAYPAL'); ?></div>
 		<form method="post" action="<?php echo $this->_url; ?>" name="jd_form" id="jd_form">
 			<?php
-				foreach ($this->_params as $key=>$val) 
-				{
-					echo '<input type="hidden" name="'.$key.'" value="'.$val.'" />';
-					echo "\n";	
-				}
+			foreach ($this->_params as $key=>$val)
+			{
+				echo '<input type="hidden" name="'.$key.'" value="'.$val.'" />';
+				echo "\n";
+			}
 			?>
 			<script type="text/javascript">
-				function redirect() 
+				function redirect()
 				{
 					document.jd_form.submit();
 				}
 				setTimeout('redirect()',5000);
 			</script>
 		</form>
-	<?php	
+	<?php
 	}
-	
+
 	/**
 	 * Validate the post data from paypal to our server
 	 *
 	 * @return string
 	 */
-	function _validate()
+	protected function _validate()
 	{
 		$errNum = "";
 		$errStr = "";
@@ -216,11 +255,11 @@ class os_paypal extends os_payment
 			if (eregi("VERIFIED", $response) && ($this->_data['payment_status'] == 'Completed'))
 			{
 				return true;
-			}				
+			}
 			else
 			{
 				return false;
-			}				
+			}
 		}
 		else
 		{
@@ -233,21 +272,21 @@ class os_paypal extends os_payment
 	 *
 	 * @param string $success
 	 */
-	function log_ipn_results($success)
+	protected function log_ipn_results($success)
 	{
 		if (!$this->ipn_log)
 		{
 			return;
-		}			
+		}
 		$text = '[' . date('m/d/Y g:i A') . '] - ';
 		if ($success)
 		{
 			$text .= "SUCCESS!\n";
-		}			
+		}
 		else
 		{
 			$text .= 'FAIL: ' . $this->last_error . "\n";
-		}			
+		}
 		$text .= "IPN POST Vars from Paypal:\n";
 		foreach ($this->_data as $key => $value)
 		{
@@ -257,52 +296,5 @@ class os_paypal extends os_payment
 		$fp = fopen($this->ipn_log_file, 'a');
 		fwrite($fp, $text . "\n\n");
 		fclose($fp); // close file
-	}
-
-	/**
-	 * Process payment 
-	 *
-	 */
-	function verifyPayment()
-	{
-		$ret = $this->_validate();
-		if ($ret)
-		{
-			$config = EventbookingHelper::getConfig();
-			$id = $this->_data['custom'];
-			$transactionId = $this->_data['txn_id'];
-			$amount = $this->_data['mc_gross'];
-			if ($amount < 0)
-			{
-				return false;
-			}					
-			$row = JTable::getInstance('EventBooking', 'Registrant');
-			$row->load($id);
-			if (!$row->id)
-			{
-				return false;
-			}					
-			if ($row->published)
-			{
-				return false;
-			}					
-			$row->transaction_id = $transactionId;
-			$row->payment_date = gmdate('Y-m-d H:i:s');
-			$row->published = true;
-			$row->store();
-			if ($row->is_group_billing)
-			{
-				EventbookingHelper::updateGroupRegistrationRecord($row->id);
-			}
-			EventbookingHelper::sendEmails($row, $config);
-			JPluginHelper::importPlugin('eventbooking');
-			$dispatcher = JDispatcher::getInstance();
-			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-			return true;
-		}
-		else
-		{
-			return false;
-		}
 	}
 }
