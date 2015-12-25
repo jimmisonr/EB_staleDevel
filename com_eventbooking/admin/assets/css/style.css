@@ -88,9 +88,6 @@ table.admintable tr td
 .clearfloat {
 	float: none ;
 }
-#recurring_end_date_img {
-	float: right ;
-}
 #recurring_end_date {
 	float: none ;
 }
