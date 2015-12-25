@@ -159,9 +159,16 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 							<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_ATTACHMENT' );?>::<?php echo JText::_('EB_ATTACHMENT_EXPLAIN'); ?>"><?php echo JText::_('EB_ATTACHMENT'); ?></span>
 						</td>
 						<td>
+							<input type="file" name="attachment"/>
 							<?php
-                                echo EventbookingHelper::getFileInput($this->item->attachment,'attachment')
-                            ?>
+							if ($this->item->attachment)
+							{
+							?>
+								<?php echo JText::_('EB_CURRENT_ATTACHMENT'); ?>&nbsp;<a href="<?php echo JURI::root().'media/com_eventbooking/'.$this->item->attachment; ?>" target="_blank"><?php echo $this->item->attachment; ?></a>
+								<input type="checkbox" name="del_attachment" value="1" /><?php echo JText::_('EB_DELETE_CURRENT_ATTACHMENT'); ?>
+							<?php
+							}
+							?>
 						</td>
 					</tr>
 					<tr>
