@@ -2204,6 +2204,7 @@ class EventbookingController extends RADControllerAdmin
 			JPATH_ROOT . '/components/com_eventbooking/views/register/tmpl/group_member.php',
 			JPATH_ROOT . '/components/com_eventbooking/views/waitinglist/tmpl/complete.php',
 			JPATH_ROOT . '/components/com_eventbooking/models/waitinglist.php',
+			JPATH_ROOT . '/components/com_eventbooking/ipn_logs.txt',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waitings.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waiting.php',
 			JPATH_ROOT . '/media/com_eventbooking/.htaccess'

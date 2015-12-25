@@ -53,9 +53,8 @@ class os_paypal extends os_payment
 		parent::setCreditCard(false);
 		parent::setCardType(false);
 		parent::setCardCvv(false);
-		parent::setCardHolderName(false);
-		$this->ipn_log = true;
-		$this->ipn_log_file = JPATH_COMPONENT . '/ipn_logs.txt';
+		parent::setCardHolderName(false);		
+		
 		$this->_mode = $params->get('paypal_mode');
 		if ($this->_mode)
 		{
@@ -74,6 +73,9 @@ class os_paypal extends os_payment
 		$this->setParam('currency_code', $params->get('paypal_currency', 'USD'));
         $this->setParam('charset', 'utf-8');
 		$this->setParam('tax', 0);
+		
+		$this->ipn_log = $params->get('ipn_log', 0);
+		$this->ipn_log_file = JPATH_COMPONENT . '/ipn_logs.txt';
 	}
 
 	/**
