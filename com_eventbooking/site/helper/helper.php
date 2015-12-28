@@ -2725,7 +2725,8 @@ class EventbookingHelper
 				//Admin has not entered email subject and email message for notification yet, simply return
 				return false;
 			}
-			if (strlen(trim(strip_tags($message->{'registrant_waitinglist_notification_body' . $fieldSuffix}))))
+
+			if (self::isValidMessage($message->{'registrant_waitinglist_notification_body' . $fieldSuffix}))
 			{
 				$body = $message->{'registrant_waitinglist_notification_body' . $fieldSuffix};
 			}
@@ -2833,11 +2834,11 @@ class EventbookingHelper
 		}
 		if (strpos($row->payment_method, 'os_offline') !== false)
 		{
-			if (strlen(trim(strip_tags($event->user_email_body_offline))))
+			if (self::isValidMessage($event->user_email_body_offline))
 			{
 				$body = $event->user_email_body_offline;
 			}
-			elseif (strlen($message->{'user_email_body_offline' . $fieldSuffix}))
+			elseif (self::isValidMessage($message->{'user_email_body_offline' . $fieldSuffix}))
 			{
 				$body = $message->{'user_email_body_offline' . $fieldSuffix};
 			}
@@ -2848,11 +2849,11 @@ class EventbookingHelper
 		}
 		else
 		{
-			if (strlen(trim(strip_tags($event->user_email_body))))
+			if (self::isValidMessage($event->user_email_body))
 			{
 				$body = $event->user_email_body;
 			}
-			elseif (strlen($message->{'user_email_body' . $fieldSuffix}))
+			elseif (self::isValidMessage($message->{'user_email_body' . $fieldSuffix}))
 			{
 				$body = $message->{'user_email_body' . $fieldSuffix};
 			}
@@ -2965,7 +2966,7 @@ class EventbookingHelper
 					{
 						$subject = $message->group_member_email_subject;
 					}
-					if (strlen(strip_tags($message->{'group_member_email_body' . $fieldSuffix})))
+					if (self::isValidMessage($message->{'group_member_email_body' . $fieldSuffix}))
 					{
 						$body = $message->{'group_member_email_body' . $fieldSuffix};
 					}
@@ -3087,7 +3088,7 @@ class EventbookingHelper
 		{
 			$subject = $message->admin_email_subject;
 		}
-		if (strlen(strip_tags($message->{'admin_email_body' . $fieldSuffix})))
+		if (self::isValidMessage($message->{'admin_email_body' . $fieldSuffix}))
 		{
 			$body = $message->{'admin_email_body' . $fieldSuffix};
 		}
@@ -3190,11 +3191,11 @@ class EventbookingHelper
 			$subject = $message->registration_approved_email_subject;
 		}
 
-		if (strlen(trim(strip_tags($event->registration_approved_email_body))))
+		if (self::isValidMessage($event->registration_approved_email_body))
 		{
 			$body = $event->registration_approved_email_body;
 		}
-		elseif (strlen($message->{'registration_approved_email_body' . $fieldSuffix}))
+		elseif (self::isValidMessage($message->{'registration_approved_email_body' . $fieldSuffix}))
 		{
 			$body = $message->{'registration_approved_email_body' . $fieldSuffix};
 		}
@@ -3282,7 +3283,7 @@ class EventbookingHelper
 		{
 			$subject = $message->watinglist_confirmation_subject;
 		}
-		if (strlen(strip_tags($message->{'watinglist_confirmation_body' . $fieldSuffix})))
+		if (self::isValidMessage($message->{'watinglist_confirmation_body' . $fieldSuffix}))
 		{
 			$body = $message->{'watinglist_confirmation_body' . $fieldSuffix};
 		}
@@ -3320,7 +3321,7 @@ class EventbookingHelper
 		{
 			$subject = $message->watinglist_notification_subject;
 		}
-		if (strlen(strip_tags($message->{'watinglist_notification_body' . $fieldSuffix})))
+		if (self::isValidMessage($message->{'watinglist_notification_body' . $fieldSuffix}))
 		{
 			$body = $message->{'watinglist_notification_body' . $fieldSuffix};
 		}
@@ -3831,6 +3832,29 @@ class EventbookingHelper
 		return true;
 	}
 
+	/**
+	 * Check if the given message entered via HTML editor has actual data
+	 *
+	 * @param $string
+	 *
+	 * @return bool
+	 */
+	public static function isValidMessage($string)
+	{
+		$string = strip_tags($string, '<img>');
+
+		// Remove none printable characters
+		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x80-\x9F]/u', '', $string);
+
+		$string = trim($string);
+
+		if (strlen($string))
+		{
+			return true;
+		}
+
+		return false;
+	}
 	/**
 	 * Generate user selection box
 	 * @param int    $userId
