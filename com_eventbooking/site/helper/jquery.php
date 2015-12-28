@@ -27,11 +27,12 @@ abstract class EventbookingHelperJquery
 	public static function colorbox($class = 'sr-iframe', $width = '80%', $height = '80%', $iframe = "true", $inline = "false", $scrolling = "true")
 	{
 		static $loaded = false;
+		$siteUrl = EventbookingHelper::getSiteUrl();
 		if (!$loaded)
 		{
 			$uncompressed = JFactory::getConfig()->get('debug') ? '' : '.min';
-			JHtml::_('stylesheet', EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/assets/js/colorbox/colorbox.css', false, false);
-			JHtml::_('script', EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/assets/js/colorbox/jquery.colorbox' . $uncompressed . '.js', false, false);
+			JHtml::_('stylesheet', $siteUrl . 'media/com_eventbooking/assets/js/colorbox/colorbox.css', false, false);
+			JHtml::_('script', $siteUrl . 'media/com_eventbooking/assets/js/colorbox/jquery.colorbox' . $uncompressed . '.js', false, false);
 
 			$activeLanguageTag   = JFactory::getLanguage()->getTag();
 			$allowedLanguageTags = array('ar-AA', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'es-ES', 'et-EE',
@@ -42,7 +43,7 @@ abstract class EventbookingHelperJquery
 			// English is bundled into the source therefore we don't have to load it.
 			if (in_array($activeLanguageTag, $allowedLanguageTags))
 			{
-				JHtml::_('script', EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/assets/js/colorbox/i18n/jquery.colorbox-' . $activeLanguageTag . '.js', false, false);
+				JHtml::_('script', $siteUrl . 'media/com_eventbooking/assets/js/colorbox/i18n/jquery.colorbox-' . $activeLanguageTag . '.js', false, false);
 			}
 
 			$loaded = true;
@@ -56,9 +57,9 @@ abstract class EventbookingHelperJquery
 			'height'     => $height,
 			'scrolling'  => $scrolling
 		);
-		
-		$script  = 'Eb.jQuery(document).ready(function($){$(".' . $class . '").colorbox(' . self::getJSObject($options) . ');});';
-		
+
+		$script = 'Eb.jQuery(document).ready(function($){$(".' . $class . '").colorbox(' . self::getJSObject($options) . ');});';
+
 		JFactory::getDocument()->addScriptDeclaration($script);
 	}
 
