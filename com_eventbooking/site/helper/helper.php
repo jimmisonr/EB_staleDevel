@@ -2785,6 +2785,16 @@ class EventbookingHelper
 			->where('id=' . $row->event_id);
 		$db->setQuery($query);
 		$event = $db->loadObject();
+
+		if ($event->created_by)
+		{
+			$eventCreator = JUser::getInstance($event->created_by);
+			if (!empty($eventCreator->email) && !$eventCreator->authorise('core.admin'))
+			{
+				$mailer->addReplyTo($eventCreator->email);
+			}
+		}
+
 		if ($config->multiple_booking)
 		{
 			$rowFields = self::getFormFields($row->id, 4);
@@ -3012,6 +3022,7 @@ class EventbookingHelper
 
 		// Clear attachments
 		$mailer->ClearAttachments();
+		$mailer->clearReplyTos();
 
 		// Add invoice to admin email if needed
 		if ($config->send_invoice_to_admin)
@@ -3105,6 +3116,12 @@ class EventbookingHelper
 			{
 				$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
 			}
+		}
+
+		if (!empty($eventCreator->email) && !$eventCreator->authorise('core.admin') && !in_array($eventCreator->email, $emails))
+		{
+			$mailer->ClearAllRecipients();
+			$mailer->sendMail($fromEmail, $fromName, $eventCreator->email, $subject, $body, 1);
 		}
 	}
 
