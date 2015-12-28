@@ -4482,39 +4482,31 @@ class EventbookingHelper
 	 */
 	public static function checkEditEvent($eventId)
 	{
-		$user  = JFactory::getUser();
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-
-		if (!$eventId)
-		{
-			return false;
-		}
-
-		$query->select('*')
-			->from('#__eb_events')
-			->where('id = ' . $eventId);
-		$db->setQuery($query);
-		$rowEvent = $db->loadObject();
-
-		if (!$rowEvent)
-		{
-			return false;
-		}
+		$user = JFactory::getUser();
 
 		if ($user->get('guest'))
 		{
 			return false;
 		}
 
-		if ($user->authorise('core.edit', 'com_eventbooking') || ($rowEvent->created_by == $user->get('id')))
-		{
-			return true;
-		}
-		else
+		if (!$eventId)
 		{
 			return false;
 		}
+
+		$rowEvent = EventbookingHelperDatabase::getEvent($eventId);
+
+		if (!$rowEvent)
+		{
+			return false;
+		}
+
+		if ($user->authorise('core.edit', 'com_eventbooking') || ($user->authorise('core.edit.own', 'com_eventbooking') && ($rowEvent->created_by == $user->get('id'))))
+		{
+			return true;
+		}
+
+		return true;
 	}
 
 	/**
