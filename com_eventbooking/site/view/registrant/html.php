@@ -133,6 +133,15 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			$lists['checked_in'] = JHtml::_('select.booleanlist', 'checked_in', ' class="inputbox" ', $item->checked_in);
 		}
 
+		if ($user->authorise('eventbooking.registrants_management', 'com_eventbooking') || empty($item->published))
+		{
+			$canChangeFeeFields = true;
+		}
+		else
+		{
+			$canChangeFeeFields = false;
+		}
+
 		$this->item            = $item;
 		$this->config          = $config;
 		$this->lists           = $lists;
@@ -140,6 +149,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		$this->form            = $form;
 		$this->rowMembers      = $rowMembers;
 		$this->return          = $this->input->get('return', '', 'string');
+		$this->canChangeFeeFields = $canChangeFeeFields;
 
 		parent::display();
 	}

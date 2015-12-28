@@ -353,32 +353,34 @@ class RADForm
 	}
 
 	/**
-	 * Store object data into database. Before running this method, please make sure you set the proper Table, Tablename, FieldName for the Form object
+	 * Store custom fields data for a registration record
 	 *
-	 * @param int   $registrantId ID of the object
+	 * @param int   $registrantId
 	 * @param array $data
-	 * @param       JTable        The JTable object used to store field value into database
+	 * @param bool  $excludeFeeFields
+	 *
+	 * @return bool
 	 */
-	public function storeData($registrantId, $data)
+	public function storeData($registrantId, $data, $excludeFeeFields = false)
 	{
 		jimport('joomla.filesystem.folder');
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_eventbooking/table');
 		$rowFieldValue = JTable::getInstance('EventBooking', 'Fieldvalue');
-		$config = EventbookingHelper::getConfig();
-		$dateFormat = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
-		$dateFormat = str_replace('%', '', $dateFormat);
+		$config        = EventbookingHelper::getConfig();
+		$dateFormat    = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
+		$dateFormat    = str_replace('%', '', $dateFormat);
 		$fieldIds      = array(0);
 		$fileFieldIds  = array(0);
 		foreach ($this->fields as $field)
 		{
 			$fieldType = strtolower($field->type);
-			if ($fieldType != 'file')
-			{
-				$fieldIds[] = $field->id;
-			}
-			else
+			if ($fieldType == 'file')
 			{
 				$fileFieldIds[] = $field->id;
+			}
+			elseif (!$excludeFeeFields || !$field->fee_field)
+			{
+				$fieldIds[] = $field->id;
 			}
 		}
 
@@ -395,6 +397,13 @@ class RADForm
 			{
 				continue;
 			}
+
+			// Don't update fee field if not needed
+			if ($excludeFeeFields && $field->fee_field)
+			{
+				continue;
+			}
+
 			$name = $field->name;
 			if ($fieldType == 'file')
 			{
@@ -443,7 +452,7 @@ class RADForm
 					// Try to convert the format
 					try
 					{
-						$date       = DateTime::createFromFormat($dateFormat, $fieldValue);
+						$date = DateTime::createFromFormat($dateFormat, $fieldValue);
 						if ($date)
 						{
 							$fieldValue = $date->format('Y-m-d');

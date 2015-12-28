@@ -71,10 +71,20 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			{
 				$rowFields = EventbookingHelper::getFormFields($data['event_id'], 0);
 			}
+			$user = JFactory::getUser();
+			if ($user->authorise('eventbooking.registrants_management', 'com_eventbooking') || empty($row->published))
+			{
+				$excludeFeeFields = false;
+			}
+			else
+			{
+				$excludeFeeFields = true;
+			}
+
 			$row->bind($data);
 			$row->store();
 			$form = new RADForm($rowFields);
-			$form->storeData($row->id, $data);
+			$form->storeData($row->id, $data, $excludeFeeFields);
 
 			//Update group members records according to grop billing record
 			if ($row->is_group_billing)

@@ -68,6 +68,7 @@ $selectedState = '';
 			$cssClass   = str_replace(',ajax[ajaxEmailCall]', '', $cssClass);
 			$emailField->setAttribute('class', $cssClass);
 		}
+
 		foreach ($fields as $field)
 		{
 			$fieldType = strtolower($field->type);
@@ -83,7 +84,24 @@ $selectedState = '';
 							<?php echo $field->title; ?>
 						</td>
 						<td class="controls">
-							<?php echo $field->input; ?>
+							<?php
+							if ($field->fee_field && !$this->canChangeFeeFields)
+							{
+								if (is_string($field->value) && is_array(json_decode($field->value)))
+								{
+									$fieldValue = implode(', ', json_decode($field->value));
+								}
+								else
+								{
+									$fieldValue = $field->value;
+								}
+								echo $fieldValue;
+							}
+							else
+							{
+								echo $field->input;
+							}
+							?>
 						</td>
 					</tr>
 				<?php
