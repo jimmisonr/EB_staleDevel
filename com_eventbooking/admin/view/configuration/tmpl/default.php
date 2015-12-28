@@ -30,14 +30,6 @@ $config = $this->config;
 			</div>
 			<div class="control-group">
 				<div class="control-label">
-					<?php echo EventbookingHelperHtml::getFieldLabel('load_jquery', JText::_('EB_LOAD_JQUERY'), JText::_('EB_LOAD_JQUERY_EXPLAIN')); ?>
-				</div>
-				<div class="controls">
-					<?php echo EventbookingHelperHtml::getBooleanInput('load_jquery', $config->get('load_jquery', 1)); ?>
-				</div>
-			</div>
-			<div class="control-group">
-				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('load_bootstrap_css_in_frontend', JText::_('EB_LOAD_BOOTSTRAP_CSS_IN_FRONTEND'), JText::_('EB_LOAD_BOOTSTRAP_CSS_IN_FRONTEND_EXPLAIN')); ?>
 				</div>
 				<div class="controls">
