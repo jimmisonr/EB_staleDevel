@@ -4413,33 +4413,18 @@ class EventbookingHelper
 	public static function canChangeEventStatus($eventId)
 	{
 		$user  = JFactory::getUser();
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		if (!$eventId)
-		{
-			return false;
-		}
-		$query->select('*')
-			->from('#__eb_events')
-			->where('id = ' . $eventId);
-		$db->setQuery($query);
-		$rowEvent = $db->loadObject();
-		if (!$rowEvent)
-		{
-			return false;
-		}
+
 		if ($user->get('guest'))
 		{
 			return false;
 		}
-		if ($user->authorise('core.edit.state', 'com_eventbooking') || ($rowEvent->created_by == $user->get('id')))
+
+		if ($user->authorise('core.edit.state', 'com_eventbooking'))
 		{
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
