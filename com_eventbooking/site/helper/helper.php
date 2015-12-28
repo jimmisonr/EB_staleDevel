@@ -3993,13 +3993,28 @@ class EventbookingHelper
 		$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
 		$pdf->SetFont('times', '', 8);
 		$pdf->AddPage();
+
 		if ($config->multiple_booking)
 		{
-			$invoiceOutput = $config->invoice_format_cart;
+			if (self::isValidMessage($config->{'invoice_format_cart' . $fieldSuffix}))
+			{
+				$invoiceOutput = $config->{'invoice_format_cart' . $fieldSuffix};
+			}
+			else
+			{
+				$invoiceOutput = $config->invoice_format_cart;
+			}
 		}
 		else
 		{
-			$invoiceOutput = $config->invoice_format;
+			if (self::isValidMessage($config->{'invoice_format' . $fieldSuffix}))
+			{
+				$invoiceOutput = $config->{'invoice_format' . $fieldSuffix};
+			}
+			else
+			{
+				$invoiceOutput = $config->invoice_format;
+			}
 		}
 
 		if (strpos($invoiceOutput, '[QRCODE]') !== false)
