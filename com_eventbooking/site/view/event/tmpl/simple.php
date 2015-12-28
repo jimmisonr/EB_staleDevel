@@ -189,12 +189,19 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				<?php echo $this->lists['registration_access']; ?>
 			</div>
 		</div>
-		<div class="<?php echo $controlGroupClass;  ?>">
-			<label class="<?php echo $controlLabelClass; ?>">
-				<?php echo JText::_('EB_PUBLISHED'); ?>
-			</label>
-			<?php echo $this->lists['published']; ?>
-		</div>
+		<?php
+		if (EventbookingHelper::canChangeEventStatus($this->item->id))
+		{
+		?>
+			<div class="<?php echo $controlGroupClass;  ?>">
+				<label class="<?php echo $controlLabelClass; ?>">
+					<?php echo JText::_('EB_PUBLISHED'); ?>
+				</label>
+				<?php echo $this->lists['published']; ?>
+			</div>
+		<?php
+		}
+		?>
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>">
 				<?php echo  JText::_('EB_SHORT_DESCRIPTION'); ?>

@@ -260,14 +260,21 @@ $format = 'Y-m-d' ;
 						<input type="text" name="max_group_number" id="max_group_number" class="input-mini" size="10" value="<?php echo $this->item->max_group_number; ?>" />
 					</td>
 				</tr>
-				<tr>
-					<td class="key">
-						<?php echo JText::_('EB_PUBLISHED'); ?>
-					</td>
-					<td>
-						<?php echo $this->lists['published']; ?>
-					</td>
-				</tr>
+				<?php
+					if (EventbookingHelper::canChangeEventStatus($this->item->id))
+					{
+					?>
+						<tr>
+							<td class="key">
+								<?php echo JText::_('EB_PUBLISHED'); ?>
+							</td>
+							<td>
+								<?php echo $this->lists['published']; ?>
+							</td>
+						</tr>
+					<?php
+					}
+				?>
 				<tr>
 					<td class="key">
 						<?php echo  JText::_('EB_SHORT_DESCRIPTION'); ?>
