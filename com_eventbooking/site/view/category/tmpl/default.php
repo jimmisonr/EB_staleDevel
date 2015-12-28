@@ -17,7 +17,7 @@ else
 {
 	$ssl = 0 ;
 }
-JHtml::_('behavior.modal', 'a.eb-modal');
+EventbookingHelperJquery::colorbox('eb-modal');
 ?>
 <div id="eb-category-page-default" class="eb-container">
 	<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=category&layout=default&id='.$this->category->id.'&Itemid='.$this->Itemid); ?>">

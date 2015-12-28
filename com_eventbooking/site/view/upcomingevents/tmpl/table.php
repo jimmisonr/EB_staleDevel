@@ -9,7 +9,7 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
-JHtml::_('behavior.modal', 'a.eb-modal');
+EventbookingHelperJquery::colorbox('eb-modal');
 ?>
 <div id="eb-upcoming-events-page-default" class="eb-container">
 	<h1 class="eb-page-heading"><?php echo $this->params->get('page_heading') ? $this->params->get('page_heading') : JText::_('EB_UPCOMING_EVENTS'); ?></h1>

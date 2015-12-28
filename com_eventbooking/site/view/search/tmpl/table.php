@@ -17,7 +17,7 @@ else
 {
 	$ssl = 0;
 }
-JHtml::_('behavior.modal', 'a.eb-modal');
+EventbookingHelperJquery::colorbox('eb-modal');
 ?>
 <div id="eb-search-result-page-table-layout" class="eb-container">
 	<h1 class="eb-page-heading"><?php echo JText::_('EB_SEARCH_RESULT'); ?></h1>

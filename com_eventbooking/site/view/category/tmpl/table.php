@@ -9,7 +9,7 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
-JHtml::_('behavior.modal', 'a.eb-modal');
+EventbookingHelperJquery::colorbox('eb-modal');
 ?>
 <div id="eb-category-page-table" class="eb-container">
 <?php
