@@ -127,6 +127,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$this->lists              = $lists;
 		$this->config             = $config;
 		$this->addToolbar();
+		$this->languages = EventbookingHelper::getLanguages();
 
 		parent::display();
 	}
