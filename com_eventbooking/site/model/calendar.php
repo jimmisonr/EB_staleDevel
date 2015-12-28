@@ -96,9 +96,10 @@ class EventbookingModelCalendar extends RADModel
 
 		if ($config->hide_past_events)
 		{
-			$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
-			$query->where('DATE(event_date) >= ' . $db->quote($currentDate));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$query->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')');
 		}
+
 		$db->setQuery($query);
 		if ($config->show_multiple_days_event_in_calendar && !$this->state->mini_calendar)
 		{
@@ -152,7 +153,7 @@ class EventbookingModelCalendar extends RADModel
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$db          = $this->getDbo();
 		$query       = $db->getQuery(true);
-		$startDay    = (int)$config->calendar_start_date;
+		$startDay    = (int) $config->calendar_start_date;
 
 		// get first day of week of today
 		$currentDateData = self::getCurrentDateData();
@@ -183,10 +184,13 @@ class EventbookingModelCalendar extends RADModel
 		{
 			EventbookingHelperDatabase::getMultilingualFields($query, array('a.title', 'a.short_description'), $fieldSuffix);
 		}
+
 		if ($config->hide_past_events)
 		{
-			$query->where('DATE(a.event_date) >=' . $db->quote($currentDateData['current_date']));
+			$currentDate = $db->quote($currentDateData['current_date']);
+			$query->where('(DATE(a.event_date) >=' . $currentDate . ' OR DATE(a.cut_off_date) >=' . $currentDate . ')');
 		}
+
 		$query->order('a.event_date ASC, a.ordering ASC');
 
 		$db->setQuery($query);
@@ -230,9 +234,11 @@ class EventbookingModelCalendar extends RADModel
 			->where('a.published = 1')
 			->where("(a.event_date BETWEEN '$startDate' AND '$endDate')")
 			->where('a.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
+
 		if ($config->hide_past_events)
 		{
-			$query->where('DATE(event_date) >=' . JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$query->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')');
 		}
 		$query->order('a.event_date ASC, a.ordering ASC');
 
