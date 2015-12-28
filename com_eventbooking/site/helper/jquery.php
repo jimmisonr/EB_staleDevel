@@ -30,9 +30,8 @@ abstract class EventbookingHelperJquery
 		$siteUrl = EventbookingHelper::getSiteUrl();
 		if (!$loaded)
 		{
-			$uncompressed = JFactory::getConfig()->get('debug') ? '' : '.min';
 			JHtml::_('stylesheet', $siteUrl . 'media/com_eventbooking/assets/js/colorbox/colorbox.css', false, false);
-			JHtml::_('script', $siteUrl . 'media/com_eventbooking/assets/js/colorbox/jquery.colorbox' . $uncompressed . '.js', false, false);
+			JHtml::_('script', $siteUrl . 'media/com_eventbooking/assets/js/colorbox/jquery.colorbox.min.js', false, false);
 
 			$activeLanguageTag   = JFactory::getLanguage()->getTag();
 			$allowedLanguageTags = array('ar-AA', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'es-ES', 'et-EE',
