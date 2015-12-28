@@ -13,7 +13,10 @@ $bootstrapHelper   = $this->bootstrapHelper;
 $controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
 $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
 $controlsClass     = $bootstrapHelper->getClassMapping('controls');
+$span7Class          = $bootstrapHelper->getClassMapping('span7');
+$span5Class          = $bootstrapHelper->getClassMapping('span5');
 ?>
+<script src="https://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
 <script type="text/javascript">
 	function checkData(pressbutton) {
 		var form = document.adminForm;
@@ -55,109 +58,214 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			form.submit();
 		}
 	}
+	var map;
+	var geocoder;
+	var marker;
+
+	Joomla.submitbutton = function(pressbutton) {
+		var form = document.adminForm;
+		if (pressbutton == 'cancel') {
+			Joomla.submitform( pressbutton );
+			return;
+		} else {
+			//Should validate the information here
+			if (form.name.value == "") {
+				alert("<?php echo JText::_('EN_ENTER_LOCATION'); ?>");
+				form.name.focus();
+				return ;
+			}
+			Joomla.submitform( pressbutton );
+		}
+	}
+	function initialize() {
+		geocoder = new google.maps.Geocoder();
+		var mapDiv = document.getElementById('map-canvas');
+		// Create the map object
+		map = new google.maps.Map(mapDiv, {
+				center: new google.maps.LatLng(<?php  if(!empty($coordinates)){ echo $coordinates; } else { echo "40.992954,29.042092"; }?>),
+				zoom: 10,
+				mapTypeId: google.maps.MapTypeId.ROADMAP,
+				streetViewControl: false
+		});
+		// Create the default marker icon
+		marker = new google.maps.Marker({
+			map: map,
+			position: new google.maps.LatLng(<?php  if(!empty($coordinates)){ echo $coordinates; } else { echo "40.992954,29.042092"; }?>),
+			draggable: true
+		});
+		// Add event to the marker
+		google.maps.event.addListener(marker, 'drag', function() {
+			geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
+				if (status == google.maps.GeocoderStatus.OK) {
+					if (results[0]) {
+						document.getElementById('address').value = results[0].formatted_address;
+						document.getElementById('coordinates').value = marker.getPosition().toUrlValue();
+					}
+				}
+			});
+		});
+	}
+	function getLocationFromAddress() {
+		var address = document.getElementById('address').value;
+		geocoder.geocode( { 'address': address}, function(results, status) {
+			if (status == google.maps.GeocoderStatus.OK) {
+				map.setCenter(results[0].geometry.location);
+				marker.setPosition(results[0].geometry.location);
+				$('coordinates').value = results[0].geometry.location.lat().toFixed(7) + ',' + results[0].geometry.location.lng().toFixed(7);
+			} else {
+				alert('We\'re sorry but your location was not found.');
+			}
+		});
+	}
+	// Initialize google map
+	google.maps.event.addDomListener(window, 'load', initialize);
+	// Search for addresses
+	function getLocations(term) {
+		var content = $('eventmaps_results');
+		address = $('address').getSize();
+		$('eventmaps_results').setStyle('width', address.x - 21);
+		$('eventmaps_results').style.display = 'none';
+		$$('#eventmaps_results li').each(function(el) {
+			el.dispose();
+		});
+		if (term != '') {
+			geocoder.geocode( {'address': term }, function(results, status) {
+				if (status == 'OK') {
+					results.each(function(item) {
+						theli = new Element('li');
+						thea = new Element('a', {
+							href: 'javascript:void(0)',
+							'text': item.formatted_address
+						});
+						thea.addEvent('click', function() {
+							$('address').value = item.formatted_address;
+							$('coordinates').value = item.geometry.location.lat().toFixed(7) + ',' + item.geometry.location.lng().toFixed(7);
+							var location = new google.maps.LatLng(item.geometry.location.lat().toFixed(7), item.geometry.location.lng().toFixed(7));
+							marker.setPosition(location);
+							map.setCenter(location);
+							$('eventmaps_results').style.display = 'none';
+						});
+						thea.inject(theli);
+						theli.inject(content);
+					});
+					$('eventmaps_results').style.display = '';
+				}
+			});
+		}
+	}
+	function clearLocations() {
+		setTimeout( function () {
+			$('eventmaps_results').style.display = 'none';
+		},1000);
+	}
 </script>
 <h1 class="eb-page-heading"><?php echo JText::_('EB_ADD_EDIT_LOCATION'); ?></h1>
-<form action="index.php?option=com_eventbooking&view=location" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
-	<div class="<?php echo $controlGroupClass;  ?>">
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_NAME'); ?>
-			<span class="required">*</span>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<input class="text_area" type="text" name="name" id="name" size="50" maxlength="250" value="<?php echo $this->item->name;?>" />
-		</div>
-	</div>
-
-	<div class="<?php echo $controlGroupClass;  ?>">
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_ADDRESS'); ?>
-			<span class="required">*</span>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<input class="text_area input-xlarge" type="text" name="address" id="address" size="70" maxlength="250" value="<?php echo $this->item->address;?>" />
-		</div>
-	</div>
-
-	<div class="<?php echo $controlGroupClass;  ?>">
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_CITY'); ?>
-			<span class="required">*</span>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<input class="text_area" type="text" name="city" id="city" size="30" maxlength="250" value="<?php echo $this->item->city;?>" />
-		</div>
-	</div>
-
-	<div class="<?php echo $controlGroupClass;  ?>">
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_STATE'); ?>
-			<span class="required">*</span>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<input class="text_area" type="text" name="state" id="state" size="30" maxlength="250" value="<?php echo $this->item->state;?>" />
-		</div>
-	</div>
-
-	<div class="<?php echo $controlGroupClass;  ?>">
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_ZIP'); ?>
-			<span class="required">*</span>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<input class="text_area" type="text" name="zip" id="zip" size="20" maxlength="250" value="<?php echo $this->item->zip;?>" />
-		</div>
-	</div>
-
-	<div class="<?php echo $controlGroupClass;  ?>">
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_COUNTRY'); ?>
-			<span class="required">*</span>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<?php echo $this->lists['country'] ; ?>
-		</div>
-	</div>
-
-	<div class="<?php echo $controlGroupClass;  ?>">
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_LATITUDE'); ?>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<input class="text_area" type="text" name="lat" id="lat" size="20" maxlength="250" value="<?php echo $this->item->lat;?>" />
-		</div>
-	</div>
-
-	<div class="<?php echo $controlGroupClass;  ?>">
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_LONGITUDE'); ?>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<input class="text_area" type="text" name="long" id="long" size="20" maxlength="250" value="<?php echo $this->item->long;?>" />
-		</div>
-	</div>
-
-	<div class="<?php echo $controlGroupClass;  ?>">
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_PUBLISHED') ; ?>
-		</label>
-		<?php
-			echo $this->lists['published'];
-		?>
-	</div>
-
-	<div class="form-actions">
-		<input type="button" class="btn btn-primary" name="btnSave" value="<?php echo JText::_('EB_SAVE'); ?>" onclick="checkData('save');" />
-		<?php
-			if ($this->item->id)
-			{
-			?>
-				<input type="button" class="btn btn-primary" name="btnSave" value="<?php echo JText::_('EB_DELETE_LOCATION'); ?>" onclick="deleteLocation();" />
-			<?php
-			}
-		?>
-		<input type="button" class="btn btn-primary" name="btnCancel" value="<?php echo JText::_('EB_CANCEL_LOCATION'); ?>" onclick="checkData('cancel');" />
-	</div>
-
+<form action="index.php?option=com_eventbooking&view=location" method="post" name="adminForm" id="adminForm" class="form">
+<div class="row-fluid">
+    <div  class="<?php echo $span5Class ?>">
+    	<div class="<?php echo $controlGroupClass;  ?>">
+    		<label class="<?php echo $controlLabelClass; ?>">
+    			<?php echo JText::_('EB_NAME'); ?>
+    			<span class="required">*</span>
+    		</label>
+    		<div class="<?php echo $controlsClass; ?>">
+    			<input class="text_area" type="text" name="name" id="name" size="50" maxlength="250" value="<?php echo $this->item->name;?>" />
+    		</div>
+    	</div>
+    
+    	<div class="<?php echo $controlGroupClass;  ?>">
+    		<label class="<?php echo $controlLabelClass; ?>">
+    			<?php echo JText::_('EB_ADDRESS'); ?>
+    			<span class="required">*</span>
+    		</label>
+    		<div class="<?php echo $controlsClass; ?>">
+      	         <input class="input-xlarge" type="text" name="address" id="address" size="70" autocomplete="off" onkeyup="getLocations(this.value)" onblur="clearLocations();" maxlength="250" value="<?php echo $this->item->address;?>" />
+    			<ul id="eventmaps_results" style="display:none;"></ul>
+    		</div>
+    	</div>
+    
+    	<div class="<?php echo $controlGroupClass;  ?>">
+    		<label class="<?php echo $controlLabelClass; ?>">
+    			<?php echo JText::_('EB_CITY'); ?>
+    			<span class="required">*</span>
+    		</label>
+    		<div class="<?php echo $controlsClass; ?>">
+    			<input class="text_area" type="text" name="city" id="city" size="30" maxlength="250" value="<?php echo $this->item->city;?>" />
+    		</div>
+    	</div>
+    
+    	<div class="<?php echo $controlGroupClass;  ?>">
+    		<label class="<?php echo $controlLabelClass; ?>">
+    			<?php echo JText::_('EB_STATE'); ?>
+    			<span class="required">*</span>
+    		</label>
+    		<div class="<?php echo $controlsClass; ?>">
+    			<input class="text_area" type="text" name="state" id="state" size="30" maxlength="250" value="<?php echo $this->item->state;?>" />
+    		</div>
+    	</div>
+    
+    	<div class="<?php echo $controlGroupClass;  ?>">
+    		<label class="<?php echo $controlLabelClass; ?>">
+    			<?php echo JText::_('EB_ZIP'); ?>
+    			<span class="required">*</span>
+    		</label>
+    		<div class="<?php echo $controlsClass; ?>">
+    			<input class="text_area" type="text" name="zip" id="zip" size="20" maxlength="250" value="<?php echo $this->item->zip;?>" />
+    		</div>
+    	</div>
+    
+    	<div class="<?php echo $controlGroupClass;  ?>">
+    		<label class="<?php echo $controlLabelClass; ?>">
+    			<?php echo JText::_('EB_COUNTRY'); ?>
+    			<span class="required">*</span>
+    		</label>
+    		<div class="<?php echo $controlsClass; ?>">
+    			<?php echo $this->lists['country'] ; ?>
+    		</div>
+    	</div>
+    
+    	<div class="<?php echo $controlGroupClass;  ?>">
+    		<label class="<?php echo $controlLabelClass; ?>">
+    			<?php echo JText::_('EB_COORDINATES'); ?>
+    		</label>
+    		<div class="<?php echo $controlsClass; ?>">
+    			<input class="text_area" type="text" name="coordinates" id="coordinates" size="30" maxlength="250" value="<?php echo $this->item->lat.','.$this->item->long;?>" />
+    		</div>
+    	</div>
+    
+    	<div class="<?php echo $controlGroupClass;  ?>">
+    		<label class="<?php echo $controlLabelClass; ?>">
+    			<?php echo JText::_('EB_PUBLISHED') ; ?>
+    		</label>
+    		<?php
+    			echo $this->lists['published'];
+    		?>
+    	</div>
+    
+    	<div class="form-actions">
+    		<input type="button" class="btn btn-primary" name="btnSave" value="<?php echo JText::_('EB_SAVE'); ?>" onclick="checkData('save');" />
+    		<?php
+    			if ($this->item->id)
+    			{
+    			?>
+    				<input type="button" class="btn btn-primary" name="btnSave" value="<?php echo JText::_('EB_DELETE_LOCATION'); ?>" onclick="deleteLocation();" />
+    			<?php
+    			}
+    		?>
+    		<input type="button" class="btn btn-primary" name="btnCancel" value="<?php echo JText::_('EB_CANCEL_LOCATION'); ?>" onclick="checkData('cancel');" />
+    	</div>
+     </div>
+     <div class="<?php echo $span7Class ?>">
+        <div class="<?php echo $controlGroupClass;  ?>">
+    		<label class="<?php echo $controlLabelClass; ?>">
+    			<input type="button" onclick="getLocationFromAddress();" value="<?php echo JText::_('EB_PINPOINT'); ?> &raquo;" />
+    		</label>
+    		<div class="<?php echo $controlsClass; ?>">
+    			<div id="map-canvas" style="width: 95%; height: 400px"></div>
+    		</div>
+    	</div>
+     </div>
+</div>
 	<div class="clearfix"></div>
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />

@@ -57,6 +57,9 @@ class EventbookingModelLocation extends EventbookingModelList
 		$row          = $this->getTable();
 		$user         = JFactory::getUser();
 		$row->user_id = $user->id;
+        $coordinates = explode(',',$data['coordinates']);
+       	$row->lat  =  $coordinates[0];
+		$row->long =  $coordinates[1];
 		if ($data['id'])
 		{
 			$row->load($data['id']);
@@ -66,50 +69,6 @@ class EventbookingModelLocation extends EventbookingModelList
 			$this->setError($this->_db->getErrorMsg());
 
 			return false;
-		}
-
-		// Calculate location here
-		$ch = curl_init();
-		if (!$row->lat && !$row->long)
-		{
-			$address = array();
-			if ($row->address)
-			{
-				$address[] = $row->address;
-			}
-			if ($row->city)
-			{
-				$address[] = $row->city;
-			}
-			if ($row->state)
-			{
-				$address[] = $row->state;
-			}
-			if ($row->zip)
-			{
-				$address[] = $row->zip;
-			}
-			if ($row->country)
-			{
-				$address[] = $row->country;
-			}
-			$address = implode('+', $address);
-			$address = str_replace(' ', '+', $address);
-			$address = urlencode($address);
-			$url     = 'http://maps.google.com/maps/api/geocode/json?sensor=false&address=' . $address;
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_HEADER, 0);
-			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			$data = curl_exec($ch);
-			curl_close($ch);
-			$arrData = json_decode($data, true);
-			if ($arrData['status'] == 'OK')
-			{
-				$location  = $arrData['results'][0]['geometry']['location'];
-				$row->lat  = $location['lat'];
-				$row->long = $location['lng'];
-			}
 		}
 		if (!$row->store())
 		{
@@ -147,4 +106,4 @@ class EventbookingModelLocation extends EventbookingModelList
 
 		return true;
 	}
-} 
+}
