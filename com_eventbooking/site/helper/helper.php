@@ -3918,6 +3918,54 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Generate article selection box
+	 *
+	 * @param int    $fieldValue
+	 * @param string $fieldName
+	 *
+	 * @return string
+	 */
+	public static function getArticleInput($fieldValue, $fieldName = 'article_id')
+	{
+		// Initialize variables.
+		JHtml::_('behavior.modal');
+		$link = 'index.php?option=com_content&amp;view=articles&amp;layout=modal&amp;tmpl=component&amp;' . JSession::getFormToken() . '=1';
+		$html = array();
+		?>
+		<script type="text/javascript">
+			function jSelectArticle(id, title, catid, object, link, lang) {
+				var old_id = document.getElementById('<?php echo $fieldName; ?>').value;
+				if (old_id != id) {
+					document.id(article_name).value = title;
+					document.getElementById('<?php echo $fieldName; ?>').value = id;
+					jModalClose();
+				}
+			}
+		</script>
+		<?php
+		$table = JTable::getInstance('content');
+		if ($fieldValue)
+		{
+			$table->load($fieldValue);
+		}
+		else
+		{
+			$table->title = '';
+		}
+		$html[] = '<div class="input-prepend input-append">';
+		$html[] = '<div class="media-preview add-on"><span title="" class="hasTipPreview"><span class="icon-eye"></span></span></div>';
+		$html[] = '	<input type="text" disabled="disabled" class="input-small hasTipImgpath" id="article_name"' . ' value="' . htmlspecialchars($table->title, ENT_COMPAT, 'UTF-8') . '"' .
+			' disabled="disabled"/>';
+		// Create the user select button.
+		$html[] = '<a title="" rel="{handler: \'iframe\', size: {x: 800, y: 500}}" data-toggle="modal" role="button" class="btn hasTooltip modal" href="' . $link . '" data-original-title="Select or Change article"><span class="icon-file"></span> Select</a>';
+		$html[] = '</div>';
+		// Create the real field, hidden, that stored the user id.
+		$html[] = '<input type="hidden" id="' . $fieldName . '" name="' . $fieldName . '" value="' . $fieldValue . '" />';
+
+		return implode("\n", $html);
+	}
+
+	/**
 	 * Get the invoice number for this subscription record
 	 */
 	public static function getInvoiceNumber()
