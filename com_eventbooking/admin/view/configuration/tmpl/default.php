@@ -361,7 +361,7 @@ $config = $this->config;
 					<?php echo EventbookingHelperHtml::getFieldLabel('article_id', JText::_('EB_DEFAULT_TERM_AND_CONDITION')); ?>
 				</div>
 				<div class="controls">
-					<?php echo $this->lists['article_id']; ?>
+					<?php echo EventbookingHelper::getArticleInput($config->article_id); ?>
 				</div>
 			</div>
 			<div class="control-group">

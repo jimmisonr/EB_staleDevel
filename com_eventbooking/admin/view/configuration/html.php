@@ -30,17 +30,6 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['calendar_start_date']                = JHtml::_('select.genericlist', $options, 'calendar_start_date', ' class="inputbox" ', 'value', 'text',
 			$config->calendar_start_date);
 
-		$query->select('id, title')
-			->from('#__content')
-			->where('`state` = 1')
-			->order('title');
-		$db->setQuery($query);
-		$rows                                 = $db->loadObjectList();
-		$options                              = array();
-		$options[]                            = JHtml::_('select.option', 0, JText::_('EB_SELECT_ARTICLE'), 'id', 'title');
-		$options                              = array_merge($options, $rows);
-		$lists['article_id']                  = JHtml::_('select.genericlist', $options, 'article_id', ' class="inputbox" ', 'id', 'title', $config->article_id);
-
 		$options                  = array();
 		$options[]                = JHtml::_('select.option', 1, JText::_('EB_ORDERING'));
 		$options[]                = JHtml::_('select.option', 2, JText::_('EB_EVENT_DATE'));

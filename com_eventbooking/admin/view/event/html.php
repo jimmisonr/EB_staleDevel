@@ -173,19 +173,7 @@ class EventbookingViewEventHtml extends RADViewItem
 		}
 		$this->lists['registration_start_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'registration_start_hour', ' class="inputbox input-mini" ', $selectedHour);
 		$this->lists['registration_start_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d');
-		//Terms and condition article
 
-		$query->clear();
-		$query->select('id, title')
-			->from('#__content')
-			->where('`state` = 1')
-			->order('title');
-		$db->setQuery($query);
-		$rows                      = $db->loadObjectList();
-		$options                   = array();
-		$options[]                 = JHtml::_('select.option', 0, JText::_('EB_SELECT_ARTICLE'), 'id', 'title');
-		$options                   = array_merge($options, $rows);
-		$this->lists['article_id'] = JHtml::_('select.genericlist', $options, 'article_id', 'class="inputbox"', 'id', 'title', $item->article_id);
 
 		$nullDate                  = $db->getNullDate();
 		//Custom field handles

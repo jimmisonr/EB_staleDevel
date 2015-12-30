@@ -360,7 +360,7 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 									<?php echo JText::_('EB_TERMS_CONDITIONS'); ?>
 								</td>
 								<td>
-									<?php echo $this->lists['article_id'] ; ?>
+									<?php echo EventbookingHelper::getArticleInput($this->item->article_id); ?>
 								</td>
 							</tr>
 						<?php
