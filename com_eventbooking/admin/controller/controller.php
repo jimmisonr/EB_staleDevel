@@ -2312,20 +2312,20 @@ class EventbookingController extends RADControllerAdmin
 
 		foreach ($deleteFiles as $file)
 		{
-			if (JFile::exists(JPATH_ROOT . $file))
+			if (JFile::exists($file))
 			{
-				JFile::delete(JPATH_ROOT . $file);
+				JFile::delete($file);
 			}
 		}
 
 		foreach ($deleteFolders as $folder)
 		{
-			if (JFolder::exists(JPATH_ROOT . $folder))
+			if (JFolder::exists($folder))
 			{
-				JFolder::delete(JPATH_ROOT . $folder);
+				JFolder::delete($folder);
 			}
-		}		
-		
+		}
+
 		// Redirect to dashboard view
 		$installType = $this->input->getCmd('install_type', '');
 		if ($installType == 'install')
