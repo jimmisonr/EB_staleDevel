@@ -209,6 +209,8 @@ class EventbookingViewEventHtml extends RADViewItem
 		$this->lists['discount_groups'] = JHtml::_('access.usergroup', 'discount_groups[]', explode(',', $item->discount_groups),
 			' multiple="multiple" size="6" ', false);
 
+		$this->lists['available_attachment'] = EventbookingHelper::attachmentList(explode('|', $item->attachment), $config);
+
 		#Plugin support
 		JPluginHelper::importPlugin('eventbooking');
 		$results = JFactory::getApplication()->triggerEvent('onEditEvent', array($item));

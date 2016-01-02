@@ -161,6 +161,7 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 						<td>
 							<input type="file" name="attachment"/>
 							<?php
+							echo $this->lists['available_attachment'];
 							if ($this->item->attachment)
 							{
 							?>

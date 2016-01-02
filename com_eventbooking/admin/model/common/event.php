@@ -73,7 +73,15 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		}
 
 		//Process attachment
-		$attachment = $thumbImage = $input->files->get('attachment');
+		if (JFactory::getApplication()->isSite())
+		{
+			$attachment = $thumbImage = $input->files->get('attachment');
+		}
+		else
+		{
+			$attachment = $thumbImage = $input->files->get('attachment', null, 'raw');
+		}
+
 		if ($attachment['name'])
 		{
 			$pathUpload        = JPATH_ROOT . '/media/com_eventbooking';
@@ -90,13 +98,30 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			if (in_array(strtolower($fileExt), $allowedExtensions))
 			{
 				$fileName = JFile::makeSafe($fileName);
-				JFile::upload($attachment['tmp_name'], $pathUpload . '/' . $fileName);
+				if (version_compare(JVERSION, '3.4.4', 'ge') && JFactory::getApplication()->isAdmin())
+				{
+					JFile::upload($attachment['tmp_name'], $pathUpload . '/' . $fileName, false, true);
+				}
+				else
+				{
+					JFile::upload($attachment['tmp_name'], $pathUpload . '/' . $fileName);
+				}
+
 				$data['attachment'] = $fileName;
 			}
 			else
 			{
 				// Throw notice, but still allow saving the event
 				$data['attachment'] = '';
+			}
+		}
+
+		if (empty($data['attachment']) && !empty($data['available_attachment']))
+		{
+			$data['attachment'] = $data['available_attachment'];
+			if (is_array($data['attachment']))
+			{
+				$data['attachment'] = implode('|', $data['attachment']);
 			}
 		}
 
@@ -864,7 +889,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 	{
 		$db = $this->getDbo();
 		$query = $db->getQuery(true);
-		if ($isNew)
+		if (!$isNew)
 		{
 			$query->delete('#__eb_event_categories')->where('event_id=' . $eventId);
 			$db->setQuery($query);

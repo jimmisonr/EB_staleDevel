@@ -2281,7 +2281,7 @@ class EventbookingHelper
 	 *
 	 * @param object $row
 	 *
-	 * @return void
+	 * @return string
 	 */
 	public static function parentCategories($row)
 	{
@@ -2326,6 +2326,30 @@ class EventbookingHelper
 				'list.select'        => $row->parent));
 	}
 
+	/**
+	 * Display list of files which users can choose for event attachment
+	 *
+	 * @param $attachment
+	 * @param $config
+	 *
+	 * @return mixed
+	 */
+	public static function attachmentList($attachment, $config)
+	{
+		jimport('joomla.filesystem.folder');
+		$path      = JPATH_ROOT . '/media/com_eventbooking';
+		$files     = JFolder::files($path,
+			strlen(trim($config->attachment_file_types)) ? $config->attachment_file_types : 'bmp|gif|jpg|png|swf|zip|doc|pdf|xls|zip');
+		$options   = array();
+		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_ATTACHMENT'));
+		for ($i = 0, $n = count($files); $i < $n; $i++)
+		{
+			$file      = $files[$i];
+			$options[] = JHtml::_('select.option', $file, $file);
+		}
+
+		return JHtml::_('select.genericlist', $options, 'available_attachment[]', 'class="advancedSelect input-xlarge" multiple="multiple" size="6" ', 'value', 'text', $attachment);
+	}
 
 	/**
 	 * Get total events of a category
@@ -2888,6 +2912,7 @@ class EventbookingHelper
 			self::generateInvoicePDF($row);
 			$attachments[] = JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
 		}
+
 		if ($config->multiple_booking)
 		{
 			$query->clear();
@@ -2896,19 +2921,37 @@ class EventbookingHelper
 				->where('id IN (SELECT event_id FROM #__eb_registrants AS a WHERE a.id=' . $row->id . ' OR a.cart_id=' . $row->id . ' ORDER BY a.id)');
 			$db->setQuery($query);
 			$attachmentFiles = $db->loadColumn();
-			foreach ($attachmentFiles as $attachmentFile)
-			{
-				if ($attachmentFile)
-				{
-					$attachments[] = JPATH_ROOT . '/media/com_eventbooking/' . $attachmentFile;
-				}
-			}
 		}
 		else
 		{
 			if ($event->attachment)
 			{
+				$attachmentFiles = array($event->attachment);
 				$attachments[] = JPATH_ROOT . '/media/com_eventbooking/' . $event->attachment;
+			}
+			else
+			{
+				$attachmentFiles = array();
+			}
+		}
+
+		// Remove empty value from array
+		$attachmentFiles = array_filter($attachmentFiles);
+
+		// Add all valid attachments to email
+		if (count($attachmentFiles))
+		{
+			foreach ($attachmentFiles as $attachmentFile)
+			{
+				$files = explode('|', $attachmentFile);
+				foreach($files as $file)
+				{
+					$filePath = JPATH_ROOT . '/media/com_eventbooking/' . $file;
+					if (file_exists($filePath))
+					{
+						$attachments[] = $filePath;
+					}
+				}
 			}
 		}
 
