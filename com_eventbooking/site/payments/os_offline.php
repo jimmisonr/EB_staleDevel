@@ -10,8 +10,19 @@
 // no direct access
 defined('_JEXEC') or die();
 
-class os_offline extends os_payment
+class os_offline extends RADPayment
 {
+
+	/**
+	 * Constructor
+	 *
+	 * @param \Joomla\Registry\Registry $params
+	 * @param array                     $config
+	 */
+	public function __construct($params, $config = array())
+	{
+		parent::__construct($params, $config);
+	}
 
 	/**
 	 * Process payment
