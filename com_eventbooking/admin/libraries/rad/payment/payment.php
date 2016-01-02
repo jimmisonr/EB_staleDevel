@@ -186,7 +186,7 @@ abstract class RADPayment
 	 */
 	public function getCardType()
 	{
-		return false;
+		return 0;
 	}
 
 	/**
