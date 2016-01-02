@@ -243,8 +243,13 @@ abstract class RADPayment
 	 *
 	 * @since 1.0
 	 */
-	protected function renderRedirectForm($url, $data = array())
+	protected function renderRedirectForm($url = null, $data = array())
 	{
+		if (empty($url))
+		{
+			$url = $this->url;
+		}
+
 		if (empty($data))
 		{
 			$data = $this->parameters;
