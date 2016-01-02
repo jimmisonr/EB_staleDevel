@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	2.2.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.2.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
@@ -22,7 +22,7 @@ define('EWAY_TRANSACTION_UNKNOWN', 2);
  * Eway payment class
  *
  */
-class os_eway extends os_payment
+class os_eway extends RADPayment
 {
 
 	/**
@@ -266,14 +266,8 @@ class os_eway extends os_payment
 	/***********************************************************************
 	 *** Class Constructor                                               ***
 	 ***********************************************************************/
-	function os_eway($params)
+	public function __construct($params, $config = array('type' => 1))
 	{
-		parent::setName('os_eway');
-		parent::os_payment();
-		parent::setCreditCard(true);
-		parent::setCardType(false);
-		parent::setCardCvv(true);
-		parent::setCardHolderName(true);
 		$this->myCustomerID = $params->get('eway_customer_id');
 		$ewayMode           = $params->get('eway_mode', 0);
 		$ewayCvn            = $params->get('eway_cvn', 0);
@@ -504,7 +498,7 @@ class os_eway extends os_payment
 	/***********************************************************************
 	 *** Business Logic                                                  ***
 	 ***********************************************************************/
-	function processPayment($row, $data)
+	public function processPayment($row, $data)
 	{
 		$app      = JFactory::getApplication();
 		$Itemid   = $app->input->getInt('Itemid', 0);
@@ -596,19 +590,7 @@ class os_eway extends os_payment
 		$result = $this->getError();
 		if ($result == EWAY_TRANSACTION_OK)
 		{
-			$config              = EventbookingHelper::getConfig();
-			$row->transaction_id = $this->getTrxnNumber();
-			$row->payment_date   = gmdate('Y-m-d H:i:s');
-			$row->published      = 1;
-			$row->store();
-			if ($row->is_group_billing)
-			{
-				EventbookingHelper::updateGroupRegistrationRecord($row->id);
-			}
-			EventbookingHelper::sendEmails($row, $config);
-			JPluginHelper::importPlugin('eventbooking');
-			$dispatcher = JDispatcher::getInstance();
-			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
+			$this->onPaymentSuccess($row, $this->getTrxnNumber());
 			$url = JRoute::_('index.php?option=com_eventbooking&view=complete&registration_code=' . $row->registration_code . '&Itemid=' . $Itemid, false, false);
 			$app->redirect($url);
 		}
