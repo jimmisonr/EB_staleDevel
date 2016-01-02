@@ -93,9 +93,9 @@ class os_paypal extends RADPayment
 		$ret = $this->validate();
 		if ($ret)
 		{
-			$id            = $this->_data['custom'];
-			$transactionId = $this->_data['txn_id'];
-			$amount        = $this->_data['mc_gross'];
+			$id            = $this->notificationData['custom'];
+			$transactionId = $this->notificationData['txn_id'];
+			$amount        = $this->notificationData['mc_gross'];
 			if ($amount < 0)
 			{
 				return false;
@@ -128,57 +128,55 @@ class os_paypal extends RADPayment
 	 */
 	protected function validate()
 	{
-		$errNum     = "";
-		$errStr     = "";
-		$urlParsed  = parse_url($this->_url);
-		$host       = $urlParsed['host'];
-		$path       = $urlParsed['path'];
-		$postString = '';
-		$response   = '';
-
 		$this->notificationData = $_POST;
+
+		$hostname = $this->mode ? 'www.paypal.com' : 'www.sandbox.paypal.com';
+		$url      = 'ssl://' . $hostname;
+		$port     = 443;
+		$req      = 'cmd=_notify-validate';
 
 		foreach ($_POST as $key => $value)
 		{
-			$postString .= $key . '=' . urlencode(stripslashes($value)) . '&';
+			$value = urlencode(stripslashes($value));
+			$req .= "&$key=$value";
 		}
-		$postString .= 'cmd=_notify-validate';
-		$fp = fsockopen($host, '80', $errNum, $errStr, 30);
+
+		$header = '';
+		$header .= "POST /cgi-bin/webscr HTTP/1.1\r\n";
+		$header .= "Host: $hostname:$port\r\n";
+		$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
+		$header .= "Content-Length: " . strlen($req) . "\r\n";
+		$header .= "User-Agent: Events Booking\r\n";
+		$header .= "Connection: Close\r\n\r\n";
+
+		$errNum   = '';
+		$errStr   = '';
+		$response = '';
+		$fp       = fsockopen($url, $port, $errNum, $errStr, 30);
+
 		if (!$fp)
 		{
+			$response = 'Could not open SSL connection to ' . $hostname . ':' . $port;
+			$this->logGatewayData($response);
+
 			return false;
 		}
-		else
+
+		fputs($fp, $header . $req);
+		while (!feof($fp))
 		{
-			fputs($fp, "POST $path HTTP/1.1\r\n");
-			fputs($fp, "Host: $host\r\n");
-			fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
-			fputs($fp, "Content-length: " . strlen($postString) . "\r\n");
-			fputs($fp, "Connection: close\r\n\r\n");
-			fputs($fp, $postString . "\r\n\r\n");
-			while (!feof($fp))
-			{
-				$response .= fgets($fp, 1024);
-			}
-			fclose($fp);
+			$response .= fgets($fp, 1024);
 		}
+		fclose($fp);
+
 
 		$this->logGatewayData($response);
 
-		if ($this->mode)
-		{
-			if (eregi("VERIFIED", $response) && ($this->notificationData['payment_status'] == 'Completed'))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
+		if (!$this->mode || (stristr($response, "VERIFIED") && ($this->notificationData['payment_status'] == 'Completed')))
 		{
 			return true;
 		}
+
+		return false;
 	}
 }
