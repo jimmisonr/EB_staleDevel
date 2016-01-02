@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        	2.2.0
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2015 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @version            2.2.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2015 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
@@ -14,28 +14,13 @@ class os_offline extends os_payment
 {
 
 	/**
-	 * Constructor functions, init some parameter
-	 *
-	 * @param object $params
-	 */
-	function os_offline($params)
-	{
-		parent::setName('os_offline');
-		parent::os_payment();
-		parent::setCreditCard(false);
-		parent::setCardType(false);
-		parent::setCardCvv(false);
-		parent::setCardHolderName(false);
-	}
-
-	/**
-	 * Process payment 
+	 * Process payment
 	 *
 	 */
-	function processPayment($row, $data)
+	public function processPayment($row, $data)
 	{
-		$app = JFactory::getApplication();
-		$Itemid = JRequest::getint('Itemid');
+		$app    = JFactory::getApplication();
+		$Itemid = $app->input->getInt('Itemid', 0);
 		$config = EventbookingHelper::getConfig();
 		if ($row->is_group_billing)
 		{
