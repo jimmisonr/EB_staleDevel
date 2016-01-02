@@ -186,6 +186,21 @@ class EventBookingModelRegister extends RADModel
 			$itemName          = str_replace('[EVENT_TITLE]', $data['event_title'], $itemName);
 			$data['item_name'] = $itemName;
 
+			// Validate credit card
+			if (!empty($data['x_card_num']))
+			{
+				if (empty($data['card_type']))
+				{
+					$data['card_type'] = EventbookingHelperCreditcard::getCardType($data['x_card_num']);
+				}
+
+				$cardNumber = $data['x_card_num'];
+				$expMonth   = $data['exp_month'];
+				$expYear    = $data['exp_year'];
+
+				EventbookingHelperCreditcard::validateCard($cardNumber, $expMonth, $expYear);
+			}
+
 			$query->clear();
 			$query->select('params')
 				->from('#__eb_payment_plugins')
@@ -429,7 +444,22 @@ class EventBookingModelRegister extends RADModel
 			$itemName          = JText::_('EB_EVENT_REGISTRATION');
 			$itemName          = str_replace('[EVENT_TITLE]', $data['event_title'], $itemName);
 			$data['item_name'] = $itemName;
-			
+
+			// Validate credit card
+			if (!empty($data['x_card_num']))
+			{
+				if (empty($data['card_type']))
+				{
+					$data['card_type'] = EventbookingHelperCreditcard::getCardType($data['x_card_num']);
+				}
+
+				$cardNumber = $data['x_card_num'];
+				$expMonth   = $data['exp_month'];
+				$expYear    = $data['exp_year'];
+
+				EventbookingHelperCreditcard::validateCard($cardNumber, $expMonth, $expYear);
+			}
+
 			$query->clear();
 			$query->select('params')
 				->from('#__eb_payment_plugins')
