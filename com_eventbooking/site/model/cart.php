@@ -196,6 +196,11 @@ class EventbookingModelCart extends RADModel
 		$db->setQuery($query);
 		$eventTitles         = $db->loadColumn();
 		$data['event_title'] = implode(', ', $eventTitles);
+
+		$itemName          = JText::_('EB_EVENT_REGISTRATION');
+		$itemName          = str_replace('[EVENT_TITLE]', $data['event_title'], $itemName);
+		$data['item_name'] = $itemName;
+
 		if ($couponId > 0)
 		{
 			$sql = 'UPDATE #__eb_coupons SET used = used + 1 WHERE id=' . (int) $couponId;

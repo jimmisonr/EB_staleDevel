@@ -181,6 +181,11 @@ class EventBookingModelRegister extends RADModel
 		if ($row->amount > 0 && !$waitingList)
 		{
 			require_once JPATH_COMPONENT . '/payments/' . $paymentMethod . '.php';
+
+			$itemName          = JText::_('EB_EVENT_REGISTRATION');
+			$itemName          = str_replace('[EVENT_TITLE]', $data['event_title'], $itemName);
+			$data['item_name'] = $itemName;
+
 			$query->clear();
 			$query->select('params')
 				->from('#__eb_payment_plugins')
@@ -420,6 +425,11 @@ class EventBookingModelRegister extends RADModel
 		if ($row->amount > 0 && !$waitingList)
 		{
 			require_once JPATH_COMPONENT . '/payments/' . $paymentMethod . '.php';
+
+			$itemName          = JText::_('EB_EVENT_REGISTRATION');
+			$itemName          = str_replace('[EVENT_TITLE]', $data['event_title'], $itemName);
+			$data['item_name'] = $itemName;
+			
 			$query->clear();
 			$query->select('params')
 				->from('#__eb_payment_plugins')
@@ -614,9 +624,9 @@ class EventBookingModelRegister extends RADModel
 		$body    = str_replace('[REGISTRATION_DETAIL]', $emailContent, $body);
 		foreach ($replaces as $key => $value)
 		{
-			$key  = strtoupper($key);
+			$key     = strtoupper($key);
 			$subject = str_replace("[$key]", $value, $subject);
-			$body = str_replace("[$key]", $value, $body);
+			$body    = str_replace("[$key]", $value, $body);
 		}
 		//Send emails to notification emails
 		if (strlen(trim($event->notification_emails)) > 0)
