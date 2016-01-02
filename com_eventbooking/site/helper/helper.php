@@ -2451,6 +2451,16 @@ class EventbookingHelper
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$user  = JFactory::getUser();
+
+		$accessLevels = $user->getAuthorisedViewLevels();
+		if (empty($event)
+			|| !$event->published
+			|| !in_array($event->access, $accessLevels)
+			|| !in_array($event->registration_access, $accessLevels))
+		{
+			return false;
+		}
+
 		if ($event->registration_type == 3)
 		{
 			return false;

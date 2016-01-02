@@ -32,7 +32,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$item   = $model->getEventData();
 
 		// Check to make sure the event is valid and user is allowed to access to it
-		if (empty($item) || !in_array($item->access, $user->getAuthorisedViewLevels()))
+		if (empty($item) || !$item->published || !in_array($item->access, $user->getAuthorisedViewLevels()))
 		{
 			$app->redirect('index.php', JText::_('EB_INVALID_EVENT'));
 		}

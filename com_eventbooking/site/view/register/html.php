@@ -32,6 +32,16 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$input   = $this->input;
 		$eventId = $input->getInt('event_id', 0);
 		$event   = EventbookingHelperDatabase::getEvent($eventId);
+
+		$accessLevels = JFactory::getUser()->getAuthorisedViewLevels();
+		if (empty($event)
+			|| !$event->published
+			|| !in_array($event->access, $accessLevels)
+			|| !in_array($event->registration_access, $accessLevels))
+		{
+			JFactory::getApplication()->redirect('index.php', JText::_('EB_ERROR_REGISTRATION'));
+		}
+
 		if (!EventbookingHelper::acceptRegistration($event))
 		{
 			$waitingList = EventbookingHelper::getConfigValue('activate_waitinglist_feature');
@@ -41,6 +51,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 					JText::_('EB_ERROR_REGISTRATION'));
 			}
 		}
+
 		if ($event->event_password)
 		{
 			$passwordPassed = JFactory::getSession()->get('eb_passowrd_' . $event->id, 0);
