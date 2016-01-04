@@ -10,7 +10,7 @@
 // no direct access
 defined('_JEXEC') or die;
 
-EventbookingHelperJquery::colorbox('eb-modal');
+EventbookingHelperJquery::colorbox('a.eb-modal');
 
 $item = $this->item ;
 $url = JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, 0, $this->Itemid), false);

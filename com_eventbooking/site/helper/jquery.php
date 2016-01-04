@@ -48,16 +48,26 @@ abstract class EventbookingHelperJquery
 			$loaded = true;
 		}
 
-		$options = array(
-			'iframe'     => $iframe,
-			'fastIframe' => false,
-			'inline'     => $inline,
-			'width'      => $width,
-			'height'     => $height,
-			'scrolling'  => $scrolling
-		);
-
-		$script = 'Eb.jQuery(document).ready(function($){$(".' . $class . '").colorbox(' . self::getJSObject($options) . ');});';
+		if ($class == 'a.eb-modal')
+		{
+			$options = array(
+				'maxWidth'  => '80%',
+				'maxHeight' => '80%'
+			);
+			$script  = 'Eb.jQuery(document).ready(function($){$("' . $class . '").colorbox(' . self::getJSObject($options) . ');});';
+		}
+		else
+		{
+			$options = array(
+				'iframe'     => $iframe,
+				'fastIframe' => false,
+				'inline'     => $inline,
+				'width'      => $width,
+				'height'     => $height,
+				'scrolling'  => $scrolling
+			);
+			$script  = 'Eb.jQuery(document).ready(function($){$(".' . $class . '").colorbox(' . self::getJSObject($options) . ');});';
+		}
 
 		JFactory::getDocument()->addScriptDeclaration($script);
 	}

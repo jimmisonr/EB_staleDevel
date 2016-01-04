@@ -74,7 +74,7 @@ if (count($this->items))
 		?>
 		<tr>
 			<td class="<?php echo $hiddenPhoneClass; ?>">
-				<?php echo $i+1 ; ?>
+				<?php echo $this->pagination->getRowOffset( $i ); ?>
 			</td>
 			<td>
 					<?php echo $row->first_name ?>
