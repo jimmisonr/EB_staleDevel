@@ -2353,7 +2353,7 @@ class EventbookingController extends RADControllerAdmin
 		$result['status'] = 0;
 		if (function_exists('curl_init'))
 		{
-			$url = 'http://joomdonationdemo.com/versions/eventbooking.txt';
+			$url = 'http://joomdonationdemo.com/versions/eventbookingj3.txt';
 			$ch  = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

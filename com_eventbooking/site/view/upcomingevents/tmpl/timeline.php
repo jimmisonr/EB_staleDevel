@@ -17,8 +17,7 @@ else
 {
 	$ssl = 0 ;
 }
-
-JHtml::_('behavior.modal', 'a.eb-modal');
+EventbookingHelperJquery::colorbox('a.eb-modal');
 ?>
 <div id="eb-upcoming-events-page-default" class="eb-container">
 <h1 class="eb-page-heading"><?php echo $this->params->get('page_heading') ? $this->params->get('page_heading') : JText::_('EB_UPCOMING_EVENTS'); ?></h1>
