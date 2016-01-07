@@ -143,8 +143,19 @@ $selectedState = '';
 				<?php echo JText::_('EB_TOTAL_AMOUNT'); ?>
 			</td>
 			<td>
-				<?php echo $this->config->currency_symbol ?><input type="text" name="total_amount" class="input-medium"
-				                                                   value="<?php echo $this->item->total_amount > 0 ? round($this->item->total_amount, 2) : null; ?>"/>
+				<?php
+					if ($this->canChangeStatus)
+					{
+					?>
+						<?php echo $this->config->currency_symbol ?><input type="text" name="total_amount" class="input-medium"
+						                                                   value="<?php echo $this->item->total_amount > 0 ? round($this->item->total_amount, 2) : null; ?>"/>
+					<?php
+					}
+					else
+					{
+						echo EventbookingHelper::formatCurrency($this->item->total_amount, $this->config);
+					}
+				?>
 			</td>
 		</tr>
 
@@ -159,9 +170,20 @@ $selectedState = '';
 						<?php echo JText::_('EB_DISCOUNT_AMOUNT'); ?>
 					</td>
 					<td>
-						<?php echo $this->config->currency_symbol?><input type="text" name="discount_amount"
-						                                                  class="input-medium"
-						                                                  value="<?php echo $this->item->discount_amount > 0 ? round($this->item->discount_amount, 2) : null;?>"/>
+						<?php
+							if ($this->canChangeStatus)
+							{
+							?>
+								<?php echo $this->config->currency_symbol?><input type="text" name="discount_amount"
+								                                                  class="input-medium"
+								                                                  value="<?php echo $this->item->discount_amount > 0 ? round($this->item->discount_amount, 2) : null;?>"/>
+							<?php
+							}
+							else
+							{
+								echo EventbookingHelper::formatCurrency($this->item->discount_amount, $this->config);
+							}
+						?>
 					</td>
 				</tr>
 			<?php
@@ -175,9 +197,20 @@ $selectedState = '';
 						<?php echo JText::_('EB_LATE_FEE'); ?>
 					</td>
 					<td>
-						<?php echo $this->config->currency_symbol?><input type="text" name="late_fee"
-						                                                  class="input-medium"
-						                                                  value="<?php echo $this->item->late_fee > 0 ? round($this->item->late_fee, 2) : null;?>"/>
+						<?php
+							if ($this->canChangeStatus)
+							{
+							?>
+								<?php echo $this->config->currency_symbol?><input type="text" name="late_fee"
+								                                                  class="input-medium"
+								                                                  value="<?php echo $this->item->late_fee > 0 ? round($this->item->late_fee, 2) : null;?>"/>
+							<?php
+							}
+							else
+							{
+								echo EventbookingHelper::formatCurrency($this->item->late_fee, $this->config);
+							}
+						?>
 					</td>
 				</tr>
 			<?php
@@ -191,9 +224,20 @@ $selectedState = '';
 						<?php echo JText::_('EB_TAX'); ?>
 					</td>
 					<td>
-						<?php echo $this->config->currency_symbol?><input type="text" name="tax_amount"
-						                                                  class="input-medium"
-						                                                  value="<?php echo $this->item->tax_amount > 0 ? round($this->item->tax_amount, 2) : null;?>"/>
+						<?php
+							if ($this->canChangeStatus)
+							{
+							?>
+								<?php echo $this->config->currency_symbol?><input type="text" name="tax_amount"
+								                                                  class="input-medium"
+								                                                  value="<?php echo $this->item->tax_amount > 0 ? round($this->item->tax_amount, 2) : null;?>"/>
+							<?php
+							}
+							else
+							{
+								echo EventbookingHelper::formatCurrency($this->item->tax_amount, $this->config);
+							}
+						?>
 					</td>
 				</tr>
 			<?php
@@ -204,8 +248,19 @@ $selectedState = '';
 					<?php echo JText::_('EB_GROSS_AMOUNT'); ?>
 				</td>
 				<td>
-					<?php echo $this->config->currency_symbol?><input type="text" name="amount" class="input-medium"
-					                                                  value="<?php echo $this->item->amount > 0 ? round($this->item->amount, 2) : null;?>"/>
+					<?php
+						if ($this->canChangeStatus)
+						{
+						?>
+							<?php echo $this->config->currency_symbol?><input type="text" name="amount" class="input-medium"
+							                                                  value="<?php echo $this->item->amount > 0 ? round($this->item->amount, 2) : null;?>"/>
+						<?php
+						}
+						else
+						{
+							echo EventbookingHelper::formatCurrency($this->item->amount, $this->config);
+						}
+					?>
 				</td>
 			</tr>
 		<?php

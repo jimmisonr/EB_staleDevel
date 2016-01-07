@@ -146,7 +146,7 @@ class plgEventbookingUserprofile extends JPlugin
 						$value = $data[$fieldMapping];
 					}
 				}
-				$tuples[] = '(' . $userId . ', ' . $db->quote('profile.' . $field) . ', ' . $db->quote($value) . ', ' . $order++ . ')';
+				$tuples[] = '(' . $userId . ', ' . $db->quote('profile.' . $field) . ', ' . $db->quote(json_encode($value)) . ', ' . $order++ . ')';
 			}
 			$db->setQuery('INSERT INTO #__user_profiles VALUES ' . implode(', ', $tuples));
 			$db->execute();

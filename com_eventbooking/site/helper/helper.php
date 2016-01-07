@@ -789,6 +789,7 @@ class EventbookingHelper
 		$replaces['invoice_number']     = EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config);
 		$replaces['transaction_id']     = $row->transaction_id;
 		$replaces['id']     			= $row->id;
+		$replaces['date']               = JHtml::_('date', 'Now', $config->date_format);
 		$method                         = os_payments::loadPaymentMethod($row->payment_method);
 		if ($method)
 		{
@@ -4145,7 +4146,7 @@ class EventbookingHelper
 
 		$replaces                   = self::buildTags($row, $form, $rowEvent, $config);
 		$replaces['invoice_number'] = self::formatInvoiceNumber($row->invoice_number, $config);
-		$replaces['invoice_date']   = date($config->date_format);
+		$replaces['invoice_date']   = JHtml::_('date', $row->register_date, $config->date_format);
 
 		if ($row->published == 0)
 		{
