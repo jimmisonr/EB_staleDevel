@@ -89,8 +89,21 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 
 		EventbookingHelperHtml::prepareDocument($params);
 
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$message     = EventbookingHelper::getMessages();
+
+		if (strlen($message->{'intro_text' . $fieldSuffix}))
+		{
+			$introText = $message->{'intro_text' . $fieldSuffix};
+		}
+		else
+		{
+			$introText = $message->intro_text;
+		}
+
 		$this->listMonth = $listMonth;
 		$this->params    = $params;
+		$this->introText = $introText;
 
 		parent::display();
 	}

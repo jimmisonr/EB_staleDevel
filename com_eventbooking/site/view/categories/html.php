@@ -69,11 +69,24 @@ class EventbookingViewCategoriesHtml extends RADViewHtml
 			}
 		}
 
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$message     = EventbookingHelper::getMessages();
+
+		if (strlen($message->{'intro_text' . $fieldSuffix}))
+		{
+			$introText = $message->{'intro_text' . $fieldSuffix};
+		}
+		else
+		{
+			$introText = $message->intro_text;
+		}
+
 		$this->categoryId = $categoryId;
 		$this->config     = $config;
 		$this->items      = $items;
 		$this->pagination = $pagination;
 		$this->params     = $params;
+		$this->introText  = $introText;
 
 		parent::display();
 	}

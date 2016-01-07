@@ -38,6 +38,14 @@ else
 		$pageHeading = $this->params->get('page_heading') ? $this->params->get('page_heading') : JText::_('EB_CALENDAR');
 	?>
 	<h1 class="eb-page-heading"><?php echo $pageHeading; ?></h1>
+	<?php
+	if (EventbookingHelper::isValidMessage($this->introText))
+	{
+	?>
+		<div class="eb-description"><?php echo $this->introText;?></div>
+	<?php
+	}
+	?>
 	<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=calendar&Itemid='.$this->Itemid);?>">
 			<div id="eb-calendarwrap">
 				<?php

@@ -23,6 +23,14 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 	<?php echo JHtml::_('bootstrap.addTab', 'message', 'registration-form-messages-page', JText::_('EB_REGISTRATION_FORM_MESSAGES', true)); ?>
 		<div class="control-group">
 			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('intro_text', JText::_('EB_INTRO_TEXT'), JText::_('EB_INTRO_TEXT_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<?php echo $editor->display( 'intro_text',  $this->message->intro_text , '100%', '250', '75', '8' ) ;?>
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('registration_form_message', JText::_('EB_REGISTRATION_FORM_MESSAGE'), JText::_('EB_REGISTRATION_FORM_MESSAGE_EXPLAIN')); ?>
 				<p class="eb-available-tags">
 					<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[EVENT_TITLE]</strong>
@@ -383,6 +391,17 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 			echo JHtml::_('bootstrap.addTab', 'message-translation', 'translation-page-' . $sef, $language->title . ' <img src="' . JUri::root() . 'media/com_eventbooking/flags/' . $sef . '.png" />');
 		?>
 			<table class="admintable adminform" style="width:100%;">
+				<tr>
+					<td class="key">
+						<?php echo JText::_('EB_INTRO_TEXT'); ?>
+					</td>
+					<td>
+						<?php echo $editor->display( 'intro_text_'.$sef,  $this->message->{'intro_text_'.$sef} , '100%', '250', '75', '8' ) ;?>
+					</td>
+					<td>
+						&nbsp;
+					</td>
+				</tr>
 				<tr>
 					<td class="key">
 						<?php echo JText::_('EB_ADMIN_EMAIL_SUBJECT'); ?>

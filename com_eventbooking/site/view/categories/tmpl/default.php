@@ -17,6 +17,14 @@ defined('_JEXEC') or die;
 			$pageHeading = $this->params->get('page_heading') ? $this->params->get('page_heading') : JText::_('EB_CATEGORIES');
 		?>
 			<h1 class="eb-page-heading"><?php echo $pageHeading;?></h1>
+			<?php
+				if (EventbookingHelper::isValidMessage($this->introText))
+				{
+				?>
+					<div class="eb-description"><?php echo $this->introText;?></div>
+				<?php
+				}
+			?>
 		<?php
 		}
 		else

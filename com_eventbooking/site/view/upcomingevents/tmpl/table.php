@@ -13,6 +13,14 @@ EventbookingHelperJquery::colorbox('a.eb-modal');
 ?>
 <div id="eb-upcoming-events-page-default" class="eb-container">
 	<h1 class="eb-page-heading"><?php echo $this->params->get('page_heading') ? $this->params->get('page_heading') : JText::_('EB_UPCOMING_EVENTS'); ?></h1>
+	<?php
+	if (EventbookingHelper::isValidMessage($this->introText))
+	{
+	?>
+		<div class="eb-description"><?php echo $this->introText; ?></div>
+	<?php
+	}
+	?>
 <?php
 if ($this->config->use_https)
 {

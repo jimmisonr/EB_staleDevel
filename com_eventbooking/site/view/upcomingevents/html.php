@@ -96,6 +96,18 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 			}
 		}
 
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$message     = EventbookingHelper::getMessages();
+
+		if (strlen($message->{'intro_text' . $fieldSuffix}))
+		{
+			$introText = $message->{'intro_text' . $fieldSuffix};
+		}
+		else
+		{
+			$introText = $message->intro_text;
+		}
+
 		$this->viewLevels      = $user->getAuthorisedViewLevels();
 		$this->userId          = $user->get('id');
 		$this->items           = $items;
@@ -105,6 +117,7 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 		$this->pagination      = $model->getPagination();
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 		$this->params          = $params;
+		$this->introText       = $introText;
 
 		parent::display();
 	}
