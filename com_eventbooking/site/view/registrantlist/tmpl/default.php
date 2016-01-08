@@ -10,13 +10,23 @@
 // no direct access
 defined('_JEXEC') or die;
 $hiddenPhoneClass = $this->bootstrapHelper->getClassMapping('hidden-phone');
-$cols = 5;
+$cols = 4;
 ?>
 <div id="eb-registrants-list-page" class="eb-container">
 <h1 class="eb_title"><?php echo JText::_('EB_REGISTRANT_LIST'); ?></h1>
 <?php
 if (count($this->items))
 {
+	$showNumberRegistrants = false;
+	foreach($this->items as $item)
+	{
+		if ($item->number_registrants > 1)
+		{
+			$showNumberRegistrants = true;
+			$cols++;
+			break;
+		}
+	}
 ?>
 	<table class="table table-striped table-bordered table-condensed">
 	<thead>
@@ -30,9 +40,16 @@ if (count($this->items))
 			<th>
 				<?php echo JText::_('EB_LAST_NAME'); ?>
 			</th>
-			<th class="<?php echo $hiddenPhoneClass; ?>">
-				<?php echo JText::_('EB_REGISTRANTS'); ?>
-			</th>
+			<?php
+				if ($showNumberRegistrants)
+				{
+				?>
+					<th class="<?php echo $hiddenPhoneClass; ?>">
+						<?php echo JText::_('EB_REGISTRANTS'); ?>
+					</th>
+				<?php
+				}
+			?>
 			<th class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo JText::_('EB_REGISTRATION_DATE'); ?>
 			</th>
@@ -82,9 +99,16 @@ if (count($this->items))
 			<td>
 				<?php echo $row->last_name ; ?>
 			</td>
-			<td class="<?php echo $hiddenPhoneClass; ?>">
-				<?php echo $row->number_registrants ; ?>
-			</td>
+			<?php
+				if ($showNumberRegistrants)
+				{
+				?>
+					<td class="<?php echo $hiddenPhoneClass; ?>">
+						<?php echo $row->number_registrants ; ?>
+					</td>
+				<?php
+				}
+			?>
 			<td class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo JHtml::_('date', $row->register_date, $this->config->date_format) ; ?>
 			</td>
