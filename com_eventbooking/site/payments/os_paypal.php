@@ -38,7 +38,6 @@ class os_paypal extends RADPayment
 		$this->setParameter('no_shipping', 1);
 		$this->setParameter('no_note', 1);
 		$this->setParameter('lc', 'US');
-		$this->setParameter('currency_code', $params->get('paypal_currency', 'USD'));
 		$this->setParameter('charset', 'utf-8');
 		$this->setParameter('tax', 0);
 	}
@@ -59,11 +58,8 @@ class os_paypal extends RADPayment
 		{
 			$this->setParameter('business', $event->paypal_email);
 		}
-		if ($event->currency_code)
-		{
-			$this->setParameter('currency_code', $event->currency_code);
-		}
 
+		$this->setParameter('currency_code', $data['currency']);
 		$this->setParameter('item_name', $data['item_name']);
 		$this->setParameter('amount', round($data['amount'], 2));
 		$this->setParameter('custom', $row->id);
@@ -79,6 +75,7 @@ class os_paypal extends RADPayment
 		$this->setParameter('state', $row->state);
 		$this->setParameter('zip', $row->zip);
 		$this->setParameter('email', $row->email);
+
 
 		$this->renderRedirectForm();
 	}
@@ -121,6 +118,41 @@ class os_paypal extends RADPayment
 		}
 	}
 
+	/**
+	 * Get list of supported currencies
+	 *
+	 * @return array
+	 */
+	public function getSupportedCurrencies()
+	{
+		return array(
+			'AUD',
+			'BRL',
+			'CAD',
+			'CZK',
+			'DKK',
+			'EUR',
+			'HKD',
+			'HUF',
+			'ILS',
+			'JPY',
+			'MYR',
+			'MXN',
+			'NOK',
+			'NZD',
+			'PHP',
+			'PLN',
+			'GBP',
+			'RUB',
+			'SGD',
+			'SEK',
+			'CHF',
+			'TWD',
+			'THB',
+			'TRY',
+			'USD'
+		);
+	}
 	/**
 	 * Validate the post data from paypal to our server
 	 *

@@ -349,6 +349,32 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Convert payment amount to USD currency in case the currency is not supported by the payment gateway
+	 *
+	 * @param $amount
+	 * @param $currency
+	 *
+	 * @return float
+	 */
+	public static function convertAmountToUSD($amount, $currency)
+	{
+		$http     = JHttpFactory::getHttp();
+		$url      = 'http://finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s=USD' . $currency . '=X';
+		$response = $http->get($url);
+		if ($response->code == 200)
+		{
+			$currencyData = explode(',', $response->body);
+			$rate         = floatval($currencyData[1]);
+			if ($rate > 0)
+			{
+				$amount = $amount / $rate;
+			}
+		}
+
+		return round($amount, 2);
+	}
+
+	/**
 	 * Synchronize Events Booking database to support multilingual
 	 */
 	public static function setupMultilingual()
@@ -546,7 +572,7 @@ class EventbookingHelper
 	 */
 	public static function buildEventTags($event, $config)
 	{
-		$replaces = array();
+		$replaces                      = array();
 		$replaces['event_title']       = $event->title;
 		$replaces['event_date']        = JHtml::_('date', $event->event_date, $config->event_date_format, null);
 		$replaces['event_end_date']    = JHtml::_('date', $event->event_end_date, $config->event_date_format, null);
@@ -554,7 +580,7 @@ class EventbookingHelper
 		$replaces['description']       = $event->description;
 		if ($event->location_id > 0)
 		{
-			$rowLocation = EventbookingHelperDatabase::getLocation($event->location_id);
+			$rowLocation         = EventbookingHelperDatabase::getLocation($event->location_id);
 			$locationInformation = array();
 			if ($rowLocation->address)
 			{
@@ -576,12 +602,12 @@ class EventbookingHelper
 			{
 				$locationInformation[] = $rowLocation->country;
 			}
-			$replaces['location'] = $rowLocation->name . ' (' . implode(', ', $locationInformation) . ')';
+			$replaces['location']      = $rowLocation->name . ' (' . implode(', ', $locationInformation) . ')';
 			$replaces['location_name'] = $rowLocation->name;
 		}
 		else
 		{
-			$replaces['location'] = '';
+			$replaces['location']      = '';
 			$replaces['location_name'] = '';
 		}
 
@@ -632,7 +658,7 @@ class EventbookingHelper
 		if ($config->event_custom_field && file_exists(JPATH_ROOT . '/components/com_eventbooking/fields.xml'))
 		{
 			EventbookingHelperData::prepareCustomFieldsData(array($event));
-			foreach($event->paramData as $customFieldName => $param)
+			foreach ($event->paramData as $customFieldName => $param)
 			{
 				$replaces[$customFieldName] = $param['value'];
 			}
@@ -663,8 +689,8 @@ class EventbookingHelper
 				$date = JFactory::getDate($fieldValue);
 				if ($date)
 				{
-					$dateFormat  = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
-					$dateFormat  = str_replace('%', '', $dateFormat);
+					$dateFormat = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
+					$dateFormat = str_replace('%', '', $dateFormat);
 					$fieldValue = $date->format($dateFormat);
 				}
 			}
@@ -718,12 +744,12 @@ class EventbookingHelper
 			$db->setQuery($sql);
 			$lateFee = $db->loadResult();
 
-			$amount         = $totalAmount - $discountAmount + $paymentProcessingFee + $taxAmount + $lateFee;
+			$amount = $totalAmount - $discountAmount + $paymentProcessingFee + $taxAmount + $lateFee;
 
 			$replaces['total_amount']           = EventbookingHelper::formatCurrency($totalAmount, $config, $event->currency_symbol);
 			$replaces['tax_amount']             = EventbookingHelper::formatCurrency($taxAmount, $config, $event->currency_symbol);
 			$replaces['discount_amount']        = EventbookingHelper::formatCurrency($discountAmount, $config, $event->currency_symbol);
-			$replaces['late_fee']        = EventbookingHelper::formatCurrency($lateFee, $config, $event->currency_symbol);
+			$replaces['late_fee']               = EventbookingHelper::formatCurrency($lateFee, $config, $event->currency_symbol);
 			$replaces['payment_processing_fee'] = EventbookingHelper::formatCurrency($paymentProcessingFee, $config, $event->currency_symbol);
 			$replaces['amount']                 = EventbookingHelper::formatCurrency($amount, $config, $event->currency_symbol);
 
@@ -788,7 +814,7 @@ class EventbookingHelper
 		$replaces['invoice_number']     = $row->invoice_number;
 		$replaces['invoice_number']     = EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config);
 		$replaces['transaction_id']     = $row->transaction_id;
-		$replaces['id']     			= $row->id;
+		$replaces['id']                 = $row->id;
 		$replaces['date']               = JHtml::_('date', 'Now', $config->date_format);
 		$method                         = os_payments::loadPaymentMethod($row->payment_method);
 		if ($method)
@@ -1049,7 +1075,7 @@ class EventbookingHelper
 				$extraFee += $memberExtraFee;
 				$membersTotalAmount[$i]    = $rate + $memberExtraFee;
 				$membersDiscountAmount[$i] = 0;
-				$membersLateFee[$i] = 0;
+				$membersLateFee[$i]        = 0;
 				$membersForm[$i]           = $memberForm;
 			}
 		}
@@ -1365,7 +1391,7 @@ class EventbookingHelper
 					$query->clear();
 					$query->select('event_id')
 						->from('#__eb_coupon_events')
-						->where('coupon_id = '. $coupon->id);
+						->where('coupon_id = ' . $coupon->id);
 					$db->setQuery($query);
 					$couponDiscountedEventIds = $db->loadColumn();
 				}
@@ -1385,8 +1411,8 @@ class EventbookingHelper
 			$eventId               = (int) $items[$i];
 			$quantity              = (int) $quantities[$i];
 			$recordsData[$eventId] = array();
-			$event = EventbookingHelperDatabase::getEvent($eventId);
-			$rate  = self::getRegistrationRate($eventId, $quantity);
+			$event                 = EventbookingHelperDatabase::getEvent($eventId);
+			$rate                  = self::getRegistrationRate($eventId, $quantity);
 			if ($i == 0)
 			{
 				$registrantTotalAmount = $rate * $quantity + $feeAmount;
@@ -1460,7 +1486,7 @@ class EventbookingHelper
 				else
 				{
 
-					$registrantLateFee = $quantity*$event->late_fee_amount;
+					$registrantLateFee = $quantity * $event->late_fee_amount;
 				}
 			}
 
@@ -1502,7 +1528,7 @@ class EventbookingHelper
 			}
 			$totalAmount += $registrantTotalAmount;
 			$discountAmount += $registrantDiscount;
-			$lateFee        += $registrantLateFee;
+			$lateFee += $registrantLateFee;
 			$depositAmount += $registrantDepositAmount;
 			$taxAmount += $registrantTaxAmount;
 			$amount += $registrantAmount;
@@ -1676,7 +1702,7 @@ class EventbookingHelper
 	 */
 	public static function getFormData($rowFields, $eventId, $userId, $config)
 	{
-		$data  = array();
+		$data = array();
 		if ($userId)
 		{
 			$mappings = array();
@@ -1822,11 +1848,11 @@ class EventbookingHelper
 	 */
 	public static function validateEngine()
 	{
-		$config = self::getConfig();
+		$config     = self::getConfig();
 		$dateFormat = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
-		$dateFormat = str_replace('%', '', $dateFormat);		
-		$dateNow = JHtml::_('date', JFactory::getDate(), $dateFormat);		
-					
+		$dateFormat = str_replace('%', '', $dateFormat);
+		$dateNow    = JHtml::_('date', JFactory::getDate(), $dateFormat);
+
 		//validate[required,custom[integer],min[-5]] text-input
 		$validClass = array(
 			"",
@@ -2192,7 +2218,7 @@ class EventbookingHelper
 				$query->clear();
 				$query->select('*')
 					->from('#__eb_registrants')
-					->where('group_id = '. $row->id)
+					->where('group_id = ' . $row->id)
 					->order('id');
 				$db->setQuery($query);
 				$rowMembers         = $db->loadObjectList();
@@ -2355,7 +2381,7 @@ class EventbookingHelper
 	/**
 	 * Get total events of a category
 	 *
-	 * @param int     $categoryId
+	 * @param int  $categoryId
 	 * @param bool $includeChildren
 	 *
 	 * @return int
@@ -2457,7 +2483,8 @@ class EventbookingHelper
 		if (empty($event)
 			|| !$event->published
 			|| !in_array($event->access, $accessLevels)
-			|| !in_array($event->registration_access, $accessLevels))
+			|| !in_array($event->registration_access, $accessLevels)
+		)
 		{
 			return false;
 		}
@@ -2630,12 +2657,12 @@ class EventbookingHelper
 	 */
 	public static function getRegistrationRate($eventId, $numberRegistrants)
 	{
-		$db  = JFactory::getDbo();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('price')
 			->from('#__eb_event_group_prices')
-			->where('event_id = '. $eventId)
-			->where('registrant_number <= '.$numberRegistrants)
+			->where('event_id = ' . $eventId)
+			->where('registrant_number <= ' . $numberRegistrants)
 			->order('registrant_number DESC');
 		$db->setQuery($query, 0, 1);
 		$rate = $db->loadResult();
@@ -2644,7 +2671,7 @@ class EventbookingHelper
 			$query->clear();
 			$query->select('individual_price')
 				->from('#__eb_events')
-				->where('id = '. $eventId);
+				->where('id = ' . $eventId);
 			$db->setQuery($query);
 			$rate = $db->loadResult();
 		}
@@ -2903,13 +2930,13 @@ class EventbookingHelper
 			$subject = str_replace("[$key]", $value, $subject);
 			$body    = str_replace("[$key]", $value, $body);
 		}
-		$body        = self::convertImgTags($body);
+		$body = self::convertImgTags($body);
 
 		if (strpos($body, '[QRCODE]') !== false)
 		{
 			EventbookingHelper::generateQrcode($row->id);
-			$imgTag = '<img src="'.EventbookingHelper::getSiteUrl().'media/com_eventbooking/qrcodes/'.$row->id.'.png" border="0" />';
-			$body = str_replace("[QRCODE]", $imgTag, $body);
+			$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+			$body   = str_replace("[QRCODE]", $imgTag, $body);
 		}
 
 		$attachments = array();
@@ -2938,7 +2965,7 @@ class EventbookingHelper
 			if ($event->attachment)
 			{
 				$attachmentFiles = array($event->attachment);
-				$attachments[] = JPATH_ROOT . '/media/com_eventbooking/' . $event->attachment;
+				$attachments[]   = JPATH_ROOT . '/media/com_eventbooking/' . $event->attachment;
 			}
 			else
 			{
@@ -2955,7 +2982,7 @@ class EventbookingHelper
 			foreach ($attachmentFiles as $attachmentFile)
 			{
 				$files = explode('|', $attachmentFile);
-				foreach($files as $file)
+				foreach ($files as $file)
 				{
 					$filePath = JPATH_ROOT . '/media/com_eventbooking/' . $file;
 					if (file_exists($filePath))
@@ -2991,7 +3018,7 @@ class EventbookingHelper
 			$query->clear();
 			$query->select('*')
 				->from('#__eb_registrants')
-				->where('group_id = '. $row->id)
+				->where('group_id = ' . $row->id)
 				->order('id');
 			$db->setQuery($query);
 			$rowMembers = $db->loadObjectList();
@@ -3269,8 +3296,8 @@ class EventbookingHelper
 		if (strpos($body, '[QRCODE]') !== false)
 		{
 			EventbookingHelper::generateQrcode($row->id);
-			$imgTag = '<img src="'.EventbookingHelper::getSiteUrl().'media/com_eventbooking/qrcodes/'.$row->id.'.png" border="0" />';
-			$body = str_replace("[QRCODE]", $imgTag, $body);
+			$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+			$body   = str_replace("[QRCODE]", $imgTag, $body);
 		}
 
 		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
@@ -3492,7 +3519,7 @@ class EventbookingHelper
 				$emailSubject = $message->reminder_email_subject;
 			}
 
-			$eventTitle = $row->{'title'.$fieldSuffix};
+			$eventTitle = $row->{'title' . $fieldSuffix};
 
 			$emailSubject = str_replace('[EVENT_TITLE]', $eventTitle, $emailSubject);
 
@@ -3594,12 +3621,12 @@ class EventbookingHelper
 		static $colors;
 		if (!isset($colors[$eventId]))
 		{
-			$db  = JFactory::getDbo();
+			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('color_code')
 				->from('#__eb_categories AS a')
 				->innerJoin('#__eb_event_categories AS b ON (a.id = b.category_id AND b.main_category = 1)')
-				->where('b.event_id = '. $eventId);
+				->where('b.event_id = ' . $eventId);
 			$db->setQuery($query);
 			$colors[$eventId] = $db->loadResult();
 		}
@@ -3672,7 +3699,7 @@ class EventbookingHelper
 			self::getInstalledVersion() . ', Copyright (C) 2010 - ' . date('Y') .
 			' <a href="http://joomdonation.com" target="_blank"><strong>Ossolution Team</strong></a></div>';
 	}
-		
+
 	/**
 	 * Get version number of GD version installed
 	 * Enter description here ...
@@ -3909,8 +3936,10 @@ class EventbookingHelper
 
 		return false;
 	}
+
 	/**
 	 * Generate user selection box
+	 *
 	 * @param int    $userId
 	 * @param string $fieldName
 	 * @param int    $registrantId
@@ -4122,7 +4151,7 @@ class EventbookingHelper
 		if (strpos($invoiceOutput, '[QRCODE]') !== false)
 		{
 			EventbookingHelper::generateQrcode($row->id);
-			$imgTag = '<img src="media/com_eventbooking/qrcodes/'.$row->id.'.png" border="0" />';
+			$imgTag        = '<img src="media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
 			$invoiceOutput = str_replace("[QRCODE]", $imgTag, $invoiceOutput);
 		}
 
@@ -4514,7 +4543,7 @@ class EventbookingHelper
 
 	public static function canChangeEventStatus($eventId)
 	{
-		$user  = JFactory::getUser();
+		$user = JFactory::getUser();
 
 		if ($user->get('guest'))
 		{
@@ -4793,7 +4822,7 @@ class EventbookingHelper
 	 */
 	public static function getMonthlyRecurringEventDates($startDate, $endDate, $monthlyFrequency, $numberOccurrences, $monthDays)
 	{
-		$eventDates = array();
+		$eventDates         = array();
 		$timeZone           = new DateTimeZone(JFactory::getConfig()->get('offset'));
 		$recurringStartDate = new Datetime($startDate, $timeZone);
 		$date               = clone $recurringStartDate;
@@ -4859,7 +4888,7 @@ class EventbookingHelper
 	 */
 	public static function getMonthlyRecurringAtDayInWeekEventDates($startDate, $endDate, $monthlyFrequency, $numberOccurrences, $n, $day)
 	{
-		$eventDates = array();
+		$eventDates         = array();
 		$timeZone           = new DateTimeZone(JFactory::getConfig()->get('offset'));
 		$recurringStartDate = new Datetime($startDate, $timeZone);
 		$date               = clone $recurringStartDate;
@@ -4872,7 +4901,7 @@ class EventbookingHelper
 			{
 				$currentMonth = $date->format('M');
 				$currentYear  = $date->format('Y');
-				$timeString = "$n $day";
+				$timeString   = "$n $day";
 				$timeString .= " of $currentMonth $currentYear";
 				$date->modify($timeString);
 				$date->setTime($recurringStartDate->format('H'), $recurringStartDate->format('i'), 0);
@@ -4892,7 +4921,7 @@ class EventbookingHelper
 			{
 				$currentMonth = $date->format('M');
 				$currentYear  = $date->format('Y');
-				$timeString = "$n $day";
+				$timeString   = "$n $day";
 				$timeString .= " of $currentMonth $currentYear";
 				$date->modify($timeString);
 				$date->setTime($recurringStartDate->format('H'), $recurringStartDate->format('i'), 0);
@@ -5000,10 +5029,10 @@ class EventbookingHelper
 		{
 			foreach ($children[$id] as $v)
 			{
-				$id = $v->id;
-				$v->level = $level;
+				$id        = $v->id;
+				$v->level  = $level;
 				$list[$id] = $v;
-				$list = self::calculateCategoriesLevel($id, $list, $children, $maxlevel, $level + 1);
+				$list      = self::calculateCategoriesLevel($id, $list, $children, $maxlevel, $level + 1);
 			}
 		}
 

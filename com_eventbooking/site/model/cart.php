@@ -110,6 +110,10 @@ class EventbookingModelCart extends RADModel
 		$recordsData = $fees['records_data'];
 		$cartId      = 0;
 		$couponId    = 0;
+
+		$dispatcher = JEventDispatcher::getInstance();
+		JPluginHelper::importPlugin('eventbooking');
+
 		// Store list of registrants
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
@@ -182,8 +186,6 @@ class EventbookingModelCart extends RADModel
 			{
 				$couponId = $row->coupon_id;
 			}
-			JPluginHelper::importPlugin('eventbooking');
-			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('onAfterStoreRegistrant', array($row));
 		}
 
@@ -244,6 +246,20 @@ class EventbookingModelCart extends RADModel
 			$db->setQuery($query);
 			$params       = new JRegistry($db->loadResult());
 			$paymentClass = new $paymentMethod($params);
+
+			// Convert payment amount to USD if the currency is not supported by payment gateway
+			$currency = $config->currency_code;
+			if (method_exists($paymentClass, 'getSupportedCurrencies'))
+			{
+				$currencies = $paymentClass->getSupportedCurrencies();
+				if (!in_array($currency, $currencies))
+				{
+					$data['amount'] = EventbookingHelper::convertAmountToUSD($data['amount'], $currency);
+					$currency       = 'USD';
+				}
+			}
+			$data['currency'] = $currency;
+
 			$paymentClass->processPayment($row, $data);
 		}
 		else
@@ -262,8 +278,6 @@ class EventbookingModelCart extends RADModel
 			$db->setQuery($query);
 			$db->execute();
 			EventbookingHelper::sendEmails($row, $config);
-			JPluginHelper::importPlugin('eventbooking');
-			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
 
 			return 1;
