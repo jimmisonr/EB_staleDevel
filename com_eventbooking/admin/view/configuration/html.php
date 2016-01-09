@@ -107,7 +107,16 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options[] = JHtml::_('select.option', '%d/%m/%Y', 'd/m/Y');
 		$options[] = JHtml::_('select.option', '%d.%m.%Y', 'd.m.Y');
 		$lists['date_field_format'] = JHtml::_('select.genericlist', $options, 'date_field_format', '', 'value', 'text', isset($config->date_field_format) ? $config->date_field_format : 'Y-m-d');
-		
+
+		$currencies = require_once JPATH_ROOT.'/components/com_eventbooking/helper/currencies.php';
+		$options                  = array();
+		$options[] = JHtml::_('select.option', '',  JText::_('EB_SELECT_CURRENCY'));
+		foreach($currencies as $code => $title)
+		{
+			$options[] = JHtml::_('select.option', $code, $title);
+		}
+		$lists['currency_code'] = JHtml::_('select.genericlist', $options, 'currency_code', '', 'value', 'text', isset($config->currency_code) ? $config->currency_code : 'USD');
+
 		$options                  = array();
 		$options[]                = JHtml::_('select.option', 0, JText::_('EB_ALL_NESTED_CATEGORIES'));
 		$options[]                = JHtml::_('select.option', 1, JText::_('EB_ONLY_LAST_ONE'));

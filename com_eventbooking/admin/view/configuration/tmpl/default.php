@@ -15,6 +15,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 $editor = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 $config = $this->config;
+JHtml::_('formbehavior.chosen', 'select');
 ?>
 <div class="row-fluid">
 <form action="index.php?option=com_eventbooking&view=configuration" method="post" name="adminForm" id="adminForm" class="form-horizontal eb-configuration">
@@ -442,6 +443,14 @@ $config = $this->config;
 				</div>
 				<div class="controls">
 					<?php echo $this->lists['date_field_format']; ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('currency_code', JText::_('EB_CURRENCY_CODE')); ?>
+				</div>
+				<div class="controls">
+					<?php echo $this->lists['currency_code']; ?>
 				</div>
 			</div>
 			<div class="control-group">
