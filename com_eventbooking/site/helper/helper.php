@@ -3190,6 +3190,13 @@ class EventbookingHelper
 		}
 		$body = self::convertImgTags($body);
 
+		if (strpos($body, '[QRCODE]') !== false)
+		{
+			EventbookingHelper::generateQrcode($row->id);
+			$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+			$body   = str_replace("[QRCODE]", $imgTag, $body);
+		}
+
 		for ($i = 0, $n = count($emails); $i < $n; $i++)
 		{
 			$email = $emails[$i];
