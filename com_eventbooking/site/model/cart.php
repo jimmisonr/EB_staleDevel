@@ -260,6 +260,9 @@ class EventbookingModelCart extends RADModel
 			}
 			$data['currency'] = $currency;
 
+			$country         = empty($data['country']) ? $config->default_country : $data['country'];
+			$data['country'] = EventbookingHelper::getCountryCode($country);
+
 			$paymentClass->processPayment($row, $data);
 		}
 		else

@@ -69,7 +69,7 @@ class os_paypal extends RADPayment
 		$this->setParameter('address1', $row->address);
 		$this->setParameter('address2', $row->address2);
 		$this->setParameter('city', $row->city);
-		$this->setParameter('country', EventbookingHelper::getCountryCode($row->country));
+		$this->setParameter('country', $data['country']);
 		$this->setParameter('first_name', $row->first_name);
 		$this->setParameter('last_name', $row->last_name);
 		$this->setParameter('state', $row->state);
@@ -153,6 +153,7 @@ class os_paypal extends RADPayment
 			'USD'
 		);
 	}
+
 	/**
 	 * Validate the post data from paypal to our server
 	 *
