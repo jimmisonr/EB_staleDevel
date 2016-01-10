@@ -159,7 +159,6 @@ class RADPaymentOmnipay extends OmnipayPayment
 		$Itemid  = JFactory::getApplication()->input->getInt('Itemid', 0);
 		$siteUrl = JUri::base();
 		$request->setCancelUrl($siteUrl . 'index.php?option=com_eventbooking&task=cancel&id=' . $row->id . '&Itemid=' . $Itemid);
-		$request->setNotifyUrl($siteUrl . 'index.php?option=com_eventbooking&task=payment_confirm&id=' . $row->id . '&payment_method=' . $this->name . '&Itemid=' . $Itemid);
 		$request->setReturnUrl($siteUrl . 'index.php?option=com_eventbooking&task=payment_confirm&id=' . $row->id . '&payment_method=' . $this->name . '&Itemid=' . $Itemid);
 		$request->setAmount($data['amount']);
 		$request->setCurrency($data['currency']);
