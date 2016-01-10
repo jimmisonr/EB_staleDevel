@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install version="1.0" type="plugin" group="payment">
 	<name>os_worldpay</name>
-	<title>Worldpay</title>	
-	<author>Tuan Pham Ngoc</author>
-	<creationDate>09-03-2010</creationDate>
-	<copyright>Copyright 2007-2010 Ossolution Team</copyright>
-	<license>http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU/GPL version 2</license>
-	<authorEmail>contact@joomdonation.com</authorEmail>
-	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>1.0</version>
+	<title>Worldpay</title>
+    <author>Tuan Pham Ngoc</author>
+    <creationDate>07-01-2016</creationDate>
+    <copyright>Copyright 2010-2016 Ossolution Team</copyright>
+    <license>http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU/GPL version 2</license>
+    <authorEmail>contact@joomdonation.com</authorEmail>
+    <authorUrl>www.joomdonation.com</authorUrl>
+    <version>2.3.0</version>
 	<description>Worldpay Payment Plugin For Events Booking Extension</description>	
 	<config>	
 		<fields name="params">
@@ -18,6 +18,8 @@
 					<option value="1">Live Mode</option>
 				</field>
 				<field name="wp_installation_id" type="text" size="50" label="Worldpay Installation ID" description="Enter your Worldpay Installation ID" default=""></field>
+                <field name="wp_callback_password" type="text" size="50" label="Callback Password" description="" default=""></field>
+				
                 <field name="payment_fee_amount" type="text" label="Payment Processing Fee ($)" description=""></field>
                 <field name="payment_fee_percent" type="text" label="Payment Processing Fee (%)" description=""></field>
 			</fieldset>			
@@ -26,9 +28,6 @@
 	<files>
 		<filename>os_worldpay.php</filename>				
 	</files>
-	<languages>
-		<filename>en-GB.os_worldpay.ini</filename>		
-	</languages>
 	<installsql />
 	<installfile />	
 </install>
