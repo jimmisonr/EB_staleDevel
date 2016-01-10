@@ -65,9 +65,9 @@ class RADPaymentOmnipay extends OmnipayPayment
 	 *
 	 * @return void
 	 */
-	protected function setPaymentSuccessUrl($row, $data)
+	protected function setPaymentSuccessUrl($id, $data = array())
 	{
-		$Itemid = JFactory::getApplication()->input->getInt('Itemid');
+		$Itemid = JFactory::getApplication()->input->get->getInt('Itemid', EventbookingHelper::getItemid());
 
 		$this->paymentSuccessUrl = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false, false);
 	}
@@ -77,16 +77,20 @@ class RADPaymentOmnipay extends OmnipayPayment
 	 * This method need to be implemented by the payment plugin class. It needs to set url which users will be
 	 * redirected to when the payment is not success for some reasons. The url is stored in paymentFailureUrl property
 	 *
-	 * @param JTable $row
-	 * @param array  $data
+	 * @param int   $id
+	 * @param array $data
 	 *
 	 * @return void
 	 */
-	protected function setPaymentFailureUrl($row, $data)
+	protected function setPaymentFailureUrl($id, $data = array())
 	{
-		$Itemid = JFactory::getApplication()->input->getInt('Itemid', 0);
+		if (empty($id))
+		{
+			$id = JFactory::getApplication()->input->getInt('id', 0);
+		}
+		$Itemid = JFactory::getApplication()->input->get->getInt('Itemid', EventbookingHelper::getItemid());
 
-		$this->paymentFailureUrl = JRoute::_('index.php?option=com_eventbooking&view=failure&id=' . $row->id . '&Itemid=' . $Itemid, false, false);
+		$this->paymentFailureUrl = JRoute::_('index.php?option=com_eventbooking&view=failure&id=' . $id . '&Itemid=' . $Itemid, false, false);
 	}
 
 	/**
@@ -160,6 +164,7 @@ class RADPaymentOmnipay extends OmnipayPayment
 		$siteUrl = JUri::base();
 		$request->setCancelUrl($siteUrl . 'index.php?option=com_eventbooking&task=cancel&id=' . $row->id . '&Itemid=' . $Itemid);
 		$request->setReturnUrl($siteUrl . 'index.php?option=com_eventbooking&task=payment_confirm&id=' . $row->id . '&payment_method=' . $this->name . '&Itemid=' . $Itemid);
+		$request->setNotifyUrl($siteUrl . 'index.php?option=com_eventbooking&task=payment_confirm&id=' . $row->id . '&payment_method=' . $this->name . '&notify=1&Itemid=' . $Itemid);
 		$request->setAmount($data['amount']);
 		$request->setCurrency($data['currency']);
 		$request->setDescription($data['item_name']);
