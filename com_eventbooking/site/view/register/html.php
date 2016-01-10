@@ -37,7 +37,8 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		if (empty($event)
 			|| !$event->published
 			|| !in_array($event->access, $accessLevels)
-			|| !in_array($event->registration_access, $accessLevels))
+			|| !in_array($event->registration_access, $accessLevels)
+		)
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('EB_ERROR_REGISTRATION'));
 		}
@@ -184,10 +185,24 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$showPaymentFee = false;
 		foreach ($methods as $method)
 		{
+			if ($method->getName() == 'os_stripe')
+			{
+				$stripePlugin = os_payments::loadPaymentMethod('os_stripe');
+				$params       = new JRegistry($stripePlugin->params);
+				$publicKey    = $params->get('stripe_public_key');
+				if ($publicKey)
+				{
+					$document = JFactory::getDocument();
+					$document->addScript('https://js.stripe.com/v2/');
+					$document->addScriptDeclaration(
+						"Stripe.setPublishableKey('$publicKey');"
+					);
+					$this->stripePublicKey = $publicKey;
+				}
+			}
 			if ($method->paymentFee)
 			{
 				$showPaymentFee = true;
-				break;
 			}
 		}
 
@@ -234,7 +249,6 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		if ($waitingList)
 		{
 			$enableCoupon   = false;
-			$idealEnabled   = false;
 			$depositPayment = false;
 			$paymentType    = false;
 			$showPaymentFee = false;
@@ -488,10 +502,24 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$showPaymentFee = false;
 		foreach ($methods as $method)
 		{
+			if ($method->getName() == 'os_stripe')
+			{
+				$stripePlugin = os_payments::loadPaymentMethod('os_stripe');
+				$params       = new JRegistry($stripePlugin->params);
+				$publicKey    = $params->get('stripe_public_key');
+				if ($publicKey)
+				{
+					$document = JFactory::getDocument();
+					$document->addScript('https://js.stripe.com/v2/');
+					$document->addScriptDeclaration(
+						"Stripe.setPublishableKey('$publicKey');"
+					);
+					$this->stripePublicKey = $publicKey;
+				}
+			}
 			if ($method->paymentFee)
 			{
 				$showPaymentFee = true;
-				break;
 			}
 		}
 

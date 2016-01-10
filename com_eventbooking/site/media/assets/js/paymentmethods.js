@@ -498,3 +498,26 @@ function showDepositAmount(paymentTypeSelect)
         }
     });
 }
+
+var stripeResponseHandler = function(status, response) {
+    Eb.jQuery(function($) {
+        var $form = $('#adminForm');
+        if (response.error) {
+            // Show the errors on the form
+            //$form.find('.payment-errors').text(response.error.message);
+            alert(response.error.message);
+            $form.find('#btn-submit').prop('disabled', false);
+        } else {
+            // token contains id, last4, and card type
+            var token = response.id;
+            // Empty card data since we now have token
+            $('#x_card_num').val('');
+            $('#x_card_code').val('');
+            $('#card_holder_name').val('');
+            // Insert the token into the form so it gets submitted to the server
+            $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+            // and re-submit
+            $form.get(0).submit();
+        }
+    });
+};
