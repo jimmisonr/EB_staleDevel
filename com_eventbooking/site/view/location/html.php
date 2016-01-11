@@ -45,7 +45,10 @@ class EventbookingViewLocationHtml extends RADViewHtml
 		{
 			EventbookingHelperData::prepareCustomFieldsData($items);
 		}
-
+		if ($config->show_list_of_registrants)
+		{
+			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
+		}
 		if ($config->multiple_booking)
 		{
 			if ($this->deviceType == 'mobile')
