@@ -690,7 +690,14 @@ else
 					 iframe: true,
 					 opacity: 0.3
 				});
-				$('html, body').animate({scrollTop:$('#eb-group-members-information').position().top}, 'slow');
+				<?php
+					if ($this->config->collect_member_information)
+					{
+					?>
+						$('html, body').animate({scrollTop:$('#eb-group-members-information').position().top}, 'slow');
+					<?php
+					}
+				?>
 			})
 	</script>
 </form>
