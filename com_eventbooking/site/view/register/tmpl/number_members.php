@@ -74,8 +74,8 @@ if (strlen($msg))
 							else
 							{
 							?>
-								$('#eb-group-billing .eb-form-content').html(html);
 								$('#eb-number-group-members .eb-form-content').slideUp('slow');
+								$('#eb-group-billing .eb-form-content').html(html);
 								$('#eb-group-billing .eb-form-content').slideDown('slow');
 								if ($('#email').val())
 								{
