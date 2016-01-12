@@ -372,6 +372,7 @@ form.form-horizontal .control-label, form.form-horizontal .control-label label {
 }
 
 .eb-form-content {
+    display: none;
     padding: 0 0 15px;
 }
 
