@@ -22,10 +22,11 @@ EventbookingHelperJquery::colorbox('a.eb-modal');
 <div id="eb-upcoming-events-page-default" class="eb-container">
 <h1 class="eb-page-heading"><?php echo $this->params->get('page_heading') ? $this->params->get('page_heading') : JText::_('EB_UPCOMING_EVENTS'); ?></h1>
 <?php
-	if (EventbookingHelper::isValidMessage($this->introText))
+	$message = empty($this->category->description) ? $this->introText : $this->category->description;
+	if (EventbookingHelper::isValidMessage($message))
 	{
 	?>
-		<div class="eb-description"><?php echo $this->introText; ?></div>
+		<div class="eb-description"><?php echo $message; ?></div>
 	<?php
 	}
 ?>
