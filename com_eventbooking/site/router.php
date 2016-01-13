@@ -40,7 +40,6 @@ function EventbookingBuildRoute(&$query)
 	// If the given menu item doesn't belong to our component, unset the Itemid from query array
 	if ($menuItemGiven && isset($menuItem) && $menuItem->component != 'com_eventbooking')
 	{
-		$menuItemGiven = false;
 		unset($query['Itemid']);
 	}
 
@@ -80,7 +79,7 @@ function EventbookingBuildRoute(&$query)
 
 	//Dealing with the catid parameter in the link to event.
 	if (($menuItem instanceof stdClass)
-		&& ($menuItem->query['view'] == 'category')
+		&& (in_array($menuItem->query['view'], array('category', 'upcomingevents')))
 		&& isset($query['catid'])
 		&& $menuItem->query['id'] == intval($query['catid'])
 	)

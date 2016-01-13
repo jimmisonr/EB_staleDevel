@@ -45,7 +45,7 @@ class EventbookingHelperRoute
 		if ($catId)
 		{
 			$needles['category'] = self::getCategoriesPath($catId, 'id', false);
-			$needles['categories'] = $needles['category'];
+			$needles['categories'] = $needles['upcomingevents'] = $needles['category'];
 			$link .= '&catid=' . $catId;
 		}
 		
