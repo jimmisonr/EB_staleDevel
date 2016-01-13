@@ -168,5 +168,21 @@ class RADPaymentOmnipay extends OmnipayPayment
 		$request->setAmount($data['amount']);
 		$request->setCurrency($data['currency']);
 		$request->setDescription($data['item_name']);
+
+		if (empty($this->redirectHeading))
+		{
+			$language    = JFactory::getLanguage();
+			$languageKey = 'EB_WAIT_' . strtoupper(substr($this->name, 3));
+			if ($language->hasKey($languageKey))
+			{
+				$redirectHeading = JText::_($languageKey);
+			}
+			else
+			{
+				$redirectHeading = JText::sprintf('EB_REDIRECT_HEADING', $this->getTitle());
+			}
+
+			$this->setRedirectHeading($redirectHeading);
+		}
 	}
 }
