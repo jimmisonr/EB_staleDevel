@@ -4020,28 +4020,19 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Get the invoice number for this subscription record
+	 * Get the invoice number for this registration record
 	 */
 	public static function getInvoiceNumber()
 	{
-		$db  = JFactory::getDbo();
-		$sql = 'SELECT MAX(invoice_number) FROM #__eb_registrants';
-		$db->setQuery($sql);
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('MAX(invoice_number)')
+			->from('#__eb_registrants');
+		$db->setQuery($query);
 		$invoiceNumber = (int) $db->loadResult();
-		if (!$invoiceNumber)
-		{
-			$invoiceNumber = (int) self::getConfigValue('invoice_start_number');
-			if (!$invoiceNumber)
-			{
-				$invoiceNumber = 1;
-			}
-		}
-		else
-		{
-			$invoiceNumber++;
-		}
+		$invoiceNumber++;
 
-		return $invoiceNumber;
+		return max($invoiceNumber, (int) self::getConfigValue('invoice_start_number'));
 	}
 
 	/**
@@ -4049,6 +4040,8 @@ class EventbookingHelper
 	 *
 	 * @param string $invoiceNumber
 	 * @param Object $config
+	 *
+	 * @return string formatted invoice number
 	 */
 	public static function formatInvoiceNumber($invoiceNumber, $config)
 	{
