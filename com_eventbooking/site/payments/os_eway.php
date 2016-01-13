@@ -28,7 +28,7 @@ class os_eway extends RADPaymentOmnipay
 	public function __construct($params, $config = array('type' => 1))
 	{
 		$config['params_map'] = array(
-			'eway_customer_id' => 'customerId',
+			'customerId' => 'eway_customer_id',
 			'testMode'         => 'eway_mode'
 		);
 
