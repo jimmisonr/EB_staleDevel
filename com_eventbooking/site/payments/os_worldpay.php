@@ -12,6 +12,8 @@ defined('_JEXEC') or die();
 
 class os_worldpay extends RADPaymentOmnipay
 {
+	protected $omnipayPackage = 'WorldPay';
+	
 	/**
 	 * Constructor
 	 *
