@@ -269,6 +269,14 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 					</tr>
 					<tr>
 						<td class="key">
+							<?php echo JText::_('EB_FEATURED'); ?>
+						</td>
+						<td>
+							<?php echo $this->lists['featured']; ?>
+						</td>
+					</tr>
+					<tr>
+						<td class="key">
 							<?php echo JText::_('EB_PUBLISHED'); ?>
 						</td>
 						<td>

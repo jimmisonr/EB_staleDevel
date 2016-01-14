@@ -49,7 +49,12 @@ $query->select('a.*, c.name AS location_name')
 	->where('a.published = 1')
 	->where('a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
 	->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')')
-	->order('a.event_date');
+	->order('a.featured DESC, a.event_date');
+
+if ($params->get('only_show_featured_events', 0))
+{
+	$query->where('a.featured = 1');
+}
 
 if ($fieldSuffix)
 {

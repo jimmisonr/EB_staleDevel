@@ -613,6 +613,13 @@ class EventbookingController extends RADControllerAdmin
 		//Events table
 		$fields = array_keys($db->getTableColumns('#__eb_events'));
 
+		if (!in_array('featured', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `featured` TINYINT NOT NULL DEFAULT  '0' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		// Discounts
 		if (!in_array('discount_groups', $fields))
 		{
