@@ -168,7 +168,7 @@ class EventBookingModelRegister extends RADModel
 		$form->storeData($row->id, $data);
 		$data['event_title'] = $event->title;
 		JPluginHelper::importPlugin('eventbooking');
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$dispatcher->trigger('onAfterStoreRegistrant', array($row));
 		if ($row->deposit_amount > 0)
 		{
@@ -208,6 +208,23 @@ class EventBookingModelRegister extends RADModel
 			$db->setQuery($query);
 			$params       = new JRegistry($db->loadResult());
 			$paymentClass = new $paymentMethod($params);
+
+			// Convert payment amount to USD if the currency is not supported by payment gateway
+			$currency = $event->currency_code ? $event->currency_code : $config->currency_code;
+			if (method_exists($paymentClass, 'getSupportedCurrencies'))
+			{
+				$currencies = $paymentClass->getSupportedCurrencies();
+				if (!in_array($currency, $currencies))
+				{
+					$data['amount'] = EventbookingHelper::convertAmountToUSD($data['amount'], $currency);
+					$currency       = 'USD';
+				}
+			}
+			$data['currency'] = $currency;
+
+			$country         = empty($data['country']) ? $config->default_country : $data['country'];
+			$data['country'] = EventbookingHelper::getCountryCode($country);
+
 			$paymentClass->processPayment($row, $data);
 		}
 		else
@@ -218,8 +235,6 @@ class EventBookingModelRegister extends RADModel
 				$row->published    = 1;
 				$row->store();
 				EventbookingHelper::sendEmails($row, $config);
-				JPluginHelper::importPlugin('eventbooking');
-				$dispatcher = JDispatcher::getInstance();
 				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
 
 				return 1;
@@ -420,7 +435,7 @@ class EventBookingModelRegister extends RADModel
 
 		// Trigger onAfterStoreRegistrant event
 		JPluginHelper::importPlugin('eventbooking');
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$dispatcher->trigger('onAfterStoreRegistrant', array($row));
 
 		// Support deposit payment
@@ -467,6 +482,23 @@ class EventBookingModelRegister extends RADModel
 			$db->setQuery($query);
 			$params       = new JRegistry($db->loadResult());
 			$paymentClass = new $paymentMethod($params);
+
+			// Convert payment amount to USD if the currency is not supported by payment gateway
+			$currency = $event->currency_code ? $event->currency_code : $config->currency_code;
+			if (method_exists($paymentClass, 'getSupportedCurrencies'))
+			{
+				$currencies = $paymentClass->getSupportedCurrencies();
+				if (!in_array($currency, $currencies))
+				{
+					$data['amount'] = EventbookingHelper::convertAmountToUSD($data['amount'], $currency);
+					$currency       = 'USD';
+				}
+			}
+			$data['currency'] = $currency;
+
+			$country         = empty($data['country']) ? $config->default_country : $data['country'];
+			$data['country'] = EventbookingHelper::getCountryCode($country);
+
 			$paymentClass->processPayment($row, $data);
 		}
 		else
@@ -481,8 +513,6 @@ class EventBookingModelRegister extends RADModel
 					EventbookingHelper::updateGroupRegistrationRecord($row->id);
 				}
 				EventbookingHelper::sendEmails($row, $config);
-				JPluginHelper::importPlugin('eventbooking');
-				$dispatcher = JDispatcher::getInstance();
 				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
 
 				return 1;

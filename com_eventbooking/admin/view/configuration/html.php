@@ -80,6 +80,19 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['currency_position']        = JHtml::_('select.genericlist', $options, 'currency_position', ' class="inputbox"', 'value', 'text',
 			$config->currency_position);
 
+		// Social sharing options
+		$options                         = array();
+		$options[]                       = JHtml::_('select.option', 'Delicious', JText::_('Delicious'));
+		$options[]                       = JHtml::_('select.option', 'Digg', JText::_('Digg'));
+		$options[]                       = JHtml::_('select.option', 'Facebook', JText::_('Facebook'));
+		$options[]                       = JHtml::_('select.option', 'Google', JText::_('Google'));
+		$options[]                       = JHtml::_('select.option', 'Stumbleupon', JText::_('Stumbleupon'));
+		$options[]                       = JHtml::_('select.option', 'Technorati', JText::_('Technorati'));
+		$options[]                       = JHtml::_('select.option', 'Twitter', JText::_('Twitter'));
+		$options[]                       = JHtml::_('select.option', 'LinkedIn', JText::_('LinkedIn'));
+		$lists['social_sharing_buttons'] = JHtml::_('select.genericlist', $options, 'social_sharing_buttons[]', ' class="inputbox" multiple="multiple" ', 'value', 'text',
+			explode(',', $config->social_sharing_buttons));
+
 		//Default settings when creating new events
 		$options                      = array();
 		$options[]                    = JHtml::_('select.option', 0, JText::_('EB_INDIVIDUAL_GROUP'));
@@ -107,7 +120,16 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options[] = JHtml::_('select.option', '%d/%m/%Y', 'd/m/Y');
 		$options[] = JHtml::_('select.option', '%d.%m.%Y', 'd.m.Y');
 		$lists['date_field_format'] = JHtml::_('select.genericlist', $options, 'date_field_format', '', 'value', 'text', isset($config->date_field_format) ? $config->date_field_format : 'Y-m-d');
-		
+
+		$currencies = require_once JPATH_ROOT.'/components/com_eventbooking/helper/currencies.php';
+		$options                  = array();
+		$options[] = JHtml::_('select.option', '',  JText::_('EB_SELECT_CURRENCY'));
+		foreach($currencies as $code => $title)
+		{
+			$options[] = JHtml::_('select.option', $code, $title);
+		}
+		$lists['currency_code'] = JHtml::_('select.genericlist', $options, 'currency_code', '', 'value', 'text', isset($config->currency_code) ? $config->currency_code : 'USD');
+
 		$options                  = array();
 		$options[]                = JHtml::_('select.option', 0, JText::_('EB_ALL_NESTED_CATEGORIES'));
 		$options[]                = JHtml::_('select.option', 1, JText::_('EB_ONLY_LAST_ONE'));

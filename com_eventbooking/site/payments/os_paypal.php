@@ -38,7 +38,6 @@ class os_paypal extends RADPayment
 		$this->setParameter('no_shipping', 1);
 		$this->setParameter('no_note', 1);
 		$this->setParameter('lc', 'US');
-		$this->setParameter('currency_code', $params->get('paypal_currency', 'USD'));
 		$this->setParameter('charset', 'utf-8');
 		$this->setParameter('tax', 0);
 	}
@@ -59,11 +58,8 @@ class os_paypal extends RADPayment
 		{
 			$this->setParameter('business', $event->paypal_email);
 		}
-		if ($event->currency_code)
-		{
-			$this->setParameter('currency_code', $event->currency_code);
-		}
 
+		$this->setParameter('currency_code', $data['currency']);
 		$this->setParameter('item_name', $data['item_name']);
 		$this->setParameter('amount', round($data['amount'], 2));
 		$this->setParameter('custom', $row->id);
@@ -73,12 +69,13 @@ class os_paypal extends RADPayment
 		$this->setParameter('address1', $row->address);
 		$this->setParameter('address2', $row->address2);
 		$this->setParameter('city', $row->city);
-		$this->setParameter('country', EventbookingHelper::getCountryCode($row->country));
+		$this->setParameter('country', $data['country']);
 		$this->setParameter('first_name', $row->first_name);
 		$this->setParameter('last_name', $row->last_name);
 		$this->setParameter('state', $row->state);
 		$this->setParameter('zip', $row->zip);
 		$this->setParameter('email', $row->email);
+
 
 		$this->renderRedirectForm();
 	}
@@ -119,6 +116,42 @@ class os_paypal extends RADPayment
 		{
 			return false;
 		}
+	}
+
+	/**
+	 * Get list of supported currencies
+	 *
+	 * @return array
+	 */
+	public function getSupportedCurrencies()
+	{
+		return array(
+			'AUD',
+			'BRL',
+			'CAD',
+			'CZK',
+			'DKK',
+			'EUR',
+			'HKD',
+			'HUF',
+			'ILS',
+			'JPY',
+			'MYR',
+			'MXN',
+			'NOK',
+			'NZD',
+			'PHP',
+			'PLN',
+			'GBP',
+			'RUB',
+			'SGD',
+			'SEK',
+			'CHF',
+			'TWD',
+			'THB',
+			'TRY',
+			'USD'
+		);
 	}
 
 	/**

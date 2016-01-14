@@ -195,4 +195,27 @@ class EventbookingModelList extends RADModelList
 
 		return $this;
 	}
+
+	/**
+	 * Builds a generic ORDER BY clause based on the model's state
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
+	 */
+	protected function buildQueryOrder(JDatabaseQuery $query)
+	{
+		$sort      = $this->state->filter_order;
+		$direction = strtoupper($this->state->filter_order_Dir);
+
+		// Featured events has highest ordering
+		$query->order('tbl.featured DESC');
+
+		if ($sort)
+		{
+			$query->order($sort . ' ' . $direction);
+		}
+
+		return $this;
+	}
 } 

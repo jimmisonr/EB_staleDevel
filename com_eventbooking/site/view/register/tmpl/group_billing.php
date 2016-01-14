@@ -611,6 +611,36 @@ else
 							form.on('submit', function(e) {
 								e.preventDefault();
 							});
+
+							<?php
+								// Publickey is available, we will use Stripejs to encrypt creditcard data
+							    if (!empty($this->stripePublicKey))
+							    {
+								?>
+								if($('input:radio[name^=payment_method]').length)
+								{
+									var paymentMethod = $('input:radio[name^=payment_method]:checked').val();
+								}
+								else
+								{
+									var paymentMethod = $('input[name^=payment_method]').val();
+								}
+
+								if (paymentMethod == 'os_stripe')
+								{
+									Stripe.card.createToken({
+										number: $('#x_card_num').val(),
+										cvc: $('#x_card_code').val(),
+										exp_month: $('select[name^=exp_month]').val(),
+										exp_year: $('select[name^=exp_year]').val()
+									}, stripeResponseHandler);
+
+									return false;
+								}
+								<?php
+								}
+							?>
+
 							return true;
 						}
 						return false;

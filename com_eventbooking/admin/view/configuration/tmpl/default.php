@@ -15,6 +15,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 $editor = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 $config = $this->config;
+JHtml::_('formbehavior.chosen', 'select');
 ?>
 <div class="row-fluid">
 <form action="index.php?option=com_eventbooking&view=configuration" method="post" name="adminForm" id="adminForm" class="form-horizontal eb-configuration">
@@ -446,6 +447,14 @@ $config = $this->config;
 			</div>
 			<div class="control-group">
 				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('currency_code', JText::_('EB_CURRENCY_CODE')); ?>
+				</div>
+				<div class="controls">
+					<?php echo $this->lists['currency_code']; ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('currency_symbol', JText::_('EB_CURRENCY_SYMBOL')); ?>
 				</div>
 				<div class="controls">
@@ -820,6 +829,14 @@ $config = $this->config;
 				</div>
 				<div class="controls">
 					<?php echo EventbookingHelperHtml::getBooleanInput('show_coupon_code_in_registrant_list', $config->show_coupon_code_in_registrant_list); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('social_sharing_buttons', JText::_('EB_SOCIAL_SHARING_BUTTONS'), JText::_('EB_SOCIAL_SHARING_BUTTONS_EXPLAIN')); ?>
+				</div>
+				<div class="controls">
+					<?php echo $this->lists['social_sharing_buttons']; ?>
 				</div>
 			</div>
 		<?php echo JHtml::_('bootstrap.endTab'); ?>

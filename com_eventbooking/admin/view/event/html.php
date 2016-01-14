@@ -42,8 +42,8 @@ class EventbookingViewEventHtml extends RADViewItem
 				$children[$pt] = $list;
 			}
 		}
-		$list    = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
-		$options = array();
+		$list      = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
+		$options   = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_SELECT_CATEGORY'));
 		foreach ($list as $listItem)
 		{
@@ -71,7 +71,7 @@ class EventbookingViewEventHtml extends RADViewItem
 			$mainCategoryId       = 0;
 			$additionalCategories = array(0);
 		}
-		$this->lists['main_category_id']         = JHtml::_('select.genericlist', $options, 'main_category_id', array(
+		$this->lists['main_category_id'] = JHtml::_('select.genericlist', $options, 'main_category_id', array(
 			'option.text.toHtml' => false,
 			'option.text'        => 'text',
 			'option.value'       => 'value',
@@ -93,7 +93,7 @@ class EventbookingViewEventHtml extends RADViewItem
 		$options[]                               = JHtml::_('select.option', 2, $config->currency_symbol);
 		$this->lists['discount_type']            = JHtml::_('select.genericlist', $options, 'discount_type', ' class="input-small" ', 'value', 'text', $item->discount_type);
 		$this->lists['early_bird_discount_type'] = JHtml::_('select.genericlist', $options, 'early_bird_discount_type', 'class="input-small"', 'value', 'text', $item->early_bird_discount_type);
-		$this->lists['late_fee_type'] = JHtml::_('select.genericlist', $options, 'late_fee_type', 'class="input-small"', 'value', 'text', $item->late_fee_type);
+		$this->lists['late_fee_type']            = JHtml::_('select.genericlist', $options, 'late_fee_type', 'class="input-small"', 'value', 'text', $item->late_fee_type);
 		if ($config->activate_deposit_feature)
 		{
 			$this->lists['deposit_type'] = JHtml::_('select.genericlist', $options, 'deposit_type', ' class="input-small" ', 'value', 'text', $item->deposit_type);
@@ -121,6 +121,7 @@ class EventbookingViewEventHtml extends RADViewItem
 		$this->lists['enable_cancel_registration'] = JHtml::_('select.booleanlist', 'enable_cancel_registration', ' class="inputbox" ', $item->enable_cancel_registration);
 		$this->lists['enable_auto_reminder']       = JHtml::_('select.booleanlist', 'enable_auto_reminder', ' class="inputbox" ', $item->enable_auto_reminder);
 		$this->lists['published']                  = JHtml::_('select.booleanlist', 'published', ' class="inputbox" ', $item->published);
+		$this->lists['featured']                  = JHtml::_('select.booleanlist', 'featured', ' class="inputbox" ', $item->featured);
 		if ($item->event_date != $db->getNullDate())
 		{
 			$selectedHour   = date('G', strtotime($item->event_date));
@@ -175,7 +176,7 @@ class EventbookingViewEventHtml extends RADViewItem
 		$this->lists['registration_start_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d');
 
 
-		$nullDate                  = $db->getNullDate();
+		$nullDate = $db->getNullDate();
 		//Custom field handles
 		if ($config->event_custom_field)
 		{
@@ -197,15 +198,15 @@ class EventbookingViewEventHtml extends RADViewItem
 		$db->setQuery($query);
 		$this->lists['payment_methods'] = JHtml::_('select.genericlist', array_merge($options, $db->loadObjectList()), 'payment_methods[]', ' class="inputbox" multiple="multiple" ', 'id', 'title', explode(',', $item->payment_methods));
 
-		$query->clear();
-		$query->select('currency_code, currency_name')
-			->from('#__eb_currencies')
-			->order('currency_name');
-		$db->setQuery($query);
-		$options                        = array();
-		$options[]                      = JHtml::_('select.option', '', JText::_('EB_SELECT_CURRENCY'), 'currency_code', 'currency_name');
-		$options                        = array_merge($options, $db->loadObjectList());
-		$this->lists['currency_code']   = JHtml::_('select.genericlist', $options, 'currency_code', ' class="inputbox" ', 'currency_code', 'currency_name', $item->currency_code);
+		$currencies = require_once JPATH_ROOT . '/components/com_eventbooking/helper/currencies.php';
+		$options    = array();
+		$options[]  = JHtml::_('select.option', '', JText::_('EB_SELECT_CURRENCY'));
+		foreach ($currencies as $code => $title)
+		{
+			$options[] = JHtml::_('select.option', $code, $title);
+		}
+		$this->lists['currency_code'] = JHtml::_('select.genericlist', $options, 'currency_code', '', 'value', 'text', isset($config->currency_code) ? $config->currency_code : 'USD');
+
 		$this->lists['discount_groups'] = JHtml::_('access.usergroup', 'discount_groups[]', explode(',', $item->discount_groups),
 			' multiple="multiple" size="6" ', false);
 

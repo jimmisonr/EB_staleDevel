@@ -116,7 +116,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 			$membersData = array();
 		}
 
-		$this->showBillingStep   = EventbookingHelper::showBillingStep($event->id);
+		$this->showBillingStep = EventbookingHelper::showBillingStep($event->id);
 
 		$showCaptcha = 0;
 		if (!$this->showBillingStep)
@@ -166,7 +166,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$this->defaultCountry    = $config->default_country;
 		$this->waitingList       = $waitingList;
 
-		$this->rowFields         = EventbookingHelper::getFormFields($event->id, 2);
+		$this->rowFields = EventbookingHelper::getFormFields($event->id, 2);
 
 		parent::display();
 	}
@@ -318,10 +318,24 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$showPaymentFee = false;
 		foreach ($methods as $method)
 		{
+			if ($method->getName() == 'os_stripe')
+			{
+				$stripePlugin = os_payments::loadPaymentMethod('os_stripe');
+				$params       = new JRegistry($stripePlugin->params);
+				$publicKey    = $params->get('stripe_public_key');
+				if ($publicKey)
+				{
+					$document = JFactory::getDocument();
+					$document->addScript('https://js.stripe.com/v2/');
+					$document->addScriptDeclaration(
+						"Stripe.setPublishableKey('$publicKey');"
+					);
+					$this->stripePublicKey = $publicKey;
+				}
+			}
 			if ($method->paymentFee)
 			{
 				$showPaymentFee = true;
-				break;
 			}
 		}
 

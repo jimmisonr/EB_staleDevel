@@ -613,6 +613,13 @@ class EventbookingController extends RADControllerAdmin
 		//Events table
 		$fields = array_keys($db->getTableColumns('#__eb_events'));
 
+		if (!in_array('featured', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `featured` TINYINT NOT NULL DEFAULT  '0' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		// Discounts
 		if (!in_array('discount_groups', $fields))
 		{
@@ -2262,6 +2269,50 @@ class EventbookingController extends RADControllerAdmin
 					JFolder::delete($tmpFolder . '/' . $installFolder);
 				}
 			}
+		}
+
+		// Migrate currency code from plugin param to configuration
+		if (empty($config->currency_code))
+		{
+			$query = $db->getQuery(true);
+			$query->select('name, params')
+				->from('#__eb_payment_plugins')
+				->where('published = 1');
+			$db->setQuery($query);
+			$plugins = $db->loadObjectList('name');
+
+			if (isset($plugins['os_paypal']))
+			{
+				$params       = new JRegistry($plugins['os_paypal']->params);
+				$currencyCode = $params->get('paypal_currency', 'USD');
+			}
+			elseif (isset($plugins['os_paypal_pro']))
+			{
+				$params       = new JRegistry($plugins['os_paypal_pro']->params);
+				$currencyCode = $params->get('paypal_pro_currency', 'USD');
+			}
+			elseif ($plugins['os_payflowpro'])
+			{
+				$params       = new JRegistry($plugins['os_payflowpro']->params);
+				$currencyCode = $params->get('payflow_currency', 'USD');
+			}
+			else
+			{
+				$currencyCode = 'USD';
+			}
+
+			$query->clear();
+			$query->delete('#__eb_configs')
+				->where('config_key = "currency_code"');
+			$db->setQuery($query);
+			$db->execute();
+
+			$query->clear();
+			$query->insert('#__eb_configs')
+				->columns('config_key, config_value')
+				->values('"currency_code", "' . $currencyCode . '"');
+			$db->setQuery($query);
+			$db->execute();
 		}
 
 		if (JLanguageMultilang::isEnabled())

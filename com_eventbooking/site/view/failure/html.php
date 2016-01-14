@@ -16,7 +16,7 @@ class EventbookingViewFailureHtml extends RADViewHtml
 	public function display()
 	{
 		$this->setLayout('default');
-		$reason = isset($_SESSION['reason']) ? $_SESSION['reason'] : '';
+		$reason = JFactory::getSession()->get('omnipay_payment_error_reason');
 		if (!$reason)
 		{
 			$reason = $this->input->getString('failReason', '');
