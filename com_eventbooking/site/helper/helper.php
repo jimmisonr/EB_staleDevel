@@ -2867,7 +2867,7 @@ class EventbookingHelper
 		{
 			$subject = $message->user_email_subject;
 		}
-		if (strpos($row->payment_method, 'os_offline') !== false)
+		if (!$row->published && strpos($row->payment_method, 'os_offline') !== false)
 		{
 			if (self::isValidMessage($event->user_email_body_offline))
 			{
