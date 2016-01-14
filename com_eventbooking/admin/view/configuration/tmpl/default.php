@@ -831,6 +831,14 @@ JHtml::_('formbehavior.chosen', 'select');
 					<?php echo EventbookingHelperHtml::getBooleanInput('show_coupon_code_in_registrant_list', $config->show_coupon_code_in_registrant_list); ?>
 				</div>
 			</div>
+			<div class="control-group">
+				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('social_sharing_buttons', JText::_('EB_SOCIAL_SHARING_BUTTONS'), JText::_('EB_SOCIAL_SHARING_BUTTONS_EXPLAIN')); ?>
+				</div>
+				<div class="controls">
+					<?php echo $this->lists['social_sharing_buttons']; ?>
+				</div>
+			</div>
 		<?php echo JHtml::_('bootstrap.endTab'); ?>
 		<?php echo JHtml::_('bootstrap.addTab', 'configuration', 'sef-setting-page', JText::_('EB_SEF_SETTING', true)); ?>
 			<p class="message"><strong><?php echo JText::_('EB_SEF_SETTING_EXPLAIN'); ?></strong></p>

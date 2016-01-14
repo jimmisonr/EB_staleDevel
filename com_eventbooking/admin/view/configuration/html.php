@@ -80,6 +80,19 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['currency_position']        = JHtml::_('select.genericlist', $options, 'currency_position', ' class="inputbox"', 'value', 'text',
 			$config->currency_position);
 
+		// Social sharing options
+		$options                         = array();
+		$options[]                       = JHtml::_('select.option', 'Delicious', JText::_('Delicious'));
+		$options[]                       = JHtml::_('select.option', 'Digg', JText::_('Digg'));
+		$options[]                       = JHtml::_('select.option', 'Facebook', JText::_('Facebook'));
+		$options[]                       = JHtml::_('select.option', 'Google', JText::_('Google'));
+		$options[]                       = JHtml::_('select.option', 'Stumbleupon', JText::_('Stumbleupon'));
+		$options[]                       = JHtml::_('select.option', 'Technorati', JText::_('Technorati'));
+		$options[]                       = JHtml::_('select.option', 'Twitter', JText::_('Twitter'));
+		$options[]                       = JHtml::_('select.option', 'LinkedIn', JText::_('LinkedIn'));
+		$lists['social_sharing_buttons'] = JHtml::_('select.genericlist', $options, 'social_sharing_buttons[]', ' class="inputbox" multiple="multiple" ', 'value', 'text',
+			explode(',', $config->social_sharing_buttons));
+
 		//Default settings when creating new events
 		$options                      = array();
 		$options[]                    = JHtml::_('select.option', 0, JText::_('EB_INDIVIDUAL_GROUP'));
