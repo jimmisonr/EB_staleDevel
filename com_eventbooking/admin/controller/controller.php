@@ -275,7 +275,7 @@ class EventbookingController extends RADControllerAdmin
 					break;
 			}
 
-			$query = $db->getQuery();
+			$query = $db->getQuery(true);
 			$query->update('#__extensions')
 				->set('`enabled`= 1')
 				->where('`element`=' . $db->quote($plugin))

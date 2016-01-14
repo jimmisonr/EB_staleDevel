@@ -29,8 +29,7 @@
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_jsactivities.tar.gz</file>
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_mailchimp.tar.gz</file>		   	     
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_moveregistrants.tar.gz</file>
-	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_unpublishevents.tar.gz</file>	      	   	
-	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_userprofile.tar.gz</file>
+	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_unpublishevents.tar.gz</file>	      	  <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_userprofile.tar.gz</file>
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_easyprofile.tar.gz</file>
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_contactenhanced.tar.gz</file>
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_easysocial.tar.gz</file>
