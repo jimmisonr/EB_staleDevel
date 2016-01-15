@@ -121,7 +121,7 @@ class EventbookingViewEventHtml extends RADViewItem
 		$this->lists['enable_cancel_registration'] = JHtml::_('select.booleanlist', 'enable_cancel_registration', ' class="inputbox" ', $item->enable_cancel_registration);
 		$this->lists['enable_auto_reminder']       = JHtml::_('select.booleanlist', 'enable_auto_reminder', ' class="inputbox" ', $item->enable_auto_reminder);
 		$this->lists['published']                  = JHtml::_('select.booleanlist', 'published', ' class="inputbox" ', $item->published);
-		$this->lists['featured']                  = JHtml::_('select.booleanlist', 'featured', ' class="inputbox" ', $item->featured);
+		$this->lists['featured']                   = JHtml::_('select.booleanlist', 'featured', ' class="inputbox" ', $item->featured);
 		if ($item->event_date != $db->getNullDate())
 		{
 			$selectedHour   = date('G', strtotime($item->event_date));
@@ -205,7 +205,7 @@ class EventbookingViewEventHtml extends RADViewItem
 		{
 			$options[] = JHtml::_('select.option', $code, $title);
 		}
-		$this->lists['currency_code'] = JHtml::_('select.genericlist', $options, 'currency_code', '', 'value', 'text', isset($config->currency_code) ? $config->currency_code : 'USD');
+		$this->lists['currency_code'] = JHtml::_('select.genericlist', $options, 'currency_code', '', 'value', 'text', $item->currency_code);
 
 		$this->lists['discount_groups'] = JHtml::_('access.usergroup', 'discount_groups[]', explode(',', $item->discount_groups),
 			' multiple="multiple" size="6" ', false);
