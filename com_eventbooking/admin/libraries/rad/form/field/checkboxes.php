@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Form Field class for the Joomla RAD.
  * Supports a checkbox list custom field.
@@ -78,7 +77,7 @@ class RADFormFieldCheckboxes extends RADFormField
 			$checked     = in_array($optionValue, $selectedOptions) ? 'checked' : '';
 			$html[]      = '<li class="' . $spanClass . '">';
 			$html[]      = '<label for="' . $this->name . $i . '" ><input type="checkbox" id="' . $this->name . $i . '" name="' . $this->name . '[]" value="' .
-				htmlspecialchars($optionValue, ENT_COMPAT, 'UTF-8') . '"' . $checked . $attributes . $this->row->extra_attributes . '/> ' . $option .
+				htmlspecialchars($optionValue, ENT_COMPAT, 'UTF-8') . '"' . $checked . $attributes . $this->row->extra_attributes . '/> ' . ($numberOptions > 1 ? $option : '') .
 				'</label>';
 			$html[]      = '</li>';
 			if ($i % $size == 0 && $i < $numberOptions)
@@ -107,7 +106,7 @@ class RADFormFieldCheckboxes extends RADFormField
 		}
 		else
 		{
-			$values = explode(",", $this->row->values);
+			$values = explode(",", empty($this->row->values) ? 'Yes' : $this->row->values);
 		}
 
 		$quantityValues = explode("\r\n", $this->row->quantity_values);
