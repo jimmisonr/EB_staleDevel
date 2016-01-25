@@ -73,7 +73,7 @@ defined('_JEXEC') or die;
 					<?php echo $item->zip; ?>
 				</td>
 				<td>
-					<?php echo $item->country; ?>
+					<?php echo $item->country_name; ?>
 				</td>
 				<td>
 					<?php echo $item->lat; ?>
