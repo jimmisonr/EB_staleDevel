@@ -24,7 +24,33 @@ class EventbookingModelLocations extends RADModelList
 
 		$this->state->setDefault('filter_order_Dir', 'DESC');
 	}
+ 	/**
+	 * Builds SELECT columns list for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
+	 */
+	protected function buildQueryColumns(JDatabaseQuery $query)
+	{
+		$query->select('tbl.*')
+			->select('c.name AS country_name');
+		return $this;
+	}
+    
+   	/**
+	 * Builds JOINS clauses for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
+	 */
+	protected function buildQueryJoins(JDatabaseQuery $query)
+	{
+		$query->leftJoin('#__eb_countries AS c ON tbl.country = c.id ');
 
+		return $this;
+	}
 	/**
 	 * Builds a WHERE clause for the query
 	 */
