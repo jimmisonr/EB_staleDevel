@@ -514,7 +514,7 @@ if (!$this->userId && $this->config->user_registration)
 							$checked = '';
 						}		
 					?>
-						<label class="checkbox">
+						<label class="radio">
 							<input onclick="changePaymentMethod('cart');" class="validate[required] radio" type="radio" name="payment_method" value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
 						</label>
 					<?php		
