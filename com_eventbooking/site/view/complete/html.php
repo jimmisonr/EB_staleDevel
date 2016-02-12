@@ -1,6 +1,6 @@
 <?php
 /**
- * @version        	2.3.0
+ * @version            2.3.2
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -94,7 +94,7 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		$db->setQuery($query);
 		$rowRegistrant = $db->loadObject();
 
-		if ($rowRegistrant->published == 0 && strpos($rowRegistrant->payment_method, 'os_offline') === false)
+		if ($rowRegistrant->published == 0 && ($rowRegistrant->payment_method == 'os_ideal'))
 		{
 			// Use online payment method and the payment is not success for some reason, we need to redirec to failure page
 			$Itemid     = JFactory::getApplication()->input->getInt('Itemid', 0);
