@@ -6839,12 +6839,18 @@ class TCPDF {
 				$file = substr($file, 1);
 				$exurl = $file;
 			}
+
 			// check if is a local file
 			if (!@file_exists($file)) {
 				// try to encode spaces on filename
 				$tfile = str_replace(' ', '%20', $file);
-				if (@file_exists($tfile)) {
+				if (@file_exists($tfile))
+				{
 					$file = $tfile;
+				}
+				elseif (@file_exists(JPATH_ROOT . '/' . $file))
+				{
+					$file = JPATH_ROOT . '/' . $file;
 				}
 			}
 			if (($imsize = @getimagesize($file)) === FALSE) {

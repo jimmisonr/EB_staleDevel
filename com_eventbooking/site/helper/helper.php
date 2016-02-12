@@ -4236,9 +4236,8 @@ class EventbookingHelper
 		{
 			$key           = strtoupper($key);
 			$invoiceOutput = str_replace("[$key]", $value, $invoiceOutput);
-		}
-
-		$invoiceOutput = self::convertImgTags($invoiceOutput);
+		}		
+		
 		$v             = $pdf->writeHTML($invoiceOutput, true, false, false, false, '');
 		//Filename
 		$filePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . $replaces['invoice_number'] . '.pdf';
