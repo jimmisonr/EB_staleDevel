@@ -146,8 +146,6 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				EventbookingHelper::notifyWaitingList($row, $config);
 			}
 			$input->set('id', $row->id);
-
-			return true;
 		}
 		else
 		{
@@ -190,8 +188,6 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			}
 
 			$input->set('id', $row->id);
-
-			return true;
 		}
 
 		return true;

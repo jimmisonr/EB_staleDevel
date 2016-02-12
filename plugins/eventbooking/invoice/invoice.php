@@ -42,7 +42,7 @@ class plgEventbookingInvoice extends JPlugin
 
 		if ((strpos($row->payment_method, 'os_offline') !== false)
 			&& !$row->invoice_number
-			&& (empty($config->generate_invoice_on_payment_complete) || $row->published == 1))
+			&& empty($config->generate_invoice_on_payment_complete))
 		{
 			$this->processInvoiceNumber($row);
 		}
