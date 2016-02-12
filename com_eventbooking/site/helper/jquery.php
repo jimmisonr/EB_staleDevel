@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.3.0
+ * @version            2.3.2
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -227,7 +227,7 @@ abstract class EventbookingHelperJquery
 				                "minSize": {
 				                    "regex": "none",
 				                    "alertText": "' . JText::_('EB_VALIDATION_MINIMUM') . '",
-				                    "alertText2": " characters required"
+				                    "alertText2": " ' . JText::_('EB_CHARACTERS_REQUIRED') . '"
 				                },
 				                "maxSize": {
 				                    "regex": "none",

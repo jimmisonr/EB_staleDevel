@@ -437,7 +437,16 @@ class RADForm
 							{
 								$targetFileName = $fileName;
 							}
-							JFile::upload($_FILES[$field->name]['tmp_name'], $pathUpload . '/' . $targetFileName);
+							
+							if (version_compare(JVERSION, '3.4.4', 'ge'))
+							{
+								$uploaded = JFile::upload($_FILES[$field->name]['tmp_name'], $pathUpload . '/' . $targetFileName, false, true);
+							}
+							else 
+							{
+								$uploaded = JFile::upload($_FILES[$field->name]['tmp_name'], $pathUpload . '/' . $targetFileName);
+							}									
+							
 							$data[$field->name] = $targetFileName;
 						}
 					}

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.3.0
+ * @version            2.3.2
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -169,11 +169,8 @@ class EventbookingModelPlugin extends RADModelAdmin
 			$file = $files[$i];
 			if ($file->getName() == 'filename')
 			{
-				$fileName = $file;
-				if (!JFile::exists($pluginDir . '/' . $fileName))
-				{
-					JFile::copy($extractDir . '/' . $fileName, $pluginDir . '/' . $fileName);
-				}
+				$fileName = $file;							
+				JFile::copy($extractDir . '/' . $fileName, $pluginDir . '/' . $fileName);				
 			}
 			elseif ($file->getName() == 'folder')
 			{

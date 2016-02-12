@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.3.0
+ * @version            2.3.2
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -161,48 +161,38 @@ class os_paypal extends RADPayment
 	 */
 	protected function validate()
 	{
+		$errNum                 = "";
+		$errStr                 = "";
+		$urlParsed              = parse_url($this->url);
+		$host                   = $urlParsed['host'];
+		$path                   = $urlParsed['path'];
+		$postString             = '';
+		$response               = '';
 		$this->notificationData = $_POST;
-
-		$hostname = $this->mode ? 'www.paypal.com' : 'www.sandbox.paypal.com';
-		$url      = 'ssl://' . $hostname;
-		$port     = 443;
-		$req      = 'cmd=_notify-validate';
-
 		foreach ($_POST as $key => $value)
 		{
-			$value = urlencode(stripslashes($value));
-			$req .= "&$key=$value";
+			$postString .= $key . '=' . urlencode(stripslashes($value)) . '&';
 		}
-
-		$header = '';
-		$header .= "POST /cgi-bin/webscr HTTP/1.1\r\n";
-		$header .= "Host: $hostname:$port\r\n";
-		$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
-		$header .= "Content-Length: " . strlen($req) . "\r\n";
-		$header .= "User-Agent: Events Booking\r\n";
-		$header .= "Connection: Close\r\n\r\n";
-
-		$errNum   = '';
-		$errStr   = '';
-		$response = '';
-		$fp       = fsockopen($url, $port, $errNum, $errStr, 30);
-
+		$postString .= 'cmd=_notify-validate';
+		$fp = fsockopen($host, '80', $errNum, $errStr, 30);
 		if (!$fp)
 		{
-			$response = 'Could not open SSL connection to ' . $hostname . ':' . $port;
+			$response = 'Could not open SSL connection to ' . $this->url;
 			$this->logGatewayData($response);
 
 			return false;
 		}
-
-		fputs($fp, $header . $req);
+		fputs($fp, "POST $path HTTP/1.1\r\n");
+		fputs($fp, "Host: $host\r\n");
+		fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
+		fputs($fp, "Content-length: " . strlen($postString) . "\r\n");
+		fputs($fp, "Connection: close\r\n\r\n");
+		fputs($fp, $postString . "\r\n\r\n");
 		while (!feof($fp))
 		{
 			$response .= fgets($fp, 1024);
 		}
 		fclose($fp);
-
-
 		$this->logGatewayData($response);
 
 		if (!$this->mode || (stristr($response, "VERIFIED") && ($this->notificationData['payment_status'] == 'Completed')))

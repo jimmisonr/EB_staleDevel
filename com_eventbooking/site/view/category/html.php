@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.3.0
+ * @version            2.3.2
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -30,6 +30,11 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 			{
 				$app->redirect('index.php', JText::_('EB_INVALID_CATEGORY_OR_NOT_AUTHORIZED'));
 			}
+			
+			if ($config->process_plugin && !empty($category->description))
+			{
+				$category->description = JHtml::_('content.prepare', $category->description);	
+			}
 		}
 		else
 		{
@@ -43,11 +48,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 			{
 				$item                    = $items[$i];
 				$item->short_description = JHtml::_('content.prepare', $item->short_description);
-			}
-			if (!empty($category))
-			{
-				$category->description = JHtml::_('content.prepare', $category->description);
-			}
+			}			
 		}
 
 		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)

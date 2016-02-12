@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @version            2.3.0
+ * @version            2.3.2
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -318,24 +318,10 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$showPaymentFee = false;
 		foreach ($methods as $method)
 		{
-			if ($method->getName() == 'os_stripe')
-			{
-				$stripePlugin = os_payments::loadPaymentMethod('os_stripe');
-				$params       = new JRegistry($stripePlugin->params);
-				$publicKey    = $params->get('stripe_public_key');
-				if ($publicKey)
-				{
-					$document = JFactory::getDocument();
-					$document->addScript('https://js.stripe.com/v2/');
-					$document->addScriptDeclaration(
-						"Stripe.setPublishableKey('$publicKey');"
-					);
-					$this->stripePublicKey = $publicKey;
-				}
-			}
 			if ($method->paymentFee)
 			{
 				$showPaymentFee = true;
+				break;
 			}
 		}
 

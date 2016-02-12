@@ -657,35 +657,31 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 								e.preventDefault();
 							});
 							form.find('#btn-submit').prop('disabled', true);
-							<?php
-								// Publickey is available, we will use Stripejs to encrypt creditcard data
-							    if (!empty($this->stripePublicKey))
-							    {
-								?>
-									if($('input:radio[name^=payment_method]').length)
-									{
-										var paymentMethod = $('input:radio[name^=payment_method]:checked').val();
-									}
-									else
-									{
-										var paymentMethod = $('input[name^=payment_method]').val();
-									}
 
-									if (paymentMethod == 'os_stripe')
-									{
-										Stripe.card.createToken({
-											number: $('#x_card_num').val(),
-											cvc: $('#x_card_code').val(),
-											exp_month: $('select[name^=exp_month]').val(),
-											exp_year: $('select[name^=exp_year]').val()
-										}, stripeResponseHandler);
+							if (typeof stripePublicKey !== 'undefined' && $('#x_card_num').is(":visible"))
+							{
+								if($('input:radio[name^=payment_method]').length)
+								{
+									var paymentMethod = $('input:radio[name^=payment_method]:checked').val();
+								}
+								else
+								{
+									var paymentMethod = $('input[name^=payment_method]').val();
+								}
 
-										return false;
-									}
-								<?php
-							    }
-							?>
+								if (paymentMethod.indexOf('os_stripe') == 0)
+								{
+									Stripe.card.createToken({
+										number: $('#x_card_num').val(),
+										cvc: $('#x_card_code').val(),
+										exp_month: $('select[name^=exp_month]').val(),
+										exp_year: $('select[name^=exp_year]').val(),
+										name: $('#card_holder_name').val()
+									}, stripeResponseHandler);
 
+									return false;
+								}
+							}
 							return true;
 						}
 						return false;

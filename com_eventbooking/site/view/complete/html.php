@@ -19,9 +19,9 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		$this->setLayout('default');
 		$db               = JFactory::getDbo();
 		$query            = $db->getQuery(true);
-		$config           = EventbookingHelper::getConfig();			
+		$config           = EventbookingHelper::getConfig();
 		// Try to get it from session
-		$registrationCode = JFactory::getSession()->get('eb_registration_code', '');		
+		$registrationCode = JFactory::getSession()->get('eb_registration_code', '');
 		if (empty($registrationCode))
 		{
 			$registrationCode = JRequest::getVar('registration_code');
@@ -93,6 +93,15 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 			->where('id=' . $id);
 		$db->setQuery($query);
 		$rowRegistrant = $db->loadObject();
+
+		if ($rowRegistrant->published == 0 && strpos($rowRegistrant->payment_method, 'os_offline') === false)
+		{
+			// Use online payment method and the payment is not success for some reason, we need to redirec to failure page
+			$Itemid     = JFactory::getApplication()->input->getInt('Itemid', 0);
+			$failureUrl = JRoute::_('index.php?option=com_eventbooking&view=failure&id=' . $rowRegistrant->id . '&Itemid=' . $Itemid, false, false);
+			JFactory::getApplication()->redirect($failureUrl, 'Something went wrong, you are NOT successfully registered');
+		}
+
 		if ($config->multiple_booking)
 		{
 			$rowFields = EventbookingHelper::getFormFields($rowRegistrant->id, 4);
