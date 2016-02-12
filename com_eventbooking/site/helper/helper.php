@@ -2940,13 +2940,8 @@ class EventbookingHelper
 		}
 
 		$attachments = array();
-		if ($config->activate_invoice_feature && $config->send_invoice_to_customer && EventbookingHelper::needInvoice($row))
+		if ($config->activate_invoice_feature && $config->send_invoice_to_customer && $row->invoice_number)
 		{
-			if (!$row->invoice_number)
-			{
-				$row->invoice_number = self::getInvoiceNumber();
-				$row->store();
-			}
 			self::generateInvoicePDF($row);
 			$attachments[] = JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
 		}
@@ -3305,6 +3300,11 @@ class EventbookingHelper
 			EventbookingHelper::generateQrcode($row->id);
 			$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
 			$body   = str_replace("[QRCODE]", $imgTag, $body);
+		}
+
+		if ($config->activate_invoice_feature && $config->generate_invoice_on_payment_complete && $row->invoice_number)
+		{
+			$mailer->addAttachment(JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf');
 		}
 
 		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);

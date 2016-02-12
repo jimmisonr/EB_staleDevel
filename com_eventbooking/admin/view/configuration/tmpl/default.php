@@ -870,6 +870,14 @@ JHtml::_('formbehavior.chosen', 'select');
 			</div>
 			<div class="control-group">
 				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('generate_invoice_on_payment_complete', JText::_('EB_GENERATE_INVOICE_ON_PAYMENT_COMPLETE'), JText::_('EB_GENERATE_INVOICE_ON_PAYMENT_COMPLETE_EXPLAIN')); ?>
+				</div>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('generate_invoice_on_payment_complete', $config->generate_invoice_on_payment_complete); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('send_invoice_to_customer', JText::_('EB_SEND_INVOICE_TO_SUBSCRIBERS'), JText::_('EB_SEND_INVOICE_TO_SUBSCRIBERS_EXPLAIN')); ?>
 				</div>
 				<div class="controls">
