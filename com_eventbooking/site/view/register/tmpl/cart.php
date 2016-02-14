@@ -204,7 +204,7 @@ if (!$this->userId && $this->config->user_registration)
 				<?php echo  JText::_('EB_USERNAME') ?><span class="required">*</span>
 			</label>
 			<div class="<?php echo $controlsClass; ?>">      				
-				<input type="text" name="username" id="username1" class="input-large validate[required,ajax[ajaxUserCall],<?php echo $minSize;?>]" value="<?php echo JRequest::getVar('username'); ?>" />
+				<input type="text" name="username" id="username1" class="input-large validate[required,ajax[ajaxUserCall]]" value="<?php echo JRequest::getVar('username'); ?>" />
 				<span class="invalid" id="validate_username_msg" style="display: none;"><?php echo JText::_('EB_INVALID_USERNAME'); ?></span>		
 			</div>	
 		</div>					
