@@ -2760,7 +2760,7 @@ class EventbookingHelper
 			}
 			else
 			{
-				$replaces['event_link'] = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')) . EventbookingHelperRoute::getEventRoute($row->event_id, 0, EventbookingHelper::getItemid());
+				$replaces['event_link'] = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')) . '/' . EventbookingHelperRoute::getEventRoute($row->event_id, 0, EventbookingHelper::getItemid());
 			}
 			$query->clear();
 			$query->select('*, title' . $fieldSuffix . ' AS title')

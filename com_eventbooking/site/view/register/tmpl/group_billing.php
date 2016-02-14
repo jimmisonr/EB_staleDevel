@@ -81,7 +81,7 @@ else
 	{
 		$params = JComponentHelper::getParams('com_users');
 		$minimumLength = $params->get('minimum_length', 4);
-		($minimumLength) ? $minSize = "minSize[4]" : $minSize = "";
+		($minimumLength) ? $minSize = ",minSize[$minimumLength]" : $minSize = "";
 	?>
 	<div class="<?php echo $controlGroupClass; ?>">
 		<label class="<?php echo $controlLabelClass; ?>" for="username1">
@@ -96,7 +96,7 @@ else
 			<?php echo  JText::_('EB_PASSWORD') ?><span class="required">*</span>
 		</label>
 		<div class="<?php echo $controlsClass; ?>">
-			<input type="password" name="password1" id="password1" class="input-large input-large validate[required,<?php echo $minSize;?>]" value=""/>
+			<input type="password" name="password1" id="password1" class="input-large input-large validate[required<?php echo $minSize;?>]" value=""/>
 		</div>
 	</div>
 	<div class="<?php echo $controlGroupClass; ?>">

@@ -226,7 +226,7 @@ abstract class EventbookingHelperJquery
 				                },
 				                "minSize": {
 				                    "regex": "none",
-				                    "alertText": "' . JText::_('EB_VALIDATION_MINIMUM') . '",
+				                    "alertText": "' . JText::_('EB_VALIDATION_MINIMUM') . ' ",
 				                    "alertText2": " ' . JText::_('EB_CHARACTERS_REQUIRED') . '"
 				                },
 				                "maxSize": {
