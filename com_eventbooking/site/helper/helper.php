@@ -3304,6 +3304,7 @@ class EventbookingHelper
 
 		if ($config->activate_invoice_feature && $config->generate_invoice_on_payment_complete && $row->invoice_number)
 		{
+			self::generateInvoicePDF($row);
 			$mailer->addAttachment(JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf');
 		}
 
