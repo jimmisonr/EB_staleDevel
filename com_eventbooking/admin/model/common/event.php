@@ -573,11 +573,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 					$rowChildEvent->store();
 					$this->storeEventGroupRegistrationRates($rowChildEvent->id, $data, false);
-
-					$sql = 'INSERT INTO #__eb_event_categories(event_id, category_id, main_category) '
-						. "SELECT $rowChildEvent->id, category_id, main_category FROM #__eb_event_categories WHERE event_id=$row->id";
-					$db->setQuery($sql);
-					$db->execute();
+					$this->storeEventCategories($rowChildEvent->id, $data, false);
 				}
 			}
 
