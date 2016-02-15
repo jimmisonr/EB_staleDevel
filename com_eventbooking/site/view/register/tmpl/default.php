@@ -137,7 +137,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				<?php echo  JText::_('EB_USERNAME') ?><span class="required">*</span>
 			</label>
 			<div class="<?php echo $controlsClass; ?>">
-				<input type="text" name="username" id="username1" class="input-large validate[required,ajax[ajaxUserCall]]" value="<?php echo JRequest::getVar('username'); ?>" />
+				<input type="text" name="username" id="username1" class="input-large validate[required,minSize[2],ajax[ajaxUserCall]]" value="<?php echo JRequest::getVar('username'); ?>" />
 			</div>
 		</div>
 		<div class="<?php echo $controlGroupClass;  ?>">
