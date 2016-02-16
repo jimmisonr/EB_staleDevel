@@ -715,11 +715,11 @@ class EventbookingHelper
 				->innerJoin('#__eb_registrants AS b ON a.id = b.coupon_id')
 				->where('b.id=' . $row->id);
 			$db->setQuery($query);
-			$data['couponCode'] = $db->loadResult();
+			$replaces['couponCode'] = $db->loadResult();
 		}
 		else
 		{
-			$data['couponCode'] = '';
+			$replaces['couponCode'] = '';
 		}
 		if ($config->multiple_booking)
 		{
