@@ -770,6 +770,8 @@ class EventbookingHelper
 			$replaces['amount']                 = EventbookingHelper::formatCurrency($row->amount, $config, $event->currency_symbol);
 		}
 
+		$replaces['individual_price'] = EventbookingHelper::formatCurrency($event->individual_price, $config, $event->currency_symbol);
+
 		// Add support for location tag
 		$query->clear();
 		$query->select('a.*')
