@@ -113,11 +113,11 @@ class RADPaymentOmnipay extends OmnipayPayment
 		if ($row->is_group_billing)
 		{
 			EventbookingHelper::updateGroupRegistrationRecord($row->id);
-		}
-		EventbookingHelper::sendEmails($row, $config);
+		}		
 		JPluginHelper::importPlugin('eventbooking');
 		$dispatcher = JEventDispatcher::getInstance();
 		$dispatcher->trigger('onAfterPaymentSuccess', array($row));
+		EventbookingHelper::sendEmails($row, $config);
 	}
 
 	/**
