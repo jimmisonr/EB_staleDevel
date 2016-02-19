@@ -196,7 +196,13 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		else
 		{
 			$captchaInvalid = 0;
-			$data           = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);
+			$data           = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);			
+			
+			// IN case there is no data, get it from URL (get for example)
+			if (empty($data))
+			{
+				$data = $input->getData();
+			}
 		}
 		if ($userId && !isset($data['first_name']))
 		{
