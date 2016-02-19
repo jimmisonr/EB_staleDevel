@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension version="2.5.0" type="plugin" group="eventbooking" method="upgrade">
-	<name>OS Membership - Easy Profile plugin</name>
+	<name>Events Booking - Easy Profile plugin</name>
 	<author>Tuan Pham Ngoc</author>
 	<authorEmail>contact@joomdonation.com</authorEmail>
 	<authorUrl>http://www.joomdonation.com</authorUrl>
