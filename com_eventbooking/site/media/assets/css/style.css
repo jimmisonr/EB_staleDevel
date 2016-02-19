@@ -1153,3 +1153,9 @@ td.eb-event-property-label {
 .eb-mobile-event-title a {
     color: #fff;
 }
+
+#payment_method_container label.radio
+{
+	display: block;
+    margin-bottom: 5px;
+}

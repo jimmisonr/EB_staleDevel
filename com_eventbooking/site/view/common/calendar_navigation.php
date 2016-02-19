@@ -9,6 +9,12 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
+$menuLayout = 'layout';
+$activeMenu = JFactory::getApplication()->getMenu()->getActive();
+if ($activeMenu && !empty($activeMenu->query['layout']))
+{
+	$menuLayout = $activeMenu->query['layout'];
+}
 ?>
 <div class="eb-topmenu-calendar">
 	<ul class="eb-menu-calendar nav nav-pills">
@@ -17,7 +23,9 @@ defined( '_JEXEC' ) or die ;
 			$month = $currentDateData['month'];
 			$year = $currentDateData['year'];
 			?>
-			<a class="calendar_link<?php if ($layout == 'default') echo ' active'; ?>" href="<?php echo JRoute::_("index.php?option=com_eventbooking&view=calendar&month=$month&year=$year&Itemid=$Itemid"); ?>" class="calendar_link active" rel="nofollow">
+			<a class="calendar_link<?php if ($layout == 'default') echo ' active'; ?>"
+			   href="<?php echo JRoute::_("index.php?option=com_eventbooking&view=calendar" . ($menuLayout == 'default' ? '' : '&layout=default') . "&month=$month&year=$year&Itemid=$Itemid"); ?>"
+			   class="calendar_link active" rel="nofollow">
 				<?php echo JText::_('EB_MONTHLY_VIEW')?>
 			</a>
 		</li>
