@@ -362,13 +362,26 @@ $return = base64_encode(JUri::getInstance()->toString());
 							}
 							if ($event->attachment && !empty($config->show_attachment_in_frontend))
 							{
-								?>
+							?>
 								<tr>
 									<td>
 										<strong><?php echo JText::_('EB_ATTACHMENT'); ?></strong>
 									</td>
 									<td>
-										<a href="<?php echo JUri::base().'/media/com_eventbooking/'.$event->attachment?>"><?php echo $event->attachment; ?></a>
+										<?php
+										$attachments = explode('|', $event->attachment);
+										for ($i = 0, $n = count($attachments) ; $i < $n; $i++)
+										{
+											$attachment = $attachments[$i];
+											if ($i > 0)
+											{
+												echo '<br />';
+											}
+											?>
+											<a href="<?php echo JUri::base().'/media/com_eventbooking/'.$attachment;?>" target="_blank"><?php echo $attachment; ?></a>
+										<?php
+										}
+										?>
 									</td>
 								</tr>
 							<?php
