@@ -38,11 +38,7 @@ class plgEventbookingInvoice extends JPlugin
 	 */
 	public function onAfterStoreRegistrant($row)
 	{
-		$config = EventbookingHelper::getConfig();
-
-		if ((strpos($row->payment_method, 'os_offline') !== false)
-			&& !$row->invoice_number
-			&& empty($config->generate_invoice_on_payment_complete))
+		if (strpos($row->payment_method, 'os_offline') !== false && !$row->invoice_number)
 		{
 			$this->processInvoiceNumber($row);
 		}

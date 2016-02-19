@@ -2942,10 +2942,15 @@ class EventbookingHelper
 		}
 
 		$attachments = array();
-		if ($config->activate_invoice_feature && $config->send_invoice_to_customer && $row->invoice_number)
+		$invoiceFilePath = '';
+		if ($config->activate_invoice_feature
+			&& $config->send_invoice_to_customer
+			&& $row->invoice_number
+			&& ($row->published == 1 || empty($config->generate_invoice_on_payment_complete)))
 		{
 			self::generateInvoicePDF($row);
-			$attachments[] = JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
+			$invoiceFilePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
+			$attachments[] = $invoiceFilePath;
 		}
 
 		if ($config->multiple_booking)
@@ -3104,13 +3109,9 @@ class EventbookingHelper
 		$mailer->clearReplyTos();
 
 		// Add invoice to admin email if needed
-		if ($config->send_invoice_to_admin)
+		if ($config->send_invoice_to_admin && $invoiceFilePath && file_exists($invoiceFilePath))
 		{
-			$invoiceFilePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
-			if (file_exists($invoiceFilePath))
-			{
-				$mailer->addAttachment($invoiceFilePath);
-			}
+			$mailer->addAttachment($invoiceFilePath);
 		}
 
 		// Send attachment to admin email if needed
