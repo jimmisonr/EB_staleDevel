@@ -70,7 +70,7 @@ class EventbookingModelMassmail extends RADModel
 			$rows    = $db->loadObjectList();
 			$emails  = array();
 			$subject = $data['subject'];
-			$body    = $data['description'];
+			$body    = EventbookingHelper::convertImgTags($data['description']);			
 			foreach ($replaces as $key => $value)
 			{
 				$key  = strtoupper($key);

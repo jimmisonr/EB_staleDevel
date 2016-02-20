@@ -370,10 +370,10 @@ $return = base64_encode(JUri::getInstance()->toString());
 									<td>
 										<?php
 										$attachments = explode('|', $event->attachment);
-										for ($i = 0, $n = count($attachments) ; $i < $n; $i++)
+										for ($j = 0, $m = count($attachments) ; $j < $m; $j++)
 										{
-											$attachment = $attachments[$i];
-											if ($i > 0)
+											$attachment = $attachments[$j];
+											if ($j > 0)
 											{
 												echo '<br />';
 											}

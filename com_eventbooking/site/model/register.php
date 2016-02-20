@@ -233,10 +233,10 @@ class EventBookingModelRegister extends RADModel
 			{
 				$row->payment_date = gmdate('Y-m-d H:i:s');
 				$row->published    = 1;
-				$row->store();
-				EventbookingHelper::sendEmails($row, $config);
+				$row->store();				
 				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-
+				EventbookingHelper::sendEmails($row, $config);
+				
 				return 1;
 			}
 			else
@@ -511,10 +511,10 @@ class EventBookingModelRegister extends RADModel
 				if ($row->is_group_billing)
 				{
 					EventbookingHelper::updateGroupRegistrationRecord($row->id);
-				}
-				EventbookingHelper::sendEmails($row, $config);
+				}				
 				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-
+				EventbookingHelper::sendEmails($row, $config);
+				
 				return 1;
 			}
 			else

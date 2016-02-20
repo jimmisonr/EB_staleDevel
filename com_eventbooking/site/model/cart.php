@@ -279,10 +279,10 @@ class EventbookingModelCart extends RADModel
 				->set('payment_date=NOW()')
 				->where('cart_id = ' . $row->id);
 			$db->setQuery($query);
-			$db->execute();
-			EventbookingHelper::sendEmails($row, $config);
+			$db->execute();			
 			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-
+			EventbookingHelper::sendEmails($row, $config);
+			
 			return 1;
 		}
 	}
