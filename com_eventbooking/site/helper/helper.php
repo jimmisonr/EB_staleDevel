@@ -3017,6 +3017,12 @@ class EventbookingHelper
 
 		if ($config->send_email_to_group_members && $row->is_group_billing)
 		{
+			// Remove invoice from attachment, group members should not receive invoice
+			if ($invoiceFilePath && file_exists($invoiceFilePath))
+			{
+				$mailer->removeAttachment(0);
+			}
+
 			$query->clear();
 			$query->select('*')
 				->from('#__eb_registrants')
