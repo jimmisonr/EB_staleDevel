@@ -56,6 +56,7 @@ class EventbookingModelPlugin extends RADModelAdmin
 	 */
 	public function install($plugin)
 	{
+		jimport('joomla.filesystem.folder');
 		jimport('joomla.filesystem.archive');
 		$db = $this->getDbo();
 		if ($plugin['error'] || $plugin['size'] < 1)
@@ -64,7 +65,14 @@ class EventbookingModelPlugin extends RADModelAdmin
 
 			return false;
 		}
-		$destinationDir = JFactory::getConfig()->get('tmp_path') . '/' . $plugin['name'];
+
+		$tmpPath = JFactory::getConfig()->get('tmp_path');
+		if (!JFolder::exists($tmpPath))
+		{
+			$tmpPath = JPATH_ROOT . '/tmp';
+		}
+		$destinationDir = $tmpPath . '/' . $plugin['name'];
+
 		if (version_compare(JVERSION, '3.4.4', 'ge'))
 		{
 			$uploaded       = JFile::upload($plugin['tmp_name'], $destinationDir, false, true);
