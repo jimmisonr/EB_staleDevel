@@ -2888,7 +2888,7 @@ class EventbookingHelper
 		$rowLocation = $db->loadObject();
 
 		// Notification email send to user
-		if ($config->send_emails == 0 || $config->send_emails == 3)
+		if ($config->send_emails == 0 || $config->send_emails == 2)
 		{
 			if (strlen($message->{'user_email_subject' . $fieldSuffix}))
 			{
