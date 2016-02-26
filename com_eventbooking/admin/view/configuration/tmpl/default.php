@@ -47,6 +47,14 @@ JHtml::_('formbehavior.chosen', 'select');
 			</div>
 			<div class="control-group">
 				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('send_emails', JText::_('EB_SEND_NOTIFICATION_EMAILS')); ?>
+				</div>
+				<div class="controls">
+					<?php echo $this->lists['send_emails']; ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('from_name', JText::_('EB_FROM_NAME'), JText::_('EB_FROM_NAME_EXPLAIN')); ?>
 				</div>
 				<div class="controls">

@@ -135,6 +135,15 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options[]                = JHtml::_('select.option', 1, JText::_('EB_ONLY_LAST_ONE'));
 		$lists['insert_category'] = JHtml::_('select.genericlist', $options, 'insert_category', ' class="inputbox"', 'value', 'text',
 			$config->insert_category);
+
+		$options                  = array();
+		$options[]                = JHtml::_('select.option', 0, JText::_('EB_ENABLE'));
+		$options[]                = JHtml::_('select.option', 1, JText::_('EB_ONLY_TO_ADMIN'));
+		$options[]                = JHtml::_('select.option', 2, JText::_('EB_ONLY_TO_REGISTRANT'));
+		$options[]                = JHtml::_('select.option', 3, JText::_('EB_DISABLE'));
+		$lists['send_emails']      = JHtml::_('select.genericlist', $options, 'send_emails', ' class="inputbox"', 'value', 'text',
+			$config->send_emails);
+
 		$this->lists              = $lists;
 		$this->config             = $config;
 		$this->addToolbar();
