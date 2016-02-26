@@ -2824,6 +2824,10 @@ class EventbookingHelper
 	 */
 	public static function sendEmails($row, $config)
 	{
+		if ($config->send_emails == 3)
+		{
+			return;
+		}
 		$db          = JFactory::getDbo();
 		$query       = $db->getQuery(true);
 		$message     = self::getMessages();
