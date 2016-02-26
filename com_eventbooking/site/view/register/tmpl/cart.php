@@ -552,7 +552,7 @@ if (!$this->userId && $this->config->user_registration)
 				<?php echo  JText::_('AUTH_CARD_NUMBER'); ?><span class="required">*</span>				
 			</label>
 			<div class="<?php echo $controlsClass; ?>">      				
-				<input type="text" id="x_card_num" name="x_card_num" class="input-large validate[required,creditCard]" value="<?php echo JRequest::getVar('x_card_num'); ?>" />
+				<input type="text" id="x_card_num" name="x_card_num" class="input-large validate[required,creditCard]" value="<?php echo JRequest::getVar('x_card_num'); ?>" onchange="removeSpace(this);" />
 			</div>	
 		</div>								
 		<div class="<?php echo $controlGroupClass;  ?> payment_information" id="tr_exp_date" <?php echo $style; ?>>

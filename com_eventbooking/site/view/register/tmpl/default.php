@@ -494,7 +494,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				<div class="<?php echo $controlsClass; ?>">
 					<input type="text" id="x_card_num" name="x_card_num"
 						   class="input-large validate[required,creditCard]"
-						   value="<?php echo JRequest::getVar('x_card_num'); ?>"/>
+						   value="<?php echo JRequest::getVar('x_card_num'); ?>" onchange="removeSpace(this);"/>
 				</div>
 			</div>
 			<div class="<?php echo $controlGroupClass;  ?> payment_information" id="tr_exp_date" <?php echo $style; ?>>

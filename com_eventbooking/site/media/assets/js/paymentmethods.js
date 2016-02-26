@@ -80,6 +80,11 @@ function PaymentMethods() {
 	}
 	return null ;
 }
+
+function removeSpace(obj)
+{
+    obj.value = obj.value.replace(/\s/g, '');
+}
 /***
  * Process event when someone change a payment method
  */ 
