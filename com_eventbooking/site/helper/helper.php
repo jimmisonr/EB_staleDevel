@@ -2888,333 +2888,340 @@ class EventbookingHelper
 		$rowLocation = $db->loadObject();
 
 		// Notification email send to user
-		if (strlen($message->{'user_email_subject' . $fieldSuffix}))
+		if ($config->send_emails == 0 || $config->send_emails == 3)
 		{
-			$subject = $message->{'user_email_subject' . $fieldSuffix};
-		}
-		else
-		{
-			$subject = $message->user_email_subject;
-		}
-		if (!$row->published && strpos($row->payment_method, 'os_offline') !== false)
-		{
-			if (self::isValidMessage($event->user_email_body_offline))
+			if (strlen($message->{'user_email_subject' . $fieldSuffix}))
 			{
-				$body = $event->user_email_body_offline;
-			}
-			elseif (self::isValidMessage($message->{'user_email_body_offline' . $fieldSuffix}))
-			{
-				$body = $message->{'user_email_body_offline' . $fieldSuffix};
+				$subject = $message->{'user_email_subject' . $fieldSuffix};
 			}
 			else
 			{
-				$body = $message->user_email_body_offline;
+				$subject = $message->user_email_subject;
 			}
-		}
-		else
-		{
-			if (self::isValidMessage($event->user_email_body))
+			if (!$row->published && strpos($row->payment_method, 'os_offline') !== false)
 			{
-				$body = $event->user_email_body;
-			}
-			elseif (self::isValidMessage($message->{'user_email_body' . $fieldSuffix}))
-			{
-				$body = $message->{'user_email_body' . $fieldSuffix};
-			}
-			else
-			{
-				$body = $message->user_email_body;
-			}
-		}
-		foreach ($replaces as $key => $value)
-		{
-			$key     = strtoupper($key);
-			$subject = str_replace("[$key]", $value, $subject);
-			$body    = str_replace("[$key]", $value, $body);
-		}
-		$body = self::convertImgTags($body);
-
-		if (strpos($body, '[QRCODE]') !== false)
-		{
-			EventbookingHelper::generateQrcode($row->id);
-			$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
-			$body   = str_replace("[QRCODE]", $imgTag, $body);
-		}
-
-		$attachments = array();
-		$invoiceFilePath = '';
-		if ($config->activate_invoice_feature
-			&& $config->send_invoice_to_customer
-			&& $row->invoice_number
-			&& ($row->published == 1 || empty($config->generate_invoice_on_payment_complete)))
-		{
-			self::generateInvoicePDF($row);
-			$invoiceFilePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
-			$attachments[] = $invoiceFilePath;
-		}
-
-		if ($config->multiple_booking)
-		{
-			$query->clear();
-			$query->select('attachment')
-				->from('#__eb_events')
-				->where('id IN (SELECT event_id FROM #__eb_registrants AS a WHERE a.id=' . $row->id . ' OR a.cart_id=' . $row->id . ' ORDER BY a.id)');
-			$db->setQuery($query);
-			$attachmentFiles = $db->loadColumn();
-		}
-		else
-		{
-			if ($event->attachment)
-			{
-				$attachmentFiles = array($event->attachment);
-				$attachments[]   = JPATH_ROOT . '/media/com_eventbooking/' . $event->attachment;
-			}
-			else
-			{
-				$attachmentFiles = array();
-			}
-		}
-
-		// Remove empty value from array
-		$attachmentFiles = array_filter($attachmentFiles);
-
-		// Add all valid attachments to email
-		if (count($attachmentFiles))
-		{
-			foreach ($attachmentFiles as $attachmentFile)
-			{
-				$files = explode('|', $attachmentFile);
-				foreach ($files as $file)
+				if (self::isValidMessage($event->user_email_body_offline))
 				{
-					$filePath = JPATH_ROOT . '/media/com_eventbooking/' . $file;
-					if (file_exists($filePath))
+					$body = $event->user_email_body_offline;
+				}
+				elseif (self::isValidMessage($message->{'user_email_body_offline' . $fieldSuffix}))
+				{
+					$body = $message->{'user_email_body_offline' . $fieldSuffix};
+				}
+				else
+				{
+					$body = $message->user_email_body_offline;
+				}
+			}
+			else
+			{
+				if (self::isValidMessage($event->user_email_body))
+				{
+					$body = $event->user_email_body;
+				}
+				elseif (self::isValidMessage($message->{'user_email_body' . $fieldSuffix}))
+				{
+					$body = $message->{'user_email_body' . $fieldSuffix};
+				}
+				else
+				{
+					$body = $message->user_email_body;
+				}
+			}
+			foreach ($replaces as $key => $value)
+			{
+				$key     = strtoupper($key);
+				$subject = str_replace("[$key]", $value, $subject);
+				$body    = str_replace("[$key]", $value, $body);
+			}
+			$body = self::convertImgTags($body);
+
+			if (strpos($body, '[QRCODE]') !== false)
+			{
+				EventbookingHelper::generateQrcode($row->id);
+				$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+				$body   = str_replace("[QRCODE]", $imgTag, $body);
+			}
+
+			$attachments     = array();
+			$invoiceFilePath = '';
+			if ($config->activate_invoice_feature
+				&& $config->send_invoice_to_customer
+				&& $row->invoice_number
+				&& ($row->published == 1 || empty($config->generate_invoice_on_payment_complete))
+			)
+			{
+				self::generateInvoicePDF($row);
+				$invoiceFilePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
+				$attachments[]   = $invoiceFilePath;
+			}
+
+			if ($config->multiple_booking)
+			{
+				$query->clear();
+				$query->select('attachment')
+					->from('#__eb_events')
+					->where('id IN (SELECT event_id FROM #__eb_registrants AS a WHERE a.id=' . $row->id . ' OR a.cart_id=' . $row->id . ' ORDER BY a.id)');
+				$db->setQuery($query);
+				$attachmentFiles = $db->loadColumn();
+			}
+			else
+			{
+				if ($event->attachment)
+				{
+					$attachmentFiles = array($event->attachment);
+					$attachments[]   = JPATH_ROOT . '/media/com_eventbooking/' . $event->attachment;
+				}
+				else
+				{
+					$attachmentFiles = array();
+				}
+			}
+
+			// Remove empty value from array
+			$attachmentFiles = array_filter($attachmentFiles);
+
+			// Add all valid attachments to email
+			if (count($attachmentFiles))
+			{
+				foreach ($attachmentFiles as $attachmentFile)
+				{
+					$files = explode('|', $attachmentFile);
+					foreach ($files as $file)
 					{
-						$attachments[] = $filePath;
+						$filePath = JPATH_ROOT . '/media/com_eventbooking/' . $file;
+						if (file_exists($filePath))
+						{
+							$attachments[] = $filePath;
+						}
 					}
 				}
 			}
-		}
 
-		//Generate and send ics file to registrants
-		if ($config->send_ics_file)
-		{
-			$ics = new EventbookingHelperIcs();
-			$ics->setName($event->title)
-				->setDescription($event->short_description)
-				->setOrganizer($fromEmail, $fromName)
-				->setStart($event->event_date)
-				->setEnd($event->event_end_date);
-
-			if ($rowLocation)
+			//Generate and send ics file to registrants
+			if ($config->send_ics_file)
 			{
-				$ics->setLocation($rowLocation->name);
-			}
-			$fileName      = JApplication::stringURLSafe($event->title) . '.ics';
-			$attachments[] = $ics->save(JPATH_ROOT . '/media/com_eventbooking/icsfiles/', $fileName);
-		}
+				$ics = new EventbookingHelperIcs();
+				$ics->setName($event->title)
+					->setDescription($event->short_description)
+					->setOrganizer($fromEmail, $fromName)
+					->setStart($event->event_date)
+					->setEnd($event->event_end_date);
 
-		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1, null, null, $attachments);
-
-		if ($config->send_email_to_group_members && $row->is_group_billing)
-		{
-			// Remove invoice from attachment, group members should not receive invoice
-			if ($invoiceFilePath && file_exists($invoiceFilePath))
-			{
-				$mailer->removeAttachment(0);
-			}
-
-			$query->clear();
-			$query->select('*')
-				->from('#__eb_registrants')
-				->where('group_id = ' . $row->id)
-				->order('id');
-			$db->setQuery($query);
-			$rowMembers = $db->loadObjectList();
-			if (count($rowMembers))
-			{
-				$memberReplaces                      = array();
-				$memberReplaces['event_title']       = $replaces['event_title'];
-				$memberReplaces['event_date']        = $replaces['event_date'];
-				$memberReplaces['transaction_id']    = $replaces['transaction_id'];
-				$memberReplaces['date']              = $replaces['date'];
-				$memberReplaces['short_description'] = $replaces['short_description'];
-				$memberReplaces['description']       = $replaces['short_description'];
-				$memberReplaces['location']          = $replaces['location'];
-				$memberFormFields                    = self::getFormFields($row->event_id, 2);
-				foreach ($rowMembers as $rowMember)
+				if ($rowLocation)
 				{
-					if (!$rowMember->email)
+					$ics->setLocation($rowLocation->name);
+				}
+				$fileName      = JApplication::stringURLSafe($event->title) . '.ics';
+				$attachments[] = $ics->save(JPATH_ROOT . '/media/com_eventbooking/icsfiles/', $fileName);
+			}
+
+			$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1, null, null, $attachments);
+
+			if ($config->send_email_to_group_members && $row->is_group_billing)
+			{
+				// Remove invoice from attachment, group members should not receive invoice
+				if ($invoiceFilePath && file_exists($invoiceFilePath))
+				{
+					$mailer->removeAttachment(0);
+				}
+
+				$query->clear();
+				$query->select('*')
+					->from('#__eb_registrants')
+					->where('group_id = ' . $row->id)
+					->order('id');
+				$db->setQuery($query);
+				$rowMembers = $db->loadObjectList();
+				if (count($rowMembers))
+				{
+					$memberReplaces                      = array();
+					$memberReplaces['event_title']       = $replaces['event_title'];
+					$memberReplaces['event_date']        = $replaces['event_date'];
+					$memberReplaces['transaction_id']    = $replaces['transaction_id'];
+					$memberReplaces['date']              = $replaces['date'];
+					$memberReplaces['short_description'] = $replaces['short_description'];
+					$memberReplaces['description']       = $replaces['short_description'];
+					$memberReplaces['location']          = $replaces['location'];
+					$memberFormFields                    = self::getFormFields($row->event_id, 2);
+					foreach ($rowMembers as $rowMember)
 					{
-						continue;
-					}
-					if (strlen($message->{'group_member_email_subject' . $fieldSuffix}))
-					{
-						$subject = $message->{'group_member_email_subject' . $fieldSuffix};
-					}
-					else
-					{
-						$subject = $message->group_member_email_subject;
-					}
-					if (self::isValidMessage($message->{'group_member_email_body' . $fieldSuffix}))
-					{
-						$body = $message->{'group_member_email_body' . $fieldSuffix};
-					}
-					else
-					{
-						$body = $message->group_member_email_body;
-					}
-					if (!$subject)
-					{
-						break;
-					}
-					if (!$body)
-					{
-						break;
-					}
-					//Build the member form
-					$memberForm = new RADForm($memberFormFields);
-					$memberData = self::getRegistrantData($rowMember, $memberFormFields);
-					$memberForm->bind($memberData);
-					$memberForm->buildFieldsDependency();
-					$fields = $memberForm->getFields();
-					foreach ($fields as $field)
-					{
-						if ($field->hideOnDisplay)
+						if (!$rowMember->email)
 						{
-							$fieldValue = '';
+							continue;
+						}
+						if (strlen($message->{'group_member_email_subject' . $fieldSuffix}))
+						{
+							$subject = $message->{'group_member_email_subject' . $fieldSuffix};
 						}
 						else
 						{
-							if (is_string($field->value) && is_array(json_decode($field->value)))
+							$subject = $message->group_member_email_subject;
+						}
+						if (self::isValidMessage($message->{'group_member_email_body' . $fieldSuffix}))
+						{
+							$body = $message->{'group_member_email_body' . $fieldSuffix};
+						}
+						else
+						{
+							$body = $message->group_member_email_body;
+						}
+						if (!$subject)
+						{
+							break;
+						}
+						if (!$body)
+						{
+							break;
+						}
+						//Build the member form
+						$memberForm = new RADForm($memberFormFields);
+						$memberData = self::getRegistrantData($rowMember, $memberFormFields);
+						$memberForm->bind($memberData);
+						$memberForm->buildFieldsDependency();
+						$fields = $memberForm->getFields();
+						foreach ($fields as $field)
+						{
+							if ($field->hideOnDisplay)
 							{
-								$fieldValue = implode(', ', json_decode($field->value));
+								$fieldValue = '';
 							}
 							else
 							{
-								$fieldValue = $field->value;
+								if (is_string($field->value) && is_array(json_decode($field->value)))
+								{
+									$fieldValue = implode(', ', json_decode($field->value));
+								}
+								else
+								{
+									$fieldValue = $field->value;
+								}
 							}
+							$memberReplaces[$field->name] = $fieldValue;
 						}
-						$memberReplaces[$field->name] = $fieldValue;
+						$memberReplaces['member_detail'] = self::getMemberDetails($config, $rowMember, $event, $rowLocation, true, $memberForm);
+						foreach ($memberReplaces as $key => $value)
+						{
+							$key     = strtoupper($key);
+							$body    = str_replace("[$key]", $value, $body);
+							$subject = str_replace("[$key]", $value, $subject);
+						}
+						$body = self::convertImgTags($body);
+						$mailer->ClearAllRecipients();
+						$mailer->sendMail($fromEmail, $fromName, $rowMember->email, $subject, $body, 1, null);
 					}
-					$memberReplaces['member_detail'] = self::getMemberDetails($config, $rowMember, $event, $rowLocation, true, $memberForm);
-					foreach ($memberReplaces as $key => $value)
-					{
-						$key     = strtoupper($key);
-						$body    = str_replace("[$key]", $value, $body);
-						$subject = str_replace("[$key]", $value, $subject);
-					}
-					$body = self::convertImgTags($body);
-					$mailer->ClearAllRecipients();
-					$mailer->sendMail($fromEmail, $fromName, $rowMember->email, $subject, $body, 1, null);
 				}
 			}
-		}
 
-		// Clear attachments
-		$mailer->ClearAttachments();
-		$mailer->clearReplyTos();
+			// Clear attachments
+			$mailer->ClearAttachments();
+			$mailer->clearReplyTos();
+		}
 
 		// Add invoice to admin email if needed
-		if ($config->send_invoice_to_admin && $invoiceFilePath && file_exists($invoiceFilePath))
+		if ($config->send_emails == 0 || $config->send_emails == 1)
 		{
-			$mailer->addAttachment($invoiceFilePath);
-		}
-
-		// Send attachment to admin email if needed
-		if ($config->send_attachments_to_admin)
-		{
-			$attachmentsPath = JPATH_ROOT . '/media/com_eventbooking/files/';
-			for ($i = 0, $n = count($rowFields); $i < $n; $i++)
+			if ($config->send_invoice_to_admin && !empty($invoiceFilePath) && file_exists($invoiceFilePath))
 			{
-				$rowField = $rowFields[$i];
-				if ($rowField->fieldtype == 'File')
+				$mailer->addAttachment($invoiceFilePath);
+			}
+
+			// Send attachment to admin email if needed
+			if ($config->send_attachments_to_admin)
+			{
+				$attachmentsPath = JPATH_ROOT . '/media/com_eventbooking/files/';
+				for ($i = 0, $n = count($rowFields); $i < $n; $i++)
 				{
-					if (isset($replaces[$rowField->name]))
+					$rowField = $rowFields[$i];
+					if ($rowField->fieldtype == 'File')
 					{
-						$fileName = $replaces[$rowField->name];
-						if ($fileName && file_exists($attachmentsPath . '/' . $fileName))
+						if (isset($replaces[$rowField->name]))
 						{
-							$pos = strpos($fileName, '_');
-							if ($pos !== false)
+							$fileName = $replaces[$rowField->name];
+							if ($fileName && file_exists($attachmentsPath . '/' . $fileName))
 							{
-								$originalFilename = substr($fileName, $pos + 1);
+								$pos = strpos($fileName, '_');
+								if ($pos !== false)
+								{
+									$originalFilename = substr($fileName, $pos + 1);
+								}
+								else
+								{
+									$originalFilename = $fileName;
+								}
+								$mailer->addAttachment($attachmentsPath . '/' . $fileName, $originalFilename);
 							}
-							else
-							{
-								$originalFilename = $fileName;
-							}
-							$mailer->addAttachment($attachmentsPath . '/' . $fileName, $originalFilename);
 						}
 					}
 				}
 			}
-		}
 
-		//Send emails to notification emails
-		if (strlen(trim($event->notification_emails)) > 0)
-		{
-			$config->notification_emails = $event->notification_emails;
-		}
-		if ($config->notification_emails == '')
-		{
-			$notificationEmails = $fromEmail;
-		}
-		else
-		{
-			$notificationEmails = $config->notification_emails;
-		}
-		$notificationEmails = str_replace(' ', '', $notificationEmails);
-		$emails             = explode(',', $notificationEmails);
-		if (strlen($message->{'admin_email_subject' . $fieldSuffix}))
-		{
-			$subject = $message->{'admin_email_subject' . $fieldSuffix};
-		}
-		else
-		{
-			$subject = $message->admin_email_subject;
-		}
-		if (self::isValidMessage($message->{'admin_email_body' . $fieldSuffix}))
-		{
-			$body = $message->{'admin_email_body' . $fieldSuffix};
-		}
-		else
-		{
-			$body = $message->admin_email_body;
-		}
-
-		if ($row->payment_method == 'os_offline_creditcard')
-		{
-			$replaces['registration_detail'] = self::getEmailContent($config, $row, true, $form, true);
-		}
-		foreach ($replaces as $key => $value)
-		{
-			$key     = strtoupper($key);
-			$subject = str_replace("[$key]", $value, $subject);
-			$body    = str_replace("[$key]", $value, $body);
-		}
-		$body = self::convertImgTags($body);
-
-		if (strpos($body, '[QRCODE]') !== false)
-		{
-			EventbookingHelper::generateQrcode($row->id);
-			$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
-			$body   = str_replace("[QRCODE]", $imgTag, $body);
-		}
-
-		for ($i = 0, $n = count($emails); $i < $n; $i++)
-		{
-			$email = $emails[$i];
-			$mailer->ClearAllRecipients();
-			if ($email)
+			//Send emails to notification emails
+			if (strlen(trim($event->notification_emails)) > 0)
 			{
-				$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
+				$config->notification_emails = $event->notification_emails;
 			}
-		}
+			if ($config->notification_emails == '')
+			{
+				$notificationEmails = $fromEmail;
+			}
+			else
+			{
+				$notificationEmails = $config->notification_emails;
+			}
+			$notificationEmails = str_replace(' ', '', $notificationEmails);
+			$emails             = explode(',', $notificationEmails);
+			if (strlen($message->{'admin_email_subject' . $fieldSuffix}))
+			{
+				$subject = $message->{'admin_email_subject' . $fieldSuffix};
+			}
+			else
+			{
+				$subject = $message->admin_email_subject;
+			}
+			if (self::isValidMessage($message->{'admin_email_body' . $fieldSuffix}))
+			{
+				$body = $message->{'admin_email_body' . $fieldSuffix};
+			}
+			else
+			{
+				$body = $message->admin_email_body;
+			}
 
-		if (!empty($eventCreator->email) && !$eventCreator->authorise('core.admin') && !in_array($eventCreator->email, $emails))
-		{
-			$mailer->ClearAllRecipients();
-			$mailer->sendMail($fromEmail, $fromName, $eventCreator->email, $subject, $body, 1);
+			if ($row->payment_method == 'os_offline_creditcard')
+			{
+				$replaces['registration_detail'] = self::getEmailContent($config, $row, true, $form, true);
+			}
+			foreach ($replaces as $key => $value)
+			{
+				$key     = strtoupper($key);
+				$subject = str_replace("[$key]", $value, $subject);
+				$body    = str_replace("[$key]", $value, $body);
+			}
+			$body = self::convertImgTags($body);
+
+			if (strpos($body, '[QRCODE]') !== false)
+			{
+				EventbookingHelper::generateQrcode($row->id);
+				$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+				$body   = str_replace("[QRCODE]", $imgTag, $body);
+			}
+
+			for ($i = 0, $n = count($emails); $i < $n; $i++)
+			{
+				$email = $emails[$i];
+				$mailer->ClearAllRecipients();
+				if ($email)
+				{
+					$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
+				}
+			}
+
+			if (!empty($eventCreator->email) && !$eventCreator->authorise('core.admin') && !in_array($eventCreator->email, $emails))
+			{
+				$mailer->ClearAllRecipients();
+				$mailer->sendMail($fromEmail, $fromName, $eventCreator->email, $subject, $body, 1);
+			}
 		}
 	}
 
