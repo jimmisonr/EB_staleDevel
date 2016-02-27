@@ -65,7 +65,9 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			$data = array();
 			$form->bind($data, true);
 		}
-		$form->bind($data);
+
+		$form->buildFieldsDependency();
+
 		if ($userId && $user->authorise('eventbooking.registrants_management', 'com_eventbooking'))
 		{
 			$canChangeStatus    = true;

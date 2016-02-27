@@ -78,8 +78,25 @@ $selectedState = '';
 				case 'message':
 					break;
 				default:
+					$controlGroupAttributes = 'id="field_' . $field->name . '" ';
+					if ($field->hideOnDisplay)
+					{
+						$controlGroupAttributes .= ' style="display:none;" ';
+					}
+					if ($field->isMasterField)
+					{
+						if ($field->suffix)
+						{
+							$class = 'master-field-' . $field->suffix;
+						}
+						else
+						{
+							$class = 'master-field';
+						}
+						$controlGroupAttributes .= ' class="'.$class.'" ';
+					}
 					?>
-					<tr id="field_<?php echo $field->name; ?>">
+					<tr <?php echo $controlGroupAttributes; ?>>
 						<td width="100" class="title_cell">
 							<?php echo $field->title; ?>
 						</td>
@@ -305,6 +322,7 @@ $selectedState = '';
 				$memberData = EventBookingHelper::getRegistrantData($rowMember, $this->memberFormFields);
 				$form->bind($memberData);
 				$form->setFieldSuffix($i + 1);
+				$form->buildFieldsDependency();
 				if ($i % 2 == 0)
 				{
 					echo "<tr>\n";
@@ -338,8 +356,25 @@ $selectedState = '';
 								case 'message':
 									break;
 								default:
+									$controlGroupAttributes = 'id="field_' . $field->name . '" ';
+									if ($field->hideOnDisplay)
+									{
+										$controlGroupAttributes .= ' style="display:none;" ';
+									}
+									if ($field->isMasterField)
+									{
+										if ($field->suffix)
+										{
+											$class = 'master-field-' . $field->suffix;
+										}
+										else
+										{
+											$class = 'master-field';
+										}
+										$controlGroupAttributes .= ' class="'.$class.'" ';
+									}
 									?>
-									<tr>
+									<tr <?php echo $controlGroupAttributes; ?>>
 										<td width="100" class="key">
 											<?php echo $field->title; ?>
 										</td>
