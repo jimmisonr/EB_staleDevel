@@ -65,6 +65,8 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 			$form->bind($data, true);
 		}
 
+		$form->buildFieldsDependency();
+
 		$options                  = array();
 		$options[]                = JHtml::_('select.option', 0, JText::_('Pending'));
 		$options[]                = JHtml::_('select.option', 1, JText::_('Paid'));
@@ -115,6 +117,8 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		{
 			$this->lists['checked_in'] = JHtml::_('select.booleanlist', 'checked_in', ' class="inputbox" ', $this->item->checked_in);
 		}
+
+		EventbookingHelper::addLangLinkForAjax();
 
 		$this->config     = $config;
 		$this->event      = $event;

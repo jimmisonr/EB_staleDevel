@@ -81,8 +81,25 @@ $selectedState = '';
 					case 'message':
 						break;
 					default:
+						$controlGroupAttributes = 'id="field_' . $field->name . '" ';
+						if ($field->hideOnDisplay)
+						{
+							$controlGroupAttributes .= ' style="display:none;" ';
+						}
+						if ($field->isMasterField)
+						{
+							if ($field->suffix)
+							{
+								$class = 'master-field-' . $field->suffix;
+							}
+							else
+							{
+								$class = 'master-field';
+							}
+							$controlGroupAttributes .= ' class="'.$class.'" ';
+						}
 				?>
-				<tr id="field_<?php echo $field->name; ?>">
+				<tr <?php echo $controlGroupAttributes; ?>>
 					<td width="100" class="key">
 						<?php echo $field->title; ?>
 					</td>
@@ -291,6 +308,7 @@ $selectedState = '';
 			$memberData = EventBookingHelper::getRegistrantData($rowMember, $this->memberFormFields);
 			$form->bind($memberData);	
 			$form->setFieldSuffix($i+1);
+			$form->buildFieldsDependency();
 			if ($i%2 == 0)
 			{
 				echo "<tr>\n";
@@ -316,8 +334,25 @@ $selectedState = '';
 									case 'message':
 										break;
 									default:
+										$controlGroupAttributes = 'id="field_' . $field->name . '" ';
+										if ($field->hideOnDisplay)
+										{
+											$controlGroupAttributes .= ' style="display:none;" ';
+										}
+										if ($field->isMasterField)
+										{
+											if ($field->suffix)
+											{
+												$class = 'master-field-' . $field->suffix;
+											}
+											else
+											{
+												$class = 'master-field';
+											}
+											$controlGroupAttributes .= ' class="'.$class.'" ';
+										}
 									?>
-									<tr>
+									<tr <?php echo $controlGroupAttributes; ?>>
 										<td width="100" class="key">
 											<?php echo $field->title; ?>
 										</td>
@@ -355,6 +390,41 @@ $selectedState = '';
 	<script type="text/javascript">
 		var siteUrl = "<?php echo JUri::root(); ?>";
 		(function($){
+
+			showHideDependFields = (function(fieldId, fieldName, fieldType, fieldSuffix) {
+				$('#ajax-loading-animation').show();
+				var masterFieldsSelector;
+				if (fieldSuffix)
+				{
+					masterFieldsSelector = '.master-field-' + fieldSuffix + ' input[type=\'checkbox\']:checked,' + ' .master-field-' + fieldSuffix + ' input[type=\'radio\']:checked,' + ' .master-field-' + fieldSuffix + ' select';
+				}
+				else
+				{
+					masterFieldsSelector = '.master-field input[type=\'checkbox\']:checked, .master-field input[type=\'radio\']:checked, .master-field select';
+				}
+				$.ajax({
+					type: 'POST',
+					url: siteUrl + 'index.php?option=com_eventbooking&task=get_depend_fields_status&field_id=' + fieldId + '&field_suffix=' + fieldSuffix + langLinkForAjax,
+					data: $(masterFieldsSelector),
+					dataType: 'json',
+					success: function(msg, textStatus, xhr) {
+						$('#ajax-loading-animation').hide();
+						var hideFields = msg.hide_fields.split(',');
+						var showFields = msg.show_fields.split(',');
+						for (var i = 0; i < hideFields.length ; i++)
+						{
+							$('#' + hideFields[i]).hide();
+						}
+						for (var i = 0; i < showFields.length ; i++)
+						{
+							$('#' + showFields[i]).show();
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						alert(textStatus);
+					}
+				});
+			});
 			buildStateField = (function(stateFieldId, countryFieldId, defaultState){
 				if($('#' + stateFieldId).length && $('#' + stateFieldId).is('select'))
 				{
@@ -397,8 +467,8 @@ $selectedState = '';
 				}//end check exits state
 							
 			});
-			$(document).ready(function(){							
-				buildStateField('state', 'country', '<?php echo $selectedState; ?>');										
+			$(document).ready(function(){
+				buildStateField('state', 'country', '<?php echo $selectedState; ?>');
 			})
 			populateRegisterData = (function(id, registerId, title){
 				$.ajax({
@@ -436,7 +506,7 @@ $selectedState = '';
 						$('#user_id_name').val(title);
 					}
 				})
-			});		
+			});
 		})(jQuery);
 	</script>
 </form>

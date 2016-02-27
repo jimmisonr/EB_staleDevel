@@ -158,8 +158,9 @@ abstract class RADFormField
 			case 'value':
 			case 'row':
 			case 'hideOnDisplay':
-			case 'isMaterField':
+			case 'isMasterField':
 			case 'eventId':
+			case 'suffix' :
 				return $this->{$name};
 				break;
 			case 'fee_field':
