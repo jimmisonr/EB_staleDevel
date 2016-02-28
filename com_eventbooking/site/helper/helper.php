@@ -2581,7 +2581,12 @@ class EventbookingHelper
 					$quantityValues = explode("\r\n", $field->quantity_values);
 					if (count($values) && count($quantityValues))
 					{
-						$values = EventbookingHelperHtml::getAvailableQuantityOptions($values, $quantityValues, $event->id, $field->id, ($field->fieldtype == 'Checkboxes') ? true : false);
+						$multilingualValues = array();
+						if (JLanguageMultilang::isEnabled())
+						{
+							$multilingualValues = RADFormField::getMultilingualOptions($field->id);
+						}
+						$values = EventbookingHelperHtml::getAvailableQuantityOptions($values, $quantityValues, $event->id, $field->id, ($field->fieldtype == 'Checkboxes') ? true : false, $multilingualValues);
 						if (!count($values))
 						{
 							return false;

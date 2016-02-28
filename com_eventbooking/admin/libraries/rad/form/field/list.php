@@ -97,7 +97,13 @@ class RADFormFieldList extends RADFormField
 
 		if ($this->row->quantity_field && count($values) && count($quantityValues) && $this->eventId)
 		{
-			$values = EventbookingHelperHtml::getAvailableQuantityOptions($values, $quantityValues, $this->eventId, $this->row->id);
+			$multilingualValues = array();
+			if (JLanguageMultilang::isEnabled())
+			{
+				$multilingualValues = RADFormField::getMultilingualOptions($this->row->id);
+			}
+
+			$values = EventbookingHelperHtml::getAvailableQuantityOptions($values, $quantityValues, $this->eventId, $this->row->id, false, $multilingualValues);
 		}
 
 		if (count($values) == 0)

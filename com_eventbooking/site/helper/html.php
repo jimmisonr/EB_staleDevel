@@ -347,10 +347,12 @@ abstract class EventbookingHelperHtml
 	 * @param array $quantityValues
 	 * @param int   $eventId
 	 * @param int   $fieldId
+	 * @param bool  $multiple
+	 * @param array $multilingualValues
 	 *
 	 * @return array
 	 */
-	public static function getAvailableQuantityOptions(&$values, $quantityValues, $eventId, $fieldId, $multiple = false)
+	public static function getAvailableQuantityOptions(&$values, $quantityValues, $eventId, $fieldId, $multiple = false, $multilingualValues = array())
 	{
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
@@ -420,8 +422,18 @@ abstract class EventbookingHelperHtml
 					$query->select('COUNT(*)')
 						->from('#__eb_field_values')
 						->where('field_id = ' . $fieldId)
-						->where('registrant_id IN (' . $registrantIds . ')')
-						->where('field_value=' . $db->quote($value));
+						->where('registrant_id IN (' . $registrantIds . ')');
+
+					if (!empty($multilingualValues))
+					{
+						$allValues = array_map(array($db, 'quote'), $multilingualValues[$i]);
+						$query->where('field_value IN (' . implode(',', $allValues) . ')');
+					}
+					else
+					{
+						$query->where('field_value=' . $db->quote($value));
+					}
+
 					$db->setQuery($query);
 					$total = $db->loadResult();
 				}

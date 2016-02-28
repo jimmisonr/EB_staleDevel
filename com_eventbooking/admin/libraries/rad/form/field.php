@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Abstract Form Field class for the RAD framework
  *
@@ -509,5 +508,49 @@ abstract class RADFormField
 		}
 
 		$this->row->required = 0;
+	}
+
+	/**
+	 * Get the list options from all languages for radio, list and checkboxes field
+	 *
+	 * @param $fieldId
+	 *
+	 * @return array
+	 */
+	public static function getMultilingualOptions($fieldId)
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('*')
+			->from('#__eb_fields')
+			->where('id = ' . $fieldId);
+		$db->setQuery($query);
+		$row = $db->loadObject();
+
+		$languages          = EventbookingHelper::getLanguages();
+		$multilingualValues = array();
+		$languageValues     = array();
+		foreach ($languages as $language)
+		{
+			$sef                  = $language->sef;
+			$languageValues[$sef] = explode("\r\n", $row->{'values_' . $sef});
+		}
+
+		$defaultValues = explode("\r\n", $row->values);
+		for ($i = 0, $n = count($defaultValues); $i < $n; $i++)
+		{
+			$multilingualValues[$i]   = array();
+			$multilingualValues[$i][] = $defaultValues[$i];
+			foreach ($languages as $language)
+			{
+				$sef = $language->sef;
+				if (isset($languageValues[$sef][$i]))
+				{
+					$multilingualValues[$i][] = $languageValues[$sef][$i];
+				}
+			}
+		}
+
+		return $multilingualValues;
 	}
 }
