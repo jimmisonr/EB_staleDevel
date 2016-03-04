@@ -502,6 +502,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					'params',
 					'currency_code',
 					'currency_symbol',
+					'custom_field_ids',
 					'published');
 				$rowChildEvent = $this->getTable();
 				foreach ($children as $childId)
