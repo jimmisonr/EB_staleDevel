@@ -60,11 +60,8 @@ class plgButtonEbevent extends JPlugin
         $button->set('link', $link);
         $button->set('text', JText::_('EB Event'));
         $button->set('name', 'ebevent');
-        $button->set('options', "{handler: 'iframe', size: {x: 770, y: 400}}");
-        if (version_compare(JVERSION, '3.0', 'ge'))
-        {
-            $button->set('class', 'btn');
-        }
+        $button->set('options', "{handler: 'iframe', size: {x: 770, y: 400}}");               
+        $button->set('class', 'btn');        
 
         return $button;
     }
