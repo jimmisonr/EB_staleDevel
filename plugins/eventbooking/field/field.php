@@ -118,7 +118,7 @@ class plgEventBookingField extends JPlugin
 
 		$rowField->store();
 
-		if (!$isNew)
+		if (!$fieldId)
 		{
 			$query->clear();
 			$query->insert('#__eb_field_events')
