@@ -12,7 +12,7 @@ defined('_JEXEC') or die();
 
 JFormHelper::loadFieldClass('list');
 
-class JFormFieldEBEvent extends JFormFieldList
+class JFormFieldEBField extends JFormFieldList
 {
 
 	/**
@@ -20,7 +20,7 @@ class JFormFieldEBEvent extends JFormFieldList
 	 *
 	 * @var string
 	 */
-	protected $type = 'ebevent';
+	protected $type = 'ebfield';
 
 	protected function getOptions()
 	{
@@ -28,13 +28,13 @@ class JFormFieldEBEvent extends JFormFieldList
 		$query = $db->getQuery(true);
 		$query->select($db->quoteName('id', 'value'))
 			->select($db->quoteName('title', 'text'))
-			->from('#__eb_events')
+			->from('#__eb_fields')
 			->where('published = 1')
 			->order('title');
 		$db->setQuery($query);
 
 		$options   = array();
-		$options[] = JHtml::_('select.option', '0', JText::_('Select Event'));
+		$options[] = JHtml::_('select.option', '0', JText::_('Select Field'));
 
 		return array_merge($options, $db->loadObjectList());
 	}

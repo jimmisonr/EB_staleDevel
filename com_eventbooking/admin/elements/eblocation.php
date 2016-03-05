@@ -9,26 +9,32 @@
  */
 // no direct access
 defined('_JEXEC') or die;
-jimport('joomla.form.formfield');
 
-class JFormFieldEBLocation extends JFormField
+JFormHelper::loadFieldClass('list');
+
+class JFormFieldEBLocation extends JFormFieldList
 {
 
 	/**
-	 * Element name
+	 * The form field type.
 	 *
-	 * @access    protected
-	 * @var        string
+	 * @var string
 	 */
-	var $_name = 'eblocation';
+	protected $type = 'eblocation';
 
-	function getInput()
+	protected function getOptions()
 	{
 		require_once JPATH_ROOT . '/components/com_eventbooking/helper/database.php';
-		$options   = array();
-		$options[] = JHtml::_('select.option', '0', JText::_('Select Location'), 'id', 'name');
-		$options   = array_merge($options, EventbookingHelperDatabase::getAllLocations());
 
-		return JHtml::_('select.genericlist', $options, $this->name, '', 'id', 'name', $this->value);
+		$options   = array();
+		$options[] = JHtml::_('select.option', '0', JText::_('Select Location'));
+
+		$locations = EventbookingHelperDatabase::getAllLocations();
+		foreach ($locations as $location)
+		{
+			$options[] = JHtml::_('select.option', $location->id, $location->name);
+		}
+
+		return $options;
 	}
 }

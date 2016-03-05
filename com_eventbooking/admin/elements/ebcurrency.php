@@ -1,35 +1,39 @@
 <?php
 /**
  * @version            2.3.2
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2016 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die();
 
-class JFormFieldEBCurrency extends JFormField
+JFormHelper::loadFieldClass('list');
+
+class JFormFieldEBCurrency extends JFormFieldList
 {
 
 	/**
-	 * Element name
+	 * The form field type.
 	 *
-	 * @access	protected
-	 * @var		string
+	 * @var string
 	 */
-	var $_name = 'ebcurrency';
+	protected $type = 'ebcurrency';
 
-	function getInput()
+	protected function getOptions()
 	{
-		$db = JFactory::getDBO();
-		$sql = "SELECT currency_code, currency_name  FROM #__eb_currencies ORDER BY currency_name ";
-		$db->setQuery($sql);
-		$options = array();
-		$options[] = JHtml::_('select.option', '', JText::_('Select Currency'), 'currency_code', 'currency_name');
-		$options = array_merge($options, $db->loadObjectList());
-		
-		return JHtml::_('select.genericlist', $options, $this->name, ' class="inputbox" ', 'currency_code', 'currency_name', $this->value);
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select($db->quoteName('currency_code', 'value'))
+			->select($db->quoteName('currency_name', 'text'))
+			->from('#__eb_currencies')
+			->order('currency_name');
+		$db->setQuery($query);
+		$options   = array();
+		$options[] = JHtml::_('select.option', '', JText::_('Select Currency'));
+
+		return array_merge($options, $db->loadObjectList());
 	}
 }   

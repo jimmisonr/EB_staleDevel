@@ -1,58 +1,56 @@
 <?php
 /**
  * @version            2.3.2
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2016 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
-jimport('joomla.form.formfield');
+defined('_JEXEC') or die;
+JFormHelper::loadFieldClass('list');
 
-class JFormFieldEBCategory extends JFormField
+class JFormFieldEBCategory extends JFormFieldList
 {
 
 	/**
-	 * Element name
+	 * The form field type.
 	 *
-	 * @access	protected
-	 * @var		string
+	 * @var string
 	 */
-	var $_name = 'ebcategory';
+	protected $type = 'ebcategory';
 
-	function getInput()
+	protected function getOptions()
 	{
-		$db = JFactory::getDBO();
-		$sql = "SELECT id, parent, parent AS parent_id, name, name AS title FROM #__eb_categories WHERE published = 1";
-		$db->setQuery($sql);
-		$rows = $db->loadObjectList();
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('id, parent AS parent_id, name AS title')
+			->from('#__eb_categories')
+			->where('published = 1');
+		$db->setQuery($query);
+		$rows     = $db->loadObjectList();
 		$children = array();
 		if ($rows)
 		{
 			// first pass - collect children
 			foreach ($rows as $v)
 			{
-				$pt = $v->parent;
+				$pt   = $v->parent_id;
 				$list = @$children[$pt] ? $children[$pt] : array();
 				array_push($list, $v);
 				$children[$pt] = $list;
 			}
 		}
-		$list = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
-		$options = array();
+
+		$list      = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
+		$options   = array();
 		$options[] = JHtml::_('select.option', '0', JText::_('Top'));
 		foreach ($list as $item)
 		{
 			$options[] = JHtml::_('select.option', $item->id, '&nbsp;&nbsp;&nbsp;' . $item->treename);
 		}
-		return JHtml::_('select.genericlist', $options, $this->name, 
-			array(
-				'option.text.toHtml' => false, 
-				'option.value' => 'value', 
-				'option.text' => 'text', 
-				'list.attr' => ' class="inputbox" ', 
-				'list.select' => $this->value));
+
+		return $options;
 	}
 }

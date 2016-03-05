@@ -38,7 +38,8 @@
 					description="" />
 				<field 
 					name="category_ids" 
-					type="ebcategories" 
+					type="ebcategory"
+					multiple="true"		
 					default="" 
 					label="Select category" 
 					description="" />
