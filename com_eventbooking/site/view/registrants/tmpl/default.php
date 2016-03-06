@@ -25,6 +25,18 @@ $return = base64_encode(JUri::getInstance()->toString());
 		}		
 		Joomla.submitform( pressbutton );
 	}
+
+	function deleteConfirm(registrantId)
+	{
+		var msg = "<?php echo JText::_('EB_DELETE_CONFIRM'); ?>";
+		if (confirm(msg))
+		{
+			var form = document.adminForm;
+			form.registrant_id.value = registrantId;
+			form.task.value = 'registrant.delete';
+			form.submit();
+		}
+	}
 </script>
 <h1 class="eb-page-heading"><?php echo JText::_('EB_REGISTRANT_LIST'); ?></h1>
 <div id="eb-registrants-management-page" class="eb-container">
@@ -155,6 +167,9 @@ $return = base64_encode(JUri::getInstance()->toString());
 					<a href="<?php echo $link; ?>">
 						<?php echo $row->first_name ?>
 					</a>
+					<span class="pull-right">
+						<a class="btn" href="javascript:deleteConfirm(<?php echo $row->id; ?>);"><i class="icon-trash"></i><?php echo JText::_('EB_DELETE'); ?></a>
+					</span>
 					<?php
 					if ($row->is_group_billing)
 					{
@@ -275,6 +290,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
+	<input type="hidden" name="registrant_id" value="0" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 </form>
 </div>

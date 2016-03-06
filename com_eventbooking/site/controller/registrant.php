@@ -32,6 +32,58 @@ class EventbookingControllerRegistrant extends EventbookingController
 	}
 
 	/**
+	 * Delete the selected registration record
+	 *
+	 */
+	public function delete()
+	{
+		$this->csrfProtection();
+
+		$user   = JFactory::getUser();
+		$config = EventbookingHelper::getConfig();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+
+		$registrantId = $this->input->getInt('registrant_id', 0);
+		$canDelete    = false;
+
+		$query->select('a.*, b.created_by')
+			->from('#__eb_registrants AS a')
+			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+			->where('a.id = ' . $registrantId);
+		$db->setQuery($query);
+		$rowRegistrant = $db->loadObject();
+
+		if (!$rowRegistrant)
+		{
+			throw new RuntimeException('Invalid registration record');
+		}
+
+		if ($user->authorise('core.admin', 'com_eventbooking'))
+		{
+			$canDelete = true;
+		}
+		elseif ($user->authorise('eventbooking.registrants_management', 'com_eventbooking'))
+		{
+			if (!$config->only_show_registrants_of_event_owner || ($rowRegistrant->created_by == $user->id))
+			{
+				$canDelete = true;
+			}
+		}
+
+		if ($canDelete)
+		{
+			$model = $this->getModel('Registrant');
+			$model->delete(array($registrantId));
+
+			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=registrants&Itemid=' . $this->input->getInt('Itemid')), JText::_('EB_REGISTRANT_DELETED'));
+		}
+		else
+		{
+			throw new RuntimeException('You don\'t have permission to delete registrant', 403);
+		}
+	}
+	/**
 	 * Cancel registration for the event
 	 */
 	public function cancel()

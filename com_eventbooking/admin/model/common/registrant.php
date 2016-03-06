@@ -194,6 +194,74 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	}
 
 	/**
+	 * Method to remove registrants
+	 *
+	 * @access    public
+	 * @return    boolean    True on success
+	 */
+	function delete($cid = array())
+	{
+		$db    = $this->getDbo();
+		$query = $db->getQuery(true);
+		$row   = $this->getTable();
+		if (count($cid))
+		{
+			foreach ($cid as $registrantId)
+			{
+				$row->load($registrantId);
+				if ($row->group_id > 0)
+				{
+					$query->update('#__eb_registrants')
+						->set('number_registrants = number_registrants -1')
+						->where('id=' . $row->group_id);
+					$db->setQuery($query);
+					$db->execute();
+					$query->clear();
+
+					$query->select('number_registrants')
+						->from('#__eb_registrants')
+						->where('id=' . $row->group_id);
+					$db->setQuery($query);
+					$numberRegistrants = (int) $db->loadResult();
+					$query->clear();
+					if ($numberRegistrants == 0)
+					{
+						$query->delete('#__eb_field_values')->where('registrant_id=' . $row->group_id);
+						$db->setQuery($query);
+						$db->execute();
+						$query->clear();
+
+						$sql = 'DELETE FROM #__eb_registrants WHERE id = ' . $row->group_id;
+						$db->setQuery($sql);
+						$db->execute();
+						$query->clear();
+					}
+				}
+			}
+			$cids = implode(',', $cid);
+			$query->select('id')
+				->from('#__eb_registrants')
+				->where('group_id IN (' . $cids . ')');
+			$db->setQuery($query);
+			$cid = array_merge($cid, $db->loadColumn());
+			$query->clear();
+
+			$registrantIds = implode(',', $cid);
+
+			$query->delete('#__eb_field_values')->where('registrant_id IN (' . $registrantIds . ')');
+			$db->setQuery($query);
+			$db->execute();
+			$query->clear();
+
+			$query->delete('#__eb_registrants')->where('id IN (' . $registrantIds . ')');
+			$db->setQuery($query);
+			$db->execute();
+		}
+
+		return true;
+	}
+
+	/**
 	 * Checkin a registration record
 	 *
 	 * @param $id
