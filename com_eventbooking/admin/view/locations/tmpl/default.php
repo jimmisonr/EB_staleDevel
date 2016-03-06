@@ -60,13 +60,13 @@ if (!function_exists('curl_init'))
 				<th class="title text_left">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_COUNTRY'), 'tbl.country', $this->state->filter_order_Dir, $this->state->filter_order); ?>
 				</th>
-				<th class="title">
+				<th class="title center">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_LATITUDE'), 'tbl.lat', $this->state->filter_order_Dir, $this->state->filter_order); ?>
 				</th>
-				<th class="title">
+				<th class="title center">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_LONGITUDE'), 'tbl.long', $this->state->filter_order_Dir, $this->state->filter_order); ?>
 				</th>
-				<th class="title">
+				<th class="title center">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_PUBLISHED'), 'tbl.published', $this->state->filter_order_Dir, $this->state->filter_order); ?>
 				</th>
 				<th width="1%" nowrap="nowrap">
