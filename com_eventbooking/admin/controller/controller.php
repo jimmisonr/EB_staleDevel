@@ -1259,6 +1259,17 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('checked_in_count', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `checked_in_count`  TINYINT NOT NULL DEFAULT  '0' ;";
+			$db->setQuery($sql);
+			$db->execute();
+
+			$sql = 'UPDATE #__eb_registrants SET checked_in_count = number_registrants WHERE checked_in = 1';
+			$db->setQuery($sql);
+			$db->execute();
+		}
+		
 		if (!in_array('deposit_amount', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD `deposit_amount` DECIMAL( 10, 2 ) NULL DEFAULT '0' ;";

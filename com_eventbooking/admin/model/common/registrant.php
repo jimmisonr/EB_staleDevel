@@ -81,7 +81,14 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				$excludeFeeFields = true;
 			}
 
+			// Reset number checked in counter if admin change checked in status
+			if ($row->checked_in && isset($data['checked_in']) && $data['checked_in'] == 0)
+			{
+				$row->checked_in_count = 0;
+			}
+
 			$row->bind($data);
+
 			$row->store();
 			$form = new RADForm($rowFields);
 			$form->storeData($row->id, $data, $excludeFeeFields);
@@ -270,10 +277,6 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	 */
 	public function checkin($id)
 	{
-		$config = EventbookingHelper::getConfig();
-		$db     = $this->getDbo();
-		$query  = $db->getQuery(true);
-
 		$row = $this->getTable();
 		$row->load($id);
 
@@ -287,28 +290,12 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			return 1;
 		}
 
-		$row->checked_in = 1;
+		$row->checked_in_count = $row->checked_in_count + 1;
+		if ($row->checked_in_count == $row->number_registrants)
+		{
+			$row->checked_in = 1;
+		}
 		$row->store();
-
-		if ($row->is_group_billing && $config->collect_member_information)
-		{
-			$query->update('#__eb_registrants')
-				->set('checked_in = 1')
-				->where('group_id = ' . $row->id);
-			$db->setQuery($query);
-			$db->execute();
-
-			$query->clear();
-		}
-
-		if ($config->multiple_booking)
-		{
-			$query->update('#__eb_registrants')
-				->set('checked_in = 1')
-				->where('cart_id = ' . (int) $row->id);
-			$db->setQuery($query);
-			$db->execute();
-		}
 
 		return 2;
 	}
