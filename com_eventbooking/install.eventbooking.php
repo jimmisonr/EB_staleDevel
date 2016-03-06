@@ -66,6 +66,11 @@ class com_eventbookingInstallerScript
 		{
 			JFile::copy(JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css', JPATH_ROOT . '/components/com_eventbooking/custom.css');
 		}
+		
+		if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/view/common'))
+		{
+			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/view/common');
+		}
 	}
 
 	/**
