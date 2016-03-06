@@ -199,7 +199,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	 * @access    public
 	 * @return    boolean    True on success
 	 */
-	function delete($cid = array())
+	public function delete($cid = array())
 	{
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
