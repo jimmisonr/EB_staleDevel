@@ -181,7 +181,7 @@ if (!$this->userId && $this->config->user_registration)
 		?>		
 		<input type="hidden" name="option" value="com_users" />
 		<input type="hidden" name="task" value="user.login" />
-		<input type="hidden" name="return" value="<?php echo base64_encode(JFactory::getURI()->toString()); ?>" />
+		<input type="hidden" name="return" value="<?php echo base64_encode(JUri::getInstance()->toString()); ?>" />
 		<?php echo JHtml::_( 'form.token' ); ?>			
 	</form>	
 	<?php	
