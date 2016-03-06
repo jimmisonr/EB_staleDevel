@@ -1,11 +1,11 @@
 <?php
 /**
  * @version            2.3.2
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2016 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
@@ -173,6 +173,20 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			$showPaymentInformation = true;
 		?>
 		<h3 class="eb-heading"><?php echo JText::_('EB_PAYMENT_INFORMATION'); ?></h3>
+		<?php
+		if ($this->enableCoupon)
+		{
+		?>
+			<div class="<?php echo $controlGroupClass;  ?>">
+				<label class="<?php echo $controlLabelClass; ?>" for="coupon_code"><?php echo  JText::_('EB_COUPON') ?></label>
+				<div class="<?php echo $controlsClass; ?>">
+					<input type="text" class="input-medium" name="coupon_code" id="coupon_code" value="<?php echo JRequest::getVar('coupon_code'); ?>" onchange="calculateIndividualRegistrationFee();" />
+					<span class="invalid" id="coupon_validate_msg" style="display: none;"><?php echo JText::_('EB_INVALID_COUPON'); ?></span>
+				</div>
+			</div>
+		<?php
+		}
+		?>
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>">
 				<?php echo JText::_('EB_AMOUNT'); ?>
@@ -409,18 +423,6 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 					<?php echo $this->lists['payment_type'] ;?>
 				</div>
 			</div>
-		<?php
-		}
-		if ($this->enableCoupon)
-		{
-		?>
-		<div class="<?php echo $controlGroupClass;  ?>">
-			<label class="<?php echo $controlLabelClass; ?>" for="coupon_code"><?php echo  JText::_('EB_COUPON') ?></label>
-			<div class="<?php echo $controlsClass; ?>">
-				<input type="text" class="input-medium" name="coupon_code" id="coupon_code" value="<?php echo JRequest::getVar('coupon_code'); ?>" onchange="calculateIndividualRegistrationFee();" />
-				<span class="invalid" id="coupon_validate_msg" style="display: none;"><?php echo JText::_('EB_INVALID_COUPON'); ?></span>
-			</div>
-		</div>
 		<?php
 		}
 		if (!$this->waitingList)
