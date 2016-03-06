@@ -43,7 +43,7 @@ defined('_JEXEC') or die;
 			</div>
 		<?php
 		}
-		echo EventbookingHelperHtml::loadCommonLayout('common/categories.php', array('categories' => $this->items, 'categoryId' => $this->categoryId, 'config' => $this->config, 'Itemid' => $this->Itemid));
+		echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/categories.php', array('categories' => $this->items, 'categoryId' => $this->categoryId, 'config' => $this->config, 'Itemid' => $this->Itemid));
 		if ($this->pagination->total > $this->pagination->limit)
 		{
 		?>

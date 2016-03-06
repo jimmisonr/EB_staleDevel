@@ -53,14 +53,14 @@ else
 
 if (count($this->categories))
 {
-	echo EventbookingHelperHtml::loadCommonLayout('common/categories.php', array('categories' => $this->categories, 'categoryId' => $this->category->id, 'config' => $this->config, 'Itemid' => $this->Itemid));
+	echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/categories.php', array('categories' => $this->categories, 'categoryId' => $this->category->id, 'config' => $this->config, 'Itemid' => $this->Itemid));
 }
 ?>
 <form method="post" name="adminForm" id="adminForm" action="index.php">
 	<?php
 		if (count($this->items))
 		{
-			echo EventbookingHelperHtml::loadCommonLayout('common/events_table.php', array('items' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate, 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'categoryId' => $this->category->id, 'bootstrapHelper' => $this->bootstrapHelper));
+			echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/events_table.php', array('items' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate, 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'categoryId' => $this->category->id, 'bootstrapHelper' => $this->bootstrapHelper));
 		}
 		else
 		{

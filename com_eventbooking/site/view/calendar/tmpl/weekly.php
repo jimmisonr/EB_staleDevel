@@ -73,7 +73,7 @@ $monthsInYear = array(
 	{
 	?>
 		<div class="<?php echo $bootstrapHelper->getClassMapping('span5');?>">
-			<?php echo EventbookingHelperHtml::loadCommonLayout('common/calendar_navigation.php', array('Itemid' => $this->Itemid, 'config' => $this->config, 'layout' => 'weekly', 'currentDateData' => $this->currentDateData)); ?>
+			<?php echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/calendar_navigation.php', array('Itemid' => $this->Itemid, 'config' => $this->config, 'layout' => 'weekly', 'currentDateData' => $this->currentDateData)); ?>
 		</div>
 	<?php
 	}

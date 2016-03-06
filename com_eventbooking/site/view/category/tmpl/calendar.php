@@ -55,7 +55,7 @@ else
 		?>
 		<div id="eb-calendarwrap">
 			<?php
-			echo EventbookingHelperHtml::loadCommonLayout('common/calendar.php',
+			echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/calendar.php',
 				array(
 					'Itemid' => $this->Itemid,
 					'config' => $this->config,

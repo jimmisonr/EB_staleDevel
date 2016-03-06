@@ -46,7 +46,7 @@ $monthsInYear = array(
 	<?php
 		if ($this->showCalendarMenu)
 		{
-			echo EventbookingHelperHtml::loadCommonLayout('common/calendar_navigation.php', array('Itemid' => $this->Itemid, 'config' => $this->config, 'layout' => 'daily', 'currentDateData' => $this->currentDateData));
+			echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/calendar_navigation.php', array('Itemid' => $this->Itemid, 'config' => $this->config, 'layout' => 'daily', 'currentDateData' => $this->currentDateData));
 		}
 	?>
 </div>

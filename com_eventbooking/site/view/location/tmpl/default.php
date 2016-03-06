@@ -38,7 +38,7 @@ EventbookingHelperJquery::colorbox('eb-modal');
 	<?php
 	if (count($this->items))
 	{
-		echo EventbookingHelperHtml::loadCommonLayout('common/events_default.php', array('events' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'param' => $param, 'ssl' => $ssl, 'width' => $width, 'height' => $height , 'viewLevels' => $this->viewLevels, 'bootstrapHelper' => $this->bootstrapHelper));
+		echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/events_default.php', array('events' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'param' => $param, 'ssl' => $ssl, 'width' => $width, 'height' => $height , 'viewLevels' => $this->viewLevels, 'bootstrapHelper' => $this->bootstrapHelper));
 	}
 	else 
 	{

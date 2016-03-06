@@ -251,7 +251,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 					{
 					?>
 						<li>
-							<?php echo EventbookingHelperHtml::loadCommonLayout('common/save_calendar.php', array('item' => $event, 'Itemid' => $Itemid)); ?>
+							<?php echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/save_calendar.php', array('item' => $event, 'Itemid' => $Itemid)); ?>
 						</li>
 					<?php
 					}

@@ -94,9 +94,15 @@ abstract class EventbookingHelperHtml
 	 */
 	public static function loadCommonLayout($layout, $data = array())
 	{
-		jimport('joomla.filesystem.file');
 		$app       = JFactory::getApplication();
 		$themeFile = str_replace('/tmpl', '', $layout);
+
+		// This line was added to keep B/C with template override code, don't remove it
+		if (strpos($layout, 'common/') === 0 && strpos($layout, 'common/tmpl') === false)
+		{
+			$layout = str_replace('common/', 'common/tmpl/', $layout);
+		}
+
 		if (JFile::exists($layout))
 		{
 			$path = $layout;

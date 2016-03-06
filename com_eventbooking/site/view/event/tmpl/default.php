@@ -582,7 +582,7 @@ else
 					{
 					?>
 						<li>
-							<?php echo EventbookingHelperHtml::loadCommonLayout('common/save_calendar.php', array('item' => $item, 'Itemid' => $this->Itemid)); ?>
+							<?php echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/save_calendar.php', array('item' => $item, 'Itemid' => $this->Itemid)); ?>
 						</li>
 					<?php
 					}
