@@ -74,8 +74,33 @@ $selectedState = '';
 			$fieldType = strtolower($field->type);
 			switch ($fieldType)
 			{
-				case 'heading':
 				case 'message':
+					break;
+				case 'heading':
+					$controlGroupAttributes = 'id="field_' . $field->name . '" ';
+					if ($field->hideOnDisplay)
+					{
+						$controlGroupAttributes .= ' style="display:none;" ';
+					}
+					if ($field->isMasterField)
+					{
+						if ($field->suffix)
+						{
+							$class = 'master-field-' . $field->suffix;
+						}
+						else
+						{
+							$class = 'master-field';
+						}
+						$controlGroupAttributes .= ' class="'.$class.'" ';
+					}
+					?>
+						<tr <?php echo $controlGroupAttributes; ?>>
+							<td class="eb-heading" colspan="2">
+								<?php echo $field->title; ?>
+							</td>
+						</tr>
+					<?php
 					break;
 				default:
 					$controlGroupAttributes = 'id="field_' . $field->name . '" ';
@@ -99,6 +124,14 @@ $selectedState = '';
 					<tr <?php echo $controlGroupAttributes; ?>>
 						<td width="100" class="title_cell">
 							<?php echo $field->title; ?>
+							<?php
+								if ($field->row->required)
+								{
+								?>
+									<span class="star">&#160;*</span>
+								<?php
+								}
+							?>
 						</td>
 						<td class="controls">
 							<?php
