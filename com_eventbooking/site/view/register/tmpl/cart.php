@@ -625,7 +625,7 @@ if (!$this->userId && $this->config->user_registration)
 	if ($this->config->accept_term ==1)
 	{
 		$articleId  = $this->config->article_id ;
-		if (version_compare(JVERSION, '3.1', 'ge') && JLanguageMultilang::isEnabled())
+		if (JLanguageMultilang::isEnabled())
 		{
 			$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $articleId);
 			$langCode     = JFactory::getLanguage()->getTag();
