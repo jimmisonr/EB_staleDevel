@@ -568,6 +568,7 @@ $offset = JFactory::getConfig()->get('offset');
 	{
 	?>
 		<div style="display:none;" itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
+			<meta itemprop="url" content="<?php echo JUri::getInstance()->toString();?>">
 			<?php
 			if ($item->individual_price > 0)
 			{
