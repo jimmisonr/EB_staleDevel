@@ -51,7 +51,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 				$waitingList = false ;
 			}
 		?>
-		<div class="eb-event-container">
+		<div class="eb-event-container" itemscope itemtype="http://schema.org/Event">
 			<div class="eb-event-date-container">
 				<div class="eb-event-date <?php echo $btnInverseClass; ?>">
 					<div class="eb-event-date-day">
@@ -70,16 +70,53 @@ $return = base64_encode(JUri::getInstance()->toString());
 					if ($config->hide_detail_button !== '1')
 					{
 					?>
-						<a class="eb-event-title" href="<?php echo $detailUrl; ?>"><?php echo $event->title; ?></a>
+						<a class="eb-event-title" href="<?php echo $detailUrl; ?>" itemprop="url"><span itemprop="name"><?php echo $event->title; ?></span></a>
 					<?php
 					}
 					else
 					{
-						echo $event->title;
+						echo '<span itemprop="name">' . $event->title . '</span>';
 					}
 				?>
 			</h2>
 			<div class="eb-event-information <?php echo $rowFluidClass; ?>">
+				<?php
+				if ($event->event_date != EB_TBC_DATE)
+				{
+				?>
+					<meta itemprop="startDate" content="<?php echo JFactory::getDate($event->event_date)->format("Y-m-d\TH:i"); ?>">
+				<?php
+				}
+				if ($event->event_end_date != $nullDate)
+				{
+				?>
+					<meta itemprop="endDate" content="<?php echo JFactory::getDate($event->event_end_date)->format("Y-m-d\TH:i"); ?>">
+				<?php
+				}
+				$ticketsLeft = $event->event_capacity - $event->total_registrants ;
+				if ($event->individual_price > 0 || $ticketsLeft > 0)
+				{
+				?>
+					<div style="display:none;" itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
+						<?php
+						if ($event->individual_price > 0)
+						{
+						?>
+							<span itemprop="lowPrice"><?php echo EventbookingHelper::formatCurrency($event->individual_price, $config, $event->currency_symbol); ?></span>
+						<?php
+						}
+
+						if ($ticketsLeft > 0)
+						{
+						?>
+							<span itemprop="offerCount"><?php echo $ticketsLeft;?></span>
+						<?php
+						}
+						?>
+					</div>
+				<?php
+				}
+				?>
 				<div class="<?php echo $span8Class; ?>">
 					<div class="clearfix">
 						<span class="eb-event-date-info">
@@ -179,7 +216,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 				</div>
 			</div>
 
-			<div class="eb-description-details">
+			<div class="eb-description-details" itemprop="description">
 				<?php
 					if ($event->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$event->thumb))
 					{
