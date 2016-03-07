@@ -47,22 +47,22 @@ $return = base64_encode(JUri::getInstance()->toString());
 				$waitingList = false ;
 			}
 		?>
-			<div class="eb-event clearfix">
+			<div class="eb-event clearfix" itemscope itemtype="http://schema.org/Event">
 				<div class="eb-box-heading clearfix">
 					<h2 class="eb-event-title pull-left">
 						<?php
 						if ($config->hide_detail_button !== '1')
 						{
 						?>
-							<a href="<?php echo $detailUrl; ?>" title="<?php echo $event->title; ?>" class="eb-event-title-link">
-								<?php echo $event->title; ?>
+							<a <a itemprop="url" href="<?php echo $detailUrl; ?>" title="<?php echo $event->title; ?>" class="eb-event-title-link">
+								<span itemprop="name"><?php echo $event->title; ?></span>
 							</a>
 						<?php
 						}
 						else
 						{
 						?>
-							<?php echo $event->title; ?>
+							<span itemprop="name"><?php echo $event->title; ?></span>
 						<?php
 						}
 						?>
@@ -70,7 +70,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 				</div>
 				<div class="eb-description clearfix">
 					<div class="<?php echo $rowFluidClass; ?>">
-					<div class="eb-description-details <?php echo $span7Class; ?>">
+					<div class="eb-description-details <?php echo $span7Class; ?>" itemprop="description">
 						<?php
 							if ($event->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$event->thumb)) {
 							?>
@@ -99,6 +99,9 @@ $return = base64_encode(JUri::getInstance()->toString());
 										}
 										else
 										{
+										?>
+											<meta itemprop="startDate" content="<?php echo JFactory::getDate($event->event_date)->format("Y-m-d\TH:i"); ?>">
+										<?php
 											if (strpos($event->event_date, '00:00:00') !== false)
 											{
 												$dateFormat = $config->date_format;
@@ -130,6 +133,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 										<?php echo JText::_('EB_EVENT_END_DATE'); ?>
 									</td>
 									<td class="eb-event-property-value">
+										<meta itemprop="endDate" content="<?php echo JFactory::getDate($event->event_end_date)->format("Y-m-d\TH:i"); ?>">
 										<?php echo JHtml::_('date', $event->event_end_date, $dateFormat, null) ; ?>
 									</td>
 								</tr>
@@ -595,6 +599,31 @@ $return = base64_encode(JUri::getInstance()->toString());
 					</ul>
 					</div>
 				</div>
+				<?php
+					$ticketsLeft = $event->event_capacity - $event->total_registrants ;
+					if ($event->individual_price > 0 || $ticketsLeft > 0)
+					{
+					?>
+						<div style="display:none;" itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
+							<?php
+								if ($event->individual_price > 0)
+								{
+								?>
+									<span itemprop="lowPrice"><?php echo EventbookingHelper::formatCurrency($event->individual_price, $config, $event->currency_symbol); ?></span>
+								<?php
+								}
+
+								if ($ticketsLeft > 0)
+								{
+								?>
+									<span itemprop="offerCount"><?php echo $ticketsLeft;?></span>
+								<?php
+								}
+							?>
+						</div>
+					<?php
+					}
+				?>
 			</div>
 		<?php
 		}
