@@ -41,11 +41,13 @@ else
 {
 	$registrationOpen = ($item->number_event_dates > 0);
 }
+
+$offset = JFactory::getConfig()->get('offset');
 ?>
-<div id="eb-event-page" class="eb-container eb-event">
+<div id="eb-event-page" class="eb-container eb-event" itemscope itemtype="http://schema.org/Event">
 	<div class="eb-box-heading clearfix">
 		<h1 class="eb-page-heading">
-			<?php echo $item->title; ?>
+			<span itemprop="name"><?php echo $item->title; ?></span>
 		</h1>
 	</div>
 	<div id="eb-event-details" class="eb-description">
@@ -97,7 +99,7 @@ else
 			<?php
 			}
 		?>
-		<div class="eb-description-details clearfix">
+		<div class="eb-description-details clearfix" itemprop="description">
 			<?php
 				if ($item->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$item->thumb))
 				{
@@ -127,6 +129,9 @@ else
 							   }
 							   else
 							   {
+							   ?>
+								   <meta itemprop="startDate" content="<?php echo JFactory::getDate($item->event_date)->format("Y-m-d\TH:i"); ?>">
+							   <?php
 								   if (strpos($item->event_date, '00:00:00') !== false)
 								   {
 									   $dateFormat = $this->config->date_format;
@@ -135,7 +140,6 @@ else
 								   {
 									   $dateFormat = $this->config->event_date_format;
 								   }
-
 								   echo JHtml::_('date', $item->event_date, $dateFormat, null) ;
 							   }
 							?>
@@ -158,6 +162,7 @@ else
 									<strong><?php echo JText::_('EB_EVENT_END_DATE'); ?></strong>
 								</td>
 								<td>
+									<meta itemprop="endDate" content="<?php echo JFactory::getDate($item->event_end_date)->format("Y-m-d\TH:i"); ?>">
 									<?php echo JHtml::_('date', $item->event_end_date, $dateFormat, null) ; ?>
 								</td>
 							</tr>
@@ -414,6 +419,25 @@ else
 										if ($this->location->address)
 										{
 										?>
+											<div style="display:none" itemprop="location" itemscope itemtype="http://schema.org/Place">
+												<div itemprop="name"><?php echo $this->location->name; ?></div>
+												<div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+												<span itemprop="streetAddress">
+													<?php echo $this->location->address; ?>
+												</span>
+												<?php
+													if ($this->location->city && $this->location->state && $this->location->zip)
+													{
+													?>
+														<span itemprop="addressLocality"><?php echo $this->location->city; ?></span>,
+														<span itemprop="addressRegion"><?php echo $this->location->state; ?></span>
+														<span itemprop="postalCode"><?php echo $this->location->zip; ?></span>
+														<span itemprop="addressCountry"><?php echo $this->location->country; ?></span>
+													<?php
+													}
+												?>
+												</div>
+											</div>
 											<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$item->location_id.'&tmpl=component&format=html'); ?>" class="eb-colorbox-map" title="<?php echo $this->location->name ; ?>"><?php echo $this->location->name ; ?></a>
 										<?php
 										}
