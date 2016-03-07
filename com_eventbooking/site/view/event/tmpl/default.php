@@ -563,6 +563,29 @@ $offset = JFactory::getConfig()->get('offset');
 	</div>
 	<div class="clearfix"></div>
 	<?php
+	$ticketsLeft = $item->event_capacity - $item->total_registrants ;
+	if ($item->individual_price > 0 || $ticketsLeft > 0)
+	{
+	?>
+		<div style="display:none;" itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
+			<?php
+			if ($item->individual_price > 0)
+			{
+			?>
+				<span itemprop="lowPrice"><?php echo EventbookingHelper::formatCurrency($item->individual_price, $this->config, $item->currency_symbol); ?></span>
+			<?php
+			}
+
+			if ($ticketsLeft > 0)
+			{
+			?>
+				<span itemprop="offerCount"><?php echo $ticketsLeft;?></span>
+			<?php
+			}
+			?>
+		</div>
+	<?php
+	}
 	if ($this->showTaskBar)
 	{
 	?>
