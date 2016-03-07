@@ -127,7 +127,16 @@ else
 							   }
 							   else
 							   {
-								   echo JHtml::_('date', $item->event_date, $this->config->event_date_format, null) ;
+								   if (strpos($item->event_date, '00:00:00') !== false)
+								   {
+									   $dateFormat = $this->config->date_format;
+								   }
+								   else
+								   {
+									   $dateFormat = $this->config->event_date_format;
+								   }
+
+								   echo JHtml::_('date', $item->event_date, $dateFormat, null) ;
 							   }
 							?>
 						</td>
@@ -135,13 +144,21 @@ else
 					<?php
 						if ($item->event_end_date != $this->nullDate)
 						{
-						?>
+							if (strpos($item->event_end_date, '00:00:00') !== false)
+							{
+								$dateFormat = $this->config->date_format;
+							}
+							else
+							{
+								$dateFormat = $this->config->event_date_format;
+							}
+							?>
 							<tr>
 								<td>
 									<strong><?php echo JText::_('EB_EVENT_END_DATE'); ?></strong>
 								</td>
 								<td>
-									<?php echo JHtml::_('date', $item->event_end_date, $this->config->event_date_format, null) ; ?>
+									<?php echo JHtml::_('date', $item->event_end_date, $dateFormat, null) ; ?>
 								</td>
 							</tr>
 						<?php
@@ -149,13 +166,21 @@ else
 
 						if ($item->registration_start_date != $this->nullDate)
 						{
-							?>
+							if (strpos($item->registration_start_date, '00:00:00') !== false)
+							{
+								$dateFormat = $this->config->date_format;
+							}
+							else
+							{
+								$dateFormat = $this->config->event_date_format;
+							}
+						?>
 							<tr>
 								<td>
 									<strong><?php echo JText::_('EB_REGISTRATION_START_DATE'); ?></strong>
 								</td>
 								<td>
-									<?php echo JHtml::_('date', $item->registration_start_date, $this->config->event_date_format, null);?>
+									<?php echo JHtml::_('date', $item->registration_start_date, $dateFormat, null);?>
 								</td>
 							</tr>
 						<?php
@@ -171,9 +196,13 @@ else
 								<td>
 									<?php
 										if ($item->event_capacity)
+										{
 											echo $item->event_capacity ;
+										}
 										else
+										{
 											echo JText::_('EB_UNLIMITED') ;
+										}
 									?>
 								</td>
 							</tr>
@@ -216,13 +245,21 @@ else
 						}
 						if ($this->nullDate != $item->cut_off_date)
 						{
+							if (strpos($item->cut_off_date, '00:00:00') !== false)
+							{
+								$dateFormat = $this->config->date_format;
+							}
+							else
+							{
+								$dateFormat = $this->config->event_date_format;
+							}
 						?>
 						<tr>
 							<td>
 								<strong><?php echo JText::_('EB_CUT_OFF_DATE'); ?></strong>
 							</td>
 							<td>
-								<?php echo JHtml::_('date', $item->cut_off_date, $this->config->event_date_format, null) ; ?>
+								<?php echo JHtml::_('date', $item->cut_off_date, $dateFormat, null) ; ?>
 							</td>
 						</tr>
 						<?php

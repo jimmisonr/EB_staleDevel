@@ -156,7 +156,16 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 						}
 						else
 						{
-							echo JHtml::_('date', $item->event_date, $config->event_date_format, null);
+							if (strpos($item->cut_off_date, '00:00:00') !== false)
+							{
+								$dateFormat = $config->date_format;
+							}
+							else
+							{
+								$dateFormat = $config->event_date_format;
+							}
+
+							echo JHtml::_('date', $item->event_date, $dateFormat, null);
 						}
 					?>
 				</td>
@@ -172,7 +181,16 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 								}
 								else
 								{
-									echo JHtml::_('date', $item->event_end_date, $config->event_date_format, null);
+									if (strpos($item->event_end_date, '00:00:00') !== false)
+									{
+										$dateFormat = $config->date_format;
+									}
+									else
+									{
+										$dateFormat = $config->event_date_format;
+									}
+
+									echo JHtml::_('date', $item->event_end_date, $dateFormat, null);
 								}
 							?>
 						</td>

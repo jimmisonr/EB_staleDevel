@@ -99,7 +99,16 @@ $return = base64_encode(JUri::getInstance()->toString());
 										}
 										else
 										{
-											echo JHtml::_('date', $event->event_date, $config->event_date_format, null) ;
+											if (strpos($event->event_date, '00:00:00') !== false)
+											{
+												$dateFormat = $config->date_format;
+											}
+											else
+											{
+												$dateFormat = $config->event_date_format;
+											}
+
+											echo JHtml::_('date', $event->event_date, $dateFormat, null) ;
 										}
 									?>
 								</td>
@@ -107,39 +116,63 @@ $return = base64_encode(JUri::getInstance()->toString());
 							<?php
 							if ($event->event_end_date != $nullDate)
 							{
+								if (strpos($event->event_end_date, '00:00:00') !== false)
+								{
+									$dateFormat = $config->date_format;
+								}
+								else
+								{
+									$dateFormat = $config->event_date_format;
+								}
 							?>
 								<tr class="eb-event-property">
 									<td class="eb-event-property-label">
 										<?php echo JText::_('EB_EVENT_END_DATE'); ?>
 									</td>
 									<td class="eb-event-property-value">
-										<?php echo JHtml::_('date', $event->event_end_date, $config->event_date_format, null) ; ?>
+										<?php echo JHtml::_('date', $event->event_end_date, $dateFormat, null) ; ?>
 									</td>
 								</tr>
 							<?php
 							}
 							if ($event->registration_start_date != $nullDate)
 							{
-								?>
+								if (strpos($event->registration_start_date, '00:00:00') !== false)
+								{
+									$dateFormat = $config->date_format;
+								}
+								else
+								{
+									$dateFormat = $config->event_date_format;
+								}
+							?>
 								<tr class="eb-event-property">
 									<td class="eb-event-property-label">
 										<?php echo JText::_('EB_REGISTRATION_START_DATE'); ?>
 									</td>
 									<td class="eb-event-property-value">
-										<?php echo JHtml::_('date', $event->registration_start_date, $config->event_date_format, null) ; ?>
+										<?php echo JHtml::_('date', $event->registration_start_date, $dateFormat, null) ; ?>
 									</td>
 								</tr>
 							<?php
 							}
 							if ($event->cut_off_date != $nullDate)
 							{
+								if (strpos($event->cut_off_date, '00:00:00') !== false)
+								{
+									$dateFormat = $config->date_format;
+								}
+								else
+								{
+									$dateFormat = $config->event_date_format;
+								}
 							?>
 								<tr class="eb-event-property">
 									<td class="eb-event-property-label">
 										<?php echo JText::_('EB_CUT_OFF_DATE'); ?>
 									</td>
 									<td class="eb-event-property-value">
-										<?php echo JHtml::_('date', $event->cut_off_date, $config->event_date_format, null) ; ?>
+										<?php echo JHtml::_('date', $event->cut_off_date, $dateFormat, null) ; ?>
 									</td>
 								</tr>
 							<?php

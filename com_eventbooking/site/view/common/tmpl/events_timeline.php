@@ -84,23 +84,44 @@ $return = base64_encode(JUri::getInstance()->toString());
 					<div class="clearfix">
 						<span class="eb-event-date-info">
 							<i class="<?php echo $iconCalendarClass; ?>"></i>
-							<?php echo JHtml::_('date', $event->event_date, $dateFormat, null); ?><span class="eb-time"><?php echo JHtml::_('date', $event->event_date, $timeFormat, null) ?></span>
+							<?php echo JHtml::_('date', $event->event_date, $dateFormat, null); ?>
 							<?php
+								if (strpos($event->event_date, '00:00:00') !== false)
+								{
+								?>
+									<span class="eb-time"><?php echo JHtml::_('date', $event->event_date, $timeFormat, null) ?></span>
+								<?php
+								}
 								if ($event->event_end_date != $nullDate)
 								{
+									if (strpos($event->event_end_date, '') !== false)
+									{
+										$showTime = false;
+									}
+									else
+									{
+										$showTime = true;
+									}
 									$startDate =  JHtml::_('date', $event->event_date, 'Y-m-d', null);
 									$endDate   = JHtml::_('date', $event->event_end_date, 'Y-m-d', null);
 									if ($startDate == $endDate)
 									{
-									?>
-										-<span class="eb-time"><?php echo JHtml::_('date', $event->event_end_date, $timeFormat, null) ?></span>
-									<?php
+										if ($showTime)
+										{
+										?>
+											-<span class="eb-time"><?php echo JHtml::_('date', $event->event_end_date, $timeFormat, null) ?></span>
+										<?php
+										}
 									}
 									else
 									{
-									?>
-										- <?php echo JHtml::_('date', $event->event_end_date, $dateFormat, null); ?><span class="eb-time"><?php echo JHtml::_('date', $event->event_end_date, $timeFormat, null) ?></span>
-									<?php
+										echo " - " .JHtml::_('date', $event->event_end_date, $dateFormat, null);
+										if ($showTime)
+										{
+										?>
+											<span class="eb-time"><?php echo JHtml::_('date', $event->event_end_date, $timeFormat, null) ?></span>
+										<?php
+										}
 									}
 								}
 							?>
