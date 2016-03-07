@@ -54,7 +54,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 						if ($config->hide_detail_button !== '1')
 						{
 						?>
-							<a <a itemprop="url" href="<?php echo $detailUrl; ?>" title="<?php echo $event->title; ?>" class="eb-event-title-link">
+							<a href="<?php echo $detailUrl; ?>" title="<?php echo $event->title; ?>" class="eb-event-title-link" itemprop="url">
 								<span itemprop="name"><?php echo $event->title; ?></span>
 							</a>
 						<?php
@@ -428,6 +428,29 @@ $return = base64_encode(JUri::getInstance()->toString());
 					</div>
 				</div>
 				<?php
+				$ticketsLeft = $event->event_capacity - $event->total_registrants ;
+				if ($event->individual_price > 0 || $ticketsLeft > 0)
+				{
+				?>
+					<div style="display:none;" itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
+						<?php
+							if ($event->individual_price > 0)
+							{
+							?>
+								<span itemprop="lowPrice"><?php echo EventbookingHelper::formatCurrency($event->individual_price, $config, $event->currency_symbol); ?></span>
+							<?php
+							}
+
+							if ($ticketsLeft > 0)
+							{
+							?>
+								<span itemprop="offerCount"><?php echo $ticketsLeft;?></span>
+							<?php
+							}
+						?>
+					</div>
+				<?php
+				}								
 				if (!$canRegister && $event->registration_type != 3 && $config->display_message_for_full_event && !$waitingList && $event->registration_start_minutes >= 0)
 				{
 					if (@$event->user_registered)
@@ -598,32 +621,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 						?>
 					</ul>
 					</div>
-				</div>
-				<?php
-					$ticketsLeft = $event->event_capacity - $event->total_registrants ;
-					if ($event->individual_price > 0 || $ticketsLeft > 0)
-					{
-					?>
-						<div style="display:none;" itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
-							<?php
-								if ($event->individual_price > 0)
-								{
-								?>
-									<span itemprop="lowPrice"><?php echo EventbookingHelper::formatCurrency($event->individual_price, $config, $event->currency_symbol); ?></span>
-								<?php
-								}
-
-								if ($ticketsLeft > 0)
-								{
-								?>
-									<span itemprop="offerCount"><?php echo $ticketsLeft;?></span>
-								<?php
-								}
-							?>
-						</div>
-					<?php
-					}
-				?>
+				</div>				
 			</div>
 		<?php
 		}
