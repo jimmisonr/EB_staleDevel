@@ -389,6 +389,7 @@ class EventbookingHelperData
 			$label                 = JText::_($field->attributes()->label);
 			$customFields["$name"] = $label;
 		}
+
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
 			$item   = $items[$i];
@@ -399,6 +400,11 @@ class EventbookingHelperData
 			{
 				$paramData[$name]['title'] = $label;
 				$paramData[$name]['value'] = $params->get($name);
+			}
+
+			if (!property_exists($item, $name))
+			{
+				$item->{$name} = $params->get($name);
 			}
 
 			$item->paramData = $paramData;
