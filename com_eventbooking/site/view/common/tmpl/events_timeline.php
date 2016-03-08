@@ -79,47 +79,24 @@ $return = base64_encode(JUri::getInstance()->toString());
 					}
 				?>
 			</h2>
-			<div class="eb-event-information <?php echo $rowFluidClass; ?>">
-				<?php
-				if ($event->event_date != EB_TBC_DATE)
-				{
-				?>
-					<meta itemprop="startDate" content="<?php echo JFactory::getDate($event->event_date)->format("Y-m-d\TH:i"); ?>">
-				<?php
-				}
-				if ($event->event_end_date != $nullDate)
-				{
-				?>
-					<meta itemprop="endDate" content="<?php echo JFactory::getDate($event->event_end_date)->format("Y-m-d\TH:i"); ?>">
-				<?php
-				}
-				$ticketsLeft = $event->event_capacity - $event->total_registrants ;
-				if ($event->individual_price > 0 || $ticketsLeft > 0)
-				{
-				?>
-					<div style="display:none;" itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
-						<?php
-						if ($event->individual_price > 0)
-						{
-						?>
-							<span itemprop="lowPrice"><?php echo EventbookingHelper::formatCurrency($event->individual_price, $config, $event->currency_symbol); ?></span>
-						<?php
-						}
-
-						if ($ticketsLeft > 0)
-						{
-						?>
-							<span itemprop="offerCount"><?php echo $ticketsLeft;?></span>
-						<?php
-						}
-						?>
-					</div>
-				<?php
-				}
-				?>
+			<div class="eb-event-information <?php echo $rowFluidClass; ?>">				
 				<div class="<?php echo $span8Class; ?>">
 					<div class="clearfix">
 						<span class="eb-event-date-info">
+                            <?php
+                                if ($event->event_date != EB_TBC_DATE)
+                                {
+                                ?>
+                                    <meta itemprop="startDate" content="<?php echo JFactory::getDate($event->event_date)->format("Y-m-d\TH:i"); ?>">
+                                <?php
+                                }
+                                if ($event->event_end_date != $nullDate)
+                                {
+                                ?>
+                                    <meta itemprop="endDate" content="<?php echo JFactory::getDate($event->event_end_date)->format("Y-m-d\TH:i"); ?>">
+                                <?php
+                                }				
+                            ?>
 							<i class="<?php echo $iconCalendarClass; ?>"></i>
 							<?php echo JHtml::_('date', $event->event_date, $dateFormat, null); ?>
 							<?php
@@ -231,6 +208,31 @@ $return = base64_encode(JUri::getInstance()->toString());
 					echo $event->short_description;
 				?>
 			</div>
+            <?php
+                $ticketsLeft = $event->event_capacity - $event->total_registrants ;
+				if ($event->individual_price > 0 || $ticketsLeft > 0)
+				{
+				?>
+					<div class="clearfix" style="display:none;" itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
+						<?php
+						if ($event->individual_price > 0)
+						{
+						?>
+							<span itemprop="lowPrice"><?php echo EventbookingHelper::formatCurrency($event->individual_price, $config, $event->currency_symbol); ?></span>
+						<?php
+						}
+
+						if ($ticketsLeft > 0)
+						{
+						?>
+							<span itemprop="offerCount"><?php echo $ticketsLeft;?></span>
+						<?php
+						}
+						?>
+					</div>
+				<?php
+				} 
+            ?>
 			<div class="eb-taskbar clearfix">
 				<ul>
 					<?php
