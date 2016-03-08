@@ -213,7 +213,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 				if ($event->individual_price > 0 || $ticketsLeft > 0)
 				{
 				?>
-					<div class="clearfix" style="display:none;" itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
+					<div style="display:none;" itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
 						<?php
 						if ($event->individual_price > 0)
 						{
