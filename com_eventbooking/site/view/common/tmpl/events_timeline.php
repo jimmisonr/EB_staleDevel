@@ -131,7 +131,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 								}
 								if ($event->event_end_date != $nullDate)
 								{
-									if (strpos($event->event_end_date, '') !== false)
+									if (strpos($event->event_end_date, '00:00:00') !== false)
 									{
 										$showTime = false;
 									}
