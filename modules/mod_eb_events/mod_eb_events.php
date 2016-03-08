@@ -80,6 +80,7 @@ for ($i = 0, $n = count($rows); $i < $n; $i++)
 	$query->where('b.event_id = ' . $row->id);
 	$db->setQuery($query);
 	$categories = $db->loadObjectList();
+	$row->number_categories  = count($categories);
 	if (count($categories))
 	{
 		$itemCategories = array();
