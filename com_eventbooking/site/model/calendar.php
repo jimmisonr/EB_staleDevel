@@ -13,6 +13,21 @@ defined('_JEXEC') or die;
 class EventbookingModelCalendar extends RADModel
 {
 	/**
+	 * Fields which will be returned from SQL query
+	 *
+	 * @var array
+	 */
+	protected static $fields = array(
+		'a.id',
+		'a.title',
+		'a.event_date',
+		'a.event_end_date',
+		'a.thumb',
+		'a.alias',
+		'a.featured'
+	);
+
+	/**
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
@@ -71,14 +86,19 @@ class EventbookingModelCalendar extends RADModel
 		$date->setTime(23, 59, 59);
 		$endDate = $date->toSql(true);
 
-
-		$query->select('a.*,title' . $fieldSuffix . ' AS title, SUM(b.number_registrants) AS total_registrants')
+		$query->select(static::$fields)
+			->select('SUM(b.number_registrants) AS total_registrants')
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id ) AND b.group_id = 0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3)))')
 			->where('a.published = 1')
 			->where('a.access in (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
 			->group('a.id')
 			->order('a.event_date ASC, a.ordering ASC');
+
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('a.title'), $fieldSuffix);
+		}
 
 		if ($this->state->id)
 		{
@@ -172,7 +192,8 @@ class EventbookingModelCalendar extends RADModel
 		$date->modify('+6 day');
 		$date->setTime(23, 59, 59);
 		$endDate = $date->toSql(true);
-		$query->select('a.*')
+		$query->select(static::$fields)
+			->select('a.short_description')
 			->select('b.name AS location_name')
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')
@@ -225,15 +246,19 @@ class EventbookingModelCalendar extends RADModel
 		}
 		$startDate = $day . " 00:00:00";
 		$endDate   = $day . " 23:59:59";
-		$query->select('a.*')
-			->select('a.title' . $fieldSuffix . ' AS title')
-			->select('short_description' . $fieldSuffix . ' AS short_description')
+		$query->select(static::$fields)
+			->select('a.short_description')
 			->select('b.name AS location_name')
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')
 			->where('a.published = 1')
 			->where("(a.event_date BETWEEN '$startDate' AND '$endDate')")
 			->where('a.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
+
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('a.title', 'a.short_description'), $fieldSuffix);
+		}
 
 		if ($config->hide_past_events)
 		{
