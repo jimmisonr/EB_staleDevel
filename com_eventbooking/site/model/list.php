@@ -12,7 +12,57 @@ defined('_JEXEC') or die;
 
 class EventbookingModelList extends RADModelList
 {
-
+	/**
+	 * Fields which will be returned from SQL query
+	 *
+	 * @var array
+	 */
+	protected static $fields = array(
+		'tbl.id',
+		'tbl.location_id',
+		'tbl.title',
+		'tbl.event_date',
+		'tbl.event_end_date',
+		'tbl.short_description',
+		'tbl.description',
+		'tbl.access',
+		'tbl.registration_access',
+		'tbl.individual_price',
+		'tbl.event_capacity',
+		'tbl.created_by',
+		'tbl.cut_off_date',
+		'tbl.registration_type',
+		'tbl.max_group_number',
+		'tbl.discount_type',
+		'tbl.discount',
+		'tbl.early_bird_discount_type',
+		'tbl.early_bird_discount_date',
+		'tbl.early_bird_discount_amount',
+		'tbl.enable_cancel_registration',
+		'tbl.cancel_before_date',
+		'tbl.params',
+		'tbl.published',
+		'tbl.custom_fields',
+		'tbl.discount_groups',
+		'tbl.discount_amounts',
+		'tbl.registration_start_date',
+		'tbl.min_group_number',
+		'tbl.registration_handle_url',
+		'tbl.fixed_group_price',
+		'tbl.attachment',
+		'tbl.late_fee_type',
+		'tbl.late_fee_date',
+		'tbl.late_fee_amount',
+		'tbl.custom_field_ids',
+		'tbl.event_password',
+		'tbl.currency_code',
+		'tbl.currency_symbol',
+		'tbl.thumb',
+		'tbl.language',
+		'tbl.alias',
+		'tbl.tax_rate',
+		'tbl.featured'
+	);
 	/**
 	 * Instantiate the model.
 	 *
@@ -99,7 +149,7 @@ class EventbookingModelList extends RADModelList
 	{
 		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$query->select('tbl.*')
+		$query->select(static::$fields)
 			->select("DATEDIFF(tbl.early_bird_discount_date, '$currentDate') AS date_diff")
 			->select("DATEDIFF('$currentDate', tbl.late_fee_date) AS late_fee_date_diff")
 			->select("DATEDIFF(tbl.event_date, '$currentDate') AS number_event_dates")
