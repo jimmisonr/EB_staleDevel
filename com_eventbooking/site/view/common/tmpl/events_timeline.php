@@ -100,7 +100,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 							<i class="<?php echo $iconCalendarClass; ?>"></i>
 							<?php echo JHtml::_('date', $event->event_date, $dateFormat, null); ?>
 							<?php
-								if (strpos($event->event_date, '00:00:00') !== false)
+								if (strpos($event->event_date, '00:00:00') === false)
 								{
 								?>
 									<span class="eb-time"><?php echo JHtml::_('date', $event->event_date, $timeFormat, null) ?></span>
@@ -108,7 +108,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 								}
 								if ($event->event_end_date != $nullDate)
 								{
-									if (strpos($event->event_end_date, '00:00:00') !== false)
+									if (strpos($event->event_end_date, '00:00:00') === false)
 									{
 										$showTime = false;
 									}
