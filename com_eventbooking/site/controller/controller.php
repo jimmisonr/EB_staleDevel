@@ -174,12 +174,12 @@ class EventbookingController extends RADController
 	{
 		$db         = JFactory::getDbo();
 		$query      = $db->getQuery(true);
-		$username   = $this->input->get('fieldValue', '', 'none');
+		$username   = $this->input->getUsername('fieldValue', '');
 		$validateId = $this->input->get('fieldId', '', 'none');
 
 		$query->select('COUNT(*)')
 			->from('#__users')
-			->where('username="' . $username . '"');
+			->where('username=' . $db->quote($username));
 		$db->setQuery($query);
 		$total        = $db->loadResult();
 		$arrayToJs    = array();
