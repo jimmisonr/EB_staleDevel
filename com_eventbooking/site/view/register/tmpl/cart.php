@@ -30,6 +30,7 @@ $addOnClass        = $bootstrapHelper->getClassMapping('add-on');
 $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
 $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 
+/* @var EventbookingViewRegisterHtml $this */
 ?>
 <div id="eb-cart-registration-page" class="eb-container row-fluid">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_CHECKOUT'); ?></h1>
@@ -204,7 +205,7 @@ if (!$this->userId && $this->config->user_registration)
 				<?php echo  JText::_('EB_USERNAME') ?><span class="required">*</span>
 			</label>
 			<div class="<?php echo $controlsClass; ?>">      				
-				<input type="text" name="username" id="username1" class="input-large validate[required,minSize[2],ajax[ajaxUserCall]]" value="<?php echo JRequest::getVar('username'); ?>" />
+				<input type="text" name="username" id="username1" class="input-large validate[required,minSize[2],ajax[ajaxUserCall]]" value="<?php echo $this->escape($this->input->getUsername('username')); ?>" />
 				<span class="invalid" id="validate_username_msg" style="display: none;"><?php echo JText::_('EB_INVALID_USERNAME'); ?></span>		
 			</div>	
 		</div>					
@@ -554,7 +555,7 @@ if (!$this->userId && $this->config->user_registration)
 				<?php echo  JText::_('AUTH_CARD_NUMBER'); ?><span class="required">*</span>				
 			</label>
 			<div class="<?php echo $controlsClass; ?>">      				
-				<input type="text" id="x_card_num" name="x_card_num" class="input-large validate[required,creditCard]" value="<?php echo JRequest::getVar('x_card_num'); ?>" onchange="removeSpace(this);" />
+				<input type="text" id="x_card_num" name="x_card_num" class="input-large validate[required,creditCard]" value="<?php echo $this->escape($this->input->getAlnum('x_card_num')); ?>" onchange="removeSpace(this);" />
 			</div>	
 		</div>								
 		<div class="<?php echo $controlGroupClass;  ?> payment_information" id="tr_exp_date" <?php echo $style; ?>>
@@ -570,7 +571,7 @@ if (!$this->userId && $this->config->user_registration)
 				<?php echo JText::_('AUTH_CVV_CODE'); ?><span class="required">*</span>				
 			</label>
 			<div class="<?php echo $controlsClass; ?>">      				
-				<input type="text" id="x_card_code" name="x_card_code" class="input-large validate[required,custom[number]]" value="<?php echo JRequest::getVar('x_card_code'); ?>" />
+				<input type="text" id="x_card_code" name="x_card_code" class="input-large validate[required,custom[number]]" value="<?php echo $this->escape($this->input->getString('x_card_code')); ?>" />
 			</div>	
 		</div>								
 		<?php
@@ -606,7 +607,7 @@ if (!$this->userId && $this->config->user_registration)
 				<?php echo JText::_('EB_CARD_HOLDER_NAME'); ?><span class="required">*</span>				
 			</label>
 			<div class="<?php echo $controlsClass; ?>">      				
-				<input type="text" id="card_holder_name" name="card_holder_name" class="input-large validate[required]"  value="<?php echo JRequest::getVar('card_holder_name'); ?>" />
+				<input type="text" id="card_holder_name" name="card_holder_name" class="input-large validate[required]"  value="<?php echo $this->escape($this->input->getString('card_holder_name')); ?>" />
 			</div>	
 		</div>
 		<?php		
