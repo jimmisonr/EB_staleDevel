@@ -80,11 +80,11 @@ class EventbookingModelCalendar extends RADModel
 		// Calculate start date and end date of the given month
 		$date->setDate($year, $month, 1);
 		$date->setTime(0, 0, 0);
-		$startDate = $date->toSql(true);
+		$startDate = $db->quote($date->toSql(true));
 
 		$date->setDate($year, $month, $date->daysinmonth);
 		$date->setTime(23, 59, 59);
-		$endDate = $date->toSql(true);
+		$endDate = $db->quote($date->toSql(true));
 
 		$query->select(static::$fields)
 			->select('SUM(b.number_registrants) AS total_registrants')
@@ -107,11 +107,11 @@ class EventbookingModelCalendar extends RADModel
 		}
 		if ($config->show_multiple_days_event_in_calendar && !$this->state->mini_calendar)
 		{
-			$query->where("((`event_date` BETWEEN '$startDate' AND '$endDate') OR (MONTH(event_end_date) = $month AND YEAR(event_end_date) = $year ))");
+			$query->where("((`event_date` BETWEEN $startDate AND $endDate) OR (MONTH(event_end_date) = $month AND YEAR(event_end_date) = $year ))");
 		}
 		else
 		{
-			$query->where("`event_date` BETWEEN '$startDate' AND '$endDate'");
+			$query->where("`event_date` BETWEEN $startDate AND $endDate");
 		}
 
 		if ($config->hide_past_events)
