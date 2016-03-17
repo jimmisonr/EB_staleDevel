@@ -77,6 +77,20 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Check to see whether the return value is a valid date format
+	 *
+	 * @param $value
+	 *
+	 * @return bool
+	 */
+	public static function isValidDate($value)
+	{
+		// basic date format yyyy-mm-dd
+		$expr = '/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/D';
+
+		return (preg_match($expr, $value, $match) && checkdate($match[2], $match[3], $match[1]));
+	}
+	/**
 	 * We only need to generate invoice for paid events only
 	 *
 	 * @param $row

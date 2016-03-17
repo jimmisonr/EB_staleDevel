@@ -178,6 +178,12 @@ class EventbookingModelCalendar extends RADModel
 		// get first day of week of today
 		$currentDateData = self::getCurrentDateData();
 		$startWeekDate   = $this->state->date;
+
+		if (!EventbookingHelper::isValidDate($startWeekDate))
+		{
+			$startWeekDate = '';
+		}
+
 		if ($startWeekDate)
 		{
 			$date = JFactory::getDate($startWeekDate, JFactory::getConfig()->get('offset'));
@@ -188,17 +194,17 @@ class EventbookingModelCalendar extends RADModel
 			$this->state->set('date', $date->format('Y-m-d', true));
 		}
 		$date->setTime(0, 0, 0);
-		$startDate = $date->toSql(true);
+		$startDate = $db->quote($date->toSql(true));
 		$date->modify('+6 day');
 		$date->setTime(23, 59, 59);
-		$endDate = $date->toSql(true);
+		$endDate = $db->quote($date->toSql(true));
 		$query->select(static::$fields)
 			->select('a.short_description')
 			->select('b.name AS location_name')
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')
 			->where('a.published = 1')
-			->where("(a.event_date BETWEEN '$startDate' AND '$endDate')")
+			->where("(a.event_date BETWEEN $startDate AND $endDate)")
 			->where('a.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
 
 		if ($fieldSuffix)
@@ -238,21 +244,27 @@ class EventbookingModelCalendar extends RADModel
 		$db          = $this->getDbo();
 		$query       = $db->getQuery(true);
 		$day         = $this->state->day;
+
+		if (!EventbookingHelper::isValidDate($day))
+		{
+			$day = '';
+		}
+
 		if (!$day)
 		{
 			$currentDateData = self::getCurrentDateData();
 			$day             = $currentDateData['current_date'];
 			$this->state->set('day', $day);
 		}
-		$startDate = $day . " 00:00:00";
-		$endDate   = $day . " 23:59:59";
+		$startDate = $db->quote($day . " 00:00:00");
+		$endDate   = $db->quote($day . " 23:59:59");
 		$query->select(static::$fields)
 			->select('a.short_description')
 			->select('b.name AS location_name')
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')
 			->where('a.published = 1')
-			->where("(a.event_date BETWEEN '$startDate' AND '$endDate')")
+			->where("(a.event_date BETWEEN $startDate AND $endDate)")
 			->where('a.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
 
 		if ($fieldSuffix)
