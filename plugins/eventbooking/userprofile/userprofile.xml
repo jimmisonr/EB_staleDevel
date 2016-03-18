@@ -7,7 +7,7 @@
 	<copyright>Copyright (C) 2010 - 2016 Ossolution Team</copyright>
 	<license>GNU General Public License version 3, or later</license>
 	<creationDate>December 2012</creationDate>
-	<version>2.4.0</version>
+	<version>2.4.1</version>
 	<description>This plugin is used to add registrants to Joomla User profile when they register for an event in Events Booking.</description>
 	<files>
 		<filename plugin="userprofile">userprofile.php</filename>
