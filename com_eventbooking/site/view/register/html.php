@@ -62,10 +62,17 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 				JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_eventbooking&view=password&event_id=' . $event->id . '&return=' . $return . '&Itemid=' . $input->getInt('Itemid', 0), false));
 			}
 		}
+
+		// Page title
 		$pageTitle = JText::_('EB_EVENT_REGISTRATION');
 		$pageTitle = str_replace('[EVENT_TITLE]', $event->title, $pageTitle);
 		JFactory::getDocument()->setTitle($pageTitle);
+
 		$layout = $this->getLayout();
+
+		// Breadcrumb
+		$this->generateBreadcrumb($event, $layout);
+
 		switch ($layout)
 		{
 			case 'group':
@@ -533,5 +540,33 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$this->paymentType          = $paymentType;
 
 		parent::display();
+	}
+
+	/**
+	 * Generate Breadcrumb for event detail page, allow users to come back to event details
+	 *
+	 * @param JTable $event
+	 * @param string $layout
+	 */
+	private function generateBreadcrumb($event, $layout)
+	{
+		$app      = JFactory::getApplication();
+		$active   = $app->getMenu()->getActive();
+		$pathway = $app->getPathway();
+		$menuView = !empty($active->query['view']) ? $active->query['view'] : null;
+
+		if ($menuView == 'calendar' || $menuView == 'upcomingevents')
+		{
+			$pathway->addItem($event->title, JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, 0, $app->input->getInt('Itemid'))));
+		}
+
+		if ($layout == 'default')
+		{
+			$pathway->addItem(JText::_('EB_INDIVIDUAL_REGISTRATION'));
+		}
+		else
+		{
+			$pathway->addItem(JText::_('EB_GROUP_REGISTRATION'));
+		}
 	}
 }
