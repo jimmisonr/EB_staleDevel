@@ -169,16 +169,16 @@ class EventbookingModelCalendar extends RADModel
 			$this->state->set('date', $date->format('Y-m-d', true));
 		}
 		$date->setTime(0, 0, 0);
-		$startDate = $date->toSql(true);
+		$startDate = $db->quote($date->toSql(true));
 		$date->modify('+6 day');
 		$date->setTime(23, 59, 59);
-		$endDate = $date->toSql(true);
+		$endDate = $db->quote($date->toSql(true));
 		$query->select('a.*')
 			->select('b.name AS location_name')
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')
 			->where('a.published = 1')
-			->where("(a.event_date BETWEEN '$startDate' AND '$endDate')")
+			->where("(a.event_date BETWEEN $startDate AND $endDate)")
 			->where('a.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
 
 		if ($fieldSuffix)
@@ -224,8 +224,8 @@ class EventbookingModelCalendar extends RADModel
 			$day             = $currentDateData['current_date'];
 			$this->state->set('day', $day);
 		}
-		$startDate = $day . " 00:00:00";
-		$endDate   = $day . " 23:59:59";
+		$startDate = $db->quote($day . " 00:00:00");
+		$endDate   = $db->quote($day . " 23:59:59");
 		$query->select('a.*')
 			->select('a.title' . $fieldSuffix . ' AS title')
 			->select('short_description' . $fieldSuffix . ' AS short_description')
@@ -233,7 +233,7 @@ class EventbookingModelCalendar extends RADModel
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')
 			->where('a.published = 1')
-			->where("(a.event_date BETWEEN '$startDate' AND '$endDate')")
+			->where("(a.event_date BETWEEN $startDate AND $endDate)")
 			->where('a.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
 
 		if ($config->hide_past_events)
