@@ -4642,7 +4642,7 @@ class EventbookingHelper
 		$ret   = $model->register($data);
 		$db    = JFactory::getDbo();
 		//Need to get the user ID based on username
-		$sql = 'SELECT id FROM #__users WHERE username="' . $data['username'] . '"';
+		$sql = 'SELECT id FROM #__users WHERE username=' . $db->quote($data['username']);
 		$db->setQuery($sql);
 
 		return (int) $db->loadResult();

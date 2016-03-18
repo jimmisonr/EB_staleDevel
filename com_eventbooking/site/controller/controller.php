@@ -182,7 +182,7 @@ class EventbookingController extends RADController
 
 		$query->select('COUNT(*)')
 			->from('#__users')
-			->where('username="' . $username . '"');
+			->where('username=' . $db->quote($username));
 		$db->setQuery($query);
 		$total        = $db->loadResult();
 		$arrayToJs    = array();
