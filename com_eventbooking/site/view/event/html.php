@@ -62,7 +62,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 					$pathway->addItem($item->title);
 				}
 			}
-			elseif (isset($active->query['view']) && ($active->query['view'] == 'calendar'))
+			elseif (isset($active->query['view']) && ($active->query['view'] == 'calendar' || $active->query['view'] == 'upcomingevents'))
 			{
 				$pathway->addItem($item->title);
 			}
