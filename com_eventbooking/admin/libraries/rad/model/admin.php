@@ -455,6 +455,11 @@ class RADModelAdmin extends RADModel
 	protected function initData()
 	{
 		$this->data = $this->getTable();
+
+		if (property_exists($this->data, 'published'))
+		{
+			$this->data->published = 1;
+		}
 	}
 
 	/**
