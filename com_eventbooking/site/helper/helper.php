@@ -2974,11 +2974,7 @@ class EventbookingHelper
 
 			$attachments     = array();
 			$invoiceFilePath = '';
-			if ($config->activate_invoice_feature
-				&& $config->send_invoice_to_customer
-				&& $row->invoice_number
-				&& ($row->published == 1 || empty($config->generate_invoice_on_payment_complete))
-			)
+			if ($config->activate_invoice_feature && $config->send_invoice_to_customer && $row->invoice_number)
 			{
 				self::generateInvoicePDF($row);
 				$invoiceFilePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
@@ -3347,7 +3343,7 @@ class EventbookingHelper
 			$body   = str_replace("[QRCODE]", $imgTag, $body);
 		}
 
-		if ($config->activate_invoice_feature && $config->generate_invoice_on_payment_complete && $row->invoice_number)
+		if ($config->activate_invoice_feature && $row->invoice_number)
 		{
 			self::generateInvoicePDF($row);
 			$mailer->addAttachment(JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf');
