@@ -27,6 +27,9 @@ $addOnClass        = $bootstrapHelper->getClassMapping('add-on');
 $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
 $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 $btnClass          = $bootstrapHelper->getClassMapping('btn');
+
+/* @var EventbookingViewRegisterHtml $this */
+
 if (!$this->userId && $this->config->user_registration)
 {
 	$validateLoginForm = true;
@@ -88,7 +91,7 @@ else
 			<?php echo  JText::_('EB_USERNAME') ?><span class="required">*</span>
 		</label>
 		<div class="<?php echo $controlsClass; ?>">
-			<input type="text" name="username" id="username1" class="input-large validate[required,ajax[ajaxUserCall],<?php echo $minSize;?>]" value="<?php echo JRequest::getVar('username'); ?>"/>
+			<input type="text" name="username" id="username1" class="input-large validate[required,ajax[ajaxUserCall],<?php echo $minSize;?>]" value="<?php echo $this->escape($this->input->getUsername('username')); ?>"/>
 		</div>
 	</div>
 	<div class="<?php echo $controlGroupClass; ?>">
@@ -369,7 +372,7 @@ else
 		<div class="<?php echo $controlGroupClass; ?>">
 			<label class="<?php echo $controlLabelClass; ?>" for="coupon_code"><?php echo  JText::_('EB_COUPON') ?></label>
 			<div class="<?php echo $controlsClass; ?>">
-				<input type="text" class="input-medium" name="coupon_code" id="coupon_code" value="<?php echo JRequest::getVar('coupon_code'); ?>" onchange="calculateGroupRegistrationFee();" />
+				<input type="text" class="input-medium" name="coupon_code" id="coupon_code" value="<?php echo $this->escape($this->input->getString('coupon_code')); ?>" onchange="calculateGroupRegistrationFee();" />
 				<span class="invalid" id="coupon_validate_msg" style="display: none;"><?php echo JText::_('EB_INVALID_COUPON'); ?></span>
 			</div>
 		</div>
@@ -446,7 +449,7 @@ else
 				<div class="<?php echo $controlsClass; ?>">
 					<input type="text" id="x_card_num" name="x_card_num"
 						   class="input-large validate[required,creditCard]"
-						   value="<?php echo JRequest::getVar('x_card_num'); ?>"/>
+						   value="<?php echo $this->escape($this->input->getString('x_card_num')); ?>"/>
 				</div>
 			</div>
 			<div class="<?php echo $controlGroupClass; ?> payment_information" id="tr_exp_date" <?php echo $style; ?>>
@@ -466,7 +469,7 @@ else
 				<div class="<?php echo $controlsClass; ?>">
 					<input type="text" id="x_card_code" name="x_card_code"
 						   class="input-large validate[required,custom[number]]"
-						   value="<?php echo JRequest::getVar('x_card_code'); ?>"/>
+						   value="<?php echo $this->escape($this->input->getString('x_card_code')); ?>"/>
 				</div>
 			</div>
 			<?php
@@ -506,7 +509,7 @@ else
 				<div class="<?php echo $controlsClass; ?>">
 					<input type="text" id="card_holder_name" name="card_holder_name"
 						   class="input-large validate[required]"
-						   value="<?php echo JRequest::getVar('card_holder_name'); ?>"/>
+						   value="<?php echo $this->escape($this->input->getString('card_holder_name')); ?>"/>
 				</div>
 			</div>
 		<?php
