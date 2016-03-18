@@ -54,6 +54,11 @@ class EventbookingControllerRegistrant extends EventbookingController
 		$db->setQuery($query);
 		$rowRegistrant = $db->loadObject();
 
+		if (!$config->get('enable_delete_registrants', 1))
+		{
+			throw new RuntimeException('Delete registrants option is disabled. Please contact administrator', 403);
+		}
+
 		if (!$rowRegistrant)
 		{
 			throw new RuntimeException('Invalid registration record');

@@ -194,6 +194,14 @@ JHtml::_('formbehavior.chosen', 'select');
 					</div>
 					<div class="control-group">
 						<div class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('enable_delete_registrants', JText::_('EB_ENABLE_REGISTRANTS_IN_FRONTEND'), JText::_('EB_ENABLE_REGISTRANTS_IN_FRONTEND_EXPLAIN')); ?>
+						</div>
+						<div class="controls">
+							<?php echo EventbookingHelperHtml::getBooleanInput('enable_delete_registrants', $config->get('enable_delete_registrants', 1)); ?>
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('show_all_locations_in_event_submission_form', JText::_('EB_SHOW_ALL_LOCATIONS_IN_EVENT_SUBMISSION_FORM'), JText::_('EB_SHOW_ALL_LOCATIONS_IN_EVENT_SUBMISSION_FORM_EXPLAIN')); ?>
 						</div>
 						<div class="controls">

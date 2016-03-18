@@ -167,10 +167,15 @@ $return = base64_encode(JUri::getInstance()->toString());
 					<a href="<?php echo $link; ?>">
 						<?php echo $row->first_name ?>
 					</a>
-					<span class="pull-right">
-						<a class="btn" href="javascript:deleteConfirm(<?php echo $row->id; ?>);"><i class="icon-trash"></i><?php echo JText::_('EB_DELETE'); ?></a>
-					</span>
 					<?php
+					if ($this->config->get('enable_delete_registrants', 1))
+					{
+					?>
+						<span class="pull-right">
+							<a class="btn" href="javascript:deleteConfirm(<?php echo $row->id; ?>);"><i class="icon-trash"></i><?php echo JText::_('EB_DELETE'); ?></a>
+						</span>
+					<?php
+					}
 					if ($row->is_group_billing)
 					{
 						echo '<br />' ;
