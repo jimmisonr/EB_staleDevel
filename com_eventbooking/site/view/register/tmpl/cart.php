@@ -248,7 +248,7 @@ if (!$this->userId && $this->config->user_registration)
 			<div class="<?php echo $controlGroupClass;  ?>">
 				<label class="<?php echo $controlLabelClass; ?>" for="coupon_code"><?php echo  JText::_('EB_COUPON') ?></label>
 				<div class="<?php echo $controlsClass; ?>">
-					<input type="text" class="input-medium" name="coupon_code" id="coupon_code" value="<?php echo JRequest::getVar('coupon_code'); ?>" onchange="calculateCartRegistrationFee();" />
+					<input type="text" class="input-medium" name="coupon_code" id="coupon_code" value="<?php echo $this->escape($this->input->getString('coupon_code')); ?>" onchange="calculateCartRegistrationFee();" />
 					<span class="invalid" id="coupon_validate_msg" style="display: none;"><?php echo JText::_('EB_INVALID_COUPON'); ?></span>
 				</div>
 			</div>
