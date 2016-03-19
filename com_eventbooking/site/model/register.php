@@ -62,10 +62,12 @@ class EventBookingModelRegister extends RADModel
 			$userId          = EventbookingHelper::saveRegistration($data);
 			$data['user_id'] = $userId;
 		}
+
 		while (true)
 		{
 			$registrationCode = JUserHelper::genRandomPassword(10);
-			$query->select('COUNT(*)')
+			$query->clear()
+				->select('COUNT(*)')
 				->from('#__eb_registrants')
 				->where('registration_code=' . $db->quote($registrationCode));
 			$db->setQuery($query);
@@ -75,7 +77,9 @@ class EventBookingModelRegister extends RADModel
 				break;
 			}
 		}
+
 		$row->registration_code = $registrationCode;
+
 		// Calculate the payment amount
 		$eventId = (int) $data['event_id'];
 		$event   = EventbookingHelperDatabase::getEvent($eventId);
@@ -370,8 +374,8 @@ class EventBookingModelRegister extends RADModel
 		while (true)
 		{
 			$registrationCode = JUserHelper::genRandomPassword(10);
-			$query->clear();
-			$query->select('COUNT(*)')
+			$query->clear()
+				->select('COUNT(*)')
 				->from('#__eb_registrants')
 				->where('registration_code=' . $db->quote($registrationCode));
 			$db->setQuery($query);

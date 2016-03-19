@@ -766,6 +766,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('hits', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `hits`  INT NOT NULL DEFAULT  '0' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		if (!in_array('thanks_message', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `thanks_message` TEXT NULL;";

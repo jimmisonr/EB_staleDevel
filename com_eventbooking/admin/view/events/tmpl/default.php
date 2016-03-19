@@ -100,6 +100,9 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 				<th width="5%" nowrap="nowrap" class="center">
 					<?php echo JHtml::_('searchtools.sort', JText::_('EB_PUBLISHED'), 'tbl.published', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
+				<th width="2%" nowrap="nowrap" class="center">
+					<?php echo JHtml::_('searchtools.sort',  JText::_('JGLOBAL_HITS'), 'tbl.hits', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
+				</th>
 				<th width="1%" nowrap="nowrap" class="center">
 					<?php echo JHtml::_('searchtools.sort',  JText::_('EB_ID'), 'tbl.id', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
@@ -108,11 +111,11 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 			<?php
 			if ($this->config->activate_recurring_event)
 			{
-				$colspan = 12 ;
+				$colspan = 13 ;
 			}
 			else
 			{
-				$colspan = 11 ;
+				$colspan = 12 ;
 			}
 			?>
 			<tfoot>
@@ -207,6 +210,9 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 					</td>
 					<td class="center">
 						<?php echo $published; ?>
+					</td>
+					<td class="center">
+						<?php echo $row->hits; ?>
 					</td>
 					<td class="center">
 						<?php echo $row->id; ?>

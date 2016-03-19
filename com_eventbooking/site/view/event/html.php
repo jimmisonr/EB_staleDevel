@@ -43,6 +43,15 @@ class EventbookingViewEventHtml extends RADViewHtml
 			$item->description = $item->short_description;
 		}
 
+		// Update hits
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->update('#__eb_events')
+			->set('hits = hits + 1')
+			->where('id = ' . $item->id);
+		$db->setQuery($query);
+		$db->execute();
+
 		$categoryId = $state->catid;
 		if ($active)
 		{
