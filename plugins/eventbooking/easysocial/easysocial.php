@@ -38,7 +38,7 @@ class plgEventbookingEasySocial extends JPlugin
 		if ($this->canRun)
 		{
 			$db  = JFactory::getDbo();
-			$sql = 'SELECT title AS `value`, title AS `text` FROM #__social_fields WHERE state=1 AND title != ""';
+			$sql = 'SELECT unique_key AS `value`, title AS `text` FROM #__social_fields WHERE state=1 AND title != ""';
 			$db->setQuery($sql);
 
 			return $db->loadObjectList();
