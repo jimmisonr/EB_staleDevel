@@ -2960,8 +2960,8 @@ class EventbookingHelper
 			foreach ($replaces as $key => $value)
 			{
 				$key     = strtoupper($key);
-				$subject = str_replace("[$key]", $value, $subject);
-				$body    = str_replace("[$key]", $value, $body);
+				$subject = str_ireplace("[$key]", $value, $subject);
+				$body    = str_ireplace("[$key]", $value, $body);
 			}
 			$body = self::convertImgTags($body);
 
@@ -2969,7 +2969,7 @@ class EventbookingHelper
 			{
 				EventbookingHelper::generateQrcode($row->id);
 				$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
-				$body   = str_replace("[QRCODE]", $imgTag, $body);
+				$body   = str_ireplace("[QRCODE]", $imgTag, $body);
 			}
 
 			$attachments     = array();
@@ -3128,8 +3128,8 @@ class EventbookingHelper
 						foreach ($memberReplaces as $key => $value)
 						{
 							$key     = strtoupper($key);
-							$body    = str_replace("[$key]", $value, $body);
-							$subject = str_replace("[$key]", $value, $subject);
+							$body    = str_ireplace("[$key]", $value, $body);
+							$subject = str_ireplace("[$key]", $value, $subject);
 						}
 						$body = self::convertImgTags($body);
 						$mailer->ClearAllRecipients();
@@ -3220,8 +3220,8 @@ class EventbookingHelper
 			foreach ($replaces as $key => $value)
 			{
 				$key     = strtoupper($key);
-				$subject = str_replace("[$key]", $value, $subject);
-				$body    = str_replace("[$key]", $value, $body);
+				$subject = str_ireplace("[$key]", $value, $subject);
+				$body    = str_ireplace("[$key]", $value, $body);
 			}
 			$body = self::convertImgTags($body);
 
@@ -3229,7 +3229,7 @@ class EventbookingHelper
 			{
 				EventbookingHelper::generateQrcode($row->id);
 				$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
-				$body   = str_replace("[QRCODE]", $imgTag, $body);
+				$body   = str_ireplace("[QRCODE]", $imgTag, $body);
 			}
 
 			for ($i = 0, $n = count($emails); $i < $n; $i++)
@@ -3330,8 +3330,8 @@ class EventbookingHelper
 		foreach ($replaces as $key => $value)
 		{
 			$key     = strtoupper($key);
-			$subject = str_replace("[$key]", $value, $subject);
-			$body    = str_replace("[$key]", $value, $body);
+			$subject = str_ireplace("[$key]", $value, $subject);
+			$body    = str_ireplace("[$key]", $value, $body);
 		}
 		$body = self::convertImgTags($body);
 
@@ -3340,7 +3340,7 @@ class EventbookingHelper
 		{
 			EventbookingHelper::generateQrcode($row->id);
 			$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
-			$body   = str_replace("[QRCODE]", $imgTag, $body);
+			$body   = str_ireplace("[QRCODE]", $imgTag, $body);
 		}
 
 		if ($config->activate_invoice_feature && $row->invoice_number)
@@ -3421,11 +3421,11 @@ class EventbookingHelper
 		{
 			$body = $message->watinglist_confirmation_body;
 		}
-		$subject = str_replace('[EVENT_TITLE]', $event->title, $subject);
+		$subject = str_ireplace('[EVENT_TITLE]', $event->title, $subject);
 		foreach ($replaces as $key => $value)
 		{
 			$key  = strtoupper($key);
-			$body = str_replace("[$key]", $value, $body);
+			$body = str_ireplace("[$key]", $value, $body);
 		}
 		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
 		//Send emails to notification emails
@@ -3459,11 +3459,11 @@ class EventbookingHelper
 		{
 			$body = $message->watinglist_notification_body;
 		}
-		$subject = str_replace('[EVENT_TITLE]', $event->title, $subject);
+		$subject = str_ireplace('[EVENT_TITLE]', $event->title, $subject);
 		foreach ($replaces as $key => $value)
 		{
 			$key  = strtoupper($key);
-			$body = str_replace("[$key]", $value, $body);
+			$body = str_ireplace("[$key]", $value, $body);
 		}
 		$body = self::convertImgTags($body);
 		for ($i = 0, $n = count($emails); $i < $n; $i++)
@@ -3570,7 +3570,7 @@ class EventbookingHelper
 
 			$eventTitle = $row->{'title' . $fieldSuffix};
 
-			$emailSubject = str_replace('[EVENT_TITLE]', $eventTitle, $emailSubject);
+			$emailSubject = str_ireplace('[EVENT_TITLE]', $eventTitle, $emailSubject);
 
 			if (strlen($message->{'reminder_email_body' . $fieldSuffix}))
 			{
@@ -3614,7 +3614,7 @@ class EventbookingHelper
 
 			foreach ($replaces as $key => $value)
 			{
-				$emailBody = str_replace('[' . strtoupper($key) . ']', $value, $emailBody);
+				$emailBody = str_ireplace('[' . strtoupper($key) . ']', $value, $emailBody);
 			}
 
 			$emailBody = EventbookingHelper::convertImgTags($emailBody);
@@ -4194,7 +4194,7 @@ class EventbookingHelper
 		{
 			EventbookingHelper::generateQrcode($row->id);
 			$imgTag        = '<img src="media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
-			$invoiceOutput = str_replace("[QRCODE]", $imgTag, $invoiceOutput);
+			$invoiceOutput = str_ireplace("[QRCODE]", $imgTag, $invoiceOutput);
 		}
 
 		if ($config->multiple_booking)
@@ -4271,13 +4271,13 @@ class EventbookingHelper
 			$replaces['PAYMENT_PROCESSING_FEE'] = self::formatCurrency($row->payment_processing_fee, $config);
 			$replaces['TOTAL_AMOUNT']           = self::formatCurrency($row->total_amount - $row->discount_amount + $row->payment_processing_fee + $row->tax_amount, $config);
 			$itemName                           = JText::_('EB_EVENT_REGISTRATION');
-			$itemName                           = str_replace('[EVENT_TITLE]', $rowEvent->title, $itemName);
+			$itemName                           = str_ireplace('[EVENT_TITLE]', $rowEvent->title, $itemName);
 			$replaces['ITEM_NAME']              = $itemName;
 		}
 		foreach ($replaces as $key => $value)
 		{
 			$key           = strtoupper($key);
-			$invoiceOutput = str_replace("[$key]", $value, $invoiceOutput);
+			$invoiceOutput = str_ireplace("[$key]", $value, $invoiceOutput);
 		}		
 		
 		$v             = $pdf->writeHTML($invoiceOutput, true, false, false, false, '');
