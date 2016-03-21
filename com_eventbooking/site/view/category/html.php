@@ -98,9 +98,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 
 		// Load sub-categories of the current category
 		if ($categoryId > 0)
-		{
-			JLoader::register('EventbookingModelCategories', JPATH_ROOT . '/components/com_eventbooking/models/categories.php');
-
+		{			
 			$model            = new EventbookingModelCategories(
 				array(
 					'table_prefix'    => '#__eb_',
