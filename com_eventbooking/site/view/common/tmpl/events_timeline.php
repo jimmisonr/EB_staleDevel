@@ -110,11 +110,11 @@ $return = base64_encode(JUri::getInstance()->toString());
 								{
 									if (strpos($event->event_end_date, '00:00:00') === false)
 									{
-										$showTime = false;
+										$showTime = true;
 									}
 									else
 									{
-										$showTime = true;
+										$showTime = false;
 									}
 									$startDate =  JHtml::_('date', $event->event_date, 'Y-m-d', null);
 									$endDate   = JHtml::_('date', $event->event_end_date, 'Y-m-d', null);
