@@ -3997,56 +3997,21 @@ class EventbookingHelper
 	 */
 	public static function getUserInput($userId, $fieldName = 'user_id', $registrantId = 0)
 	{
-		// Initialize variables.
-		$html = array();
-		$link = 'index.php?option=com_users&amp;view=users&amp;layout=modal&amp;tmpl=component&amp;field=user_id';
-		// Initialize some field attributes.
-		$attr = ' class="inputbox"';
-		// Load the modal behavior script.
-		JHtml::_('behavior.modal', 'a.modal_user_id');
-		// Build the script.
-		$script   = array();
-		$script[] = '	function jSelectUser_user_id(id, title) {';
-		$script[] = '		var old_id = document.getElementById("' . $fieldName . '").value;';
-		$script[] = '		if (old_id != id) {';
-		$script[] = '			document.getElementById("' . $fieldName . '").value = id;';
-		$script[] = '			document.getElementById("user_id_name").value = title;';
-		$script[] = '		}';
+		JHtml::_('jquery.framework');
+		$field = JFormHelper::loadFieldType('User');
+
+		$element = new SimpleXMLElement('<field />');
+		$element->addAttribute('name', $fieldName);
+		$element->addAttribute('class', 'readonly');
+
 		if (!$registrantId)
 		{
-			$script[] = ' populateRegisterData(id, document.getElementById("event_id").value, title); ';
-		}
-		$script[] = '		SqueezeBox.close();';
-		$script[] = '	}';
-		// Add the script to the document head.
-		JFactory::getDocument()->addScriptDeclaration(implode("\n", $script));
-		// Load the current username if available.
-		$table = JTable::getInstance('user');
-		if ($userId)
-		{
-			$table->load($userId);
-		}
-		else
-		{
-			$table->name = '';
+			$element->addAttribute('onchange', 'populateRegistrantData();');
 		}
 
+		$field->setup($element, $userId);
 
-		$html[] = '<div class="input-append">';
-		$html[] = '	<input type="text" id="user_id_name"' . ' value="' . htmlspecialchars($table->name, ENT_COMPAT, 'UTF-8') . '"' .
-			' disabled="disabled"' . $attr . ' />';
-		// Create the user select button.
-		$html[] = '<a class="btn btn-primary modal_user_id" title="' . JText::_('JLIB_FORM_CHANGE_USER') . '"' . ' href="' . $link . '"' .
-			' rel="{handler: \'iframe\', size: {x: 800, y: 500}}">';
-
-		$html[] = '<span class="icon-user"></span></a>';
-		$html[] = '</div>';
-
-
-		// Create the real field, hidden, that stored the user id.
-		$html[] = '<input type="hidden" id="' . $fieldName . '" name="' . $fieldName . '" value="' . $userId . '" />';
-
-		return implode("\n", $html);
+		return $field->input;
 	}
 
 	/**
@@ -4068,7 +4033,7 @@ class EventbookingHelper
 			function jSelectArticle(id, title, catid, object, link, lang) {
 				var old_id = document.getElementById('<?php echo $fieldName; ?>').value;
 				if (old_id != id) {
-					document.id(article_name).value = title;
+					document.id('article_name').value = title;
 					document.getElementById('<?php echo $fieldName; ?>').value = id;
 					jModalClose();
 				}

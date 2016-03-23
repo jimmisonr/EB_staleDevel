@@ -470,10 +470,12 @@ $selectedState = '';
 			$(document).ready(function(){
 				buildStateField('state', 'country', '<?php echo $selectedState; ?>');
 			})
-			populateRegisterData = (function(id, registerId, title){
+			populateRegistrantData = (function(){
+				var userId = $('#user_id_id').val();
+				var eventId = $('#event_id').val();
 				$.ajax({
 					type : 'POST',
-					url : 'index.php?option=com_eventbooking&task=get_profile_data&user_id=' + id + '&event_id=' +registerId,
+					url : 'index.php?option=com_eventbooking&task=get_profile_data&user_id=' + userId + '&eventId=' +eventId,
 					dataType: 'json',
 					success : function(json){
 						var selecteds = [];
@@ -501,9 +503,7 @@ $selectedState = '';
 							{
 								$('#' + field).val(value);
 							}
-						}
-						$('#user_id').val(id);
-						$('#user_id_name').val(title);
+						}						
 					}
 				})
 			});
