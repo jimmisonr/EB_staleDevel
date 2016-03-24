@@ -19,7 +19,6 @@ $selectedState = '';
 		if (pressbutton == 'cancel') 
 		{
 			Joomla.submitform( pressbutton );
-			return;				
 		} 
 		else 
 		{
@@ -59,7 +58,7 @@ $selectedState = '';
 					else 
 					{
 					?>
-						<input class="text_area" type="text" name="number_registrants" id="number_registrants" size="40" maxlength="250" value="" />						
+						<input class="text_area" type="text" name="number_registrants" id="number_registrants" size="40" maxlength="250" value="1" />
 						<small><?php echo JText::_('EB_NUMBER_REGISTRANTS_EXPLAIN'); ?></small>							
 					<?php	
 					}
@@ -126,75 +125,68 @@ $selectedState = '';
 			<td>
 				<?php echo $this->config->currency_symbol?><input type="text" name="total_amount" class="input-medium" value="<?php echo $this->item->total_amount > 0 ? round($this->item->total_amount , 2) : null;?>" />				
 			</td>
-		</tr>	
+		</tr>
+		<tr>
+			<td width="100" class="key">
+				<?php echo  JText::_('EB_DISCOUNT_AMOUNT'); ?>
+			</td>
+			<td>
+				<?php echo $this->config->currency_symbol?><input type="text" name="discount_amount" class="input-medium" value="<?php echo $this->item->discount_amount > 0 ? round($this->item->discount_amount , 2) : null;?>" />
+			</td>
+		</tr>
 		<?php
-			if ($this->item->discount_amount > 0 || $this->item->tax_amount > 0 || $this->item->payment_processing_fee || $this->item->late_fee > 0)
-			{
-			    if ($this->item->discount_amount > 0) 
-				{
-			    ?>
-			  	<tr>
-    				<td width="100" class="key">
-    					<?php echo  JText::_('EB_DISCOUNT_AMOUNT'); ?>
-    				</td>
-    				<td>
-    					<?php echo $this->config->currency_symbol?><input type="text" name="discount_amount" class="input-medium" value="<?php echo $this->item->discount_amount > 0 ? round($this->item->discount_amount , 2) : null;?>" />    					
-    				</td>
-    			</tr>  	
-			    <?php    
-			    }
-				if ($this->item->late_fee > 0)
-				{
-				?>
-					<tr>
-						<td width="100" class="key">
-							<?php echo  JText::_('EB_LATE_FEE'); ?>
-						</td>
-						<td>
-							<?php echo $this->config->currency_symbol?><input type="text" name="late_fee" class="input-medium" value="<?php echo $this->item->late_fee > 0 ? round($this->item->late_fee , 2) : null;?>" />
-						</td>
-					</tr>
-				<?php
-				}
-				if ($this->item->tax_amount > 0)
-			    {
-			    ?>
-    			    <tr>
-        				<td width="100" class="key">
-        					<?php echo  JText::_('EB_TAX'); ?>
-        				</td>
-        				<td>
-        					<?php echo $this->config->currency_symbol?><input type="text" name="tax_amount" class="input-medium" value="<?php echo $this->item->tax_amount > 0 ? round($this->item->tax_amount , 2) : null;?>" />        				
-        				</td>
-        			</tr> 
-    			<?php    
-    			}
-
-				if ($this->item->payment_processing_fee > 0)
-				{
-					?>
-					<tr>
-						<td width="100" class="key">
-							<?php echo  JText::_('EB_PAYMENT_FEE'); ?>
-						</td>
-						<td>
-							<?php echo $this->config->currency_symbol?><input type="text" name="payment_processing_fee" class="input-medium" value="<?php echo $this->item->payment_processing_fee > 0 ? round($this->item->payment_processing_fee , 2) : null;?>" />
-						</td>
-					</tr>
-				<?php
-				}
-				?>
+		if ($this->item->late_fee > 0)
+		{
+		?>
 			<tr>
 				<td width="100" class="key">
-					<?php echo  JText::_('EB_GROSS_AMOUNT'); ?>
+					<?php echo  JText::_('EB_LATE_FEE'); ?>
 				</td>
 				<td>
-					<?php echo $this->config->currency_symbol?><input type="text" name="amount" class="input-medium" value="<?php echo $this->item->amount > 0 ? round($this->item->amount , 2) : null;?>" />					
+					<?php echo $this->config->currency_symbol?><input type="text" name="late_fee" class="input-medium" value="<?php echo $this->item->late_fee > 0 ? round($this->item->late_fee , 2) : null;?>" />
 				</td>
-			</tr>					
-			<?php			    
-			}					
-			if ($this->item->deposit_amount > 0) 
+			</tr>
+		<?php
+		}
+
+		if ($this->event->tax_rate > 0 || $this->item->tax_amount > 0)
+		{
+		?>
+			<tr>
+				<td width="100" class="key">
+					<?php echo  JText::_('EB_TAX'); ?>
+				</td>
+				<td>
+					<?php echo $this->config->currency_symbol?><input type="text" name="tax_amount" class="input-medium" value="<?php echo $this->item->tax_amount > 0 ? round($this->item->tax_amount , 2) : null;?>" />
+				</td>
+			</tr>
+		<?php
+		}
+
+		if ($this->showPaymentFee || $this->item->payment_processing_fee > 0)
+		{
+		?>
+			<tr>
+				<td width="100" class="key">
+					<?php echo  JText::_('EB_PAYMENT_FEE'); ?>
+				</td>
+				<td>
+					<?php echo $this->config->currency_symbol?><input type="text" name="payment_processing_fee" class="input-medium" value="<?php echo $this->item->payment_processing_fee > 0 ? round($this->item->payment_processing_fee , 2) : null;?>" />
+				</td>
+			</tr>
+		<?php
+		}
+		?>
+		<tr>
+			<td width="100" class="key">
+				<?php echo  JText::_('EB_GROSS_AMOUNT'); ?>
+			</td>
+			<td>
+				<?php echo $this->config->currency_symbol?><input type="text" name="amount" class="input-medium" value="<?php echo $this->item->amount > 0 ? round($this->item->amount , 2) : null;?>" />
+			</td>
+		</tr>
+		<?php
+			if ($this->config->activate_deposit_feature)
 			{
 			?>
 				<tr>
@@ -202,35 +194,56 @@ $selectedState = '';
 						<?php echo JText::_('EB_DEPOSIT_AMOUNT'); ?>
 					</td>
 					<td>
-						<?php echo $this->config->currency_symbol?><input type="text" name="deposit_amount" value="<?php echo $this->item->deposit_amount > 0 ? round($this->item->deposit_amount , 2) : null;?>" />						
+						<?php echo $this->config->currency_symbol?><input type="text" name="deposit_amount" value="<?php echo $this->item->deposit_amount > 0 ? round($this->item->deposit_amount , 2) : null;?>" />
 					</td>
 				</tr>
-			<?php			   
-    			if($this->item->payment_status == 0) 
-				{
-    			?>
-    				<tr>
-    					<td class="key">
-    						<?php echo JText::_('EB_DUE_AMOUNT'); ?>
-    					</td>
-    					<td>
-    						<?php
-    							$dueAmount = $this->item->amount - $this->item->deposit_amount;
-    							echo $this->config->currency_symbol?><input type="text" name="due_amount" class="input-medium" value="<?php echo $dueAmount > 0 ? round($dueAmount , 2) : null;?>" />
-    					</td>
-    				</tr>
-    			<?php    			    			       
-    			}
-    			?>
-    				<tr>
-    					<td class="key">
-    						<?php echo JText::_('EB_PAYMENT_STATUS'); ?>
-    					</td>
-    					<td>    						
-    						<?php echo $this->lists['payment_status'];?>
-    					</td>
-    				</tr>
-    			<?php			            
+				<?php
+					if ($this->item->payment_status == 0 && $this->item->id)
+					{
+					?>
+						<tr>
+							<td class="key">
+								<?php echo JText::_('EB_DUE_AMOUNT'); ?>
+							</td>
+							<td>
+								<?php
+								if ($this->item->payment_status == 1)
+								{
+									$dueAmount = 0;
+								}
+								else
+								{
+									$dueAmount = $this->item->amount - $this->item->deposit_amount;
+								}
+								echo $this->config->currency_symbol?><input type="text" name="due_amount" class="input-medium" value="<?php echo $dueAmount > 0 ? round($dueAmount , 2) : null;?>" />
+							</td>
+						</tr>
+					<?php
+					}
+				?>
+				<tr>
+					<td class="key">
+						<?php echo JText::_('EB_PAYMENT_STATUS'); ?>
+					</td>
+					<td>
+						<?php echo $this->lists['payment_status'];?>
+					</td>
+				</tr>
+			<?php
+			}
+
+			if ($this->item->amount > 0)
+			{
+			?>
+				<tr>
+					<td class="key">
+						<?php echo JText::_('EB_TRANSACTION_ID'); ?>
+					</td>
+					<td>
+						<input type="text" name="transaction_id" value="<?php echo $this->item->transaction_id;?>" />
+					</td>
+				</tr>
+			<?php
 			}
 			if ($this->item->payment_method == "os_offline_creditcard")
 			{
