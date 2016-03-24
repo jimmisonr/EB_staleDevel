@@ -139,7 +139,7 @@ class plgCommunityEB_RegistrationHistory extends CApplications
 	 *
 	 */
 	function _getTotal($userId) {
-		$db		= & JFactory::getDBO();
+		$db		= JFactory::getDBO();
 		$sql = 'SELECT COUNT(*) FROM #__eb_registrants  WHERE user_id='.$userId.' AND (published=1 OR payment_method = "os_offline") ';
 		$db->setQuery($sql);		
 		return $db->loadResult();

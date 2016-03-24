@@ -138,7 +138,7 @@ class EventbookingHelperBootstrap
 			{
 				$icon = substr($class, 5);
 
-				return 'glyphicon glyphicon-' . $icon;
+				return "glyphicon glyphicon-$icon fa fa-$icon";
 			}
 		}
 
