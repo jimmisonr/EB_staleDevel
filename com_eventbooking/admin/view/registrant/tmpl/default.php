@@ -488,7 +488,7 @@ $selectedState = '';
 				var eventId = $('#event_id').val();
 				$.ajax({
 					type : 'POST',
-					url : 'index.php?option=com_eventbooking&task=get_profile_data&user_id=' + userId + '&eventId=' +eventId,
+					url : 'index.php?option=com_eventbooking&task=get_profile_data&user_id=' + userId + '&event_id=' +eventId,
 					dataType: 'json',
 					success : function(json){
 						var selecteds = [];
