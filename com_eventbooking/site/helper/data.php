@@ -426,11 +426,11 @@ class EventbookingHelperData
 	{
 		if (count($rows))
 		{
-			if (ereg('Opera(/| )([0-9].[0-9]{1,2})', $_SERVER['HTTP_USER_AGENT']))
+			if (preg_match('Opera(/| )([0-9].[0-9]{1,2})', $_SERVER['HTTP_USER_AGENT']))
 			{
 				$UserBrowser = "Opera";
 			}
-			elseif (ereg('MSIE ([0-9].[0-9]{1,2})', $_SERVER['HTTP_USER_AGENT']))
+			elseif (preg_match('MSIE ([0-9].[0-9]{1,2})', $_SERVER['HTTP_USER_AGENT']))
 			{
 				$UserBrowser = "IE";
 			}
