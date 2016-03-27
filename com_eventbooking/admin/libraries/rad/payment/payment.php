@@ -221,7 +221,7 @@ abstract class RADPayment
 		$config              = EventbookingHelper::getConfig();
 		$row->transaction_id = $transactionId;
 		$row->payment_date   = gmdate('Y-m-d H:i:s');
-		$row->published      = true;
+		$row->published      = 1;
 		$row->store();
 		if ($row->is_group_billing)
 		{
