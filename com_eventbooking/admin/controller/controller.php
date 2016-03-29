@@ -2338,6 +2338,18 @@ class EventbookingController extends RADControllerAdmin
 			EventbookingHelper::setupMultilingual();
 		}
 
+		//Migrating permissions name, fixing bugs causes by Joomla 3.5.0
+		$asset = JTable::getInstance('asset');
+		$asset->loadByName('com_eventbooking');
+		if ($asset)
+		{
+			$rules = $asset->rules;
+			$rules = str_replace('eventbooking.registrants_management', 'eventbooking.registrantsManagement', $rules);
+			$rules = str_replace('eventbooking.view_registrants_list', 'eventbooking.viewRegistrantsList', $rules);
+			$asset->rules = $rules;
+			$asset->store();
+		}
+		
 		// Files, Folders clean up
 		$deleteFiles = array(
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php',
