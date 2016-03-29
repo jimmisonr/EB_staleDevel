@@ -72,7 +72,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				$rowFields = EventbookingHelper::getFormFields($data['event_id'], 0);
 			}
 			$user = JFactory::getUser();
-			if ($user->authorise('eventbooking.registrants_management', 'com_eventbooking') || empty($row->published))
+			if ($user->authorise('eventbooking.registrantsManagement', 'com_eventbooking') || empty($row->published))
 			{
 				$excludeFeeFields = false;
 			}

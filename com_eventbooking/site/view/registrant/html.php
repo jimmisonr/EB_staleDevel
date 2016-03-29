@@ -68,7 +68,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 
 		$form->buildFieldsDependency();
 
-		if ($userId && $user->authorise('eventbooking.registrants_management', 'com_eventbooking'))
+		if ($userId && $user->authorise('eventbooking.registrantsManagement', 'com_eventbooking'))
 		{
 			$canChangeStatus    = true;
 			$options            = array();
@@ -135,7 +135,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			$lists['checked_in'] = JHtml::_('select.booleanlist', 'checked_in', ' class="inputbox" ', $item->checked_in);
 		}
 
-		if ($user->authorise('eventbooking.registrants_management', 'com_eventbooking') || empty($item->published))
+		if ($user->authorise('eventbooking.registrantsManagement', 'com_eventbooking') || empty($item->published))
 		{
 			$canChangeFeeFields = true;
 		}

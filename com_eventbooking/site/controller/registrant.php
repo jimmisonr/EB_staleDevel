@@ -68,7 +68,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 		{
 			$canDelete = true;
 		}
-		elseif ($user->authorise('eventbooking.registrants_management', 'com_eventbooking'))
+		elseif ($user->authorise('eventbooking.registrantsManagement', 'com_eventbooking'))
 		{
 			if (!$config->only_show_registrants_of_event_owner || ($rowRegistrant->created_by == $user->id))
 			{
@@ -186,7 +186,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		if (!$canDownload)
 		{
-			if ($user->authorise('eventbooking.registrants_management', 'com_eventbooking'))
+			if ($user->authorise('eventbooking.registrantsManagement', 'com_eventbooking'))
 			{
 				$config = EventbookingHelper::getConfig();
 				if ($config->only_show_registrants_of_event_owner)
@@ -350,7 +350,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 	public function checkin()
 	{
 		$user = JFactory::getUser();
-		if ($user->authorise('eventbooking.registrants_management', 'com_eventbooking'))
+		if ($user->authorise('eventbooking.registrantsManagement', 'com_eventbooking'))
 		{
 			$model = $this->getModel();
 			$id = $this->input->getInt('id');
