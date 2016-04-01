@@ -4464,7 +4464,7 @@ class EventbookingHelper
 	 */
 	public static function canViewRegistrantList()
 	{
-		return JFactory::getUser()->authorise('eventbooking.viewRegistrantsList', 'com_eventbooking');
+		return JFactory::getUser()->authorise('eventbooking.viewregistrantslist', 'com_eventbooking');
 	}
 
 	/**
@@ -4474,7 +4474,7 @@ class EventbookingHelper
 	public static function checkEditRegistrant($rowRegistrant)
 	{
 		$user = JFactory::getUser();
-		if ($user->authorise('eventbooking.registrantsManagement', 'com_eventbooking') || ($user->get('id') == $rowRegistrant->user_id) ||
+		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking') || ($user->get('id') == $rowRegistrant->user_id) ||
 			($user->get('email') == $rowRegistrant->email)
 		)
 		{
@@ -4537,13 +4537,13 @@ class EventbookingHelper
 			}
 			else
 			{
-				return (($createdBy > 0 && $createdBy == $user->id) || $user->authorise('eventbooking.registrantsManagement', 'com_eventbooking'));
+				return (($createdBy > 0 && $createdBy == $user->id) || $user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'));
 			}
 
 		}
 		else
 		{
-			return $user->authorise('eventbooking.registrantsManagement', 'com_eventbooking');
+			return $user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking');
 		}
 	}
 

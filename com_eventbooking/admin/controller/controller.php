@@ -2344,8 +2344,8 @@ class EventbookingController extends RADControllerAdmin
 		if ($asset)
 		{
 			$rules = $asset->rules;
-			$rules = str_replace('eventbooking.registrants_management', 'eventbooking.registrantsManagement', $rules);
-			$rules = str_replace('eventbooking.view_registrants_list', 'eventbooking.viewRegistrantsList', $rules);
+			$rules = str_replace('eventbooking.registrants_management', 'eventbooking.registrantsmanagement', $rules);
+			$rules = str_replace('eventbooking.view_registrants_list', 'eventbooking.viewregistrantslist', $rules);
 			$asset->rules = $rules;
 			$asset->store();
 		}

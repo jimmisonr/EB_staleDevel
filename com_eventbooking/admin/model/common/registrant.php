@@ -72,7 +72,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				$rowFields = EventbookingHelper::getFormFields($data['event_id'], 0);
 			}
 			$user = JFactory::getUser();
-			if ($user->authorise('eventbooking.registrantsManagement', 'com_eventbooking') || empty($row->published))
+			if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking') || empty($row->published))
 			{
 				$excludeFeeFields = false;
 			}
@@ -181,14 +181,14 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				$row->amount = $row->total_amount - $row->discount_amount + $row->tax_amount + $row->late_fee + $row->payment_processing_fee;
 			}
 
-			if ($row->payment_status == 1)
+			/*if ($row->payment_status == 1)
 			{
 				$row->due_amount = 0;
 			}
 			else
 			{
 				$row->due_amount = $row->amount - $row->deposit_amount;
-			}
+			}*/
 			
 			if ($row->number_registrants > 1)
 			{

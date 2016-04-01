@@ -16,7 +16,7 @@ class EventbookingViewRegistrantsHtml extends RADViewHtml
 	public function display()
 	{
 		$user = JFactory::getUser();
-		if (!$user->authorise('eventbooking.registrantsManagement', 'com_eventbooking'))
+		if (!$user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
 			if ($user->get('guest'))
 			{

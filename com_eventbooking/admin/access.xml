@@ -10,7 +10,7 @@
 		<action name="core.edit.own" title="JACTION_EDITOWN" description="JACTION_EDITOWN_COMPONENT_DESC" />		
 		<action name="eventbooking.addlocation" title="Front-end Locations Creation" description="Allows creating event locations from front-end" />
 		<action name="eventbooking.addevent" title="Front-end event submission" description="Allows submitting events from front-end" />
-		<action name="eventbooking.registrantsManagement" title="Front-end Registrants Management" description="Allows managing registrants from front-end" />
-		<action name="eventbooking.viewRegistrantsList" title="View Registrants List" description="Allows viewing list of registrants of an event in the front-end" />
+		<action name="eventbooking.registrantsmanagement" title="Front-end Registrants Management" description="Allows managing registrants from front-end" />
+		<action name="eventbooking.viewregistrantslist" title="View Registrants List" description="Allows viewing list of registrants of an event in the front-end" />
 	</section>	
 </access>
