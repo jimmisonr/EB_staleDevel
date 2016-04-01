@@ -90,6 +90,7 @@ class EventbookingHelper
 
 		return (preg_match($expr, $value, $match) && checkdate($match[2], $match[3], $match[1]));
 	}
+
 	/**
 	 * We only need to generate invoice for paid events only
 	 *
@@ -100,11 +101,11 @@ class EventbookingHelper
 	public static function needInvoice($row)
 	{
 		// Don't generate invoice for waiting list records
-		if ($row->published  === 3)
+		if ($row->published === 3)
 		{
 			return false;
-		}		
-		
+		}
+
 		if ($row->amount > 0 || $row->total_amount > 0)
 		{
 			return true;
@@ -4243,9 +4244,9 @@ class EventbookingHelper
 		{
 			$key           = strtoupper($key);
 			$invoiceOutput = str_ireplace("[$key]", $value, $invoiceOutput);
-		}		
-		
-		$v             = $pdf->writeHTML($invoiceOutput, true, false, false, false, '');
+		}
+
+		$v = $pdf->writeHTML($invoiceOutput, true, false, false, false, '');
 		//Filename
 		$filePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . $replaces['invoice_number'] . '.pdf';
 		$pdf->Output($filePath, 'F');
@@ -4473,17 +4474,19 @@ class EventbookingHelper
 	 */
 	public static function checkEditRegistrant($rowRegistrant)
 	{
-		$user = JFactory::getUser();
-		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking') || ($user->get('id') == $rowRegistrant->user_id) ||
-			($user->get('email') == $rowRegistrant->email)
-		)
+		$user      = JFactory::getUser();
+		$canAccess = false;
+		if ($user->id)
 		{
-			$canAccess = true;
+			if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking')
+				|| $user->get('id') == $rowRegistrant->user_id
+				|| $user->get('email') == $rowRegistrant->email
+			)
+			{
+				$canAccess = true;
+			}
 		}
-		else
-		{
-			$canAccess = false;
-		}
+		
 		if (!$canAccess)
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('NOT_AUTHORIZED'));
