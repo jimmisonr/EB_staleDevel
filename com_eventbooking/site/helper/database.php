@@ -203,6 +203,7 @@ class EventbookingHelperDatabase
 	 */
 	public static function getMultilingualFields(JDatabaseQuery $query, $fields = array(), $fieldSuffix)
 	{
+		$db = JFactory::getDbo();
 		foreach ($fields as $field)
 		{
 			$alias  = $field;
@@ -211,7 +212,7 @@ class EventbookingHelperDatabase
 			{
 				$alias = substr($field, $dotPos + 1);
 			}
-			$query->select($query->quoteName($field . $fieldSuffix, $alias));
+			$query->select($db->quoteName($field . $fieldSuffix, $alias));
 		}
 	}
 }
