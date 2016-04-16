@@ -25,8 +25,9 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 	 */
 	public function store($input, $ignore = array())
 	{
-		$db  = $this->getDbo();
-		$app = JFactory::getApplication();
+		$db    = $this->getDbo();
+		$query = $db->getQuery(true);
+		$app   = JFactory::getApplication();
 		if ($app->isAdmin())
 		{
 			$data = $input->getData(RAD_INPUT_ALLOWRAW);
@@ -161,20 +162,38 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				$row->load($this->state->id);
 				if (isset($data['del_thumb']) && $row->thumb)
 				{
-					if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . $row->thumb))
+					// Check to see whether there are any other events use this same thumb, if not, delete it
+					$query->select('COUNT(*)')
+						->from('#__eb_events')
+						->where('id != ' . $row->id)
+						->where('thumb = ' . $db->quote($row->thumb));
+					$db->setQuery($query);
+					$total = $db->loadResult();
+					if (!$total)
 					{
-						JFile::delete(JPATH_ROOT . '/media/com_eventbooking/images/' . $row->thumb);
+						if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . $row->thumb))
+						{
+							JFile::delete(JPATH_ROOT . '/media/com_eventbooking/images/' . $row->thumb);
+						}
+						if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $row->thumb))
+						{
+							JFile::delete(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $row->thumb);
+						}
 					}
-					if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $row->thumb))
-					{
-						JFile::delete(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $row->thumb);
-					}
+
 					$row->thumb = '';
 				}
 
 				if (isset($data['del_attachment']) && $row->attachment)
 				{
-					if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/' . $row->attachment))
+					$query->clear()
+						->select('COUNT(*)')
+						->from('#__eb_events')
+						->where('id != ' . $row->id)
+						->where('thumb = ' . $db->quote($row->thumb));
+					$db->setQuery($query);
+					$total = $db->loadResult();
+					if (!$total && JFile::exists(JPATH_ROOT . '/media/com_eventbooking/' . $row->attachment))
 					{
 						JFile::delete(JPATH_ROOT . '/media/com_eventbooking/' . $row->attachment);
 					}
