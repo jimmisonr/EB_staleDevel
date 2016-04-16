@@ -190,7 +190,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 						->select('COUNT(*)')
 						->from('#__eb_events')
 						->where('id != ' . $row->id)
-						->where('thumb = ' . $db->quote($row->thumb));
+						->where('attachment = ' . $db->quote($row->attachment));
 					$db->setQuery($query);
 					$total = $db->loadResult();
 					if (!$total && JFile::exists(JPATH_ROOT . '/media/com_eventbooking/' . $row->attachment))
