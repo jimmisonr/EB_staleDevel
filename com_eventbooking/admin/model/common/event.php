@@ -63,7 +63,11 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				{
 					$config->thumb_height = 120;
 				}
-				EventbookingHelper::resizeImage($imagePath, $thumbPath, $config->thumb_width, $config->thumb_height, 95);
+
+				$image = new JImage($imagePath);
+				$image->resize($config->thumb_width, $config->thumb_height, false)
+					->toFile($thumbPath);
+
 				$data['thumb'] = $fileName;
 			}
 		}
