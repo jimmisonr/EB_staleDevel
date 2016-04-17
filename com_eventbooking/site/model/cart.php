@@ -204,18 +204,9 @@ class EventbookingModelCart extends RADModel
 		$data['item_name'] = $itemName;
 
 		// Validate credit card
-		if (!empty($data['x_card_num']))
+		if (!empty($data['x_card_num']) && empty($data['card_type']))
 		{
-			if (empty($data['card_type']))
-			{
-				$data['card_type'] = EventbookingHelperCreditcard::getCardType($data['x_card_num']);
-			}
-
-			$cardNumber = $data['x_card_num'];
-			$expMonth   = $data['exp_month'];
-			$expYear    = $data['exp_year'];
-
-			EventbookingHelperCreditcard::validateCard($cardNumber, $expMonth, $expYear);
+			$data['card_type'] = EventbookingHelperCreditcard::getCardType($data['x_card_num']);
 		}
 
 		if ($couponId > 0)
