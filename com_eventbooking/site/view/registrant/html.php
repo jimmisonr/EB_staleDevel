@@ -57,7 +57,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		$form = new RADForm($rowFields);
 		if ($item->id)
 		{
-			$data = Eventbookinghelper::getRegistrantData($item, $rowFields);
+			$data = EventbookingHelper::getRegistrantData($item, $rowFields);
 			$form->bind($data, false);
 		}
 		else
@@ -65,6 +65,8 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			$data = array();
 			$form->bind($data, true);
 		}
+
+		$form->setEventId($item->event_id);
 
 		$form->buildFieldsDependency();
 
