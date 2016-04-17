@@ -37,9 +37,10 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('EB_INVALID_REGISTRATION_CODE'));
 		}
-		
+
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$query->select('a.*, a.title' . $fieldSuffix . ' AS title, b.payment_method')
+		$query->clear()
+			->select('a.*, a.title' . $fieldSuffix . ' AS title, b.payment_method')
 			->from('#__eb_events  AS a ')
 			->innerJoin('#__eb_registrants AS b ON a.id = b.event_id')
 			->where('b.id=' . $id);
