@@ -20,26 +20,24 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		$db               = JFactory::getDbo();
 		$query            = $db->getQuery(true);
 		$config           = EventbookingHelper::getConfig();
-		// Try to get it from session
-		$registrationCode = JFactory::getSession()->get('eb_registration_code', '');
-		if (empty($registrationCode))
-		{
-			$registrationCode = JRequest::getVar('registration_code');
-		}
+
+		$session = JFactory::getSession();
+		$registrationCode = $session->get('eb_registration_code', '');
+
+		$id = 0;
 		if ($registrationCode)
 		{
-			$sql = 'SELECT id FROM #__eb_registrants WHERE registration_code="' . $registrationCode . '" ORDER BY id LIMIT 1 ';
-			$db->setQuery($sql);
+			$query->select('id')
+				->from('#__eb_registrants')
+				->where('registration_code = '. $db->quote($registrationCode));
 			$id = (int) $db->loadResult();
 		}
-		else
-		{
-			JFactory::getApplication()->redirect('index.php', JText::_('EB_INVALID_REGISTRATION_CODE'));
-		}
+
 		if (!$id)
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('EB_INVALID_REGISTRATION_CODE'));
 		}
+		
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->select('a.*, a.title' . $fieldSuffix . ' AS title, b.payment_method')
 			->from('#__eb_events  AS a ')
