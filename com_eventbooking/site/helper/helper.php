@@ -3489,11 +3489,13 @@ class EventbookingHelper
 		$message = EventbookingHelper::getMessages();
 		$mailer  = JFactory::getMailer();
 
+		$siteUrl = EventbookingHelper::getSiteUrl();
+
 		self::loadLanguage();
 
 		if ($bccEmail)
 		{
-			$mailer->AddBCC($bccEmail);
+			$mailer->addBcc($bccEmail);
 		}
 
 		if (!$numberEmailSendEachTime)
@@ -3611,6 +3613,13 @@ class EventbookingHelper
 				$form->buildFieldsDependency();
 
 				$replaces['registration_detail'] = EventbookingHelper::getEmailContent($config, $row, true, $form);
+			}
+
+			if (strpos($emailBody, '[QRCODE]') !== false)
+			{
+				EventbookingHelper::generateQrcode($row->id);
+				$imgTag    = '<img src="' . $siteUrl . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+				$emailBody = str_ireplace("[QRCODE]", $imgTag, $emailBody);
 			}
 
 			foreach ($replaces as $key => $value)
