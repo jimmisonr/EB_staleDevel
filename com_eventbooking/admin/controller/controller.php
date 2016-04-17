@@ -1132,6 +1132,14 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
+
+		if (!in_array('show_on_submit_event_form', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_categories` ADD  `show_on_submit_event_form` TINYINT NOT NULL DEFAULT  '1' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		if (!in_array('color_code', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_categories` ADD  `color_code` VARCHAR( 20 ) NULL;";

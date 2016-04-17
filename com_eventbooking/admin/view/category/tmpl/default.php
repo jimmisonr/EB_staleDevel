@@ -41,7 +41,7 @@ if ($translatable)
 ?>
 	<table class="admintable adminform">
 		<tr>
-			<td width="100" class="key">
+			<td width="250" class="key">
 				<?php echo  JText::_('EB_NAME'); ?>
 			</td>
 			<td>
@@ -49,7 +49,7 @@ if ($translatable)
 			</td>
 		</tr>
 		<tr>
-			<td width="100" class="key">
+			<td class="key">
 				<?php echo  JText::_('EB_ALIAS'); ?>
 			</td>
 			<td>
@@ -90,7 +90,7 @@ if ($translatable)
 			</td>
 		</tr>
 		<tr>
-			<td width="100" class="key">
+			<td class="key">
 				<?php echo  JText::_('EB_META_KEYWORDS'); ?>
 			</td>
 			<td>
@@ -98,7 +98,7 @@ if ($translatable)
 			</td>
 		</tr>
 		<tr>
-			<td width="100" class="key">
+			<td class="key">
 				<?php echo  JText::_('EB_META_DESCRIPTION'); ?>
 			</td>
 			<td>
@@ -111,6 +111,15 @@ if ($translatable)
 			</td>
 			<td>
 				<?php echo $editor->display( 'description',  $this->item->description , '100%', '250', '75', '10' ) ; ?>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo JText::_('EB_SHOW_ON_SUBMIT_EVENT_FORM'); ?>
+				<p class="description" style="font-weight: normal; font-style: italic;"><?php echo JText::_('EB_SHOW_ON_SUBMIT_EVENT_FORM_EXPLAIN'); ?></p>
+			</td>
+			<td>
+				<?php echo $this->lists['show_on_submit_event_form']; ?>
 			</td>
 		</tr>
 		<tr>
@@ -135,7 +144,7 @@ if ($translatable)
 		?>
 		<table class="admintable adminform" style="width: 100%;">
 			<tr>
-				<td class="key">
+				<td class="key" width="250">
 					<?php echo JText::_('EB_NAME'); ?>
 				</td>
 				<td>

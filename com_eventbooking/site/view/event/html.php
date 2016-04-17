@@ -226,6 +226,12 @@ class EventbookingViewEventHtml extends RADViewHtml
 			->from('#__eb_categories')
 			->where('published = 1')
 			->order('name' . $fieldSuffix);
+
+		if (!$user->authorise('core.admin', 'com_eventbooking'))
+		{
+			$query->where('show_on_submit_event_form = 1');
+		}
+		
 		$db->setQuery($query);
 		$rows     = $db->loadObjectList();
 		$children = array();
