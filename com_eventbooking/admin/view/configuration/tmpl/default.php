@@ -681,6 +681,14 @@ JHtml::_('formbehavior.chosen', 'select');
 			</div>
 			<div class="control-group">
 				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('show_event_creator', JText::_('EB_SHOW_EVENT_CREATOR'), JText::_('EB_SHOW_EVENT_CREATOR_EXPLAIN')); ?>
+				</div>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('show_event_creator', $config->show_list_of_registrants); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('show_location_in_category_view', JText::_('EB_SHOW_LOCATION_IN_CATEGORY_VIEW')); ?>
 				</div>
 				<div class="controls">

@@ -60,6 +60,7 @@ class EventbookingModelList extends RADModelList
 		'tbl.tax_rate',
 		'tbl.featured'
 	);
+
 	/**
 	 * Instantiate the model.
 	 *
@@ -144,6 +145,7 @@ class EventbookingModelList extends RADModelList
 	 */
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
+		$config      = EventbookingHelper::getConfig();
 		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->select(static::$fields)
@@ -154,6 +156,11 @@ class EventbookingModelList extends RADModelList
 			->select("TIMESTAMPDIFF(MINUTE, tbl.cut_off_date, '$currentDate') AS cut_off_minutes")
 			->select('c.name AS location_name, c.address AS location_address')
 			->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants');
+
+		if ($config->show_event_creator)
+		{
+			$query->select('u.name as creator_name');
+		}
 
 		if ($fieldSuffix)
 		{
@@ -172,9 +179,16 @@ class EventbookingModelList extends RADModelList
 	 */
 	protected function buildQueryJoins(JDatabaseQuery $query)
 	{
+		$config = EventbookingHelper::getConfig();
+
 		$query->leftJoin(
 			'#__eb_registrants AS b ON (tbl.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')->leftJoin(
 			'#__eb_locations AS c ON tbl.location_id = c.id ');
+
+		if ($config->show_event_creator)
+		{
+			$query->leftJoin('#__users as u ON tbl.created_by = u.id');
+		}
 
 		return $this;
 	}
@@ -208,6 +222,11 @@ class EventbookingModelList extends RADModelList
 		if ($state->location_id)
 		{
 			$query->where('tbl.location_id=' . $state->location_id);
+		}
+
+		if ($state->created_by)
+		{
+			$query->where('tbl.created_by =' . $state->created_by);
 		}
 
 		if ($state->search)

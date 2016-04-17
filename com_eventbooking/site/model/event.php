@@ -35,6 +35,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 	 */
 	public function getEventData()
 	{
+		$config      = EventbookingHelper::getConfig();
 		$db          = $this->getDbo();
 		$query       = $db->getQuery(true);
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
@@ -51,6 +52,13 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 			->where('a.id = ' . $this->state->id)
 			->where('a.published = 1')
 			->group('a.id');
+
+		if ($config->show_event_creator)
+		{
+			$query->select('u.name AS creator_name')
+				->leftJoin('#__users as u ON a.created_by = u.id');
+		}
+
 		if ($fieldSuffix)
 		{
 			EventbookingHelperDatabase::getMultilingualFields($query, array('title', 'short_description', 'description', 'meta_keywords', 'meta_description'), $fieldSuffix);

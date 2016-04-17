@@ -350,6 +350,20 @@ $return = base64_encode(JUri::getInstance()->toString());
 							<?php
 							}
 
+							if ($config->show_event_creator)
+							{
+							?>
+								<tr class="eb-event-property">
+									<td class="eb-event-property-label">
+										<?php echo JText::_('EB_CREATED_BY'); ?>
+									</td>
+									<td class="eb-event-property-value">
+										<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=search&created_by=' . $event->created_by . '&Itemid=' . $Itemid); ?>"><?php echo $event->creator_name; ?></a>
+									</td>
+								</tr>
+							<?php
+							}
+
 							if (isset($event->paramData))
 							{
 								foreach ($event->paramData as $paramItem)

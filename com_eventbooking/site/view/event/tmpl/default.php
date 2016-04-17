@@ -378,6 +378,19 @@ $offset = JFactory::getConfig()->get('offset');
 						<?php
 						}
 
+						if ($this->config->show_event_creator)
+						{
+						?>
+							<tr class="eb-event-property">
+								<td class="eb-event-property-label">
+									<?php echo JText::_('EB_CREATED_BY'); ?>
+								</td>
+								<td class="eb-event-property-value">
+									<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=search&created_by=' . $item->created_by . '&Itemid=' . $this->Itemid); ?>"><?php echo $item->creator_name; ?></a>
+								</td>
+							</tr>
+						<?php
+						}
 						if ($this->config->event_custom_field)
 						{
 							foreach($this->paramData as $param)

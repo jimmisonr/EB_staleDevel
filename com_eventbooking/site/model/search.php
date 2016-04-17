@@ -25,6 +25,7 @@ class EventbookingModelSearch extends EventbookingModelList
 		$this->state->remove('id')
 			->insert('category_id', 'int', 0)
 			->insert('location_id', 'int', '0')
+			->insert('created_by', 'int', 0)
 			->insert('search', 'string', '');
 	}
 }  
