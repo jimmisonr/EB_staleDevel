@@ -19,6 +19,12 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	public function display()
 	{
+		$document = JFactory::getDocument();
+
+		$document->addScriptDeclaration(
+			'var siteUrl = "'.EventbookingHelper::getSiteUrl().'";'
+		);
+
 		$layout = $this->getLayout();
 		EventbookingHelper::addLangLinkForAjax();
 		$config                = EventbookingHelper::getConfig();
@@ -94,12 +100,25 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	private function displayIndividualRegistrationForm($event, $input)
 	{
-		JFactory::getDocument()->addScript(JUri::base(true) . '/media/com_eventbooking/assets/js/paymentmethods.js');
+		$document = JFactory::getDocument();
+		$baseUri = JUri::base(true);
+		$document->addScript($baseUri . '/media/com_eventbooking/assets/js/paymentmethods.js');
+
 		$config    = EventbookingHelper::getConfig();
 		$user      = JFactory::getUser();
 		$userId    = $user->get('id');
 		$eventId   = $event->id;
 		$rowFields = EventbookingHelper::getFormFields($eventId, 0);
+
+		foreach ($rowFields as $rowField)
+		{
+			if ($rowField->fieldtype == 'File')
+			{
+				$document->addScript($baseUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
+				break;
+			}
+		}
+
 		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
 		{
 			$waitingList = true;
@@ -297,8 +316,11 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	{
 		$user     = JFactory::getUser();
 		$document = JFactory::getDocument();
-		$document->addScript(JUri::base(true) . '/media/com_eventbooking/assets/js/paymentmethods.js');
+		$baseUri = JUri::base(true);
+		$document->addScript($baseUri. '/media/com_eventbooking/assets/js/paymentmethods.js');
+		$document->addScript($baseUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
 		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
+		
 		$this->event           = $event;
 		$this->message         = EventbookingHelper::getMessages();
 		$this->fieldSuffix     = EventbookingHelper::getFieldSuffix();
