@@ -714,7 +714,6 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				}
 				?>
 			})
-			var siteUrl = "<?php echo EventbookingHelper::getSiteUrl(); ?>";
 			<?php
 				echo os_payments::writeJavascriptObjects();
 			?>

@@ -737,8 +737,8 @@ if (!$this->userId && $this->config->user_registration)
                     }
                     ?>
 				})
-			});		
-			var siteUrl = "<?php echo EventbookingHelper::getSiteUrl(); ?>";			
+			});
+			
 			<?php
 				echo os_payments::writeJavascriptObjects();					 		 
 			?>				
