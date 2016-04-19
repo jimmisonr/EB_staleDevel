@@ -314,17 +314,46 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	private function displayGroupForm($event, $input)
 	{
-		$user     = JFactory::getUser();
 		$document = JFactory::getDocument();
+		$config = EventbookingHelper::getConfig();
+		$user     = JFactory::getUser();
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
 		$baseUri = JUri::base(true);
 		$document->addScript($baseUri. '/media/com_eventbooking/assets/js/paymentmethods.js');
-		$document->addScript($baseUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
+
+		// Check to see whether we need to load ajax file upload script
+		$query->select('COUNT(*)')
+			->from('#__eb_fields')
+			->where('fieldtype="File"')
+			->where('published=1')
+			->where(' `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
+
+		if ($config->custom_field_by_category)
+		{
+			//Get main category of the event
+			$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $event->id . ' AND main_category = 1';
+			$db->setQuery($sql);
+			$categoryId = (int) $db->loadResult();
+			$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
+		}
+		else
+		{
+			$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $event->id . '))');
+		}
+		$db->setQuery($query);
+		$totalFileFields = $db->loadResult();
+		if ($totalFileFields)
+		{
+			$document->addScript($baseUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
+		}
+
 		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
 		
 		$this->event           = $event;
 		$this->message         = EventbookingHelper::getMessages();
 		$this->fieldSuffix     = EventbookingHelper::getFieldSuffix();
-		$this->config          = EventbookingHelper::getConfig();
+		$this->config          = $config;
 		$this->captchaInvalid  = $input->get('captcha_invalid', 0);
 		$this->showBillingStep = EventbookingHelper::showBillingStep($event->id);
 		$config                = EventbookingHelper::getConfig();
