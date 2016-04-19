@@ -377,7 +377,11 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	private function displayCart()
 	{
-		JFactory::getDocument()->addScript(JUri::base(true) . '/media/com_eventbooking/assets/js/paymentmethods.js');
+		$document = JFactory::getDocument();
+		$baseUri = JUri::base(true);
+		$document->addScript($baseUri. '/media/com_eventbooking/assets/js/paymentmethods.js');
+		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
+
 		$app    = JFactory::getApplication();
 		$input  = $this->input;
 		$db     = JFactory::getDbo();
@@ -394,6 +398,17 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$eventId        = (int) $items[0];
 		$query          = $db->getQuery(true);
 		$rowFields      = EventbookingHelper::getFormFields(0, 4);
+
+		// Including ajax file upload if necessary
+		foreach ($rowFields as $rowField)
+		{
+			if ($rowField->fieldtype == 'File')
+			{
+				$document->addScript($baseUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
+				break;
+			}
+		}
+
 		$captchaInvalid = $input->getInt('captcha_invalid', 0);
 		if ($captchaInvalid)
 		{
@@ -534,7 +549,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 				break;
 			}
 		}
-
+		
 		// Assign these parameters
 		$this->paymentMethod        = $paymentMethod;
 		$this->lists                = $lists;

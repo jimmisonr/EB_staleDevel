@@ -402,7 +402,6 @@ $selectedState = '';
 	<input type="hidden" name="task" value="" />			
 	<?php echo JHtml::_( 'form.token' ); ?>
 	<script type="text/javascript">
-		var siteUrl = "<?php echo JUri::root(); ?>";
 		(function($){
 
 			showHideDependFields = (function(fieldId, fieldName, fieldType, fieldSuffix) {

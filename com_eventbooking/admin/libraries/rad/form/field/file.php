@@ -45,7 +45,7 @@ class RADFormFieldFile extends RADFormField
 			$html .= '<span class="eb-uploaded-file" id="uploaded-file-'.$this->name.'"></span>';
 		}
 
-		$html .= '<input type="hidden" name="uploaded-file-'.$this->name.'-value"  value="" />';
+		$html .= '<input type="hidden" name="' . $this->name . '"  value="" />';
 
 		ob_start();
 		?>
@@ -56,7 +56,7 @@ class RADFormFieldFile extends RADFormField
 				autoSubmit: true,
 				responseType: 'json',
 				onSubmit: function (file, extension) {
-					jQuery('#button-file-<?php echo $this->name; ?>').after('<span class="wait">&nbsp;<img src="<?php echo JUri::base(true);?>/media/com_eventbooking/ajax-loadding-animation.gif" alt="" /></span>');
+					jQuery('#button-file-<?php echo $this->name; ?>').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true);?>/media/com_eventbooking/ajax-loadding-animation.gif" alt="" /></span>');
 					jQuery('#button-file-<?php echo $this->name; ?>').attr('disabled', true);
 				},
 				onComplete: function (file, json) {
@@ -64,9 +64,8 @@ class RADFormFieldFile extends RADFormField
 					jQuery('.error').remove();
 					if (json['success'])
 					{
-						alert(json['success']);
 						jQuery('#uploaded-file-<?php echo $this->name; ?>').html(file);
-						jQuery('input[name="uploaded-file-<?php echo $this->name; ?>-value"]').attr('value', json['file']);
+						jQuery('input[name="<?php echo $this->name; ?>"]').attr('value', json['file']);
 					}
 					if (json['error'])
 					{

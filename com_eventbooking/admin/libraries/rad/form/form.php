@@ -403,56 +403,7 @@ class RADForm
 			{
 				continue;
 			}
-
-			$name = $field->name;
-			if ($fieldType == 'file')
-			{
-				//If there are field, we need to upload the file to server and save it !
-				if (isset($_FILES[$name]))
-				{
-					if ($_FILES[$name]['name'] != '')
-					{
-						$pathUpload = JPATH_ROOT . '/media/com_eventbooking/files';
-						if (!JFolder::exists($pathUpload))
-						{
-							JFolder::create($pathUpload);
-						}
-						$allowedExtensions = $config->attachment_file_types;
-						if (!$allowedExtensions)
-						{
-							$allowedExtensions = 'doc|docx|ppt|pptx|pdf|zip|rar|bmp|gif|jpg|jepg|png|swf|zipx';
-						}
-						$allowedExtensions = explode('|', $allowedExtensions);
-						$allowedExtensions = array_map('trim', $allowedExtensions);
-						$fileName          = $_FILES[$field->name]['name'];
-						$fileExt           = JFile::getExt($fileName);
-						if (in_array(strtolower($fileExt), $allowedExtensions))
-						{
-							$fileName = JFile::makeSafe($fileName);
-							if (JFile::exists($pathUpload . '/' . $fileName))
-							{
-								$targetFileName = time() . '_' . $fileName;
-							}
-							else
-							{
-								$targetFileName = $fileName;
-							}
-							
-							if (version_compare(JVERSION, '3.4.4', 'ge'))
-							{
-								$uploaded = JFile::upload($_FILES[$field->name]['tmp_name'], $pathUpload . '/' . $targetFileName, false, true);
-							}
-							else 
-							{
-								$uploaded = JFile::upload($_FILES[$field->name]['tmp_name'], $pathUpload . '/' . $targetFileName);
-							}									
-							
-							$data[$field->name] = $targetFileName;
-						}
-					}
-				}
-			}
-
+			
 			if ($fieldType == 'date')
 			{
 				$fieldValue = $data[$field->name];

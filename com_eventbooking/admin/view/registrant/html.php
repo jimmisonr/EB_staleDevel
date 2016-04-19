@@ -17,6 +17,15 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 	{
 		parent::prepareView();
 
+		// Add necessary javascript library
+		$document = JFactory::getDocument();
+		$rootUri  = JUri::root(true);
+		$document->addScript($rootUri . '/media/com_eventbooking/assets/js/paymentmethods.js');
+		$document->addScript($rootUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
+		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
+		EventbookingHelper::addLangLinkForAjax();
+
+
 		$db        = JFactory::getDbo();
 		$config    = EventbookingHelper::getConfig();
 		$rows      = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
@@ -119,8 +128,6 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		{
 			$this->lists['checked_in'] = JHtml::_('select.booleanlist', 'checked_in', ' class="inputbox" ', $this->item->checked_in);
 		}
-
-		EventbookingHelper::addLangLinkForAjax();
 
 		$this->config     = $config;
 		$this->event      = $event;
