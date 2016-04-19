@@ -8,7 +8,7 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 class EventbookingViewRegisterHtml extends RADViewHtml
 {
@@ -26,15 +26,16 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/js/paymentmethods.js');
 		EventbookingHelper::addLangLinkForAjax();
 
-		$layout                = $this->getLayout();
 		$config                = EventbookingHelper::getConfig();
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+		$layout                = $this->getLayout();
 		if ($layout == 'cart')
 		{
 			$this->displayCart();
 
 			return;
 		}
+
 		$input   = $this->input;
 		$eventId = $input->getInt('event_id', 0);
 		$event   = EventbookingHelperDatabase::getEvent($eventId);
@@ -54,8 +55,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			$waitingList = EventbookingHelper::getConfigValue('activate_waitinglist_feature');
 			if (!$waitingList || !$event->number_event_dates)
 			{
-				JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_eventbooking&Itemid=' . $input->getInt('Itemid', 0), false),
-					JText::_('EB_ERROR_REGISTRATION'));
+				JFactory::getApplication()->redirect('index.php', JText::_('EB_ERROR_REGISTRATION'));
 			}
 		}
 
@@ -98,7 +98,6 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	private function displayIndividualRegistrationForm($event, $input)
 	{
-		$document  = JFactory::getDocument();
 		$config    = EventbookingHelper::getConfig();
 		$user      = JFactory::getUser();
 		$userId    = $user->get('id');
@@ -109,7 +108,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			if ($rowField->fieldtype == 'File')
 			{
-				$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/js/ajaxupload.js');
+				JFactory::getDocument()->addScript(JUri::root(true) . '/media/com_eventbooking/assets/js/ajaxupload.js');
 				break;
 			}
 		}
@@ -164,7 +163,8 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			$data['country'] = $config->default_country;
 		}
-		//Get data				
+
+		//Get data
 		$form = new RADForm($rowFields);
 		if ($captchaInvalid)
 		{
@@ -262,7 +262,6 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$this->paymentType          = $paymentType;
 		$this->message              = EventbookingHelper::getMessages();
 		$this->fieldSuffix          = EventbookingHelper::getFieldSuffix();
-		$this->showCaptcha          = $showCaptcha;
 		$this->form                 = $form;
 		$this->totalAmount          = $fees['total_amount'];
 		$this->taxAmount            = $fees['tax_amount'];
@@ -288,7 +287,6 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	private function displayGroupForm($event, $input)
 	{
-		$document = JFactory::getDocument();
 		$config   = EventbookingHelper::getConfig();
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDbo();
@@ -322,7 +320,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$totalFileFields = $db->loadResult();
 		if ($totalFileFields)
 		{
-			$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/js/ajaxupload.js');
+			JFactory::getDocument()->addScript(JUri::root(true) . '/media/com_eventbooking/assets/js/ajaxupload.js');
 		}
 
 		$this->event           = $event;
@@ -366,7 +364,6 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	private function displayCart()
 	{
 		$app      = JFactory::getApplication();
-		$document = JFactory::getDocument();
 		$input    = $this->input;
 		$db       = JFactory::getDbo();
 		$config   = EventbookingHelper::getConfig();
@@ -388,7 +385,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			if ($rowField->fieldtype == 'File')
 			{
-				$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/js/ajaxupload.js');
+				JFactory::getDocument()->addScript(JUri::root(true) . '/media/com_eventbooking/assets/js/ajaxupload.js');
 				break;
 			}
 		}
@@ -573,7 +570,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			$pathway->addItem(JText::_('EB_GROUP_REGISTRATION'));
 		}
 	}
-
+	
 	/**
 	 * Load captcha for registration form
 	 * @param bool $initOnly
