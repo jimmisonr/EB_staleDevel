@@ -12,21 +12,21 @@ defined('_JEXEC') or die();
 
 class EventbookingViewRegisterHtml extends RADViewHtml
 {
-
 	/**
 	 * Display interface to user
 	 *
 	 */
 	public function display()
 	{
+		// Load common js code
 		$document = JFactory::getDocument();
-
 		$document->addScriptDeclaration(
-			'var siteUrl = "'.EventbookingHelper::getSiteUrl().'";'
+			'var siteUrl = "' . EventbookingHelper::getSiteUrl() . '";'
 		);
-
-		$layout = $this->getLayout();
+		$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/js/paymentmethods.js');
 		EventbookingHelper::addLangLinkForAjax();
+
+		$layout                = $this->getLayout();
 		$config                = EventbookingHelper::getConfig();
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 		if ($layout == 'cart')
@@ -72,9 +72,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		// Page title
 		$pageTitle = JText::_('EB_EVENT_REGISTRATION');
 		$pageTitle = str_replace('[EVENT_TITLE]', $event->title, $pageTitle);
-		JFactory::getDocument()->setTitle($pageTitle);
-
-		$layout = $this->getLayout();
+		$document->setTitle($pageTitle);
 
 		// Breadcrumb
 		$this->generateBreadcrumb($event, $layout);
@@ -100,10 +98,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	private function displayIndividualRegistrationForm($event, $input)
 	{
-		$document = JFactory::getDocument();
-		$baseUri = JUri::base(true);
-		$document->addScript($baseUri . '/media/com_eventbooking/assets/js/paymentmethods.js');
-
+		$document  = JFactory::getDocument();
 		$config    = EventbookingHelper::getConfig();
 		$user      = JFactory::getUser();
 		$userId    = $user->get('id');
@@ -114,7 +109,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			if ($rowField->fieldtype == 'File')
 			{
-				$document->addScript($baseUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
+				$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/js/ajaxupload.js');
 				break;
 			}
 		}
@@ -135,7 +130,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		else
 		{
 			$data = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);
-			
+
 			// IN case there is no data, get it from URL (get for example)
 			if (empty($data))
 			{
@@ -240,28 +235,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			$depositPayment = 0;
 		}
 
-		// Captcha
-		$showCaptcha = 0;
-		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
-		{
-			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			if (!$captchaPlugin)
-			{
-				// Hardcode to recaptcha, reduce support request
-				$captchaPlugin = 'recaptcha';
-			}
-			// Check to make sure Captcha is enabled
-			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
-			if ($plugin)
-			{
-				$showCaptcha   = 1;
-				$this->captcha = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
-			}
-			else
-			{
-				JFactory::getApplication()->enqueueMessage(JText::_('EB_CAPTCHA_NOT_ACTIVATED_IN_YOUR_SITE'), 'error');
-			}
-		}
+		$this->loadCaptcha();
 
 		// Reset some values if waiting list is activated
 		if ($waitingList)
@@ -315,12 +289,10 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	private function displayGroupForm($event, $input)
 	{
 		$document = JFactory::getDocument();
-		$config = EventbookingHelper::getConfig();
+		$config   = EventbookingHelper::getConfig();
 		$user     = JFactory::getUser();
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$baseUri = JUri::base(true);
-		$document->addScript($baseUri. '/media/com_eventbooking/assets/js/paymentmethods.js');
+		$db       = JFactory::getDbo();
+		$query    = $db->getQuery(true);
 
 		// Check to see whether we need to load ajax file upload script
 		$query->select('COUNT(*)')
@@ -332,9 +304,14 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		if ($config->custom_field_by_category)
 		{
 			//Get main category of the event
-			$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $event->id . ' AND main_category = 1';
-			$db->setQuery($sql);
+			$categoryQuery = $db->getQuery(true);
+			$categoryQuery->select('category_id')
+				->from('#__eb_event_categories')
+				->where('event_id = ' . $event->id)
+				->where('main_category = 1');
+			$db->setQuery($categoryQuery);
 			$categoryId = (int) $db->loadResult();
+
 			$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 		}
 		else
@@ -345,36 +322,15 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$totalFileFields = $db->loadResult();
 		if ($totalFileFields)
 		{
-			$document->addScript($baseUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
+			$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/js/ajaxupload.js');
 		}
 
-		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
-		
 		$this->event           = $event;
 		$this->message         = EventbookingHelper::getMessages();
 		$this->fieldSuffix     = EventbookingHelper::getFieldSuffix();
 		$this->config          = $config;
 		$this->captchaInvalid  = $input->get('captcha_invalid', 0);
 		$this->showBillingStep = EventbookingHelper::showBillingStep($event->id);
-		$config                = EventbookingHelper::getConfig();
-		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
-		{
-			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			if (!$captchaPlugin)
-			{
-				// Hardcode to recaptcha, reduce support request
-				$captchaPlugin = 'recaptcha';
-			}
-			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
-			if ($plugin)
-			{
-				JCaptcha::getInstance($captchaPlugin)->initialise('dynamic_recaptcha_1');
-			}
-			else
-			{
-				JFactory::getApplication()->enqueueMessage(JText::_('EB_CAPTCHA_NOT_ACTIVATED_IN_YOUR_SITE'), 'error');
-			}
-		}
 
 		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
 		{
@@ -395,7 +351,10 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 
 		$this->waitingList = $waitingList;
 
+		$this->loadCaptcha(true);
+
 		EventbookingHelperJquery::colorbox('eb-colorbox-term');
+
 		parent::display();
 	}
 
@@ -406,34 +365,30 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	private function displayCart()
 	{
+		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
-		$baseUri = JUri::base(true);
-		$document->addScript($baseUri. '/media/com_eventbooking/assets/js/paymentmethods.js');
-		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
-
-		$app    = JFactory::getApplication();
-		$input  = $this->input;
-		$db     = JFactory::getDbo();
-		$config = EventbookingHelper::getConfig();
-		$user   = JFactory::getUser();
-		$userId = $user->get('id');
-		$cart   = new EventbookingHelperCart();
-		$items  = $cart->getItems();
+		$input    = $this->input;
+		$db       = JFactory::getDbo();
+		$config   = EventbookingHelper::getConfig();
+		$user     = JFactory::getUser();
+		$userId   = $user->get('id');
+		$cart     = new EventbookingHelperCart();
+		$items    = $cart->getItems();
 		if (!count($items))
 		{
 			$url = JRoute::_('index.php?option=com_eventbooking&Itemid=' . $input->getInt('Itemid', 0));
 			$app->redirect($url, JText::_('EB_NO_EVENTS_FOR_CHECKOUT'));
 		}
-		$eventId        = (int) $items[0];
-		$query          = $db->getQuery(true);
-		$rowFields      = EventbookingHelper::getFormFields(0, 4);
+		$eventId   = (int) $items[0];
+		$query     = $db->getQuery(true);
+		$rowFields = EventbookingHelper::getFormFields(0, 4);
 
 		// Including ajax file upload if necessary
 		foreach ($rowFields as $rowField)
 		{
 			if ($rowField->fieldtype == 'File')
 			{
-				$document->addScript($baseUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
+				$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/js/ajaxupload.js');
 				break;
 			}
 		}
@@ -540,26 +495,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		}
 		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$showCaptcha = 0;
-		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
-		{
-			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			if (!$captchaPlugin)
-			{
-				// Hardcode to recaptcha, reduce support request
-				$captchaPlugin = 'recaptcha';
-			}
-			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
-			if ($plugin)
-			{
-				$showCaptcha   = 1;
-				$this->captcha = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
-			}
-			else
-			{
-				JFactory::getApplication()->enqueueMessage(JText::_('EB_CAPTCHA_NOT_ACTIVATED_IN_YOUR_SITE'), 'error');
-			}
-		}
+
 		$query->clear();
 		$query->select('title' . $fieldSuffix . ' AS title')
 			->from('#__eb_events')
@@ -578,7 +514,10 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 				break;
 			}
 		}
-		
+
+		// Load captcha
+		$this->loadCaptcha();
+
 		// Assign these parameters
 		$this->paymentMethod        = $paymentMethod;
 		$this->lists                = $lists;
@@ -590,7 +529,6 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$this->depositPayment       = $depositPayment;
 		$this->message              = $message;
 		$this->fieldSuffix          = $fieldSuffix;
-		$this->showCaptcha          = $showCaptcha;
 		$this->form                 = $form;
 		$this->totalAmount          = $fees['total_amount'];
 		$this->taxAmount            = $fees['tax_amount'];
@@ -618,7 +556,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	{
 		$app      = JFactory::getApplication();
 		$active   = $app->getMenu()->getActive();
-		$pathway = $app->getPathway();
+		$pathway  = $app->getPathway();
 		$menuView = !empty($active->query['view']) ? $active->query['view'] : null;
 
 		if ($menuView == 'calendar' || $menuView == 'upcomingevents')
@@ -634,5 +572,47 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			$pathway->addItem(JText::_('EB_GROUP_REGISTRATION'));
 		}
+	}
+
+	/**
+	 * Load captcha for registration form
+	 * @param bool $initOnly
+	 *
+	 * @throws Exception
+	 */
+	private function loadCaptcha($initOnly = false)
+	{
+		$config = EventbookingHelper::getConfig();
+		$user   = JFactory::getUser();
+		$showCaptcha = 0;
+
+		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
+		{
+			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+			if (!$captchaPlugin)
+			{
+				// Hardcode to recaptcha, reduce support request
+				$captchaPlugin = 'recaptcha';
+			}
+			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+			if ($plugin)
+			{
+				$showCaptcha   = 1;
+				if ($initOnly)
+				{
+					JCaptcha::getInstance($captchaPlugin)->initialise('dynamic_recaptcha_1');
+				}
+				else
+				{
+					$this->captcha = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
+				}
+			}
+			else
+			{
+				JFactory::getApplication()->enqueueMessage(JText::_('EB_CAPTCHA_NOT_ACTIVATED_IN_YOUR_SITE'), 'error');
+			}
+		}
+
+		$this->showCaptcha = $showCaptcha;
 	}
 }
