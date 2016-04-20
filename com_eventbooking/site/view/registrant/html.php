@@ -16,11 +16,11 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 	public function display()
 	{
 		$document = JFactory::getDocument();
-		$baseUri = JUri::base(true);
+		$rootUri  = JUri::root(true);
 		EventbookingHelper::addLangLinkForAjax();
 		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
-		$document->addScript($baseUri. '/media/com_eventbooking/assets/js/paymentmethods.js');
-		$document->addScript($baseUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
+		$document->addScript($rootUri . '/media/com_eventbooking/assets/js/paymentmethods.js');
+		$document->addScript($rootUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
 
 		$this->setLayout('default');
 
@@ -151,13 +151,13 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			$canChangeFeeFields = false;
 		}
 
-		$this->item            = $item;
-		$this->config          = $config;
-		$this->lists           = $lists;
-		$this->canChangeStatus = $canChangeStatus;
-		$this->form            = $form;
-		$this->rowMembers      = $rowMembers;
-		$this->return          = $this->input->get('return', '', 'string');
+		$this->item               = $item;
+		$this->config             = $config;
+		$this->lists              = $lists;
+		$this->canChangeStatus    = $canChangeStatus;
+		$this->form               = $form;
+		$this->rowMembers         = $rowMembers;
+		$this->return             = $this->input->get('return', '', 'string');
 		$this->canChangeFeeFields = $canChangeFeeFields;
 
 		parent::display();
