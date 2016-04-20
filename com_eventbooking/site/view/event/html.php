@@ -218,16 +218,11 @@ class EventbookingViewEventHtml extends RADViewHtml
 
 		// Categories dropdown
 		$query->clear();
-		$query->select("id, parent, parent AS parent_id, name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title")
+		$query->select("id, parent AS parent_id, name" . $fieldSuffix . " AS title")
 			->from('#__eb_categories')
 			->where('published = 1')
 			->order('name' . $fieldSuffix);
-
-		if (!$user->authorise('core.admin', 'com_eventbooking'))
-		{
-			$query->where('show_on_submit_event_form = 1');
-		}
-
+		
 		$isAdmin = $user->authorise('core.admin', 'com_eventbooking');
 
 		$db->setQuery($query);
@@ -244,6 +239,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 				$children[$pt] = $list;
 			}
 		}
+
 		$list    = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
 		$options = array();
 		foreach ($list as $listItem)

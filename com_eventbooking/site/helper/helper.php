@@ -2285,7 +2285,7 @@ class EventbookingHelper
 	{
 		$db          = JFactory::getDbo();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$sql         = "SELECT id, parent, parent AS parent_id, name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title FROM #__eb_categories";
+		$sql         = "SELECT id, parent AS parent_id, name" . $fieldSuffix . " AS title FROM #__eb_categories";
 		$db->setQuery($sql);
 		$rows     = $db->loadObjectList();
 		$children = array();
@@ -2337,7 +2337,7 @@ class EventbookingHelper
 	{
 		$db          = JFactory::getDbo();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$sql         = "SELECT id, parent, parent AS parent_id, name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title FROM #__eb_categories";
+		$sql         = "SELECT id, parent AS parent_id, name" . $fieldSuffix . " AS title FROM #__eb_categories";
 		if ($row->id)
 			$sql .= ' WHERE id != ' . $row->id;
 		if (!$row->parent)

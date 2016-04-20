@@ -43,8 +43,8 @@ if ($showCategory)
 	$db          = JFactory::getDbo();
 	$query       = $db->getQuery(true);
 	$fieldSuffix = EventbookingHelper::getFieldSuffix();
-	$query->select('id, parent, parent AS parent_id')
-		->select("name" . $fieldSuffix . " AS name, name" . $fieldSuffix . " AS title")
+	$query->select('id, parent AS parent_id')
+		->select("name" . $fieldSuffix . " AS title")
 		->from('#__eb_categories')
 		->where('published = 1')
 		->where('`access` IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
