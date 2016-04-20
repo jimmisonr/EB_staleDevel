@@ -30,6 +30,7 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 			$query->select('id')
 				->from('#__eb_registrants')
 				->where('registration_code = '. $db->quote($registrationCode));
+			$db->setQuery($query);
 			$id = (int) $db->loadResult();
 		}
 
@@ -40,13 +41,19 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->clear()
-			->select('a.*, a.title' . $fieldSuffix . ' AS title, b.payment_method')
+			->select('a.*, b.payment_method')
 			->from('#__eb_events  AS a ')
 			->innerJoin('#__eb_registrants AS b ON a.id = b.event_id')
 			->where('b.id=' . $id);
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('a.title'), $fieldSuffix);
+		}
 		$db->setQuery($query);
 		$rowEvent    = $db->loadObject();
+
 		$message     = EventbookingHelper::getMessages();
+
 		//Override thanks message
 		if (strlen(trim(strip_tags($rowEvent->thanks_message))))
 		{
