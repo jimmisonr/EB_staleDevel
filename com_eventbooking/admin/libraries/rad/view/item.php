@@ -6,7 +6,7 @@
  * @copyright   Copyright (C) 2015 Ossolution Team, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 /**
  * Joomla CMS Item View Class. This class is used to display details information of an item
