@@ -15,10 +15,15 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 
 	public function display()
 	{
-		JFactory::getDocument()->addScript(JUri::base(true) . '/media/com_eventbooking/assets/js/paymentmethods.js');
+		$document = JFactory::getDocument();
+		$baseUri = JUri::base(true);
+		EventbookingHelper::addLangLinkForAjax();
+		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
+		$document->addScript($baseUri. '/media/com_eventbooking/assets/js/paymentmethods.js');
+		$document->addScript($baseUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
+
 		$this->setLayout('default');
 
-		EventbookingHelper::addLangLinkForAjax();
 		$db          = JFactory::getDbo();
 		$query       = $db->getQuery(true);
 		$user        = JFactory::getUser();

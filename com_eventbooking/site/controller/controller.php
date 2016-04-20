@@ -405,8 +405,68 @@ class EventbookingController extends RADController
 	 */
 	public function payment_confirm()
 	{
-		$model = $this->getModel('Register');
-		$paymentMethod = $this->input->getString('payment_method');	
+		$model         = $this->getModel('Register');
+		$paymentMethod = $this->input->getString('payment_method');
 		$model->paymentConfirm($paymentMethod);
+	}
+
+	/**
+	 * Process upload file
+	 */
+	public function upload_file()
+	{
+		jimport('joomla.filesystem.folder');
+
+		$config     = EventbookingHelper::getConfig();
+		$json       = array();
+		$pathUpload = JPATH_ROOT . '/media/com_eventbooking/files';
+		if (!JFolder::exists($pathUpload))
+		{
+			JFolder::create($pathUpload);
+		}
+		$allowedExtensions = $config->attachment_file_types;
+		if (!$allowedExtensions)
+		{
+			$allowedExtensions = 'doc|docx|ppt|pptx|pdf|zip|rar|bmp|gif|jpg|jepg|png|swf|zipx';
+		}
+		$allowedExtensions = explode('|', $allowedExtensions);
+		$allowedExtensions = array_map('trim', $allowedExtensions);
+
+		$file     = $this->input->files->get('file', array(), 'raw');
+		$fileName = $file['name'];
+		$fileExt  = JFile::getExt($fileName);
+
+		if (in_array(strtolower($fileExt), $allowedExtensions))
+		{
+			$fileName = JFile::makeSafe($fileName);
+			if (JFile::exists($pathUpload . '/' . $fileName))
+			{
+				$targetFileName = time() . '_' . $fileName;
+			}
+			else
+			{
+				$targetFileName = $fileName;
+			}
+
+			if (version_compare(JVERSION, '3.4.4', 'ge'))
+			{
+				JFile::upload($file['tmp_name'], $pathUpload . '/' . $targetFileName, false, true);
+			}
+			else
+			{
+				JFile::upload($file['tmp_name'], $pathUpload . '/' . $targetFileName);
+			}
+
+			$json['success'] = JText::sprintf('EB_FILE_UPLOADED', $fileName);
+			$json['file'] = $targetFileName;
+		}
+		else
+		{
+			$json['error'] = JText::sprintf('EB_FILE_NOT_ALLOWED', $fileExt, implode(', ' . $allowedExtensions));
+		}
+
+		echo json_encode($json);
+
+		$this->app->close();
 	}
 }

@@ -1159,3 +1159,8 @@ td.eb-event-property-label {
 	display: block;
     margin-bottom: 5px;
 }
+span.eb-uploaded-file
+{
+	padding-left:10px;
+	font-weight: bold;
+}

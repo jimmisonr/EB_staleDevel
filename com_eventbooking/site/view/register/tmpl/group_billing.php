@@ -596,7 +596,6 @@ else
 	<script type="text/javascript">
 		var eb_current_page = 'group_billing';
 		<?php echo os_payments::writeJavascriptObjects();?>
-		var siteUrl = "<?php echo EventbookingHelper::getSiteUrl(); ?>";
 			Eb.jQuery(document).ready(function($){
 				<?php
 					if (count($dateFields))

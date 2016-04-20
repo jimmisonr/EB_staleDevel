@@ -280,4 +280,9 @@ div.cpanel-right {
 #eb-dropdown-menu .dropdown .dropdown-menu li.active a 
 {
 	color: #fff !important;
+}
+span.eb-uploaded-file
+{
+	padding-left:10px;
+	font-weight: bold;
 } 
