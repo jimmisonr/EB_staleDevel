@@ -211,10 +211,6 @@ class EventbookingViewEventHtml extends RADViewHtml
 			->from('#__eb_locations')
 			->where('published = 1')
 			->order('name');
-		if (!$config->show_all_locations_in_event_submission_form)
-		{
-			$query->where('user_id = ' . (int) $user->id);
-		}
 		$db->setQuery($query);
 		$options[]            = JHtml::_('select.option', '', JText::_('Select Location'), 'id', 'name');
 		$options              = array_merge($options, $db->loadObjectList());
@@ -231,7 +227,9 @@ class EventbookingViewEventHtml extends RADViewHtml
 		{
 			$query->where('show_on_submit_event_form = 1');
 		}
-		
+
+		$isAdmin = $user->authorise('core.admin', 'com_eventbooking');
+
 		$db->setQuery($query);
 		$rows     = $db->loadObjectList();
 		$children = array();
@@ -250,8 +248,17 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$options = array();
 		foreach ($list as $listItem)
 		{
-			$options[] = JHtml::_('select.option', $listItem->id, '&nbsp;&nbsp;&nbsp;' . $listItem->treename);
+			if ($isAdmin || $listItem->show_on_submit_event_form)
+			{
+				$disabled = false;
+			}
+			else
+			{
+				$disabled = true;
+			}
+			$options[] = JHtml::_('select.option', $listItem->id, '&nbsp;&nbsp;&nbsp;' . $listItem->treename, 'value', 'text', $disabled);
 		}
+
 		if ($item->id)
 		{
 			$query->clear();
