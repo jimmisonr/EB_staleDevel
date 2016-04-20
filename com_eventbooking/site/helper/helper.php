@@ -86,7 +86,7 @@ class EventbookingHelper
 	public static function isValidDate($value)
 	{
 		// basic date format yyyy-mm-dd
-		$expr = '/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/D';
+		$expr = '/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$/D';
 
 		return (preg_match($expr, $value, $match) && checkdate($match[2], $match[3], $match[1]));
 	}

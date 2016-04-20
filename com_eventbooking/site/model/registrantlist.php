@@ -35,7 +35,7 @@ class EventbookingModelRegistrantlist extends RADModelList
 	 * @see RADModelList::buildQueryWhere()
 	 */
 	protected function buildQueryWhere(JDatabaseQuery $query)
-	{
+	{		
 		$config = EventbookingHelper::getConfig();
 
 		$query->where('(tbl.published >= 1 OR tbl.payment_method LIKE "os_offline%")')
