@@ -757,6 +757,28 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 		</tr>
 		<tr>
 			<td class="key">
+				<?php echo  JText::_('EB_REGISTRATION_FORM_MESSAGE'); ?>
+			</td>
+			<td>
+				<?php echo $editor->display( 'registration_form_message',  $this->item->registration_form_message , '100%', '250', '90', '10' ) ; ?>
+			</td>
+			<td>
+				<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> :[EVENT_TITLE]</strong>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo  JText::_('EB_REGISTRATION_FORM_MESSAGE_GROUP'); ?>
+			</td>
+			<td>
+				<?php echo $editor->display( 'registration_form_message_group',  $this->item->registration_form_message_group , '100%', '250', '90', '10' ) ; ?>
+			</td>
+			<td>
+				<strong><?php echo JText::_('EB_AVAILABLE_TAGS'); ?> :[EVENT_TITLE]</strong>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
 				<?php echo  JText::_('EB_USER_EMAIL_BODY'); ?>
 			</td>
 			<td>

@@ -751,6 +751,19 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('registration_form_message', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `registration_form_message` TEXT NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('registration_form_message_group', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `registration_form_message_group` TEXT NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
 
 		if (!in_array('user_email_body', $fields))
 		{
