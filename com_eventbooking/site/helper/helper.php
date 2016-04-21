@@ -295,7 +295,7 @@ class EventbookingHelper
 		$query->select('lang_id, lang_code, title, `sef`')
 			->from('#__languages')
 			->where('published = 1')
-			->where('lang_code != "' . $default . '"')
+			->where('lang_code != ' . $db->quote($default))
 			->order('ordering');
 		$db->setQuery($query);
 		$languages = $db->loadObjectList();
@@ -322,6 +322,7 @@ class EventbookingHelper
 	 */
 	public static function addLangLinkForAjax()
 	{
+		$langLink = '';
 		if (JLanguageMultilang::isEnabled())
 		{
 			$db    = JFactory::getDbo();
@@ -333,10 +334,6 @@ class EventbookingHelper
 				->where('lang_code=' . $db->quote($tag));
 			$db->setQuery($query, 0, 1);
 			$langLink = '&lang=' . $db->loadResult();
-		}
-		else
-		{
-			$langLink = '';
 		}
 
 		JFactory::getDocument()->addScriptDeclaration(
@@ -380,7 +377,7 @@ class EventbookingHelper
 	public static function convertAmountToUSD($amount, $currency)
 	{
 		$http     = JHttpFactory::getHttp();
-		$url      = 'http://finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s=USD' . $currency . '=X';
+		$url      = 'http://download.finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s=USD' . $currency . '=X';
 		$response = $http->get($url);
 		if ($response->code == 200)
 		{
@@ -654,13 +651,21 @@ class EventbookingHelper
 		// Event information
 		if ($config->multiple_booking)
 		{
-			$sql = 'SELECT event_id FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id . ' ORDER BY id';
-			$db->setQuery($sql);
-			$eventIds    = $db->loadColumn();
+			$query->select('event_id')
+				->from('#__eb_registrants')
+				->where("(id = $row->id OR card_id = $row->id)")
+				->order('id');
+			$db->setQuery($query);
+			$eventIds = $db->loadColumn();
+
 			$fieldSuffix = EventbookingHelper::getFieldSuffix();
-			$sql         = 'SELECT title' . $fieldSuffix . ' AS title FROM #__eb_events WHERE id IN (' . implode(',', $eventIds) . ') ORDER BY FIND_IN_SET(id, "' . implode(',', $eventIds) .
-				'")';
-			$db->setQuery($sql);
+			$query->clear();
+			$query->select('title' . $fieldSuffix . ' AS title')
+				->from('#__eb_events')
+				->where('id IN (' . implode(',', $eventIds) . ')')
+				->order('FIND_IN_SET(id, "' . implode(',', $eventIds) . '")');
+
+			$db->setQuery($query);
 			$eventTitles = $db->loadColumn();
 			$eventTitle  = implode(', ', $eventTitles);
 		}
@@ -668,6 +673,7 @@ class EventbookingHelper
 		{
 			$eventTitle = $event->title;
 		}
+
 		$replaces['date']              = date($config->date_format);
 		$replaces['event_title']       = $eventTitle;
 		$replaces['event_date']        = JHtml::_('date', $event->event_date, $config->event_date_format, null);
@@ -756,28 +762,43 @@ class EventbookingHelper
 		{
 			$replaces['username'] = '';
 		}
-		
+
 		if ($config->multiple_booking)
 		{
 			//Amount calculation
-			$sql = 'SELECT SUM(total_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
+			$query->clear();
+			$query->select('SUM(total_amount)')
+				->from('#__eb_registrants')
+				->where("(id = $row->id OR cart_id = $row->id)");
+			$db->setQuery($query);
 			$totalAmount = $db->loadResult();
 
-			$sql = 'SELECT SUM(tax_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
+			$query->clear();
+			$query->select('SUM(tax_amount)')
+				->from('#__eb_registrants')
+				->where("(id = $row->id OR cart_id = $row->id)");
+			$db->setQuery($query);
 			$taxAmount = $db->loadResult();
 
-			$sql = 'SELECT SUM(payment_processing_fee) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
+			$query->clear();
+			$query->select('SUM(payment_processing_fee)')
+				->from('#__eb_registrants')
+				->where("(id = $row->id OR cart_id = $row->id)");
+			$db->setQuery($query);
 			$paymentProcessingFee = $db->loadResult();
 
-			$sql = 'SELECT SUM(discount_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
+			$query->clear();
+			$query->select('SUM(discount_amount)')
+				->from('#__eb_registrants')
+				->where("(id = $row->id OR cart_id = $row->id)");
+			$db->setQuery($query);
 			$discountAmount = $db->loadResult();
 
-			$sql = 'SELECT SUM(late_fee) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
+			$query->clear();
+			$query->select('SUM(late_fee)')
+				->from('#__eb_registrants')
+				->where("(id = $row->id OR cart_id = $row->id)");
+			$db->setQuery($query);
 			$lateFee = $db->loadResult();
 
 			$amount = $totalAmount - $discountAmount + $paymentProcessingFee + $taxAmount + $lateFee;
@@ -877,11 +898,13 @@ class EventbookingHelper
 		$enableCancel = $db->loadResult();
 		if ($enableCancel)
 		{
-			$Itemid = JRequest::getInt('Itemid', 0);
+			$Itemid = JFactory::getApplication()->input->getInt('Itemid', 0);
+
 			if (!$Itemid)
 			{
 				$Itemid = self::getItemid();
 			}
+
 			$replaces['cancel_registration_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=registrant.cancel&cancel_code=' . $row->registration_code . '&Itemid=' . $Itemid;
 		}
 		else
@@ -1370,11 +1393,11 @@ class EventbookingHelper
 	/**
 	 * Calculate registration fee for cart registration
 	 *
-	 * @param      $cart
-	 * @param      $form
-	 * @param      $data
-	 * @param      $config
-	 * @param null $paymentMethod
+	 * @param EventbookingHelperCart $cart
+	 * @param RADForm                $form
+	 * @param                        $data
+	 * @param                        $config
+	 * @param null                   $paymentMethod
 	 *
 	 * @return array
 	 */
@@ -1675,6 +1698,7 @@ class EventbookingHelper
 
 		return $db->loadObjectList();
 	}
+
 	/**
 	 * Get the form fields to display in registration form
 	 *
@@ -1692,14 +1716,15 @@ class EventbookingHelper
 		$config      = EventbookingHelper::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix($activeLanguage);
 		$query->select('*')
-			->select('title' . $fieldSuffix . ' AS title')
-			->select('description' . $fieldSuffix . ' AS description')
-			->select('`values' . $fieldSuffix . '` AS `values`')
-			->select('default_values' . $fieldSuffix . ' AS default_values')
-			->select('depend_on_options' . $fieldSuffix . ' AS depend_on_options')
 			->from('#__eb_fields')
 			->where('published=1')
 			->where(' `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
+
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('title', 'description', 'values', 'default_values', 'depend_on_options'), $fieldSuffix);
+		}
+
 		switch ($registrationType)
 		{
 			case 0:
@@ -1712,6 +1737,8 @@ class EventbookingHelper
 				$query->where('display_in IN (0, 4, 5)');
 				break;
 		}
+
+		$subQuery = $db->getQuery(true);
 		if ($registrationType == 4)
 		{
 			$cart  = new EventbookingHelperCart();
@@ -1721,16 +1748,23 @@ class EventbookingHelper
 				if (!count($items))
 				{
 					//In this case, we have ID of registration record, so, get list of events from that registration
-					$sql = 'SELECT event_id FROM #__eb_registrants WHERE id=' . $eventId;
-					$db->setQuery($sql);
+					$subQuery->select('event_id')
+						->from('#__eb_registrants')
+						->where('id = '. $eventId);
+					$db->setQuery($subQuery);
 					$cartEventId = (int) $db->loadResult();
+					$subQuery->clear();
 				}
 				else
 				{
 					$cartEventId = (int) $items[0];
 				}
-				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $cartEventId . ' AND main_category = 1';
-				$db->setQuery($sql);
+
+				$subQuery->select('category_id')
+					->from('#__eb_event_categories')
+					->where('event_id = '. $cartEventId)
+					->where('main_category = 1');
+				$db->setQuery($subQuery);
 				$categoryId = (int) $db->loadResult();
 				$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 			}
@@ -1739,8 +1773,10 @@ class EventbookingHelper
 				if (!count($items))
 				{
 					//In this case, we have ID of registration record, so, get list of events from that registration
-					$sql = 'SELECT event_id FROM #__eb_registrants WHERE id=' . $eventId;
-					$db->setQuery($sql);
+					$subQuery->select('event_id')
+						->from('#__eb_registrants')
+						->where('id = '. $eventId);
+					$db->setQuery($subQuery);
 					$items = $db->loadColumn();
 				}
 				$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id IN (' . implode(',', $items) . ')))');
@@ -1751,8 +1787,11 @@ class EventbookingHelper
 			if ($config->custom_field_by_category)
 			{
 				//Get main category of the event
-				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $eventId . ' AND main_category = 1';
-				$db->setQuery($sql);
+				$subQuery->select('category_id')
+					->from('#__eb_event_categories')
+					->where('event_id = '. $eventId)
+					->where('main_category = 1');
+				$db->setQuery($subQuery);
 				$categoryId = (int) $db->loadResult();
 				$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 			}
