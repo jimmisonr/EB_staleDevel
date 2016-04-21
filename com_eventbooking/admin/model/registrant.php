@@ -89,6 +89,12 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 				$row->load($registrantId);
 				if (!$row->published)
 				{
+					// Re-generate invoice with Paid status
+					if ($config->activate_invoice_feature && $row->invoice_number)
+					{
+						EventbookingHelper::generateInvoicePDF($row);
+					}
+
 					EventbookingHelper::sendRegistrationApprovedEmail($row, $config);
 
 					// Trigger event
