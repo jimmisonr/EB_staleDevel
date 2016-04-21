@@ -1933,21 +1933,31 @@ class EventbookingHelper
 		if ($individualPrice == 0)
 		{
 			$config = EventbookingHelper::getConfig();
+			$query->clear();
+			$query->select('COUNT(*)')
+				->from('#__eb_fields')
+				->where('fee_field = 1')
+				->where('published = 1');
+
 			if ($config->custom_field_by_category)
 			{
-				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $eventId . ' AND main_category = 1';
-				$db->setQuery($sql);
+				$categoryQuery = $db->getQuery(true);
+				$categoryQuery->select('category_id')
+					->from('#__eb_event_categories')
+					->where('event_id = ' . $eventId)
+					->where('main_category = 1');
+				$db->setQuery($categoryQuery);
 				$categoryId = (int) $db->loadResult();
-				$sql        = 'SELECT COUNT(*) FROM #__eb_fields WHERE fee_field = 1 AND published= 1 AND (category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))';
-				$db->setQuery($sql);
+				$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 			}
 			else
 			{
-				$sql = 'SELECT COUNT(*) FROM #__eb_fields WHERE fee_field = 1 AND published= 1 AND (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' .
-					$eventId . '))';
-				$db->setQuery($sql);
+				$query->where('(event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id = ' . $eventId . '))');
 			}
+			$db->setQuery($query);
+
 			$numberFeeFields = (int) $db->loadResult();
+
 			if ($numberFeeFields == 0)
 			{
 				return false;
