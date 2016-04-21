@@ -13,9 +13,9 @@ EventbookingHelperJquery::validateForm();
 if ($this->waitingList)
 {
 	$headerText = JText::_('EB_JOIN_WAITINGLIST');
-	if (strlen(strip_tags($this->message->{'waitinglist_form_message'.$this->fieldSuffix})))
+	if (strlen(strip_tags($this->message->{'waitinglist_form_message' . $this->fieldSuffix})))
 	{
-		$msg = $this->message->{'waitinglist_form_message'.$this->fieldSuffix};
+		$msg = $this->message->{'waitinglist_form_message' . $this->fieldSuffix};
 	}
 	else
 	{
@@ -24,17 +24,24 @@ if ($this->waitingList)
 }
 else
 {
-	$headerText = JText::_('EB_INDIVIDUAL_REGISTRATION') ;
-	if (strlen(strip_tags($this->message->{'registration_form_message'.$this->fieldSuffix})))
+	$headerText = JText::_('EB_INDIVIDUAL_REGISTRATION');
+	if (strlen(strip_tags($this->message->{'registration_form_message' . $this->fieldSuffix})))
 	{
-		$msg = $this->message->{'registration_form_message'.$this->fieldSuffix};
+		$msg = $this->message->{'registration_form_message' . $this->fieldSuffix};
 	}
 	else
 	{
-		$msg = $this->message->registration_form_message;
+		if (strlen(strip_tags($this->event->registration_form_message)))
+		{
+			$msg = $this->event->registration_form_message;
+		}
+		else
+		{
+			$msg = $this->message->registration_form_message;
+		}
 	}
 
-	$msg = str_replace('[AMOUNT]', EventbookingHelper::formatCurrency($this->amount, $this->config, $this->event->currency_symbol), $msg) ;
+	$msg = str_replace('[AMOUNT]', EventbookingHelper::formatCurrency($this->amount, $this->config, $this->event->currency_symbol), $msg);
 }
 
 $replaces = EventbookingHelper::buildEventTags($this->event, $this->config);

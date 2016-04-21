@@ -45,7 +45,14 @@ else
 	}
 	else
 	{
-		$msg = $this->message->registration_form_message_group;
+		if (strlen(strip_tags($this->event->registration_form_message_group)))
+		{
+			$msg = $this->event->registration_form_message_group;
+		}
+		else
+		{
+			$msg = $this->message->registration_form_message_group;
+		}
 	}
 }
 $replaces = EventbookingHelper::buildEventTags($this->event, $this->config);
