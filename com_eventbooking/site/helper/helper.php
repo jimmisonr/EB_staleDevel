@@ -742,6 +742,21 @@ class EventbookingHelper
 		{
 			$replaces['couponCode'] = '';
 		}
+
+		$replaces['user_id'] = $row->user_id;
+		if ($row->user_id)
+		{
+			$query->clear()
+				->select('username')
+				->from('#__users')
+				->where('id = ' . $row->user_id);
+			$replaces['username'] = $db->loadResult();
+		}
+		else
+		{
+			$replaces['username'] = '';
+		}
+		
 		if ($config->multiple_booking)
 		{
 			//Amount calculation
