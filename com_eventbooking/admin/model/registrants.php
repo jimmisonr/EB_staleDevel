@@ -21,9 +21,9 @@ class EventbookingModelRegistrants extends RADModelList
 	 */
 	public function __construct($config = array())
 	{
-		$config['search_fields'] = array('tbl.first_name', 'tbl.last_name', 'tbl.email', 'tbl.transaction_id');
+		$config['search_fields']   = array('tbl.first_name', 'tbl.last_name', 'tbl.email', 'tbl.transaction_id');
 		$config['remember_states'] = true;
-		
+
 		parent::__construct($config);
 
 		$this->state->insert('filter_event_id', 'int', 0)
@@ -40,41 +40,88 @@ class EventbookingModelRegistrants extends RADModelList
 	 */
 	public function getData()
 	{
-		$rows = parent::getData();
-		if (count($rows))
+		if (empty($this->data))
+		{
+			$rows = parent::getData();
+			if (count($rows))
+			{
+				$db    = $this->getDbo();
+				$query = $db->getQuery(true);
+
+				// Get group billing records
+				$billingIds = array();
+				foreach ($rows as $row)
+				{
+					if ($row->group_id)
+					{
+						$billingIds[] = $row->group_id;
+					}
+				}
+
+				if (count($billingIds))
+				{
+					$query->select('id, first_name, last_name')
+						->from('#__eb_registrants')
+						->where('id IN (' . implode(',', $billingIds) . ')');
+					$db->setQuery($query);
+					$billingRecords = $db->loadObjectList('id');
+					foreach ($rows as $row)
+					{
+						if ($row->group_id > 0)
+						{
+							$billingRecord   = $billingRecords[$row->group_id];
+							$row->group_name = $billingRecord->first_name . ' ' . $billingRecord->last_name;
+						}
+					}
+				}
+			}
+
+			$this->data = $rows;
+		}
+
+		return $this->data;
+	}
+
+	/**
+	 * Get registrants custom fields data
+	 *
+	 * @param array $fields
+	 *
+	 * @return array
+	 */
+	public function getFieldsData($fields)
+	{
+		$fieldsData = array();
+		$rows       = $this->data;
+		if (count($rows) && count($fields))
 		{
 			$db    = $this->getDbo();
 			$query = $db->getQuery(true);
 
-			// Get group billing records
-			$billingIds = array();
+			$registrantIds = array();
 			foreach ($rows as $row)
 			{
-				if ($row->group_id)
-				{
-					$billingIds[] = $row->group_id;
-				}
+				$registrantIds[] = $row->id;
 			}
 
-			if (count($billingIds))
+			$query->select('registrant_id, field_id, field_value')
+				->from('#__eb_field_values')
+				->where('registrant_id IN (' . implode(',', $registrantIds) . ')')
+				->where('field_idn IN (' . implode(',', $fields) . ')');
+			$db->setQuery($query);
+			$rowFieldValues = $db->loadObjectList();
+			foreach ($rowFieldValues as $rowFieldValue)
 			{
-				$query->select('id, first_name, last_name')
-					->from('#__eb_registrants')
-					->where('id IN (' . implode(',', $billingIds) . ')');
-				$db->setQuery($query);
-				$billingRecords = $db->loadObjectList('id');
-				foreach ($rows as $row)
+				$fieldValue = $rowFieldValue->field_value;
+				if (is_string($fieldValue) && is_array(json_decode($fieldValue)))
 				{
-					if ($row->group_id > 0)
-					{
-						$billingRecord   = $billingRecords[$row->group_id];
-						$row->group_name = $billingRecord->first_name . ' ' . $billingRecord->last_name;
-					}
+					$fieldValue = implode(', ', json_decode($fieldValue));
 				}
+				$fieldsData[$rowFieldValue->registrant_id][$rowFieldValue->field_id] = $fieldValue;
 			}
 		}
 
-		return $rows;
+		return $fieldsData;
 	}
 
 	/**
