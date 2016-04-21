@@ -417,12 +417,11 @@ class EventbookingHelperData
 	 * @param $rows
 	 * @param $config
 	 * @param $rowFields
-	 * @param $fieldValues
-	 * @param $groupNames
+	 * @param $fieldValues		
 	 *
 	 * @throws Exception
 	 */
-	public static function csvExport($rows, $config, $rowFields, $fieldValues, $groupNames)
+	public static function csvExport($rows, $config, $rowFields, $fieldValues)
 	{
 		if (count($rows))
 		{
@@ -522,7 +521,7 @@ class EventbookingHelperData
 					}
 					elseif ($r->group_id > 0)
 					{
-						$fields[] = isset($groupNames[$r->group_id]) ? $groupNames[$r->group_id] : '';
+						$fields[] = $r->group_name;
 					}
 					else
 					{

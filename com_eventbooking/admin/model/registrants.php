@@ -107,7 +107,7 @@ class EventbookingModelRegistrants extends RADModelList
 			$query->select('registrant_id, field_id, field_value')
 				->from('#__eb_field_values')
 				->where('registrant_id IN (' . implode(',', $registrantIds) . ')')
-				->where('field_idn IN (' . implode(',', $fields) . ')');
+				->where('field_id IN (' . implode(',', $fields) . ')');
 			$db->setQuery($query);
 			$rowFieldValues = $db->loadObjectList();
 			foreach ($rowFieldValues as $rowFieldValue)
@@ -129,7 +129,7 @@ class EventbookingModelRegistrants extends RADModelList
 	 */
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
-		$query->select('tbl.*, ev.title, ev.event_date, cp.code AS coupon_code');
+		$query->select('tbl.*, ev.title, ev.event_date, ev.event_end_date, cp.code AS coupon_code');
 
 		return $this;
 	}
@@ -176,7 +176,7 @@ class EventbookingModelRegistrants extends RADModelList
 			$query->where('(tbl.published >= 1 OR tbl.payment_method LIKE "os_offline%")');
 		}
 
-		if (isset($config->include_group_billing_in_registrants) && !$config->include_group_billing_in_registrants)
+		if (!$config->get('include_group_billing_in_registrants', 1))
 		{
 			$query->where(' tbl.is_group_billing = 0 ');
 		}

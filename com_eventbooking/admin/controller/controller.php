@@ -53,52 +53,15 @@ class EventbookingController extends RADControllerAdmin
 	{
 		set_time_limit(0);
 		$config    = EventbookingHelper::getConfig();
-		$db        = JFactory::getDbo();
-		$query     = $db->getQuery(true);
-		$eventId   = $this->input->getInt('filter_event_id', 0);
-		$published = $this->input->getInt('filter_published', -1);
-		$query->select('a.*, b.event_date, b.event_end_date')
-			->select(' b.title AS event_title')
-			->from('#__eb_registrants AS a')
-			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
-			->order('a.id');
+		$model = $this->getModel('registrants');
 
-		if ($config->show_coupon_code_in_registrant_list)
-		{
-			$query->select('c.code AS coupon_code')
-				->leftJoin('#__eb_coupons AS c ON a.coupon_id=c.id');
-		}
+		/* @var EventbookingModelRegistrants $model*/
+		$model->setState('limitstart', 0)
+			->setState('limit', 0)
+			->setState('filter_order', 'tbl.id')
+			->setState('filter_order_Dir', 'ASC');
 
-		if ($eventId > 0)
-		{
-			$query->where('a.event_id = ' . $eventId);
-		}
-
-		if ($published != -1)
-		{
-			$query->where('a.published = ' . $published);
-			if ($published == 0)
-			{
-				$query->where('a.payment_method LIKE "os_offline%"');
-			}
-		}
-		else
-		{
-			$query->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published NOT IN (2,3)))');
-		}
-
-		if (!$config->get('include_group_billing_in_csv_export', 1))
-		{
-			$query->where('a.is_group_billing = 0');
-		}
-
-		if (!$config->include_group_members_in_csv_export)
-		{
-			$query->where('a.group_id = 0');
-		}
-
-		$db->setQuery($query);
-		$rows = $db->loadObjectList();
+		$rows = $model->getData();
 
 		if (count($rows) == 0)
 		{
@@ -108,74 +71,16 @@ class EventbookingController extends RADControllerAdmin
 			return;
 		}
 
-		if ($eventId)
+		$rowFields = EventbookingHelper::getAllEventFields((int) $model->getState('filter_event_id'));
+		$fieldIds = array();
+		foreach($rowFields as $rowField)
 		{
-			if ($config->custom_field_by_category)
-			{
-				$query->clear();
-				$query->select('category_id')
-					->from('#__eb_event_categories')
-					->where('event_id=' . $eventId)
-					->where('main_category=1');
-				$db->setQuery($query);
-				$categoryId = (int) $db->loadResult();
-
-				$query->clear();
-				$query->select('id, name, title, is_core')
-					->from('#__eb_fields')
-					->where('published = 1')
-					->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))')
-					->order('ordering');
-			}
-			else
-			{
-				$query->clear();
-				$query->select('id, name, title, is_core')
-					->from('#__eb_fields')
-					->where('published = 1')
-					->where('(event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . '))')
-					->order('ordering');
-			}
-		}
-		else
-		{
-			$query->clear();
-			$query->select('id, name, title, is_core')
-				->from('#__eb_fields')
-				->where('published = 1')
-				->order('ordering');
-		}
-		$db->setQuery($query);
-		$rowFields = $db->loadObjectList();
-
-		$registrantIds = array();
-
-		//Get name of groups
-		$groupNames = array();
-		foreach ($rows as $row)
-		{
-			$registrantIds[] = $row->id;
-			if ($row->is_group_billing)
-			{
-				$groupNames[$row->id] = $row->first_name . ' ' . $row->last_name;
-			}
+			$fieldIds[] = $rowField->id;
 		}
 
-		//Get the custom fields value and store them into an array
-		$query->clear();
-		$query->select('registrant_id, field_id, field_value')
-			->from('#__eb_field_values')
-			->where('registrant_id IN (' . implode(',', $registrantIds) . ')');
-		$db->setQuery($query);
-		$rowFieldValues = $db->loadObjectList();
-		$fieldValues    = array();
-		for ($i = 0, $n = count($rowFieldValues); $i < $n; $i++)
-		{
-			$rowFieldValue                                                        = $rowFieldValues[$i];
-			$fieldValues[$rowFieldValue->registrant_id][$rowFieldValue->field_id] = $rowFieldValue->field_value;
-		}
+		$fieldValues = $model->getFieldsData($fieldIds);
 
-		EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues, $groupNames);
+		EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues);
 	}
 
 	/**

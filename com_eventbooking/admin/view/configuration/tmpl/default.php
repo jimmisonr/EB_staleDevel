@@ -378,26 +378,10 @@ JHtml::_('formbehavior.chosen', 'select');
 					</div>
 					<div class="control-group">
 						<div class="control-label">
-							<?php echo EventbookingHelperHtml::getFieldLabel('include_group_billing_in_csv_export', JText::_('EB_INCLUDE_GROUP_BILLING_IN_CSV_EXPORT'), JText::_('EB_INCLUDE_GROUP_BILLING_IN_CSV_EXPORT_EXPLAIN')); ?>
-						</div>
-						<div class="controls">
-							<?php echo EventbookingHelperHtml::getBooleanInput('include_group_billing_in_csv_export', $config->get('include_group_billing_in_csv_export', 1)); ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('include_group_billing_in_registrants', JText::_('EB_INCLUDE_GROUP_BILLING_IN_REGISTRANTS_MANAGEMENT'), JText::_('EB_INCLUDE_GROUP_BILLING_IN_REGISTRANTS_MANAGEMENT_EXPLAIN')); ?>
 						</div>
 						<div class="controls">
 							<?php echo EventbookingHelperHtml::getBooleanInput('include_group_billing_in_registrants', $config->get('include_group_billing_in_registrants', 1)); ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<div class="control-label">
-							<?php echo EventbookingHelperHtml::getFieldLabel('include_group_members_in_csv_export', JText::_('EB_INCLUDE_GROUP_MEMBERS_IN_CSV_EXPORT'), JText::_('EB_INCLUDE_GROUP_MEMBERS_IN_CSV_EXPORT_EXPLAIN')); ?>
-						</div>
-						<div class="controls">
-							<?php echo EventbookingHelperHtml::getBooleanInput('include_group_members_in_csv_export', $config->get('include_group_members_in_csv_export', 0)); ?>
 						</div>
 					</div>
 					<div class="control-group">

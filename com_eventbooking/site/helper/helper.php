@@ -1622,6 +1622,45 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Get all custom fields for an event
+	 *
+	 * @param $eventId
+	 *
+	 * @return array
+	 */
+	public static function getAllEventFields($eventId)
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('id, name, title, is_core')
+			->from('#__eb_fields')
+			->where('published = 1')
+			->order('ordering');
+		
+		if ($eventId)
+		{
+			$config = EventbookingHelper::getConfig();
+			if ($config->custom_field_by_category)
+			{
+				$subQuery = $db->getQuery(true);
+				$subQuery->select('category_id')
+					->from('#__eb_event_categories')
+					->where('event_id = ' . $eventId)
+					->where('main_category = 1');
+				$db->setQuery($subQuery);
+				$categoryId = (int) $db->loadResult();
+				$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
+			}
+			else
+			{
+				$query->where('(event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . '))');
+			}
+		}
+		$db->setQuery($query);
+
+		return $db->loadObjectList();
+	}
+	/**
 	 * Get the form fields to display in registration form
 	 *
 	 * @param int    $eventId (ID of the event or ID of the registration record in case the system use shopping cart)
