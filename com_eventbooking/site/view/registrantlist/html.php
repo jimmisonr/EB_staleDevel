@@ -10,6 +10,9 @@
 // no direct access
 defined('_JEXEC') or die;
 
+/**
+ * @property EventbookingModelRegistrantlist $model
+ */
 class EventbookingViewRegistrantlistHtml extends RADViewHtml
 {
 
@@ -19,14 +22,16 @@ class EventbookingViewRegistrantlistHtml extends RADViewHtml
 		{
 			return;
 		}
-		$config  = EventbookingHelper::getConfig();
-		$db      = JFactory::getDbo();
-		$query   = $db->getQuery(true);
+
 		$state   = $this->model->getState();
 		$eventId = $state->id;
 		if ($eventId)
 		{
 			$rows = $this->model->getData();
+
+			$config  = EventbookingHelper::getConfig();
+			$db      = JFactory::getDbo();
+			$query   = $db->getQuery(true);
 
 			// Check to see whether we need to display custom fields data for this event
 			$query->select('custom_field_ids')
@@ -43,7 +48,6 @@ class EventbookingViewRegistrantlistHtml extends RADViewHtml
 			{
 				$fields      = explode(',', $customFieldIds);
 				$fieldTitles = array();
-				$fieldValues = array();
 				$fieldSuffix = EventbookingHelper::getFieldSuffix();
 				$query->clear();
 				$query->select('id, name,title' . $fieldSuffix . ' AS title, is_core')
@@ -55,39 +59,8 @@ class EventbookingViewRegistrantlistHtml extends RADViewHtml
 					$fieldTitles[$rowField->id] = $rowField->title;
 				}
 
-				// Getting values for custom fields
-				$registrantIds = array();
-				foreach ($rows as $row)
-				{
-					$registrantIds[] = $row->id;
-					foreach ($rowFields as $rowField)
-					{
-						if ($rowField->is_core)
-						{
-							$fieldValues[$row->id][$rowField->id] = $row->{$rowField->name};
-						}
-					}
-
-				}
-
-				$query->clear();
-				$query->select('registrant_id, field_id, field_value')
-					->from('#__eb_field_values')
-					->where('registrant_id IN (' . implode(',', $registrantIds) . ')');
-				$db->setQuery($query);
-				$rowFieldValues = $db->loadObjectList();
-				foreach ($rowFieldValues as $rowFieldValue)
-				{
-					$fieldValue = $rowFieldValue->field_value;
-					if (is_string($fieldValue) && is_array(json_decode($fieldValue)))
-					{
-						$fieldValue = implode(', ', json_decode($fieldValue));
-					}
-					$fieldValues[$rowFieldValue->registrant_id][$rowFieldValue->field_id] = $fieldValue;
-				}
-
 				$this->fieldTitles  = $fieldTitles;
-				$this->fieldValues  = $fieldValues;
+				$this->fieldValues  = $this->model->getFieldsData($fields);
 				$this->fields       = $fields;
 				$displayCustomField = true;
 			}
@@ -102,10 +75,6 @@ class EventbookingViewRegistrantlistHtml extends RADViewHtml
 			$this->bootstrapHelper    = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
 			parent::display();
-		}
-		else
-		{
-			return;
 		}
 	}
 }

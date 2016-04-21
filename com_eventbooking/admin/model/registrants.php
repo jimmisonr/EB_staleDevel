@@ -21,15 +21,19 @@ class EventbookingModelRegistrants extends RADModelList
 	 */
 	public function __construct($config = array())
 	{
-		$config['search_fields']   = array('tbl.first_name', 'tbl.last_name', 'tbl.email', 'tbl.transaction_id');
-		$config['remember_states'] = true;
+		$config['search_fields'] = array('tbl.first_name', 'tbl.last_name', 'tbl.email', 'tbl.transaction_id');
+
+		if (!isset($config['remember_states']))
+		{
+			$config['remember_states'] = true;
+		}
 
 		parent::__construct($config);
 
 		$this->state->insert('filter_event_id', 'int', 0)
 			->insert('filter_published', 'int', -1)
 			->insert('filter_checked_in', 'int', -1)
-			->insert('filter_order_Dir', 'word', 'DESC');
+			->setDefault('filter_order_Dir', 'DESC');
 	}
 
 	/**
@@ -129,8 +133,10 @@ class EventbookingModelRegistrants extends RADModelList
 	 */
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
-		$query->select('tbl.*, ev.title, ev.event_date, ev.event_end_date, cp.code AS coupon_code');
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
+		$query->select('tbl.*, ev.title' . $fieldSuffix . ' AS title, ev.event_date, ev.event_end_date, cp.code AS coupon_code');
+		
 		return $this;
 	}
 
@@ -151,6 +157,7 @@ class EventbookingModelRegistrants extends RADModelList
 	 */
 	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
+		$app    = JFactory::getApplication();
 		$config = EventbookingHelper::getConfig();
 
 		// Prevent empty registration records (spams) from being showed
@@ -166,12 +173,14 @@ class EventbookingModelRegistrants extends RADModelList
 			$query->where(' tbl.checked_in = ' . $this->state->filter_checked_in);
 		}
 
-		if ($this->state->filter_event_id)
+		if ($this->state->filter_event_id || $this->state->id)
 		{
-			$query->where(' tbl.event_id = ' . $this->state->filter_event_id);
+			$eventId = $this->state->filter_event_id ? $this->state->filter_event_id : $this->state->id;
+
+			$query->where(' tbl.event_id = ' . $eventId);
 		}
 
-		if (!$config->show_pending_registrants)
+		if (!$config->show_pending_registrants || $app->isSite())
 		{
 			$query->where('(tbl.published >= 1 OR tbl.payment_method LIKE "os_offline%")');
 		}
@@ -186,7 +195,7 @@ class EventbookingModelRegistrants extends RADModelList
 			$query->where(' tbl.group_id = 0 ');
 		}
 
-		if (JFactory::getApplication()->isSite() && $config->only_show_registrants_of_event_owner)
+		if ($app->isSite() && $config->only_show_registrants_of_event_owner)
 		{
 			$query->where('tbl.event_id IN (SELECT id FROM #__eb_events WHERE created_by =' . JFactory::getUser()->id . ')');
 		}
