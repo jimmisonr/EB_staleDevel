@@ -18,7 +18,7 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 		parent::prepareView();
 
 		$config = EventbookingHelper::getConfig();
-		$db     = JFactory::getDBO();
+		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
 
 		$rows      = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
@@ -77,7 +77,8 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 	protected function addToolbar()
 	{
 		parent::addToolbar();
-		JToolBarHelper::custom('resend_email', 'envelope', 'envelope', 'Resend Email', true);
-		JToolBarHelper::custom('csv_export', 'download', 'download', 'Export Registration', false);
+
+		JToolbarHelper::custom('resend_email', 'envelope', 'envelope', 'Resend Email', true);
+		JToolbarHelper::custom('csv_export', 'download', 'download', 'Export Registration', false);
 	}
 }
