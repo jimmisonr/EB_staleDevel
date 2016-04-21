@@ -39,7 +39,7 @@ JHtml::_('formbehavior.chosen', 'select');
 					<?php echo JText::_( 'NUM' ); ?>
 				</th>
 				<th class="list_event">
-					<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT'), 'b.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT'), 'ev.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
 				<?php
 					if ($this->config->show_event_date)
@@ -47,7 +47,7 @@ JHtml::_('formbehavior.chosen', 'select');
 						$cols++;
 					?>
 						<th class="list_event_date">
-							<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT_DATE'), 'b.event_date', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+							<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT_DATE'), 'ev.event_date', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 						</th>
 					<?php
 					}
@@ -136,7 +136,10 @@ JHtml::_('formbehavior.chosen', 'select');
 								break ;
 							case 2 :
 								echo JText::_('EB_CANCELLED');
-								break ;
+								break;
+							case 3:
+								echo JText::_('EB_WAITING_LIST');
+								break;
 						}
 					?>
 				</td>

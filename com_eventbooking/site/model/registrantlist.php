@@ -20,8 +20,8 @@ class EventbookingModelRegistrantlist extends EventbookingModelRegistrants
 	 */
 	public function __construct($config = array())
 	{
-		$config['table'] = '#__eb_registrants';
-
+		$config['remember_states'] = false;
+		
 		parent::__construct($config);
 
 		$this->state->insert('id', 'int', 0);

@@ -23,6 +23,8 @@ class EventbookingModelRegistrants extends RADModelList
 	{
 		$config['search_fields'] = array('tbl.first_name', 'tbl.last_name', 'tbl.email', 'tbl.transaction_id');
 
+		$config['table'] = '#__eb_registrants';
+
 		if (!isset($config['remember_states']))
 		{
 			$config['remember_states'] = true;
@@ -136,7 +138,7 @@ class EventbookingModelRegistrants extends RADModelList
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
 		$query->select('tbl.*, ev.title' . $fieldSuffix . ' AS title, ev.event_date, ev.event_end_date, cp.code AS coupon_code');
-		
+
 		return $this;
 	}
 
