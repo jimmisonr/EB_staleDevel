@@ -2437,15 +2437,23 @@ class EventbookingHelper
 	public static function parentCategories($row)
 	{
 		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$sql         = "SELECT id, parent AS parent_id, name" . $fieldSuffix . " AS title FROM #__eb_categories";
+
+		$query->select('id, parent AS parent_id')
+			->select('name' . $fieldSuffix . ' AS title')
+			->from('#__eb_categories');
 		if ($row->id)
-			$sql .= ' WHERE id != ' . $row->id;
+		{
+			$query->where('id != ' . $row->id);
+		}
+
 		if (!$row->parent)
 		{
 			$row->parent = 0;
 		}
-		$db->setQuery($sql);
+
+		$db->setQuery($query);
 		$rows     = $db->loadObjectList();
 		$children = array();
 		if ($rows)
@@ -2513,40 +2521,45 @@ class EventbookingHelper
 	 */
 	public static function getTotalEvent($categoryId, $includeChildren = true)
 	{
-		$user           = JFactory::getUser();
-		$hidePastEvents = EventbookingHelper::getConfigValue('hide_past_events');
-		$db             = JFactory::getDbo();
-		$arrCats        = array();
-		$cats           = array();
-		$arrCats[]      = $categoryId;
-		$cats[]         = $categoryId;
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+		$config = self::getConfig();
+
+		$arrCats   = array();
+		$cats      = array();
+		$arrCats[] = $categoryId;
+		$cats[]    = $categoryId;
 		if ($includeChildren)
 		{
 			while (count($arrCats))
 			{
 				$catId = array_pop($arrCats);
+
 				//Get list of children category
-				$sql = 'SELECT id FROM #__eb_categories WHERE parent=' . $catId . ' AND published=1';
-				$db->setQuery($sql);
-				$rows = $db->loadObjectList();
-				for ($i = 0, $n = count($rows); $i < $n; $i++)
-				{
-					$row       = $rows[$i];
-					$arrCats[] = $row->id;
-					$cats[]    = $row->id;
-				}
+				$query->clear();
+				$query->select('id')
+					->from('#__eb_categories')
+					->where('parent = ' . $catId)
+					->where('published = 1');
+				$db->setQuery($query);
+				$childrenCategories = $db->loadColumn();
+				$arrCats            = array_merge($arrCats, $childrenCategories);
+				$cats               = array_merge($cats, $childrenCategories);
 			}
 		}
 
-		if ($hidePastEvents)
-			$sql = 'SELECT COUNT(a.id) FROM #__eb_events AS a INNER JOIN #__eb_event_categories AS b ON a.id = b.event_id WHERE b.category_id IN(' .
-				implode(',', $cats) . ') AND published = 1 AND `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) .
-				') AND event_date >= "' . JHtml::_('date', 'Now', 'Y-m-d') . '" ';
-		else
-			$sql = 'SELECT COUNT(a.id) FROM #__eb_events AS a INNER JOIN #__eb_event_categories AS b ON a.id = b.event_id WHERE b.category_id IN(' .
-				implode(',', $cats) . ') AND `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ') AND published = 1 ';
-
-		$db->setQuery($sql);
+		$query->clear();
+		$query->select('COUNT(a.id)')
+			->from('#__eb_events AS a')
+			->innerJoin('#__eb_event_categories AS b ON a.id = b.event_id')
+			->where('b.category_id IN (' . implode(',', $cats) . ')')
+			->where('`access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
+		if ($config->hide_past_events)
+		{
+			$query->where('event_date >= ' . $db->quote(JHtml::_('date', 'Now', 'Y-m-d')));
+		}
+		$db->setQuery($query);
 
 		return (int) $db->loadResult();
 	}
