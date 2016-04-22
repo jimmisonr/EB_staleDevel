@@ -2696,8 +2696,13 @@ class EventbookingHelper
 			if ($config->custom_field_by_category)
 			{
 				//Get main category of the event
-				$sql = 'SELECT category_id FROM #__eb_event_categories WHERE event_id=' . $event->id . ' AND main_category = 1';
-				$db->setQuery($sql);
+				$categoryQuery = $db->getQuery(true);
+				$categoryQuery->select('category_id')
+					->from('#__eb_event_categories')
+					->where('event_id = ' . $event->id)
+					->where('main_category = 1');
+
+				$db->setQuery($categoryQuery);
 				$categoryId = (int) $db->loadResult();
 				$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 			}
@@ -2736,25 +2741,32 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Get total registrants
+	 * Get total registrants of the given event
 	 *
+	 * @param int $eventId
+	 *
+	 * @return int
 	 */
 	public static function getTotalRegistrants($eventId)
 	{
 		$db  = JFactory::getDbo();
-		$sql = 'SELECT SUM(number_registrants) AS total_registrants FROM #__eb_registrants WHERE event_id=' . $eventId .
-			' AND group_id=0 AND (published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))';
-		$db->setQuery($sql);
-		$numberRegistrants = (int) $db->loadResult();
+		$query = $db->getQuery(true);
+		$query->select('SUM(number_registrants) AS total_registrants')
+			->from('#__eb_registrants')
+			->where('event_id = '. $eventId)
+			->where('group_id = 0')
+			->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
+		$db->setQuery($query);
 
-		return $numberRegistrants;
+		return (int) $db->loadResult();
 	}
 
 	/**
 	 * Get max number of registrants allowed for an event
 	 *
-	 * @param int    $eventId
-	 * @param object $config
+	 * @param $event
+	 *
+	 * @return int
 	 */
 	public static function getMaxNumberRegistrants($event)
 	{
@@ -2951,7 +2963,7 @@ class EventbookingHelper
 				}
 				//Send email to waiting list users
 				$mailer->sendMail($fromEmail, $fromName, $registrant->email, $subject, $message, 1);
-				$mailer->ClearAllRecipients();
+				$mailer->clearAllRecipients();
 			}
 		}
 	}
@@ -3247,14 +3259,14 @@ class EventbookingHelper
 							$subject = str_ireplace("[$key]", $value, $subject);
 						}
 						$body = self::convertImgTags($body);
-						$mailer->ClearAllRecipients();
+						$mailer->clearAllRecipients();
 						$mailer->sendMail($fromEmail, $fromName, $rowMember->email, $subject, $body, 1, null);
 					}
 				}
 			}
 
 			// Clear attachments
-			$mailer->ClearAttachments();
+			$mailer->clearAttachments();
 			$mailer->clearReplyTos();
 		}
 
@@ -3350,7 +3362,7 @@ class EventbookingHelper
 			for ($i = 0, $n = count($emails); $i < $n; $i++)
 			{
 				$email = $emails[$i];
-				$mailer->ClearAllRecipients();
+				$mailer->clearAllRecipients();
 				if ($email)
 				{
 					$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
@@ -3359,7 +3371,7 @@ class EventbookingHelper
 
 			if (!empty($eventCreator->email) && !$eventCreator->authorise('core.admin') && !in_array($eventCreator->email, $emails))
 			{
-				$mailer->ClearAllRecipients();
+				$mailer->clearAllRecipients();
 				$mailer->sendMail($fromEmail, $fromName, $eventCreator->email, $subject, $body, 1);
 			}
 		}
@@ -3584,7 +3596,7 @@ class EventbookingHelper
 		for ($i = 0, $n = count($emails); $i < $n; $i++)
 		{
 			$email = $emails[$i];
-			$mailer->ClearAllRecipients();
+			$mailer->clearAllRecipients();
 			$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
 		}
 	}
@@ -3839,15 +3851,20 @@ class EventbookingHelper
 	 * Get title of the given payment method
 	 *
 	 * @param string $methodName
+	 *
+	 * @return string
 	 */
 	public static function getPaymentMethodTitle($methodName)
 	{
 		static $titles;
 		if (!isset($titles[$methodName]))
 		{
-			$db  = JFactory::getDbo();
-			$sql = 'SELECT title FROM #__eb_payment_plugins WHERE name="' . $methodName . '"';
-			$db->setQuery($sql);
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('title')
+				->from('#__eb_payment_plugins')
+				->where('name = ' . $db->quote($methodName));
+			$db->setQuery($query);
 			$methodTitle = $db->loadResult();
 			if ($methodTitle)
 			{
@@ -3873,75 +3890,6 @@ class EventbookingHelper
 			' <a href="http://joomdonation.com" target="_blank"><strong>Ossolution Team</strong></a></div>';
 	}
 
-	/**
-	 * Get version number of GD version installed
-	 * Enter description here ...
-	 *
-	 * @param unknown_type $user_ver
-	 */
-	public static function getGDVersion($user_ver = 0)
-	{
-		if (!extension_loaded('gd'))
-		{
-			return 0;
-		}
-
-		static $gd_ver = 0;
-
-		// just accept the specified setting if it's 1.
-		if ($user_ver == 1)
-		{
-			$gd_ver = 1;
-
-			return 1;
-		}
-
-		// use static variable if function was cancelled previously.
-		if ($user_ver != 2 && $gd_ver > 0)
-		{
-			return $gd_ver;
-		}
-
-		// use the gd_info() function if posible.
-		if (function_exists('gd_info'))
-		{
-			$ver_info = gd_info();
-			$match    = null;
-			preg_match('/\d/', $ver_info['GD Version'], $match);
-			$gd_ver = $match[0];
-
-			return $match[0];
-		}
-
-		// if phpinfo() is disabled use a specified / fail-safe choice...
-		if (preg_match('/phpinfo/', ini_get('disable_functions')))
-		{
-			if ($user_ver == 2)
-			{
-				$gd_ver = 2;
-
-				return 2;
-			}
-			else
-			{
-				$gd_ver = 1;
-
-				return 1;
-			}
-		}
-		// ...otherwise use phpinfo().
-		ob_start();
-		phpinfo(8);
-		$info = ob_get_contents();
-		ob_end_clean();
-		$info  = stristr($info, 'gd version');
-		$match = null;
-		preg_match('/\d/', $info, $match);
-		$gd_ver = $match[0];
-
-		return $match[0];
-	}
-	
 	/**
 	 * Check if the given message entered via HTML editor has actual data
 	 *
@@ -4547,32 +4495,51 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Check to see whether the users can cancel registration
+	 * Check to see whether the user can cancel registration for the given event
 	 *
-	 * @param int $eventId
+	 * @param $eventId
+	 *
+	 * @return bool|int
 	 */
 	public static function canCancelRegistration($eventId)
 	{
 		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
 		$user   = JFactory::getUser();
 		$userId = $user->get('id');
 		$email  = $user->get('email');
+
 		if (!$userId)
+		{
 			return false;
-		$sql = 'SELECT id FROM #__eb_registrants WHERE event_id=' . $eventId . ' AND (user_id=' . $userId . ' OR email="' . $email .
-			'") AND (published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))';
-		$db->setQuery($sql);
+		}
+
+		$query->select('id')
+			->from('#__eb_registrants')
+			->where('event_id = ' . $eventId)
+			->where('(user_id = ' . $userId . ' OR email = ' . $db->quote($email) . ')')
+			->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
+
+		$db->setQuery($query);
 		$registrantId = $db->loadResult();
 		if (!$registrantId)
+		{
 			return false;
+		}
 
-		$sql = 'SELECT COUNT(*) FROM #__eb_events WHERE id=' . $eventId .
-			' AND enable_cancel_registration = 1 AND (DATEDIFF(cancel_before_date, NOW()) >=0) ';
-		$db->setQuery($sql);
+		$query->clear();
+		$query->select('COUNT(*)')
+			->from('#__eb_events')
+			->where('id = ' . $eventId)
+			->where('enable_cancel_registration = 1')
+			->where('DATEDIFF(cancel_before_date, NOW()) >= 0');
+		$db->setQuery($query);
 		$total = $db->loadResult();
 
 		if (!$total)
+		{
 			return false;
+		}
 
 		return $registrantId;
 	}
@@ -4673,10 +4640,13 @@ class EventbookingHelper
 		require_once JPATH_ROOT . '/components/com_users/models/registration.php';
 		$model = new UsersModelRegistration();
 		$ret   = $model->register($data);
+
 		$db    = JFactory::getDbo();
-		//Need to get the user ID based on username
-		$sql = 'SELECT id FROM #__users WHERE username=' . $db->quote($data['username']);
-		$db->setQuery($sql);
+		$query = $db->getQuery(true);
+		$query->select('id')
+			->from('#__users')
+			->where('username = ' . $db->quote($data['username']));
+		$db->setQuery($query);
 
 		return (int) $db->loadResult();
 	}
