@@ -1710,100 +1710,108 @@ class EventbookingHelper
 	 */
 	public static function getFormFields($eventId = 0, $registrationType = 0, $activeLanguage = null)
 	{
-		$user        = JFactory::getUser();
-		$db          = JFactory::getDbo();
-		$query       = $db->getQuery(true);
-		$config      = EventbookingHelper::getConfig();
-		$fieldSuffix = EventbookingHelper::getFieldSuffix($activeLanguage);
-		$query->select('*')
-			->from('#__eb_fields')
-			->where('published=1')
-			->where(' `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
+		static $cache;
 
-		if ($fieldSuffix)
+		$cacheKey = md5(serialize(func_get_args()));
+		if (empty($cache[$cacheKey]))
 		{
-			EventbookingHelperDatabase::getMultilingualFields($query, array('title', 'description', 'values', 'default_values', 'depend_on_options'), $fieldSuffix);
-		}
+			$user        = JFactory::getUser();
+			$db          = JFactory::getDbo();
+			$query       = $db->getQuery(true);
+			$config      = EventbookingHelper::getConfig();
+			$fieldSuffix = EventbookingHelper::getFieldSuffix($activeLanguage);
+			$query->select('*')
+				->from('#__eb_fields')
+				->where('published=1')
+				->where(' `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
 
-		switch ($registrationType)
-		{
-			case 0:
-				$query->where('display_in IN (0, 1, 3, 5)');
-				break;
-			case 1:
-				$query->where('display_in IN (0, 2, 3)');
-				break;
-			case 2:
-				$query->where('display_in IN (0, 4, 5)');
-				break;
-		}
-
-		$subQuery = $db->getQuery(true);
-		if ($registrationType == 4)
-		{
-			$cart  = new EventbookingHelperCart();
-			$items = $cart->getItems();
-			if ($config->custom_field_by_category)
+			if ($fieldSuffix)
 			{
-				if (!count($items))
+				EventbookingHelperDatabase::getMultilingualFields($query, array('title', 'description', 'values', 'default_values', 'depend_on_options'), $fieldSuffix);
+			}
+
+			switch ($registrationType)
+			{
+				case 0:
+					$query->where('display_in IN (0, 1, 3, 5)');
+					break;
+				case 1:
+					$query->where('display_in IN (0, 2, 3)');
+					break;
+				case 2:
+					$query->where('display_in IN (0, 4, 5)');
+					break;
+			}
+
+			$subQuery = $db->getQuery(true);
+			if ($registrationType == 4)
+			{
+				$cart  = new EventbookingHelperCart();
+				$items = $cart->getItems();
+				if ($config->custom_field_by_category)
 				{
-					//In this case, we have ID of registration record, so, get list of events from that registration
-					$subQuery->select('event_id')
-						->from('#__eb_registrants')
-						->where('id = '. $eventId);
+					if (!count($items))
+					{
+						//In this case, we have ID of registration record, so, get list of events from that registration
+						$subQuery->select('event_id')
+							->from('#__eb_registrants')
+							->where('id = ' . $eventId);
+						$db->setQuery($subQuery);
+						$cartEventId = (int) $db->loadResult();
+						$subQuery->clear();
+					}
+					else
+					{
+						$cartEventId = (int) $items[0];
+					}
+
+					$subQuery->select('category_id')
+						->from('#__eb_event_categories')
+						->where('event_id = ' . $cartEventId)
+						->where('main_category = 1');
 					$db->setQuery($subQuery);
-					$cartEventId = (int) $db->loadResult();
-					$subQuery->clear();
+					$categoryId = (int) $db->loadResult();
+					$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 				}
 				else
 				{
-					$cartEventId = (int) $items[0];
+					if (!count($items))
+					{
+						//In this case, we have ID of registration record, so, get list of events from that registration
+						$subQuery->select('event_id')
+							->from('#__eb_registrants')
+							->where('id = ' . $eventId);
+						$db->setQuery($subQuery);
+						$items = $db->loadColumn();
+					}
+					$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id IN (' . implode(',', $items) . ')))');
 				}
-
-				$subQuery->select('category_id')
-					->from('#__eb_event_categories')
-					->where('event_id = '. $cartEventId)
-					->where('main_category = 1');
-				$db->setQuery($subQuery);
-				$categoryId = (int) $db->loadResult();
-				$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 			}
 			else
 			{
-				if (!count($items))
+				if ($config->custom_field_by_category)
 				{
-					//In this case, we have ID of registration record, so, get list of events from that registration
-					$subQuery->select('event_id')
-						->from('#__eb_registrants')
-						->where('id = '. $eventId);
+					//Get main category of the event
+					$subQuery->select('category_id')
+						->from('#__eb_event_categories')
+						->where('event_id = ' . $eventId)
+						->where('main_category = 1');
 					$db->setQuery($subQuery);
-					$items = $db->loadColumn();
+					$categoryId = (int) $db->loadResult();
+					$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 				}
-				$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id IN (' . implode(',', $items) . ')))');
+				else
+				{
+					$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . '))');
+				}
 			}
-		}
-		else
-		{
-			if ($config->custom_field_by_category)
-			{
-				//Get main category of the event
-				$subQuery->select('category_id')
-					->from('#__eb_event_categories')
-					->where('event_id = '. $eventId)
-					->where('main_category = 1');
-				$db->setQuery($subQuery);
-				$categoryId = (int) $db->loadResult();
-				$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
-			}
-			else
-			{
-				$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . '))');
-			}
-		}
-		$query->order('ordering');
-		$db->setQuery($query);
+			$query->order('ordering');
+			$db->setQuery($query);
 
-		return $db->loadObjectList();
+			$cache[$cacheKey] = $db->loadObjectList();
+		}
+
+		return $cache[$cacheKey];
 	}
 
 	/**
