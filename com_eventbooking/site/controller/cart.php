@@ -19,7 +19,7 @@ class EventbookingControllerCart extends EventbookingController
 	 */
 	public function add_cart()
 	{
-		$data  = $this->input->getData();
+		$data = $this->input->getData();
 		if (is_numeric($data['id']))
 		{
 			// Check if this is event is password protected
@@ -117,54 +117,42 @@ class EventbookingControllerCart extends EventbookingController
 	 */
 	public function process_checkout()
 	{
-		$emailValid   = true;
-		$captchaValid = true;
+		$errors = array();
+
+		if (!$this->validateCaptcha())
+		{
+			$errors[] = JText::_('EB_INVALID_CAPTCHA_ENTERED');
+		}
 
 		// Check email
 		$result = $this->validateRegistrantEmail(0, $this->input->get('email', '', 'none'));
 
 		if (!$result['success'])
 		{
-			$emailValid = false;
-		}
-		else
-		{
-			$config = EventbookingHelper::getConfig();
-			$user   = JFactory::getUser();
-			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
-			{
-				$captchaPlugin = $this->app->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-				if (!$captchaPlugin)
-				{
-					// Hardcode to recaptcha, reduce support request
-					$captchaPlugin = 'recaptcha';
-				}
-				$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
-				if ($plugin)
-				{
-					$captchaValid = JCaptcha::getInstance($captchaPlugin)->checkAnswer($this->input->post->get('recaptcha_response_field', '', 'string'));
-				}
-			}
+			$result[] = $result['message'];
 		}
 
-		if (!$emailValid || !$captchaValid)
+		$data = $this->input->post->getData();
+
+		if ($formErrors = $this->validateFormData($data))
+		{
+			$errors = array_merge($errors, $formErrors);
+		}
+
+		if (count($errors))
 		{
 			// Enqueue the error message
-			if (!$emailValid)
+			foreach ($errors as $error)
 			{
-				$this->app->enqueueMessage($result['message'], 'warning');
+				$this->app->enqueueMessage($error, 'error');
 			}
-			else
-			{
-				$this->app->enqueueMessage(JText::_('EB_INVALID_CAPTCHA_ENTERED'), 'warning');
-			}
+
 			$this->input->set('captcha_invalid', 1);
 			$this->input->set('view', 'register');
 			$this->input->set('layout', 'cart');
 			$this->display();
 
 			return;
-
 		}
 
 		$cart  = new EventbookingHelperCart();
@@ -174,7 +162,6 @@ class EventbookingControllerCart extends EventbookingController
 			$this->app->redirect('index.php', JText::_('Sorry, your session was expired. Please try again!'));
 		}
 
-		$data   = $this->input->post->getData();
 		$model  = $this->getModel('cart');
 		$return = $model->processCheckout($data);
 
@@ -215,6 +202,30 @@ class EventbookingControllerCart extends EventbookingController
 
 
 	/**
+	 * Validate form data, make sure the required fields are entered
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	private function validateFormData($data)
+	{
+		$errors = array();
+
+		$rowFields = EventbookingHelper::getFormFields(0, 4);
+
+		foreach ($rowFields as $rowField)
+		{
+			if ($rowField->fieldtype == 'File' && !$rowField->depend_on_field_id && empty($data[$rowField->name]))
+			{
+				$errors[] = JText::sprintf('EB_FORM_FIELD_IS_REQURED', $rowField->title);
+			}
+		}
+
+		return $errors;
+	}
+
+	/**
 	 * Validate to see whether this email can be used to register for this event or not
 	 *
 	 * @param $eventId
@@ -222,7 +233,7 @@ class EventbookingControllerCart extends EventbookingController
 	 *
 	 * @return array
 	 */
-	protected function validateRegistrantEmail($eventId, $email)
+	private function validateRegistrantEmail($eventId, $email)
 	{
 		$user   = JFactory::getUser();
 		$db     = JFactory::getDbo();
@@ -269,6 +280,36 @@ class EventbookingControllerCart extends EventbookingController
 	}
 
 	/**
+	 * Validate captcha on registration form
+	 *
+	 * @return bool|mixed
+	 */
+	private function validateCaptcha()
+	{
+		$result = true;
+
+		$user   = JFactory::getUser();
+		$config = EventbookingHelper::getConfig();
+
+		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
+		{
+			$captchaPlugin = $this->app->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+			if (!$captchaPlugin)
+			{
+				// Hardcode to recaptcha, reduce support request
+				$captchaPlugin = 'recaptcha';
+			}
+			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+			if ($plugin)
+			{
+				$result = JCaptcha::getInstance($captchaPlugin)->checkAnswer($this->input->post->get('recaptcha_response_field', '', 'string'));
+			}
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Refresh content of cart module so that data will be keep synchronized
 	 */
 	private function reloadCartModule()
@@ -294,6 +335,6 @@ class EventbookingControllerCart extends EventbookingController
 				})
 			})
 		</script>
-	<?php
+		<?php
 	}
 }
