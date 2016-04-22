@@ -120,7 +120,7 @@ class EventbookingHelperDatabase
 	{
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('id, parent, parent AS parent_id, name, name AS title')
+		$query->select('id, parent AS parent_id, name AS title')
 			->from('#__eb_categories')
 			->where('published=1')
 			->order($order);
