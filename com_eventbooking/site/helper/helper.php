@@ -2277,39 +2277,44 @@ class EventbookingHelper
 			$query->clear();
 			$query->select('SUM(total_amount)')
 				->from('#__eb_registrants')
-				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+				->where("(id = $row->id OR cart_id = $row->id)");
 			$db->setQuery($query);
 			$totalAmount = $db->loadResult();
 
+			$query->clear();
 			$query->select('SUM(tax_amount)')
 				->from('#__eb_registrants')
-				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+				->where("(id = $row->id OR cart_id = $row->id)");
 			$db->setQuery($query);
 			$taxAmount = $db->loadResult();
 
+			$query->clear();
 			$query->select('SUM(discount_amount)')
 				->from('#__eb_registrants')
-				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+				->where("(id = $row->id OR cart_id = $row->id)");
 			$db->setQuery($query);
 			$discountAmount = $db->loadResult();
 
+			$query->clear();
 			$query->select('SUM(late_fee)')
 				->from('#__eb_registrants')
-				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+				->where("(id = $row->id OR cart_id = $row->id)");
 			$db->setQuery($query);
 			$lateFee = $db->loadResult();
 
+			$query->clear();
 			$query->select('SUM(payment_processing_fee)')
 				->from('#__eb_registrants')
-				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+				->where("(id = $row->id OR cart_id = $row->id)");
 			$db->setQuery($query);
 			$paymentProcessingFee = $db->loadResult();
 
 			$amount = $totalAmount + $paymentProcessingFee - $discountAmount + $taxAmount + $lateFee;
 
+			$query->clear();
 			$query->select('SUM(deposit_amount)')
 				->from('#__eb_registrants')
-				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+				->where("(id = $row->id OR cart_id = $row->id)");
 			$db->setQuery($query);
 			$depositAmount = $db->loadResult();
 
