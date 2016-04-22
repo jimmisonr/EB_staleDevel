@@ -13,7 +13,7 @@ defined('_JEXEC') or die;
 class EventbookingHelperCart
 {
 
-	function EventbookingHelperCart()
+	public function __construct()
 	{
 		$session = JFactory::getSession();
 		$cart    = $session->get('eb_cart');
@@ -29,7 +29,7 @@ class EventbookingHelperCart
 	 *
 	 * @param int $id
 	 */
-	function add($id)
+	public function add($id)
 	{
 		$config     = EventbookingHelper::getConfig();
 		$session    = JFactory::getSession();
@@ -66,11 +66,11 @@ class EventbookingHelperCart
 	}
 
 	/**
-	 * Add serveral events into shopping cart
+	 * Add several events into shopping cart
 	 *
 	 * @param array $cid
 	 */
-	function addEvents($cid)
+	public function addEvents($cid)
 	{
 		$config     = EventbookingHelper::getConfig();
 		$session    = JFactory::getSession();
@@ -117,7 +117,7 @@ class EventbookingHelperCart
 	 *
 	 * @param int $id
 	 */
-	function remove($id)
+	public function remove($id)
 	{
 		$session       = JFactory::getSession();
 		$cart          = $session->get('eb_cart');
@@ -142,7 +142,7 @@ class EventbookingHelperCart
 	 * Reset the cart
 	 *
 	 */
-	function reset()
+	public function reset()
 	{
 		$session = JFactory::getSession();
 		$cart    = array('items' => array(), 'quantities' => array());
@@ -153,7 +153,7 @@ class EventbookingHelperCart
 	 * Get all items from cart
 	 * @return array
 	 */
-	function getItems()
+	public function getItems()
 	{
 		$session = JFactory::getSession();
 		$cart    = $session->get('eb_cart');
@@ -171,7 +171,7 @@ class EventbookingHelperCart
 	 * Get quantities
 	 * @return array
 	 */
-	function getQuantities()
+	public function getQuantities()
 	{
 		$session = JFactory::getSession();
 		$cart    = $session->get('eb_cart');
@@ -186,11 +186,11 @@ class EventbookingHelperCart
 	}
 
 	/**
-	 * Get item couns
+	 * Get item count
 	 *
 	 * @return int
 	 */
-	function getCount()
+	public function getCount()
 	{
 		$session = JFactory::getSession();
 		$cart    = $session->get('eb_cart');
@@ -209,8 +209,10 @@ class EventbookingHelperCart
 	 *
 	 * @param array $eventIds
 	 * @param array $quantities
+	 *
+	 * @return bool
 	 */
-	function updateCart($eventIds, $quantities)
+	public function updateCart($eventIds, $quantities)
 	{
 		$session       = JFactory::getSession();
 		$newItems      = array();
@@ -231,9 +233,10 @@ class EventbookingHelperCart
 
 	/**
 	 * Calculate total price of the registration
-	 * @return decimal
+	 *
+	 * @return float
 	 */
-	function calculateTotal()
+	public function calculateTotal()
 	{
 		$items      = $this->getItems();
 		$quantities = $this->getQuantities();
@@ -248,9 +251,10 @@ class EventbookingHelperCart
 
 	/**
 	 * Get list of events in the cart
+	 *
 	 * return array
 	 */
-	function getEvents()
+	public function getEvents()
 	{
 		$db   = JFactory::getDbo();
 		$items       = $this->getItems();
@@ -327,9 +331,8 @@ class EventbookingHelperCart
 	 * @return float
 	 *
 	 */
-	function calculateTotalDiscount()
+	public function calculateTotalDiscount()
 	{
-		$config        = EventbookingHelper::getConfig();
 		$user          = JFactory::getUser();
 		$db            = JFactory::getDbo();
 		$nullDate      = $db->getNullDate();
@@ -401,5 +404,3 @@ class EventbookingHelperCart
 		return $totalDiscount;
 	}
 }
-
-?>
