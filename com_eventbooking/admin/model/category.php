@@ -55,4 +55,14 @@ class EventbookingModelCategory extends RADModelAdmin
 	{
 		return array('`parent` = ' . (int) $row->parent);
 	}
+
+	/**
+	 * Initialize data for new category
+	 */
+	public function initData()
+	{
+		parent::initData();
+
+		$this->data->show_on_submit_event_form = 1;
+	}
 }
