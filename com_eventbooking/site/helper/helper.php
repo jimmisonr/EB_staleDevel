@@ -653,7 +653,7 @@ class EventbookingHelper
 		{
 			$query->select('event_id')
 				->from('#__eb_registrants')
-				->where("(id = $row->id OR card_id = $row->id)")
+				->where("(id = $row->id OR cart_id = $row->id)")
 				->order('id');
 			$db->setQuery($query);
 			$eventIds = $db->loadColumn();
