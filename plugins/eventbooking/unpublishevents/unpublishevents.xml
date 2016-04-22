@@ -7,7 +7,7 @@
     <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
     <authorEmail>contact@joomdonation.com</authorEmail>
     <authorUrl>www.joomdonation.com</authorUrl>
-    <version>2.4.2</version>  
+    <version>2.4.3</version>  
     <description>This plugin is used to unpublish an event when it is full</description>
     <files>
         <filename plugin="unpublishevents">unpublishevents.php</filename>
