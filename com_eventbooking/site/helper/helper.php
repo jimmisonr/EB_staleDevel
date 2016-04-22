@@ -2032,7 +2032,7 @@ class EventbookingHelper
 			->where('a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
 		if ($app->isSite() && $app->getLanguageFilter())
 		{
-			$query->where('a.language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')');
+			$query->where('a.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
 		}
 		$query->order('a.access');
 		$db->setQuery($query);
@@ -2051,33 +2051,6 @@ class EventbookingHelper
 		}
 
 		return $itemId;
-	}
-
-	/**
-	 *
-	 * @param JUser    $user the current logged in user
-	 * @param Stdclass $config
-	 *
-	 * @return boolean
-	 */
-	public static function memberGetDiscount($user, $config)
-	{
-		if (isset($config->member_discount_groups) && $config->member_discount_groups)
-		{
-			$userGroups = $user->getAuthorisedGroups();
-			if (count(array_intersect(explode(',', $config->member_discount_groups), $userGroups)))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			return true;
-		}
 	}
 
 	/**
@@ -2134,9 +2107,8 @@ class EventbookingHelper
 	/**
 	 * Format the currency according to the settings in Configuration
 	 *
-	 * @param      $amount         the input amount
-	 * @param      $config         the config object
-	 * @param null $currencySymbol the currency symbol. If null, the one in configuration will be used
+	 * @param  float     $amount the input amount
+	 * @param  RADConfig $config the config object
 	 *
 	 * @return string   the formatted string
 	 */
@@ -2152,9 +2124,9 @@ class EventbookingHelper
 	/**
 	 * Format the currency according to the settings in Configuration
 	 *
-	 * @param      $amount         the input amount
-	 * @param      $config         the config object
-	 * @param null $currencySymbol the currency symbol. If null, the one in configuration will be used
+	 * @param  float     $amount         the input amount
+	 * @param  RADConfig $config         the config object
+	 * @param  string    $currencySymbol the currency symbol. If null, the one in configuration will be used
 	 *
 	 * @return string   the formatted string
 	 */
@@ -2180,17 +2152,23 @@ class EventbookingHelper
 			$lang = JFactory::getLanguage();
 			$tag  = $lang->getTag();
 			if (!$tag)
+			{
 				$tag = 'en-GB';
+			}
 			$lang->load('com_eventbooking', JPATH_ROOT, $tag);
 			$loaded = true;
 		}
 	}
 
 	/**
-	 * Get email content, used for [REGISTRATION_DETAIL] tag
+	 * Get group member detail, using for [MEMBER_DETAIL] tag in the email message
 	 *
-	 * @param object $config
-	 * @param object $row
+	 * @param      $config
+	 * @param      $rowMember
+	 * @param      $rowEvent
+	 * @param      $rowLocation
+	 * @param bool $loadCss
+	 * @param      $memberForm
 	 *
 	 * @return string
 	 */
@@ -2228,8 +2206,10 @@ class EventbookingHelper
 	public static function getEmailContent($config, $row, $loadCss = true, $form = null, $toAdmin = false)
 	{
 		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
 		$data   = array();
-		$Itemid = JRequest::getInt('Itemid', 0);
+		$Itemid = JFactory::getApplication()->input->getInt('Itemid', 0);
+
 		if ($config->multiple_booking)
 		{
 			if ($loadCss)
@@ -2277,35 +2257,54 @@ class EventbookingHelper
 			$data['row']    = $row;
 			$data['config'] = $config;
 			$data['Itemid'] = $Itemid;
-			$sql            = 'SELECT a.*, b.event_date, b.event_end_date, b.title' . $fieldSuffix . ' AS title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id=b.id WHERE a.id=' .
-				$row->id . ' OR a.cart_id=' . $row->id;
-			$db->setQuery($sql);
+
+			$query->select('a.*, b.event_date, b.event_end_date')
+				->select('b.title' . $fieldSuffix . ' AS title')
+				->from('#__eb_registrants AS a')
+				->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+			$db->setQuery($query);
 			$rows = $db->loadObjectList();
-			$sql  = 'SELECT SUM(total_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
+
+			$query->clear();
+			$query->select('SUM(total_amount)')
+				->from('#__eb_registrants')
+				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+			$db->setQuery($query);
 			$totalAmount = $db->loadResult();
 
-			$sql = 'SELECT SUM(tax_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
+			$query->select('SUM(tax_amount)')
+				->from('#__eb_registrants')
+				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+			$db->setQuery($query);
 			$taxAmount = $db->loadResult();
 
-			$sql = 'SELECT SUM(discount_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
+			$query->select('SUM(discount_amount)')
+				->from('#__eb_registrants')
+				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+			$db->setQuery($query);
 			$discountAmount = $db->loadResult();
 
-			$sql = 'SELECT SUM(late_fee) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
+			$query->select('SUM(late_fee)')
+				->from('#__eb_registrants')
+				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+			$db->setQuery($query);
 			$lateFee = $db->loadResult();
 
-			$sql = 'SELECT SUM(payment_processing_fee) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
+			$query->select('SUM(payment_processing_fee)')
+				->from('#__eb_registrants')
+				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+			$db->setQuery($query);
 			$paymentProcessingFee = $db->loadResult();
 
 			$amount = $totalAmount + $paymentProcessingFee - $discountAmount + $taxAmount + $lateFee;
 
-			$sql = 'SELECT SUM(deposit_amount) FROM #__eb_registrants WHERE id=' . $row->id . ' OR cart_id=' . $row->id;
-			$db->setQuery($sql);
+			$query->select('SUM(deposit_amount)')
+				->from('#__eb_registrants')
+				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+			$db->setQuery($query);
 			$depositAmount = $db->loadResult();
+
 			//Added support for custom field feature
 			$data['discountAmount']       = $discountAmount;
 			$data['lateFee']              = $lateFee;
@@ -2319,7 +2318,6 @@ class EventbookingHelper
 		}
 		else
 		{
-			$query = $db->getQuery(true);
 			$query->select('*, title' . $fieldSuffix . ' AS title')
 				->from('#__eb_events')
 				->where('id=' . $row->event_id);
