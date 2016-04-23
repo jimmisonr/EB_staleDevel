@@ -106,7 +106,7 @@ class EventbookingHelper
 			return false;
 		}
 
-		if ($row->amount > 0 || $row->total_amount > 0)
+		if ($row->amount > 0)
 		{
 			return true;
 		}
@@ -117,7 +117,7 @@ class EventbookingHelper
 		{
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
-			$query->select('SUM(total_amount)')
+			$query->select('SUM(amount)')
 				->from('#__eb_registrants')
 				->where('id=' . $row->id . ' OR cart_id=' . $row->id);
 			$db->setQuery($query);
