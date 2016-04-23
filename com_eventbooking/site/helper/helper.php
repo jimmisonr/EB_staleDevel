@@ -766,38 +766,30 @@ class EventbookingHelper
 		if ($config->multiple_booking)
 		{
 			//Amount calculation
-			$query->clear();
-			$query->select('SUM(total_amount)')
+			$query->clear()
+				->select('SUM(total_amount)')
 				->from('#__eb_registrants')
 				->where("(id = $row->id OR cart_id = $row->id)");
 			$db->setQuery($query);
 			$totalAmount = $db->loadResult();
 
-			$query->clear();
-			$query->select('SUM(tax_amount)')
-				->from('#__eb_registrants')
-				->where("(id = $row->id OR cart_id = $row->id)");
+			$query->clear('select')
+				->select('SUM(tax_amount)');
 			$db->setQuery($query);
 			$taxAmount = $db->loadResult();
 
-			$query->clear();
-			$query->select('SUM(payment_processing_fee)')
-				->from('#__eb_registrants')
-				->where("(id = $row->id OR cart_id = $row->id)");
+			$query->clear('select')
+				->select('SUM(payment_processing_fee)');
 			$db->setQuery($query);
 			$paymentProcessingFee = $db->loadResult();
 
-			$query->clear();
-			$query->select('SUM(discount_amount)')
-				->from('#__eb_registrants')
-				->where("(id = $row->id OR cart_id = $row->id)");
+			$query->clear('select')
+				->select('SUM(discount_amount)');
 			$db->setQuery($query);
 			$discountAmount = $db->loadResult();
 
-			$query->clear();
-			$query->select('SUM(late_fee)')
-				->from('#__eb_registrants')
-				->where("(id = $row->id OR cart_id = $row->id)");
+			$query->clear('select')
+				->select('SUM(late_fee)');
 			$db->setQuery($query);
 			$lateFee = $db->loadResult();
 
@@ -2274,47 +2266,37 @@ class EventbookingHelper
 			$db->setQuery($query);
 			$rows = $db->loadObjectList();
 
-			$query->clear();
-			$query->select('SUM(total_amount)')
+			$query->clear()
+				->select('SUM(total_amount)')
 				->from('#__eb_registrants')
 				->where("(id = $row->id OR cart_id = $row->id)");
 			$db->setQuery($query);
 			$totalAmount = $db->loadResult();
 
-			$query->clear();
-			$query->select('SUM(tax_amount)')
-				->from('#__eb_registrants')
-				->where("(id = $row->id OR cart_id = $row->id)");
+			$query->clear('select')
+				->select('SUM(tax_amount)');
 			$db->setQuery($query);
 			$taxAmount = $db->loadResult();
 
-			$query->clear();
-			$query->select('SUM(discount_amount)')
-				->from('#__eb_registrants')
-				->where("(id = $row->id OR cart_id = $row->id)");
+			$query->clear('select')
+				->select('SUM(discount_amount)');
 			$db->setQuery($query);
 			$discountAmount = $db->loadResult();
 
-			$query->clear();
-			$query->select('SUM(late_fee)')
-				->from('#__eb_registrants')
-				->where("(id = $row->id OR cart_id = $row->id)");
+			$query->clear('select')
+				->select('SUM(late_fee)');
 			$db->setQuery($query);
 			$lateFee = $db->loadResult();
 
-			$query->clear();
-			$query->select('SUM(payment_processing_fee)')
-				->from('#__eb_registrants')
-				->where("(id = $row->id OR cart_id = $row->id)");
+			$query->clear('select')
+				->select('SUM(payment_processing_fee)');
 			$db->setQuery($query);
 			$paymentProcessingFee = $db->loadResult();
 
 			$amount = $totalAmount + $paymentProcessingFee - $discountAmount + $taxAmount + $lateFee;
 
-			$query->clear();
-			$query->select('SUM(deposit_amount)')
-				->from('#__eb_registrants')
-				->where("(id = $row->id OR cart_id = $row->id)");
+			$query->clear('select')
+				->select('SUM(deposit_amount)');
 			$db->setQuery($query);
 			$depositAmount = $db->loadResult();
 
