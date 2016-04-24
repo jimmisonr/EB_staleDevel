@@ -2355,7 +2355,7 @@ class EventbookingHelper
 			}
 		}
 
-		$text = EventbookingHelperHtml::loadCommonLayout('com_eventbooking/emailtemplates/' . $layout, $data);
+		$text = EventbookingHelperHtml::loadCommonLayout('com_eventbooking/emailtemplates/tmpl/' . $layout, $data);
 		if ($loadCss)
 		{
 			$text .= "
@@ -4135,7 +4135,7 @@ class EventbookingHelper
 			$total                              = $replaces['amt_amount'];
 			$paymentProcessingFee               = $replaces['amt_payment_processing_fee'];
 			$replaces['EVENTS_LIST'] = EventbookingHelperHtml::loadCommonLayout(
-				'emailtemplates/invoice_items.php',
+				'emailtemplates/tmpl/invoice_items.php',
 				array(
 					'rowEvents'      => $rowEvents,
 					'subTotal'       => $subTotal,
