@@ -41,8 +41,7 @@
     <folder>model</folder>		    
     <folder>view</folder>	
     <folder>helper</folder>
-    <folder>payments</folder>     
-    <folder>emailtemplates</folder>
+    <folder>payments</folder>         
     <folder>tcpdf</folder>    
   </files>
   <administration>
