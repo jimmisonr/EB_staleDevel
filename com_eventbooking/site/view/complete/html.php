@@ -142,6 +142,10 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		$this->registrationCode = $registrationCode;
 		$this->tmpl             = $this->input->getString('tmpl');
 		$this->conversionTrackingCode = $config->conversion_tracking_code;
+		
+		// Reset cart
+		$cart = new EventbookingHelperCart();
+		$cart->reset();
 
 		parent::display();
 	}
