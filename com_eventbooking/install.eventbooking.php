@@ -71,6 +71,11 @@ class com_eventbookingInstallerScript
 		{
 			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/view/common');
 		}
+		
+		if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/emailtemplates'))
+		{
+			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/emailtemplates');
+		}
 	}
 
 	/**

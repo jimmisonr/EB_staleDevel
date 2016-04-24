@@ -2181,8 +2181,8 @@ class EventbookingHelper
 		$data['rowLocation'] = $rowLocation;
 		$data['memberForm']  = $memberForm;
 
-		$text = EventbookingHelperHtml::loadCommonLayout(JPATH_ROOT . '/components/com_eventbooking/emailtemplates/email_group_member_detail.php',
-			$data);
+		$text = EventbookingHelperHtml::loadCommonLayout('emailtemplates/tmpl/email_group_member_detail.php', $data);
+		
 		if ($loadCss)
 		{
 			$text .= "
@@ -2355,7 +2355,7 @@ class EventbookingHelper
 			}
 		}
 
-		$text = EventbookingHelperHtml::loadCommonLayout(JPATH_ROOT . '/components/com_eventbooking/emailtemplates/' . $layout, $data);
+		$text = EventbookingHelperHtml::loadCommonLayout('com_eventbooking/emailtemplates/' . $layout, $data);
 		if ($loadCss)
 		{
 			$text .= "
@@ -4134,8 +4134,8 @@ class EventbookingHelper
 			$discountAmount                     = $replaces['amt_discount_amount'];
 			$total                              = $replaces['amt_amount'];
 			$paymentProcessingFee               = $replaces['amt_payment_processing_fee'];
-			$replaces['EVENTS_LIST']            = EventbookingHelperHtml::loadCommonLayout(
-				JPATH_ROOT . '/components/com_eventbooking/emailtemplates/invoice_items.php',
+			$replaces['EVENTS_LIST'] = EventbookingHelperHtml::loadCommonLayout(
+				'emailtemplates/invoice_items.php',
 				array(
 					'rowEvents'      => $rowEvents,
 					'subTotal'       => $subTotal,
