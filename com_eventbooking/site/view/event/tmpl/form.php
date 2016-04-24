@@ -337,7 +337,7 @@ $format = 'Y-m-d' ;
 							<td>
 								<input type="radio" name="repeat_until" value="1"  <?php if ($this->item->recurring_occurrencies > 0 || $this->item->recurring_end_date == '') echo ' checked="checked" ' ; ?> /> <?php echo JText::_('EB_AFTER'); ?> <input type="text" name="recurring_occurrencies" size="5" class="inputbox" value="<?php echo $this->item->recurring_occurrencies ; ?>" /> <?php echo JText::_('EB_OCCURENCIES'); ?>
 								<br />
-								<input type="radio" name="repeat_until" value="2" <?php if ($this->item->recurring_end_date != '') echo ' checked="checked"' ; ?> /> <?php echo JText::_('EB_AFTER_DATE') ?> <?php echo JHtml::_('calendar', $this->item->recurring_end_date != '0000-00-00 00:00:00' ? JHtml::_('date', $this->item->recurring_end_date, '%Y-%m-%d', 0) : '', 'recurring_end_date', 'recurring_end_date'); ?>
+								<input type="radio" name="repeat_until" value="2" <?php if ($this->item->recurring_end_date != '') echo ' checked="checked"' ; ?> /> <?php echo JText::_('EB_AFTER_DATE') ?> <?php echo JHtml::_('calendar', $this->item->recurring_end_date != '0000-00-00 00:00:00' ? JHtml::_('date', $this->item->recurring_end_date, 'Y-m-d', null) : '', 'recurring_end_date', 'recurring_end_date'); ?>
 								<br />
 							</td>
 						</tr>

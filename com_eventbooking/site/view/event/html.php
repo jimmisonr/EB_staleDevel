@@ -218,7 +218,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 
 		// Categories dropdown
 		$query->clear();
-		$query->select("id, parent AS parent_id, name" . $fieldSuffix . " AS title")
+		$query->select("id, parent AS parent_id, show_on_submit_event_form, name" . $fieldSuffix . " AS title")
 			->from('#__eb_categories')
 			->where('published = 1')
 			->order('name' . $fieldSuffix);
@@ -377,7 +377,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$options                   = array();
 		$options[]                 = JHtml::_('select.option', 0, JText::_('EB_SELECT_ARTICLE'), 'id', 'title');
 		$options                   = array_merge($options, $rows);
-		$this->lists['article_id'] = JHtml::_('select.genericlist', $options, 'article_id', 'class="inputbox"', 'id', 'title', $item->article_id);
+		$lists['article_id'] = JHtml::_('select.genericlist', $options, 'article_id', 'class="inputbox"', 'id', 'title', $item->article_id);
 
 		//Custom field handles
 		if ($config->event_custom_field)
