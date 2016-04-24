@@ -10,7 +10,7 @@
 // no direct access
 defined('_JEXEC') or die;
 
-class EventbookingModelHistory extends RADModelList
+class EventbookingModelHistory extends EventbookingModelRegistrants
 {
 	/**
 	 * Instantiate the model.

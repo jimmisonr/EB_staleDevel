@@ -2355,7 +2355,7 @@ class EventbookingHelper
 			}
 		}
 
-		$text = EventbookingHelperHtml::loadCommonLayout('com_eventbooking/emailtemplates/tmpl/' . $layout, $data);
+		$text = EventbookingHelperHtml::loadCommonLayout('emailtemplates/tmpl/' . $layout, $data);
 		if ($loadCss)
 		{
 			$text .= "
