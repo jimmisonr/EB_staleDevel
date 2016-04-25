@@ -246,13 +246,8 @@ class EventbookingViewEventHtml extends RADViewHtml
 		{
 			if ($isAdmin || $listItem->show_on_submit_event_form)
 			{
-				$disabled = false;
+				$options[] = JHtml::_('select.option', $listItem->id, '&nbsp;&nbsp;&nbsp;' . $listItem->treename, 'value', 'text');
 			}
-			else
-			{
-				$disabled = true;
-			}
-			$options[] = JHtml::_('select.option', $listItem->id, '&nbsp;&nbsp;&nbsp;' . $listItem->treename, 'value', 'text', $disabled);
 		}
 
 		if ($item->id)
