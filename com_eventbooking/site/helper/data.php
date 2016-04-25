@@ -425,24 +425,13 @@ class EventbookingHelperData
 	{
 		if (count($rows))
 		{
-			if (preg_match('Opera(/| )([0-9].[0-9]{1,2})', $_SERVER['HTTP_USER_AGENT']))
-			{
-				$UserBrowser = "Opera";
-			}
-			elseif (preg_match('MSIE ([0-9].[0-9]{1,2})', $_SERVER['HTTP_USER_AGENT']))
-			{
-				$UserBrowser = "IE";
-			}
-			else
-			{
-				$UserBrowser = '';
-			}
-			$mime_type = ($UserBrowser == 'IE' || $UserBrowser == 'Opera') ? 'application/octetstream' : 'application/octet-stream';
+			$browser   = JFactory::getApplication()->client->browser;
+			$mime_type = ($browser == JApplicationWebClient::IE || $browser == JApplicationWebClient::OPERA) ? 'application/octetstream' : 'application/octet-stream';
 			$filename  = "registrants_list";
 			header('Content-Encoding: UTF-8');
 			header('Content-Type: ' . $mime_type . ' ;charset=UTF-8');
 			header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-			if ($UserBrowser == 'IE')
+			if ($browser == JApplicationWebClient::IE)
 			{
 				header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
 				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
@@ -458,7 +447,7 @@ class EventbookingHelperData
 			$delimiter = $config->csv_delimiter ? $config->csv_delimiter : ',';
 
 			$showGroup = false;
-			foreach($rows as $row)
+			foreach ($rows as $row)
 			{
 				if ($row->is_group_billing || $row->group_id > 0)
 				{
@@ -467,15 +456,15 @@ class EventbookingHelperData
 				}
 			}
 
-			$fields     = array();
-			$fields[]   = JText::_('EB_EVENT');
+			$fields   = array();
+			$fields[] = JText::_('EB_EVENT');
 			if ($config->show_event_date)
 			{
 				$fields[] = JText::_('EB_EVENT_DATE');
 			}
 			if ($showGroup)
 			{
-				$fields[]   = JText::_('EB_GROUP');
+				$fields[] = JText::_('EB_GROUP');
 			}
 			if (count($rowFields))
 			{
@@ -508,7 +497,7 @@ class EventbookingHelperData
 			{
 
 				$fields   = array();
-				$fields[] = $r->event_title;
+				$fields[] = $r->title;
 				if ($config->show_event_date)
 				{
 					$fields[] = JHtml::_('date', $r->event_date, $config->date_format, null);
@@ -573,7 +562,7 @@ class EventbookingHelperData
 
 				$fields[] = JHtml::_('date', $r->register_date, $config->date_format);
 				$fields[] = $r->transaction_id;
-				switch($r->published)
+				switch ($r->published)
 				{
 					case 0:
 						$fields[] = JText::_('EB_PENDING');
