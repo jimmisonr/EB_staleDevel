@@ -41,35 +41,40 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			$db->setQuery($query);
 			$event       = $db->loadObject();
 			$this->event = $event;
-		}
 
-		if ($item->id && $item->is_group_billing)
-		{
-			$rowFields = EventbookingHelper::getFormFields($item->event_id, 1, $item->language);
+			if ($item->is_group_billing)
+			{
+				$rowFields = EventbookingHelper::getFormFields($item->event_id, 1, $item->language);
+			}
+			else
+			{
+				$rowFields = EventbookingHelper::getFormFields($item->event_id, 0, $item->language);
+			}
+
+			$data = EventbookingHelper::getRegistrantData($item, $rowFields);
+
 			$query->clear();
 			$query->select('*')
-				->from('#__eb_registrants')
-				->where('group_id=' . $item->id)
-				->order('id');
-			$db->setQuery($query);
+					->from('#__eb_registrants')
+					->where('group_id=' . $item->id)
+					->order('id');
+			$db->setQuery($query, 0, $item->number_registrants);
 			$rowMembers = $db->loadObjectList();
+
+			$useDefault = false;
 		}
 		else
 		{
-			$rowFields  = EventbookingHelper::getFormFields($item->event_id, 0, $item->language);
+			$rowFields  = EventbookingHelper::getFormFields($item->event_id, 0);
+
+			$useDefault = true;
+			$data = array();
 			$rowMembers = array();
 		}
+
+
 		$form = new RADForm($rowFields);
-		if ($item->id)
-		{
-			$data = EventbookingHelper::getRegistrantData($item, $rowFields);
-			$form->bind($data, false);
-		}
-		else
-		{
-			$data = array();
-			$form->bind($data, true);
-		}
+		$form->bind($data, $useDefault);
 
 		$form->setEventId($item->event_id);
 
