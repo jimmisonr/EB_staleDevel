@@ -45,7 +45,7 @@ class RADFormFieldFile extends RADFormField
 			$html .= '<span class="eb-uploaded-file" id="uploaded-file-'.$this->name.'"></span>';
 		}
 
-		$html .= '<input type="hidden" name="' . $this->name . '"  value="" />';
+		$html .= '<input type="hidden" name="' . $this->name . '"  value="' . $this->value . '" />';
 
 		ob_start();
 		?>

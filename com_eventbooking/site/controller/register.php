@@ -413,7 +413,7 @@ class EventbookingControllerRegister extends EventbookingController
 
 		foreach ($rowFields as $rowField)
 		{
-			if ($rowField->fieldtype == 'File' && !$rowField->depend_on_field_id && empty($data[$rowField->name]))
+			if ($rowField->fieldtype == 'File' && $rowField->required && !$rowField->depend_on_field_id && empty($data[$rowField->name]))
 			{
 				$errors[] = JText::sprintf('EB_FORM_FIELD_IS_REQURED', $rowField->title);
 			}
