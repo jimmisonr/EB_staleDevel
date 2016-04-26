@@ -26,7 +26,7 @@ JToolBarHelper::title(JText::_('EB_DASHBOARD'), 'generic.png');
 					$this->quickiconButton('index.php?option=com_eventbooking&view=plugins', 'icon-48-eventbooking-payments.png', JText::_('EB_PAYMENT_PLUGINS'));					
 					$this->quickiconButton('index.php?option=com_eventbooking&view=language', 'icon-48-eventbooking-language.png', JText::_('EB_TRANSLATION'));
 					$this->quickiconButton('index.php?option=com_eventbooking&view=message', 'icon-48-mail.png', JText::_('EB_EMAIL_MESSAGES'));
-					$this->quickiconButton('index.php?option=com_eventbooking&task=csv_export', 'icon-48-eventbooking-export.png', JText::_('EB_EXPORT_REGISTRANTS'));					
+					$this->quickiconButton('index.php?option=com_eventbooking&task=registrant.export', 'icon-48-eventbooking-export.png', JText::_('EB_EXPORT_REGISTRANTS'));
 					$this->quickiconButton('index.php?option=com_eventbooking&view=massmail', 'icon-48-eventbooking-massmail.png', JText::_('EB_MASS_MAIL'));
                     $this->quickiconButton('index.php?option=com_eventbooking&view=countries', 'icon-48-countries.png', JText::_('EB_COUNTRIES'));
 					$this->quickiconButton('index.php?option=com_eventbooking&view=states', 'icon-48-states.png', JText::_('EB_STATES'));

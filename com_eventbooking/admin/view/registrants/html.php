@@ -86,6 +86,6 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 		$bar->appendButton('Custom', $dhtml, 'batch');
 
 		JToolbarHelper::custom('resend_email', 'envelope', 'envelope', 'Resend Email', true);
-		JToolbarHelper::custom('csv_export', 'download', 'download', 'Export Registration', false);
+		JToolbarHelper::custom('export', 'download', 'download', 'Export Registration', false);
 	}
 }
