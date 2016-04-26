@@ -78,6 +78,13 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 	{
 		parent::addToolbar();
 
+		// Instantiate a new JLayoutFile instance and render the batch button
+		$layout = new JLayoutFile('joomla.toolbar.batch');
+
+		$bar = JToolbar::getInstance('toolbar');
+		$dhtml = $layout->render(array('title' => JText::_('EB_MASS_MAIL')));
+		$bar->appendButton('Custom', $dhtml, 'batch');
+
 		JToolbarHelper::custom('resend_email', 'envelope', 'envelope', 'Resend Email', true);
 		JToolbarHelper::custom('csv_export', 'download', 'download', 'Export Registration', false);
 	}

@@ -69,6 +69,139 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 	}
 
 	/**
+	 * Send batch emails to selected registrants
+	 *
+	 * @param RADInput $input
+	 *
+	 * @throws Exception
+	 */
+	public function batchMail($input)
+	{
+		$cid     = $input->get('cid', array(), 'array');
+		$emailSubject = $input->getString('subject');
+		$emailMessage    = $input->get('message', '', 'raw');
+
+		if (empty($cid))
+		{
+			throw new Exception('Please select registrants to send mass mail');
+		}
+
+		if (empty($emailSubject))
+		{
+			throw new Exception('Please enter subject of the email');
+		}
+
+		if (empty($emailMessage))
+		{
+			throw new Exception('Please enter message ofthe email');
+		}
+
+		// OK, data is valid, process sending email
+		$mailer = JFactory::getMailer();
+		$config = EventbookingHelper::getConfig();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+
+		if ($config->from_name)
+		{
+			$fromName = $config->from_name;
+		}
+		else
+		{
+			$fromName = JFactory::getConfig()->get('fromname');
+		}
+
+		if ($config->from_email)
+		{
+			$fromEmail = $config->from_email;
+		}
+		else
+		{
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
+		}
+
+		// Get list of registration records
+		$query->select('a.*, b.title, b.event_date, b.event_end_date, b.short_description, b.description')
+				->from('#__eb_registrants AS a')
+				->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+				->where('a.id IN (' . implode(',', $cid) . ')');
+		$db->setQuery($query);
+		$rows = $db->loadObjectList();
+
+		// Get list of core fields
+		$query->clear();
+		$query->select('name')
+			->from('#__eb_fields')
+			->where('is_core = 1');
+		$db->setQuery($query);
+		$fields = $db->loadObjectList();
+
+		$emails = array();
+
+		foreach ($rows as $row)
+		{
+			$subject = $emailSubject;
+			$message = $emailMessage;
+			$email   = $row->email;
+			if (!in_array($email, $emails))
+			{
+				$replaces                      = array();
+				$replaces['event_title']       = $row->title;
+				$replaces['event_date']        = JHtml::_('date', $row->event_date, $config->event_date_format, null);
+				$replaces['event_end_date']    = JHtml::_('date', $row->event_end_date, $config->event_date_format, null);
+				$replaces['short_description'] = $row->short_description;
+				$replaces['description']       = $row->description;
+				$replaces['first_name']       = $row->first_name;
+
+
+				foreach($replaces as $key => $value)
+				{
+					$key     = strtoupper($key);
+					$subject = str_ireplace("[$key]", $value, $subject);
+					$message    = str_ireplace("[$key]", $value, $message);
+				}
+
+				foreach($fields as $field)
+				{
+					$key = $field->name;
+					$value = $row->{$field->name};
+					$subject = str_ireplace("[$key]", $value, $subject);
+					$message    = str_ireplace("[$key]", $value, $message);
+				}
+
+				// Process [REGISTRATION_DETAIL] tag if it is used in the message
+				if (strpos($message, '[REGISTRATION_DETAIL]') !== false)
+				{
+					// Build this tag
+					if ($config->multiple_booking)
+					{
+						$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+					}
+					elseif ($row->is_group_billing)
+					{
+						$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+					}
+					else
+					{
+						$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+					}
+
+					$form = new RADForm($rowFields);
+					$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+					$form->bind($data);
+					$form->buildFieldsDependency();
+					$registrationDetail = EventbookingHelper::getEmailContent($config, $row, true, $form);
+					$message            = str_replace("[REGISTRATION_DETAIL]", $registrationDetail, $message);
+				}
+
+				$emails[] = $email;
+				$mailer->sendMail($fromEmail, $fromName, $email, $subject, $message, 1);
+				$mailer->clearAllRecipients();
+			}
+		}
+	}
+
+	/**
 	 * Method to change the published state of one or more records.
 	 *
 	 * @param array $cid   A list of the primary keys to change.

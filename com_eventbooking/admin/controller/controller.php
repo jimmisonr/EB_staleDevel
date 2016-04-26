@@ -26,6 +26,26 @@ class EventbookingController extends RADControllerAdmin
 	}
 
 	/**
+	 * Send batch mail to registrants
+	 *
+	 */
+	public function batch_mail()
+	{
+		$model = $this->getModel('Registrant');
+		try
+		{
+			$model->batchMail($this->input);
+			$this->setMessage(JText::_('EB_BATCH_MAIL_SUCCESS'));
+		}
+		catch(Exception $e)
+		{
+			$this->setMessage($e->getMessage(), 'error');
+		}
+
+		$this->setRedirect('index.php?option=com_eventbooking&view=registrants');
+	}
+
+	/**
 	 * Resend confirmation email to registrants in case they didn't receive it
 	 */
 	public function resend_email()

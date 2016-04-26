@@ -296,6 +296,17 @@ $colSpan = 11;
 			?>
 			</tbody>
 		</table>
+
+		<?php echo JHtml::_(
+				'bootstrap.renderModal',
+				'collapseModal',
+				array(
+						'title' => JText::_('EB_MASS_MAIL'),
+						'footer' => $this->loadTemplate('batch_footer')
+				),
+				$this->loadTemplate('batch_body')
+		); ?>
+
 	</div>
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="boxchecked" value="0" />
