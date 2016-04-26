@@ -967,8 +967,8 @@ class EventbookingHelper
 			$query->clear();
 			$query->select('*')
 				->from('#__eb_coupons')
-				->where('published=1')
-				->where('code="' . $couponCode . '"')
+				->where('published = 1')
+				->where('code = ' . $db->quote($couponCode))
 				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
 				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
 				->where('(times = 0 OR times > used)')
@@ -1176,16 +1176,16 @@ class EventbookingHelper
 
 		if ($couponCode)
 		{
-			$query->clear();
-			$query->select('*')
-				->from('#__eb_coupons')
-				->where('published=1')
-				->where('code="' . $couponCode . '"')
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
-				->where('(times = 0 OR times > used)')
-				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id=' . $event->id . '))')
-				->order('id DESC');
+			$query->clear()
+					->select('*')
+					->from('#__eb_coupons')
+					->where('published = 1')
+					->where('code = ' . $db->quote($couponCode))
+					->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
+					->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
+					->where('(times = 0 OR times > used)')
+					->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id=' . $event->id . '))')
+					->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
 			if ($coupon)
@@ -1427,12 +1427,16 @@ class EventbookingHelper
 		$couponDiscountedEventIds = array();
 		if ($couponCode)
 		{
-			$query->clear();
-			$query->select('*')
-				->from('#__eb_coupons')
-				->where('code=' . $db->quote($couponCode))
-				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id IN (' . implode(',', $items) . ')))')
-				->order('id DESC');
+			$query->clear()
+					->select('*')
+					->from('#__eb_coupons')
+					->where('published = 1')
+					->where('code = ' . $db->quote($couponCode))
+					->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
+					->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
+					->where('(times = 0 OR times > used)')
+					->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id IN (' . implode(',', $items) . ')))')
+					->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
 			if ($coupon)
