@@ -462,7 +462,7 @@ class EventbookingController extends RADController
 		}
 		else
 		{
-			$json['error'] = JText::sprintf('EB_FILE_NOT_ALLOWED', $fileExt, implode(', ' . $allowedExtensions));
+			$json['error'] = JText::sprintf('EB_FILE_NOT_ALLOWED', $fileExt, implode(', ', $allowedExtensions));
 		}
 
 		echo json_encode($json);
