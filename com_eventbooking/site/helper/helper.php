@@ -4631,7 +4631,9 @@ class EventbookingHelper
 		$lang = JFactory::getLanguage();
 		$tag  = $lang->getTag();
 		if (!$tag)
+		{
 			$tag = 'en-GB';
+		}
 		$lang->load('com_users', JPATH_ROOT, $tag);
 		$data['name']     = $data['first_name'] . ' ' . $data['last_name'];
 		$data['password'] = $data['password2'] = $data['password1'];
@@ -4713,9 +4715,15 @@ class EventbookingHelper
 		$recurringStartDate = new Datetime($startDate, $timeZone);
 		$hour               = $recurringStartDate->format('H');
 		$minutes            = $recurringStartDate->format('i');
-		$startWeek          = clone $recurringStartDate->modify(('Sunday' == $recurringStartDate->format('l')) ? 'Sunday this week' : 'Sunday last week');
+		$dayOfWeek          = $recurringStartDate->format('w');
+		$startWeek          = clone $recurringStartDate;
+		if ($dayOfWeek > 0)
+		{
+			$startWeek->modify('- ' . $dayOfWeek . ' day');
+		}
 		$startWeek->setTime($hour, $minutes, 0);
 		$dateInterval = new DateInterval('P' . $weeklyFrequency . 'W');
+
 		if ($numberOccurrences)
 		{
 			$count = 0;
