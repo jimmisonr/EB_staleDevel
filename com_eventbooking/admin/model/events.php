@@ -93,7 +93,7 @@ class EventbookingModelEvents extends RADModelList
 		}
 		if ($this->state->filter_past_events == 0 && $app->isAdmin())
 		{
-			$query->where('DATE(tbl.event_date) >= CURDATE()');
+			$query->where('(DATE(tbl.event_date) >= CURDATE() OR DATE(tbl.event_end_date) >= CURDATE())');
 		}
 
 		if ($app->isSite())

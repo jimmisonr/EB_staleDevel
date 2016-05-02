@@ -57,7 +57,7 @@ if ($showCategory)
 		// first pass - collect children
 		foreach ($rows as $v)
 		{
-			$pt   = $v->parent;
+			$pt   = $v->parent_id;
 			$list = @$children[$pt] ? $children[$pt] : array();
 			array_push($list, $v);
 			$children[$pt] = $list;
