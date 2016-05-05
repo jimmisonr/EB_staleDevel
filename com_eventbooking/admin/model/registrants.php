@@ -161,6 +161,7 @@ class EventbookingModelRegistrants extends RADModelList
 	{
 		$app    = JFactory::getApplication();
 		$config = EventbookingHelper::getConfig();
+		$user   = JFactory::getUser();
 
 		// Prevent empty registration records (spams) from being showed
 		$query->where(' tbl.first_name != ""');
@@ -197,7 +198,11 @@ class EventbookingModelRegistrants extends RADModelList
 			$query->where(' tbl.group_id = 0 ');
 		}
 
-		if ($app->isSite() && $config->only_show_registrants_of_event_owner)
+		$modelName = strtolower($this->getName());
+		if ($app->isSite()
+				&& $modelName == 'registrants'
+				&& !$user->authorise('core.admin', 'com_eventbooking')
+				&& $config->only_show_registrants_of_event_owner)
 		{
 			$query->where('tbl.event_id IN (SELECT id FROM #__eb_events WHERE created_by =' . JFactory::getUser()->id . ')');
 		}
