@@ -3121,7 +3121,6 @@ class EventbookingHelper
 				if ($event->attachment)
 				{
 					$attachmentFiles = array($event->attachment);
-					$attachments[]   = JPATH_ROOT . '/media/com_eventbooking/' . $event->attachment;
 				}
 				else
 				{
@@ -3133,18 +3132,15 @@ class EventbookingHelper
 			$attachmentFiles = array_filter($attachmentFiles);
 
 			// Add all valid attachments to email
-			if (count($attachmentFiles))
+			foreach ($attachmentFiles as $attachmentFile)
 			{
-				foreach ($attachmentFiles as $attachmentFile)
+				$files = explode('|', $attachmentFile);
+				foreach ($files as $file)
 				{
-					$files = explode('|', $attachmentFile);
-					foreach ($files as $file)
+					$filePath = JPATH_ROOT . '/media/com_eventbooking/' . $file;
+					if (file_exists($filePath))
 					{
-						$filePath = JPATH_ROOT . '/media/com_eventbooking/' . $file;
-						if (file_exists($filePath))
-						{
-							$attachments[] = $filePath;
-						}
+						$attachments[] = $filePath;
 					}
 				}
 			}
