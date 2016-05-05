@@ -125,6 +125,25 @@ class EventbookingModelRegistrants extends RADModelList
 				}
 				$fieldsData[$rowFieldValue->registrant_id][$rowFieldValue->field_id] = $fieldValue;
 			}
+
+			// Get data from core fields
+			$query->clear()
+					->select('id, name')
+					->from('#__eb_fields')
+					->where('id IN (' . implode(',', $fields) . ')')
+					->where('is_core = 1');
+			$db->setQuery($query);
+			$coreFields = $db->loadObjectList();
+			if (count($coreFields))
+			{
+				foreach ($rows as $row)
+				{
+					foreach ($coreFields as $coreField)
+					{
+						$fieldsData[$row->id][$coreField->id] = $row->{$coreField->name};
+					}
+				}
+			}
 		}
 
 		return $fieldsData;
