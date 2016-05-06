@@ -190,7 +190,7 @@ class EventbookingViewFieldHtml extends RADViewItem
 		if ($this->item->depend_on_field_id)
 		{
 			//Get the selected options
-			$this->dependOnOptions = explode(",", $this->item->depend_on_options);
+			$this->dependOnOptions = json_decode($this->item->depend_on_options);
 			$query->clear();
 			$query->select('`values`')
 				->from('#__eb_fields')
