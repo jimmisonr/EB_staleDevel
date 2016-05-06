@@ -372,7 +372,7 @@ class EventbookingController extends RADController
 						{
 							$selectedOptions = array($masterFieldValues);
 						}
-						$dependOnOptions = explode(',', $rowField->depend_on_options);
+						$dependOnOptions = json_decode($rowField->depend_on_options);
 						if (!count(array_intersect($selectedOptions, $dependOnOptions)))
 						{
 							$hiddenFields[] = $rowField->id;
