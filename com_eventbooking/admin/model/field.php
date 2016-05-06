@@ -22,7 +22,7 @@ class EventbookingModelField extends RADModelAdmin
 	 */
 	protected function beforeStore($row, $input, $isNew)
 	{
-		$input->set('depend_on_options', implode(',', $input->get('depend_on_options', array(), 'array')));
+		$input->set('depend_on_options', json_encode($input->get('depend_on_options', array(), 'array')));
 		if (in_array($row->id, $this->getRestrictedFieldIds()))
 		{
 			$data = $input->getData(RAD_INPUT_ALLOWRAW);
@@ -140,7 +140,7 @@ class EventbookingModelField extends RADModelAdmin
 					$masterField = $this->getTable();
 					$masterField->load($row->depend_on_field_id);
 					$masterFieldValues = explode("\r\n", $masterField->values);
-					$dependOnOptions   = explode(',', $row->depend_on_options);
+					$dependOnOptions   = json_decode($row->depend_on_options);
 					$dependOnIndexes   = array();
 					foreach ($dependOnOptions as $option)
 					{
@@ -162,7 +162,7 @@ class EventbookingModelField extends RADModelAdmin
 								$dependOnOptionsWithThisLanguage[] = $values[$index];
 							}
 						}
-						$row->{'depend_on_options_' . $sef} = implode(',', $dependOnOptionsWithThisLanguage);
+						$row->{'depend_on_options_' . $sef} = json_encode($dependOnOptionsWithThisLanguage);
 					}
 					$row->store();
 				}

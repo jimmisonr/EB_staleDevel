@@ -224,7 +224,7 @@ class RADForm
 						{
 							$selectedOptions = array($masterFieldValues);
 						}
-						$dependOnOptions = explode(',', $field->depend_on_options);
+						$dependOnOptions = json_decode($field->depend_on_options);
 						if (!count(array_intersect($selectedOptions, $dependOnOptions)))
 						{
 							$field->hideOnDisplay();
