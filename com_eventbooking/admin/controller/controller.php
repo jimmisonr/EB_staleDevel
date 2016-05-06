@@ -2208,7 +2208,50 @@ class EventbookingController extends RADControllerAdmin
 			$asset->rules = $rules;
 			$asset->store();
 		}
-		
+
+		// Convert depend_on_options data to json instead of comma separated
+		$query->clear()
+			->select('*')
+			->from('#__eb_fields')
+			->where('depend_on_field_id > 0');
+		$db->setQuery($query);
+		$rowFields = $db->loadObjectList();
+		if (JLanguageMultilang::isEnabled())
+		{
+			$languages = EventbookingHelper::getLanguages();
+		}
+
+		foreach ($rowFields as $rowField)
+		{
+			$dependOnOptions = $rowField->depend_on_options;
+
+			// If it is converted before, simply ignore all other fields
+			if (is_string($dependOnOptions) && is_array(json_decode($dependOnOptions)))
+			{
+				break;
+			}
+
+			$dependOnOptions = json_encode(explode(',', $dependOnOptions));
+
+			$query->clear()
+					->update('#__eb_fields')
+					->set('depend_on_options = ' . $db->quote($dependOnOptions))
+					->where('id = ' . $rowField->id);
+
+			if (!empty($languages))
+			{
+				foreach ($languages as $language)
+				{
+					$prefix          = $language->sef;
+					$dependOnOptions = $rowField->{'depend_on_options_' . $prefix};
+					$dependOnOptions = json_encode(explode(',', $dependOnOptions));
+					$query->set('depend_on_options_' . $prefix . ' = ' . $db->quote($dependOnOptions));
+				}
+			}
+
+			$db->execute();
+		}
+
 		// Files, Folders clean up
 		$deleteFiles = array(
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php',
