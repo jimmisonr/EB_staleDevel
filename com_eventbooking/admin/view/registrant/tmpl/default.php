@@ -12,306 +12,290 @@ defined('_JEXEC') or die;
 
 $selectedState = '';
 ?>
-<script type="text/javascript">
-	Joomla.submitbutton = function(pressbutton) 
-	{
-		var form = document.adminForm;
-		if (pressbutton == 'cancel') 
-		{
-			Joomla.submitform( pressbutton );
-		} 
-		else 
-		{
-			Joomla.submitform( pressbutton );
-		}
-	}
-</script>
-<form action="index.php?option=com_eventbooking&view=registrant" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data">
-<div class="row-fluid">			
-	<table class="admintable adminform">
-		<tr>
-			<td width="180" class="key">
-				<?php echo  JText::_('EB_EVENT'); ?>
-			</td>
-			<td>
-				<?php echo $this->lists['event_id']; ?>
-			</td>
-		</tr>
-		<tr>
-			<td class="key">
-				<?php echo  JText::_('EB_USER'); ?>
-			</td>
-			<td>
-				<?php echo EventbookingHelper::getUserInput($this->item->user_id,'user_id',(int) $this->item->id) ; ?>
-			</td>
-		</tr>
-		<tr>
-			<td class="key">
-				<?php echo  JText::_('EB_NB_REGISTRANTS'); ?>
-			</td>
-			<td>
-				<?php
-					if ($this->item->number_registrants > 0) 
-					{
-						echo $this->item->number_registrants ;	
-					} 
-					else 
-					{
-					?>
-						<input class="text_area" type="text" name="number_registrants" id="number_registrants" size="40" maxlength="250" value="1" />
-						<small><?php echo JText::_('EB_NUMBER_REGISTRANTS_EXPLAIN'); ?></small>							
-					<?php	
-					}
-				?>				
-			</td>
-		</tr>
-		<?php 
-			$fields = $this->form->getFields();
-			if (isset($fields['state']))
-			{
-				$selectedState = $fields['state']->value;
-			}
-			foreach ($fields as $field)
-			{
-				$fieldType = strtolower($field->type);
-				switch ($fieldType)
+<form action="index.php?option=com_eventbooking&view=registrant" method="post" name="adminForm" id="adminForm" class="form form-horizontal" enctype="multipart/form-data">
+<div class="row-fluid">
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_EVENT'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['event_id']; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_USER'); ?>
+		</label>
+		<div class="controls">
+			<?php echo EventbookingHelper::getUserInput($this->item->user_id,'user_id',(int) $this->item->id) ; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_NB_REGISTRANTS'); ?>
+		</label>
+		<div class="controls">
+			<?php
+				if ($this->item->number_registrants > 0)
 				{
-					case 'heading':
-					case 'message':
-						break;
-					default:
-						$controlGroupAttributes = 'id="field_' . $field->name . '" ';
-						if ($field->hideOnDisplay)
+					echo $this->item->number_registrants ;
+				}
+				else
+				{
+				?>
+					<input class="text_area" type="text" name="number_registrants" id="number_registrants" size="40" maxlength="250" value="1" />
+					<small><?php echo JText::_('EB_NUMBER_REGISTRANTS_EXPLAIN'); ?></small>
+				<?php
+				}
+			?>
+		</div>
+	</div>
+	<?php
+		$fields = $this->form->getFields();
+		if (isset($fields['state']))
+		{
+			$selectedState = $fields['state']->value;
+		}
+		foreach ($fields as $field)
+		{
+			$fieldType = strtolower($field->type);
+			switch ($fieldType)
+			{
+				case 'heading':
+				case 'message':
+					break;
+				default:
+					$controlGroupAttributes = 'id="field_' . $field->name . '" ';
+					if ($field->hideOnDisplay)
+					{
+						$controlGroupAttributes .= ' style="display:none;" ';
+					}
+					$class = "";
+					if ($field->isMasterField)
+					{
+						if ($field->suffix)
 						{
-							$controlGroupAttributes .= ' style="display:none;" ';
+							$class = ' master-field-' . $field->suffix;
 						}
-						if ($field->isMasterField)
+						else
 						{
-							if ($field->suffix)
+							$class = ' master-field';
+						}
+					}
+			?>
+			<div class="control-group<?php echo $class; ?>" <?php echo $controlGroupAttributes; ?>>
+				<label class="control-label">
+					<?php echo $field->title; ?>
+				</label>
+				<div class="controls">
+					<?php echo $field->input; ?>
+				</div>
+			</div>
+			<?php
+			}
+		}
+	?>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_REGISTRATION_DATE'); ?>
+		</label>
+		<div class="controls">
+			<?php echo  JHtml::_('date', $this->item->register_date, $this->config->date_format, null);?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_TOTAL_AMOUNT'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->config->currency_symbol?><input type="text" name="total_amount" class="input-medium" value="<?php echo $this->item->total_amount > 0 ? round($this->item->total_amount , 2) : null;?>" />
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_DISCOUNT_AMOUNT'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->config->currency_symbol?><input type="text" name="discount_amount" class="input-medium" value="<?php echo $this->item->discount_amount > 0 ? round($this->item->discount_amount , 2) : null;?>" />
+		</div>
+	</div>
+	<?php
+	if ($this->item->late_fee > 0)
+	{
+	?>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo  JText::_('EB_LATE_FEE'); ?>
+			</label>
+			<div class="controls">
+				<?php echo $this->config->currency_symbol?><input type="text" name="late_fee" class="input-medium" value="<?php echo $this->item->late_fee > 0 ? round($this->item->late_fee , 2) : null;?>" />
+			</div>
+		</div>
+	<?php
+	}
+
+	if ($this->event->tax_rate > 0 || $this->item->tax_amount > 0)
+	{
+	?>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo  JText::_('EB_TAX'); ?>
+			</label>
+			<div class="controls">
+				<?php echo $this->config->currency_symbol?><input type="text" name="tax_amount" class="input-medium" value="<?php echo $this->item->tax_amount > 0 ? round($this->item->tax_amount , 2) : null;?>" />
+			</div>
+		</div>
+	<?php
+	}
+
+	if ($this->showPaymentFee || $this->item->payment_processing_fee > 0)
+	{
+	?>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo  JText::_('EB_PAYMENT_FEE'); ?>
+			</label>
+			<div class="controls">
+				<?php echo $this->config->currency_symbol?><input type="text" name="payment_processing_fee" class="input-medium" value="<?php echo $this->item->payment_processing_fee > 0 ? round($this->item->payment_processing_fee , 2) : null;?>" />
+			</div>
+		</div>
+	<?php
+	}
+	?>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_GROSS_AMOUNT'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->config->currency_symbol?><input type="text" name="amount" class="input-medium" value="<?php echo $this->item->amount > 0 ? round($this->item->amount , 2) : null;?>" />
+		</div>
+	</div>
+	<?php
+		if ($this->config->activate_deposit_feature)
+		{
+		?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_DEPOSIT_AMOUNT'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $this->config->currency_symbol?><input type="text" name="deposit_amount" value="<?php echo $this->item->deposit_amount > 0 ? round($this->item->deposit_amount , 2) : null;?>" />
+				</div>
+			</div>
+			<?php
+				if ($this->item->payment_status == 0 && $this->item->id)
+				{
+				?>
+					<div class="control-group">
+						<label class="control-label">
+							<?php echo JText::_('EB_DUE_AMOUNT'); ?>
+						</label>
+						<div class="controls">
+							<?php
+							if ($this->item->payment_status == 1)
 							{
-								$class = 'master-field-' . $field->suffix;
+								$dueAmount = 0;
 							}
 							else
 							{
-								$class = 'master-field';
+								$dueAmount = $this->item->amount - $this->item->deposit_amount;
 							}
-							$controlGroupAttributes .= ' class="'.$class.'" ';
-						}
-				?>
-				<tr <?php echo $controlGroupAttributes; ?>>
-					<td width="100" class="key">
-						<?php echo $field->title; ?>
-					</td>
-					<td class="controls">
-						<?php echo $field->input; ?>
-					</td>
-				</tr>	
-				<?php							
-				}	
-			}
-		?>
-		<tr>
-			<td width="100" class="key">
-				<?php echo  JText::_('EB_REGISTRATION_DATE'); ?>
-			</td>
-			<td>
-				<?php echo  JHtml::_('date', $this->item->register_date, $this->config->date_format, null);?>
-			</td>
-		</tr>		
-		<tr>
-			<td width="100" class="key">
-				<?php echo  JText::_('EB_TOTAL_AMOUNT'); ?>
-			</td>
-			<td>
-				<?php echo $this->config->currency_symbol?><input type="text" name="total_amount" class="input-medium" value="<?php echo $this->item->total_amount > 0 ? round($this->item->total_amount , 2) : null;?>" />				
-			</td>
-		</tr>
-		<tr>
-			<td width="100" class="key">
-				<?php echo  JText::_('EB_DISCOUNT_AMOUNT'); ?>
-			</td>
-			<td>
-				<?php echo $this->config->currency_symbol?><input type="text" name="discount_amount" class="input-medium" value="<?php echo $this->item->discount_amount > 0 ? round($this->item->discount_amount , 2) : null;?>" />
-			</td>
-		</tr>
-		<?php
-		if ($this->item->late_fee > 0)
-		{
-		?>
-			<tr>
-				<td width="100" class="key">
-					<?php echo  JText::_('EB_LATE_FEE'); ?>
-				</td>
-				<td>
-					<?php echo $this->config->currency_symbol?><input type="text" name="late_fee" class="input-medium" value="<?php echo $this->item->late_fee > 0 ? round($this->item->late_fee , 2) : null;?>" />
-				</td>
-			</tr>
-		<?php
-		}
-
-		if ($this->event->tax_rate > 0 || $this->item->tax_amount > 0)
-		{
-		?>
-			<tr>
-				<td width="100" class="key">
-					<?php echo  JText::_('EB_TAX'); ?>
-				</td>
-				<td>
-					<?php echo $this->config->currency_symbol?><input type="text" name="tax_amount" class="input-medium" value="<?php echo $this->item->tax_amount > 0 ? round($this->item->tax_amount , 2) : null;?>" />
-				</td>
-			</tr>
-		<?php
-		}
-
-		if ($this->showPaymentFee || $this->item->payment_processing_fee > 0)
-		{
-		?>
-			<tr>
-				<td width="100" class="key">
-					<?php echo  JText::_('EB_PAYMENT_FEE'); ?>
-				</td>
-				<td>
-					<?php echo $this->config->currency_symbol?><input type="text" name="payment_processing_fee" class="input-medium" value="<?php echo $this->item->payment_processing_fee > 0 ? round($this->item->payment_processing_fee , 2) : null;?>" />
-				</td>
-			</tr>
-		<?php
-		}
-		?>
-		<tr>
-			<td width="100" class="key">
-				<?php echo  JText::_('EB_GROSS_AMOUNT'); ?>
-			</td>
-			<td>
-				<?php echo $this->config->currency_symbol?><input type="text" name="amount" class="input-medium" value="<?php echo $this->item->amount > 0 ? round($this->item->amount , 2) : null;?>" />
-			</td>
-		</tr>
-		<?php
-			if ($this->config->activate_deposit_feature)
-			{
-			?>
-				<tr>
-					<td class="key">
-						<?php echo JText::_('EB_DEPOSIT_AMOUNT'); ?>
-					</td>
-					<td>
-						<?php echo $this->config->currency_symbol?><input type="text" name="deposit_amount" value="<?php echo $this->item->deposit_amount > 0 ? round($this->item->deposit_amount , 2) : null;?>" />
-					</td>
-				</tr>
+							echo $this->config->currency_symbol?><input type="text" name="due_amount" class="input-medium" value="<?php echo $dueAmount > 0 ? round($dueAmount , 2) : null;?>" />
+						</div>
+					</div>
 				<?php
-					if ($this->item->payment_status == 0 && $this->item->id)
-					{
-					?>
-						<tr>
-							<td class="key">
-								<?php echo JText::_('EB_DUE_AMOUNT'); ?>
-							</td>
-							<td>
-								<?php
-								if ($this->item->payment_status == 1)
-								{
-									$dueAmount = 0;
-								}
-								else
-								{
-									$dueAmount = $this->item->amount - $this->item->deposit_amount;
-								}
-								echo $this->config->currency_symbol?><input type="text" name="due_amount" class="input-medium" value="<?php echo $dueAmount > 0 ? round($dueAmount , 2) : null;?>" />
-							</td>
-						</tr>
-					<?php
-					}
-				?>
-				<tr>
-					<td class="key">
-						<?php echo JText::_('EB_PAYMENT_STATUS'); ?>
-					</td>
-					<td>
-						<?php echo $this->lists['payment_status'];?>
-					</td>
-				</tr>
-			<?php
-			}
+				}
+			?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_PAYMENT_STATUS'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $this->lists['payment_status'];?>
+				</div>
+			</div>
+		<?php
+		}
 
-			if ($this->item->amount > 0)
-			{
-			?>
-				<tr>
-					<td class="key">
-						<?php echo JText::_('EB_TRANSACTION_ID'); ?>
-					</td>
-					<td>
-						<input type="text" name="transaction_id" value="<?php echo $this->item->transaction_id;?>" />
-					</td>
-				</tr>
-			<?php
-			}
-			if ($this->item->payment_method == "os_offline_creditcard")
-			{
-				$params = new JRegistry($this->item->params);
-			?>
-				<tr>
-					<td class="key">
-						<?php echo JText::_('EB_FIRST_12_DIGITS_CREDITCARD_NUMBER'); ?>
-					</td>
-					<td>
-						<?php echo $params->get('card_number'); ?>
-					</td>
-				</tr>
-				<tr>
-					<td class="key">
-						<?php echo JText::_('AUTH_CARD_EXPIRY_DATE'); ?>
-					</td>
-					<td>
-						<?php echo $params->get('exp_date'); ?>
-					</td>
-				</tr>
-				<tr>
-					<td class="key">
-						<?php echo JText::_('AUTH_CVV_CODE'); ?>
-					</td>
-					<td>
-						<?php echo $params->get('cvv'); ?>
-					</td>
-				</tr>
-				<tr>
-					<td class="key">
-						<?php echo JText::_('EB_CARD_HOLDER_NAME'); ?>
-					</td>
-					<td>
-						<?php echo $params->get('card_holder_name'); ?>
-					</td>
-				</tr>
-			<?php
-			}
-			if ($this->config->activate_checkin_registrants)
-			{
-			?>
-				<tr>
-					<td width="100" class="key">
-						<?php echo  JText::_('EB_CHECKED_IN'); ?>
-					</td>
-					<td>
-						<?php echo $this->lists['checked_in'] ; ?>
-					</td>
-				</tr>
-			<?php
-			}
+		if ($this->item->amount > 0)
+		{
 		?>
-		<tr>
-			<td width="100" class="key">
-				<?php echo  JText::_('EB_REGISTRATION_STATUS'); ?>
-			</td>
-			<td>
-				<?php echo $this->lists['published'] ; ?>
-			</td>
-		</tr>
-	</table>	
-	
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_TRANSACTION_ID'); ?>
+				</label>
+				<div class="controls">
+					<input type="text" name="transaction_id" value="<?php echo $this->item->transaction_id;?>" />
+				</div>
+			</div>
+		<?php
+		}
+
+		if ($this->item->payment_method == "os_offline_creditcard")
+		{
+			$params = new JRegistry($this->item->params);
+		?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_FIRST_12_DIGITS_CREDITCARD_NUMBER'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $params->get('card_number'); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('AUTH_CARD_EXPIRY_DATE'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $params->get('exp_date'); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('AUTH_CVV_CODE'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $params->get('cvv'); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_CARD_HOLDER_NAME'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $params->get('card_holder_name'); ?>
+				</div>
+			</div>
+		<?php
+		}
+		if ($this->config->activate_checkin_registrants)
+		{
+		?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo  JText::_('EB_CHECKED_IN'); ?>
+				</label>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('checked_in', $this->item->checked_in); ?>
+				</div>
+			</div>
+		<?php
+		}
+	?>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_REGISTRATION_STATUS'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['published'] ; ?>
+		</div>
+	</div>
 	<?php
 	if ($this->config->collect_member_information && count($this->rowMembers)) 
 	{
-	?>		
-	<table class="table">
+	?>
+		<h3 class="eb-heading"><?php echo JText::_('EB_MEMBERS_INFORMATION') ; ?></h3>
 	<?php			
 		for ($i = 0 , $n = count($this->rowMembers) ; $i < $n ; $i++) 
 		{
@@ -325,71 +309,67 @@ $selectedState = '';
 			$form->buildFieldsDependency();
 			if ($i%2 == 0)
 			{
-				echo "<tr>\n";
+				echo "<div class=\"row-fluid\">\n" ;
 			}					
 			?>
-				<td>
-					<table class="admintable">
-						<tr>
-							<td colspan="2" class="key eb_row_heading"><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1); ;?></td>
-						</tr>		
-						<?php
-							$fields = $form->getFields();									
-							foreach ($fields as $field)
+				<div class="span6">
+					<h4><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1); ;?></h4>
+					<?php
+						$fields = $form->getFields();
+						foreach ($fields as $field)
+						{
+							if ($i > 0 && $field->row->only_show_for_first_member)
 							{
-								if ($i > 0 && $field->row->only_show_for_first_member)
-								{
-									continue;
-								}
-								$fieldType = strtolower($field->type);
-								switch ($fieldType)
-								{
-									case 'heading':
-									case 'message':
-										break;
-									default:
-										$controlGroupAttributes = 'id="field_' . $field->name . '" ';
-										if ($field->hideOnDisplay)
-										{
-											$controlGroupAttributes .= ' style="display:none;" ';
-										}
-										if ($field->isMasterField)
-										{
-											if ($field->suffix)
-											{
-												$class = 'master-field-' . $field->suffix;
-											}
-											else
-											{
-												$class = 'master-field';
-											}
-											$controlGroupAttributes .= ' class="'.$class.'" ';
-										}
-									?>
-									<tr <?php echo $controlGroupAttributes; ?>>
-										<td width="100" class="key">
-											<?php echo $field->title; ?>
-										</td>
-										<td>
-											<?php echo $field->input; ?>
-										</td>
-									</tr>	
-								<?php							
-								}	
+								continue;
 							}
-						?>											
-					</table>
-					<input type="hidden" name="ids[]" value="<?php echo $rowMember->id; ?>" />			
-				</td>
+							$fieldType = strtolower($field->type);
+							switch ($fieldType)
+							{
+								case 'heading':
+								case 'message':
+									break;
+								default:
+									$controlGroupAttributes = 'id="field_' . $field->name . '" ';
+									if ($field->hideOnDisplay)
+									{
+										$controlGroupAttributes .= ' style="display:none;" ';
+									}
+									$class = '';
+									if ($field->isMasterField)
+									{
+										if ($field->suffix)
+										{
+											$class = ' master-field-' . $field->suffix;
+										}
+										else
+										{
+											$class = ' master-field';
+										}
+									}
+								?>
+								<div class="control-group<?php echo $class; ?>" <?php echo $controlGroupAttributes; ?>>
+									<label class="control-label">
+										<?php echo $field->title; ?>
+									</label>
+									<div class="controls">
+										<?php echo $field->input; ?>
+									</div>
+								</div>
+							<?php
+							}
+						}
+					?>
+					<input type="hidden" name="ids[]" value="<?php echo $rowMember->id; ?>" />
+				</div>
 			<?php	
 			if (($i + 1) %2 == 0)
 			{
-				echo "</tr>" ;
-			}							
+				echo "</div>\n" ;
+			}
 		}
 		if ($i %2 != 0)
 		{
-			echo "<td>&nbsp;</td></tr>\n" ;
+			echo "</div>" ;
 		}	
 	?>				
 	</table>	
