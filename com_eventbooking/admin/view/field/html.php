@@ -118,12 +118,6 @@ class EventbookingViewFieldHtml extends RADViewItem
 			$this->lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id[]', 'class="input-xlarge" multiple="multiple" size="5" ', 'id',
 				'title', $selectedEventIds);
 		}
-		$this->lists['required']       = JHtml::_('select.booleanlist', 'required', '', $this->item->required);
-		$this->lists['fee_field']      = JHtml::_('select.booleanlist', 'fee_field', '', $this->item->fee_field);
-		$this->lists['quantity_field'] = JHtml::_('select.booleanlist', 'quantity_field', '', $this->item->quantity_field);
-		$this->lists['only_show_for_first_member'] = JHtml::_('select.booleanlist', 'only_show_for_first_member', '', $this->item->only_show_for_first_member);
-		$this->lists['only_require_for_first_member'] = JHtml::_('select.booleanlist', 'only_require_for_first_member', '', $this->item->only_require_for_first_member);
-		$this->lists['multiple']       = JHtml::_('select.booleanlist', 'multiple', ' class="inputbox" ', $this->item->multiple);
 
 		// Trigger plugins to get list of fields for mapping
 		JPluginHelper::importPlugin( 'eventbooking');
@@ -191,15 +185,14 @@ class EventbookingViewFieldHtml extends RADViewItem
 		{
 			//Get the selected options
 			$this->dependOnOptions = json_decode($this->item->depend_on_options);
-			$query->clear();
-			$query->select('`values`')
-				->from('#__eb_fields')
-				->where('id=' . $this->item->depend_on_field_id);
+			$query->clear()
+					->select('`values`')
+					->from('#__eb_fields')
+					->where('id=' . $this->item->depend_on_field_id);
 			$db->setQuery($query);
 			$this->dependOptions = explode("\r\n", $db->loadResult());
 		}
 
-		//$this->integration = $integration;
 		$this->config      = $config;
 	}
 }
