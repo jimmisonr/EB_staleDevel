@@ -118,10 +118,6 @@ class EventbookingViewEventHtml extends RADViewItem
 
 		$this->lists['access']                     = JHtml::_('access.level', 'access', $item->access, 'class="inputbox"', false);
 		$this->lists['registration_access']        = JHtml::_('access.level', 'registration_access', $item->registration_access, 'class="inputbox"', false);
-		$this->lists['enable_cancel_registration'] = JHtml::_('select.booleanlist', 'enable_cancel_registration', ' class="inputbox" ', $item->enable_cancel_registration);
-		$this->lists['enable_auto_reminder']       = JHtml::_('select.booleanlist', 'enable_auto_reminder', ' class="inputbox" ', $item->enable_auto_reminder);
-		$this->lists['published']                  = JHtml::_('select.booleanlist', 'published', ' class="inputbox" ', $item->published);
-		$this->lists['featured']                   = JHtml::_('select.booleanlist', 'featured', ' class="inputbox" ', $item->featured);
 		if ($item->event_date != $db->getNullDate())
 		{
 			$selectedHour   = date('G', strtotime($item->event_date));
