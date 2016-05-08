@@ -18,6 +18,14 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 	 */
 	public function display()
 	{
+		$layout = $this->getLayout();
+		if ($layout == 'complete')
+		{
+			$this->displayPaymentCompelete();
+
+			return;
+		}
+
 		// Load common js code
 		$document = JFactory::getDocument();
 		$document->addScriptDeclaration(
@@ -29,14 +37,14 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 		$config                = EventbookingHelper::getConfig();
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
-		$input   = $this->input;
+		$input        = $this->input;
 		$registrantId = $input->getInt('registrant_id');
 
-		$db = JFactory::getDbo();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('*')
 			->from('#__eb_registrants')
-			->where('id = '. $registrantId);
+			->where('id = ' . $registrantId);
 		$db->setQuery($query);
 		$rowRegistrant = $db->loadObject();
 		if (empty($rowRegistrant))
@@ -53,7 +61,7 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 			return;
 		}
 
-		$event   = EventbookingHelperDatabase::getEvent($rowRegistrant->event_id);
+		$event = EventbookingHelperDatabase::getEvent($rowRegistrant->event_id);
 
 		$config    = EventbookingHelper::getConfig();
 		$user      = JFactory::getUser();
@@ -118,41 +126,96 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 
 		$paymentMethod = $input->post->getString('payment_method', os_payments::getDefautPaymentMethod(trim($event->payment_methods)));
 
-		$expMonth            = $input->post->getInt('exp_month', date('m'));
-		$expYear             = $input->post->getInt('exp_year', date('Y'));
-		$lists['exp_month']  = JHtml::_('select.integerlist', 1, 12, 1, 'exp_month', ' class="input-small" ', $expMonth, '%02d');
-		$currentYear         = date('Y');
-		$lists['exp_year']   = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
+		$expMonth           = $input->post->getInt('exp_month', date('m'));
+		$expYear            = $input->post->getInt('exp_year', date('Y'));
+		$lists['exp_month'] = JHtml::_('select.integerlist', 1, 12, 1, 'exp_month', ' class="input-small" ', $expMonth, '%02d');
+		$currentYear        = date('Y');
+		$lists['exp_year']  = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
 
-		$methods            = os_payments::getPaymentMethods(trim($event->payment_methods));
+		$methods = os_payments::getPaymentMethods(trim($event->payment_methods));
 
 
 		$this->loadCaptcha();
 
 		// Assign these parameters
-		$this->paymentMethod        = $paymentMethod;
-		$this->config               = $config;
-		$this->event                = $event;
-		$this->methods              = $methods;
-		$this->lists                = $lists;
-		$this->message              = EventbookingHelper::getMessages();
-		$this->fieldSuffix          = EventbookingHelper::getFieldSuffix();
-		$this->message              = EventbookingHelper::getMessages();
-		$this->form                 = $form;
-		$this->rowRegistrant        = $rowRegistrant;
+		$this->paymentMethod = $paymentMethod;
+		$this->config        = $config;
+		$this->event         = $event;
+		$this->methods       = $methods;
+		$this->lists         = $lists;
+		$this->message       = EventbookingHelper::getMessages();
+		$this->fieldSuffix   = EventbookingHelper::getFieldSuffix();
+		$this->message       = EventbookingHelper::getMessages();
+		$this->form          = $form;
+		$this->rowRegistrant = $rowRegistrant;
 
 		parent::display();
 	}
+
+	/**
+	 * Display payment complete page
+	 */
+	private function displayPaymentComplete()
+	{
+		$message     = EventbookingHelper::getMessages();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+
+		if (strlen(trim(strip_tags($message->{'deposit_payment_thanks_message' . $fieldSuffix}))))
+		{
+			$thankMessage = $message->{'deposit_payment_thanks_message' . $fieldSuffix};
+		}
+		else
+		{
+			$thankMessage = $message->deposit_payment_thanks_message;
+		}
+
+		$id = (int) JFactory::getSession()->get('payment_id', 0);
+
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('*')
+			->from('#__eb_registrants')
+			->where('id = ' . $id);
+		$db->setQuery($query);
+		$row = $db->loadObject();
+
+		$rowFields = EventbookingHelper::getDepositPaymentFormFields();
+		$form      = new RADForm($rowFields);
+		$data      = EventbookingHelper::getRegistrantData($row, $rowFields);
+		$form->bind($data);
+
+		$replaces = array();
+		foreach ($rowFields as $rowField)
+		{
+			$replaces[$rowField->name] = $row->{$rowField->name};
+		}
+
+		$replaces['AMOUNT']          = $row->amount - $row->deposit_amount;
+		$replaces['REGISTRATION_ID'] = $row->id;
+		$replaces['TRANSACTION_ID']  = $row->deposit_payment_transaction_id;
+
+		foreach ($replaces as $key => $value)
+		{
+			$key          = strtoupper($key);
+			$thankMessage = str_ireplace("[$key]", $value, $thankMessage);
+		}
+
+		$this->message = $thankMessage;
+
+		parent::display();
+	}
+
 	/**
 	 * Load captcha for registration form
+	 *
 	 * @param bool $initOnly
 	 *
 	 * @throws Exception
 	 */
 	private function loadCaptcha($initOnly = false)
 	{
-		$config = EventbookingHelper::getConfig();
-		$user   = JFactory::getUser();
+		$config      = EventbookingHelper::getConfig();
+		$user        = JFactory::getUser();
 		$showCaptcha = 0;
 
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
@@ -166,7 +229,7 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
 			if ($plugin)
 			{
-				$showCaptcha   = 1;
+				$showCaptcha = 1;
 				if ($initOnly)
 				{
 					JCaptcha::getInstance($captchaPlugin)->initialise('dynamic_recaptcha_1');
