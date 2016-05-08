@@ -60,16 +60,26 @@ class RADPaymentOmnipay extends OmnipayPayment
 	 * This method need to be implemented by the payment plugin class. It needs to set url which users will be
 	 * redirected to after a successful payment. The url is stored in paymentSuccessUrl property
 	 *
-	 * @param JTable $row
-	 * @param array  $data
+	 * @param int   $id
+	 * @param array $data
 	 *
 	 * @return void
 	 */
 	protected function setPaymentSuccessUrl($id, $data = array())
 	{
+
+		$input  = JFactory::getApplication()->input;
+		$task   = $input->getCmd('task');
 		$Itemid = JFactory::getApplication()->input->get->getInt('Itemid', EventbookingHelper::getItemid());
 
-		$this->paymentSuccessUrl = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false, false);
+		if ($task == 'process')
+		{
+			$this->paymentSuccessUrl = JRoute::_('index.php?option=com_eventbooking&view=payment&layout=complete&Itemid=' . $Itemid, false, false);
+		}
+		else
+		{
+			$this->paymentSuccessUrl = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false, false);
+		}
 	}
 
 
@@ -84,13 +94,25 @@ class RADPaymentOmnipay extends OmnipayPayment
 	 */
 	protected function setPaymentFailureUrl($id, $data = array())
 	{
+		$input = JFactory::getApplication()->input;
+
 		if (empty($id))
 		{
-			$id = JFactory::getApplication()->input->getInt('id', 0);
+			$id = $input->getInt('id', 0);
 		}
-		$Itemid = JFactory::getApplication()->input->get->getInt('Itemid', EventbookingHelper::getItemid());
 
-		$this->paymentFailureUrl = JRoute::_('index.php?option=com_eventbooking&view=failure&id=' . $id . '&Itemid=' . $Itemid, false, false);
+		$Itemid = $input->get->getInt('Itemid', EventbookingHelper::getItemid());
+
+		$task = $input->getCmd('task');
+
+		if ($task == 'process')
+		{
+			$this->paymentFailureUrl = JRoute::_('index.php?option=com_eventbooking&view=failure&Itemid=' . $Itemid, false, false);
+		}
+		else
+		{
+			$this->paymentFailureUrl = JRoute::_('index.php?option=com_eventbooking&view=failure&id=' . $id . '&Itemid=' . $Itemid, false, false);
+		}
 	}
 
 	/**
@@ -105,19 +127,34 @@ class RADPaymentOmnipay extends OmnipayPayment
 	 */
 	protected function onPaymentSuccess($row, $transactionId)
 	{
-		$config              = EventbookingHelper::getConfig();
-		$row->transaction_id = $transactionId;
-		$row->payment_date   = gmdate('Y-m-d H:i:s');
-		$row->published      = 1;
-		$row->store();
-		if ($row->is_group_billing)
+		$config = EventbookingHelper::getConfig();
+		if ($row->process_deposit_payment)
 		{
-			EventbookingHelper::updateGroupRegistrationRecord($row->id);
-		}		
-		JPluginHelper::importPlugin('eventbooking');
-		$dispatcher = JEventDispatcher::getInstance();
-		$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-		EventbookingHelper::sendEmails($row, $config);
+			$row->deposit_payment_transaction_id = $transactionId;
+			$row->payment_status                 = 1;
+			$row->store();
+
+			JPluginHelper::importPlugin('eventbooking');
+			$dispatcher = JEventDispatcher::getInstance();
+			$dispatcher->trigger('onDepositPaymentSuccess', array($row));
+
+			EventbookingHelper::sendDepositPaymentEmail($row, $config);
+		}
+		else
+		{
+			$row->transaction_id = $transactionId;
+			$row->payment_date   = gmdate('Y-m-d H:i:s');
+			$row->published      = 1;
+			$row->store();
+			if ($row->is_group_billing)
+			{
+				EventbookingHelper::updateGroupRegistrationRecord($row->id);
+			}
+			JPluginHelper::importPlugin('eventbooking');
+			$dispatcher = JEventDispatcher::getInstance();
+			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
+			EventbookingHelper::sendEmails($row, $config);
+		}
 	}
 
 	/**
