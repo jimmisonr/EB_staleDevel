@@ -63,7 +63,16 @@ class os_paypal extends RADPayment
 		$this->setParameter('item_name', $data['item_name']);
 		$this->setParameter('amount', round($data['amount'], 2));
 		$this->setParameter('custom', $row->id);
-		$this->setParameter('return', $siteUrl . 'index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid);
+
+		if ($row->process_deposit_payment)
+		{
+			$this->setParameter('return', $siteUrl . 'index.php?option=com_eventbooking&view=payment&layout=complete&Itemid=' . $Itemid);
+		}
+		else
+		{
+			$this->setParameter('return', $siteUrl . 'index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid);
+		}
+		
 		$this->setParameter('cancel_return', $siteUrl . 'index.php?option=com_eventbooking&task=cancel&id=' . $row->id . '&Itemid=' . $Itemid);
 		$this->setParameter('notify_url', $siteUrl . 'index.php?option=com_eventbooking&task=payment_confirm&payment_method=os_paypal');
 		$this->setParameter('address1', $row->address);
