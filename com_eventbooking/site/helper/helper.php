@@ -1811,6 +1811,34 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Get the form fields to display in deposit payment form
+	 *
+	 * @return array
+	 */
+	public static function getDepositPaymentFormFields()
+	{
+		$user        = JFactory::getUser();
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$query->select('*')
+				->from('#__eb_fields')
+				->where('published=1')
+				->where('id < 13')
+				->where(' `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
+				->order('ordering');
+
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('title', 'description', 'values', 'default_values', 'depend_on_options'), $fieldSuffix);
+		}
+
+		$db->setQuery($query);
+
+		return $db->loadObjectList();
+	}
+
+	/**
 	 * Get the form data used to bind to the RADForm object
 	 *
 	 * @param array  $rowFields
@@ -3591,6 +3619,141 @@ class EventbookingHelper
 		for ($i = 0, $n = count($emails); $i < $n; $i++)
 		{
 			$email = $emails[$i];
+			$mailer->clearAllRecipients();
+			$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
+		}
+	}
+
+	/**
+	 * Send email when registrants complete deposit payment
+	 *
+	 * @param  object $row
+	 * @param object  $config
+	 */
+	public static function sendDepositPaymentEmail($row, $config)
+	{
+		$db          = JFactory::getDbo();
+		$mailer      = JFactory::getMailer();
+		$query       = $db->getQuery(true);
+		$message     = self::getMessages();
+		$fieldSuffix = self::getFieldSuffix($row->language);
+		if ($config->from_name)
+		{
+			$fromName = $config->from_name;
+		}
+		else
+		{
+			$fromName = JFactory::getConfig()->get('fromname');
+		}
+		if ($config->from_email)
+		{
+			$fromEmail = $config->from_email;
+		}
+		else
+		{
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
+		}
+
+		$event = EventbookingHelperDatabase::getEvent($row->event_id);
+
+		$rowFields = EventbookingHelper::getDepositPaymentFormFields();
+		$form      = new RADForm($rowFields);
+		$data      = self::getRegistrantData($row, $rowFields);
+		$form->bind($data);
+
+		$replaces = array();
+		foreach ($rowFields as $rowField)
+		{
+			$replaces[$rowField->name] = $row->{$rowField->name};
+		}
+
+		$replaces['AMOUNT']          = $row->amount - $row->deposit_amount;
+		$replaces['REGISTRATION_ID'] = $row->id;
+		$replaces['TRANSACTION_ID']  = $row->deposit_payment_transaction_id;
+
+		//Notification email send to user
+
+		if (JMailHelper::isEmailAddress($row->email))
+		{
+			if (strlen($message->{'deposit_payment_user_email_subject' . $fieldSuffix}))
+			{
+				$subject = $message->{'deposit_payment_user_email_subject' . $fieldSuffix};
+			}
+			else
+			{
+				$subject = $message->deposit_payment_user_email_subject;
+			}
+
+			if (self::isValidMessage($message->{'deposit_payment_user_email_body' . $fieldSuffix}))
+			{
+				$body = $message->{'deposit_payment_user_email_body' . $fieldSuffix};
+			}
+			else
+			{
+				$body = $message->deposit_payment_user_email_body;
+			}
+
+			$subject = str_ireplace('[EVENT_TITLE]', $event->title, $subject);
+			foreach ($replaces as $key => $value)
+			{
+				$key  = strtoupper($key);
+				$body = str_ireplace("[$key]", $value, $body);
+			}
+
+			$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
+		}
+
+		//Send emails to notification emails
+		if (strlen(trim($event->notification_emails)) > 0)
+		{
+			$config->notification_emails = $event->notification_emails;
+		}
+
+		if ($config->notification_emails == '')
+		{
+			$notificationEmails = $fromEmail;
+		}
+		else
+		{
+			$notificationEmails = $config->notification_emails;
+		}
+		$notificationEmails = str_replace(' ', '', $notificationEmails);
+		$emails             = explode(',', $notificationEmails);
+
+		if (strlen($message->{'deposit_payment_admin_email_subject' . $fieldSuffix}))
+		{
+			$subject = $message->{'deposit_payment_admin_email_subject' . $fieldSuffix};
+		}
+		else
+		{
+			$subject = $message->deposit_payment_admin_email_subject;
+		}
+
+		if (self::isValidMessage($message->{'deposit_payment_admin_email_body' . $fieldSuffix}))
+		{
+			$body = $message->{'deposit_payment_admin_email_body' . $fieldSuffix};
+		}
+		else
+		{
+			$body = $message->deposit_payment_admin_email_body;
+		}
+
+		$subject = str_ireplace('[EVENT_TITLE]', $event->title, $subject);
+		foreach ($replaces as $key => $value)
+		{
+			$key  = strtoupper($key);
+			$body = str_ireplace("[$key]", $value, $body);
+		}
+
+		$body = self::convertImgTags($body);
+
+		for ($i = 0, $n = count($emails); $i < $n; $i++)
+		{
+			$email = $emails[$i];
+			if (!JMailHelper::isEmailAddress($email))
+			{
+				continue;
+			}
 			$mailer->clearAllRecipients();
 			$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
 		}
