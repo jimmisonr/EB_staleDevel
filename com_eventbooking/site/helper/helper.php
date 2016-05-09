@@ -904,6 +904,15 @@ class EventbookingHelper
 			$replaces['cancel_registration_link'] = '';
 		}
 
+		if ($config->activate_deposit_feature)
+		{
+			$replaces['make_deposit_payment_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&view=payment&registrant_id='.$row->id.'&Itemid=' . $Itemid;
+		}
+		else
+		{
+			$replaces['make_deposit_payment_link'] = '';
+		}
+
 		return $replaces;
 	}
 
