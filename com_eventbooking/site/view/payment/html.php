@@ -21,7 +21,7 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 		$layout = $this->getLayout();
 		if ($layout == 'complete')
 		{
-			$this->displayPaymentCompelete();
+			$this->displayPaymentComplete();
 
 			return;
 		}
