@@ -132,8 +132,14 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 		$currentYear        = date('Y');
 		$lists['exp_year']  = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
 
-		$methods = os_payments::getPaymentMethods(trim($event->payment_methods));
+		$methods = os_payments::getPaymentMethods(trim($event->payment_methods), false);
 
+		if (count($methods) == 0)
+		{
+			echo JText::_('EB_ENABLE_PAYMENT_METHODS');
+
+			return;
+		}
 
 		$this->loadCaptcha();
 
