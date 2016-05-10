@@ -4141,7 +4141,7 @@ class EventbookingHelper
 
 		$element = new SimpleXMLElement('<field />');
 		$element->addAttribute('name', $fieldName);
-		$element->addAttribute('class', 'readonly');
+		$element->addAttribute('class', 'readonly input-medium');
 
 		if (!$registrantId)
 		{
