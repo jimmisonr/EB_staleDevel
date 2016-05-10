@@ -9,6 +9,9 @@
  */
 // no direct access
 defined('_JEXEC') or die;
+
+JHtml::_('behavior.framework') ;
+
 $bootstrapHelper   = $this->bootstrapHelper;
 $controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
 $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');

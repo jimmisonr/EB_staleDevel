@@ -8,7 +8,10 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;
+defined( '_JEXEC' ) or die;
+
+JHtml::_('behavior.framework') ;
+
 if ($this->item->id)
 {
 	$coordinates = $this->item->lat.','.$this->item->long;
