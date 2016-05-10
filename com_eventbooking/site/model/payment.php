@@ -33,6 +33,8 @@ class EventBookingModelPayment extends RADModel
 		// Calculate the payment amount
 		$paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : '';
 
+		$row->deposit_payment_method = $paymentMethod;
+
 		// Mark the the registration record as "deposit payment processing"
 		$row->process_deposit_payment = 1;
 

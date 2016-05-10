@@ -1210,6 +1210,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('deposit_payment_method', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_registrants` ADD `deposit_payment_method` VARCHAR( 100 ) NULL;;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		if (!in_array('is_group_billing', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `is_group_billing` TINYINT NOT NULL DEFAULT  '0';";
