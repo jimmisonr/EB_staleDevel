@@ -219,18 +219,33 @@ abstract class RADPayment
 	protected function onPaymentSuccess($row, $transactionId)
 	{
 		$config              = EventbookingHelper::getConfig();
-		$row->transaction_id = $transactionId;
-		$row->payment_date   = gmdate('Y-m-d H:i:s');
-		$row->published      = 1;
-		$row->store();
-		if ($row->is_group_billing)
+		if ($row->process_deposit_payment)
 		{
-			EventbookingHelper::updateGroupRegistrationRecord($row->id);
-		}		
-		JPluginHelper::importPlugin('eventbooking');
-		$dispatcher = JEventDispatcher::getInstance();
-		$dispatcher->trigger('onAfterPaymentSuccess', array($row));
-		EventbookingHelper::sendEmails($row, $config);
+			$row->deposit_payment_transaction_id = $transactionId;
+			$row->payment_status = 1;
+			$row->store();
+
+			JPluginHelper::importPlugin('eventbooking');
+			$dispatcher = JEventDispatcher::getInstance();
+			$dispatcher->trigger('onDepositPaymentSuccess', array($row));
+
+			EventbookingHelper::sendDepositPaymentEmail($row, $config);
+		}
+		else
+		{
+			$row->transaction_id = $transactionId;
+			$row->payment_date   = gmdate('Y-m-d H:i:s');
+			$row->published      = 1;
+			$row->store();
+			if ($row->is_group_billing)
+			{
+				EventbookingHelper::updateGroupRegistrationRecord($row->id);
+			}
+			JPluginHelper::importPlugin('eventbooking');
+			$dispatcher = JEventDispatcher::getInstance();
+			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
+			EventbookingHelper::sendEmails($row, $config);
+		}
 	}
 
 	/***

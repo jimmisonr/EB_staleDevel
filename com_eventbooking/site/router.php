@@ -223,6 +223,21 @@ function EventbookingBuildRoute(&$query)
 		case 'search':
 			$segments[] = 'search result';
 			break;
+		case 'payment':
+			$segments[] = 'payment deposit';
+
+			if (isset($query['registrant_id']))
+			{
+				$segments[] = $query['registrant_id'];
+				unset($query['registrant_id']);
+			}
+
+			if ($layout == 'complete')
+			{
+				$segments[] = 'payment-complete';
+				unset($query['layout']);
+			}
+			break;
 		case 'events':
 			$segments[] = 'my events';
 			break;

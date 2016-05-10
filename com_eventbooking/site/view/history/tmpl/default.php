@@ -12,6 +12,8 @@ defined('_JEXEC') or die;
 $cols = 6;
 $return = base64_encode(JUri::getInstance()->toString());
 JHtml::_('formbehavior.chosen', 'select');
+
+$numberPaymentMethods = EventbookingHelper::getNumberNoneOfflinePaymentMethods();
 ?>
 <div id="eb-registration-history-page" class="eb-container row-fluid eb-event">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_REGISTRATION_HISTORY'); ?></h1>
@@ -61,6 +63,17 @@ JHtml::_('formbehavior.chosen', 'select');
 				<th class="list_amount hidden-phone">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_AMOUNT'), 'tbl.amount', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
+				<?php
+					if ($this->config->activate_deposit_feature && $numberPaymentMethods)
+					{
+						$cols++;
+					?>
+						<th style="text-align: right;">
+							<?php echo JText::_('EB_DUE_AMOUNT'); ?>
+						</th>
+					<?php
+					}
+				?>
 				<th class="list_id">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_REGISTRATION_STATUS'), 'tbl.published', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
@@ -124,6 +137,24 @@ JHtml::_('formbehavior.chosen', 'select');
 				<td align="right" class="hidden-phone">
 					<?php echo EventbookingHelper::formatCurrency($row->amount, $this->config) ; ?>
 				</td>
+				<?php
+				if ($this->config->activate_deposit_feature && $numberPaymentMethods)
+				{
+				?>
+					<td style="text-align: right;">
+						<?php
+						if ($row->payment_status == 0)
+						{
+							echo EventbookingHelper::formatCurrency($row->amount - $row->deposit_amount, $this->config);
+						?>
+							<a class="btn btn-primary" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=payment&registrant_id='.$row->id.'&Itemid='.$this->Itemid); ?>"><?php echo JText::_('EB_MAKE_PAYMENT'); ?></a>
+						<?php
+						}
+						?>
+					</td>
+				<?php
+				}
+				?>
 				<td class="center">
 					<?php
 						switch($row->published)
