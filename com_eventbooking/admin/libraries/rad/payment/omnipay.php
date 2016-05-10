@@ -70,7 +70,7 @@ class RADPaymentOmnipay extends OmnipayPayment
 
 		$input  = JFactory::getApplication()->input;
 		$task   = $input->getCmd('task');
-		$Itemid = JFactory::getApplication()->input->get->getInt('Itemid', EventbookingHelper::getItemid());
+		$Itemid = $input->getInt('Itemid', EventbookingHelper::getItemid());
 
 		if ($task == 'process')
 		{
@@ -101,7 +101,7 @@ class RADPaymentOmnipay extends OmnipayPayment
 			$id = $input->getInt('id', 0);
 		}
 
-		$Itemid = $input->get->getInt('Itemid', EventbookingHelper::getItemid());
+		$Itemid = $input->getInt('Itemid', EventbookingHelper::getItemid());
 
 		$task = $input->getCmd('task');
 
