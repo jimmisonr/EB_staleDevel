@@ -70,8 +70,10 @@ table.admintable td label {
 fieldset.adminform {
 	border: none ;	
 }
+
 .form-horizontal label.control-label {
 	text-align: left;
+	width: 160px !important;
 }
 
 .form-horizontal div.controls label {	

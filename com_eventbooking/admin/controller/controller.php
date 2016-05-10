@@ -2276,8 +2276,8 @@ class EventbookingController extends RADControllerAdmin
 		// Insert deposit payment related messages
 		$query->clear()
 				->select('COUNT(*)')
-				->from('#__eb_messsages')
-				->where('deposit_payment_form_message = "deposit_payment_form_message"');
+				->from('#__eb_messages')
+				->where('message_key = "deposit_payment_form_message"');
 		$db->setQuery($query);
 		$total = $db->loadResult();
 		if (!$total)

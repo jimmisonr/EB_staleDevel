@@ -13,8 +13,8 @@ $editor = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 JHtml::_('behavior.tooltip');
 JHtml::_('behavior.modal');
 $format = 'Y-m-d';
-$translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 
+$translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text_multiple' => JText::_('EB_SELECT_CATEGORIES')));
 ?>
 <style>
@@ -84,7 +84,7 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 							<?php echo JText::_('EB_EVENT_START_DATE'); ?>
 						</label>
 						<div class="controls">
-							<?php echo JHtml::_('calendar', ($this->item->event_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_date, $format, null), 'event_date', 'event_date') ; ?>
+							<?php echo JHtml::_('calendar', ($this->item->event_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_date, $format, null), 'event_date', 'event_date', '%Y-%m-%d', array('class' => 'input-small')) ; ?>
 							<?php echo $this->lists['event_date_hour'].' '.$this->lists['event_date_minute']; ?>
 						</div>
 					</div>
@@ -93,7 +93,7 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 							<?php echo JText::_('EB_EVENT_END_DATE'); ?>
 						</label>
 						<div class="controls">
-							<?php echo JHtml::_('calendar', ($this->item->event_end_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_end_date, $format, null), 'event_end_date', 'event_end_date') ; ?>
+							<?php echo JHtml::_('calendar', ($this->item->event_end_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_end_date, $format, null), 'event_end_date', 'event_end_date', '%Y-%m-%d', array('class' => 'input-small')) ; ?>
 							<?php echo $this->lists['event_end_date_hour'].' '.$this->lists['event_end_date_minute']; ?>
 						</div>
 					</div>
@@ -102,7 +102,7 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 							<?php echo JText::_('EB_REGISTRATION_START_DATE'); ?>
 						</label>
 						<div class="controls">
-							<?php echo JHtml::_('calendar', ($this->item->registration_start_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->registration_start_date, $format, null), 'registration_start_date', 'registration_start_date') ; ?>
+							<?php echo JHtml::_('calendar', ($this->item->registration_start_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->registration_start_date, $format, null), 'registration_start_date', 'registration_start_date', '%Y-%m-%d', array('class' => 'input-small')) ; ?>
 							<?php echo $this->lists['registration_start_hour'].' '.$this->lists['registration_start_minute']; ?>
 						</div>
 					</div>
@@ -111,7 +111,7 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 							<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_CUT_OFF_DATE' );?>::<?php echo JText::_('EB_CUT_OFF_DATE_EXPLAIN'); ?>"><?php echo JText::_('EB_CUT_OFF_DATE') ; ?></span>
 						</label>
 						<div class="controls">
-							<?php echo JHtml::_('calendar', ($this->item->cut_off_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->cut_off_date, $format, null), 'cut_off_date', 'cut_off_date') ; ?>
+							<?php echo JHtml::_('calendar', ($this->item->cut_off_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->cut_off_date, $format, null), 'cut_off_date', 'cut_off_date', '%Y-%m-%d', array('class' => 'input-small')) ; ?>
 							<?php echo $this->lists['cut_off_hour'].' '.$this->lists['cut_off_minute']; ?>
 						</div>
 					</div>
@@ -338,7 +338,7 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 							<?php echo JText::_('EB_CANCEL_BEFORE_DATE'); ?>
 						</label>
 						<div class="controls">
-							<?php echo JHtml::_('calendar', $this->item->cancel_before_date != $this->nullDate ? JHtml::_('date', $this->item->cancel_before_date, $format, null) : '', 'cancel_before_date', 'cancel_before_date'); ?>
+							<?php echo JHtml::_('calendar', $this->item->cancel_before_date != $this->nullDate ? JHtml::_('date', $this->item->cancel_before_date, $format, null) : '', 'cancel_before_date', 'cancel_before_date', '%Y-%m-%d', array('class' => 'input-small')); ?>
 						</div>
 					</div>
 					<div class="control-group">
@@ -461,7 +461,7 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 										<td>
 											<input type="radio" name="repeat_until" value="1"  <?php if (($this->item->recurring_occurrencies > 0) || ($this->item->recurring_end_date == '') || ($this->item->recurring_end_date == '0000-00-00 00:00:00')) echo ' checked="checked" ' ; ?> /> <?php echo JText::_('EB_AFTER'); ?> <input type="text" name="recurring_occurrencies" size="5" class="input-small clearfloat" value="<?php echo $this->item->recurring_occurrencies ; ?>" /> <?php echo JText::_('EB_OCCURENCIES'); ?>
 											<br />
-											<input type="radio" name="repeat_until" value="2" <?php if (($this->item->recurring_end_date != '') && ($this->item->recurring_end_date != '0000-00-00 00:00:00')) echo ' checked="checked"' ; ?> /> <?php echo JText::_('EB_AFTER_DATE') ?> <?php echo JHtml::_('calendar', $this->item->recurring_end_date != '0000-00-00 00:00:00' ? JHtml::_('date', $this->item->recurring_end_date, $format, null) : '', 'recurring_end_date', 'recurring_end_date'); ?>
+											<input type="radio" name="repeat_until" value="2" <?php if (($this->item->recurring_end_date != '') && ($this->item->recurring_end_date != '0000-00-00 00:00:00')) echo ' checked="checked"' ; ?> /> <?php echo JText::_('EB_AFTER_DATE') ?> <?php echo JHtml::_('calendar', $this->item->recurring_end_date != '0000-00-00 00:00:00' ? JHtml::_('date', $this->item->recurring_end_date, $format, null) : '', 'recurring_end_date', 'recurring_end_date', '%Y-%m-%d', array('class' => 'input-small')); ?>
 											<br />
 										</td>
 									</tr>
@@ -700,10 +700,10 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label"><?php echo JText::_('EB_TRANSACTION_KEY') ; ?></div>
+			<label class="control-label"><?php echo JText::_('EB_TRANSACTION_KEY') ; ?></label>
 			<div class="controls">
 				<input type="text" name="transaction_key" value="<?php echo $this->item->transaction_key; ?>" class="inputbox" size="30" />
-			</label>
+			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">
