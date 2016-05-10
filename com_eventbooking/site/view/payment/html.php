@@ -163,6 +163,7 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 	 */
 	private function displayPaymentComplete()
 	{
+		$config      = EventbookingHelper::getConfig();
 		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
@@ -185,20 +186,14 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 		$db->setQuery($query);
 		$row = $db->loadObject();
 
-		$rowFields = EventbookingHelper::getDepositPaymentFormFields();
-		$form      = new RADForm($rowFields);
-		$data      = EventbookingHelper::getRegistrantData($row, $rowFields);
-		$form->bind($data);
-
-		$replaces = array();
-		foreach ($rowFields as $rowField)
+		if (empty($row->id))
 		{
-			$replaces[$rowField->name] = $row->{$rowField->name};
+			echo JText::_('Invalid Registration Record');
+
+			return;
 		}
 
-		$replaces['AMOUNT']          = $row->amount - $row->deposit_amount;
-		$replaces['REGISTRATION_ID'] = $row->id;
-		$replaces['TRANSACTION_ID']  = $row->deposit_payment_transaction_id;
+		$replaces = EventbookingHelper::buildDepositPaymentTags($row, $config);
 
 		foreach ($replaces as $key => $value)
 		{

@@ -599,6 +599,45 @@ class EventbookingHelper
 		return (int) $db->loadResult();
 	}
 
+
+	/**
+	 * Method to build common tags use for email messages
+	 *
+	 * @param $row
+	 * @param $config
+	 *
+	 * @return array
+	 */
+	public static function buildDepositPaymentTags($row, $config)
+	{
+		$event  = EventbookingHelperDatabase::getEvent($row->event_id);
+		$method = os_payments::loadPaymentMethod($row->deposit_payment_method);
+
+		$rowFields = static::getDepositPaymentFormFields();
+		$replaces  = array();
+		foreach ($rowFields as $rowField)
+		{
+			$replaces[$rowField->name] = $row->{$rowField->name};
+		}
+
+		if ($method)
+		{
+			$replaces['payment_method'] = JText::_($method->title);
+		}
+		else
+		{
+			$replaces['payment_method'] = '';
+		}
+
+		$replaces['AMOUNT']          = $row->amount - $row->deposit_amount;
+		$replaces['REGISTRATION_ID'] = $row->id;
+		$replaces['TRANSACTION_ID']  = $row->deposit_payment_transaction_id;
+
+		$replaces = array_merge($replaces, static::buildEventTags($event, $config));
+
+		return $replaces;
+	}
+
 	/**
 	 * Build tags related to event
 	 *
@@ -3660,11 +3699,10 @@ class EventbookingHelper
 	 */
 	public static function sendDepositPaymentEmail($row, $config)
 	{
-		$db          = JFactory::getDbo();
 		$mailer      = JFactory::getMailer();
-		$query       = $db->getQuery(true);
 		$message     = self::getMessages();
 		$fieldSuffix = self::getFieldSuffix($row->language);
+
 		if ($config->from_name)
 		{
 			$fromName = $config->from_name;
@@ -3673,6 +3711,7 @@ class EventbookingHelper
 		{
 			$fromName = JFactory::getConfig()->get('fromname');
 		}
+
 		if ($config->from_email)
 		{
 			$fromEmail = $config->from_email;
@@ -3684,23 +3723,9 @@ class EventbookingHelper
 
 		$event = EventbookingHelperDatabase::getEvent($row->event_id);
 
-		$rowFields = EventbookingHelper::getDepositPaymentFormFields();
-		$form      = new RADForm($rowFields);
-		$data      = self::getRegistrantData($row, $rowFields);
-		$form->bind($data);
-
-		$replaces = array();
-		foreach ($rowFields as $rowField)
-		{
-			$replaces[$rowField->name] = $row->{$rowField->name};
-		}
-
-		$replaces['AMOUNT']          = $row->amount - $row->deposit_amount;
-		$replaces['REGISTRATION_ID'] = $row->id;
-		$replaces['TRANSACTION_ID']  = $row->deposit_payment_transaction_id;
+		$replaces = static::buildDepositPaymentTags($row, $config);
 
 		//Notification email send to user
-
 		if (JMailHelper::isEmailAddress($row->email))
 		{
 			if (strlen($message->{'deposit_payment_user_email_subject' . $fieldSuffix}))
