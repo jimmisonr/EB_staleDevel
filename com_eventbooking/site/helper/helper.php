@@ -629,7 +629,7 @@ class EventbookingHelper
 			$replaces['payment_method'] = '';
 		}
 
-		$replaces['AMOUNT']          = $row->amount - $row->deposit_amount;
+		$replaces['AMOUNT']          = static::formatCurrency($row->amount - $row->deposit_amount, $config, $event->currency_symbol);
 		$replaces['REGISTRATION_ID'] = $row->id;
 		$replaces['TRANSACTION_ID']  = $row->deposit_payment_transaction_id;
 
