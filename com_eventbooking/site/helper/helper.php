@@ -3791,11 +3791,11 @@ class EventbookingHelper
 			$body = $message->deposit_payment_admin_email_body;
 		}
 
-		$subject = str_ireplace('[EVENT_TITLE]', $event->title, $subject);
 		foreach ($replaces as $key => $value)
 		{
-			$key  = strtoupper($key);
-			$body = str_ireplace("[$key]", $value, $body);
+			$key     = strtoupper($key);
+			$subject = str_ireplace("[$key]", $value, $subject);
+			$body    = str_ireplace("[$key]", $value, $body);
 		}
 
 		$body = self::convertImgTags($body);
