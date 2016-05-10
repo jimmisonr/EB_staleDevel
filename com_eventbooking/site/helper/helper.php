@@ -171,7 +171,7 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Get page params of the givem view
+	 * Get page params of the given view
 	 *
 	 * @param $active
 	 * @param $views
@@ -578,6 +578,25 @@ class EventbookingHelper
 		{
 			return "lang : '" . $tag . "',";
 		}
+	}
+
+	/**
+	 * Count total none-offline payment methods.
+	 *
+	 * @return int
+	 */
+	public static function getNumberNoneOfflinePaymentMethods()
+	{
+
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true)
+				->select('COUNT(*)')
+				->from('#__eb_payment_plugins')
+				->where('published = 1')
+				->where('NAME NOT LIKE "os_offline%"');
+		$db->setQuery($query);
+
+		return (int) $db->loadResult();
 	}
 
 	/**
