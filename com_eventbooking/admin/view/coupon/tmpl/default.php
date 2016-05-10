@@ -36,77 +36,73 @@ JHtml::_('formbehavior.chosen', 'select');
 		}
 	}
 </script>
-<form action="index.php?option=com_eventbooking&view=coupon" method="post" name="adminForm" id="adminForm">
-	<div class="row-fluid">
-		<table class="admintable adminform">
-			<tr>
-				<td width="180" class="key">
-					<?php echo JText::_('EB_CODE'); ?>
-				</td>
-				<td>
-					<input class="text_area" type="text" name="code" id="code" size="15" maxlength="250"
-					       value="<?php echo $this->item->code; ?>"/>
-				</td>
-			</tr>
-			<tr>
-				<td width="100" class="key">
-					<?php echo JText::_('EB_DISCOUNT'); ?>
-				</td>
-				<td>
-					<input class="input-small" type="text" name="discount" id="discount" size="10" maxlength="250"
-					       value="<?php echo $this->item->discount; ?>"/>&nbsp;&nbsp;<?php echo $this->lists['coupon_type']; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_EVENT'); ?>
-				</td>
-				<td>
-					<?php echo $this->lists['event_id']; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_TIMES'); ?>
-				</td>
-				<td>
-					<input class="input-small" type="text" name="times" id="times" size="5" maxlength="250"
-					       value="<?php echo $this->item->times; ?>"/>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_TIME_USED'); ?>
-				</td>
-				<td>
-					<?php echo $this->item->used; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_VALID_FROM_DATE'); ?>
-				</td>
-				<td>
-					<?php echo JHtml::_('calendar', $this->item->valid_from != $this->nullDate ? $this->item->valid_from : '', 'valid_from', 'valid_from'); ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_VALID_TO_DATE'); ?>
-				</td>
-				<td>
-					<?php echo JHtml::_('calendar', $this->item->valid_to != $this->nullDate ? $this->item->valid_to : '', 'valid_to', 'valid_to'); ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_PUBLISHED'); ?>
-				</td>
-				<td>
-					<?php echo $this->lists['published']; ?>
-				</td>
-			</tr>
-		</table>
+<form action="index.php?option=com_eventbooking&view=coupon" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_CODE'); ?>
+		</label>
+		<div class="controls">
+			<input class="text_area" type="text" name="code" id="code" size="15" maxlength="250"
+			       value="<?php echo $this->item->code; ?>"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_DISCOUNT'); ?>
+		</label>
+		<div class="controls">
+			<input class="input-small" type="text" name="discount" id="discount" size="10" maxlength="250"
+			       value="<?php echo $this->item->discount; ?>"/>&nbsp;&nbsp;<?php echo $this->lists['coupon_type']; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_EVENT'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['event_id']; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_TIMES'); ?>
+		</label>
+		<div class="controls">
+			<input class="input-small" type="text" name="times" id="times" size="5" maxlength="250"
+			       value="<?php echo $this->item->times; ?>"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_TIME_USED'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->item->used; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_VALID_FROM_DATE'); ?>
+		</label>
+		<div class="controls">
+			<?php echo JHtml::_('calendar', $this->item->valid_from != $this->nullDate ? $this->item->valid_from : '', 'valid_from', 'valid_from'); ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_VALID_TO_DATE'); ?>
+		</label>
+		<div class="controls">
+			<?php echo JHtml::_('calendar', $this->item->valid_to != $this->nullDate ? $this->item->valid_to : '', 'valid_to', 'valid_to'); ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_PUBLISHED'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['published']; ?>
+		</div>
 	</div>
 	<div class="clearfix"></div>
 	<?php echo JHtml::_('form.token'); ?>

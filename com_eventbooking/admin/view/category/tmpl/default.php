@@ -9,7 +9,12 @@
  */
 
  // no direct access
-defined( '_JEXEC' ) or die ;
+defined( '_JEXEC' ) or die;
+
+JHtml::_('bootstrap.tooltip');
+$document = JFactory::getDocument();
+$document->addStyleDeclaration(".hasTip{display:block !important}");
+JHtml::_('formbehavior.chosen', 'select');
 
 $editor = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
@@ -30,8 +35,7 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 		}
 	}
 </script>
-<div class="row-fluid">
-<form action="index.php?option=com_eventbooking&view=category" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_eventbooking&view=category" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
 <?php
 if ($translatable)
 {
@@ -39,98 +43,94 @@ if ($translatable)
 	echo JHtml::_('bootstrap.addTab', 'category', 'general-page', JText::_('EB_GENERAL', true));
 }
 ?>
-	<table class="admintable adminform">
-		<tr>
-			<td width="250" class="key">
-				<?php echo  JText::_('EB_NAME'); ?>
-			</td>
-			<td>
-				<input class="text_area" type="text" name="name" id="name" size="40" maxlength="250" value="<?php echo $this->item->name;?>" />
-			</td>
-		</tr>
-		<tr>
-			<td class="key">
-				<?php echo  JText::_('EB_ALIAS'); ?>
-			</td>
-			<td>
-				<input class="text_area" type="text" name="alias" id="alias" maxlength="250" value="<?php echo $this->item->alias;?>" />
-			</td>
-		</tr>
-		<tr>
-			<td class="key">
-				<?php echo  JText::_('EB_PARENT'); ?>
-			</td>
-			<td>
-				<?php echo $this->lists['parent']; ?>
-			</td>
-		</tr>
-		<tr>
-			<td class="key">
-				<?php echo  JText::_('EB_LAYOUT'); ?>
-			</td>
-			<td>
-				<?php echo $this->lists['layout']; ?>
-			</td>
-		</tr>
-		<tr>
-			<td class="key">
-				<?php echo  JText::_('EB_ACCESS_LEVEL'); ?>
-			</td>
-			<td>
-				<?php echo $this->lists['access']; ?>
-			</td>
-		</tr>
-		<tr>
-			<td class="key">
-				<?php echo JText::_('EB_COLOR'); ?>
-			</td>
-			<td>
-				<input type="text" name="color_code" class="inputbox color {required:false}" value="<?php echo $this->item->color_code; ?>" size="10" />
-				<?php echo JText::_('EB_COLOR_EXPLAIN'); ?>
-			</td>
-		</tr>
-		<tr>
-			<td class="key">
-				<?php echo  JText::_('EB_META_KEYWORDS'); ?>
-			</td>
-			<td>
-				<textarea rows="5" cols="30" class="input-lage" name="meta_keywords"><?php echo $this->item->meta_keywords; ?></textarea>
-			</td>
-		</tr>
-		<tr>
-			<td class="key">
-				<?php echo  JText::_('EB_META_DESCRIPTION'); ?>
-			</td>
-			<td>
-				<textarea rows="5" cols="30" class="input-lage" name="meta_description"><?php echo $this->item->meta_description; ?></textarea>
-			</td>
-		</tr>
-		<tr>
-			<td class="key">
-				<?php echo JText::_('EB_DESCRIPTION'); ?>
-			</td>
-			<td>
-				<?php echo $editor->display( 'description',  $this->item->description , '100%', '250', '75', '10' ) ; ?>
-			</td>
-		</tr>
-		<tr>
-			<td class="key">
-				<?php echo JText::_('EB_SHOW_ON_SUBMIT_EVENT_FORM'); ?>
-				<p class="description" style="font-weight: normal; font-style: italic;"><?php echo JText::_('EB_SHOW_ON_SUBMIT_EVENT_FORM_EXPLAIN'); ?></p>
-			</td>
-			<td>
-				<?php echo $this->lists['show_on_submit_event_form']; ?>
-			</td>
-		</tr>
-		<tr>
-			<td class="key">
-				<?php echo JText::_('EB_PUBLISHED'); ?>
-			</td>
-			<td>
-				<?php echo $this->lists['published']; ?>
-			</td>
-		</tr>
-	</table>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_NAME'); ?>
+		</label>
+		<div class="controls">
+			<input class="text_area" type="text" name="name" id="name" size="40" maxlength="250" value="<?php echo $this->item->name;?>" />
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_ALIAS'); ?>
+		</label>
+		<div class="controls">
+			<input class="text_area" type="text" name="alias" id="alias" maxlength="250" value="<?php echo $this->item->alias;?>" />
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_PARENT'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['parent']; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_LAYOUT'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['layout']; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_ACCESS_LEVEL'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['access']; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo EventbookingHelperHtml::getFieldLabel('show_on_submit_event_form', JText::_('EB_SHOW_ON_SUBMIT_EVENT_FORM'), JText::_('EB_SHOW_ON_SUBMIT_EVENT_FORM_EXPLAIN')); ?>
+		</label>
+		<div class="controls">
+			<?php echo EventbookingHelperHtml::getBooleanInput('show_on_submit_event_form', $this->item->show_on_submit_event_form); ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_PUBLISHED'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['published']; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo EventbookingHelperHtml::getFieldLabel('color_code', JText::_('EB_COLOR'), JText::_('EB_COLOR_EXPLAIN')); ?>
+		</label>
+		<div class="controls">
+			<input type="text" name="color_code" class="inputbox color {required:false}" value="<?php echo $this->item->color_code; ?>" size="10" />
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_META_KEYWORDS'); ?>
+		</label>
+		<div class="controls">
+			<textarea rows="5" cols="30" class="input-lage" name="meta_keywords"><?php echo $this->item->meta_keywords; ?></textarea>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_META_DESCRIPTION'); ?>
+		</label>
+		<div class="controls">
+			<textarea rows="5" cols="30" class="input-lage" name="meta_description"><?php echo $this->item->meta_description; ?></textarea>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_DESCRIPTION'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $editor->display( 'description',  $this->item->description , '100%', '250', '75', '10' ) ; ?>
+		</div>
+	</div>
 <?php
 if ($translatable)
 {
@@ -142,32 +142,30 @@ if ($translatable)
 		$sef = $language->sef;
 		echo JHtml::_('bootstrap.addTab', 'category-translation', 'translation-page-' . $sef, $language->title . ' <img src="' . JUri::root() . 'media/com_eventbooking/flags/' . $sef . '.png" />');
 		?>
-		<table class="admintable adminform" style="width: 100%;">
-			<tr>
-				<td class="key" width="250">
+			<div class="control-group">
+				<label class="control-label">
 					<?php echo JText::_('EB_NAME'); ?>
-				</td>
-				<td>
+				</label>
+				<div class="controls">
 					<input class="input-xlarge" type="text" name="name_<?php echo $sef; ?>" id="name_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'name_' . $sef}; ?>"/>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
 					<?php echo JText::_('EB_ALIAS'); ?>
-				</td>
-				<td>
+				</label>
+				<div class="controls">
 					<input class="input-xlarge" type="text" name="alias_<?php echo $sef; ?>" id="alias_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'alias_' . $sef}; ?>"/>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
 					<?php echo JText::_('EB_DESCRIPTION'); ?>
-				</td>
-				<td>
+				</label>
+				<div class="controls">
 					<?php echo $editor->display('description_' . $sef, $this->item->{'description_' . $sef}, '100%', '250', '75', '10'); ?>
-				</td>
-			</tr>
-		</table>
+				</div>
+			</div>
 		<?php
 		echo JHtml::_('bootstrap.endTab');
 	}
@@ -181,4 +179,3 @@ if ($translatable)
 <input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 <input type="hidden" name="task" value="" />
 </form>
-</div>
