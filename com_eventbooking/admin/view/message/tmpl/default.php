@@ -399,7 +399,7 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 		<div class="control-label">
 			<?php echo EventbookingHelperHtml::getFieldLabel('deposit_payment_thanks_message', JText::_('EB_DEPOSIT_PAYMENT_THANK_YOU_MESSAGE'), JText::_('EB_DEPOSIT_PAYMENT_THANK_YOU_MESSAGE_EXPLAIN')); ?>
 			<p class="eb-available-tags">
-				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>:
+				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[EVENT_TITLE], [REGISTRAION_ID], [AMOUNT], [PAYMENT_METHOD]</strong>
 			</p>
 		</div>
 		<div class="controls">
@@ -409,10 +409,7 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 
 	<div class="control-group">
 		<div class="control-label">
-			<?php echo EventbookingHelperHtml::getFieldLabel('deposit_payment_admin_email_subject', JText::_('EB_DEPOSIT_PAYMENT_ADMIN_EMAIL_SUBJECT')); ?>
-			<p class="eb-available-tags">
-				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[EVENT_TITLE]</strong>
-			</p>
+			<?php echo EventbookingHelperHtml::getFieldLabel('deposit_payment_admin_email_subject', JText::_('EB_DEPOSIT_PAYMENT_ADMIN_EMAIL_SUBJECT')); ?>			
 		</div>
 		<div class="controls">
 			<input type="text" name="deposit_payment_admin_email_subject" class="input-xlarge" value="<?php echo $this->message->deposit_payment_admin_email_subject; ?>" size="80" />
@@ -422,7 +419,7 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 		<div class="control-label">
 			<?php echo EventbookingHelperHtml::getFieldLabel('deposit_payment_admin_email_body', JText::_('EB_DEPOSIT_PAYMENT_ADMIN_EMAIL_BODY')); ?>
 			<p class="eb-available-tags">
-				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>:
+				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[EVENT_TITLE], [REGISTRAION_ID], [AMOUNT], [PAYMENT_METHOD]</strong>
 			</p>
 		</div>
 		<div class="controls">
@@ -431,10 +428,7 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 	</div>
 	<div class="control-group">
 		<div class="control-label">
-			<?php echo EventbookingHelperHtml::getFieldLabel('deposit_payment_user_email_subject', JText::_('EB_DEPOSIT_PAYMENT_USER_EMAIL_SUBJECT')); ?>
-			<p class="eb-available-tags">
-				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[EVENT_TITLE]</strong>
-			</p>
+			<?php echo EventbookingHelperHtml::getFieldLabel('deposit_payment_user_email_subject', JText::_('EB_DEPOSIT_PAYMENT_USER_EMAIL_SUBJECT')); ?>			
 		</div>
 		<div class="controls">
 			<input type="text" name="deposit_payment_user_email_subject" class="input-xlarge" value="<?php echo $this->message->deposit_payment_user_email_subject; ?>" size="50" />
@@ -444,7 +438,7 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 		<div class="control-label">
 			<?php echo EventbookingHelperHtml::getFieldLabel('deposit_payment_user_email_body', JText::_('EB_DEPOSIT_PAYMENT_USER_EMAIL_BODY')); ?>
 			<p class="eb-available-tags">
-				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>:
+				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[EVENT_TITLE], [REGISTRAION_ID], [AMOUNT], [PAYMENT_METHOD]</strong>
 			</p>
 		</div>
 		<div class="controls">

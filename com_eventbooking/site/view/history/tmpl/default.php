@@ -12,8 +12,6 @@ defined('_JEXEC') or die;
 $cols = 6;
 $return = base64_encode(JUri::getInstance()->toString());
 JHtml::_('formbehavior.chosen', 'select');
-
-$numberPaymentMethods = EventbookingHelper::getNumberNoneOfflinePaymentMethods();
 ?>
 <div id="eb-registration-history-page" class="eb-container row-fluid eb-event">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_REGISTRATION_HISTORY'); ?></h1>
@@ -64,7 +62,7 @@ $numberPaymentMethods = EventbookingHelper::getNumberNoneOfflinePaymentMethods()
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_AMOUNT'), 'tbl.amount', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
 				<?php
-					if ($this->config->activate_deposit_feature && $numberPaymentMethods)
+					if ($this->config->activate_deposit_feature && $this->showDueAmountColumn)
 					{
 						$cols++;
 					?>
@@ -138,7 +136,7 @@ $numberPaymentMethods = EventbookingHelper::getNumberNoneOfflinePaymentMethods()
 					<?php echo EventbookingHelper::formatCurrency($row->amount, $this->config) ; ?>
 				</td>
 				<?php
-				if ($this->config->activate_deposit_feature && $numberPaymentMethods)
+				if ($this->config->activate_deposit_feature && $this->showDueAmountColumn)
 				{
 				?>
 					<td style="text-align: right;">
