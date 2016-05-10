@@ -24,8 +24,9 @@ class EventbookingModelFields extends RADModelList
 		parent::__construct($config);
 
 		$this->state->insert('filter_category_id', 'int', 0)
-			->insert('filter_event_id', 'int', 0)
-			->insert('filter_show_core_fields', 'int', 0);
+				->insert('filter_event_id', 'int', 0)
+				->insert('filter_show_core_fields', 'int', 0)
+				->insert('filter_fee_field', 'int', -1);
 	}
 
 	/**
@@ -45,6 +46,11 @@ class EventbookingModelFields extends RADModelList
 		if ($state->filter_show_core_fields == 2)
 		{
 			$query->where('tbl.is_core = 0');
+		}
+
+		if ($state->filter_fee_field != -1)
+		{
+			$query->where('fee_field = '. $state->filter_fee_field);
 		}
 
 		return parent::buildQueryWhere($query);
