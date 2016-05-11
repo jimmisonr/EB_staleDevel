@@ -572,7 +572,7 @@ class RADModelAdmin extends RADModel
 			{
 				$row->alias = $row->{$titleField};
 			}
-			$row->alias = JApplication::stringURLSafe($row->alias);
+			$row->alias = JApplicationHelper::stringURLSafe($row->alias);
 
 			// Handle alias for extra languages
 			if (JLanguageMultilang::isEnabled())
@@ -586,11 +586,11 @@ class RADModelAdmin extends RADModel
 						$sef = $language->sef;
 						if (!$row->{'alias_' . $sef})
 						{
-							$row->{'alias_' . $sef} = JApplication::stringURLSafe($row->{$titleField . '_' . $sef});
+							$row->{'alias_' . $sef} = JApplicationHelper::stringURLSafe($row->{$titleField . '_' . $sef});
 						}
 						else
 						{
-							$row->{'alias_' . $sef} = JApplication::stringURLSafe($row->{'alias_' . $sef});
+							$row->{'alias_' . $sef} = JApplicationHelper::stringURLSafe($row->{'alias_' . $sef});
 						}
 					}
 				}
