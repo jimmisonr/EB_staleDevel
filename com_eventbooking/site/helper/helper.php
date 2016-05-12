@@ -2928,39 +2928,6 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Check to see whether the ideal payment plugin installed and activated
-	 * @return boolean
-	 */
-	public static function idealEnabled()
-	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('COUNT(id)')
-			->from('#__eb_payment_plugins')
-			->where('name = "os_ideal"')
-			->where('published = 1');
-		$db->setQuery($query);
-		$total = $db->loadResult();
-		if ($total)
-		{
-			if (file_exists(JPATH_ROOT . '/components/com_eventbooking/payments/Mollie/API/Autoloader.php'))
-			{
-				require_once JPATH_ROOT . '/components/com_eventbooking/payments/Mollie/API/Autoloader.php';
-			}
-			else
-			{
-				require_once JPATH_ROOT . '/components/com_eventbooking/payments/ideal/ideal.class.php';
-			}
-
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	/**
 	 * Send notification emails to waiting list users when someone cancel registration
 	 *
 	 * @param $row
