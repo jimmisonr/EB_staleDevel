@@ -289,13 +289,14 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	}
 
 	/**
-	 * Checkin a registration record
+	 * Check-in a registration record
 	 *
 	 * @param $id
+	 * @pram  $group
 	 *
 	 * @return int
 	 */
-	public function checkin($id)
+	public function checkin($id, $group = false)
 	{
 		$row = $this->getTable();
 		$row->load($id);
@@ -310,7 +311,15 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			return 1;
 		}
 
-		$row->checked_in_count = $row->checked_in_count + 1;
+		if ($group)
+		{
+			$row->checked_in_count = $row->number_registrants;
+		}
+		else
+		{
+			$row->checked_in_count = $row->checked_in_count + 1;
+		}
+
 		if ($row->checked_in_count == $row->number_registrants)
 		{
 			$row->checked_in = 1;
@@ -318,5 +327,28 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 		$row->store();
 
 		return 2;
+	}
+
+	/**
+	 * Reset check-in status for the registration record
+	 *
+	 * @param $id
+	 *
+	 * @throws Exception
+	 */
+	public function resetCheckin($id)
+	{
+		$row = $this->getTable();
+		$row->load($id);
+
+		if (empty($row))
+		{
+			throw new Exception(JText::sprintf('Error checkin registration record %s', $id));
+		}
+
+		$row->checked_in_count = 0;
+		$row->checked_in       = 0;
+
+		$row->store();
 	}
 }

@@ -169,7 +169,13 @@ $colSpan = 11;
 
 				$img 	= $row->checked_in ? 'tick.png' : 'publish_x.png';
 				$alt 	= $row->checked_in ? JText::_( 'EB_CHECKED_IN' ) : JText::_( 'EB_NOT_CHECKED_IN');
-				$img = JHtml::_('image','admin/'.$img, $alt, array('border' => 0), true) ;
+				$img = JHtml::_('image','admin/'.$img, $alt, array('border' => 0), true);
+				$action = $row->checked_in ? JText::_( 'EB_UN_CHECKIN' ) : JText::_( 'EB_CHECKIN' );
+				$task 	= $row->checked_in ? 'reset_check_in' : 'check_in';
+				$href = '
+					<a href="javascript:void(0);" onclick="return listItemTask(\'cb'. $i .'\',\''. $task .'\')" title="'. $action .'">'.
+						$img .'</a>'
+				;
 				?>
 				<tr class="<?php echo "row$k"; ?>">
 					<td class="text_center">
@@ -267,7 +273,7 @@ $colSpan = 11;
 					if ($this->config->activate_checkin_registrants)
 					{
 					?>
-						<td class="center"><?php echo $img; ?></td>
+						<td class="center"><?php echo $href; ?></td>
 					<?php
 					}
 					if ($this->config->activate_invoice_feature)

@@ -98,4 +98,48 @@ class EventbookingControllerRegistrant extends EventbookingController
 		$id = $this->input->getInt('id');
 		EventbookingHelper::downloadInvoice($id);
 	}
+
+	/*
+	 * Check in a registrant
+	 */
+	public function check_in()
+	{
+		$cid = $this->input->get('cid', array(), 'array');
+
+		$model  = $this->getModel();
+
+		try
+		{
+			$model->checkin($cid[0], true);
+			$this->setMessage(JText::_('EB_CHECKIN_SUCCESSFULLY'));
+		}
+		catch(Exception $e)
+		{
+			$this->setMessage($e->getMessage(), 'error');
+		}
+
+		$this->setRedirect('index.php?option=com_eventbooking&view=registrants');
+	}
+
+	/**
+	 * Reset check in for a registrant
+	 */
+	public function reset_check_in()
+	{
+		$cid = $this->input->get('cid', array(), 'array');
+
+		$model  = $this->getModel();
+
+		try
+		{
+			$model->resetCheckin($cid[0]);
+			$this->setMessage(JText::_('EB_RESET_CHECKIN_SUCCESSFULLY'));
+		}
+		catch(Exception $e)
+		{
+			$this->setMessage($e->getMessage(), 'error');
+		}
+
+		$this->setRedirect('index.php?option=com_eventbooking&view=registrants');
+	}
 }
