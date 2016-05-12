@@ -159,7 +159,9 @@ $selectedState = '';
 		}
 		if ($this->canChangeStatus)
 		{
-		?>
+			if ($this->config->activate_checkin_registrants)
+			{
+			?>
 			<tr>
 				<td class="title_cell">
 					<?php echo JText::_('EB_CHECKED_IN'); ?>
@@ -168,7 +170,9 @@ $selectedState = '';
 					<?php echo $this->lists['checked_in']; ?>
 				</td>
 			</tr>
-
+			<?php
+			}
+		?>			
 			<tr>
 				<td class="title_cell">
 					<?php echo JText::_('EB_REGISTRATION_STATUS'); ?>
