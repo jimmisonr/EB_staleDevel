@@ -3013,6 +3013,11 @@ class EventbookingHelper
 			}
 			foreach ($registrants as $registrant)
 			{
+				if (!JMailHelper::isEmailAddress($registrant->email))
+				{
+					continue;
+				}
+
 				$message                = $body;
 				$replaces['first_name'] = $registrant->first_name;
 				$replaces['last_name']  = $registrant->last_name;
@@ -3225,7 +3230,10 @@ class EventbookingHelper
 				$attachments[] = $ics->save(JPATH_ROOT . '/media/com_eventbooking/icsfiles/', $fileName);
 			}
 
-			$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1, null, null, $attachments);
+			if (JMailHelper::isEmailAddress($row->email))
+			{
+				$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1, null, null, $attachments);
+			}
 
 			if ($config->send_email_to_group_members && $row->is_group_billing)
 			{
@@ -3255,10 +3263,11 @@ class EventbookingHelper
 					$memberFormFields                    = self::getFormFields($row->event_id, 2);
 					foreach ($rowMembers as $rowMember)
 					{
-						if (!$rowMember->email)
+						if (!JMailHelper::isEmailAddress($rowMember->email))
 						{
 							continue;
 						}
+
 						if (strlen($message->{'group_member_email_subject' . $fieldSuffix}))
 						{
 							$subject = $message->{'group_member_email_subject' . $fieldSuffix};
@@ -3419,14 +3428,16 @@ class EventbookingHelper
 			for ($i = 0, $n = count($emails); $i < $n; $i++)
 			{
 				$email = $emails[$i];
-				$mailer->clearAllRecipients();
-				if ($email)
+				if (!JMailHelper::isEmailAddress($email))
 				{
-					$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
+					continue;
 				}
+
+				$mailer->clearAllRecipients();
+				$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
 			}
 
-			if (!empty($eventCreator->email) && !$eventCreator->authorise('core.admin') && !in_array($eventCreator->email, $emails))
+			if (!empty($eventCreator->email) && !$eventCreator->authorise('core.admin') && JMailHelper::isEmailAddress($eventCreator->email) && !in_array($eventCreator->email, $emails))
 			{
 				$mailer->clearAllRecipients();
 				$mailer->sendMail($fromEmail, $fromName, $eventCreator->email, $subject, $body, 1);
