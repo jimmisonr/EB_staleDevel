@@ -65,6 +65,12 @@ class EventbookingModelCalendar extends RADModel
 		$month           = $this->state->month ? $this->state->month : $this->state->default_month;
 		$currentDateData = self::getCurrentDateData();
 
+		// Exclude categories
+		$params = JFactory::getApplication()->getParams();
+		$excludeCategoryIds = JFactory::getApplication()->getParams()->get('exclude_category_ids');
+		JArrayHelper::toInteger($excludeCategoryIds);
+		$excludeCategoryIds = array_filter($excludeCategoryIds);
+
 		if (!$year)
 		{
 			$year = $currentDateData['year'];
@@ -119,6 +125,11 @@ class EventbookingModelCalendar extends RADModel
 		{
 			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
 			$query->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')');
+		}
+
+		if (!empty($excludeCategoryIds))
+		{
+			$query->where('a.id NOT IN (SELECT event_id FROM #__eb_event_categories WHERE category_id IN ('.implode(',', $excludeCategoryIds).'))');
 		}
 
 		$db->setQuery($query);
