@@ -60,7 +60,7 @@ class RADViewItem extends RADViewHtml
 		$this->item  = $this->model->getData();
 		if (property_exists($this->item, 'published'))
 		{
-			$this->lists['published'] = JHtml::_('select.booleanlist', 'published', ' ', $this->item->published);
+			$this->lists['published'] = EventbookingHelperHtml::getBooleanInput('published', $this->item->published);
 		}
 		if (property_exists($this->item, 'access'))
 		{

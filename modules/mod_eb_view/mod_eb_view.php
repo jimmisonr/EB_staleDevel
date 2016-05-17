@@ -28,6 +28,20 @@ if (file_exists(JPATH_ROOT . '/components/com_eventbooking/eventbooking.php'))
 	{
 		$request['Itemid'] = EventbookingHelper::getItemid();	
 	}
+
+	if (!isset($request['limitstart']))
+	{
+		$appInput   = JFactory::getApplication()->input;
+		$start      = $appInput->get->getInt('start', 0);
+		$limitStart = $appInput->get->getInt('limitstart', 0);
+		if ($start && !$limitStart)
+		{
+			$limitStart = $start;
+		}
+
+		$request['limitstart'] = $limitStart;
+	}
+
 	$input   = new RADInput($request);
 	$config  = EventbookingHelper::getComponentSettings('site');
 	RADController::getInstance('com_eventbooking', $input, $config)

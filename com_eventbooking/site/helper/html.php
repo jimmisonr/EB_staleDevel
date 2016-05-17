@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.4.3
+ * @version            2.5.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -103,22 +103,35 @@ abstract class EventbookingHelperHtml
 			$layout = str_replace('common/', 'common/tmpl/', $layout);
 		}
 
-		if (JFile::exists($layout))
+		$deviceType = EventbookingHelper::getDeviceType();
+
+		$paths = array($layout);
+
+		if ($deviceType != 'desktop')
 		{
-			$path = $layout;
+			$paths[] = JPATH_THEMES . '/' . $app->getTemplate() . '/html/com_eventbooking/' . str_replace('.php', '.' . $deviceType . '.php', $themeFile);
+			$paths[] = JPATH_ROOT . '/components/com_eventbooking/view/' . str_replace('.php', '.' . $deviceType . '.php', $layout);
 		}
-		elseif (JFile::exists(JPATH_THEMES . '/' . $app->getTemplate() . '/html/com_eventbooking/' . $themeFile))
+
+		$paths[] = JPATH_THEMES . '/' . $app->getTemplate() . '/html/com_eventbooking/' . $themeFile;
+		$paths[] = JPATH_ROOT . '/components/com_eventbooking/view/' . $layout;
+		
+		$path = '';
+
+		foreach ($paths as $possiblePath)
 		{
-			$path = JPATH_THEMES . '/' . $app->getTemplate() . '/html/com_eventbooking/' . $themeFile;
+			if (JFile::exists($possiblePath))
+			{
+				$path = $possiblePath;
+				break;
+			}
 		}
-		elseif (JFile::exists(JPATH_ROOT . '/components/com_eventbooking/view/' . $layout))
+
+		if (empty($path))
 		{
-			$path = JPATH_ROOT . '/components/com_eventbooking/view/' . $layout;
+			throw new RuntimeException(JText::sprintf('The given common layout %s does not exist', $layout));
 		}
-		else
-		{
-			throw new RuntimeException(JText::_('The given shared template path is not exist'));
-		}
+
 
 		// Start an output buffer.
 		ob_start();

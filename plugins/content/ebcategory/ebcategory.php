@@ -12,7 +12,7 @@ defined('_JEXEC') or die;
 class plgContentEbCategory extends JPlugin
 {
 
-	function onContentPrepare($context, &$article, &$params, $limitstart)
+	public function onContentPrepare($context, &$article, &$params, $limitstart)
 	{
 		if (file_exists(JPATH_ROOT . '/components/com_eventbooking/eventbooking.php'))
 		{
@@ -47,6 +47,16 @@ class plgContentEbCategory extends JPlugin
 		EventbookingHelper::loadLanguage();
 		$categoryId = (int) $matches[1];
 		$request    = array('option' => 'com_eventbooking', 'view' => 'category', 'id' => $categoryId, 'limit' => 0, 'hmvc_call' => 1, 'Itemid' => EventbookingHelper::getItemid());
+
+		$appInput   = JFactory::getApplication()->input;
+		$start      = $appInput->get->getInt('start', 0);
+		$limitStart = $appInput->get->getInt('limitstart', 0);
+		if ($start && !$limitStart)
+		{
+			$limitStart = $start;
+		}
+		$request['limitstart'] = $limitStart;
+
 		$input      = new RADInput($request);
 		$config     = EventbookingHelper::getComponentSettings('site');
 		ob_start();

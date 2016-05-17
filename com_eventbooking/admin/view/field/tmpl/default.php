@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.4.3
+ * @version            2.5.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -9,6 +9,11 @@
  */
 // no direct access
 defined('_JEXEC') or die;
+
+JHtml::_('bootstrap.tooltip');
+$document = JFactory::getDocument();
+$document->addStyleDeclaration(".hasTip{display:block !important}");
+
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 JHtml::_('formbehavior.chosen', 'select#event_id,select#category_id');
 ?>
@@ -39,7 +44,7 @@ JHtml::_('formbehavior.chosen', 'select#event_id,select#category_id');
 		}
 	}
 </script>
-<form action="index.php?option=com_eventbooking&view=field" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_eventbooking&view=field" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
 <div class="row-fluid">
 <?php
 if ($translatable)
@@ -48,428 +53,334 @@ if ($translatable)
 	echo JHtml::_('bootstrap.addTab', 'field', 'general-page', JText::_('EB_GENERAL', true));
 }
 ?>
-<table class="admintable adminform">
-	<?php
-		if ($this->config->custom_field_by_category)
-		{
-		?>
-			<tr>
-				<td class="key" valign="top" width="20%">
-					<?php echo JText::_('EB_CATEGORY'); ?>
-				</td>
-				<td style="margin-bottom: 10px;">
-					<?php echo $this->lists['category_id'] ; ?>
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
-		<?php
-		}
-		else
-		{
-		?>
-			<tr>
-				<td class="key" valign="top" width="20%">
-					<?php echo JText::_('EB_EVENT'); ?>
-				</td>
-				<td>
-					<?php echo $this->lists['event_id'] ; ?>
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
-		<?php
-		}
-	?>
-	<tr>
-		<td class="key">
-			<?php echo JText::_('EB_FIELD_TYPE'); ?>
-		</td>
-		<td>
-			<?php echo $this->lists['fieldtype']; ?>
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo  JText::_('EB_NAME'); ?>
-		</td>
-		<td>
-			<input class="text_area" type="text" name="name" id="name" size="50" maxlength="250" value="<?php echo $this->item->name;?>" onchange="checkFieldName();" <?php if ($this->item->is_core) echo 'readonly="readonly"' ;?> />
-		</td>
-		<td>
-			<?php echo JText::_('EB_FIELD_NAME_REQUIREMENT'); ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo  JText::_('EB_TITLE'); ?>
-		</td>
-		<td>
-			<input class="text_area" type="text" name="title" id="title" size="50" maxlength="250" value="<?php echo $this->item->title;?>" />
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr class="eb-field eb-list">
-		<td class="key">
-			<?php echo JText::_('EB_MULTIPLE'); ?>
-		</td>
-		<td>
-			<?php echo $this->lists['multiple']; ?>
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_('EB_REQUIRED'); ?>
-		</td>
-		<td>
-			<?php echo $this->lists['required']; ?>
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_('EB_DATATYPE_VALIDATION') ; ?>
-		</td>
-		<td>
-			<?php echo $this->lists['datatype_validation']; ?>
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr class="validation-rules">
-		<td class="key">
-			<?php echo JText::_('EB_VALIDATION_RULES') ; ?>
-		</td>
-		<td>
-			<input type="text" class="input-xlarge" size="50" name="validation_rules" value="<?php echo $this->item->validation_rules ; ?>" />
-		</td>
-		<td>
-			<?php echo JText::_('EB_VALIDATION_RULES_EXPLAIN'); ?>
-		</td>
-	</tr>
-	<tr class="eb-field eb-list eb-checkboxes eb-radio">
-		<td class="key">
-			<?php echo JText::_('EB_VALUES'); ?>
-		</td>
-		<td>
-			<textarea rows="5" cols="50" name="values" class="input-xlarge"><?php echo $this->item->values; ?></textarea>
-		</td>
-		<td>
-			<?php echo JText::_('EB_EACH_ITEM_LINE'); ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_('EB_DEFAULT_VALUES'); ?>
-		</td>
-		<td>
-			<textarea rows="5" cols="50" name="default_values" class="input-xlarge"><?php echo $this->item->default_values; ?></textarea>
-		</td>
-		<td>
-			<?php echo JText::_('EB_EACH_ITEM_LINE'); ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key"><?php echo JText::_('EB_FEE_FIELD') ; ?></td>
-		<td>
-			<?php echo $this->lists['fee_field']; ?>
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr class="eb-field eb-list eb-checkboxes eb-radio">
-		<td class="key">
-			<?php echo JText::_('EB_FEE_VALUES'); ?>
-		</td>
-		<td>
-			<textarea rows="5" cols="50" name="fee_values" class="input-xlarge"><?php echo $this->item->fee_values; ?></textarea>
-		</td>
-		<td>
-			 <?php echo JText::_('EB_EACH_ITEM_LINE'); ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_('EB_FEE_FORMULA') ; ?>
-		</td>
-		<td>
-			<input type="text" class="inputbox" size="50" name="fee_formula" value="<?php echo $this->item->fee_formula ; ?>" />
-		</td>
-		<td>
-			<?php echo JText::_('EB_FEE_FORMULA_EXPLAIN'); ?>
-		</td>
-	</tr>
+	<div class="span6">
+		<fieldset class="form-horizontal">
+			<legend><?php echo JText::_('EB_BASIC'); ?></legend>
+			<?php
+			if ($this->config->custom_field_by_category)
+			{
+				?>
+				<div class="control-group">
+					<label class="control-label">
+						<?php echo JText::_('EB_CATEGORY'); ?>
+					</label>
+					<div class="controls">
+						<?php echo $this->lists['category_id'] ; ?>
+					</div>
+				</div>
+				<?php
+			}
+			else
+			{
+				?>
+				<div class="control-group">
+					<label class="control-label">
+						<?php echo JText::_('EB_EVENT'); ?>
+					</label>
+					<div class="controls">
+						<?php echo $this->lists['event_id'] ; ?>
+					</div>
+				</div>
+				<?php
+			}
+			?>
 
-	<tr class="eb-field eb-list eb-radio eb-checkboxes">
-		<td class="key">
-			<?php echo JText::_('EB_QUANTITY_FIELD'); ?>
-		</td>
-		<td>
-			<?php echo $this->lists['quantity_field'];?>
-		</td>
-		<td>
-			<?php echo JText::_('EB_QUANTITY_FIELD_EXPLAIN'); ?>
-		</td>
-	</tr>
-	<tr class="eb-field eb-list eb-radio eb-checkboxes">
-		<td class="key">
-			<?php echo JText::_('EB_QUANITY_VALUES') ; ?>
-		</td>
-		<td>
-			<textarea rows="5" cols="50" name="quantity_values" class="input-xlarge"><?php echo $this->item->quantity_values; ?></textarea>
-		</td>
-		<td>
-			<?php echo JText::_('EB_EACH_ITEM_LINE'); ?>
-		</td>
-	</tr>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('name', JText::_('EB_NAME'), JText::_('EB_FIELD_NAME_REQUIREMENT')); ?>
+				</label>
+				<div class="controls">
+					<input class="text_area" type="text" name="name" id="name" size="50" maxlength="250" value="<?php echo $this->item->name;?>" onchange="checkFieldName();" <?php if ($this->item->is_core) echo 'readonly="readonly"' ;?> />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo  JText::_('EB_TITLE'); ?>
+				</label>
+				<div class="controls">
+					<input class="text_area" type="text" name="title" id="title" size="50" maxlength="250" value="<?php echo $this->item->title;?>" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_DISPLAY_IN'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $this->lists['display_in']; ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_ACCESS'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $this->lists['access']; ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_REQUIRED'); ?>
+				</label>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('required', $this->item->required); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_PUBLISHED'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $this->lists['published']; ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_DATATYPE_VALIDATION') ; ?>
+				</label>
+				<div class="controls">
+					<?php echo $this->lists['datatype_validation']; ?>
+				</div>
+			</div>
+			<div class="control-group validation-rules">
+				<label class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('validation_rules', JText::_('EB_VALIDATION_RULES'), JText::_('EB_VALIDATION_RULES_EXPLAIN')); ?>
+				</label>
+				<div class="controls">
+					<input type="text" class="input-xlarge" size="50" name="validation_rules" value="<?php echo $this->item->validation_rules ; ?>" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('only_show_for_first_member', JText::_('EB_ONLY_SHOW_FOR_FIRST_GROUP_MEMBER'), JText::_('EB_ONLY_SHOW_FOR_FIRST_GROUP_MEMBER_EXPLAIN')); ?>
+				</label>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('only_show_for_first_member', $this->item->only_show_for_first_member); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('only_require_for_first_member', JText::_('EB_ONLY_REQUIRE_FOR_FIRST_GROUP_MEMBER'), JText::_('EB_ONLY_REQUIRE_FOR_FIRST_GROUP_MEMBER_EXPLAIN')); ?>
+				</label>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('only_require_for_first_member', $this->item->only_require_for_first_member); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo  JText::_('EB_DESCRIPTION'); ?>
+				</label>
+				<div class="controls">
+					<textarea rows="5" cols="50" name="description" class="input-xlarge"><?php echo $this->item->description;?></textarea>
+				</div>
+			</div>
+			<?php
+			if (isset($this->lists['field_mapping']))
+			{
+			?>
+				<div class="control-group">
+					<label class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('field_mapping', JText::_('EB_FIELD_MAPPING'), JText::_('EB_FIELD_MAPPING_EXPLAIN')); ?>
+					</label>
+					<div class="controls">
+						<?php echo $this->lists['field_mapping'] ; ?>
+					</div>
+				</div>
+			<?php
+			}
+			?>
+		</fieldset>
+	</div>
+	<div class="span6">
+		<fieldset class="form-horizontal">
+			<legend><?php echo JText::_('EB_FIELD_SETTINGS'); ?></legend>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_FIELD_TYPE'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $this->lists['fieldtype']; ?>
+				</div>
+			</div>
+			<div class="control-group eb-field eb-list">
+				<label class="control-label">
+					<?php echo JText::_('EB_MULTIPLE'); ?>
+				</label>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('multiple', $this->item->multiple); ?>
+				</div>
+			</div>
+			<div class="control-group eb-field eb-list eb-checkboxes eb-radio">
+				<label class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('values', JText::_('EB_VALUES'), JText::_('EB_EACH_ITEM_LINE')); ?>
+				</label>
+				<div class="controls">
+					<textarea rows="5" cols="50" name="values" class="input-xlarge"><?php echo $this->item->values; ?></textarea>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('default_values', JText::_('EB_DEFAULT_VALUES'), JText::_('EB_EACH_ITEM_LINE')); ?>
+				</label>
+				<div class="controls">
+					<textarea rows="5" cols="50" name="default_values" class="input-xlarge"><?php echo $this->item->default_values; ?></textarea>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label"><?php echo JText::_('EB_FEE_FIELD') ; ?></label>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('fee_field', $this->item->fee_field); ?>
+				</div>
+			</div>
+			<div class="control-group eb-field eb-list eb-checkboxes eb-radio">
+				<label class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('fee_values', JText::_('EB_FEE_VALUES'), JText::_('EB_EACH_ITEM_LINE')); ?>
+				</label>
+				<div class="controls">
+					<textarea rows="5" cols="50" name="fee_values" class="input-xlarge"><?php echo $this->item->fee_values; ?></textarea>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('fee_formula', JText::_('EB_FEE_FORMULA'), JText::_('EB_FEE_FORMULA_EXPLAIN')); ?>
+				</label>
+				<div class="controls">
+					<input type="text" class="inputbox" size="50" name="fee_formula" value="<?php echo $this->item->fee_formula ; ?>" />
+				</div>
+			</div>
 
-	<tr>
-		<td class="key">
-			<?php echo  JText::_('EB_DESCRIPTION'); ?>
-		</td>
-		<td>
-			<textarea rows="5" cols="50" name="description" class="input-xlarge"><?php echo $this->item->description;?></textarea>
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr>
-        <td class="key">
-            <?php echo JText::_('EB_ACCESS'); ?>
-        </td>
-        <td>
-            <?php echo $this->lists['access']; ?>
-        </td>
-        <td>
-            &nbsp;
-        </td>
-    </tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_('EB_PUBLISHED'); ?>
-		</td>
-		<td>
-			<?php echo $this->lists['published']; ?>
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo  JText::_('EB_CSS_CLASS'); ?>
-		</td>
-		<td>
-			<input class="text_area" type="text" name="css_class" id="css_class" size="10" maxlength="250" value="<?php echo $this->item->css_class;?>" />
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr class="eb-field eb-text eb-textarea">
-		<td class="key">
-			<?php echo  JText::_('EB_PLACE_HOLDER'); ?>
-		</td>
-		<td>
-			<input class="text_area" type="text" name="place_holder" id="place_holder" size="50" maxlength="250" value="<?php echo $this->item->place_holder;?>" />
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr class="eb-field eb-text eb-checkboxes eb-radio eb-list">
-		<td class="key">
-			<?php echo  JText::_('EB_SIZE'); ?>
-		</td>
-		<td>
-			<input class="text_area" type="text" name="size" id="size" size="10" maxlength="250" value="<?php echo $this->item->size;?>" />
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr class="eb-field eb-text eb-textarea">
-		<td class="key">
-			<?php echo  JText::_('EB_MAX_LENGTH'); ?>
-		</td>
-		<td>
-			<input class="text_area" type="text" name="max_length" id="max_lenth" size="50" maxlength="250" value="<?php echo $this->item->max_length;?>" />
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr	class="eb-field eb-textarea">
-		<td class="key">
-			<?php echo  JText::_('EB_ROWS'); ?>
-		</td>
-		<td>
-			<input class="text_area" type="text" name="rows" id="rows" size="10" maxlength="250" value="<?php echo $this->item->rows;?>" />
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr class="eb-field eb-textarea">
-		<td class="key">
-			<?php echo  JText::_('EB_COLS'); ?>
-		</td>
-		<td>
-			<input class="text_area" type="text" name="cols" id="cols" size="10" maxlength="250" value="<?php echo $this->item->cols;?>" />
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo  JText::_('EB_EXTRA'); ?>
-		</td>
-		<td>
-			<input class="text_area" type="text" name="extra_attributes" id="extra" size="40" maxlength="250" value="<?php echo $this->item->extra_attributes;?>" />
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
-	<tr>
-		<td class="key">
-			<?php echo JText::_('EB_DISPLAY_IN'); ?>
-		</td>
-		<td>
-			<?php echo $this->lists['display_in']; ?>
-		</td>
-		<td>
-			&nbsp;
-		</td>
-	</tr>
+			<div class="control-group eb-field eb-list eb-radio eb-checkboxes">
+				<label class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('quantity_field', JText::_('EB_QUANTITY_FIELD'), JText::_('EB_QUANTITY_FIELD_EXPLAIN')); ?>
+				</label>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('quantity_field', $this->item->quantity_field); ?>
+				</div>
+			</div>
+			<div class="control-group eb-field eb-list eb-radio eb-checkboxes">
+				<label class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('quantity_values', JText::_('EB_QUANITY_VALUES'), JText::_('EB_FEE_FORMULA_EXPLAIN')); ?>
+				</label>
+				<div class="controls">
+					<textarea rows="5" cols="50" name="quantity_values" class="input-xlarge"><?php echo $this->item->quantity_values; ?></textarea>
+				</div>
+			</div>
 
-	<tr>
-		<td class="key">
-			<?php echo JText::_('EB_ONLY_SHOW_FOR_FIRST_GROUP_MEMBER'); ?>
-		</td>
-		<td>
-			<?php echo $this->lists['only_show_for_first_member']; ?>
-		</td>
-		<td>
-			<?php echo JText::_('EB_ONLY_SHOW_FOR_FIRST_GROUP_MEMBER_EXPLAIN'); ?>
-		</td>
-	</tr>
-
-	<tr>
-		<td class="key">
-			<?php echo JText::_('EB_ONLY_REQUIRE_FOR_FIRST_GROUP_MEMBER'); ?>
-		</td>
-		<td>
-			<?php echo $this->lists['only_require_for_first_member']; ?>
-		</td>
-		<td>
-			<?php echo JText::_('EB_ONLY_REQUIRE_FOR_FIRST_GROUP_MEMBER_EXPLAIN'); ?>
-		</td>
-	</tr>
-
-	<!--<tr class="validation-rules">
-		<td class="key">
-			<?php echo JText::_('EB_VALIDATION_ERROR_MESSAGE') ; ?>
-		</td>
-		<td>
-			<input type="text" class="inputbox" size="50" name="validation_error_message" value="<?php echo $this->item->validation_error_message ; ?>" />
-		</td>
-		<td>
-			<?php echo JText::_('EB_VALIDATION_ERROR_MESSAGE_EXPLAIN'); ?>
-		</td>
-	</tr>
-	 -->
-	<?php
-		if (isset($this->lists['field_mapping']))
-		{
-		?>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_FIELD_MAPPING') ; ?>
-				</td>
-				<td>
-					<?php echo $this->lists['field_mapping'] ; ?>
-				</td>
-				<td>
-					<?php echo JText::_('EB_FIELD_MAPPING_EXPLAIN'); ?>
-				</td>
-			</tr>
-		<?php
-		}
-	?>
-    <tr>
-        <td class="key">
-            <?php echo JText::_('EB_DEPEND_ON_FIELD');?>
-        </td>
-        <td colspan="2">
-            <?php echo $this->lists['depend_on_field_id']; ?>
-        </td>
-    </tr>
-    <tr id="depend_on_options_container" style="display: <?php echo $this->item->depend_on_field_id ? '' : 'none'; ?>">
-        <td class="key">
-            <?php echo JText::_('EB_DEPEND_ON_OPTIONS');?>
-        </td>
-        <td id="options_container" colspan="2">
-            <?php
-                if (count($this->dependOptions))
-                {
-                ?>
-                    <table cellspacing="3" cellpadding="3" width="100%">
-                        <?php
-                        $optionsPerLine = 3;
-                        for ($i = 0 , $n = count($this->dependOptions) ; $i < $n ; $i++)
-                        {
-                            $value = $this->dependOptions[$i] ;
-                            if ($i % $optionsPerLine == 0) {
-                                ?>
-                                <tr>
-                            <?php
-                            }
-                            ?>
-                            <td>
-                                <input class="inputbox" value="<?php echo $value; ?>" type="checkbox" name="depend_on_options[]" <?php if (in_array($value, $this->dependOnOptions)) echo 'checked="checked"'; ?>><?php echo $value;?>
-                            </td>
-                            <?php
-                            if (($i+1) % $optionsPerLine == 0)
-                            {
-                                ?>
-                                </tr>
-                            <?php
-                            }
-                        }
-                        if ($i % $optionsPerLine != 0)
-                        {
-                            $colspan = $optionsPerLine - $i % $optionsPerLine ;
-                            ?>
-                            <td colspan="<?php echo $colspan; ?>">&nbsp;</td>
-                            </tr>
-                        <?php
-                        }
-                        ?>
-                    </table>
-                <?php
-                }
-            ?>
-        </td>
-    </tr>
-</table>
-
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_DEPEND_ON_FIELD');?>
+				</label>
+				<div class="controls">
+					<?php echo $this->lists['depend_on_field_id']; ?>
+				</div>
+			</div>
+			<div class="control-group" id="depend_on_options_container" style="display: <?php echo $this->item->depend_on_field_id ? '' : 'none'; ?>">
+				<label class="control-label">
+					<?php echo JText::_('EB_DEPEND_ON_OPTIONS');?>
+				</label>
+				<div class="controls" id="options_container">
+					<?php
+					if (count($this->dependOptions))
+					{
+						?>
+						<table cellspacing="3" cellpadding="3" width="100%">
+							<?php
+							$optionsPerLine = 3;
+							for ($i = 0 , $n = count($this->dependOptions) ; $i < $n ; $i++)
+							{
+								$value = $this->dependOptions[$i] ;
+								if ($i % $optionsPerLine == 0) {
+									?>
+									<tr>
+									<?php
+								}
+								?>
+								<td>
+									<input class="inputbox" value="<?php echo $value; ?>" type="checkbox" name="depend_on_options[]" <?php if (in_array($value, $this->dependOnOptions)) echo 'checked="checked"'; ?>><?php echo $value;?>
+								</td>
+								<?php
+								if (($i+1) % $optionsPerLine == 0)
+								{
+									?>
+									</tr>
+									<?php
+								}
+							}
+							if ($i % $optionsPerLine != 0)
+							{
+								$colspan = $optionsPerLine - $i % $optionsPerLine ;
+								?>
+								<td colspan="<?php echo $colspan; ?>">&nbsp;</td>
+								</tr>
+							<?php
+							}
+							?>
+						</table>
+						<?php
+					}
+					?>
+				</div>
+			</div>
+		</fieldset>
+		<fieldset class="form-horizontal">
+			<legend><?php echo JText::_('EB_DISPLAY_SETTINGS'); ?></legend>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo  JText::_('EB_CSS_CLASS'); ?>
+				</label>
+				<div class="controls">
+					<input class="text_area" type="text" name="css_class" id="css_class" size="10" maxlength="250" value="<?php echo $this->item->css_class;?>" />
+				</div>
+			</div>
+			<div class="control-group eb-field eb-text eb-textarea">
+				<label class="control-label">
+					<?php echo  JText::_('EB_PLACE_HOLDER'); ?>
+				</label>
+				<div class="controls">
+					<input class="text_area" type="text" name="place_holder" id="place_holder" size="50" maxlength="250" value="<?php echo $this->item->place_holder;?>" />
+				</div>
+			</div>
+			<div class="control-group eb-field eb-text eb-checkboxes eb-radio eb-list">
+				<label class="control-label">
+					<?php echo  JText::_('EB_SIZE'); ?>
+				</label>
+				<div class="controls">
+					<input class="text_area" type="text" name="size" id="size" size="10" maxlength="250" value="<?php echo $this->item->size;?>" />
+				</div>
+			</div>
+			<div class="control-group eb-field eb-text eb-textarea">
+				<label class="control-label">
+					<?php echo  JText::_('EB_MAX_LENGTH'); ?>
+				</label>
+				<div class="controls">
+					<input class="text_area" type="text" name="max_length" id="max_lenth" size="50" maxlength="250" value="<?php echo $this->item->max_length;?>" />
+				</div>
+			</div>
+			<div class="control-group eb-field eb-textarea">
+				<label class="control-label">
+					<?php echo  JText::_('EB_ROWS'); ?>
+				</label>
+				<div class="controls">
+					<input class="text_area" type="text" name="rows" id="rows" size="10" maxlength="250" value="<?php echo $this->item->rows;?>" />
+				</div>
+			</div>
+			<div class="control-group eb-field eb-textarea">
+				<label class="control-label">
+					<?php echo  JText::_('EB_COLS'); ?>
+				</label>
+				<div class="controls">
+					<input class="text_area" type="text" name="cols" id="cols" size="10" maxlength="250" value="<?php echo $this->item->cols;?>" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo  JText::_('EB_EXTRA'); ?>
+				</label>
+				<div class="controls">
+					<input class="text_area" type="text" name="extra_attributes" id="extra" size="40" maxlength="250" value="<?php echo $this->item->extra_attributes;?>" />
+				</div>
+			</div>
+		</fieldset>
+	</div>
 <?php
 if ($translatable)
 {
@@ -481,49 +392,38 @@ if ($translatable)
 		$sef = $language->sef;
 		echo JHtml::_('bootstrap.addTab', 'field-translation', 'translation-page-' . $sef, $language->title . ' <img src="' . JUri::root() . 'media/com_eventbooking/flags/' . $sef . '.png" />');
 		?>
-		<table class="admintable adminform" style="width: 100%;">
-			<tr>
-				<td class="key">
-					<?php echo  JText::_('EB_TITLE'); ?>
-				</td>
-				<td>
-					<input class="input-xlarge" type="text" name="title_<?php echo $sef; ?>" id="title_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'title_'.$sef}; ?>" />
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_DESCRIPTION'); ?>
-				</td>
-				<td>
-					<textarea rows="5" cols="50" name="description_<?php echo $sef; ?>"><?php echo $this->item->{'description_'.$sef};?></textarea>
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_VALUES'); ?>
-				</td>
-				<td>
-					<textarea rows="5" cols="50" name="values_<?php echo $sef; ?>"><?php echo $this->item->{'values_'.$sef}; ?></textarea>
-				</td>
-				<td>
-					<?php echo JText::_('EB_EACH_ITEM_LINE'); ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_DEFAULT_VALUES'); ?>
-				</td>
-				<td>
-					<textarea rows="5" cols="50" name="default_values_<?php echo $sef; ?>"><?php echo $this->item->{'default_values_'.$sef}; ?></textarea>
-				</td>
-				<td>
-					<?php echo JText::_('EB_EACH_ITEM_LINE'); ?>
-				</td>
-			</tr>
-		</table>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo  JText::_('EB_TITLE'); ?>
+			</label>
+			<div class="controls">
+				<input class="input-xlarge" type="text" name="title_<?php echo $sef; ?>" id="title_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'title_'.$sef}; ?>" />
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_DESCRIPTION'); ?>
+			</label>
+			<div class="controls">
+				<textarea rows="5" cols="50" name="description_<?php echo $sef; ?>"><?php echo $this->item->{'description_'.$sef};?></textarea>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_VALUES'); ?>
+			</label>
+			<div class="controls">
+				<textarea rows="5" cols="50" name="values_<?php echo $sef; ?>"><?php echo $this->item->{'values_'.$sef}; ?></textarea>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_DEFAULT_VALUES'); ?>
+			</label>
+			<div class="controls">
+				<textarea rows="5" cols="50" name="default_values_<?php echo $sef; ?>"><?php echo $this->item->{'default_values_'.$sef}; ?></textarea>
+			</div>
+		</div>
 		<?php
 		echo JHtml::_('bootstrap.endTab');
 	}
@@ -607,13 +507,13 @@ if ($translatable)
 				{			
 					if (fieldType == '')
 					{
-						$('tr.eb-field').hide();
+						$('div.eb-field').hide();
 					}
 					else 
 					{
 						var cssClass = '.eb-' + fieldType.toLowerCase();	
-						$('tr.eb-field').show();
-						$('tr.eb-field').not(cssClass).hide();
+						$('div.eb-field').show();
+						$('div.eb-field').not(cssClass).hide();
 					}																												
 				}
 			});

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.4.3
+ * @version            2.5.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -18,7 +18,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '2.4.3';
+		return '2.5.0';
 	}
 
 	/**
@@ -171,7 +171,7 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Get page params of the givem view
+	 * Get page params of the given view
 	 *
 	 * @param $active
 	 * @param $views
@@ -581,6 +581,64 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Count total none-offline payment methods.
+	 *
+	 * @return int
+	 */
+	public static function getNumberNoneOfflinePaymentMethods()
+	{
+
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true)
+				->select('COUNT(*)')
+				->from('#__eb_payment_plugins')
+				->where('published = 1')
+				->where('NAME NOT LIKE "os_offline%"');
+		$db->setQuery($query);
+
+		return (int) $db->loadResult();
+	}
+
+
+	/**
+	 * Method to build common tags use for email messages
+	 *
+	 * @param $row
+	 * @param $config
+	 *
+	 * @return array
+	 */
+	public static function buildDepositPaymentTags($row, $config)
+	{
+		$event  = EventbookingHelperDatabase::getEvent($row->event_id);
+		$method = os_payments::loadPaymentMethod($row->deposit_payment_method);
+
+		$rowFields = static::getDepositPaymentFormFields();
+		$replaces  = array();
+		foreach ($rowFields as $rowField)
+		{
+			$replaces[$rowField->name] = $row->{$rowField->name};
+		}
+
+		if ($method)
+		{
+			$replaces['payment_method'] = JText::_($method->title);
+		}
+		else
+		{
+			$replaces['payment_method'] = '';
+		}
+
+		$replaces['AMOUNT']          = static::formatCurrency($row->amount - $row->deposit_amount, $config, $event->currency_symbol);
+		$replaces['REGISTRATION_ID'] = $row->id;
+		$replaces['TRANSACTION_ID']  = $row->deposit_payment_transaction_id;
+
+		$replaces = array_merge($replaces, static::buildEventTags($event, $config));
+
+		return $replaces;
+	}
+
+	/**
 	 * Build tags related to event
 	 *
 	 * @param $event
@@ -902,6 +960,15 @@ class EventbookingHelper
 		else
 		{
 			$replaces['cancel_registration_link'] = '';
+		}
+
+		if ($config->activate_deposit_feature)
+		{
+			$replaces['deposit_payment_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&view=payment&registrant_id='.$row->id.'&Itemid=' . $Itemid;
+		}
+		else
+		{
+			$replaces['deposit_payment_link'] = '';
 		}
 
 		return $replaces;
@@ -1808,6 +1875,34 @@ class EventbookingHelper
 		}
 
 		return $cache[$cacheKey];
+	}
+
+	/**
+	 * Get the form fields to display in deposit payment form
+	 *
+	 * @return array
+	 */
+	public static function getDepositPaymentFormFields()
+	{
+		$user        = JFactory::getUser();
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$query->select('*')
+				->from('#__eb_fields')
+				->where('published=1')
+				->where('id < 13')
+				->where(' `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
+				->order('ordering');
+
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('title', 'description', 'values', 'default_values', 'depend_on_options'), $fieldSuffix);
+		}
+
+		$db->setQuery($query);
+
+		return $db->loadObjectList();
 	}
 
 	/**
@@ -2833,39 +2928,6 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Check to see whether the ideal payment plugin installed and activated
-	 * @return boolean
-	 */
-	public static function idealEnabled()
-	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('COUNT(id)')
-			->from('#__eb_payment_plugins')
-			->where('name = "os_ideal"')
-			->where('published = 1');
-		$db->setQuery($query);
-		$total = $db->loadResult();
-		if ($total)
-		{
-			if (file_exists(JPATH_ROOT . '/components/com_eventbooking/payments/Mollie/API/Autoloader.php'))
-			{
-				require_once JPATH_ROOT . '/components/com_eventbooking/payments/Mollie/API/Autoloader.php';
-			}
-			else
-			{
-				require_once JPATH_ROOT . '/components/com_eventbooking/payments/ideal/ideal.class.php';
-			}
-
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	/**
 	 * Send notification emails to waiting list users when someone cancel registration
 	 *
 	 * @param $row
@@ -2951,6 +3013,11 @@ class EventbookingHelper
 			}
 			foreach ($registrants as $registrant)
 			{
+				if (!JMailHelper::isEmailAddress($registrant->email))
+				{
+					continue;
+				}
+
 				$message                = $body;
 				$replaces['first_name'] = $registrant->first_name;
 				$replaces['last_name']  = $registrant->last_name;
@@ -3163,7 +3230,10 @@ class EventbookingHelper
 				$attachments[] = $ics->save(JPATH_ROOT . '/media/com_eventbooking/icsfiles/', $fileName);
 			}
 
-			$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1, null, null, $attachments);
+			if (JMailHelper::isEmailAddress($row->email))
+			{
+				$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1, null, null, $attachments);
+			}
 
 			if ($config->send_email_to_group_members && $row->is_group_billing)
 			{
@@ -3193,10 +3263,11 @@ class EventbookingHelper
 					$memberFormFields                    = self::getFormFields($row->event_id, 2);
 					foreach ($rowMembers as $rowMember)
 					{
-						if (!$rowMember->email)
+						if (!JMailHelper::isEmailAddress($rowMember->email))
 						{
 							continue;
 						}
+
 						if (strlen($message->{'group_member_email_subject' . $fieldSuffix}))
 						{
 							$subject = $message->{'group_member_email_subject' . $fieldSuffix};
@@ -3357,14 +3428,16 @@ class EventbookingHelper
 			for ($i = 0, $n = count($emails); $i < $n; $i++)
 			{
 				$email = $emails[$i];
-				$mailer->clearAllRecipients();
-				if ($email)
+				if (!JMailHelper::isEmailAddress($email))
 				{
-					$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
+					continue;
 				}
+
+				$mailer->clearAllRecipients();
+				$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
 			}
 
-			if (!empty($eventCreator->email) && !$eventCreator->authorise('core.admin') && !in_array($eventCreator->email, $emails))
+			if (!empty($eventCreator->email) && !$eventCreator->authorise('core.admin') && JMailHelper::isEmailAddress($eventCreator->email) && !in_array($eventCreator->email, $emails))
 			{
 				$mailer->clearAllRecipients();
 				$mailer->sendMail($fromEmail, $fromName, $eventCreator->email, $subject, $body, 1);
@@ -3597,6 +3670,127 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Send email when registrants complete deposit payment
+	 *
+	 * @param  object $row
+	 * @param object  $config
+	 */
+	public static function sendDepositPaymentEmail($row, $config)
+	{
+		$mailer      = JFactory::getMailer();
+		$message     = self::getMessages();
+		$fieldSuffix = self::getFieldSuffix($row->language);
+
+		if ($config->from_name)
+		{
+			$fromName = $config->from_name;
+		}
+		else
+		{
+			$fromName = JFactory::getConfig()->get('fromname');
+		}
+
+		if ($config->from_email)
+		{
+			$fromEmail = $config->from_email;
+		}
+		else
+		{
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
+		}
+
+		$event = EventbookingHelperDatabase::getEvent($row->event_id);
+
+		$replaces = static::buildDepositPaymentTags($row, $config);
+
+		//Notification email send to user
+		if (JMailHelper::isEmailAddress($row->email))
+		{
+			if (strlen($message->{'deposit_payment_user_email_subject' . $fieldSuffix}))
+			{
+				$subject = $message->{'deposit_payment_user_email_subject' . $fieldSuffix};
+			}
+			else
+			{
+				$subject = $message->deposit_payment_user_email_subject;
+			}
+
+			if (self::isValidMessage($message->{'deposit_payment_user_email_body' . $fieldSuffix}))
+			{
+				$body = $message->{'deposit_payment_user_email_body' . $fieldSuffix};
+			}
+			else
+			{
+				$body = $message->deposit_payment_user_email_body;
+			}
+
+			$subject = str_ireplace('[EVENT_TITLE]', $event->title, $subject);
+			foreach ($replaces as $key => $value)
+			{
+				$key  = strtoupper($key);
+				$body = str_ireplace("[$key]", $value, $body);
+			}
+
+			$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
+		}
+
+		//Send emails to notification emails
+		if (strlen(trim($event->notification_emails)) > 0)
+		{
+			$config->notification_emails = $event->notification_emails;
+		}
+
+		if ($config->notification_emails == '')
+		{
+			$notificationEmails = $fromEmail;
+		}
+		else
+		{
+			$notificationEmails = $config->notification_emails;
+		}
+		$notificationEmails = str_replace(' ', '', $notificationEmails);
+		$emails             = explode(',', $notificationEmails);
+
+		if (strlen($message->{'deposit_payment_admin_email_subject' . $fieldSuffix}))
+		{
+			$subject = $message->{'deposit_payment_admin_email_subject' . $fieldSuffix};
+		}
+		else
+		{
+			$subject = $message->deposit_payment_admin_email_subject;
+		}
+
+		if (self::isValidMessage($message->{'deposit_payment_admin_email_body' . $fieldSuffix}))
+		{
+			$body = $message->{'deposit_payment_admin_email_body' . $fieldSuffix};
+		}
+		else
+		{
+			$body = $message->deposit_payment_admin_email_body;
+		}
+
+		foreach ($replaces as $key => $value)
+		{
+			$key     = strtoupper($key);
+			$subject = str_ireplace("[$key]", $value, $subject);
+			$body    = str_ireplace("[$key]", $value, $body);
+		}
+
+		$body = self::convertImgTags($body);
+
+		for ($i = 0, $n = count($emails); $i < $n; $i++)
+		{
+			$email = $emails[$i];
+			if (!JMailHelper::isEmailAddress($email))
+			{
+				continue;
+			}
+			$mailer->clearAllRecipients();
+			$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
+		}
+	}
+
+	/**
 	 * Send reminder email to registrants
 	 *
 	 * @param int  $numberEmailSendEachTime
@@ -3756,6 +3950,117 @@ class EventbookingHelper
 			$query->update('#__eb_registrants')
 				->set('is_reminder_sent = 1')
 				->where('id = ' . (int) $row->id);
+			$db->setQuery($query);
+			$db->execute();
+		}
+	}
+
+	/**
+	 * Send deposit payment reminder email to registrants
+	 *
+	 * @param int  $numberDays
+	 * @param int  $numberEmailSendEachTime
+	 * @param null $bccEmail
+	 */
+	public static function sendDepositReminder($numberDays, $numberEmailSendEachTime = 0, $bccEmail = null)
+	{
+		$db      = JFactory::getDbo();
+		$query   = $db->getQuery(true);
+		$config  = EventbookingHelper::getConfig();
+		$message = EventbookingHelper::getMessages();
+		$mailer  = JFactory::getMailer();
+		$Itemid  = EventbookingHelper::getItemid();
+		$siteUrl = static::getSiteUrl();
+
+		if ($bccEmail)
+		{
+			$mailer->addBcc($bccEmail);
+		}
+
+		if (!$numberDays)
+		{
+			$numberDays = 7;
+		}
+
+		if (!$numberEmailSendEachTime)
+		{
+			$numberEmailSendEachTime = 15;
+		}
+
+		if ($config->from_name)
+		{
+			$fromName = $config->from_name;
+		}
+		else
+		{
+			$fromName = JFactory::getConfig()->get('fromname');
+		}
+
+		if ($config->from_email)
+		{
+			$fromEmail = $config->from_email;
+		}
+		else
+		{
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
+		}
+
+		$query->select('a.id, a.first_name, a.last_name, a.email, a.amount, a.deposit_amount, b.title, b.event_date, b.currency_symbol')
+				->from('#__eb_registrants AS a')
+				->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+				->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published = 0))')
+				->where('a.payment_status = 0')
+				->where('a.group_id = 0')
+				->where('a.is_deposit_payment_reminder_sent = 0')
+				->where('b.published = 1')
+				->where('DATEDIFF(b.event_date, NOW()) <= '.$numberDays)
+				->where('DATEDIFF(b.event_date, NOW()) >= 0')
+				->order('b.event_date, a.register_date');
+
+		$db->setQuery($query, 0, $numberEmailSendEachTime);
+
+		try
+		{
+			$rows = $db->loadObjectList();
+		}
+		catch (Exception  $e)
+		{
+			$rows = array();
+		}
+
+		foreach($rows as $row)
+		{
+			if (!JMailHelper::isEmailAddress($row->email))
+			{
+				continue;
+			}
+
+			$emailSubject = $message->deposit_payment_reminder_email_subject;
+			$emailBody = $message->deposit_payment_reminder_email_body;
+
+			$replaces                    = array();
+			$replaces['event_date']      = JHtml::_('date', $row->event_date, $config->event_date_format, null);
+			$replaces['first_name']      = $row->first_name;
+			$replaces['last_name']       = $row->last_name;
+			$replaces['event_title']     = $row->title;
+			$replaces['amount']          = static::formatCurrency($row->amount - $row->deposit_amount, $config, $row->currency_symbol);
+			$replaces['registration_id'] = $row->id;
+			$replaces['deposit_payment_link'] = $siteUrl . 'index.php?option=com_eventbooking&view=payment&registrant_id='.$row->id.'&Itemid=' . $Itemid;
+
+			foreach ($replaces as $key => $value)
+			{
+				$emailSubject = str_ireplace('[' . strtoupper($key) . ']', $value, $emailSubject);
+				$emailBody = str_ireplace('[' . strtoupper($key) . ']', $value, $emailBody);
+			}
+
+			$emailBody = EventbookingHelper::convertImgTags($emailBody);
+			$mailer->sendMail($fromEmail, $fromName, $row->email, $emailSubject, $emailBody, 1);
+			$mailer->clearAddresses();
+
+			$query->clear();
+			$query->update('#__eb_registrants')
+					->set('is_deposit_payment_reminder_sent = 1')
+					->where('id = ' . (int) $row->id);
 			$db->setQuery($query);
 			$db->execute();
 		}
@@ -3925,7 +4230,7 @@ class EventbookingHelper
 
 		$element = new SimpleXMLElement('<field />');
 		$element->addAttribute('name', $fieldName);
-		$element->addAttribute('class', 'readonly');
+		$element->addAttribute('class', 'readonly input-medium');
 
 		if (!$registrantId)
 		{

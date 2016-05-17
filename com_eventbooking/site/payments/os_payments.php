@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.4.3
+ * @version            2.5.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -22,7 +22,7 @@ class os_payments
 	 *
 	 * @return array
 	 */
-	public static function getPaymentMethods($methodIds = null)
+	public static function getPaymentMethods($methodIds = null, $loadOffline = true)
 	{
 		if (!self::$methods)
 		{
@@ -38,6 +38,12 @@ class os_payments
 			{
 				$query->where('id IN (' . $methodIds . ')');
 			}
+
+			if (!$loadOffline)
+			{
+				$query->where('NAME NOT LIKE "os_offline%"');
+			}
+
 			$db->setQuery($query);
 			$rows = $db->loadObjectList();
 			foreach ($rows as $row)

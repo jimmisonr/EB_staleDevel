@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.4.3
+ * @version            2.5.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -48,7 +48,6 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 			</div>
 			<div class="btn-group pull-right hidden-phone">
 				<?php
-					echo $this->lists['filter_show_core_fields'];
 					if ($this->config->custom_field_by_category)
 					{
 						echo $this->lists['filter_category_id'];
@@ -57,6 +56,8 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 					{
 						echo $this->lists['filter_event_id'];
 					}
+					echo $this->lists['filter_show_core_fields'];
+					echo $this->lists['filter_fee_field'];
 					echo $this->lists['filter_state'];
 					echo $this->pagination->getLimitBox();
 				?>

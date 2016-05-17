@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.4.3
+ * @version            2.5.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -8,7 +8,10 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;
+defined( '_JEXEC' ) or die;
+
+JHtml::_('behavior.framework') ;
+
 if ($this->item->id)
 {
 	$coordinates = $this->item->lat.','.$this->item->long;
@@ -138,142 +141,112 @@ else
 		},1000);
 	}
 </script>
-<form action="index.php?option=com_eventbooking&view=location" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_eventbooking&view=location" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
 <div class="row-fluid">
 	<div class="span5">
-		<table class="admintable adminform">
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_NAME'); ?>
-				</td>
-				<td>
-					<input class="text_area" type="text" name="name" id="name" size="50" maxlength="250" value="<?php echo $this->item->name;?>" />
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_LAYOUT'); ?>
-				</td>
-				<td>
-					<?php echo $this->lists['layout']; ?>
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_CREATED_BY'); ?>
-				</td>
-				<td>
-					<?php echo EventbookingHelper::getUserInput($this->item->user_id) ; ?>
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_ADDRESS'); ?>
-				</td>
-				<td>
-					<input class="input-xlarge" type="text" name="address" id="address" size="70" autocomplete="off" onkeyup="getLocations(this.value)" onblur="clearLocations();" maxlength="250" value="<?php echo $this->item->address;?>" />
-					<ul id="eventmaps_results" style="display:none;"></ul>
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_CITY'); ?>
-				</td>
-				<td>
-					<input class="text_area" type="text" name="city" id="city" size="30" maxlength="250" value="<?php echo $this->item->city;?>" />
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_STATE'); ?>
-				</td>
-				<td>
-					<input class="text_area" type="text" name="state" id="state" size="30" maxlength="250" value="<?php echo $this->item->state;?>" />
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_ZIP'); ?>
-				</td>
-				<td>
-					<input class="text_area" type="text" name="zip" id="zip" size="20" maxlength="250" value="<?php echo $this->item->zip;?>" />
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_COUNTRY'); ?>
-				</td>
-				<td>
-					<?php echo $this->lists['country'] ; ?>
-				</td>
-				<td>
-					&nbsp;
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_COORDINATES'); ?>
-				</td>
-				<td>
-					<input class="text_area" type="text" name="coordinates" id="coordinates" size="30" maxlength="250" value="<?php echo $this->item->lat.','.$this->item->long;?>" />
-				</td>
-			</tr>
-			<?php
-				if (JLanguageMultilang::isEnabled())
-				{
-				?>
-					<tr>
-						<td class="key">
-							<?php echo JText::_('EB_LANGUAGE'); ?>
-						</td>
-						<td>
-							<?php echo $this->lists['language'] ; ?>
-						</td>
-					</tr>
-				<?php
-				}
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_NAME'); ?>
+			</label>
+			<div class="controls">
+				<input class="text_area" type="text" name="name" id="name" size="50" maxlength="250" value="<?php echo $this->item->name;?>" />
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_LAYOUT'); ?>
+			</label>
+			<div class="controls">
+				<?php echo $this->lists['layout']; ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_CREATED_BY'); ?>
+			</label>
+			<div class="controls">
+				<?php echo EventbookingHelper::getUserInput($this->item->user_id) ; ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_ADDRESS'); ?>
+			</label>
+			<div class="controls">
+				<input class="input-xlarge" type="text" name="address" id="address" size="70" autocomplete="off" onkeyup="getLocations(this.value)" onblur="clearLocations();" maxlength="250" value="<?php echo $this->item->address;?>" />
+				<ul id="eventmaps_results" style="display:none;"></ul>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_CITY'); ?>
+			</label>
+			<div class="controls">
+				<input class="text_area" type="text" name="city" id="city" size="30" maxlength="250" value="<?php echo $this->item->city;?>" />
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_STATE'); ?>
+			</label>
+			<div class="controls">
+				<input class="text_area" type="text" name="state" id="state" size="30" maxlength="250" value="<?php echo $this->item->state;?>" />
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_ZIP'); ?>
+			</label>
+			<div class="controls">
+				<input class="text_area" type="text" name="zip" id="zip" size="20" maxlength="250" value="<?php echo $this->item->zip;?>" />
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_COUNTRY'); ?>
+			</label>
+			<div class="controls">
+				<?php echo $this->lists['country'] ; ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_COORDINATES'); ?>
+			</label>
+			<div class="controls">
+				<input class="text_area" type="text" name="coordinates" id="coordinates" size="30" maxlength="250" value="<?php echo $this->item->lat.','.$this->item->long;?>" />
+			</div>
+		</div>
+		<?php
+			if (JLanguageMultilang::isEnabled())
+			{
 			?>
-			<tr>
-				<td class="key">
-					<?php echo JText::_('EB_PUBLISHED') ; ?>
-				</td>
-				<td>
-					<?php echo $this->lists['published']; ?>
-				</td>
-			</tr>
-		</table>
+				<div class="control-group">
+					<label class="control-label">
+						<?php echo JText::_('EB_LANGUAGE'); ?>
+					</label>
+					<div class="controls">
+						<?php echo $this->lists['language'] ; ?>
+					</div>
+				</div>
+			<?php
+			}
+		?>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_PUBLISHED') ; ?>
+			</label>
+			<div class="controls">
+				<?php echo $this->lists['published']; ?>
+			</div>
+		</div>
 	</div>
 	<div class="span7">
-		<table class="admintable adminform" style="width:100%;">
-			<tr>
-				<td>
-					<input type="button" onclick="getLocationFromAddress();" value="<?php echo JText::_('EB_PINPOINT'); ?> &raquo;" />
-					<br/><br/>
-					<div id="map-canvas" style="width: 95%; height: 400px"></div>
-				</td>
-			</tr>
-		</table>
+		<div class="control-group">
+			<input type="button" onclick="getLocationFromAddress();" value="<?php echo JText::_('EB_PINPOINT'); ?> &raquo;" />
+			<br/><br/>
+			<div id="map-canvas" style="width: 95%; height: 400px"></div>
+		</div>
 	</div>
 </div>
 <div class="clearfix"></div>

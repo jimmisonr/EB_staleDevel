@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.4.3
+ * @version            2.5.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -47,10 +47,29 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 
 		$lists['filter_event_id'] = JHtml::_('select.genericlist', $options, 'filter_event_id', 'class="input-xlarge" onchange="submit();"', 'id', 'title',
 			$state->filter_event_id);
-		$this->lists              = $lists;
-		$this->items              = $model->getData();
-		$this->pagination         = $model->getPagination();
-		$this->config             = $config;
+
+		$items = $model->getData();
+
+		$showDueAmountColumn = false;
+
+		$numberPaymentMethods = EventbookingHelper::getNumberNoneOfflinePaymentMethods();
+		if ($numberPaymentMethods > 0)
+		{
+			foreach ($items as $item)
+			{
+				if ($item->payment_status == 0)
+				{
+					$showDueAmountColumn = true;
+					break;
+				}
+			}
+		}
+
+		$this->lists               = $lists;
+		$this->items               = $items;
+		$this->pagination          = $model->getPagination();
+		$this->config              = $config;
+		$this->showDueAmountColumn = $showDueAmountColumn;
 
 		parent::display();
 	}

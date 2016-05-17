@@ -41,6 +41,7 @@
 	   <file type="plugin" id="eventbooking" group="content">plug_content_ebcategory.zip</file>	   
 	   <file type="plugin" id="eventbooking" group="content">plug_content_ebrestriction.zip</file>	   
 	   <file type="plugin" id="eventbooking" group="system">plug_system_ebreminder.zip</file>
+	   <file type="plugin" id="eventbooking" group="system">plug_system_ebdepositreminder.zip</file>
 	   <file type="plugin" id="eventbooking" group="search">plug_search_eventbooking.zip</file>	   
 	   <file type="plugin" id="eventbooking" group="community">plug_js_regisrationhisory.zip</file>
 	   <file type="plugin" id="eventbooking" group="editors-xtd">plug_editors_xtd_ebevent.zip</file>

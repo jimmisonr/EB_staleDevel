@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.4.3
+ * @version            2.5.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -74,6 +74,15 @@ class EventbookingViewFieldsHtml extends RADViewList
 		$options[]                              = JHtml::_('select.option', 2, JText::_('EB_HIDE'));
 		$this->lists['filter_show_core_fields'] = JHtml::_('select.genericlist', $options, 'filter_show_core_fields', ' onchange="submit();" ',
 			'value', 'text', $this->state->filter_show_core_fields);
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', -1, JText::_('EB_FEE_FIELD'));
+		$options[] = JHtml::_('select.option', 0, JText::_('JNO'));
+		$options[] = JHtml::_('select.option', 1, JText::_('JYES'));
+
+		$this->lists['filter_fee_field'] = JHtml::_('select.genericlist', $options, 'filter_fee_field', ' onchange="submit();" ',
+				'value', 'text', $this->state->filter_fee_field);
+
 		$this->config                           = $config;
 	}
 }

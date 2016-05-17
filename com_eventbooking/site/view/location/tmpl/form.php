@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.4.3
+ * @version            2.5.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -9,6 +9,9 @@
  */
 // no direct access
 defined('_JEXEC') or die;
+
+JHtml::_('behavior.framework') ;
+
 $bootstrapHelper   = $this->bootstrapHelper;
 $controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
 $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');

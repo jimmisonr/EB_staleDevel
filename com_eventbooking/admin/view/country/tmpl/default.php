@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.4.3
+ * @version            2.5.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -10,44 +10,40 @@
 // no direct access
 defined('_JEXEC') or die;
 ?>
-<form action="index.php?option=com_eventbooking&view=country" method="post" name="adminForm" id="adminForm">
-<div class="row-fluid">	
-	<table class="admintable adminform">
-		<tr>
-			<td width="100" class="key">
-				<?php echo  JText::_('EB_COUNTRY_NAME'); ?>
-			</td>
-			<td>
-				<input class="text_area" type="text" name="name" id="name" size="40" maxlength="250" value="<?php echo $this->item->name;?>" />
-			</td>
-		</tr>	
-		<tr>
-			<td width="100" class="key">
-				<?php echo  JText::_('EB_COUNTRY_CODE_3'); ?>
-			</td>
-			<td>
-				<input class="text_area" type="text" name="country_3_code" id="country_3_code" maxlength="250" value="<?php echo $this->item->country_3_code;?>" />
-			</td>
-		</tr>
-		<tr>
-			<td width="100" class="key">
-				<?php echo  JText::_('EB_COUNTRY_CODE_2'); ?>
-			</td>
-			<td>
-				<input class="text_area" type="text" name="country_2_code" id="country_2_code" maxlength="250" value="<?php echo $this->item->country_2_code;?>" />
-			</td>
-		</tr>				
-		<tr>
-			<td class="key">
-				<?php echo JText::_('EB_PUBLISHED'); ?>
-			</td>
-			<td>
-				<?php echo $this->lists['published']; ?>
-			</td>
-		</tr>
-	</table>										
-</div>		
-<div class="clearfix"></div>	
+<form action="index.php?option=com_eventbooking&view=country" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_COUNTRY_NAME'); ?>
+		</label>
+		<div class="controls">
+			<input class="text_area" type="text" name="name" id="name" size="40" maxlength="250" value="<?php echo $this->item->name;?>" />
+		</div>
+	</div>	
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_COUNTRY_CODE_3'); ?>
+		</label>
+		<div class="controls">
+			<input class="text_area" type="text" name="country_3_code" id="country_3_code" maxlength="250" value="<?php echo $this->item->country_3_code;?>" />
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_COUNTRY_CODE_2'); ?>
+		</label>
+		<div class="controls">
+			<input class="text_area" type="text" name="country_2_code" id="country_2_code" maxlength="250" value="<?php echo $this->item->country_2_code;?>" />
+		</div>
+	</div>				
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_PUBLISHED'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['published']; ?>
+		</div>
+	</div>
+	<div class="clearfix"></div>
 	<?php echo JHtml::_( 'form.token' ); ?>
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 	<input type="hidden" name="task" value="" />

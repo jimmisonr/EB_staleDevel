@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.4.3
+ * @version            2.5.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -326,12 +326,32 @@ $selectedState = '';
 					<?php echo EventbookingHelper::formatCurrency($this->item->deposit_amount, $this->config); ?>
 				</td>
 			</tr>
+			<?php
+			if ($this->item->payment_status == 1)
+			{
+			?>
+				<tr>
+					<td class="title_cell">
+						<?php echo JText::_('EB_PAYMENT_MADE'); ?>
+					</td>
+					<td class="field_cell">
+						<?php echo EventbookingHelper::formatCurrency($this->item->amount - $this->item->deposit_amount, $this->config); ?>
+					</td>
+				</tr>
+			<?php
+				$dueAmount = 0;
+			}
+			else
+			{
+				$dueAmount = $this->item->amount - $this->item->deposit_amount;
+			}
+			?>
 			<tr>
 				<td class="title_cell">
 					<?php echo JText::_('EB_DUE_AMOUNT'); ?>
 				</td>
 				<td class="field_cell">
-					<?php echo EventbookingHelper::formatCurrency($this->item->amount - $this->item->deposit_amount, $this->config); ?>
+					<?php echo EventbookingHelper::formatCurrency($dueAmount, $this->config); ?>
 				</td>
 			</tr>
 		<?php
