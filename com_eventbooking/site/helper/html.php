@@ -115,9 +115,7 @@ abstract class EventbookingHelperHtml
 
 		$paths[] = JPATH_THEMES . '/' . $app->getTemplate() . '/html/com_eventbooking/' . $themeFile;
 		$paths[] = JPATH_ROOT . '/components/com_eventbooking/view/' . $layout;
-
-		print_r($paths);
-
+		
 		$path = '';
 
 		foreach ($paths as $possiblePath)

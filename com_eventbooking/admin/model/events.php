@@ -25,7 +25,7 @@ class EventbookingModelEvents extends RADModelList
 		$this->state->insert('filter_category_id', 'int', 0)
 			->insert('filter_location_id', 'int', 0)
 			->insert('filter_past_events', 'int', 0)
-			->insert('filter_order_Dir', 'word', 'DESC');
+			->setDefault('filter_order', 'tbl.event_date');
 	}
 
 	/**
