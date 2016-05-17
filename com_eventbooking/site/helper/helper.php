@@ -964,11 +964,11 @@ class EventbookingHelper
 
 		if ($config->activate_deposit_feature)
 		{
-			$replaces['make_deposit_payment_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&view=payment&registrant_id='.$row->id.'&Itemid=' . $Itemid;
+			$replaces['deposit_payment_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&view=payment&registrant_id='.$row->id.'&Itemid=' . $Itemid;
 		}
 		else
 		{
-			$replaces['make_deposit_payment_link'] = '';
+			$replaces['deposit_payment_link'] = '';
 		}
 
 		return $replaces;
@@ -3969,6 +3969,8 @@ class EventbookingHelper
 		$config  = EventbookingHelper::getConfig();
 		$message = EventbookingHelper::getMessages();
 		$mailer  = JFactory::getMailer();
+		$Itemid  = EventbookingHelper::getItemid();
+		$siteUrl = static::getSiteUrl();
 
 		if ($bccEmail)
 		{
@@ -4043,6 +4045,7 @@ class EventbookingHelper
 			$replaces['event_title']     = $row->title;
 			$replaces['amount']          = static::formatCurrency($row->amount - $row->deposit_amount, $config, $row->currency_symbol);
 			$replaces['registration_id'] = $row->id;
+			$replaces['deposit_payment_link'] = $siteUrl . 'index.php?option=com_eventbooking&view=payment&registrant_id='.$row->id.'&Itemid=' . $Itemid;
 
 			foreach ($replaces as $key => $value)
 			{
