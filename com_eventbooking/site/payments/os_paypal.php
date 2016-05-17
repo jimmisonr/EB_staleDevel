@@ -112,7 +112,7 @@ class os_paypal extends RADPayment
 			{
 				return false;
 			}
-			if ($row->published)
+			if ($row->published && $row->payment_status)
 			{
 				return false;
 			}
