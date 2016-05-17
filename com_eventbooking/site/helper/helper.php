@@ -3956,6 +3956,114 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Send deposit payment reminder email to registrants
+	 *
+	 * @param int  $numberDays
+	 * @param int  $numberEmailSendEachTime
+	 * @param null $bccEmail
+	 */
+	public static function sendDepositReminder($numberDays, $numberEmailSendEachTime = 0, $bccEmail = null)
+	{
+		$db      = JFactory::getDbo();
+		$query   = $db->getQuery(true);
+		$config  = EventbookingHelper::getConfig();
+		$message = EventbookingHelper::getMessages();
+		$mailer  = JFactory::getMailer();
+
+		if ($bccEmail)
+		{
+			$mailer->addBcc($bccEmail);
+		}
+
+		if (!$numberDays)
+		{
+			$numberDays = 7;
+		}
+
+		if (!$numberEmailSendEachTime)
+		{
+			$numberEmailSendEachTime = 15;
+		}
+
+		if ($config->from_name)
+		{
+			$fromName = $config->from_name;
+		}
+		else
+		{
+			$fromName = JFactory::getConfig()->get('fromname');
+		}
+
+		if ($config->from_email)
+		{
+			$fromEmail = $config->from_email;
+		}
+		else
+		{
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
+		}
+
+		$query->select('a.id, a.first_name, a.last_name, a.email, a.amount, a.deposit_amount, b.title, b.event_date, b.currency_symbol')
+				->from('#__eb_registrants AS a')
+				->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+				->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published = 0))')
+				->where('a.payment_status = 0')
+				->where('a.group_id = 0')
+				->where('a.is_deposit_payment_reminder_sent = 0')
+				->where('b.published = 1')
+				->where('DATEDIFF(b.event_date, NOW()) <= '.$numberDays)
+				->where('DATEDIFF(b.event_date, NOW()) >= 0')
+				->order('b.event_date, a.register_date');
+
+		$db->setQuery($query, 0, $numberEmailSendEachTime);
+
+		try
+		{
+			$rows = $db->loadObjectList();
+		}
+		catch (Exception  $e)
+		{
+			$rows = array();
+		}
+
+		foreach($rows as $row)
+		{
+			if (!JMailHelper::isEmailAddress($row->email))
+			{
+				continue;
+			}
+
+			$emailSubject = $message->deposit_payment_reminder_email_subject;
+			$emailBody = $message->deposit_payment_reminder_email_body;
+
+			$replaces                    = array();
+			$replaces['event_date']      = JHtml::_('date', $row->event_date, $config->event_date_format, null);
+			$replaces['first_name']      = $row->first_name;
+			$replaces['last_name']       = $row->last_name;
+			$replaces['event_title']     = $row->title;
+			$replaces['amount']          = static::formatCurrency($row->amount - $row->deposit_amount, $config, $row->currency_symbol);
+			$replaces['registration_id'] = $row->id;
+
+			foreach ($replaces as $key => $value)
+			{
+				$emailSubject = str_ireplace('[' . strtoupper($key) . ']', $value, $emailSubject);
+				$emailBody = str_ireplace('[' . strtoupper($key) . ']', $value, $emailBody);
+			}
+
+			$emailBody = EventbookingHelper::convertImgTags($emailBody);
+			$mailer->sendMail($fromEmail, $fromName, $row->email, $emailSubject, $emailBody, 1);
+			$mailer->clearAddresses();
+
+			$query->clear();
+			$query->update('#__eb_registrants')
+					->set('is_deposit_payment_reminder_sent = 1')
+					->where('id = ' . (int) $row->id);
+			$db->setQuery($query);
+			$db->execute();
+		}
+	}
+
+	/**
 	 * Get country code
 	 *
 	 * @param string $countryName

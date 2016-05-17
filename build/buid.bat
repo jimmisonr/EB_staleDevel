@@ -79,6 +79,8 @@ cd E:\www\eventbooking\plugins\search\eventbooking\
 7z a -tzip E:\www\eventbooking\build/packages/plug_search_eventbooking.zip *
 cd E:\www\eventbooking\plugins\system\ebreminder\
 7z a -tzip E:\www\eventbooking\build/packages/plug_system_ebreminder.zip *
+cd E:\www\eventbooking\plugins\system\ebdepositreminder\
+7z a -tzip E:\www\eventbooking\build/packages/plug_system_ebdepositreminder.zip *
 cd E:\www\eventbooking\plugins\community\eb_registrationhistory
 7z a -tzip E:\www\eventbooking\build/packages/plug_js_regisrationhisory.zip *
 REM package
