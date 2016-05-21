@@ -2648,6 +2648,7 @@ class EventbookingHelper
 			->from('#__eb_events AS a')
 			->innerJoin('#__eb_event_categories AS b ON a.id = b.event_id')
 			->where('b.category_id IN (' . implode(',', $cats) . ')')
+			->where('published = 1')
 			->where('`access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
 		if ($config->hide_past_events)
 		{

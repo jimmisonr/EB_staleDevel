@@ -13,7 +13,13 @@ defined('_JEXEC') or die;
 class EventbookingViewCompleteHtml extends RADViewHtml
 {
 	public $hasModel = false;
-	function display()
+
+	/**
+	 * Display the view
+	 *
+	 * @throws Exception
+	 */
+	public function display()
 	{
 		//Hardcoded the layout, it happens with some clients. Maybe it is a bug of Joomla core code, will find out it later
 		$this->setLayout('default');
@@ -128,20 +134,30 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		foreach ($replaces as $key => $value)
 		{
 			$key          = strtoupper($key);
-			$thankMessage = str_replace("[$key]", $value, $thankMessage);
+			$thankMessage = str_ireplace("[$key]", $value, $thankMessage);
 		}
 
 		if (strpos($thankMessage, '[QRCODE]') !== false)
 		{
 			EventbookingHelper::generateQrcode($rowRegistrant->id);
 			$imgTag = '<img src="media/com_eventbooking/qrcodes/'.$rowRegistrant->id.'.png" border="0" />';
-			$thankMessage = str_replace("[QRCODE]", $imgTag, $thankMessage);
+			$thankMessage = str_ireplace("[QRCODE]", $imgTag, $thankMessage);
+		}
+
+		$trackingCode = $config->conversion_tracking_code;
+		if (!empty($trackingCode))
+		{
+			foreach ($replaces as $key => $value)
+			{
+				$key          = strtoupper($key);
+				$trackingCode = str_ireplace("[$key]", $value, $trackingCode);
+			}
 		}
 
 		$this->message          = $thankMessage;
 		$this->registrationCode = $registrationCode;
 		$this->tmpl             = $this->input->getString('tmpl');
-		$this->conversionTrackingCode = $config->conversion_tracking_code;
+		$this->conversionTrackingCode = $trackingCode;
 		
 		// Reset cart
 		$cart = new EventbookingHelperCart();
