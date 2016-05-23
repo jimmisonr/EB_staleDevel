@@ -221,9 +221,10 @@ class EventbookingModelRegistrants extends RADModelList
 		if ($app->isSite()
 				&& $modelName == 'registrants'
 				&& !$user->authorise('core.admin', 'com_eventbooking')
-				&& $config->only_show_registrants_of_event_owner)
+				&& $config->only_show_registrants_of_event_owner
+		)
 		{
-			$query->where('tbl.event_id IN (SELECT id FROM #__eb_events WHERE created_by =' . JFactory::getUser()->id . ')');
+			$query->where('tbl.event_id IN (SELECT id FROM #__eb_events WHERE created_by =' . $user->id . ')');
 		}
 
 		return parent::buildQueryWhere($query);
