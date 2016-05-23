@@ -191,6 +191,30 @@ class EventbookingController extends RADControllerAdmin
 
 		}
 
+		// Countries and states management
+		$fields = array_keys($db->getTableColumns('#__eb_coupons'));
+
+		if (!in_array('user_id', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_coupons` ADD  `user_id` INT(11) NOT NULL DEFAULT '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('apply_to', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_coupons` ADD  `apply_to` INT(11) NOT NULL DEFAULT '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('enable_for', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_coupons` ADD  `enable_for` INT(11) NOT NULL DEFAULT '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		$fields = array_keys($db->getTableColumns('#__eb_states'));
 
 		if (!in_array('id', $fields))
