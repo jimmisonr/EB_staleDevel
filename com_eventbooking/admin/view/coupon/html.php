@@ -70,6 +70,7 @@ class EventbookingViewCouponHtml extends RADViewItem
 
 		$this->lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id[]', 'class="input-xlarge" multiple="multiple" ', 'id', 'title', $selectedEventIds);
 		$this->nullDate          = $db->getNullDate();
+		$this->config            = $config;
 	}
 
 	/**

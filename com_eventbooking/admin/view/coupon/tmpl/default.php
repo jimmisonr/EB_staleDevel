@@ -96,24 +96,30 @@ JHtml::_('formbehavior.chosen', 'select');
 			<?php echo JHtml::_('calendar', $this->item->valid_to != $this->nullDate ? $this->item->valid_to : '', 'valid_to', 'valid_to'); ?>
 		</div>
 	</div>
-	<div class="control-group">
-		<label class="control-label">
-			<?php echo JText::_('EB_APPLY_TO'); ?>
-		</label>
-		<div class="controls">
-			<?php echo $this->lists['apply_to']; ?>
-		</div>
-	</div>
+	<?php
+		if (!$this->config->multiple_booking)
+		{
+		?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_APPLY_TO'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $this->lists['apply_to']; ?>
+				</div>
+			</div>
 
-	<div class="control-group">
-		<label class="control-label">
-			<?php echo JText::_('EB_ENABLE_FOR'); ?>
-		</label>
-		<div class="controls">
-			<?php echo $this->lists['enable_for']; ?>
-		</div>
-	</div>
-
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_ENABLE_FOR'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $this->lists['enable_for']; ?>
+				</div>
+			</div>
+		<?php
+		}
+	?>
 	<div class="control-group">
 		<label class="control-label">
 			<?php echo  JText::_('EB_USER'); ?>
