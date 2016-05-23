@@ -1040,6 +1040,8 @@ class EventbookingHelper
 				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
 				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
 				->where('(times = 0 OR times > used)')
+				->where('enable_for IN (0, 1)')
+				->where('user_id IN (0, ' . $user->id . ')')
 				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id=' . $event->id . '))')
 				->order('id DESC');
 			$db->setQuery($query);
@@ -1254,6 +1256,8 @@ class EventbookingHelper
 					->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
 					->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
 					->where('(times = 0 OR times > used)')
+					->where('enable_for IN (0, 2)')
+					->where('user_id IN (0, ' . $user->id . ')')
 					->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id=' . $event->id . '))')
 					->order('id DESC');
 			$db->setQuery($query);
@@ -1276,14 +1280,22 @@ class EventbookingHelper
 				}
 				else
 				{
-					$discountAmount = $discountAmount + $numberRegistrants * $coupon->discount;
-
-					if ($config->collect_member_information)
+					if ($coupon->apply_to == 0)
 					{
-						for ($i = 0; $i < $numberRegistrants; $i++)
+						$discountAmount = $discountAmount + $numberRegistrants * $coupon->discount;
+
+						if ($config->collect_member_information)
 						{
-							$membersDiscountAmount[$i] += $coupon->discount;
+							for ($i = 0; $i < $numberRegistrants; $i++)
+							{
+								$membersDiscountAmount[$i] += $coupon->discount;
+							}
 						}
+					}
+					else
+					{
+						$discountAmount = $discountAmount + $coupon->discount;
+						$membersDiscountAmount[0] += $coupon->discount;
 					}
 				}
 			}
@@ -1504,6 +1516,7 @@ class EventbookingHelper
 					->where('code = ' . $db->quote($couponCode))
 					->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
 					->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
+					->where('user_id IN (0, ' . $user->id . ')')
 					->where('(times = 0 OR times > used)')
 					->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id IN (' . implode(',', $items) . ')))')
 					->order('id DESC');
