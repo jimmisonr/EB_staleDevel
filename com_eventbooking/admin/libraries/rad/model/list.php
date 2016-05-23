@@ -146,16 +146,11 @@ class RADModelList extends RADModel
 	{
 		if (empty($this->data))
 		{
-			$db    = $this->getDbo();
-			$query = $this->query;
+			$db = $this->getDbo();
 
-			$this->buildQueryColumns($query)
-				->buildQueryFrom($query)
-				->buildQueryJoins($query)
-				->buildQueryWhere($query)
-				->buildQueryGroup($query)
-				->buildQueryHaving($query)
-				->buildQueryOrder($query);
+			$query = $this->buildListQuery();
+
+			$this->beforeQueryData($query);
 
 			// Adjust the limitStart state property
 			$limit = $this->state->limit;
@@ -178,6 +173,8 @@ class RADModelList extends RADModel
 			$db->setQuery($query, $this->state->limitstart, $this->state->limit);
 			$this->data = $db->loadObjectList();
 
+			$this->beforeReturnData($this->data);
+
 			// Store the query so that it can be used in getTotal method if needed
 			$this->query = $query;
 		}
@@ -196,20 +193,8 @@ class RADModelList extends RADModel
 		if (empty($this->total))
 		{
 			$db    = $this->getDbo();
-			$query = clone $this->query;
-			$query->clear('select')
-				->clear('group')
-				->clear('having')
-				->clear('order')
-				->clear('limit')
-				->select('COUNT(*)');
-
-			// Clear join clause if needed
-			if ($this->clearJoin)
-			{
-				$query->clear('join');
-			}
-
+			$query = $this->buildTotalQuery();
+			$this->beforeQueryTotal($query);
 			$db->setQuery($query);
 			$this->total = (int) $db->loadResult();
 		}
@@ -232,6 +217,50 @@ class RADModelList extends RADModel
 		}
 
 		return $this->pagination;
+	}
+
+	/**
+	 * Build the query object which is used to get list of records from database
+	 *
+	 * @return JDatabaseQuery
+	 */
+	protected function buildListQuery()
+	{
+		$query = $this->query;
+
+		$this->buildQueryColumns($query)
+			->buildQueryFrom($query)
+			->buildQueryJoins($query)
+			->buildQueryWhere($query)
+			->buildQueryGroup($query)
+			->buildQueryHaving($query)
+			->buildQueryOrder($query);
+
+		return $query;
+	}
+
+	/**
+	 * Build query object use to get total records from database
+	 *
+	 * @return JDatabaseQuery
+	 */
+	protected function buildTotalQuery()
+	{
+		$query = clone $this->query;
+		$query->clear('select')
+			->clear('group')
+			->clear('having')
+			->clear('order')
+			->clear('limit')
+			->select('COUNT(*)');
+
+		// Clear join clause if needed
+		if ($this->clearJoin)
+		{
+			$query->clear('join');
+		}
+
+		return $query;
 	}
 
 	/**
@@ -306,13 +335,13 @@ class RADModelList extends RADModel
 		{
 			//Remove blank space from searching
 			$state->filter_search = trim($state->filter_search);
-			if (stripos($state->search, 'id:') === 0)
+			if (stripos($state->filter_search, 'id:') === 0)
 			{
 				$query->where('tbl.id = ' . (int) substr($state->filter_search, 3));
 			}
 			else
 			{
-				$search = $db->Quote('%' . $db->escape($state->filter_search, true) . '%', false);
+				$search = $db->quote('%' . $db->escape($state->filter_search, true) . '%', false);
 				if (is_array($this->searchFields))
 				{
 					$whereOr = array();
@@ -327,7 +356,7 @@ class RADModelList extends RADModel
 
 		if ($state->filter_language && $state->filter_language != '*')
 		{
-			$query->where('tbl.language IN (' . $db->Quote($state->filter_language) . ',' . $db->Quote('*') . ', "")');
+			$query->where('tbl.language IN (' . $db->quote($state->filter_language) . ',' . $db->quote('*') . ', "")');
 		}
 
 		return $this;
@@ -374,5 +403,36 @@ class RADModelList extends RADModel
 		}
 
 		return $this;
+	}
+
+	/**
+	 * This method give child class a chance to adjust the query before it is run to return list of records
+	 *
+	 * @param JDatabaseQuery $query
+	 */
+	protected function beforeQueryData(JDatabaseQuery $query)
+	{
+
+	}
+
+	/**
+	 * This method give child class a chance to adjust the query object before it is run to return total records
+	 *
+	 * @param JDatabaseQuery $query
+	 */
+	protected function beforeQueryTotal(JDatabaseQuery $query)
+	{
+
+	}
+
+	/**
+	 * This method give child class to adjust the return data in getData method without having to override the
+	 * whole method
+	 *
+	 * @param array $rows
+	 */
+	protected function beforeReturnData($rows)
+	{
+
 	}
 }
