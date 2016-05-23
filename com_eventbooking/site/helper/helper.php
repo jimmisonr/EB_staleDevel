@@ -992,7 +992,8 @@ class EventbookingHelper
 		$db                    = JFactory::getDbo();
 		$query                 = $db->getQuery(true);
 		$couponCode            = isset($data['coupon_code']) ? $data['coupon_code'] : '';
-		$totalAmount           = $event->individual_price + $form->calculateFee();
+
+		$totalAmount           = $event->individual_price + $form->calculateFee(array('NUMBER_REGISTRANTS' => 1, 'INDIVIDUAL_PRICE' => $event->individual_price));
 		$discountAmount        = 0;
 		$fees['discount_rate'] = 0;
 		$nullDate              = $db->getNullDate();
@@ -1164,10 +1165,12 @@ class EventbookingHelper
 		$query                 = $db->getQuery(true);
 		$couponCode            = isset($data['coupon_code']) ? $data['coupon_code'] : '';
 		$eventId               = $event->id;
-		$extraFee              = $form->calculateFee();
 		$numberRegistrants     = (int) $session->get('eb_number_registrants', '');
 		$memberFormFields      = EventbookingHelper::getFormFields($eventId, 2);
 		$rate                  = EventbookingHelper::getRegistrationRate($eventId, $numberRegistrants);
+
+		$extraFee              = $form->calculateFee(array('NUMBER_REGISTRANTS' => $numberRegistrants, 'INDIVIDUAL_PRICE' => $rate));
+
 		$nullDate              = $db->getNullDate();
 		$membersForm           = array();
 		$membersTotalAmount    = array();
