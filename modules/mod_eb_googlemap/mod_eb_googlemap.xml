@@ -36,6 +36,12 @@
 					default="8"
 					label="Zoom level"
 					description="" />
+				<field
+					name="number_events"
+					type="text"
+					default="15"
+					label="Max number events per location"
+					description="" />
 				<field 
 					name="category_ids" 
 					type="ebcategory"
@@ -46,7 +52,7 @@
 				<field
 					name="hide_past_events"
 					type="radio"
-					default="0"
+					default="1"
 					class="btn-group btn-group-yesno"
 					label="Hide past events"
 					description="">
