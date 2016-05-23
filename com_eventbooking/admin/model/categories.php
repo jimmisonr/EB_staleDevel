@@ -38,15 +38,10 @@ class EventbookingModelCategories extends RADModelList
 		{
 			$parent = $this->state->filter_parent;
 			$db     = $this->getDbo();
-			$query  = $db->getQuery(true);
-			$this->buildQueryColumns($query)
-				->buildQueryFrom($query)
-				->buildQueryJoins($query)
-				->buildQueryWhere($query)
-				->buildQueryGroup($query)
-				->buildQueryOrder($query);
+			$query  = $this->buildListQuery();
 			$db->setQuery($query);
-			$rows     = $db->loadObjectList();
+			$rows = $db->loadObjectList();
+			
 			$children = array();
 			// first pass - collect children
 			if (count($rows))

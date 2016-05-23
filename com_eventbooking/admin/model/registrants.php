@@ -38,54 +38,46 @@ class EventbookingModelRegistrants extends RADModelList
 			->setDefault('filter_order_Dir', 'DESC');
 	}
 
+
 	/**
-	 * Method to get registrants data
+	 * Get list group name for group members records
 	 *
-	 * @access public
-	 * @return array
+	 * @param array $rows
 	 */
-	public function getData()
+	protected function beforeReturnData($rows)
 	{
-		if (empty($this->data))
+		if (count($rows))
 		{
-			$rows = parent::getData();
-			if (count($rows))
+			// Get group billing records
+			$billingIds = array();
+			foreach ($rows as $row)
+			{
+				if ($row->group_id)
+				{
+					$billingIds[] = $row->group_id;
+				}
+			}
+
+			if (count($billingIds))
 			{
 				$db    = $this->getDbo();
 				$query = $db->getQuery(true);
 
-				// Get group billing records
-				$billingIds = array();
-				foreach ($rows as $row)
-				{
-					if ($row->group_id)
-					{
-						$billingIds[] = $row->group_id;
-					}
-				}
-
-				if (count($billingIds))
-				{
-					$query->select('id, first_name, last_name')
+				$query->select('id, first_name, last_name')
 						->from('#__eb_registrants')
 						->where('id IN (' . implode(',', $billingIds) . ')');
-					$db->setQuery($query);
-					$billingRecords = $db->loadObjectList('id');
-					foreach ($rows as $row)
+				$db->setQuery($query);
+				$billingRecords = $db->loadObjectList('id');
+				foreach ($rows as $row)
+				{
+					if ($row->group_id > 0)
 					{
-						if ($row->group_id > 0)
-						{
-							$billingRecord   = $billingRecords[$row->group_id];
-							$row->group_name = $billingRecord->first_name . ' ' . $billingRecord->last_name;
-						}
+						$billingRecord   = $billingRecords[$row->group_id];
+						$row->group_name = $billingRecord->first_name . ' ' . $billingRecord->last_name;
 					}
 				}
 			}
-
-			$this->data = $rows;
 		}
-
-		return $this->data;
 	}
 
 	/**

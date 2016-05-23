@@ -29,29 +29,28 @@ class EventbookingModelEvents extends RADModelList
 	}
 
 	/**
-	 * Method to get events data
+	 * Get list of categories belong to each event before it is displayed
 	 *
-	 * @access public
-	 * @return array
+	 * @param array $rows
 	 */
-	function getData()
+	protected function beforeReturnData($rows)
 	{
-		$rows  = parent::getData();
-		$db    = $this->getDbo();
-		$query = $db->getQuery(true);
-		$query->select('a.name FROM #__eb_categories AS a')
-			->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id')
-			->order('a.ordering');
-		for ($i = 0, $n = count($rows); $i < $n; $i++)
+		if (count($rows))
 		{
-			$row = $rows[$i];
-			$query->where('event_id=' . $row->id);
-			$db->setQuery($query);
-			$row->category_name = implode(' | ', $db->loadColumn());
-			$query->clear('where');
-		}
+			$db    = $this->getDbo();
+			$query = $db->getQuery(true);
+			$query->select('a.name FROM #__eb_categories AS a')
+					->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id')
+					->order('a.ordering');
 
-		return $rows;
+			foreach($rows as $row)
+			{
+				$query->where('event_id=' . $row->id);
+				$db->setQuery($query);
+				$row->category_name = implode(' | ', $db->loadColumn());
+				$query->clear('where');
+			}
+		}
 	}
 
 	/**
