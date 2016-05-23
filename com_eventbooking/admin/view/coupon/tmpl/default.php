@@ -98,6 +98,33 @@ JHtml::_('formbehavior.chosen', 'select');
 	</div>
 	<div class="control-group">
 		<label class="control-label">
+			<?php echo JText::_('EB_APPLY_TO'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['apply_to']; ?>
+		</div>
+	</div>
+
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_ENABLE_FOR'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['enable_for']; ?>
+		</div>
+	</div>
+
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_USER'); ?>
+		</label>
+		<div class="controls">
+			<?php echo EventbookingHelper::getUserInput($this->item->user_id, 'user_id', (int) $this->item->id); ?>
+		</div>
+	</div>
+
+	<div class="control-group">
+		<label class="control-label">
 			<?php echo JText::_('EB_PUBLISHED'); ?>
 		</label>
 		<div class="controls">
