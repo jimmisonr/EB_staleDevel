@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.4.3
+ * @version            2.5.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -41,7 +41,8 @@ $currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
 $numberEvents = $params->get('number_events', 6);
 $categoryIds  = trim($params->get('category_ids', ''));
 $showCategory = $params->get('show_category', 1);
-$showLocation = $params->get('show_location');
+$showLocation = $params->get('show_location', 0);
+$showThumb    = $params->get('show_thumb', 0);
 
 $query->select('a.*, c.name AS location_name')
 	->from('#__eb_events AS a')

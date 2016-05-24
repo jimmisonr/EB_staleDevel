@@ -1,11 +1,11 @@
 <?php
 /**
- * @version        2.0.0
- * @package        Joomla
- * @subpackage     Event Booking
- * @author         Tuan Pham Ngoc
- * @copyright      Copyright (C) 2010 - 2016 Ossolution Team
- * @license        GNU/GPL, see LICENSE.php
+ * @version            2.5.0
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 
 // no direct access
@@ -47,11 +47,13 @@ if (count($rows))
         <ul class="eventsmall">
             <?php
             $k = 0 ;
-            foreach ($rows as  $row) {
+            $baseUri = JUri::base(true);
+            foreach ($rows as  $row)
+            {
                 $k = 1 - $k ;
                 $date = JHtml::_('date', $row->event_date, 'd', null);
                 $month = JHtml::_('date', $row->event_date, 'n', null);
-                ?>
+            ?>
                 <li class="vevent clearfix row-fluid">
                     <div class="span3">
                         <span class="event-date">
@@ -64,6 +66,14 @@ if (count($rows))
                     <div class="span9">
                     	<p>
                         <a class="url eb-event-link" href="<?php echo JRoute::_(EventbookingHelperRoute::getEventRoute($row->id, 0, $itemId), false); ?>">
+                            <?php
+                            if ($showThumb && $row->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$row->thumb))
+                            {
+                            ?>
+                                <img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $row->thumb; ?>" class="eb_event_thumb" /> <br/>
+                            <?php
+                            }
+                            ?>
                             <strong class="summary"><?php echo $row->title ; ?></strong>
                         </a>
                         </p>
@@ -73,7 +83,7 @@ if (count($rows))
                             ?>
                                 <p><small title="<?php echo JText::_('EB_CATEGORY'); ?>" class="category"><span>
 									<i class="icon-folder-open"></i>
-									<?php //echo JText::_('EB_CATEGORY'); ?><?php echo $row->categories ; ?></span></small></p>
+									<?php echo $row->categories ; ?></span></small></p>
                             <?php
                             }
                             if ($showLocation && strlen($row->location_name))
@@ -89,7 +99,9 @@ if (count($rows))
                             ?>
                     </div>
                 </li>
-            <?php } ?>
+            <?php
+            }
+            ?>
         </ul>
     </div>
 <?php
