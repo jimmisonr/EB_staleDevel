@@ -249,7 +249,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 								{
 									echo $item->event_capacity ;
 								}
-								else
+								elseif ($config->show_capacity != 2)
 								{
 									echo JText::_('EB_UNLIMITED') ;
 								}

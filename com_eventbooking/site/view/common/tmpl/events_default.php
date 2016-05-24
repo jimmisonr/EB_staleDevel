@@ -181,7 +181,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 								</tr>
 							<?php
 							}
-							if ($config->show_capacity)
+							if ($config->show_capacity == 1 || ($config->show_capacity == 2 && $event->event_capacity))
 							{
 							?>
 								<tr class="eb-event-property">

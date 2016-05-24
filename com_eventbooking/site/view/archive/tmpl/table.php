@@ -186,7 +186,7 @@ if (count($this->items))
 					{
 						echo $item->event_capacity ;
 					}
-					else
+					elseif ($this->config->show_capacity != 2)
 					{
 						echo JText::_('EB_UNLIMITED') ;
 					}

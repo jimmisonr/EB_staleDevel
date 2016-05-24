@@ -636,9 +636,10 @@ JHtml::_('formbehavior.chosen', 'select');
 					<?php echo EventbookingHelperHtml::getFieldLabel('show_capacity', JText::_('EB_SHOW_EVENT_CAPACITY')); ?>
 				</div>
 				<div class="controls">
-					<?php echo EventbookingHelperHtml::getBooleanInput('show_capacity', $config->show_capacity); ?>
+					<?php echo $this->lists['show_capacity']; ?>
 				</div>
 			</div>
+
 			<div class="control-group">
 				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('show_registered', JText::_('EB_SHOW_NUMBER_REGISTERED_USERS')); ?>

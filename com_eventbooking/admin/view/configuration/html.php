@@ -73,12 +73,19 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['calendar_theme']                             = JHtml::_('select.genericlist', $options, 'calendar_theme', ' class="inputbox" ', 'value', 'text',
 			$config->calendar_theme);
 
-		$options                           = array();
-		$options[]                         = JHtml::_('select.option', '', JText::_('EB_SELECT_POSITION'));
-		$options[]                         = JHtml::_('select.option', 0, JText::_('EB_BEFORE_AMOUNT'));
-		$options[]                         = JHtml::_('select.option', 1, JText::_('EB_AFTER_AMOUNT'));
-		$lists['currency_position']        = JHtml::_('select.genericlist', $options, 'currency_position', ' class="inputbox"', 'value', 'text',
-			$config->currency_position);
+		$options                    = array();
+		$options[]                  = JHtml::_('select.option', '', JText::_('EB_SELECT_POSITION'));
+		$options[]                  = JHtml::_('select.option', 0, JText::_('EB_BEFORE_AMOUNT'));
+		$options[]                  = JHtml::_('select.option', 1, JText::_('EB_AFTER_AMOUNT'));
+		$lists['currency_position'] = JHtml::_('select.genericlist', $options, 'currency_position', ' class="inputbox"', 'value', 'text',
+				$config->currency_position);
+
+		$options                = array();
+		$options[]              = JHtml::_('select.option', 0, JText::_('JNO'));
+		$options[]              = JHtml::_('select.option', 1, JText::_('JYES'));
+		$options[]              = JHtml::_('select.option', 2, JText::_('EB_SHOW_IF_LIMITED'));
+		$lists['show_capacity'] = JHtml::_('select.genericlist', $options, 'show_capacity', '', 'value', 'text', $this->config->show_capacity);
+
 
 		// Social sharing options
 		$options                         = array();

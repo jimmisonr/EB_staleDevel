@@ -191,7 +191,7 @@ $offset = JFactory::getConfig()->get('offset');
 						<?php
 						}
 
-						if ($this->config->show_capacity)
+					if ($this->config->show_capacity == 1 || ($this->config->show_capacity == 2 && $item->event_capacity))
 						{
 						?>
 							<tr>
