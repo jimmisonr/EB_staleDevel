@@ -212,7 +212,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 			->where('published = 1')
 			->order('name');
 		$db->setQuery($query);
-		$options[]            = JHtml::_('select.option', '', JText::_('Select Location'), 'id', 'name');
+		$options[]            = JHtml::_('select.option', '', JText::_('EB_SELECT_LOCATION'), 'id', 'name');
 		$options              = array_merge($options, $db->loadObjectList());
 		$lists['location_id'] = JHtml::_('select.genericlist', $options, 'location_id', '', 'id', 'name', $item->location_id);
 

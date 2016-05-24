@@ -127,7 +127,7 @@ class EventbookingViewLocationHtml extends RADViewHtml
 		$config             = EventbookingHelper::getConfig();
 		$item               = $this->model->getLocationData();
 		$options            = array();
-		$options[]          = JHtml::_('select.option', '', JText::_('Select Country'), 'id', 'name');
+		$options[]          = JHtml::_('select.option', '', JText::_('EB_SELECT_COUNTRY'), 'id', 'name');
 		$options            = array_merge($options, EventbookingHelperDatabase::getAllCountries());
 		$lists['country']   = JHtml::_('select.genericlist', $options, 'country', ' class="inputbox" ', 'id', 'name', $item->country);
 		$lists['published'] = JHtml::_('select.booleanlist', 'published', '', $item->published);
