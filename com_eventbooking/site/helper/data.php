@@ -456,6 +456,21 @@ class EventbookingHelperData
 				}
 			}
 
+			// Determine whether we need to show payment method column
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('name, title')
+					->from('#__eb_payment_plugins')
+					->where('published=1');
+			$db->setQuery($query);
+			$plugins = $db->loadObjectList('name');
+
+			$showPaymentMethodColumn = false;
+			if (count($plugins) > 1)
+			{
+				$showPaymentMethodColumn = true;
+			}
+
 			$fields   = array();
 			$fields[] = JText::_('EB_EVENT');
 			if ($config->show_event_date)
@@ -489,6 +504,10 @@ class EventbookingHelperData
 				$fields[] = JText::_('EB_COUPON');
 			}
 			$fields[] = JText::_('EB_REGISTRATION_DATE');
+			if ($showPaymentMethodColumn)
+			{
+				$fields[] = JText::_('EB_PAYMENT_METHOD');
+			}
 			$fields[] = JText::_('EB_TRANSACTION_ID');
 			$fields[] = JText::_('EB_PAYMENT_STATUS');
 			$fields[] = JText::_('EB_ID');
@@ -561,6 +580,17 @@ class EventbookingHelperData
 				}
 
 				$fields[] = JHtml::_('date', $r->register_date, $config->date_format);
+				if ($showPaymentMethodColumn)
+				{
+					if ($r->payment_method && isset($plugins[$r->payment_method]))
+					{
+						$fields[] = JText::_($plugins[$r->payment_method]->title);
+					}
+					else
+					{
+						$fields[] = '';
+					}
+				}
 				$fields[] = $r->transaction_id;
 				switch ($r->published)
 				{
