@@ -75,6 +75,8 @@ cd E:\www\eventbooking\plugins\eventbooking\membershippro\
 7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_membershippro.zip *
 cd E:\www\eventbooking\plugins\eventbooking\field\
 7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_field.zip *
+cd E:\www\eventbooking\plugins\eventbooking\dates\
+7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_dates.zip *
 cd E:\www\eventbooking\plugins\search\eventbooking\
 7z a -tzip E:\www\eventbooking\build/packages/plug_search_eventbooking.zip *
 cd E:\www\eventbooking\plugins\system\ebreminder\
