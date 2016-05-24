@@ -273,7 +273,7 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 		<div class="control-label">
 			<?php echo EventbookingHelperHtml::getFieldLabel('submit_event_user_email_body', JText::_('EB_SUBMIT_EVENT_USER_EMAIL_BODY')); ?>
 			<p class="eb-available-tags">
-				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[NAME], [EVENT_TITLE], [EVENT_DATE], [EVENT_ID]</strong>
+				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[NAME], [USERNAME], [EVENT_TITLE], [EVENT_DATE], [EVENT_ID], [EVENT_LINK]</strong>
 			</p>
 		</div>
 		<div class="controls">
@@ -292,7 +292,7 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 		<div class="control-label">
 			<?php echo EventbookingHelperHtml::getFieldLabel('submit_event_admin_email_body', JText::_('EB_SUBMIT_EVENT_ADMIN_EMAIL_BODY')); ?>
 			<p class="eb-available-tags">
-				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[NAME], [USER_NAME], [USER_USERNAME], [EVENT_TITLE], [EVENT_DATE], [EVENT_ID]</strong>
+				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[NAME], [USERNAME], [EVENT_TITLE], [EVENT_DATE], [EVENT_ID], [EVENT_LINK]</strong>
 			</p>
 		</div>
 		<div class="controls">
