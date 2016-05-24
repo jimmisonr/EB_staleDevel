@@ -3808,6 +3808,136 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Send new event notification email to admin and users when new event is submitted in the frontend
+	 *
+	 * @param JTable    $row
+	 * @param RADConfig $config
+	 */
+	public static function sendNewEventNotificationEmail($row, $config)
+	{
+		$user        = JFactory::getUser();
+		$mailer      = JFactory::getMailer();
+		$message     = self::getMessages();
+		$fieldSuffix = self::getFieldSuffix($row->language);
+
+		if ($config->from_name)
+		{
+			$fromName = $config->from_name;
+		}
+		else
+		{
+			$fromName = JFactory::getConfig()->get('fromname');
+		}
+
+		if ($config->from_email)
+		{
+			$fromEmail = $config->from_email;
+		}
+		else
+		{
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
+		}
+
+		$replaces = array(
+				'username'    => $user->username,
+				'name'        => $user->name,
+				'event_id'    => $row->id,
+				'event_title' => $row->title,
+				'event_date'  => JHtml::_('date', $row->event_date, $config->event_date_format, null),
+				'event_link'  => JUri::root() . 'administrator/index.php?option=com_eventbooking&view=event&id=' . $row->id,
+		);
+
+		//Notification email send to user
+
+		if (strlen($message->{'submit_event_user_email_subject' . $fieldSuffix}))
+		{
+			$subject = $message->{'submit_event_user_email_subject' . $fieldSuffix};
+		}
+		else
+		{
+			$subject = $message->submit_event_user_email_subject;
+		}
+
+		if (self::isValidMessage($message->{'submit_event_user_email_body' . $fieldSuffix}))
+		{
+			$body = $message->{'submit_event_user_email_body' . $fieldSuffix};
+		}
+		else
+		{
+			$body = $message->submit_event_user_email_body;
+		}
+
+		if($subject)
+		{
+			foreach ($replaces as $key => $value)
+			{
+				$key  = strtoupper($key);
+				$subject = str_ireplace("[$key]", $value, $subject);
+				$body = str_ireplace("[$key]", $value, $body);
+			}
+
+			$body = self::convertImgTags($body);
+			$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
+		}
+
+		//Send emails to admintrators
+		if ($config->notification_emails == '')
+		{
+			$notificationEmails = $fromEmail;
+		}
+		else
+		{
+			$notificationEmails = $config->notification_emails;
+		}
+
+		$emails             = explode(',', $notificationEmails);
+		$emails = array_map('trim', $emails);
+
+		if (strlen($message->{'submit_event_admin_email_subject' . $fieldSuffix}))
+		{
+			$subject = $message->{'submit_event_admin_email_subject' . $fieldSuffix};
+		}
+		else
+		{
+			$subject = $message->submit_event_admin_email_subject;
+		}
+
+		if (!$subject)
+		{
+			return;
+		}
+
+		if (self::isValidMessage($message->{'submit_event_admin_email_body' . $fieldSuffix}))
+		{
+			$body = $message->{'submit_event_admin_email_body' . $fieldSuffix};
+		}
+		else
+		{
+			$body = $message->submit_event_admin_email_body;
+		}
+
+		foreach ($replaces as $key => $value)
+		{
+			$key     = strtoupper($key);
+			$subject = str_ireplace("[$key]", $value, $subject);
+			$body    = str_ireplace("[$key]", $value, $body);
+		}
+
+		$body = self::convertImgTags($body);
+
+		for ($i = 0, $n = count($emails); $i < $n; $i++)
+		{
+			$email = $emails[$i];
+			if (!JMailHelper::isEmailAddress($email))
+			{
+				continue;
+			}
+			$mailer->clearAllRecipients();
+			$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
+		}
+	}
+
+	/**
 	 * Send reminder email to registrants
 	 *
 	 * @param int  $numberEmailSendEachTime

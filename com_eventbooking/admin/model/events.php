@@ -102,7 +102,7 @@ class EventbookingModelEvents extends RADModelList
 
 		if ($app->isAdmin())
 		{
-			$query->where('tbl.is_additional_date = 1');
+			$query->where('tbl.is_additional_date = 0');
 		}
 
 		return parent::buildQueryWhere($query);

@@ -259,6 +259,48 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 			</div>
 		</div>
 	<?php echo JHtml::_('bootstrap.endTab'); ?>
+
+	<?php echo JHtml::_('bootstrap.addTab', 'message', 'submit-event-email-messages-page', JText::_('EB_SUBMIT_EVENT_EMAIL_MESSAGES', true)); ?>
+	<div class="control-group">
+		<div class="control-label">
+			<?php echo EventbookingHelperHtml::getFieldLabel('submit_event_user_email_subject', JText::_('EB_SUBMIT_EVENT_USER_EMAIL_SUBJECT')); ?>
+		</div>
+		<div class="controls">
+			<input type="text" name="submit_event_user_email_subject" class="input-xlarge" value="<?php echo $this->message->submit_event_user_email_subject; ?>" size="80" />
+		</div>
+	</div>
+	<div class="control-group">
+		<div class="control-label">
+			<?php echo EventbookingHelperHtml::getFieldLabel('submit_event_user_email_body', JText::_('EB_SUBMIT_EVENT_USER_EMAIL_BODY')); ?>
+			<p class="eb-available-tags">
+				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[NAME], [EVENT_TITLE], [EVENT_DATE], [EVENT_ID]</strong>
+			</p>
+		</div>
+		<div class="controls">
+			<?php echo $editor->display( 'submit_event_user_email_body',  $this->message->submit_event_user_email_body , '100%', '250', '75', '8' ) ;?>
+		</div>
+	</div>
+	<div class="control-group">
+		<div class="control-label">
+			<?php echo EventbookingHelperHtml::getFieldLabel('submit_event_admin_email_subject', JText::_('EB_SUBMIT_EVENT_ADMIN_EMAIL_SUBJECT')); ?>
+		</div>
+		<div class="controls">
+			<input type="text" name="submit_event_admin_email_subject" class="input-xlarge" value="<?php echo $this->message->submit_event_admin_email_subject; ?>" size="50" />
+		</div>
+	</div>
+	<div class="control-group">
+		<div class="control-label">
+			<?php echo EventbookingHelperHtml::getFieldLabel('submit_event_admin_email_body', JText::_('EB_SUBMIT_EVENT_ADMIN_EMAIL_BODY')); ?>
+			<p class="eb-available-tags">
+				<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[NAME], [USER_NAME], [USER_USERNAME], [EVENT_TITLE], [EVENT_DATE], [EVENT_ID]</strong>
+			</p>
+		</div>
+		<div class="controls">
+			<?php echo $editor->display( 'submit_event_admin_email_body',  $this->message->submit_event_admin_email_body , '100%', '250', '75', '8' ) ;?>
+		</div>
+	</div>
+	<?php echo JHtml::_('bootstrap.endTab');?>
+
 	<?php echo JHtml::_('bootstrap.addTab', 'message', 'invitation-messages-page', JText::_('EB_INVITATION_MESSAGES', true)); ?>
 		<div class="control-group">
 			<div class="control-label">
