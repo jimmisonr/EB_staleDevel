@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.5.1
+ * @version            2.4.3
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -74,6 +74,8 @@ class plgEventBookingCB extends JPlugin
 
 		if ($row->user_id)
 		{
+			$config = EventbookingHelper::getConfig();
+
 			$db  = JFactory::getDbo();
 			$sql = 'SELECT count(*) FROM `#__comprofiler` WHERE `user_id` = ' . $db->quote($row->user_id);
 			$db->setQuery($sql);
@@ -123,15 +125,19 @@ class plgEventBookingCB extends JPlugin
 
 
 			$profile                 = new stdClass();
+
 			$profile->id             = $row->user_id;
 			$profile->user_id        = $row->user_id;
 			$profile->firstname      = $row->first_name;
 			$profile->lastname       = $row->last_name;
-			$profile->avatarapproved = 1;
-			$profile->confirmed      = 1;
-			$profile->registeripaddr = htmlspecialchars($_SERVER['REMOTE_ADDR']);
-			$profile->banned         = 0;
-			$profile->acceptedterms  = 1;
+			if (!$config->use_cb_api)
+			{
+				$profile->confirmed      = 1;
+				$profile->avatarapproved = 1;
+				$profile->registeripaddr = htmlspecialchars($_SERVER['REMOTE_ADDR']);
+				$profile->banned         = 0;
+				$profile->acceptedterms  = 1;
+			}
 
 			foreach ($fieldValues as $fieldName => $value)
 			{

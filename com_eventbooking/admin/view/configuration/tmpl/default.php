@@ -216,6 +216,14 @@ JHtml::_('formbehavior.chosen', 'select');
 							<?php echo $this->lists['country_list']; ?>
 						</div>
 					</div>
+					<div class="control-group">
+						<div class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('require_admin_approve', JText::_('EB_REQUIRE_ADMIN_APPROVE_NEW_EVENT'), JText::_('EB_REQUIRE_ADMIN_APPROVE_NEW_EVENT_EXPLAIN')); ?>
+						</div>
+						<div class="controls">
+							<?php echo EventbookingHelperHtml::getBooleanInput('require_admin_approve', $config->require_admin_approve); ?>
+						</div>
+					</div>
 				</fieldset>
 				<fieldset class="form-horizontal" style="margin-top:103px;">
 					<legend><?php echo JText::_('EB_MAIL_SETTINGS'); ?></legend>
@@ -280,6 +288,21 @@ JHtml::_('formbehavior.chosen', 'select');
 							<?php echo EventbookingHelperHtml::getBooleanInput('user_registration', $config->user_registration); ?>
 						</div>
 					</div>
+					<?php
+						if (JComponentHelper::isEnabled('com_comprofiler') && JPluginHelper::isEnabled('eventbooking', 'cb'))
+						{
+						?>
+							<div class="control-group">
+								<div class="control-label">
+									<?php echo EventbookingHelperHtml::getFieldLabel('use_cb_api', JText::_('EB_USE_CB_API'), JText::_('EB_USE_CB_API_EXPLAIN')); ?>
+								</div>
+								<div class="controls">
+									<?php echo EventbookingHelperHtml::getBooleanInput('use_cb_api', $config->use_cb_api); ?>
+								</div>
+							</div>
+						<?php
+						}
+					?>
 					<div class="control-group">
 						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('multiple_booking', JText::_('EB_MULTIPLE_BOOKING'), JText::_('EB_MULTIPLE_BOOKING_EXPLAIN')); ?>

@@ -5075,29 +5075,112 @@ class EventbookingHelper
 	 */
 	public static function saveRegistration($data)
 	{
-		//Need to load com_users language file
-		$lang = JFactory::getLanguage();
-		$tag  = $lang->getTag();
-		if (!$tag)
+		$config = static::getConfig();
+		if ($config->use_cb_api)
 		{
-			$tag = 'en-GB';
+			return static::userRegistrationCB($data['first_name'], $data['last_name'], $data['email'], $data['username'], $data['password1']);
 		}
-		$lang->load('com_users', JPATH_ROOT, $tag);
-		$data['name']     = $data['first_name'] . ' ' . $data['last_name'];
-		$data['password'] = $data['password2'] = $data['password1'];
-		$data['email1']   = $data['email2'] = $data['email'];
-		require_once JPATH_ROOT . '/components/com_users/models/registration.php';
-		$model = new UsersModelRegistration();
-		$ret   = $model->register($data);
+		else
+		{
+			//Need to load com_users language file
+			$lang = JFactory::getLanguage();
+			$tag  = $lang->getTag();
+			if (!$tag)
+			{
+				$tag = 'en-GB';
+			}
+			$lang->load('com_users', JPATH_ROOT, $tag);
+			$data['name']     = $data['first_name'] . ' ' . $data['last_name'];
+			$data['password'] = $data['password2'] = $data['password1'];
+			$data['email1']   = $data['email2'] = $data['email'];
+			require_once JPATH_ROOT . '/components/com_users/models/registration.php';
+			$model = new UsersModelRegistration();
+			$ret   = $model->register($data);
 
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('id')
-			->from('#__users')
-			->where('username = ' . $db->quote($data['username']));
-		$db->setQuery($query);
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('id')
+					->from('#__users')
+					->where('username = ' . $db->quote($data['username']));
+			$db->setQuery($query);
 
-		return (int) $db->loadResult();
+			return (int) $db->loadResult();
+		}
+	}
+
+	/**
+	 * Use CB API for saving user account
+	 *
+	 * @param       $firstName
+	 * @param       $lastName
+	 * @param       $email
+	 * @param       $username
+	 * @param       $password
+	 *
+	 * @return int
+	 */
+	public static function userRegistrationCB($firstName, $lastName, $email, $username, $password)
+	{
+
+		global $_CB_framework, $_PLUGINS, $ueConfig;
+
+		$approval     = $ueConfig['reg_admin_approval'];
+		$confirmation = ($ueConfig['reg_confirmation']);
+		$user         = new \CB\Database\Table\UserTable();
+
+		$user->set('username', $username);
+		$user->set('email', $email);
+		$user->set('name', trim($firstName . ' ' . $lastName));
+		$user->set('gids', array((int) $_CB_framework->getCfg('new_usertype')));
+		$user->set('sendEmail', 0);
+		$user->set('registerDate', $_CB_framework->getUTCDate());
+		$user->set('password', $user->hashAndSaltPassword($password));
+		$user->set('registeripaddr', cbGetIPlist());
+
+		if ($approval == 0)
+		{
+			$user->set('approved', 1);
+		}
+		else
+		{
+			$user->set('approved', 0);
+		}
+
+		if ($confirmation == 0)
+		{
+			$user->set('confirmed', 1);
+		}
+		else
+		{
+			$user->set('confirmed', 0);
+		}
+
+		if (($user->get('confirmed') == 1) && ($user->get('approved') == 1))
+		{
+			$user->set('block', 0);
+		}
+		else
+		{
+			$user->set('block', 1);
+		}
+
+		$_PLUGINS->trigger('onBeforeUserRegistration', array(&$user, &$user));
+
+		if ($user->store())
+		{
+			if ($user->get('confirmed') == 0)
+			{
+				$user->store();
+			}
+
+			$messagesToUser = activateUser($user, 1, 'UserRegistration');
+
+			$_PLUGINS->trigger('onAfterUserRegistration', array(&$user, &$user, true));
+
+			return $user->get('id');
+		}
+
+		return 0;
 	}
 
 	/**
