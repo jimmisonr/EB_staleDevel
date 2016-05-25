@@ -131,7 +131,7 @@ function EventbookingBuildRoute(&$query)
 			unset($query['id']);
 			break;
 		case 'location':
-			if ($layout == 'form')
+			if ($layout == 'form' || $layout == 'popup')
 			{
 				if ($id)
 				{
@@ -148,8 +148,10 @@ function EventbookingBuildRoute(&$query)
 				{
 					$segments[] = 'Add Location';
 				}
-
-				unset($query['layout']);
+				if ($layout == 'form')
+				{
+					unset($query['layout']);
+				}
 			}
 			else
 			{

@@ -19,19 +19,52 @@ class EventbookingControllerLocation extends EventbookingController
 	public function save()
 	{
 		$this->csrfProtection();
-		$post  = $this->input->post->getData();
-		$model = $this->getModel();
-		try
+		if (JFactory::getUser()->authorise('eventbooking.addlocation', 'com_eventbooking'))
 		{
-			$model->store($post);
-			$msg = JText::_('EB_LOCATION_SAVED');
-		}
-		catch (Exception $e)
-		{
-			$msg = JText::_('EB_ERROR_SAVING_LOCATION') . ':' . $e->getMessage();
-		}
+			$post  = $this->input->post->getData();
+			$model = $this->getModel();
+			try
+			{
+				$model->store($post);
+				$msg = JText::_('EB_LOCATION_SAVED');
+			}
+			catch (Exception $e)
+			{
+				$msg = JText::_('EB_ERROR_SAVING_LOCATION') . ':' . $e->getMessage();
+			}
 
-		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=locations&Itemid=' . $this->input->getInt('Itemid', 0)), $msg);
+			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=locations&Itemid=' . $this->input->getInt('Itemid', 0)), $msg);
+		}
+	}
+
+	/**
+	 * Save location from ajax request
+	 */
+	public function save_ajax()
+	{
+		$this->csrfProtection();
+		if (JFactory::getUser()->authorise('eventbooking.addlocation', 'com_eventbooking'))
+		{
+			$post  = $this->input->post->getData();
+			$model = $this->getModel();
+
+			$json = array();
+			try
+			{
+				$model->store($post);
+				$json['success'] = true;
+				$json['id']      = $post['id'];
+				$json['name']    = $post['name'];
+			}
+			catch (Exception $e)
+			{
+				$json['success'] = false;
+				$json['message'] = $e->getMessage();
+			}
+
+			echo json_encode($json);
+			$this->app->close();
+		}
 	}
 
 	/**

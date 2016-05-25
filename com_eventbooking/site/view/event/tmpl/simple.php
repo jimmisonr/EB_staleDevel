@@ -78,6 +78,14 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			<label class="<?php echo $controlLabelClass; ?>"><?php echo JText::_('EB_LOCATION') ; ?></label>
 			<div class="<?php echo $controlsClass; ?>">
 				<?php echo $this->lists['location_id'] ; ?>
+				<?php
+				if (JFactory::getUser()->authorise('eventbooking.addlocation', 'com_eventbooking'))
+				{
+					?>
+					<button type="button" class="btn btn-small btn-success eb-colorbox-addlocation" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=location&layout=popup&tmpl=component&Itemid='.$this->Itemid)?>"><span class="icon-new icon-white"></span><?php echo JText::_('EB_ADD_NEW_LOCATION') ; ?></button>
+					<?php
+				}
+				?>
 			</div>
 		</div>
 		<div class="<?php echo $controlGroupClass;  ?>">

@@ -19,7 +19,7 @@ class EventbookingViewLocationHtml extends RADViewHtml
 	public function display()
 	{
 		$layout = $this->getLayout();
-		if ($layout == 'form')
+		if ($layout == 'form' || $layout == 'popup')
 		{
 			$this->displayForm();
 
@@ -124,6 +124,10 @@ class EventbookingViewLocationHtml extends RADViewHtml
 			return;
 		}
 
+		$document = JFactory::getDocument();
+		$document->addScriptDeclaration(
+				'var siteUrl = "' . EventbookingHelper::getSiteUrl() . '";'
+		);
 		$config             = EventbookingHelper::getConfig();
 		$item               = $this->model->getLocationData();
 		$options            = array();

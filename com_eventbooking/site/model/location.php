@@ -52,7 +52,7 @@ class EventbookingModelLocation extends EventbookingModelList
 	 * @access    public
 	 * @return    boolean    True on success
 	 */
-	public function store($data)
+	public function store(&$data)
 	{
 		$row          = $this->getTable();
 		$user         = JFactory::getUser();
@@ -66,7 +66,7 @@ class EventbookingModelLocation extends EventbookingModelList
 		}
 		if (!$row->bind($data))
 		{
-			$this->setError($this->_db->getErrorMsg());
+			$this->setError($this->db->getErrorMsg());
 
 			return false;
 		}
@@ -77,7 +77,9 @@ class EventbookingModelLocation extends EventbookingModelList
 			return false;
 		}
 
-		return true;
+		$data['id'] = $row->id;
+
+		return $row->id;
 	}
 
 	/**

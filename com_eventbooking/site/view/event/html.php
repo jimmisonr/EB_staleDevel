@@ -169,6 +169,8 @@ class EventbookingViewEventHtml extends RADViewHtml
 	 */
 	protected function displayForm()
 	{
+		EventbookingHelperJquery::colorbox('eb-colorbox-addlocation');
+
 		$db          = JFactory::getDbo();
 		$query       = $db->getQuery(true);
 		$user        = JFactory::getUser();
