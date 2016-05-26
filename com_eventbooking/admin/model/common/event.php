@@ -153,7 +153,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 		if (isset($data['recurring_type']) && $data['recurring_type'])
 		{
-			$this->storeRecurringEvent($data);
+			$this->storeRecurringEvent($data, $input->getInt('source_id'));
 			$input->set('id', $data['id']);
 		}
 		else
@@ -235,7 +235,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				}
 			}
 
-			$this->prepareTable($row, $input->getCmd('task'));
+			$this->prepareTable($row, $input->getCmd('task'), $input->getInt('source_id'));
 
 			if (!$row->store())
 			{
@@ -266,7 +266,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 	 *
 	 * @throws Exception
 	 */
-	protected function storeRecurringEvent(&$data)
+	protected function storeRecurringEvent(&$data, $sourceId)
 	{
 		$db       = $this->getDbo();
 		$query    = $db->getQuery(true);
@@ -402,7 +402,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			}
 		}
 
-		$this->prepareTable($row, $task);
+		$this->prepareTable($row, $task, $sourceId);
 
 		if (!$row->store())
 		{

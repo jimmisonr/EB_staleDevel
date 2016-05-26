@@ -21,7 +21,7 @@ class EventbookingModelCategory extends RADModelAdmin
 	 * @return void
 	 *
 	 */
-	protected function prepareTable($row, $task)
+	protected function prepareTable($row, $task, $sourceId)
 	{
 		if ($row->parent > 0)
 		{
@@ -40,7 +40,7 @@ class EventbookingModelCategory extends RADModelAdmin
 			$row->level = 1;
 		}
 
-		parent::prepareTable($row, $task);
+		parent::prepareTable($row, $task, $sourceId);
 	}
 
 	/**

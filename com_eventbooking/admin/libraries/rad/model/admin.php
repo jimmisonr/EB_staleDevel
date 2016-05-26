@@ -227,7 +227,7 @@ class RADModelAdmin extends RADModel
 		$this->beforeStore($row, $input, $isNew);
 		$data = $input->getData();
 		$row->bind($data, $ignore);
-		$this->prepareTable($row, $input->get('task'));
+		$this->prepareTable($row, $input->get('task'), $input->getInt('source_id'));
 		if (!$row->check())
 		{
 			throw new Exception($row->getError());
@@ -243,8 +243,6 @@ class RADModelAdmin extends RADModel
 		if (!$row->store())
 		{
 			throw new Exception($row->getError());
-
-			return false;
 		}
 		if ($this->triggerEvents)
 		{
@@ -526,13 +524,17 @@ class RADModelAdmin extends RADModel
 	 * Prepare and sanitise the table data prior to saving.
 	 *
 	 * @param JTable $row A reference to a JTable object.
+	 * @param string $task
+	 * @param int    $sourceId
 	 *
 	 * @return void
 	 *
 	 */
-	protected function prepareTable($row, $task)
+	protected function prepareTable($row, $task, $sourceId = 0)
 	{
 		$user = JFactory::getUser();
+
+		$titleField = '';
 		if (property_exists($row, 'title'))
 		{
 			$titleField = 'title';
@@ -541,14 +543,28 @@ class RADModelAdmin extends RADModel
 		{
 			$titleField = 'name';
 		}
+
 		if (($task == 'save2copy') && $titleField)
 		{
 			if (property_exists($row, 'alias'))
 			{
 				//Need to generate new title and alias
-				list ($title, $alias) = $this->generateNewTitle($row, $row->alias, $row->{$titleField});
-				$row->{$titleField} = $title;
-				$row->alias         = $alias;
+				$origTable = clone $this->getTable();
+				$origTable->load($sourceId);
+
+				if ($row->{$titleField} == $origTable->{$titleField})
+				{
+					list($title, $alias) = $this->generateNewTitle($row, $row->alias, $row->{$titleField});
+					$row->{$titleField} = $title;
+					$row->alias         = $alias;
+				}
+				else
+				{
+					if ($row->alias == $origTable->alias)
+					{
+						$row->alias = '';
+					}
+				}
 			}
 			else
 			{
@@ -556,23 +572,20 @@ class RADModelAdmin extends RADModel
 			}
 		}
 
-		if (property_exists($row, 'title'))
+		if ($titleField)
 		{
-			$row->title = htmlspecialchars_decode($row->title, ENT_QUOTES);
+			$row->{$titleField} = htmlspecialchars_decode($row->{$titleField}, ENT_QUOTES);
 		}
 
-		if (property_exists($row, 'name'))
-		{
-			$row->name = htmlspecialchars_decode($row->name, ENT_QUOTES);
-		}
 
 		if (property_exists($row, 'alias'))
 		{
-			if (empty($row->alias))
+			if (!$row->alias)
 			{
-				$row->alias = $row->{$titleField};
+				$row->alias = JApplicationHelper::stringURLSafe($row->{$titleField});
+				list($title, $alias) = $this->generateNewTitle($row, $row->alias, $row->{$titleField});
+				$row->alias = $alias;
 			}
-			$row->alias = JApplicationHelper::stringURLSafe($row->alias);
 
 			// Handle alias for extra languages
 			if (JLanguageMultilang::isEnabled())
@@ -596,6 +609,7 @@ class RADModelAdmin extends RADModel
 				}
 			}
 		}
+
 		if (empty($row->id))
 		{
 			// Set ordering to the last item if not set
