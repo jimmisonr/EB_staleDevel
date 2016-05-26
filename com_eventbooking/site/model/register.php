@@ -186,8 +186,12 @@ class EventBookingModelRegister extends RADModel
 		{
 			require_once JPATH_COMPONENT . '/payments/' . $paymentMethod . '.php';
 
-			$itemName          = JText::_('EB_EVENT_REGISTRATION');
-			$itemName          = str_replace('[EVENT_TITLE]', $data['event_title'], $itemName);
+			$itemName = JText::_('EB_EVENT_REGISTRATION');
+			$itemName = str_replace('[EVENT_TITLE]', $data['event_title'], $itemName);
+			$itemName = str_replace('[FIRST_NAME]', $row->first_name, $itemName);
+			$itemName = str_replace('[LAST_NAME]', $row->last_name, $itemName);
+			$itemName = str_replace('[REGISTRANT_ID]', $row->id, $itemName);
+
 			$data['item_name'] = $itemName;
 
 			// Guess card type based on card number
@@ -453,6 +457,9 @@ class EventBookingModelRegister extends RADModel
 
 			$itemName          = JText::_('EB_EVENT_REGISTRATION');
 			$itemName          = str_replace('[EVENT_TITLE]', $data['event_title'], $itemName);
+			$itemName          = str_replace('[FIRST_NAME]', $row->first_name, $itemName);
+			$itemName          = str_replace('[LAST_NAME]', $row->last_name, $itemName);
+			$itemName          = str_replace('[REGISTRANT_ID]', $row->id, $itemName);
 			$data['item_name'] = $itemName;
 
 			// Validate credit card
