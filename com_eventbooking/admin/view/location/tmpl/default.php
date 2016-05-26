@@ -18,7 +18,12 @@ if ($this->item->id)
 }
 else
 {
-	$coordinates = '40.992954,29.042092';
+
+	$config = EventbookingHelper::getConfig();
+	$geocode_stats = file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?address=".str_replace(' ','+',$config->default_country)."&sensor=false");
+	$output_deals = json_decode($geocode_stats);
+	$latLng = $output_deals->results[0]->geometry->location;
+	$coordinates = $latLng->lat.','.$latLng->lng;
 }
 ?>
 <script type="text/javascript">
@@ -64,7 +69,7 @@ else
 		var mapDiv = document.getElementById('map-canvas');
 		// Create the map object
 		map = new google.maps.Map(mapDiv, {
-				center: new google.maps.LatLng(<?php  if(!empty($coordinates)){ echo $coordinates; } else { echo "40.992954,29.042092"; }?>),
+				center: new google.maps.LatLng(<?php  echo $coordinates; ?>),
 				zoom: 10,
 				mapTypeId: google.maps.MapTypeId.ROADMAP,
 				streetViewControl: false
@@ -72,7 +77,7 @@ else
 		// Create the default marker icon
 		marker = new google.maps.Marker({
 			map: map,
-			position: new google.maps.LatLng(<?php  if(!empty($coordinates)){ echo $coordinates; } else { echo "40.992954,29.042092"; }?>),
+			position: new google.maps.LatLng(<?php echo $coordinates;?>),
 			draggable: true
 		});
 		// Add event to the marker

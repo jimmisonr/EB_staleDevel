@@ -18,11 +18,12 @@ $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
 $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 $span7Class          = $bootstrapHelper->getClassMapping('span7');
 $span5Class          = $bootstrapHelper->getClassMapping('span5');
-$geocode_stats = file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?address='".str_replace(' ','+',EventbookingHelper::getConfigValue('default_country'))."'&sensor=false");
+
+$config = EventbookingHelper::getConfig();
+$geocode_stats = file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?address=".str_replace(' ','+',$config->default_country)."&sensor=false");
 $output_deals = json_decode($geocode_stats);
 $latLng = $output_deals->results[0]->geometry->location;
-$defaultlat = $latLng->lat;
-$defaultlng = $latLng->lng;
+$coordinates = $latLng->lat.','.$latLng->lng;
 ?>
 
 <script src="https://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
@@ -35,7 +36,7 @@ $defaultlng = $latLng->lng;
 		var mapDiv = document.getElementById('map-canvas');
 		// Create the map object
 		map = new google.maps.Map(mapDiv, {
-				center: new google.maps.LatLng(<?php echo "$defaultlat,$defaultlng"; ?>),
+				center: new google.maps.LatLng(<?php echo $coordinates; ?>),
 				zoom: 10,
 				mapTypeId: google.maps.MapTypeId.ROADMAP,
 				streetViewControl: false
@@ -43,7 +44,7 @@ $defaultlng = $latLng->lng;
 		// Create the default marker icon
 		marker = new google.maps.Marker({
 			map: map,
-			position: new google.maps.LatLng(<?php echo "$defaultlat,$defaultlng"; ?>),
+			position: new google.maps.LatLng(<?php echo $coordinates; ?>),
 			draggable: true
 		});
 		// Add event to the marker
