@@ -63,6 +63,7 @@ class plgEventBookingDates extends JPlugin
 
 		$additionalEventIds = array();
 
+		$numberChildrenEvents = 0;
 		for ($i = 0; $i < $maxNumberDates; $i++)
 		{
 			if (empty($data['event_date_' . $i]))
@@ -82,14 +83,19 @@ class plgEventBookingDates extends JPlugin
 
 			$rowEvent->location_id        = $data['location_id_' . $i];
 			$rowEvent->parent_id          = $row->id;
+			$rowEvent->event_type         = 2;
 			$rowEvent->is_additional_date = 1;
 
 			if (!$rowEvent->id)
 			{
 				$rowEvent->alias = JApplicationHelper::stringURLSafe($rowEvent->title . '-' . JHtml::_('date', $rowEvent->event_date, $config->date_format, null));
+				$rowEvent->hits = 0;
 			}
 
+
 			$rowEvent->store();
+
+			$numberChildrenEvents++;
 
 			if ($id == 0)
 			{
@@ -108,6 +114,19 @@ class plgEventBookingDates extends JPlugin
 
 			$additionalEventIds[] = $rowEvent->id;
 		}
+
+		if ($numberChildrenEvents)
+		{
+			$row->event_type = 1;
+		}
+		else
+		{
+			$row->event_type = 0;
+		}
+
+		$row->store();
+
+
 
 		// Remove the events which are removed by users
 		if (!$isNew)

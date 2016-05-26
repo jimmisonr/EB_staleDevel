@@ -100,11 +100,6 @@ class EventbookingModelEvents extends RADModelList
 			$query->where('tbl.created_by=' . (int) JFactory::getUser()->id);
 		}
 
-		if ($app->isAdmin())
-		{
-			$query->where('tbl.is_additional_date = 0');
-		}
-
 		return parent::buildQueryWhere($query);
 	}
 
