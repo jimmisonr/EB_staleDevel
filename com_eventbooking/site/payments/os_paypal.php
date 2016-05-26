@@ -193,6 +193,7 @@ class os_paypal extends RADPayment
 		}
 		fputs($fp, "POST $path HTTP/1.1\r\n");
 		fputs($fp, "Host: $host\r\n");
+		fputs($fp, "User-Agent: Events Booking\r\n");
 		fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
 		fputs($fp, "Content-length: " . strlen($postString) . "\r\n");
 		fputs($fp, "Connection: close\r\n\r\n");
