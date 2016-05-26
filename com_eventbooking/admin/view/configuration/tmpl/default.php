@@ -289,7 +289,7 @@ JHtml::_('formbehavior.chosen', 'select');
 						</div>
 					</div>
 					<?php
-						if (JComponentHelper::isEnabled('com_comprofiler') && JPluginHelper::isEnabled('eventbooking', 'cb'))
+						if (JComponentHelper::isInstalled('com_comprofiler') && JPluginHelper::isEnabled('eventbooking', 'cb'))
 						{
 						?>
 							<div class="control-group">
