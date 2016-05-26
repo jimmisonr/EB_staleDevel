@@ -185,6 +185,12 @@ $defaultlng = $latLng->lng;
     			<input class="input-large validate[required]" type="text" name="coordinates" id="coordinates" size="30" maxlength="250" value="" />
     		</div>
     	</div>
+	    <div class="<?php echo $controlGroupClass;  ?>">
+		    <label class="<?php echo $controlLabelClass; ?>">
+			    <?php echo JText::_('EB_PUBLISHED') ; ?>
+		    </label>
+		    <?php echo $this->lists['published']; ?>
+	    </div>
      </div>
      <div class="<?php echo $span7Class ?>">
         <div class="<?php echo $controlGroupClass;  ?>">

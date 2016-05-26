@@ -31,22 +31,22 @@ $span5Class          = $bootstrapHelper->getClassMapping('span5');
 			if (form.name.value == '') {
 				alert("<?php echo JText::_('EN_ENTER_LOCATION_NAME'); ?>");
 				form.name.focus();
-				return ;
+				return;
 			}
 			if (form.address.value == '') {
 				alert("<?php echo JText::_('EN_ENTER_LOCATION_ADDRESS'); ?>");
 				form.address.focus();
-				return ;
+				return;
 			}
 			if (form.city.value == '') {
 				alert("<?php echo JText::_('EN_ENTER_LOCATION_CITY'); ?>");
 				form.city.focus();
-				return ;
+				return;
 			}
 			if (form.zip.value == '') {
 				alert("<?php echo JText::_('EN_ENTER_LOCATION_ZIP'); ?>");
 				form.zip.focus();
-				return ;
+				return;
 			}
 			form.task.value = pressbutton;
 			form.submit();
@@ -240,11 +240,9 @@ $span5Class          = $bootstrapHelper->getClassMapping('span5');
     		<label class="<?php echo $controlLabelClass; ?>">
     			<?php echo JText::_('EB_PUBLISHED') ; ?>
     		</label>
-    		<?php
-    			echo $this->lists['published'];
-    		?>
+		    <?php echo $this->lists['published']; ?>
     	</div>
-    
+
     	<div class="form-actions">
     		<input type="button" class="btn btn-primary" name="btnSave" value="<?php echo JText::_('EB_SAVE'); ?>" onclick="checkData('save');" />
     		<?php
