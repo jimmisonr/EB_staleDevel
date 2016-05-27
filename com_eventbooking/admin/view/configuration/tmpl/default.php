@@ -313,6 +313,14 @@ JHtml::_('formbehavior.chosen', 'select');
 					</div>
 					<div class="control-group">
 						<div class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('collect_member_information_in_cart', JText::_('EB_COLLECT_MEMBER_INFORMATION_IN_CART'), JText::_('EB_COLLECT_MEMBER_INFORMATION_IN_CART_EXPLAIN')); ?>
+						</div>
+						<div class="controls">
+							<?php echo EventbookingHelperHtml::getBooleanInput('collect_member_information_in_cart', $config->collect_member_information_in_cart); ?>
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('collect_member_information', JText::_('EB_COLLECT_MEMBER_INFORMATION'), JText::_('EB_COLLECT_EXPLAIN')); ?>
 						</div>
 						<div class="controls">
