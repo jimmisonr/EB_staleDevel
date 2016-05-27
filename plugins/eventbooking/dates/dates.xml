@@ -15,7 +15,7 @@
 	<config>
         <fields name="params">
             <fieldset name="basic">
-                <field name="max_number_dates" type="text" size="60" default="8" label="Max Number Dates" description="Enter max number of dates you can add to an event" />
+                <field name="max_number_dates" type="text" size="60" default="3" label="Max Number Dates" description="Enter max number of dates you can add to an event" />
             </fieldset>
         </fields>
     </config>		
