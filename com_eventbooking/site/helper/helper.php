@@ -1971,6 +1971,8 @@ class EventbookingHelper
 					}
 					$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id IN (' . implode(',', $items) . ')))');
 				}
+
+				$query->where('display_in IN (0, 1, 2, 3)');
 			}
 			else
 			{
@@ -1990,6 +1992,7 @@ class EventbookingHelper
 					$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . '))');
 				}
 			}
+
 			$query->order('ordering');
 			$db->setQuery($query);
 

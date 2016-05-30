@@ -244,8 +244,7 @@ if (!$this->userId && $this->config->user_registration)
 					$form = new RADForm($rowFields);
 					$form->setFieldSuffix($count);
 					$form->bind($this->formData, $this->useDefault);
-					$form->prepareFormFields('calculateCartRegistrationFee();');
-
+					$form->buildFieldsDependency();
 					$fields = $form->getFields();
 
 					//We don't need to use ajax validation for email field for group members
@@ -266,7 +265,7 @@ if (!$this->userId && $this->config->user_registration)
 				}
 			}
 		?>
-
+			<h3 class="eb-heading"><?php echo JText::_('EB_BILLING_INFORMATION'); ?></h3>
 		<?php
 		}
 
