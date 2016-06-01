@@ -77,8 +77,8 @@ class RADFormFieldCheckboxes extends RADFormField
 			$checked     = in_array($optionValue, $selectedOptions) ? 'checked' : '';
 			$html[]      = '<li class="' . $spanClass . '">';
 			$html[]      = '<label for="' . $this->name . $i . '" ><input type="checkbox" id="' . $this->name . $i . '" name="' . $this->name . '[]" value="' .
-				htmlspecialchars($optionValue, ENT_COMPAT, 'UTF-8') . '"' . $checked . $attributes . $this->row->extra_attributes . '/> ' . ($numberOptions > 1 ? $option : '') .
-				'</label>';
+					htmlspecialchars($optionValue, ENT_COMPAT, 'UTF-8') . '"' . $checked . $attributes . $this->row->extra_attributes . '/> ' . $option .
+					'</label>';
 			$html[]      = '</li>';
 			if ($i % $size == 0 && $i < $numberOptions)
 			{
