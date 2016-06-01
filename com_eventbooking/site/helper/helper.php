@@ -2486,7 +2486,8 @@ class EventbookingHelper
 				->select('b.title' . $fieldSuffix . ' AS title')
 				->from('#__eb_registrants AS a')
 				->innerJoin('#__eb_events AS b ON a.event_id = b.id')
-				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+				->where("(a.id = $row->id OR a.cart_id = $row->id)")
+				->order('a.id');
 			$db->setQuery($query);
 			$rows = $db->loadObjectList();
 
