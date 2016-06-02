@@ -18,14 +18,15 @@ class EventbookingModelCalendar extends RADModel
 	 * @var array
 	 */
 	protected static $fields = array(
-		'a.id',
-		'a.event_capacity',
-		'a.title',
-		'a.event_date',
-		'a.event_end_date',
-		'a.thumb',
-		'a.alias',
-		'a.featured'
+			'a.id',
+			'a.parent_id',
+			'a.event_capacity',
+			'a.title',
+			'a.event_date',
+			'a.event_end_date',
+			'a.thumb',
+			'a.alias',
+			'a.featured'
 	);
 
 	/**

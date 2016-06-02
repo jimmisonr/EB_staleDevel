@@ -118,10 +118,20 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
 
-		$query->select('*')
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$query->select(EventbookingModelList::$fields)
+				->select("DATEDIFF(tbl.early_bird_discount_date, '$currentDate') AS date_diff")
+				->select("DATEDIFF('$currentDate', tbl.late_fee_date) AS late_fee_date_diff")
+				->select("DATEDIFF(tbl.event_date, '$currentDate') AS number_event_dates")
+				->select("TIMESTAMPDIFF(MINUTE, tbl.registration_start_date, '$currentDate') AS registration_start_minutes")
+				->select("TIMESTAMPDIFF(MINUTE, tbl.cut_off_date, '$currentDate') AS cut_off_minutes")
+				->select('c.name AS location_name, c.address AS location_address')
+				->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
 				->from('#__eb_events AS tbl')
+				->leftJoin('#__eb_registrants AS b ON (tbl.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
+				->leftJoin('#__eb_locations AS c ON tbl.location_id = c.id ')
 				->where('tbl.published = 1')
-				->where('(id = ' . $parentEventId . ' OR parent_id=' . $parentEventId . ')')
+				->where('(tbl.id = ' . $parentEventId . ' OR tbl.parent_id=' . $parentEventId . ')')
 				->where('tbl.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
 
 		if ($config->hide_past_events)
@@ -130,7 +140,8 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 			$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.cut_off_date) >= ' . $currentDate . ')');
 		}
 
-		$query->order('tbl.event_date');
+		$query->group('tbl.id')
+				->order('tbl.event_date');
 
 		$db->setQuery($query, 0, 30);
 
