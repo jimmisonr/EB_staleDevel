@@ -105,4 +105,55 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 
 		return null;
 	}
+
+	/**
+	 * Get all children events of this event
+	 * @param int $parentEventId
+	 *
+	 * @return array
+	 */
+	public static function getAllChildrenEvents($parentEventId)
+	{
+		$config = EventbookingHelper::getConfig();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+
+		$query->select('*')
+				->from('#__eb_events AS tbl')
+				->where('tbl.published = 1')
+				->where('(id = ' . $parentEventId . ' OR parent_id=' . $parentEventId . ')')
+				->where('tbl.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
+
+		if ($config->hide_past_events)
+		{
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.cut_off_date) >= ' . $currentDate . ')');
+		}
+
+		$query->order('tbl.event_date');
+
+		$db->setQuery($query, 0, 30);
+
+		$rows = $db->loadObjectList();
+
+		EventbookingHelperData::calculateDiscount($rows);
+
+		if ($config->show_price_including_tax)
+		{
+
+			for ($i = 0, $n = count($rows); $i < $n; $i++)
+			{
+				$row                    = $rows[$i];
+				$taxRate                = $row->tax_rate;
+				$row->individual_price  = round($row->individual_price * (1 + $taxRate / 100), 2);
+				$row->fixed_group_price = round($row->fixed_group_price * (1 + $taxRate / 100), 2);
+				if ($config->show_discounted_price)
+				{
+					$row->discounted_price = round($row->discounted_price * (1 + $taxRate / 100), 2);
+				}
+			}
+		}
+
+		return $rows;
+	}
 } 

@@ -21,6 +21,7 @@ class EventbookingModelList extends RADModelList
 		'tbl.id',
 		'tbl.location_id',
 		'tbl.title',
+		'tbl.event_type',
 		'tbl.event_date',
 		'tbl.event_end_date',
 		'tbl.short_description',
@@ -206,6 +207,11 @@ class EventbookingModelList extends RADModelList
 		$user   = JFactory::getUser();
 		$state  = $this->getState();
 		$config = EventbookingHelper::getConfig();
+
+		if ($config->show_children_events_under_parent_event)
+		{
+			$query->where('tbl.parent_id = 0');
+		}
 
 		if (!$user->authorise('core.admin', 'com_eventbooking'))
 		{

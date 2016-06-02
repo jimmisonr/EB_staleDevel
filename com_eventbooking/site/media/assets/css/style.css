@@ -1164,3 +1164,9 @@ span.eb-uploaded-file
 	padding-left:10px;
 	font-weight: bold;
 }
+
+.eb-multiple-dates-instructions
+{
+    margin-top: 5px;
+    font-weight: bold;
+}
