@@ -90,6 +90,48 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 		</tbody>
 	</table>
 	<?php
+		if ($config->collect_member_information_in_cart)
+		{
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			foreach($items as $item)
+			{
+				$rowFields = EventbookingHelper::getFormFields($item->event_id, 2);
+				$query->clear()
+						->select('*')
+						->from('#__eb_registrants')
+						->where('group_id = ' . $item->id);
+				$db->setQuery($query);
+				$rowMembers = $db->loadObjectList();
+			?>
+				<h3 class="eb-heading"><?php echo JText::sprintf('EB_EVENT_REGISTRANTS_INFORMATION', $item->title); ?></h3>
+			<?php
+				$i = 0;
+				foreach($rowMembers as $rowMember)
+				{
+					$i++;
+					$memberForm = new RADForm($rowFields);
+					$memberData = EventbookingHelper::getRegistrantData($rowMember, $rowFields);
+					$memberForm->bind($memberData);
+					$memberForm->buildFieldsDependency();
+					$fields = $memberForm->getFields();
+					?>
+					<h4 class="eb-heading"><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i); ?></h4>
+					<?php
+					foreach ($fields as $field)
+					{
+						if ($field->hideOnDisplay)
+						{
+							continue;
+						}
+						echo $field->getOutput(true, $bootstrapHelper);
+					}
+				}
+			}
+		?>
+			<h3 class="eb-heading"><?php echo JText::_('EB_BILLING_INFORMATION'); ?></h3>
+		<?php
+		}
 		$fields = $form->getFields();
 		foreach ($fields as $field)
 		{

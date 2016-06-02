@@ -539,6 +539,8 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$this->form                 = $form;
 		$this->showPaymentFee       = $showPaymentFee;
 		$this->paymentType          = $paymentType;
+		$this->formData             = $data;
+		$this->useDefaultData       = $useDefault;
 
 		parent::display();
 	}
