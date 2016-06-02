@@ -409,7 +409,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 							?>
 								<div class="eb-taskbar">
 									<li>
-										<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, $categoryId, $Itemid));?>"><?php echo JText::_('EB_REGISTER'); ; ?></a>
+										<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, $categoryId, $Itemid));?>"><?php echo JText::_('EB_CHOOSE_DATE_LOCATION'); ; ?></a>
 									</li>
 								</div>
 							<?php

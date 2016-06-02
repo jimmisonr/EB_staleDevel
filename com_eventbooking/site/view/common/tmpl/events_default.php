@@ -81,16 +81,6 @@ $return = base64_encode(JUri::getInstance()->toString());
 							<?php
 							}
 							echo $event->short_description;
-							if ($isMultipleDate)
-							{
-								$infoMessage = JText::_('EB_MULTIPLE_DATES_INSTRUCTIONS');
-								if ($infoMessage)
-								{
-								?>
-									<p class="eb-multiple-dates-instructions text-info clearfix"><?php echo $infoMessage; ?></p>
-								<?php
-								}
-							}
 						?>
 					</div>
 						<div class="<?php echo $span5Class; ?>">
@@ -643,12 +633,12 @@ $return = base64_encode(JUri::getInstance()->toString());
 									<?php
 								}
 							}
-							if ($config->hide_detail_button !== '1')
+							if ($config->hide_detail_button !== '1' || $isMultipleDate)
 							{
 								?>
 								<li>
 									<a class="<?php echo $btnClass; ?> btn-primary" href="<?php echo $detailUrl; ?>">
-										<?php echo JText::_('EB_DETAILS'); ?>
+										<?php echo $isMultipleDate ? JText::_('EB_CHOOSE_DATE_LOCATION') : JText::_('EB_DETAILS');?>
 									</a>
 								</li>
 								<?php
