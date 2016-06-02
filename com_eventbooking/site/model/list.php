@@ -17,7 +17,7 @@ class EventbookingModelList extends RADModelList
 	 *
 	 * @var array
 	 */
-	protected static $fields = array(
+	public static $fields = array(
 		'tbl.id',
 		'tbl.location_id',
 		'tbl.title',
