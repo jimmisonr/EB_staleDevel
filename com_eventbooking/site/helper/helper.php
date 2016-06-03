@@ -814,6 +814,7 @@ class EventbookingHelper
 				->select('username')
 				->from('#__users')
 				->where('id = ' . $row->user_id);
+			$db->setQuery($query);	
 			$replaces['username'] = $db->loadResult();
 		}
 		else

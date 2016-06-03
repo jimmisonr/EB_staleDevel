@@ -159,7 +159,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 						}
 						else
 						{
-							if (strpos($item->cut_off_date, '00:00:00') !== false)
+							if (strpos($item->event_date, '00:00:00') !== false)
 							{
 								$dateFormat = $config->date_format;
 							}

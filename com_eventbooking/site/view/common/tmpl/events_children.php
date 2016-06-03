@@ -16,16 +16,6 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 <table class="table table-striped table-bordered table-condensed">
 	<thead>
 		<tr>
-		<?php
-			if ($config->show_image_in_table_layout)
-			{
-			?>
-				<th class="hidden-phone">
-					<?php echo JText::_('EB_EVENT_IMAGE'); ?>
-				</th>
-			<?php
-			}
-		?>
 		<th class="date_col">
 			<?php echo JText::_('EB_EVENT_DATE'); ?>
 		</th>
@@ -107,27 +97,6 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 			}
 		?>
 			<tr>
-				<?php
-					if ($config->show_image_in_table_layout)
-					{
-					?>
-					<td class="eb-image-column <?php echo $hiddenPhoneClass; ?>">
-						<?php
-							if ($item->thumb)
-							{
-							?>
-								<a href="<?php echo JUri::base(true).'/media/com_eventbooking/images/'.$item->thumb; ?>" class="eb-modal"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$item->thumb; ?>" class="eb_thumb-left"/></a>
-							<?php
-							}
-							else
-							{
-								echo ' ';
-							}
-						?>
-					</td>
-					<?php
-					}
-				?>
 				<td>
 					<?php
 						if ($item->event_date == EB_TBC_DATE)
@@ -136,7 +105,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 						}
 						else
 						{
-							if (strpos($item->cut_off_date, '00:00:00') !== false)
+							if (strpos($item->event_date, '00:00:00') !== false)
 							{
 								$dateFormat = $config->date_format;
 							}
