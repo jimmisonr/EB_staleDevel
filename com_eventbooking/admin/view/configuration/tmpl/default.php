@@ -16,6 +16,9 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 $editor = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 $config = $this->config;
 JHtml::_('formbehavior.chosen', 'select');
+
+JHtml::_('jquery.framework');
+JHtml::_('script', 'jui/cms.js', false, true);
 ?>
 <div class="row-fluid">
 <form action="index.php?option=com_eventbooking&view=configuration" method="post" name="adminForm" id="adminForm" class="form-horizontal eb-configuration">
@@ -54,6 +57,22 @@ JHtml::_('formbehavior.chosen', 'select');
 						</div>
 						<div class="controls">
 							<?php echo EventbookingHelperHtml::getBooleanInput('activate_recurring_event', $config->activate_recurring_event); ?>
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('show_children_events_under_parent_event', JText::_('EB_SHOW_CHILDREN_EVENTS_UNDER_PARENT_EVENT'), JText::_('EB_SHOW_CHILDREN_EVENTS_UNDER_PARENT_EVENT_EXPLAIN')); ?>
+						</div>
+						<div class="controls">
+							<?php echo EventbookingHelperHtml::getBooleanInput('show_children_events_under_parent_event', $config->show_children_events_under_parent_event); ?>
+						</div>
+					</div>
+					<div class="control-group" data-showon='[{"field":"show_children_events_under_parent_event","values":["1"],"op":""}]'>
+						<div class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('max_number_of_children_events', JText::_('EB_MAX_NUMBER_CHILDREN_EVENTS'), JText::_('EB_MAX_NUMBER_CHILDREN_EVENTS_EXPLAIN')); ?>
+						</div>
+						<div class="controls">
+							<input type="text" name="max_number_of_children_events" class="input-small" value="<?php echo $config->get('max_number_of_children_events', 30); ?>" size="60" />
 						</div>
 					</div>
 					<div class="control-group">
@@ -311,23 +330,7 @@ JHtml::_('formbehavior.chosen', 'select');
 							<?php echo EventbookingHelperHtml::getBooleanInput('multiple_booking', $config->multiple_booking); ?>
 						</div>
 					</div>
-					<div class="control-group">
-						<div class="control-label">
-							<?php echo EventbookingHelperHtml::getFieldLabel('show_children_events_under_parent_event', JText::_('EB_SHOW_CHILDREN_EVENTS_UNDER_PARENT_EVENT'), JText::_('EB_SHOW_CHILDREN_EVENTS_UNDER_PARENT_EVENT_EXPLAIN')); ?>
-						</div>
-						<div class="controls">
-							<?php echo EventbookingHelperHtml::getBooleanInput('show_children_events_under_parent_event', $config->show_children_events_under_parent_event); ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<div class="control-label">
-							<?php echo EventbookingHelperHtml::getFieldLabel('max_number_of_children_events', JText::_('EB_MAX_NUMBER_CHILDREN_EVENTS'), JText::_('EB_MAX_NUMBER_CHILDREN_EVENTS_EXPLAIN')); ?>
-						</div>
-						<div class="controls">
-							<input type="text" name="max_number_of_children_events" class="input-small" value="<?php echo $config->get('max_number_of_children_events', 30); ?>" size="60" />
-						</div>
-					</div>
-					<div class="control-group">
+					<div class="control-group" data-showon='[{"field":"multiple_booking","values":["1"],"op":""}]'>
 						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('collect_member_information_in_cart', JText::_('EB_COLLECT_MEMBER_INFORMATION_IN_CART'), JText::_('EB_COLLECT_MEMBER_INFORMATION_IN_CART_EXPLAIN')); ?>
 						</div>
@@ -335,7 +338,7 @@ JHtml::_('formbehavior.chosen', 'select');
 							<?php echo EventbookingHelperHtml::getBooleanInput('collect_member_information_in_cart', $config->collect_member_information_in_cart); ?>
 						</div>
 					</div>
-					<div class="control-group">
+					<div class="control-group" data-showon='[{"field":"multiple_booking","values":["0"],"op":""}]'>
 						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('collect_member_information', JText::_('EB_COLLECT_MEMBER_INFORMATION'), JText::_('EB_COLLECT_EXPLAIN')); ?>
 						</div>
@@ -463,7 +466,7 @@ JHtml::_('formbehavior.chosen', 'select');
 							<?php echo EventbookingHelperHtml::getBooleanInput('accept_term', $config->accept_term); ?>
 						</div>
 					</div>
-					<div class="control-group">
+					<div class="control-group" data-showon='[{"field":"accept_term","values":["1"],"op":""}]'>
 						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('term_condition_by_event', JText::_('EB_TERM_AND_CONDITION_BY_EVENT'), JText::_('EB_TERM_AND_CONDITION_BY_EVENT_EXPLAIN')); ?>
 						</div>
@@ -471,7 +474,7 @@ JHtml::_('formbehavior.chosen', 'select');
 							<?php echo EventbookingHelperHtml::getBooleanInput('term_condition_by_event', $config->term_condition_by_event); ?>
 						</div>
 					</div>
-					<div class="control-group">
+					<div class="control-group" data-showon='[{"field":"accept_term","values":["1"],"op":""}]'>
 						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('article_id', JText::_('EB_DEFAULT_TERM_AND_CONDITION')); ?>
 						</div>
