@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.6.0
+ * @version            2.7.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -115,6 +115,14 @@ class EventbookingModelCart extends RADModel
 		JPluginHelper::importPlugin('eventbooking');
 
 		// Store list of registrants
+
+		$membersForm           = $fees['members_form'];
+		$membersTotalAmount    = $fees['members_total_amount'];
+		$membersDiscountAmount = $fees['members_discount_amount'];
+		$membersTaxAmount      = $fees['members_tax_amount'];
+		$membersLateFee        = $fees['members_late_fee'];
+
+		$count = 0;
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
 			$eventId    = $items[$i];
@@ -185,6 +193,38 @@ class EventbookingModelCart extends RADModel
 			if ($row->coupon_id > 0)
 			{
 				$couponId = $row->coupon_id;
+			}
+
+			if ($config->collect_member_information_in_cart)
+			{
+				for ($j = 0 ; $j < $row->number_registrants; $j++)
+				{
+					$count++;
+					$rowMember                     = JTable::getInstance('EventBooking', 'Registrant');
+					$rowMember->group_id           = $row->id;
+					$rowMember->transaction_id     = $row->transaction_id;
+					$rowMember->event_id           = $row->event_id;
+					$rowMember->payment_method     = $row->payment_method;
+					$rowMember->user_id            = $row->user_id;
+					$rowMember->register_date      = $row->register_date;
+
+					$rowMember->total_amount       = $membersTotalAmount[$eventId][$j];
+					$rowMember->discount_amount    = $membersDiscountAmount[$eventId][$j];
+					$rowMember->late_fee           = $membersLateFee[$eventId][$j];
+					$rowMember->tax_amount         = $membersTaxAmount[$eventId][$j];
+					$rowMember->amount             = $rowMember->total_amount - $rowMember->discount_amount + $rowMember->tax_amount + $rowMember->late_fee;
+
+					$rowMember->number_registrants = 1;
+					$memberForm = $membersForm[$eventId][$j];
+					$memberForm->removeFieldSuffix();
+
+					$memberData = $memberForm->getFormData();
+					$rowMember->bind($memberData);
+					$rowMember->store();
+
+					//Store members data custom field
+					$memberForm->storeData($rowMember->id, $memberData);
+				}
 			}
 			$dispatcher->trigger('onAfterStoreRegistrant', array($row));
 		}

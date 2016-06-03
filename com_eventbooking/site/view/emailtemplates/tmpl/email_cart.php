@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.6.0
+ * @version            2.7.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -185,7 +185,49 @@ span.view_list {
 	</tbody>					
 </table>	
 <table width="100%" class="os_table" cellspacing="2" cellpadding="2">	
-<?php				
+<?php
+	if ($config->collect_member_information_in_cart)
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		foreach ($items as $item)
+		{
+			$rowFields = EventbookingHelper::getFormFields($item->event_id, 2);
+			$query->clear()
+					->select('*')
+					->from('#__eb_registrants')
+					->where('group_id = ' . $item->id);
+			$db->setQuery($query);
+			$rowMembers = $db->loadObjectList();
+			?>
+			<tr><td colspan="2"><h3 class="eb-heading"><?php echo JText::sprintf('EB_EVENT_REGISTRANTS_INFORMATION', $item->title); ?></h3></td></tr>
+			<?php
+			$i = 0;
+			foreach ($rowMembers as $rowMember)
+			{
+				$i++;
+				$memberForm = new RADForm($rowFields);
+				$memberData = EventbookingHelper::getRegistrantData($rowMember, $rowFields);
+				$memberForm->bind($memberData);
+				$memberForm->buildFieldsDependency();
+				$fields = $memberForm->getFields();
+				?>
+				<tr><td colspan="2"><h4 class="eb-heading"><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i); ?></h4></td></tr>
+				<?php
+				foreach ($fields as $field)
+				{
+					if ($field->hideOnDisplay)
+					{
+						continue;
+					}
+					echo $field->getOutput(false);
+				}
+			}
+		}
+		?>
+		<tr><td colspan="2"><h3 class="eb-heading"><?php echo JText::_('EB_BILLING_INFORMATION'); ?></h3></td></tr>
+		<?php
+	}
 	$fields = $form->getFields();
 	foreach ($fields as $field)
 	{

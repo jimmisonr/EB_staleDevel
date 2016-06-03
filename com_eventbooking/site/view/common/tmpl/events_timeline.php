@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.6.0
+ * @version            2.7.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -42,13 +42,16 @@ $return = base64_encode(JUri::getInstance()->toString());
 				$registrationOpen = ($event->number_event_dates > 0);
 			}
 
+			$waitingList = false ;
 			if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants) && $activateWaitingList && !@$event->user_registered && $registrationOpen)
 			{
 				$waitingList = true ;
 			}
-			else
+
+			$isMultipleDate = false;
+			if ($config->show_children_events_under_parent_event && $event->event_type == 1)
 			{
-				$waitingList = false ;
+				$isMultipleDate = true;
 			}
 		?>
 		<div class="eb-event-container" itemscope itemtype="http://schema.org/Event">
@@ -201,10 +204,6 @@ $return = base64_encode(JUri::getInstance()->toString());
 						<a href="<?php echo JUri::base(true).'/media/com_eventbooking/images/'.$event->thumb; ?>" class="eb-modal"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$event->thumb; ?>" class="eb-thumb-left"/></a>
 					<?php
 					}
-					if (!$event->short_description)
-					{
-						$event->short_description = $event->description;
-					}
 					echo $event->short_description;
 				?>
 			</div>
@@ -236,148 +235,159 @@ $return = base64_encode(JUri::getInstance()->toString());
 			<div class="eb-taskbar clearfix">
 				<ul>
 					<?php
-					if ($canRegister)
+					if (!$isMultipleDate)
 					{
-						$registrationUrl = trim($event->registration_handle_url);
-						if ($registrationUrl)
+						if ($canRegister)
 						{
-						?>
-							<li>
-								<a class="<?php echo $btnClass; ?>" href="<?php echo $registrationUrl; ?>" target="_blank"><?php echo JText::_('EB_REGISTER');; ?></a>
-							</li>
-						<?php
-						}
-						else
-						{
-							if ($event->registration_type == 0 || $event->registration_type == 1)
+							$registrationUrl = trim($event->registration_handle_url);
+							if ($registrationUrl)
 							{
-								if ($config->multiple_booking)
+								?>
+								<li>
+									<a class="<?php echo $btnClass; ?>" href="<?php echo $registrationUrl; ?>" target="_blank"><?php echo JText::_('EB_REGISTER');; ?></a>
+								</li>
+								<?php
+							}
+							else
+							{
+								if ($event->registration_type == 0 || $event->registration_type == 1)
 								{
-									$url        = 'index.php?option=com_eventbooking&task=cart.add_cart&id=' . (int) $event->id . '&Itemid=' . (int) $Itemid;
-									if ($event->event_password)
+									if ($config->multiple_booking)
 									{
-										$extraClass = '';
+										$url        = 'index.php?option=com_eventbooking&task=cart.add_cart&id=' . (int) $event->id . '&Itemid=' . (int) $Itemid;
+										if ($event->event_password)
+										{
+											$extraClass = '';
+										}
+										else
+										{
+											$extraClass = 'eb-colorbox-addcart';
+										}
+										$text       = JText::_('EB_REGISTER');
 									}
 									else
 									{
-										$extraClass = 'eb-colorbox-addcart';
+										$url        = JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id=' . $event->id . '&Itemid=' . $Itemid, false, $ssl);
+										$text       = JText::_('EB_REGISTER_INDIVIDUAL');
+										$extraClass = '';
 									}
-									$text       = JText::_('EB_REGISTER');
+									?>
+									<li>
+										<a class="<?php echo $btnClass.' '.$extraClass;?>"
+										   href="<?php echo $url; ?>"><?php echo $text; ?></a>
+									</li>
+									<?php
 								}
-								else
+								if (($event->registration_type == 0 || $event->registration_type == 2) && !$config->multiple_booking)
 								{
-									$url        = JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id=' . $event->id . '&Itemid=' . $Itemid, false, $ssl);
-									$text       = JText::_('EB_REGISTER_INDIVIDUAL');
-									$extraClass = '';
+									?>
+									<li>
+										<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+									</li>
+									<?php
 								}
+							}
+						}
+						elseif ($waitingList)
+						{
+							if ($event->registration_type == 0 || $event->registration_type == 1)
+							{
 								?>
 								<li>
-									<a class="<?php echo $btnClass.' '.$extraClass;?>"
-									   href="<?php echo $url; ?>"><?php echo $text; ?></a>
+									<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
 								</li>
-							<?php
+								<?php
 							}
 							if (($event->registration_type == 0 || $event->registration_type == 2) && !$config->multiple_booking)
 							{
-							?>
+								?>
 								<li>
-									<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+									<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
 								</li>
-							<?php
+								<?php
 							}
 						}
-					}
-					elseif ($waitingList)
-					{
-						if ($event->registration_type == 0 || $event->registration_type == 1)
-						{
-							?>
-							<li>
-								<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
-							</li>
-						<?php
-						}
-						if (($event->registration_type == 0 || $event->registration_type == 2) && !$config->multiple_booking)
-						{
-							?>
-							<li>
-								<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id='.$event->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
-							</li>
-						<?php
-						}
-					}
 
-					if ($config->show_save_to_personal_calendar)
+						if ($config->show_save_to_personal_calendar)
+						{
+							?>
+							<li>
+								<?php echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/save_calendar.php', array('item' => $event, 'Itemid' => $Itemid)); ?>
+							</li>
+							<?php
+						}
+						$registrantId = EventbookingHelper::canCancelRegistration($event->id) ;
+						if ($registrantId !== false)
+						{
+							?>
+							<li>
+								<a class="<?php echo $btnClass; ?>" href="javascript:cancelRegistration(<?php echo $registrantId; ?>)"><?php echo JText::_('EB_CANCEL_REGISTRATION'); ?></a>
+							</li>
+							<?php
+						}
+
+						if (EventbookingHelper::checkEditEvent($event->id))
+						{
+							?>
+							<li>
+								<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id='.$event->id.'&Itemid='.$Itemid.'&return='.$return); ?>">
+									<i class="<?php echo $iconPencilClass; ?>"></i>
+									<?php echo JText::_('EB_EDIT'); ?>
+								</a>
+							</li>
+							<?php
+						}
+						if (EventbookingHelper::canChangeEventStatus($event->id))
+						{
+							if ($event->published == 1)
+							{
+								$link = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id='.$event->id.'&Itemid='.$Itemid.'&return='.$return);
+								$text = JText::_('EB_UNPUBLISH');
+								$class = $iconRemoveClass;
+							}
+							else
+							{
+								$link = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id='.$event->id.'&Itemid='.$Itemid.'&return='.$return);
+								$text = JText::_('EB_PUBLISH');
+								$class = $iconOkClass;
+							}
+							?>
+							<li>
+								<a class="<?php echo $btnClass; ?>" href="<?php echo $link; ?>">
+									<i class="<?php echo $class; ?>"></i>
+									<?php echo $text; ?>
+								</a>
+							</li>
+							<?php
+						}
+
+						if ($event->total_registrants && EventbookingHelper::canExportRegistrants($event->id))
+						{
+							?>
+							<li>
+								<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.export&event_id='.$event->id.'&Itemid='.$Itemid); ?>">
+									<i class="<?php echo $iconDownloadClass; ?>"></i>
+									<?php echo JText::_('EB_EXPORT_REGISTRANTS'); ?>
+								</a>
+							</li>
+							<?php
+						}
+					}
+					elseif ($config->show_save_to_personal_calendar)
 					{
+
 					?>
 						<li>
 							<?php echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/save_calendar.php', array('item' => $event, 'Itemid' => $Itemid)); ?>
 						</li>
 					<?php
 					}
-					$registrantId = EventbookingHelper::canCancelRegistration($event->id) ;
-					if ($registrantId !== false)
-					{
-						?>
-						<li>
-							<a class="<?php echo $btnClass; ?>" href="javascript:cancelRegistration(<?php echo $registrantId; ?>)"><?php echo JText::_('EB_CANCEL_REGISTRATION'); ?></a>
-						</li>
-					<?php
-					}
-
-					if (EventbookingHelper::checkEditEvent($event->id))
-					{
-						?>
-						<li>
-							<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id='.$event->id.'&Itemid='.$Itemid.'&return='.$return); ?>">
-								<i class="<?php echo $iconPencilClass; ?>"></i>
-								<?php echo JText::_('EB_EDIT'); ?>
-							</a>
-						</li>
-					<?php
-					}
-					if (EventbookingHelper::canChangeEventStatus($event->id))
-					{
-						if ($event->published == 1)
-						{
-							$link = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id='.$event->id.'&Itemid='.$Itemid.'&return='.$return);
-							$text = JText::_('EB_UNPUBLISH');
-							$class = $iconRemoveClass;
-						}
-						else
-						{
-							$link = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id='.$event->id.'&Itemid='.$Itemid.'&return='.$return);
-							$text = JText::_('EB_PUBLISH');
-							$class = $iconOkClass;
-						}
-						?>
-						<li>
-							<a class="<?php echo $btnClass; ?>" href="<?php echo $link; ?>">
-								<i class="<?php echo $class; ?>"></i>
-								<?php echo $text; ?>
-							</a>
-						</li>
-					<?php
-					}
-
-					if ($event->total_registrants && EventbookingHelper::canExportRegistrants($event->id))
-					{
-						?>
-						<li>
-							<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.export&event_id='.$event->id.'&Itemid='.$Itemid); ?>">
-								<i class="<?php echo $iconDownloadClass; ?>"></i>
-								<?php echo JText::_('EB_EXPORT_REGISTRANTS'); ?>
-							</a>
-						</li>
-					<?php
-					}
-
-					if ($config->hide_detail_button !== '1')
+					if ($config->hide_detail_button !== '1' || $isMultipleDate)
 					{
 					?>
 						<li>
 							<a class="<?php echo $btnClass; ?> btn-primary" href="<?php echo $detailUrl; ?>">
-								<?php echo JText::_('EB_DETAILS'); ?>
+								<?php echo $isMultipleDate ? JText::_('EB_CHOOSE_DATE_LOCATION') : JText::_('EB_DETAILS'); ?>
 							</a>
 						</li>
 					<?php

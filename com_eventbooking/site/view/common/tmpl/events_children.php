@@ -16,19 +16,6 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 <table class="table table-striped table-bordered table-condensed">
 	<thead>
 		<tr>
-		<?php
-			if ($config->show_image_in_table_layout)
-			{
-			?>
-				<th class="hidden-phone">
-					<?php echo JText::_('EB_EVENT_IMAGE'); ?>
-				</th>
-			<?php
-			}
-		?>
-		<th>
-			<?php echo JText::_('EB_EVENT_TITLE'); ?>
-		</th>
 		<th class="date_col">
 			<?php echo JText::_('EB_EVENT_DATE'); ?>
 		</th>
@@ -49,14 +36,11 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 				</th>
 			<?php
 			}
-			if ($config->show_price_in_table_layout)
-			{
 			?>
 				<th class="table_price_col <?php echo $hiddenPhoneClass; ?>">
 					<?php echo JText::_('EB_INDIVIDUAL_PRICE'); ?>
 				</th>
 			<?php
-			}
 			if ($config->show_capacity)
 			{
 			?>
@@ -103,54 +87,16 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 				$registrationOpen = ($item->number_event_dates > 0);
 			}
 
-			$waitingList = false ;
 			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !$item->user_registered && $registrationOpen)
 			{
 				$waitingList = true ;
 			}
-
-			$isMultipleDate = false;
-			if ($config->show_children_events_under_parent_event && $item->event_type == 1)
+			else
 			{
-				$isMultipleDate = true;
+				$waitingList = false ;
 			}
 		?>
 			<tr>
-				<?php
-					if ($config->show_image_in_table_layout)
-					{
-					?>
-					<td class="eb-image-column <?php echo $hiddenPhoneClass; ?>">
-						<?php
-							if ($item->thumb)
-							{
-							?>
-								<a href="<?php echo JUri::base(true).'/media/com_eventbooking/images/'.$item->thumb; ?>" class="eb-modal"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$item->thumb; ?>" class="eb_thumb-left"/></a>
-							<?php
-							}
-							else
-							{
-								echo ' ';
-							}
-						?>
-					</td>
-					<?php
-					}
-				?>
-				<td>
-					<?php
-						if ($config->hide_detail_button !== '1')
-						{
-						?>
-							<a href="<?php echo JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, $categoryId, $Itemid));?>" class="eb-event-link"><?php echo $item->title ; ?></a>
-						<?php
-						}
-						else
-						{
-							echo $item->title;
-						}
-					?>
-				</td>
 				<td>
 					<?php
 						if ($item->event_date == EB_TBC_DATE)
@@ -227,22 +173,19 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 					</td>
 					<?php
 					}
-					if ($config->show_price_in_table_layout)
+					if ($config->show_discounted_price)
 					{
-						if ($config->show_discounted_price)
-						{
-							$price = $item->discounted_price ;
-						}
-						else
-						{
-							$price = $item->individual_price ;
-						}
+						$price = $item->discounted_price ;
+					}
+					else
+					{
+						$price = $item->individual_price ;
+					}
 					?>
 						<td class="<?php echo $hiddenPhoneClass; ?>">
 							<?php echo EventbookingHelper::formatCurrency($price, $config, $item->currency_symbol); ?>
 						</td>
 					<?php
-					}
 					if ($config->show_capacity)
 					{
 					?>
@@ -294,7 +237,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 				?>
 					<td class="center">
 						<?php
-							if (!$isMultipleDate && ($waitingList || $canRegister || ($item->registration_type != 3 && $config->display_message_for_full_event)))
+							if ($waitingList || $canRegister || ($item->registration_type != 3 && $config->display_message_for_full_event))
 							{
 								if ($canRegister)
 								{
@@ -402,17 +345,6 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 									</div>
 								<?php
 								}
-							}
-
-							if ($isMultipleDate)
-							{
-							?>
-								<div class="eb-taskbar">
-									<li>
-										<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, $categoryId, $Itemid));?>"><?php echo JText::_('EB_CHOOSE_DATE_LOCATION'); ; ?></a>
-									</li>
-								</div>
-							<?php
 							}
 						?>
 					</td>

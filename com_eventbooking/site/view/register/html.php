@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.6.0
+ * @version            2.7.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -539,6 +539,8 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$this->form                 = $form;
 		$this->showPaymentFee       = $showPaymentFee;
 		$this->paymentType          = $paymentType;
+		$this->formData             = $data;
+		$this->useDefaultData       = $useDefault;
 
 		parent::display();
 	}

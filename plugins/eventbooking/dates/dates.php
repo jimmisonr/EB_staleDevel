@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.6.0
+ * @version            2.7.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -60,6 +60,7 @@ class plgEventBookingDates extends JPlugin
 
 		$config = EventbookingHelper::getConfig();
 		$maxNumberDates = (int) $data['count_event_dates'];
+
 		$additionalEventIds = array();
 		$numberChildrenEvents = 0;
 		for ($i = 0; $i < $maxNumberDates; $i++)
@@ -335,7 +336,7 @@ class plgEventBookingDates extends JPlugin
 		</div>
 		<div class="row-fluid">
 			<button type="button" class="btn btn-success" onclick="addEventContainer()"><i class="icon-new icon-white"></i><?php echo JText::_('EB_ADD'); ?></button>
-			<input type="hidden" id="count_event_dates" name="count_event_dates" value="0" />
+			<input type="hidden" id="count_event_dates" name="count_event_dates" value="<?php echo $maxNumberDates; ?>" />
 		</div>
 		<script language="JavaScript">
 			function removeEventContainer(id)

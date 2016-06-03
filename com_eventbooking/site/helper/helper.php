@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.6.0
+ * @version            2.7.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -18,7 +18,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '2.6.0';
+		return '2.7.0';
 	}
 
 	/**
@@ -814,6 +814,7 @@ class EventbookingHelper
 				->select('username')
 				->from('#__users')
 				->where('id = ' . $row->user_id);
+			$db->setQuery($query);	
 			$replaces['username'] = $db->loadResult();
 		}
 		else
@@ -1546,6 +1547,16 @@ class EventbookingHelper
 			$fees['coupon_valid'] = 1;
 		}
 
+		if ($config->collect_member_information_in_cart)
+		{
+			$membersForm           = array();
+			$membersTotalAmount    = array();
+			$membersDiscountAmount = array();
+			$membersLateFee        = array();
+			$membersTaxAmount      = array();
+		}
+
+		$count = 0;
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
 			$eventId               = (int) $items[$i];
@@ -1562,6 +1573,25 @@ class EventbookingHelper
 				$registrantTotalAmount = $rate * $quantity;
 			}
 
+			// Members data
+			if ($config->collect_member_information_in_cart)
+			{
+				$memberFormFields = EventbookingHelper::getFormFields($eventId, 2);
+				for ($j = 0; $j < $quantity; $j++)
+				{
+					$count++;
+					$memberForm = new RADForm($memberFormFields);
+					$memberForm->setFieldSuffix($count);
+					$memberForm->bind($data);
+					$memberExtraFee = $memberForm->calculateFee();
+					$registrantTotalAmount += $memberExtraFee;
+					$membersTotalAmount[$eventId][$j]    = $rate + $memberExtraFee;
+					$membersDiscountAmount[$eventId][$j] = 0;
+					$membersLateFee[$eventId][$j]        = 0;
+					$membersForm[$eventId][$j]           = $memberForm;
+				}
+			}
+
 			$registrantDiscount = 0;
 
 			// Member discount
@@ -1573,10 +1603,24 @@ class EventbookingHelper
 					if ($event->discount_type == 1)
 					{
 						$registrantDiscount = $registrantTotalAmount * $discountRate / 100;
+						if ($config->collect_member_information_in_cart)
+						{
+							for ($j = 0; $j < $quantity; $j++)
+							{
+								$membersDiscountAmount[$eventId][$j] += $membersTotalAmount[$eventId][$j] * $discountRate / 100;
+							}
+						}
 					}
 					else
 					{
 						$registrantDiscount = $quantity * $discountRate;
+						if ($config->collect_member_information_in_cart)
+						{
+							for ($j = 0; $j < $quantity; $j++)
+							{
+								$membersDiscountAmount[$eventId][$j] += $discountRate;
+							}
+						}
 					}
 				}
 			}
@@ -1586,10 +1630,25 @@ class EventbookingHelper
 				if ($event->early_bird_discount_type == 1)
 				{
 					$registrantDiscount += $registrantTotalAmount * $event->early_bird_discount_amount / 100;
+
+					if ($config->collect_member_information_in_cart)
+					{
+						for ($j = 0; $j < $quantity; $j++)
+						{
+							$membersDiscountAmount[$eventId][$j] += $membersTotalAmount[$eventId][$j] * $event->early_bird_discount_amount / 100;
+						}
+					}
 				}
 				else
 				{
 					$registrantDiscount += $quantity * $event->early_bird_discount_amount;
+					if ($config->collect_member_information_in_cart)
+					{
+						for ($j = 0; $j < $quantity; $j++)
+						{
+							$membersDiscountAmount[$eventId][$j] += $event->early_bird_discount_amount;
+						}
+					}
 				}
 			}
 
@@ -1599,11 +1658,23 @@ class EventbookingHelper
 				if ($coupon->coupon_type == 0)
 				{
 					$registrantDiscount = $registrantDiscount + $registrantTotalAmount * $coupon->discount / 100;
+					if ($config->collect_member_information_in_cart)
+					{
+						for ($j = 0; $j < $quantity; $j++)
+						{
+							$membersDiscountAmount[$eventId][$j] += $membersTotalAmount[$eventId][$j] * $coupon->discount / 100;
+						}
+					}
 				}
 				else
 				{
 					$registrantDiscount = $registrantDiscount + $coupon->discount;
+					if ($config->collect_member_information_in_cart)
+					{
+						$membersDiscountAmount[$eventId][0] += $coupon->discount;
+					}
 				}
+
 				if ($collectRecordsData)
 				{
 					$recordsData[$eventId]['coupon_id'] = $coupon->id;
@@ -1622,22 +1693,52 @@ class EventbookingHelper
 				if ($event->late_fee_type == 1)
 				{
 					$registrantLateFee = $registrantTotalAmount * $event->late_fee_amount / 100;
+
+					if ($config->collect_member_information_in_cart)
+					{
+						for ($j = 0; $j < $quantity; $j++)
+						{
+							$membersLateFee[$eventId][$j] = $membersTotalAmount[$eventId][$j] * $event->late_fee_amount / 100;
+						}
+					}
 				}
 				else
 				{
 
 					$registrantLateFee = $quantity * $event->late_fee_amount;
+
+					if ($config->collect_member_information_in_cart)
+					{
+						for ($j = 0; $j < $quantity; $j++)
+						{
+							$membersLateFee[$eventId][$j] = $event->late_fee_amount / 100;
+						}
+					}
 				}
 			}
 
 			if ($event->tax_rate > 0)
 			{
 				$registrantTaxAmount = round($event->tax_rate * ($registrantTotalAmount - $registrantDiscount + $registrantLateFee) / 100, 2);
+
+				if ($config->collect_member_information_in_cart)
+				{
+					for ($j = 0; $j < $quantity; $j++)
+					{
+						$membersTaxAmount[$eventId][$j] = round($event->tax_rate * ($membersTotalAmount[$eventId][$j] - $membersDiscountAmount[$eventId][$j] + $membersLateFee[$eventId][$j]) / 100, 2);
+					}
+				}
 			}
 			else
 			{
 				$registrantTaxAmount = 0;
+
+				for ($j = 0; $j < $quantity; $j++)
+				{
+					$membersTaxAmount[$eventId][$j] = 0;
+				}
 			}
+
 			$registrantAmount = $registrantTotalAmount - $registrantDiscount + $registrantTaxAmount + $registrantLateFee;
 
 			if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $registrantAmount > 0)
@@ -1697,6 +1798,12 @@ class EventbookingHelper
 		{
 			$fees['records_data'] = $recordsData;
 		}
+
+		$fees['members_form']            = $membersForm;
+		$fees['members_total_amount']    = $membersTotalAmount;
+		$fees['members_discount_amount'] = $membersDiscountAmount;
+		$fees['members_tax_amount']      = $membersTaxAmount;
+		$fees['members_late_fee']        = $membersLateFee;
 
 		return $fees;
 	}
@@ -1865,6 +1972,8 @@ class EventbookingHelper
 					}
 					$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id IN (' . implode(',', $items) . ')))');
 				}
+
+				$query->where('display_in IN (0, 1, 2, 3)');
 			}
 			else
 			{
@@ -1884,6 +1993,7 @@ class EventbookingHelper
 					$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . '))');
 				}
 			}
+
 			$query->order('ordering');
 			$db->setQuery($query);
 
@@ -2377,7 +2487,8 @@ class EventbookingHelper
 				->select('b.title' . $fieldSuffix . ' AS title')
 				->from('#__eb_registrants AS a')
 				->innerJoin('#__eb_events AS b ON a.event_id = b.id')
-				->where("(a.id = $row->id OR a.cart_id = $row->id)");
+				->where("(a.id = $row->id OR a.cart_id = $row->id)")
+				->order('a.id');
 			$db->setQuery($query);
 			$rows = $db->loadObjectList();
 

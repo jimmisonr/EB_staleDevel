@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.6.0
+ * @version            2.7.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -138,7 +138,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 		}
 
 		JPluginHelper::importPlugin('eventbooking');
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$plugins    = $dispatcher->trigger('onEventDisplay', array($item));
 
 		if ($this->input->get('tmpl', '') == 'component')
@@ -148,6 +148,11 @@ class EventbookingViewEventHtml extends RADViewHtml
 		else
 		{
 			$this->showTaskBar = true;
+		}
+
+		if ($item->event_type == 1 && $config->show_children_events_under_parent_event)
+		{
+			$this->items = EventbookingModelEvent::getAllChildrenEvents($item->id);
 		}
 
 		$this->viewLevels      = $user->getAuthorisedViewLevels();

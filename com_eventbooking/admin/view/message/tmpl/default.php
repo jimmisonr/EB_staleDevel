@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.6.0
+ * @version            2.7.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -17,7 +17,6 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 $editor = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 ?>
-<div class="row-fluid">
 <form action="index.php?option=com_eventbooking&view=message" method="post" name="adminForm" id="adminForm" class="form-horizontal eb-configuration">
 	<?php echo JHtml::_('bootstrap.startTabSet', 'message', array('active' => 'registration-form-messages-page')); ?>
 	<?php echo JHtml::_('bootstrap.addTab', 'message', 'registration-form-messages-page', JText::_('EB_REGISTRATION_FORM_MESSAGES', true)); ?>
@@ -928,8 +927,6 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 	}
 	echo JHtml::_('bootstrap.endTabSet');
 	?>
-	</div>
 	<div class="clearfix"></div>
 	<input type="hidden" name="task" value="" />
 </form>
-</div>

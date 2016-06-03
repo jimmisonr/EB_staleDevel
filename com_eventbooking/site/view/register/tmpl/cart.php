@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.6.0
+ * @version            2.7.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -226,7 +226,49 @@ if (!$this->userId && $this->config->user_registration)
 			</div>
 		</div>											
 		<?php	
-		}		
+		}
+
+		// Collect registrants information
+		if ($this->config->collect_member_information_in_cart)
+		{
+			$count = 0;
+			foreach($this->items as $item)
+			{
+			?>
+				<h3 class="eb-heading"><?php echo JText::sprintf('EB_EVENT_REGISTRANTS_INFORMATION', $item->title); ?></h3>
+			<?php
+				for ($i = 0 ; $i < $item->quantity; $i++)
+				{
+					$count++;
+					$rowFields = EventbookingHelper::getFormFields($item->id, 2);
+					$form = new RADForm($rowFields);
+					$form->setFieldSuffix($count);
+					$form->bind($this->formData, $this->useDefault);
+					$form->buildFieldsDependency();
+					$fields = $form->getFields();
+
+					//We don't need to use ajax validation for email field for group members
+					if (isset($fields['email']))
+					{
+						$emailField = $fields['email'];
+						$cssClass = $emailField->getAttribute('class');
+						$cssClass = str_replace(',ajax[ajaxEmailCall]', '', $cssClass);
+						$emailField->setAttribute('class', $cssClass);
+					}
+				?>
+					<h4 class="eb-heading"><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1); ?></h4>
+				<?php
+					foreach ($fields as $field)
+					{
+						echo $field->getControlGroup($bootstrapHelper);
+					}
+				}
+			}
+		?>
+			<h3 class="eb-heading"><?php echo JText::_('EB_BILLING_INFORMATION'); ?></h3>
+		<?php
+		}
+
 		$fields = $this->form->getFields();
 		if (isset($fields['state']))
 		{

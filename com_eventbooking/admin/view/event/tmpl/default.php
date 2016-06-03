@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.6.0
+ * @version            2.7.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -22,7 +22,6 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 		vertical-align: bottom;
 	}
 </style>
-<div class="row-fuid">
 	<form action="index.php?option=com_eventbooking&view=event" method="post" name="adminForm" id="adminForm" class="form form-horizontal" enctype="multipart/form-data">
 		<?php echo JHtml::_('bootstrap.startTabSet', 'event', array('active' => 'basic-information-page')); ?>
 		<?php echo JHtml::_('bootstrap.addTab', 'event', 'basic-information-page', JText::_('EB_BASIC_INFORMATION', true)); ?>
@@ -792,11 +791,11 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 		}
 		echo JHtml::_('bootstrap.endTabSet');
 		?>
-</div>
 <input type="hidden" name="option" value="com_eventbooking" />
 <input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 <input type="hidden" name="task" value="" />
 <?php echo JHtml::_( 'form.token' ); ?>
+</form>
 <script type="text/javascript">
 	Joomla.submitbutton = function(pressbutton) {
 		var form = document.adminForm;
@@ -927,5 +926,3 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 		}
 	}
 </script>
-</form>
-</div>
