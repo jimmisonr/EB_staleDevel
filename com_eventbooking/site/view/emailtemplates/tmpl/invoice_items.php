@@ -54,6 +54,17 @@ defined('_JEXEC') or die;
 			<td colspan="3" align="right" valign="top" width="90%"><?php echo JText::_('EB_TAX');?> :</td>
 			<td align="right" valign="top" width="10%"><?php echo EventbookingHelper::formatCurrency($taxAmount, $config); ?></td>
 		</tr>
+		<?php
+			if ($paymentProcessingFee)
+			{
+			?>
+				<tr>
+					<td colspan="3" align="right" valign="top" width="90%"><?php echo JText::_('EB_PAYMENT_FEE');?> :</td>
+					<td align="right" valign="top" width="10%"><?php echo EventbookingHelper::formatCurrency($paymentProcessingFee, $config); ?></td>
+				</tr>
+			<?php
+			}
+		?>
 		<tr>
 			<td colspan="3" align="right" valign="top" width="90%"><?php echo JText::_('EB_GROSS_AMOUNT');?></td>
 			<td align="right" valign="top" width="10%"><?php echo EventbookingHelper::formatCurrency($total, $config);?></td>
