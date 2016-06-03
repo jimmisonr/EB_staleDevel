@@ -143,7 +143,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 		$query->group('tbl.id')
 				->order('tbl.event_date');
 
-		$db->setQuery($query, 0, 30);
+		$db->setQuery($query, 0, $config->get('max_number_of_children_events', 30));
 
 		$rows = $db->loadObjectList();
 

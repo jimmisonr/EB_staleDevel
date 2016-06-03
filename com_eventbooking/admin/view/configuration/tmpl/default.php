@@ -321,6 +321,14 @@ JHtml::_('formbehavior.chosen', 'select');
 					</div>
 					<div class="control-group">
 						<div class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('max_number_of_children_events', JText::_('EB_MAX_NUMBER_CHILDREN_EVENTS'), JText::_('EB_MAX_NUMBER_CHILDREN_EVENTS_EXPLAIN')); ?>
+						</div>
+						<div class="controls">
+							<input type="text" name="max_number_of_children_events" class="input-small" value="<?php echo $config->get('max_number_of_children_events', 30); ?>" size="60" />
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('collect_member_information_in_cart', JText::_('EB_COLLECT_MEMBER_INFORMATION_IN_CART'), JText::_('EB_COLLECT_MEMBER_INFORMATION_IN_CART_EXPLAIN')); ?>
 						</div>
 						<div class="controls">
