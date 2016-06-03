@@ -55,7 +55,7 @@ defined('_JEXEC') or die;
 			<td align="right" valign="top" width="10%"><?php echo EventbookingHelper::formatCurrency($taxAmount, $config); ?></td>
 		</tr>
 		<?php
-			if ($paymentProcessingFee)
+			if ($paymentProcessingFee > 0)
 			{
 			?>
 				<tr>
