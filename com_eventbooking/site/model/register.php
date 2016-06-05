@@ -639,7 +639,7 @@ class EventBookingModelRegister extends RADModel
 		$db->setQuery($query);
 		$eventTitle              = $db->loadResult();
 		$replaces                = array();
-		$replaces['event_title'] = $db->loadResult();
+		$replaces['event_title'] = $eventTitle;
 		//Replace the custom fields
 		$fields = $form->getFields();
 		foreach ($fields as $field)

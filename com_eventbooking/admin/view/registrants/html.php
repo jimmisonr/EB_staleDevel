@@ -68,6 +68,7 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 
 		$this->config       = $config;
 		$this->totalPlugins = (int) $db->loadResult();
+		$this->coreFields   = EventbookingHelper::getPublishedCoreFields();
 	}
 
 	/**

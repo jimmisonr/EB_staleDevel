@@ -2004,6 +2004,25 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Get name of published core fields in the system
+	 *
+	 * @return array
+	 */
+	public static function getPublishedCoreFields()
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+
+		$query->select('name')
+				->from('#__eb_fields')
+				->where('published = 1')
+				->where('is_core = 1');
+		$db->setQuery($query);
+
+		return $db->loadColumn();
+	}
+
+	/**
 	 * Get the form fields to display in deposit payment form
 	 *
 	 * @return array
@@ -2476,6 +2495,7 @@ class EventbookingHelper
 			// Need to pass bootstrap helper
 			$data['bootstrapHelper'] = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 		}
+
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		if ($config->multiple_booking)
 		{
@@ -4732,6 +4752,7 @@ class EventbookingHelper
 		}
 
 		$v = $pdf->writeHTML($invoiceOutput, true, false, false, false, '');
+
 		//Filename
 		$filePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . $replaces['invoice_number'] . '.pdf';
 		$pdf->Output($filePath, 'F');

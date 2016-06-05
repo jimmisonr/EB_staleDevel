@@ -88,6 +88,7 @@ class EventbookingViewRegistrantsHtml extends RADViewHtml
 		$this->items               = $model->getData();
 		$this->pagination          = $model->getPagination();
 		$this->config              = $config;
+		$this->coreFields          = EventbookingHelper::getPublishedCoreFields();
 
 		parent::display();
 	}

@@ -73,6 +73,7 @@ class EventbookingViewRegistrantlistHtml extends RADViewHtml
 			$this->config             = $config;
 			$this->displayCustomField = $displayCustomField;
 			$this->bootstrapHelper    = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+			$this->coreFields         = EventbookingHelper::getPublishedCoreFields();
 
 			parent::display();
 		}

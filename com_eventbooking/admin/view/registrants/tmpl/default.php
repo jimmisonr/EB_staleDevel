@@ -11,7 +11,16 @@
 defined('_JEXEC') or die;
 
 JHtml::_('formbehavior.chosen', 'select');
-$colSpan = 11;
+$colSpan = 10;
+if (in_array('last_name', $this->coreFields))
+{
+	$cols++;
+	$showLastName = true;
+}
+else
+{
+	$showLastName = false;
+}
 ?>
 <form action="index.php?option=com_eventbooking&view=registrants" method="post" name="adminForm" id="adminForm">
 	<div id="j-main-container">
@@ -46,9 +55,16 @@ $colSpan = 11;
 				<th class="title" style="text-align: left;" width="10%">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_FIRST_NAME'), 'tbl.first_name', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
-				<th class="title" style="text-align: left;" width="10%">
-					<?php echo JHtml::_('grid.sort',  JText::_('EB_LAST_NAME'), 'tbl.last_name', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
-				</th>
+				<?php
+					if ($showLastName)
+					{
+					?>
+						<th class="title" style="text-align: left;" width="10%">
+							<?php echo JHtml::_('grid.sort',  JText::_('EB_LAST_NAME'), 'tbl.last_name', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
+						</th>
+					<?php
+					}
+				?>
 				<th class="title" style="text-align: left;" width="15%">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT'), 'ev.title', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
@@ -200,9 +216,16 @@ $colSpan = 11;
 						}
 						?>
 					</td>
-					<td>
-						<?php echo $row->last_name ; ?>
-					</td>
+					<?php
+						if ($showLastName)
+						{
+						?>
+							<td>
+								<?php echo $row->last_name ; ?>
+							</td>
+						<?php
+						}
+					?>
 					<td>
 						<a href="index.php?option=com_eventbooking&view=event&id=<?php echo $row->event_id; ?>"><?php echo $row->title ; ?></a>
 					</td>

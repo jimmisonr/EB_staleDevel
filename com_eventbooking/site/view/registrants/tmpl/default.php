@@ -9,9 +9,19 @@
  */
 // no direct access
 defined('_JEXEC') or die;
-$cols = 8;
+$cols = 7;
 JHtml::_('formbehavior.chosen', 'select');
 $return = base64_encode(JUri::getInstance()->toString());
+
+if (in_array('last_name', $this->coreFields))
+{
+	$showLastName = true;
+	$cols++;
+}
+else
+{
+	$showLastName = false;
+}
 ?>
 <script type="text/javascript">
 	function checkData(pressbutton)
@@ -68,9 +78,16 @@ $return = base64_encode(JUri::getInstance()->toString());
 				<th class="list_first_name">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_FIRST_NAME'), 'tbl.first_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
-				<th class="list_last_name">
-					<?php echo JHtml::_('grid.sort',  JText::_('EB_LAST_NAME'), 'tbl.last_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				</th>
+				<?php
+					if ($showLastName)
+					{
+					?>
+						<th class="list_last_name">
+							<?php echo JHtml::_('grid.sort',  JText::_('EB_LAST_NAME'), 'tbl.last_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+						</th>
+					<?php
+					}
+				?>
 				<th class="list_event">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT'), 'ev.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
@@ -190,9 +207,16 @@ $return = base64_encode(JUri::getInstance()->toString());
 					}
 					?>
 				</td>
-				<td>
-					<?php echo $row->last_name ; ?>
-				</td>
+				<?php
+					if ($showLastName)
+					{
+					?>
+						<td>
+							<?php echo $row->last_name ; ?>
+						</td>
+					<?php
+					}
+				?>
 				<td>
 					<?php echo $row->title ; ?>
 				</td>
