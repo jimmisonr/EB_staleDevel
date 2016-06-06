@@ -10,6 +10,15 @@
 // no direct access
 defined('_JEXEC') or die;
 $hiddenPhoneClass = $this->bootstrapHelper->getClassMapping('hidden-phone');
+if (in_array('last_name', $this->coreFields))
+{
+	$cols++;
+	$showLastName = true;
+}
+else
+{
+	$showLastName = false;
+}
 ?>
 <div id="eb-registrants-list-page" class="eb-container">
 <h1 class="eb_title"><?php echo JText::_('EB_REGISTRANT_LIST'); ?></h1>
@@ -26,9 +35,16 @@ if (count($this->items))
 			<th>
 				<?php echo JText::_('EB_FIRST_NAME'); ?>
 			</th>
-			<th>
-				<?php echo JText::_('EB_LAST_NAME'); ?>
-			</th>
+			<?php
+			if ($showLastName)
+			{
+			?>
+				<th>
+					<?php echo JText::_('EB_LAST_NAME'); ?>
+				</th>
+			<?php
+			}
+			?>					
 			<th class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo JText::_('EB_REGISTRANTS'); ?>
 			</th>
@@ -64,9 +80,16 @@ if (count($this->items))
 			<td>
 					<?php echo $row->first_name ?>
 			</td>
-			<td>
-				<?php echo $row->last_name ; ?>
-			</td>
+			<?php 
+				if ($showLastName)
+				{
+				?>
+					<td>
+						<?php echo $row->last_name ; ?>
+					</td>
+				<?php
+				}
+			?>			
 			<td class="<?php echo $hiddenPhoneClass; ?>">
 				<?php echo $row->number_registrants ; ?>
 			</td>
