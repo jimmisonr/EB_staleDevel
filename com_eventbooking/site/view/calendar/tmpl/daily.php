@@ -91,7 +91,7 @@ $monthsInYear = array(
 							<div class="eventdesc">
 								<h4><a href="<?php echo $url; ?>"><?php echo $event->title?></a></h4>
 								<p class="location-name">
-									<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$event->location_id.'&tmpl=component&format=html'); ?>" rel="gb_page_center[500,450]" title="<?php echo $event->location_name ; ?>" class="location_link" rel="nofollow"><?php echo $event->location_name; ?></a>
+									<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$event->location_id.'&tmpl=component&format=html'); ?>" title="<?php echo $event->location_name ; ?>" class="eb-colorbox-addlocation" rel="nofollow"><?php echo $event->location_name; ?></a>
 							     </p>
 								<?php echo $event->short_description; ?>
 							</div>
