@@ -134,6 +134,7 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 	 */
 	private function displayDailyView()
 	{
+		EventbookingHelperJquery::colorbox('eb-colorbox-addlocation');
 		$config 	  = EventbookingHelper::getConfig();		
 		$model        = $this->getModel();
 		$rows 		  = $model->getEventsByDaily();
