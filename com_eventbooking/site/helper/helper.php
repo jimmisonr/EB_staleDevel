@@ -4128,10 +4128,11 @@ class EventbookingHelper
 			}
 		}
 
-		$query->select('a.*')
+		$query->select('a.*, c.name AS location_name')
 			->select(implode(',', $eventFields))
 			->from('#__eb_registrants AS a')
 			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+			->leftJoin('#__eb_locations AS c ON a.location_id = c.id')
 			->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published = 0))')
 			->where('a.is_reminder_sent = 0')
 			->where('b.published = 1')
@@ -4182,6 +4183,7 @@ class EventbookingHelper
 			$replaces['first_name']  = $row->first_name;
 			$replaces['last_name']   = $row->last_name;
 			$replaces['event_title'] = $eventTitle;
+			$replaces['location']    = $row->location_name;
 
 			// On process [REGISTRATION_DETAIL] tag if it is available in the email message
 			if (strpos($emailBody, '[REGISTRATION_DETAIL]') !== false)

@@ -272,7 +272,7 @@ class EventbookingModelCalendar extends RADModel
 		$startDate = $db->quote($day . " 00:00:00");
 		$endDate   = $db->quote($day . " 23:59:59");
 		$query->select(static::$fields)
-			->select('a.short_description,a.location_id')
+			->select('a.short_description, a.location_id')
 			->select('b.name AS location_name')
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')
