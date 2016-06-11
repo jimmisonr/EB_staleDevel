@@ -165,6 +165,14 @@ if ($translatable)
 					<?php echo EventbookingHelperHtml::getBooleanInput('only_require_for_first_member', $this->item->only_require_for_first_member); ?>
 				</div>
 			</div>
+			<!-- START quangnv -->
+			<div class="control-group">
+				<label class="control-label"><?php echo JText::_('EB_HIDE_ON_EMAIL') ; ?></label>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('hide_on_email', $this->item->hide_on_email); ?>
+				</div>
+			</div>
+			<!-- END quangnv -->
 			<div class="control-group">
 				<label class="control-label">
 					<?php echo  JText::_('EB_DESCRIPTION'); ?>

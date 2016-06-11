@@ -471,6 +471,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
+		
+		if (!in_array('hide_on_email', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_fields` ADD  `hide_on_email` TINYINT NOT NULL DEFAULT  '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
 
 		//Events table
 		$fields = array_keys($db->getTableColumns('#__eb_events'));
