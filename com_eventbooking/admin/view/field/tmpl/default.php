@@ -167,7 +167,9 @@ if ($translatable)
 			</div>
 			<!-- START quangnv -->
 			<div class="control-group">
-				<label class="control-label"><?php echo JText::_('EB_HIDE_ON_EMAIL') ; ?></label>
+				<label class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('hide_on_email', JText::_('EB_HIDE_ON_EMAIL'), JText::_('EB_HIDE_ON_EMAIL_EXPLAIN')); ?>
+				</label>
 				<div class="controls">
 					<?php echo EventbookingHelperHtml::getBooleanInput('hide_on_email', $this->item->hide_on_email); ?>
 				</div>
