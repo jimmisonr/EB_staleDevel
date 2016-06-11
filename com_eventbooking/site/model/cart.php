@@ -123,6 +123,8 @@ class EventbookingModelCart extends RADModel
 		$membersLateFee        = $fees['members_late_fee'];
 
 		$count = 0;
+		$userIp = EventbookingHelper::getUserIp();
+
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
 			$eventId    = $items[$i];
@@ -130,6 +132,7 @@ class EventbookingModelCart extends RADModel
 			$row->bind($data);
 			$row->event_id               = $eventId;
 			$row->coupon_id              = isset($recordData['coupon_id']) ? $recordData['coupon_id'] : 0;
+			$row->user_ip                = $userIp;
 			$row->total_amount           = $recordData['total_amount'];
 			$row->discount_amount        = $recordData['discount_amount'];
 			$row->late_fee               = $recordData['late_fee'];

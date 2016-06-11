@@ -1248,6 +1248,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('user_ip', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_registrants` ADD `user_ip` VARCHAR( 100 ) NULL;;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		if (!in_array('deposit_payment_method', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD `deposit_payment_method` VARCHAR( 100 ) NULL;;";

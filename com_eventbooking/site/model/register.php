@@ -139,6 +139,8 @@ class EventBookingModelRegister extends RADModel
 			$row->payment_status = 1;
 		}
 
+		$row->user_ip = EventbookingHelper::getUserIp();
+
 		//Save the active language
 		if (JFactory::getApplication()->getLanguageFilter())
 		{
@@ -401,6 +403,9 @@ class EventBookingModelRegister extends RADModel
 			$row->published      = 3;
 			$row->payment_method = 'os_offline';
 		}
+
+		$row->user_ip = EventbookingHelper::getUserIp();
+
 		//Clear the coupon session
 		$row->store();
 		$form->storeData($row->id, $data);
@@ -416,6 +421,7 @@ class EventBookingModelRegister extends RADModel
 				$rowMember->payment_method     = $row->payment_method;
 				$rowMember->user_id            = $row->user_id;
 				$rowMember->register_date      = $row->register_date;
+				$rowMember->user_ip            = $row->user_ip;
 				$rowMember->total_amount       = $membersTotalAmount[$i];
 				$rowMember->discount_amount    = $membersDiscountAmount[$i];
 				$rowMember->late_fee           = $membersLateFee[$i];
@@ -639,7 +645,7 @@ class EventBookingModelRegister extends RADModel
 		$db->setQuery($query);
 		$eventTitle              = $db->loadResult();
 		$replaces                = array();
-		$replaces['event_title'] = $eventTitle;
+		$replaces['event_title'] = $db->loadResult();
 		//Replace the custom fields
 		$fields = $form->getFields();
 		foreach ($fields as $field)
