@@ -166,7 +166,12 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			$rowFields = EventbookingHelper::getFormFields($data['event_id'], 0);
 			$form      = new RADForm($rowFields);
 			$form->bind($data);
-			$row->payment_method = 'os_offline';
+
+			if (!$row->payment_method || $row->published == 0)
+			{
+				$row->payment_method = 'os_offline';
+			}
+
 			$row->register_date  = JFactory::getDate()->toSql();
 
 			// In case total amount is not entered, calculate it automatically
@@ -181,15 +186,6 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				$row->amount = $row->total_amount - $row->discount_amount + $row->tax_amount + $row->late_fee + $row->payment_processing_fee;
 			}
 
-			/*if ($row->payment_status == 1)
-			{
-				$row->due_amount = 0;
-			}
-			else
-			{
-				$row->due_amount = $row->amount - $row->deposit_amount;
-			}*/
-			
 			if ($row->number_registrants > 1)
 			{
 				$row->is_group_billing = 1;

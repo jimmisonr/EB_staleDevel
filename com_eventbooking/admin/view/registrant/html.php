@@ -25,8 +25,8 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
 		EventbookingHelper::addLangLinkForAjax();
 
-
 		$db        = JFactory::getDbo();
+		$query     = $db->getQuery(true);
 		$config    = EventbookingHelper::getConfig();
 		$rows      = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
 		$options[] = JHtml::_('select.option', 0, JText::_('Select Event'), 'id', 'title');
@@ -87,7 +87,6 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 			$this->item->published);
 		if ($this->item->id > 0)
 		{
-			$query = $db->getQuery(true);
 			$query->select('*')
 				->from('#__eb_registrants')
 				->where('group_id=' . $this->item->id)
@@ -118,6 +117,19 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		$options[]                     = JHtml::_('select.option', 1, JText::_('EB_FULL_PAYMENT'));
 		$this->lists['payment_status'] = JHtml::_('select.genericlist', $options, 'payment_status', ' class="inputbox" ', 'value', 'text',
 			$this->item->payment_status);
+
+		// Payment methods
+		$options                       = array();
+		$options[]                     = JHtml::_('select.option', '', JText::_('EB_PAYMENT_METHOD'), 'name', 'title');
+		$query->clear()
+			->select('name, title')
+			->from('#__eb_payment_plugins')
+			->where('published = 1')
+			->order('ordering');
+		$db->setQuery($query);
+		$options = array_merge($options, $db->loadObjectList());
+		$this->lists['payment_method'] = JHtml::_('select.genericlist', $options, 'payment_method', ' class="inputbox" ', 'name', 'title',
+				$this->item->payment_method ? $this->item->payment_method : 'os_offline');
 
 		if (count($rowMembers))
 		{
