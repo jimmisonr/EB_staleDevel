@@ -292,6 +292,19 @@ $selectedState = '';
 		</div>
 	</div>
 	<?php
+	if ($this->item->user_ip)
+	{
+	?>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo  JText::_('EB_USER_IP'); ?>
+			</label>
+			<div class="controls">
+				<?php echo $this->item->user_ip; ?>
+			</div>
+		</div>
+	<?php
+	}
 	if ($this->config->collect_member_information && count($this->rowMembers)) 
 	{
 	?>
