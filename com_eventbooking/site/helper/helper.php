@@ -5058,6 +5058,13 @@ class EventbookingHelper
 		}
 	}
 
+	/**
+	 * Check to see whether the current user can change status (publish/unpublish) of the given event
+	 *
+	 * @param $eventId
+	 *
+	 * @return bool
+	 */
 	public static function canChangeEventStatus($eventId)
 	{
 		$user = JFactory::getUser();
@@ -5067,9 +5074,25 @@ class EventbookingHelper
 			return false;
 		}
 
-		if ($user->authorise('core.edit.state', 'com_eventbooking'))
+		if ($user->authorise('core.admin', 'com_eventbooking'))
 		{
 			return true;
+		}
+
+		if ($user->authorise('core.edit.state', 'com_eventbooking'))
+		{
+			$db     = JFactory::getDbo();
+			$query  = $db->getQuery(true);
+			$query->select('created_by')
+					->from('#__eb_events')
+					->where('id = ' . (int) $eventId);
+			$db->setQuery($query);
+			$createdBy = (int) $db->loadResult();
+
+			if ($createdBy  == $user->id)
+			{
+				return true;
+			}
 		}
 
 		return false;

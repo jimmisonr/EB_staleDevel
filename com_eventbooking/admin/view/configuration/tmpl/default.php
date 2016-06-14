@@ -235,14 +235,6 @@ JHtml::_('script', 'jui/cms.js', false, true);
 							<?php echo $this->lists['country_list']; ?>
 						</div>
 					</div>
-					<div class="control-group">
-						<div class="control-label">
-							<?php echo EventbookingHelperHtml::getFieldLabel('require_admin_approve', JText::_('EB_REQUIRE_ADMIN_APPROVE_NEW_EVENT'), JText::_('EB_REQUIRE_ADMIN_APPROVE_NEW_EVENT_EXPLAIN')); ?>
-						</div>
-						<div class="controls">
-							<?php echo EventbookingHelperHtml::getBooleanInput('require_admin_approve', $config->require_admin_approve); ?>
-						</div>
-					</div>
 				</fieldset>
 				<fieldset class="form-horizontal" style="margin-top:103px;">
 					<legend><?php echo JText::_('EB_MAIL_SETTINGS'); ?></legend>
