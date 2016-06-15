@@ -13,7 +13,7 @@ EventbookingHelperJquery::colorbox('a.eb-modal');
 ?>
 <div id="eb-category-page-table" class="eb-container">
 <?php
-if ($this->config->show_cat_decription_in_calendar_layout && $this->category)
+if ($this->config->show_cat_decription_in_table_layout && $this->category)
 {
 	if ($this->params->get('page_heading'))
 	{

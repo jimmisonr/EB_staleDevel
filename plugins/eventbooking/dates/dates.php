@@ -117,12 +117,8 @@ class plgEventBookingDates extends JPlugin
 		if ($numberChildrenEvents)
 		{
 			$row->event_type = 1;
-		}
-		else
-		{
-			$row->event_type = 0;
-		}
-
+		}		
+		
 		$row->store();
 
 
