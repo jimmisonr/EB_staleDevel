@@ -57,15 +57,26 @@ $return = base64_encode(JUri::getInstance()->toString());
 		<div class="eb-event-container" itemscope itemtype="http://schema.org/Event">
 			<div class="eb-event-date-container">
 				<div class="eb-event-date <?php echo $btnInverseClass; ?>">
-					<div class="eb-event-date-day">
-						<?php echo JHtml::_('date', $event->event_date, 'd', null); ?>
-					</div>
-					<div class="eb-event-date-month">
-						<?php echo JHtml::_('date', $event->event_date, 'M', null); ?>
-					</div>
-					<div class="eb-event-date-year">
-						<?php echo JHtml::_('date', $event->event_date, 'Y', null); ?>
-					</div>
+					<?php
+						if ($event->event_date != EB_TBC_DATE)
+						{
+						?>
+							<div class="eb-event-date-day">
+								<?php echo JHtml::_('date', $event->event_date, 'd', null); ?>
+							</div>
+							<div class="eb-event-date-month">
+								<?php echo JHtml::_('date', $event->event_date, 'M', null); ?>
+							</div>
+							<div class="eb-event-date-year">
+								<?php echo JHtml::_('date', $event->event_date, 'Y', null); ?>
+							</div>
+						<?php
+						}
+						else
+						{
+							echo JText::_('EB_TBC');
+						}
+					?>
 				</div>
 			</div>
 			<h2 class="eb-even-title-container">
@@ -101,8 +112,15 @@ $return = base64_encode(JUri::getInstance()->toString());
                                 }				
                             ?>
 							<i class="<?php echo $iconCalendarClass; ?>"></i>
-							<?php echo JHtml::_('date', $event->event_date, $dateFormat, null); ?>
 							<?php
+								if ($event->event_date != EB_TBC_DATE)
+								{
+									echo JHtml::_('date', $event->event_date, $dateFormat, null);
+								}
+								else
+								{
+									echo JText::_('EB_TBC');
+								}
 								if (strpos($event->event_date, '00:00:00') === false)
 								{
 								?>
