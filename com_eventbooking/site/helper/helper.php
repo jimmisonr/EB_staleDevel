@@ -738,6 +738,7 @@ class EventbookingHelper
 		$replaces['event_end_date']    = JHtml::_('date', $event->event_end_date, $config->event_date_format, null);
 		$replaces['short_description'] = $event->short_description;
 		$replaces['description']       = $event->description;
+		$replaces['event_link'] 	   = self::getSiteUrl() . 'index.php?option=com_eventbooking&view=event&id='.$event->id.'&Itemid=' . $Itemid;
 
 		// Event custom fields
 		if ($config->event_custom_field && file_exists(JPATH_ROOT . '/components/com_eventbooking/fields.xml'))

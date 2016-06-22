@@ -175,7 +175,7 @@ class EventbookingModelRegistrants extends RADModelList
 		$user   = JFactory::getUser();
 
 		// Prevent empty registration records (spams) from being showed
-		$query->where(' tbl.first_name != ""');
+		$query->where(' (tbl.first_name != "" OR tbl.group_id > 0)');
 
 		if ($this->state->filter_published != -1)
 		{

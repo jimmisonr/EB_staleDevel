@@ -14,7 +14,7 @@ JHtml::_('formbehavior.chosen', 'select');
 $colSpan = 10;
 if (in_array('last_name', $this->coreFields))
 {
-	$cols++;
+	$colSpan++;
 	$showLastName = true;
 }
 else
