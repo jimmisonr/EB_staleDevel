@@ -4326,7 +4326,7 @@ class EventbookingHelper
 			$replaces['event_title']     = $row->title;
 			$replaces['amount']          = static::formatCurrency($row->amount - $row->deposit_amount, $config, $row->currency_symbol);
 			$replaces['registration_id'] = $row->id;
-			$replaces['deposit_payment_link'] = $siteUrl . 'index.php?option=com_eventbooking&view=payment&registrant_id='.$row->id.'&Itemid=' . $Itemid;
+			$replaces['deposit_payment_link'] = $siteUrl . 'index.php?option=com_eventbooking&view=payment&amp;registrant_id='.$row->id.'&Itemid=' . $Itemid;
 
 			foreach ($replaces as $key => $value)
 			{

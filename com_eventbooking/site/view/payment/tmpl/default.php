@@ -23,7 +23,7 @@ else
 	$msg = $this->message->deposit_payment_form_message;
 }
 
-$msg = str_replace('[AMOUNT]', EventbookingHelper::formatCurrency($this->rowRegistrant->amount = $this->rowRegistrant->deposit_amount, $this->config, $this->event->currency_symbol), $msg);
+$msg = str_replace('[AMOUNT]', EventbookingHelper::formatCurrency($this->rowRegistrant->amount - $this->rowRegistrant->deposit_amount, $this->config, $this->event->currency_symbol), $msg);
 $msg = str_replace('[REGISTRATION_ID]', $this->rowRegistrant->id, $msg);
 
 $replaces = EventbookingHelper::buildEventTags($this->event, $this->config);
