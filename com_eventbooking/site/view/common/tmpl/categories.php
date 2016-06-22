@@ -36,7 +36,7 @@ if (count($categories))
                                 echo $category->name;
                                 if ($config->show_number_events) {
                                 ?>
-                                    <small>( <?php echo $category->total_events ;?> <?php echo $category->total_events > 1 ? JText::_('EB_EVENTS') :  JText::_('EB_EVENT') ; ?> )</small>
+                                    <small>( <?php echo $category->total_events ;?> <?php echo $category->total_events == 1 ? JText::_('EB_EVENTS') :  JText::_('EB_EVENT') ; ?> )</small>
                                 <?php
                                 }
                             ?>
