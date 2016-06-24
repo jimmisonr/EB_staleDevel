@@ -590,10 +590,10 @@ class EventbookingHelper
 
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true)
-				->select('COUNT(*)')
-				->from('#__eb_payment_plugins')
-				->where('published = 1')
-				->where('NAME NOT LIKE "os_offline%"');
+			->select('COUNT(*)')
+			->from('#__eb_payment_plugins')
+			->where('published = 1')
+			->where('NAME NOT LIKE "os_offline%"');
 		$db->setQuery($query);
 
 		return (int) $db->loadResult();
@@ -738,7 +738,7 @@ class EventbookingHelper
 		$replaces['event_end_date']    = JHtml::_('date', $event->event_end_date, $config->event_date_format, null);
 		$replaces['short_description'] = $event->short_description;
 		$replaces['description']       = $event->description;
-		$replaces['event_link'] 	   = self::getSiteUrl() . 'index.php?option=com_eventbooking&view=event&id='.$event->id.'&Itemid=' . $Itemid;
+		$replaces['event_link']        = self::getSiteUrl() . 'index.php?option=com_eventbooking&view=event&id=' . $event->id . '&Itemid=' . $Itemid;
 
 		// Event custom fields
 		if ($config->event_custom_field && file_exists(JPATH_ROOT . '/components/com_eventbooking/fields.xml'))
@@ -815,7 +815,7 @@ class EventbookingHelper
 				->select('username')
 				->from('#__users')
 				->where('id = ' . $row->user_id);
-			$db->setQuery($query);	
+			$db->setQuery($query);
 			$replaces['username'] = $db->loadResult();
 		}
 		else
@@ -966,7 +966,7 @@ class EventbookingHelper
 
 		if ($config->activate_deposit_feature)
 		{
-			$replaces['deposit_payment_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&view=payment&registrant_id='.$row->id.'&Itemid=' . $Itemid;
+			$replaces['deposit_payment_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&view=payment&registrant_id=' . $row->id . '&Itemid=' . $Itemid;
 		}
 		else
 		{
@@ -989,11 +989,11 @@ class EventbookingHelper
 	 */
 	public static function calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod = null)
 	{
-		$fees                  = array();
-		$user                  = JFactory::getUser();
-		$db                    = JFactory::getDbo();
-		$query                 = $db->getQuery(true);
-		$couponCode            = isset($data['coupon_code']) ? $data['coupon_code'] : '';
+		$fees       = array();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDbo();
+		$query      = $db->getQuery(true);
+		$couponCode = isset($data['coupon_code']) ? $data['coupon_code'] : '';
 
 		$totalAmount           = $event->individual_price + $form->calculateFee(array('NUMBER_REGISTRANTS' => 1, 'INDIVIDUAL_PRICE' => $event->individual_price));
 		$discountAmount        = 0;
@@ -1162,18 +1162,18 @@ class EventbookingHelper
 	 */
 	public static function calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod = null)
 	{
-		$fees                  = array();
-		$session               = JFactory::getSession();
-		$user                  = JFactory::getUser();
-		$db                    = JFactory::getDbo();
-		$query                 = $db->getQuery(true);
-		$couponCode            = isset($data['coupon_code']) ? $data['coupon_code'] : '';
-		$eventId               = $event->id;
-		$numberRegistrants     = (int) $session->get('eb_number_registrants', '');
-		$memberFormFields      = EventbookingHelper::getFormFields($eventId, 2);
-		$rate                  = EventbookingHelper::getRegistrationRate($eventId, $numberRegistrants);
+		$fees              = array();
+		$session           = JFactory::getSession();
+		$user              = JFactory::getUser();
+		$db                = JFactory::getDbo();
+		$query             = $db->getQuery(true);
+		$couponCode        = isset($data['coupon_code']) ? $data['coupon_code'] : '';
+		$eventId           = $event->id;
+		$numberRegistrants = (int) $session->get('eb_number_registrants', '');
+		$memberFormFields  = EventbookingHelper::getFormFields($eventId, 2);
+		$rate              = EventbookingHelper::getRegistrationRate($eventId, $numberRegistrants);
 
-		$extraFee              = $form->calculateFee(array('NUMBER_REGISTRANTS' => $numberRegistrants, 'INDIVIDUAL_PRICE' => $rate));
+		$extraFee = $form->calculateFee(array('NUMBER_REGISTRANTS' => $numberRegistrants, 'INDIVIDUAL_PRICE' => $rate));
 
 		$nullDate              = $db->getNullDate();
 		$membersForm           = array();
@@ -1251,17 +1251,17 @@ class EventbookingHelper
 		if ($couponCode)
 		{
 			$query->clear()
-					->select('*')
-					->from('#__eb_coupons')
-					->where('published = 1')
-					->where('code = ' . $db->quote($couponCode))
-					->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-					->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
-					->where('(times = 0 OR times > used)')
-					->where('enable_for IN (0, 2)')
-					->where('user_id IN (0, ' . $user->id . ')')
-					->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id=' . $event->id . '))')
-					->order('id DESC');
+				->select('*')
+				->from('#__eb_coupons')
+				->where('published = 1')
+				->where('code = ' . $db->quote($couponCode))
+				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
+				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
+				->where('(times = 0 OR times > used)')
+				->where('enable_for IN (0, 2)')
+				->where('user_id IN (0, ' . $user->id . ')')
+				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id=' . $event->id . '))')
+				->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
 			if ($coupon)
@@ -1512,16 +1512,16 @@ class EventbookingHelper
 		if ($couponCode)
 		{
 			$query->clear()
-					->select('*')
-					->from('#__eb_coupons')
-					->where('published = 1')
-					->where('code = ' . $db->quote($couponCode))
-					->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-					->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
-					->where('user_id IN (0, ' . $user->id . ')')
-					->where('(times = 0 OR times > used)')
-					->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id IN (' . implode(',', $items) . ')))')
-					->order('id DESC');
+				->select('*')
+				->from('#__eb_coupons')
+				->where('published = 1')
+				->where('code = ' . $db->quote($couponCode))
+				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
+				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
+				->where('user_id IN (0, ' . $user->id . ')')
+				->where('(times = 0 OR times > used)')
+				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id IN (' . implode(',', $items) . ')))')
+				->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
 			if ($coupon)
@@ -1861,7 +1861,7 @@ class EventbookingHelper
 			->from('#__eb_fields')
 			->where('published = 1')
 			->order('ordering');
-		
+
 		if ($eventId)
 		{
 			$config = EventbookingHelper::getConfig();
@@ -2015,9 +2015,9 @@ class EventbookingHelper
 		$query = $db->getQuery(true);
 
 		$query->select('name')
-				->from('#__eb_fields')
-				->where('published = 1')
-				->where('is_core = 1');
+			->from('#__eb_fields')
+			->where('published = 1')
+			->where('is_core = 1');
 		$db->setQuery($query);
 
 		return $db->loadColumn();
@@ -2035,11 +2035,11 @@ class EventbookingHelper
 		$query       = $db->getQuery(true);
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$query->select('*')
-				->from('#__eb_fields')
-				->where('published=1')
-				->where('id < 13')
-				->where(' `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
-				->order('ordering');
+			->from('#__eb_fields')
+			->where('published=1')
+			->where('id < 13')
+			->where(' `access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
+			->order('ordering');
 
 		if ($fieldSuffix)
 		{
@@ -2427,7 +2427,7 @@ class EventbookingHelper
 		$data['memberForm']  = $memberForm;
 
 		$text = EventbookingHelperHtml::loadCommonLayout('emailtemplates/tmpl/email_group_member_detail.php', $data);
-		
+
 		if ($loadCss)
 		{
 			$text .= "
@@ -2992,11 +2992,11 @@ class EventbookingHelper
 	 */
 	public static function getTotalRegistrants($eventId)
 	{
-		$db  = JFactory::getDbo();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('SUM(number_registrants) AS total_registrants')
 			->from('#__eb_registrants')
-			->where('event_id = '. $eventId)
+			->where('event_id = ' . $eventId)
 			->where('group_id = 0')
 			->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 		$db->setQuery($query);
@@ -3971,12 +3971,12 @@ class EventbookingHelper
 		}
 
 		$replaces = array(
-				'username'    => $user->username,
-				'name'        => $user->name,
-				'event_id'    => $row->id,
-				'event_title' => $row->title,
-				'event_date'  => JHtml::_('date', $row->event_date, $config->event_date_format, null),
-				'event_link'  => JUri::root() . 'administrator/index.php?option=com_eventbooking&view=event&id=' . $row->id,
+			'username'    => $user->username,
+			'name'        => $user->name,
+			'event_id'    => $row->id,
+			'event_title' => $row->title,
+			'event_date'  => JHtml::_('date', $row->event_date, $config->event_date_format, null),
+			'event_link'  => JUri::root() . 'administrator/index.php?option=com_eventbooking&view=event&id=' . $row->id,
 		);
 
 		//Notification email send to user
@@ -3999,17 +3999,20 @@ class EventbookingHelper
 			$body = $message->submit_event_user_email_body;
 		}
 
-		if($subject)
+		if ($subject)
 		{
 			foreach ($replaces as $key => $value)
 			{
-				$key  = strtoupper($key);
+				$key     = strtoupper($key);
 				$subject = str_ireplace("[$key]", $value, $subject);
-				$body = str_ireplace("[$key]", $value, $body);
+				$body    = str_ireplace("[$key]", $value, $body);
 			}
 
 			$body = self::convertImgTags($body);
-			$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
+			if (JMailHelper::isEmailAddress($user->email))
+			{
+				$mailer->sendMail($fromEmail, $fromName, $user->email, $subject, $body, 1);
+			}
 		}
 
 		//Send emails to admintrators
@@ -4022,7 +4025,7 @@ class EventbookingHelper
 			$notificationEmails = $config->notification_emails;
 		}
 
-		$emails             = explode(',', $notificationEmails);
+		$emails = explode(',', $notificationEmails);
 		$emails = array_map('trim', $emails);
 
 		if (strlen($message->{'submit_event_admin_email_subject' . $fieldSuffix}))
@@ -4133,7 +4136,7 @@ class EventbookingHelper
 			->select(implode(',', $eventFields))
 			->from('#__eb_registrants AS a')
 			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
-			->leftJoin('#__eb_locations AS c ON a.location_id = c.id')
+			->leftJoin('#__eb_locations AS c ON b.location_id = c.id')
 			->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published = 0))')
 			->where('a.is_reminder_sent = 0')
 			->where('b.published = 1')
@@ -4287,16 +4290,16 @@ class EventbookingHelper
 		}
 
 		$query->select('a.id, a.first_name, a.last_name, a.email, a.amount, a.deposit_amount, b.title, b.event_date, b.currency_symbol')
-				->from('#__eb_registrants AS a')
-				->innerJoin('#__eb_events AS b ON a.event_id = b.id')
-				->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published = 0))')
-				->where('a.payment_status = 0')
-				->where('a.group_id = 0')
-				->where('a.is_deposit_payment_reminder_sent = 0')
-				->where('b.published = 1')
-				->where('DATEDIFF(b.event_date, NOW()) <= '.$numberDays)
-				->where('DATEDIFF(b.event_date, NOW()) >= 0')
-				->order('b.event_date, a.register_date');
+			->from('#__eb_registrants AS a')
+			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+			->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published = 0))')
+			->where('a.payment_status = 0')
+			->where('a.group_id = 0')
+			->where('a.is_deposit_payment_reminder_sent = 0')
+			->where('b.published = 1')
+			->where('DATEDIFF(b.event_date, NOW()) <= ' . $numberDays)
+			->where('DATEDIFF(b.event_date, NOW()) >= 0')
+			->order('b.event_date, a.register_date');
 
 		$db->setQuery($query, 0, $numberEmailSendEachTime);
 
@@ -4309,7 +4312,7 @@ class EventbookingHelper
 			$rows = array();
 		}
 
-		foreach($rows as $row)
+		foreach ($rows as $row)
 		{
 			if (!JMailHelper::isEmailAddress($row->email))
 			{
@@ -4317,21 +4320,21 @@ class EventbookingHelper
 			}
 
 			$emailSubject = $message->deposit_payment_reminder_email_subject;
-			$emailBody = $message->deposit_payment_reminder_email_body;
+			$emailBody    = $message->deposit_payment_reminder_email_body;
 
-			$replaces                    = array();
-			$replaces['event_date']      = JHtml::_('date', $row->event_date, $config->event_date_format, null);
-			$replaces['first_name']      = $row->first_name;
-			$replaces['last_name']       = $row->last_name;
-			$replaces['event_title']     = $row->title;
-			$replaces['amount']          = static::formatCurrency($row->amount - $row->deposit_amount, $config, $row->currency_symbol);
-			$replaces['registration_id'] = $row->id;
-			$replaces['deposit_payment_link'] = $siteUrl . 'index.php?option=com_eventbooking&view=payment&amp;registrant_id='.$row->id.'&Itemid=' . $Itemid;
+			$replaces                         = array();
+			$replaces['event_date']           = JHtml::_('date', $row->event_date, $config->event_date_format, null);
+			$replaces['first_name']           = $row->first_name;
+			$replaces['last_name']            = $row->last_name;
+			$replaces['event_title']          = $row->title;
+			$replaces['amount']               = static::formatCurrency($row->amount - $row->deposit_amount, $config, $row->currency_symbol);
+			$replaces['registration_id']      = $row->id;
+			$replaces['deposit_payment_link'] = $siteUrl . 'index.php?option=com_eventbooking&view=payment&amp;registrant_id=' . $row->id . '&Itemid=' . $Itemid;
 
 			foreach ($replaces as $key => $value)
 			{
 				$emailSubject = str_ireplace('[' . strtoupper($key) . ']', $value, $emailSubject);
-				$emailBody = str_ireplace('[' . strtoupper($key) . ']', $value, $emailBody);
+				$emailBody    = str_ireplace('[' . strtoupper($key) . ']', $value, $emailBody);
 			}
 
 			$emailBody = EventbookingHelper::convertImgTags($emailBody);
@@ -4340,8 +4343,8 @@ class EventbookingHelper
 
 			$query->clear();
 			$query->update('#__eb_registrants')
-					->set('is_deposit_payment_reminder_sent = 1')
-					->where('id = ' . (int) $row->id);
+				->set('is_deposit_payment_reminder_sent = 1')
+				->where('id = ' . (int) $row->id);
 			$db->setQuery($query);
 			$db->execute();
 		}
@@ -4720,7 +4723,7 @@ class EventbookingHelper
 			$discountAmount                     = $replaces['amt_discount_amount'];
 			$total                              = $replaces['amt_amount'];
 			$paymentProcessingFee               = $replaces['amt_payment_processing_fee'];
-			$replaces['EVENTS_LIST'] = EventbookingHelperHtml::loadCommonLayout(
+			$replaces['EVENTS_LIST']            = EventbookingHelperHtml::loadCommonLayout(
 				'emailtemplates/tmpl/invoice_items.php',
 				array(
 					'rowEvents'      => $rowEvents,
@@ -4995,7 +4998,7 @@ class EventbookingHelper
 				$canAccess = true;
 			}
 		}
-		
+
 		if (!$canAccess)
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('NOT_AUTHORIZED'));
@@ -5082,15 +5085,15 @@ class EventbookingHelper
 
 		if ($user->authorise('core.edit.state', 'com_eventbooking'))
 		{
-			$db     = JFactory::getDbo();
-			$query  = $db->getQuery(true);
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
 			$query->select('created_by')
-					->from('#__eb_events')
-					->where('id = ' . (int) $eventId);
+				->from('#__eb_events')
+				->where('id = ' . (int) $eventId);
 			$db->setQuery($query);
 			$createdBy = (int) $db->loadResult();
 
-			if ($createdBy  == $user->id)
+			if ($createdBy == $user->id)
 			{
 				return true;
 			}
@@ -5203,6 +5206,7 @@ class EventbookingHelper
 				$query = $db->getQuery(true);
 				$query->update('#__eb_registrants')
 					->set('published = ' . $row->published)
+					->set('payment_status = ' . $row->payment_status)
 					->set('transaction_id = ' . $db->quote($row->transaction_id))
 					->set('payment_method = ' . $db->quote($row->payment_method))
 					->where('group_id = ' . $row->id);
@@ -5258,8 +5262,8 @@ class EventbookingHelper
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('id')
-					->from('#__users')
-					->where('username = ' . $db->quote($data['username']));
+				->from('#__users')
+				->where('username = ' . $db->quote($data['username']));
 			$db->setQuery($query);
 
 			return (int) $db->loadResult();

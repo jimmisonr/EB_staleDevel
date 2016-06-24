@@ -84,7 +84,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options[]              = JHtml::_('select.option', 0, JText::_('JNO'));
 		$options[]              = JHtml::_('select.option', 1, JText::_('JYES'));
 		$options[]              = JHtml::_('select.option', 2, JText::_('EB_SHOW_IF_LIMITED'));
-		$lists['show_capacity'] = JHtml::_('select.genericlist', $options, 'show_capacity', '', 'value', 'text', $this->config->show_capacity);
+		$lists['show_capacity'] = JHtml::_('select.genericlist', $options, 'show_capacity', '', 'value', 'text', $config->show_capacity);
 
 
 		// Social sharing options
