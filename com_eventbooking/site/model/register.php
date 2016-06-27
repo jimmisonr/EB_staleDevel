@@ -419,6 +419,7 @@ class EventBookingModelRegister extends RADModel
 				$rowMember->transaction_id     = $row->transaction_id;
 				$rowMember->event_id           = $row->event_id;
 				$rowMember->payment_method     = $row->payment_method;
+				$rowMember->payment_status     = $row->payment_status;
 				$rowMember->user_id            = $row->user_id;
 				$rowMember->register_date      = $row->register_date;
 				$rowMember->user_ip            = $row->user_ip;
