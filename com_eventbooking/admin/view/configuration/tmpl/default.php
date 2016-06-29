@@ -29,6 +29,18 @@ JHtml::_('script', 'jui/cms.js', false, true);
 					<legend><?php echo JText::_('EB_GENERAL_SETTINGS'); ?></legend>
 					<div class="control-group">
 						<div class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('map_api_key', JText::_('EB_MAP_API_KEY')); ?>
+						</div>
+						<div class="controls">
+							<input type="text" name="map_api_key" class="input-xlarge" value="<?php echo $config->get('map_api_key', ''); ?>" size="60" />
+							<p class="text-warning" style="margin-top: 10px;">
+								Google now requires a KEY for their API call. So if you use map functions in Events Booking (for example use map module or display event location in google map, please
+								<a href="https://console.developers.google.com/flows/enableapi?apiid=maps_backend,geocoding_backend,directions_backend,distance_matrix_backend,elevation_backend&keyType=CLIENT_SIDE&reusekey=true" target="_blank"><strong>CLICK HERE</strong></a> to register for an API Key, then enter the received key into this config option.
+							</p>
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('custom_field_by_category', JText::_('EB_CUSTOM_FIELD_BY_CATEGORY'), JText::_('EB_CUSTOM_FIELD_BY_CATEGORY_EXPLAIN')); ?>
 						</div>
 						<div class="controls">

@@ -19,20 +19,20 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 $span7Class          = $bootstrapHelper->getClassMapping('span7');
 $span5Class          = $bootstrapHelper->getClassMapping('span5');
 
+$config = EventbookingHelper::getConfig();
 if ($this->item->id)
 {
 	$coordinates = $this->item->lat.','.$this->item->long;
 }
 else
 {
-	$config = EventbookingHelper::getConfig();
-	$geocode_stats = file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?address=".str_replace(' ','+',$config->default_country)."&sensor=false");
+	$geocode_stats = file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?address=" . str_replace(' ', '+', $config->default_country) . "&sensor=false" . ($config->map_api_key ? '&key=' . $config->map_api_key : ''));
 	$output_deals = json_decode($geocode_stats);
 	$latLng = $output_deals->results[0]->geometry->location;
 	$coordinates = $latLng->lat.','.$latLng->lng;
 }
 ?>
-<script src="https://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
+<script src="https://maps.google.com/maps/api/js?sensor=false<?php echo $config->map_api_key ? '&key=' . $config->map_api_key : ''; ?>" type="text/javascript"></script>
 <script type="text/javascript">
 	function checkData(pressbutton) {
 		var form = document.adminForm;

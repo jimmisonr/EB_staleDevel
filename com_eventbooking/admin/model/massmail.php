@@ -70,12 +70,14 @@ class EventbookingModelMassmail extends RADModel
 			$rows    = $db->loadObjectList();
 			$emails  = array();
 			$subject = $data['subject'];
-			$body    = EventbookingHelper::convertImgTags($data['description']);			
+			$body    = EventbookingHelper::convertImgTags($data['description']);
 			foreach ($replaces as $key => $value)
 			{
-				$key  = strtoupper($key);
-				$body = str_replace("[$key]", $value, $body);
+				$key     = strtoupper($key);
+				$subject = str_replace("[$key]", $value, $subject);
+				$body    = str_replace("[$key]", $value, $body);
 			}
+			
 			if (count($rows))
 			{
 				foreach ($rows as $row)

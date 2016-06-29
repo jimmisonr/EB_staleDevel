@@ -97,6 +97,8 @@ class modEventBookingGoogleMapHelper
 	 */
 	protected function loadMapInListing()
 	{
+		$config = EventbookingHelper::getConfig();
+
 		$locations = $this->loadAllLocations();
 
 		if (!$this->location)
@@ -109,7 +111,7 @@ class modEventBookingGoogleMapHelper
 		$rootUri = JUri::root();
 		$zoomLevel = $this->params->get('zoom_level', 10);
 
-		JFactory::getDocument()->addScript('https://maps.googleapis.com/maps/api/js?sensor=false');
+		JFactory::getDocument()->addScript('https://maps.googleapis.com/maps/api/js?sensor=false' . ($config->map_api_key ? '&key=' . $config->map_api_key : ''));
 		?>
 		<script type="text/javascript">
 			Eb.jQuery(document).ready(function ($) {

@@ -19,9 +19,11 @@ $zoomLevel = (int) $this->config->zoom_level ;
 if (!$zoomLevel) {
 	$zoomLevel = 8 ;
 }
+
+$config = EventbookingHelper::getConfig();
 $doc = JFactory::getDocument();
 $protocol = JUri::getInstance()->getScheme();
-$doc->addScript($protocol . '://maps.google.com/maps/api/js?sensor=true');
+$doc->addScript($protocol . '://maps.google.com/maps/api/js?sensor=true' . ($config->map_api_key ? '&key=' . $config->map_api_key : ''));
 $doc->addScriptDeclaration('
 	var geocoder, map;
 	function initialize() {
