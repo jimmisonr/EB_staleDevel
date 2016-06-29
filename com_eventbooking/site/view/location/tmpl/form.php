@@ -20,19 +20,29 @@ $span7Class          = $bootstrapHelper->getClassMapping('span7');
 $span5Class          = $bootstrapHelper->getClassMapping('span5');
 
 $config = EventbookingHelper::getConfig();
+$mapApiKye = $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4');
 if ($this->item->id)
 {
 	$coordinates = $this->item->lat.','.$this->item->long;
 }
 else
 {
-	$geocode_stats = file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?address=" . str_replace(' ', '+', $config->default_country) . "&sensor=false" . ($config->map_api_key ? '&key=' . $config->map_api_key : ''));
-	$output_deals = json_decode($geocode_stats);
-	$latLng = $output_deals->results[0]->geometry->location;
-	$coordinates = $latLng->lat.','.$latLng->lng;
+	$http     = JHttpFactory::getHttp();
+	$url      = "https://maps.googleapis.com/maps/api/geocode/json?address=" . str_replace(' ', '+', $config->default_country) . "&key=" . $mapApiKye;
+	$response = $http->get($url);
+	if ($response->code == 200)
+	{
+		$output_deals = json_decode($response->body);
+		$latLng = $output_deals->results[0]->geometry->location;
+		$coordinates = $latLng->lat.','.$latLng->lng;
+	}
+	else
+	{
+		$coordinates = '37.09024,-95.712891';
+	}
 }
 ?>
-<script src="https://maps.google.com/maps/api/js?sensor=false<?php echo $config->map_api_key ? '&key=' . $config->map_api_key : ''; ?>" type="text/javascript"></script>
+<script src="https://maps.google.com/maps/api/js?key=<?php echo $mapApiKye; ?>" type="text/javascript"></script>
 <script type="text/javascript">
 	function checkData(pressbutton) {
 		var form = document.adminForm;

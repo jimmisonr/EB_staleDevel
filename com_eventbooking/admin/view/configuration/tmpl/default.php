@@ -32,10 +32,10 @@ JHtml::_('script', 'jui/cms.js', false, true);
 							<?php echo EventbookingHelperHtml::getFieldLabel('map_api_key', JText::_('EB_MAP_API_KEY')); ?>
 						</div>
 						<div class="controls">
-							<input type="text" name="map_api_key" class="input-xlarge" value="<?php echo $config->get('map_api_key', ''); ?>" size="60" />
+							<input type="text" name="map_api_key" class="input-xlarge" value="<?php echo $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4'); ?>" size="60" />
 							<p class="text-warning" style="margin-top: 10px;">
-								Google now requires a KEY for their API call. So if you use map functions in Events Booking (for example use map module or display event location in google map, please
-								<a href="https://console.developers.google.com/flows/enableapi?apiid=maps_backend,geocoding_backend,directions_backend,distance_matrix_backend,elevation_backend&keyType=CLIENT_SIDE&reusekey=true" target="_blank"><strong>CLICK HERE</strong></a> to register for an API Key, then enter the received key into this config option.
+								Google now requires a KEY for their API . Events Booking ships with a default API Key. With this key, Google will allows 25,000 map loads per day for all the websites which has Events Booking installed. That should be OK, however, if you are worry about this limit, please
+								<a href="https://console.developers.google.com/flows/enableapi?apiid=maps_backend,geocoding_backend,directions_backend,distance_matrix_backend,elevation_backend&keyType=CLIENT_SIDE&reusekey=true" target="_blank"><strong>CLICK HERE</strong></a> to register for an own API Key, then enter the received key into this config option.
 							</p>
 						</div>
 					</div>

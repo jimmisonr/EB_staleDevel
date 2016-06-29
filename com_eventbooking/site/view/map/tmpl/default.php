@@ -9,21 +9,22 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
-$getDirectionLink = 'http://maps.google.com/maps?f=d&daddr='.$this->location->lat.','.$this->location->long.'('.addslashes($this->location->address.', '.$this->location->city.', '.$this->location->state.', '.$this->location->zip.', '.$this->location->country).')' ;
-$height = (int) $this->config->map_height ;
-if (!$height) {
-	$height = 600 ;
+$getDirectionLink = 'http://maps.google.com/maps?f=d&daddr=' . $this->location->lat . ',' . $this->location->long . '(' . addslashes($this->location->address . ', ' . $this->location->city . ', ' . $this->location->state . ', ' . $this->location->zip . ', ' . $this->location->country) . ')';
+$height           = (int) $this->config->map_height;
+if (!$height)
+{
+	$height = 600;
 }
-$height += 20 ;
-$zoomLevel = (int) $this->config->zoom_level ;
-if (!$zoomLevel) {
-	$zoomLevel = 8 ;
+$height += 20;
+$zoomLevel = (int) $this->config->zoom_level;
+if (!$zoomLevel)
+{
+	$zoomLevel = 8;
 }
 
 $config = EventbookingHelper::getConfig();
-$doc = JFactory::getDocument();
-$protocol = JUri::getInstance()->getScheme();
-$doc->addScript($protocol . '://maps.google.com/maps/api/js?sensor=true' . ($config->map_api_key ? '&key=' . $config->map_api_key : ''));
+$doc    = JFactory::getDocument();
+$doc->addScript('https://maps.google.com/maps/api/js?key=' . $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4'));
 $doc->addScriptDeclaration('
 	var geocoder, map;
 	function initialize() {
