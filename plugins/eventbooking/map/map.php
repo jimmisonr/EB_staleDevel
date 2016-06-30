@@ -83,7 +83,7 @@ class plgEventBookingMap extends JPlugin
 		$session = JFactory::getSession();
 		?>
 		<script type="text/javascript"
-		        src="<?php echo ($https) ? 'https' : 'http'?>://maps.google.com/maps/api/js?sensor=false"></script>
+		        src="<?php echo ($https) ? 'https' : 'http'?>://maps.google.com/maps/api/js?key=<?php echo $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4');?>"></script>
 		<script type="text/javascript">
 			(function ($) {
 				$(document).ready(function () {
