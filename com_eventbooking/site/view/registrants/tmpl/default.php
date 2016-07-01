@@ -22,6 +22,8 @@ else
 {
 	$showLastName = false;
 }
+
+$rootUri = JUri::root(true);
 ?>
 <script type="text/javascript">
 	function checkData(pressbutton)
@@ -165,16 +167,18 @@ else
 		<?php
 		for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 		{
-			$row = $this->items[$i];
-			$link 	= JRoute::_( 'index.php?option=com_eventbooking&task=edit_registrant&id='. $row->id.'&Itemid='.$this->Itemid.'&return='.$return);
-			$isMember = $row->group_id > 0 ? true : false ;
+			$row      = $this->items[$i];
+			$link     = JRoute::_('index.php?option=com_eventbooking&task=edit_registrant&id=' . $row->id . '&Itemid=' . $this->Itemid . '&return=' . $return);
+			$isMember = $row->group_id > 0 ? true : false;
 			if ($isMember)
 			{
-				$groupLink = JRoute::_( 'index.php?option=com_eventbooking&task=edit_registrant&cid[]='. $row->group_id.'&Itemid='.$this->Itemid);
+				$groupLink = JRoute::_('index.php?option=com_eventbooking&task=edit_registrant&cid[]=' . $row->group_id . '&Itemid=' . $this->Itemid);
 			}
 
-			$img 	= $row->checked_in ? 'tick.png' : 'publish_x.png';
-			$alt 	= $row->checked_in ? JText::_( 'EB_CHECKED_IN' ) : JText::_( 'EB_NOT_CHECKED_IN');
+			$img    = $row->checked_in ? 'tick.png' : 'publish_x.png';
+			$alt    = $row->checked_in ? JText::_('EB_CHECKED_IN') : JText::_('EB_NOT_CHECKED_IN');
+			$action = $row->checked_in ? JText::_('EB_UN_CHECKIN') : JText::_('EB_CHECKIN');
+			$task   = $row->checked_in ? 'registrant.reset_check_in' : 'registrant.check_in_webapp';
 			?>
 			<tr>
 				<td>
@@ -281,7 +285,7 @@ else
 				{
 				?>
 					<td class="center">
-						<img src="media/com_eventbooking/assets/images/<?php echo $img; ?>" alt="<?php echo $alt; ?>" />
+						<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task='.$task.'&id='.$row->id.'&'.JSession::getFormToken().'=1'.'&Itemid='.$this->Itemid); ?>"><img src="<?php echo $rootUri . '/media/com_eventbooking/assets/images/' . $img; ?>" alt="<?php echo $alt; ?>" /></a>
 					</td>
 				<?php
 				}

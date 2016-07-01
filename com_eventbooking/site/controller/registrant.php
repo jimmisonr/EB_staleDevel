@@ -88,6 +88,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 			throw new RuntimeException('You don\'t have permission to delete registrant', 403);
 		}
 	}
+
 	/**
 	 * Cancel registration for the event
 	 */
@@ -191,11 +192,11 @@ class EventbookingControllerRegistrant extends EventbookingController
 				$config = EventbookingHelper::getConfig();
 				if ($config->only_show_registrants_of_event_owner)
 				{
-					$db = JFactory::getDbo();
+					$db    = JFactory::getDbo();
 					$query = $db->getQuery(true);
 					$query->select('created_by')
 						->from('#__eb_events')
-						->where('id = '. $row->event_id);
+						->where('id = ' . $row->event_id);
 					$db->setQuery($query);
 					$createdBy = $db->loadResult();
 					if ($createdBy == $user->id)
@@ -224,17 +225,17 @@ class EventbookingControllerRegistrant extends EventbookingController
 	 */
 	public function export()
 	{
-		$eventId     = $this->input->getInt('event_id', 0);
+		$eventId = $this->input->getInt('event_id', 0);
 		if (!EventbookingHelper::canExportRegistrants($eventId))
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('EB_NOT_ALLOWED_TO_EXPORT'));
 		}
 
 		set_time_limit(0);
-		$config    = EventbookingHelper::getConfig();
-		$model = $this->getModel('registrants');
+		$config = EventbookingHelper::getConfig();
+		$model  = $this->getModel('registrants');
 
-		/* @var EventbookingModelRegistrants $model*/
+		/* @var EventbookingModelRegistrants $model */
 		$model->setState('filter_event_id', $eventId)
 			->setState('limitstart', 0)
 			->setState('limit', 0)
@@ -245,14 +246,14 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		if (count($rows) == 0)
 		{
-			echo  JText::_('There are no registrants to export');
+			echo JText::_('There are no registrants to export');
 
 			return;
 		}
 
 		$rowFields = EventbookingHelper::getAllEventFields($eventId);
-		$fieldIds = array();
-		foreach($rowFields as $rowField)
+		$fieldIds  = array();
+		foreach ($rowFields as $rowField)
 		{
 			$fieldIds[] = $rowField->id;
 		}
@@ -270,10 +271,10 @@ class EventbookingControllerRegistrant extends EventbookingController
 		$user = JFactory::getUser();
 		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
-			$model = $this->getModel();
-			$id = $this->input->getInt('id');
+			$model  = $this->getModel();
+			$id     = $this->input->getInt('id');
 			$result = $model->checkin($id);
-			switch($result)
+			switch ($result)
 			{
 				case 0:
 					$message = JText::_('EB_INVALID_REGISTRATION_RECORD');
@@ -287,6 +288,72 @@ class EventbookingControllerRegistrant extends EventbookingController
 			}
 
 			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', null)), $message);
+		}
+		else
+		{
+			throw new Exception('You do not have permission to checkin registrant', 403);
+		}
+	}
+
+	/*
+	 * Check in a registrant
+	 */
+	public function check_in_webapp()
+	{
+		JSession::checkToken('get');
+		
+		$user = JFactory::getUser();
+		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
+		{
+			$id = $this->input->getInt('id');
+
+			$model = $this->getModel();
+
+			try
+			{
+				$model->checkin($id, true);
+				$this->setMessage(JText::_('EB_CHECKIN_SUCCESSFULLY'));
+			}
+			catch (Exception $e)
+			{
+				$this->setMessage($e->getMessage(), 'error');
+			}
+
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', null)));
+		}
+		else
+		{
+			throw new Exception('You do not have permission to checkin registrant', 403);
+		}
+	}
+
+	/**
+	 * Reset check in for a registrant
+	 */
+	public function reset_check_in()
+	{
+		JSession::checkToken('get');
+
+		$user = JFactory::getUser();
+		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
+		{
+			$id    = $this->input->getInt('id');
+			$model = $this->getModel();
+			try
+			{
+				$model->resetCheckin($id);
+				$this->setMessage(JText::_('EB_RESET_CHECKIN_SUCCESSFULLY'));
+			}
+			catch (Exception $e)
+			{
+				$this->setMessage($e->getMessage(), 'error');
+			}
+
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', null)), $message);
+		}
+		else
+		{
+			throw new Exception('You do not have permission to checkin registrant', 403);
 		}
 	}
 }
