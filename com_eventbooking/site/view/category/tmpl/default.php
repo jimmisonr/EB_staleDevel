@@ -54,6 +54,13 @@ EventbookingHelperJquery::colorbox('a.eb-modal');
 			<?php
 			}
 
+			if (!$this->category && EventbookingHelper::isValidMessage($this->introText))
+			{
+			?>
+				<div class="eb-description"><?php echo $this->introText;?></div>
+			<?php
+			}
+
 			if (count($this->categories))
 			{
 				echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/categories.php', array('categories' => $this->categories, 'categoryId' => $this->category->id, 'config' => $this->config, 'Itemid' => $this->Itemid));

@@ -47,11 +47,25 @@ EventbookingHelperJquery::colorbox('a.eb-modal');
 			<div class="clearfix"></div>
 		<?php
 		}
+		elseif ($this->params->get('page_heading'))
+		{
+		?>
+			<h1 class="eb-page-heading"><?php echo $this->params->get('page_heading');?></h1>
+		<?php
+		}
+
+		if (!$this->category && EventbookingHelper::isValidMessage($this->introText))
+		{
+		?>
+			<div class="eb-description"><?php echo $this->introText;?></div>
+		<?php
+		}
 
 		if (count($this->categories))
 		{
 			echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/categories.php', array('categories' => $this->categories, 'categoryId' => $this->category->id, 'config' => $this->config, 'Itemid' => $this->Itemid));
 		}
+
 		if (count($this->items))
 		{
 			echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/events_timeline.php', array('events' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate , 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'category' => $this->category, 'Itemid' => $this->Itemid, 'bootstrapHelper' => $this->bootstrapHelper));

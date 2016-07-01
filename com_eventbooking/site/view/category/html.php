@@ -30,10 +30,10 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 			{
 				$app->redirect('index.php', JText::_('EB_INVALID_CATEGORY_OR_NOT_AUTHORIZED'));
 			}
-			
+
 			if ($config->process_plugin && !empty($category->description))
 			{
-				$category->description = JHtml::_('content.prepare', $category->description);	
+				$category->description = JHtml::_('content.prepare', $category->description);
 			}
 		}
 		else
@@ -48,7 +48,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 			{
 				$item                    = $items[$i];
 				$item->short_description = JHtml::_('content.prepare', $item->short_description);
-			}			
+			}
 		}
 
 		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)
@@ -98,7 +98,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 
 		// Load sub-categories of the current category
 		if ($categoryId > 0)
-		{			
+		{
 			$model            = new EventbookingModelCategories(
 				array(
 					'table_prefix'    => '#__eb_',
@@ -163,6 +163,18 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 
 		EventbookingHelperHtml::prepareDocument($params, $category);
 
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$message     = EventbookingHelper::getMessages();
+
+		if (strlen($message->{'intro_text' . $fieldSuffix}))
+		{
+			$introText = $message->{'intro_text' . $fieldSuffix};
+		}
+		else
+		{
+			$introText = $message->intro_text;
+		}
+
 		$this->viewLevels      = $user->getAuthorisedViewLevels();
 		$this->userId          = $user->id;
 		$this->items           = $items;
@@ -172,6 +184,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		$this->nullDate        = JFactory::getDbo()->getNullDate();
 		$this->params          = $params;
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+		$this->introText       = $introText;
 
 		parent::display();
 	}

@@ -37,7 +37,8 @@ if ($this->config->show_cat_decription_in_table_layout && $this->category)
 	</div>
 	<div class="clearfix"></div>
 <?php
-} else
+}
+else
 {
 ?>
 	<h1 class="eb-page-heading"><?php echo $this->params->get('page_heading')? $this->params->get('page_heading') : JText::_('EB_EVENT_LIST') ; ?></h1>
@@ -46,10 +47,15 @@ if ($this->config->show_cat_decription_in_table_layout && $this->category)
 	</p>
 <?php
 }
+
 if ($this->config->use_https)
-	$ssl = 1 ;
+{
+	$ssl = 1;
+}
 else
-	$ssl = 0 ;
+{
+	$ssl = 0;
+}
 
 if (count($this->categories))
 {
