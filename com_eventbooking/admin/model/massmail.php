@@ -24,10 +24,12 @@ class EventbookingModelMassmail extends RADModel
 	{
 		if ($data['event_id'] >= 1)
 		{
-			$mailer = JFactory::getMailer();
-			$config = EventbookingHelper::getConfig();
-			$db     = JFactory::getDbo();
-			$query  = $db->getQuery(true);
+			$mailer  = JFactory::getMailer();
+			$config  = EventbookingHelper::getConfig();
+			$siteUrl = EventbookingHelper::getSiteUrl();
+			$db      = JFactory::getDbo();
+			$query   = $db->getQuery(true);
+
 			if ($config->from_name)
 			{
 				$fromName = $config->from_name;
@@ -36,6 +38,7 @@ class EventbookingModelMassmail extends RADModel
 			{
 				$fromName = JFactory::getConfig()->get('fromname');
 			}
+
 			if ($config->from_email)
 			{
 				$fromEmail = $config->from_email;
@@ -44,6 +47,7 @@ class EventbookingModelMassmail extends RADModel
 			{
 				$fromEmail = JFactory::getConfig()->get('mailfrom');
 			}
+
 			$event                         = EventbookingHelperDatabase::getEvent((int) $data['event_id']);
 			$replaces                      = array();
 			$replaces['event_title']       = $event->title;
@@ -60,8 +64,8 @@ class EventbookingModelMassmail extends RADModel
 				$replaces['event_location'] = '';
 			}
 
-			$query->clear();
-			$query->select('*')
+			$query->clear()
+				->select('*')
 				->from('#__eb_registrants')
 				->where('event_id = ' . (int) $data['event_id'])
 				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
@@ -77,43 +81,50 @@ class EventbookingModelMassmail extends RADModel
 				$subject = str_replace("[$key]", $value, $subject);
 				$body    = str_replace("[$key]", $value, $body);
 			}
-			
-			if (count($rows))
+
+			foreach ($rows as $row)
 			{
-				foreach ($rows as $row)
+				$message = $body;
+				$email   = $row->email;
+				if (!in_array($email, $emails))
 				{
-					$message = $body;
-					$email   = $row->email;
-					if (!in_array($email, $emails))
+					$message = str_replace("[FIRST_NAME]", $row->first_name, $message);
+					$message = str_replace("[LAST_NAME]", $row->last_name, $message);
+
+					// Process [REGISTRATION_DETAIL] tag if it is used in the message
+					if (strpos($message, '[REGISTRATION_DETAIL]') !== false)
 					{
-						$message = str_replace("[FIRST_NAME]", $row->first_name, $message);
-						$message = str_replace("[LAST_NAME]", $row->last_name, $message);
-
-						// Process [REGISTRATION_DETAIL] tag if it is used in the message
-						if (strpos($message, '[REGISTRATION_DETAIL]') !== false)
+						// Build this tag
+						if ($config->multiple_booking)
 						{
-							// Build this tag
-							if ($config->multiple_booking)
-							{
-								$rowFields = EventbookingHelper::getFormFields($row->id, 4);
-							}
-							elseif ($row->is_group_billing)
-							{
-								$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
-							}
-							else
-							{
-								$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
-							}
-
-							$form = new RADForm($rowFields);
-							$data = EventbookingHelper::getRegistrantData($row, $rowFields);
-							$form->bind($data);
-							$form->buildFieldsDependency();
-							$registrationDetail = EventbookingHelper::getEmailContent($config, $row, true, $form);
-							$message            = str_replace("[REGISTRATION_DETAIL]", $registrationDetail, $message);
+							$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+						}
+						elseif ($row->is_group_billing)
+						{
+							$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+						}
+						else
+						{
+							$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
 						}
 
+						$form = new RADForm($rowFields);
+						$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+						$form->bind($data);
+						$form->buildFieldsDependency();
+						$registrationDetail = EventbookingHelper::getEmailContent($config, $row, true, $form);
+						$message            = str_replace("[REGISTRATION_DETAIL]", $registrationDetail, $message);
+					}
+
+					if (strpos($message, '[QRCODE]') !== false)
+					{
+						EventbookingHelper::generateQrcode($row->id);
+						$imgTag  = '<img src="' . $siteUrl . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+						$message = str_ireplace("[QRCODE]", $imgTag, $message);
+					}
+
+					if (JMailHelper::isEmailAddress($email))
+					{
 						$emails[] = $email;
 						$mailer->sendMail($fromEmail, $fromName, $email, $subject, $message, 1);
 						$mailer->ClearAllRecipients();
@@ -121,7 +132,7 @@ class EventbookingModelMassmail extends RADModel
 				}
 			}
 		}
-
+		
 		return true;
 	}
 }
