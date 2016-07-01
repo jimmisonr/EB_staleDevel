@@ -989,6 +989,17 @@ JHtml::_('script', 'jui/cms.js', false, true);
 			</div>
 			<div class="control-group">
 				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('pdf_font', JText::_('EB_PDF_FONT'), JText::_('EB_PDF_FONT_EXPLAIN')); ?>
+					<p class="text-warning">
+						<?php echo JText::_('EB_PDF_FONT_WARNING'); ?>
+					</p>
+				</div>
+				<div class="controls">
+					<?php echo $this->lists['pdf_font']; ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('invoice_format', JText::_('EB_INVOICE_FORMAT'), JText::_('EB_INVOICE_FORMAT_EXPLAIN')); ?>
 				</div>
 				<div class="controls">

@@ -15,19 +15,19 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 
 	public function display()
 	{
-		$db        = JFactory::getDbo();
-		$query     = $db->getQuery(true);
-		$config    = EventbookingHelper::getConfig();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+		$config = EventbookingHelper::getConfig();
 
 		$options                            = array();
 		$options[]                          = JHtml::_('select.option', 2, JText::_('EB_VERSION_2'));
 		$options[]                          = JHtml::_('select.option', 3, JText::_('EB_VERSION_3'));
 		$lists['twitter_bootstrap_version'] = JHtml::_('select.genericlist', $options, 'twitter_bootstrap_version', '', 'value', 'text', $config->get('twitter_bootstrap_version', 2));
 
-		$options                                     = array();
-		$options[]                                   = JHtml::_('select.option', 0, JText::_('EB_SUNDAY'));
-		$options[]                                   = JHtml::_('select.option', 1, JText::_('EB_MONDAY'));
-		$lists['calendar_start_date']                = JHtml::_('select.genericlist', $options, 'calendar_start_date', ' class="inputbox" ', 'value', 'text',
+		$options                      = array();
+		$options[]                    = JHtml::_('select.option', 0, JText::_('EB_SUNDAY'));
+		$options[]                    = JHtml::_('select.option', 1, JText::_('EB_MONDAY'));
+		$lists['calendar_start_date'] = JHtml::_('select.genericlist', $options, 'calendar_start_date', ' class="inputbox" ', 'value', 'text',
 			$config->calendar_start_date);
 
 		$options                  = array();
@@ -63,14 +63,14 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['submit_event_form_layout'] = JHtml::_('select.genericlist', $options, 'submit_event_form_layout', '', 'value', 'text',
 			$config->submit_event_form_layout);
 		//Theme configuration						
-		$options                                             = array();
-		$options[]                                           = JHtml::_('select.option', 'default', JText::_('EB_DEFAULT'));
-		$options[]                                           = JHtml::_('select.option', 'fire', JText::_('EB_FIRE'));
-		$options[]                                           = JHtml::_('select.option', 'leaf', JText::_('EB_LEAF'));
-		$options[]                                           = JHtml::_('select.option', 'sky', JText::_('EB_SKY'));
-		$options[]                                           = JHtml::_('select.option', 'tree', JText::_('EB_TREE'));
-		$options[]                                           = JHtml::_('select.option', 'dark', JText::_('EB_DARK'));
-		$lists['calendar_theme']                             = JHtml::_('select.genericlist', $options, 'calendar_theme', ' class="inputbox" ', 'value', 'text',
+		$options                 = array();
+		$options[]               = JHtml::_('select.option', 'default', JText::_('EB_DEFAULT'));
+		$options[]               = JHtml::_('select.option', 'fire', JText::_('EB_FIRE'));
+		$options[]               = JHtml::_('select.option', 'leaf', JText::_('EB_LEAF'));
+		$options[]               = JHtml::_('select.option', 'sky', JText::_('EB_SKY'));
+		$options[]               = JHtml::_('select.option', 'tree', JText::_('EB_TREE'));
+		$options[]               = JHtml::_('select.option', 'dark', JText::_('EB_DARK'));
+		$lists['calendar_theme'] = JHtml::_('select.genericlist', $options, 'calendar_theme', ' class="inputbox" ', 'value', 'text',
 			$config->calendar_theme);
 
 		$options                    = array();
@@ -78,7 +78,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options[]                  = JHtml::_('select.option', 0, JText::_('EB_BEFORE_AMOUNT'));
 		$options[]                  = JHtml::_('select.option', 1, JText::_('EB_AFTER_AMOUNT'));
 		$lists['currency_position'] = JHtml::_('select.genericlist', $options, 'currency_position', ' class="inputbox"', 'value', 'text',
-				$config->currency_position);
+			$config->currency_position);
 
 		$options                = array();
 		$options[]              = JHtml::_('select.option', 0, JText::_('JNO'));
@@ -115,23 +115,23 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options[]                     = JHtml::_('select.option', 1, JText::_('EB_PUBLISHED'));
 		$lists['default_event_status'] = JHtml::_('select.genericlist', $options, 'default_event_status', ' class="inputbox"', 'value', 'text', $config->get('default_event_status', 0));
 
-		$options = array();
-		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_FORMAT'));
-		$options[] = JHtml::_('select.option', '%Y-%m-%d', 'Y-m-d');
-		$options[] = JHtml::_('select.option', '%Y/%m/%d', 'Y/m/d');
-		$options[] = JHtml::_('select.option', '%Y.%m.%d', 'Y.m.d');
-		$options[] = JHtml::_('select.option', '%m-%d-%Y', 'm-d-Y');
-		$options[] = JHtml::_('select.option', '%m/%d/%Y', 'm/d/Y');
-		$options[] = JHtml::_('select.option', '%m.%d.%Y', 'm.d.Y');
-		$options[] = JHtml::_('select.option', '%d-%m-%Y', 'd-m-Y');
-		$options[] = JHtml::_('select.option', '%d/%m/%Y', 'd/m/Y');
-		$options[] = JHtml::_('select.option', '%d.%m.%Y', 'd.m.Y');
+		$options                    = array();
+		$options[]                  = JHtml::_('select.option', '', JText::_('EB_SELECT_FORMAT'));
+		$options[]                  = JHtml::_('select.option', '%Y-%m-%d', 'Y-m-d');
+		$options[]                  = JHtml::_('select.option', '%Y/%m/%d', 'Y/m/d');
+		$options[]                  = JHtml::_('select.option', '%Y.%m.%d', 'Y.m.d');
+		$options[]                  = JHtml::_('select.option', '%m-%d-%Y', 'm-d-Y');
+		$options[]                  = JHtml::_('select.option', '%m/%d/%Y', 'm/d/Y');
+		$options[]                  = JHtml::_('select.option', '%m.%d.%Y', 'm.d.Y');
+		$options[]                  = JHtml::_('select.option', '%d-%m-%Y', 'd-m-Y');
+		$options[]                  = JHtml::_('select.option', '%d/%m/%Y', 'd/m/Y');
+		$options[]                  = JHtml::_('select.option', '%d.%m.%Y', 'd.m.Y');
 		$lists['date_field_format'] = JHtml::_('select.genericlist', $options, 'date_field_format', '', 'value', 'text', isset($config->date_field_format) ? $config->date_field_format : 'Y-m-d');
 
-		$currencies = require_once JPATH_ROOT.'/components/com_eventbooking/helper/currencies.php';
-		$options                  = array();
-		$options[] = JHtml::_('select.option', '',  JText::_('EB_SELECT_CURRENCY'));
-		foreach($currencies as $code => $title)
+		$currencies = require_once JPATH_ROOT . '/components/com_eventbooking/helper/currencies.php';
+		$options    = array();
+		$options[]  = JHtml::_('select.option', '', JText::_('EB_SELECT_CURRENCY'));
+		foreach ($currencies as $code => $title)
 		{
 			$options[] = JHtml::_('select.option', $code, $title);
 		}
@@ -143,16 +143,49 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['insert_category'] = JHtml::_('select.genericlist', $options, 'insert_category', ' class="inputbox"', 'value', 'text',
 			$config->insert_category);
 
-		$options                  = array();
-		$options[]                = JHtml::_('select.option', 0, JText::_('EB_ENABLE'));
-		$options[]                = JHtml::_('select.option', 1, JText::_('EB_ONLY_TO_ADMIN'));
-		$options[]                = JHtml::_('select.option', 2, JText::_('EB_ONLY_TO_REGISTRANT'));
-		$options[]                = JHtml::_('select.option', 3, JText::_('EB_DISABLE'));
-		$lists['send_emails']      = JHtml::_('select.genericlist', $options, 'send_emails', ' class="inputbox"', 'value', 'text',
+		$options              = array();
+		$options[]            = JHtml::_('select.option', 0, JText::_('EB_ENABLE'));
+		$options[]            = JHtml::_('select.option', 1, JText::_('EB_ONLY_TO_ADMIN'));
+		$options[]            = JHtml::_('select.option', 2, JText::_('EB_ONLY_TO_REGISTRANT'));
+		$options[]            = JHtml::_('select.option', 3, JText::_('EB_DISABLE'));
+		$lists['send_emails'] = JHtml::_('select.genericlist', $options, 'send_emails', ' class="inputbox"', 'value', 'text',
 			$config->send_emails);
 
-		$this->lists              = $lists;
-		$this->config             = $config;
+		$fontsPath = JPATH_ROOT . '/components/com_eventbooking/tcpdf/fonts/';
+		$options   = array();
+		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_FONT'));
+		$options[] = JHtml::_('select.option', 'courier', JText::_('Courier'));
+		$options[] = JHtml::_('select.option', 'helvetica', JText::_('Helvetica'));
+		$options[] = JHtml::_('select.option', 'symbol', JText::_('Symbol'));
+		$options[] = JHtml::_('select.option', 'times', JText::_('Times New Roman'));
+		$options[] = JHtml::_('select.option', 'zapfdingbats', JText::_('Zapf Dingbats'));
+
+		$additionalFonts = array(
+			'aealarabiya',
+			'aefurat',
+			'dejavusans',
+			'dejavuserif',
+			'freemono',
+			'freesans',
+			'freeserif',
+			'hysmyeongjostdmedium',
+			'kozgopromedium',
+			'kozminproregular',
+			'msungstdlight',
+		);
+
+		foreach ($additionalFonts as $fontName)
+		{
+			if (file_exists($fontsPath . $fontName . '.php'))
+			{
+				$options[] = JHtml::_('select.option', $fontName, ucfirst($fontName));
+			}
+		}
+
+		$lists['pdf_font'] = JHtml::_('select.genericlist', $options, 'pdf_font', ' class="inputbox"', 'value', 'text', empty($config->pdf_font) ? 'times' : $config->pdf_font);
+
+		$this->lists  = $lists;
+		$this->config = $config;
 		$this->addToolbar();
 		$this->languages = EventbookingHelper::getLanguages();
 

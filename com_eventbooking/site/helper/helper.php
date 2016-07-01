@@ -4641,7 +4641,9 @@ class EventbookingHelper
 		$pdf->SetAutoPageBreak(true, PDF_MARGIN_BOTTOM);
 		//set image scale factor
 		$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-		$pdf->SetFont('times', '', 8);
+
+		$font = empty($config->pdf_font) ? 'times' : $config->pdf_font;
+		$pdf->SetFont($font, '', 8);
 		$pdf->AddPage();
 
 		if ($config->multiple_booking)
