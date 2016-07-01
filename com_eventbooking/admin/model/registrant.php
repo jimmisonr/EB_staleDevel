@@ -77,9 +77,9 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 	 */
 	public function batchMail($input)
 	{
-		$cid     = $input->get('cid', array(), 'array');
+		$cid          = $input->get('cid', array(), 'array');
 		$emailSubject = $input->getString('subject');
-		$emailMessage    = $input->get('message', '', 'raw');
+		$emailMessage = $input->get('message', '', 'raw');
 
 		if (empty($cid))
 		{
@@ -97,10 +97,11 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 		}
 
 		// OK, data is valid, process sending email
-		$mailer = JFactory::getMailer();
-		$config = EventbookingHelper::getConfig();
-		$db     = JFactory::getDbo();
-		$query  = $db->getQuery(true);
+		$mailer  = JFactory::getMailer();
+		$config  = EventbookingHelper::getConfig();
+		$siteUrl = EventbookingHelper::getSiteUrl();
+		$db      = JFactory::getDbo();
+		$query   = $db->getQuery(true);
 
 		if ($config->from_name)
 		{
@@ -122,9 +123,9 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 
 		// Get list of registration records
 		$query->select('a.*, b.title, b.event_date, b.event_end_date, b.short_description, b.description')
-				->from('#__eb_registrants AS a')
-				->innerJoin('#__eb_events AS b ON a.event_id = b.id')
-				->where('a.id IN (' . implode(',', $cid) . ')');
+			->from('#__eb_registrants AS a')
+			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+			->where('a.id IN (' . implode(',', $cid) . ')');
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
 
@@ -151,22 +152,22 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 				$replaces['event_end_date']    = JHtml::_('date', $row->event_end_date, $config->event_date_format, null);
 				$replaces['short_description'] = $row->short_description;
 				$replaces['description']       = $row->description;
-				$replaces['first_name']       = $row->first_name;
+				$replaces['first_name']        = $row->first_name;
 
 
-				foreach($replaces as $key => $value)
+				foreach ($replaces as $key => $value)
 				{
 					$key     = strtoupper($key);
 					$subject = str_ireplace("[$key]", $value, $subject);
-					$message    = str_ireplace("[$key]", $value, $message);
+					$message = str_ireplace("[$key]", $value, $message);
 				}
 
-				foreach($fields as $field)
+				foreach ($fields as $field)
 				{
-					$key = $field->name;
-					$value = $row->{$field->name};
+					$key     = $field->name;
+					$value   = $row->{$field->name};
 					$subject = str_ireplace("[$key]", $value, $subject);
-					$message    = str_ireplace("[$key]", $value, $message);
+					$message = str_ireplace("[$key]", $value, $message);
 				}
 
 				// Process [REGISTRATION_DETAIL] tag if it is used in the message
@@ -194,9 +195,19 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 					$message            = str_replace("[REGISTRATION_DETAIL]", $registrationDetail, $message);
 				}
 
-				$emails[] = $email;
-				$mailer->sendMail($fromEmail, $fromName, $email, $subject, $message, 1);
-				$mailer->clearAllRecipients();
+				if (strpos($message, '[QRCODE]') !== false)
+				{
+					EventbookingHelper::generateQrcode($row->id);
+					$imgTag  = '<img src="' . $siteUrl . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+					$message = str_ireplace("[QRCODE]", $imgTag, $message);
+				}
+
+				if (JMailHelper::isEmailAddress($email))
+				{
+					$emails[] = $email;
+					$mailer->sendMail($fromEmail, $fromName, $email, $subject, $message, 1);
+					$mailer->clearAllRecipients();
+				}
 			}
 		}
 	}
@@ -215,8 +226,8 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 		if (($state == 1) && count($cid))
 		{
 			JPluginHelper::importPlugin('eventbooking');
-			$config     = EventbookingHelper::getConfig();
-			$row        = new RADTable('#__eb_registrants', 'id', $db);
+			$config = EventbookingHelper::getConfig();
+			$row    = new RADTable('#__eb_registrants', 'id', $db);
 			foreach ($cid as $registrantId)
 			{
 				$row->load($registrantId);
