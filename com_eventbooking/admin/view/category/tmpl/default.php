@@ -91,6 +91,21 @@ if ($translatable)
 			<?php echo EventbookingHelperHtml::getBooleanInput('show_on_submit_event_form', $this->item->show_on_submit_event_form); ?>
 		</div>
 	</div>
+	<?php
+		if ($translatable)
+		{
+		?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_LANGUAGE'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $this->lists['language']; ?>
+				</div>
+			</div>
+		<?php
+		}
+	?>
 	<div class="control-group">
 		<label class="control-label">
 			<?php echo JText::_('EB_PUBLISHED'); ?>

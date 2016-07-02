@@ -251,6 +251,11 @@ class EventbookingModelList extends RADModelList
 			$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.cut_off_date) >= ' . $currentDate . ')');
 		}
 
+		if (JLanguageMultilang::isEnabled())
+		{
+			$query->where('tbl.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
+		}
+
 		return $this;
 	}
 

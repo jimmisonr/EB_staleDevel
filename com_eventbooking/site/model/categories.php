@@ -90,6 +90,12 @@ class EventbookingModelCategories extends RADModelList
 			->where('tbl.parent=' . $this->state->id)
 			->where('tbl.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
 
+		if (JLanguageMultilang::isEnabled())
+		{
+			$db = JFactory::getDbo();
+			$query->where('tbl.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
+		}
+
 		return $this;
 	}
 }

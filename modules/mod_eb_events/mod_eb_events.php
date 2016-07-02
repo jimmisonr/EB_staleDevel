@@ -67,6 +67,11 @@ if ($categoryIds)
 	$query->where('a.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id IN (' . $categoryIds . '))');
 }
 
+if (JLanguageMultilang::isEnabled())
+{
+	$query->where('a.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
+}
+
 $db->setQuery($query, 0, $numberEvents);
 $rows = $db->loadObjectList();
 
