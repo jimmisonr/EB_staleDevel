@@ -117,8 +117,8 @@ class plgEventBookingDates extends JPlugin
 		if ($numberChildrenEvents)
 		{
 			$row->event_type = 1;
-		}		
-		
+		}
+
 		$row->store();
 
 
@@ -146,6 +146,11 @@ class plgEventBookingDates extends JPlugin
 					$model->delete($deletedEventIds);
 				}
 			}
+		}
+
+		if ($numberChildrenEvents)
+		{
+			EventbookingHelper::updateParentMaxEventDate($row->id);
 		}
 	}
 

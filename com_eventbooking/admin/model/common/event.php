@@ -256,6 +256,11 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			{
 				EventbookingHelper::sendNewEventNotificationEmail($row, $config);
 			}
+
+			if (!$isNew && $row->parent_id > 0)
+			{
+				EventBookingHelper::updateParentMaxEventDate($row->parent_id);
+			}
 		}
 	}
 
@@ -410,6 +415,8 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		}
 
 		$data['id'] = $row->id;
+
+
 
 		// Store group registration rates
 		$this->storeEventGroupRegistrationRates($row->id, $data, $isNew);
@@ -700,6 +707,8 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		{
 			EventbookingHelper::sendNewEventNotificationEmail($row, $config);
 		}
+
+		EventbookingHelper::updateParentMaxEventDate($row->id);
 	}
 
 	/**

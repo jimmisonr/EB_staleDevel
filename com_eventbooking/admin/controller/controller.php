@@ -531,6 +531,38 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('max_end_date', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `max_end_date` DATETIME NULL DEFAULT '0000-00-00 00:00:00';";
+			$db->setQuery($sql);
+			$db->execute();
+
+			$sql = 'SELECT DISTINCT parent_id FROM #__eb_events WHERE parent_id > 0';
+			$db->setQuery($sql);
+			$parentIds = $db->loadColumn();
+			$nullDate  = $db->getNullDate();
+			foreach ($parentIds as $parentId)
+			{
+				$sql = 'SELECT MAX(event_date) AS max_event_date, MAX(cut_off_date) AS max_cut_off_date FROM #__eb_events WHERE published = 1 AND parent_id = ' . $parentId;
+				$db->setQuery($sql);
+				$maxDateInfo  = $db->loadObject();
+				$maxEventDate = $maxDateInfo->max_event_date;
+				if ($maxDateInfo->max_cut_off_date != $nullDate)
+				{
+					$oMaxEventDate  = new DateTime($maxDateInfo->max_event_date);
+					$oMaxCutOffDate = new DateTime($maxDateInfo->max_cut_off_date);
+					if ($oMaxCutOffDate > $oMaxEventDate)
+					{
+						$maxEventDate = $maxDateInfo->max_cut_off_date;
+					}
+				}
+
+				$sql = 'UPDATE #__eb_events SET max_end_date = ' . $db->quote($maxEventDate) . ' WHERE id = ' . $parentId;
+				$db->setQuery($sql);
+				$db->execute();
+			}
+		}
+
 		if (!in_array('access', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `access` TINYINT NOT NULL DEFAULT  '0' ;";

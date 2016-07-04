@@ -4605,6 +4605,41 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Update max child date of a recurring event
+	 *
+	 * @param $parentId
+	 */
+	public static function updateParentMaxEventDate($parentId)
+	{
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$nullDate = $db->getNullDate();
+		$query->select('MAX(event_date) AS max_event_date, MAX(cut_off_date) AS max_cut_off_date')
+			->from('#__eb_events')
+			->where('published = 1')
+			->where('parent_id = ' . $parentId);
+		$db->setQuery($query);
+		$maxDateInfo  = $db->loadObject();
+		$maxEventDate = $maxDateInfo->max_event_date;
+		if ($maxDateInfo->max_cut_off_date != $nullDate)
+		{
+			$oMaxEventDate  = new DateTime($maxDateInfo->max_event_date);
+			$oMaxCutOffDate = new DateTime($maxDateInfo->max_cut_off_date);
+			if ($oMaxCutOffDate > $oMaxEventDate)
+			{
+				$maxEventDate = $maxDateInfo->max_cut_off_date;
+			}
+		}
+
+		$query->clear()
+			->update('#__eb_events')
+			->set('max_end_date = ' . $db->quote($maxEventDate))
+			->where('id = ' . $parentId);
+		$db->setQuery($query);
+		$db->execute();
+	}
+
+	/**
 	 * Generate invoice PDF
 	 *
 	 * @param object $row
