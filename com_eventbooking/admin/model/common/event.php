@@ -55,6 +55,8 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				$imagePath = JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName;
 				$thumbPath = JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $fileName;
 				JFile::upload($_FILES['thumb_image']['tmp_name'], $imagePath);
+				JFile::copy($imagePath, JPATH_ROOT . '/images/com_eventbooking/' . $fileName);
+
 				if (!$config->thumb_width)
 				{
 					$config->thumb_width = 120;
@@ -66,9 +68,46 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 				$image = new JImage($imagePath);
 				$image->resize($config->thumb_width, $config->thumb_height, false)
-					->toFile($thumbPath);
+						->toFile($thumbPath);
 
 				$data['thumb'] = $fileName;
+			}
+		}
+
+		if (JFactory::getApplication()->isAdmin())
+		{
+			if (!empty($data['image']))
+			{
+				$fileName = basename($data['image']);
+
+				if (!JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName))
+				{
+					JFile::copy(JPATH_ROOT . '/' . $data['image'], JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName);
+				}
+
+				$thumbPath = JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $fileName;
+
+				if (!JFile::exists($thumbPath))
+				{
+					if (!$config->thumb_width)
+					{
+						$config->thumb_width = 120;
+					}
+					if (!$config->thumb_height)
+					{
+						$config->thumb_height = 120;
+					}
+
+					$image = new JImage(JPATH_ROOT . '/' . $data['image']);
+					$image->resize($config->thumb_width, $config->thumb_height, false)
+							->toFile($thumbPath);
+				}
+
+				$data['thumb'] = $fileName;
+			}
+			else
+			{
+				$data['thumb'] = '';
 			}
 		}
 
@@ -148,6 +187,11 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				{
 					$data['thumb'] = $sourceRow->thumb;
 				}
+
+				if (empty($data['image']))
+				{
+					$data['image'] = $sourceRow->image;
+				}
 			}
 		}
 
@@ -186,6 +230,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					}
 
 					$row->thumb = '';
+					$row->image = '';
 				}
 
 				if (isset($data['del_attachment']) && $row->attachment)
@@ -513,6 +558,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				$fieldsToUpdate = array(
 					'category_id',
 					'thumb',
+					'image',
 					'location_id',
 					'tax_rate',
 					'registration_type',

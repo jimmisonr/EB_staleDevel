@@ -848,6 +848,30 @@ JHtml::_('script', 'jui/cms.js', false, true);
 			</div>
 			<div class="control-group">
 				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('display_large_image', JText::_('EB_DISPLAY_LARGE_IMAGE'), JText::_('EB_DISPLAY_LARGE_IMAGE_EXPLAIN')); ?>
+				</div>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('display_large_image', $config->display_large_image); ?>
+				</div>
+			</div>
+			<div class="control-group" data-showon='[{"field":"display_large_image","values":["1"],"op":""}]'>
+				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('large_image_width', JText::_('EB_LARGE_IMAGE_WIDTH'), JText::_('EB_LARGE_IMAGE_WIDTH_EXPLAIN')); ?>
+				</div>
+				<div class="controls">
+					<input type="text" name="large_image_width" class="input-small" value="<?php echo $config->large_image_width ; ?>" />
+				</div>
+			</div>
+			<div class="control-group" data-showon='[{"field":"display_large_image","values":["1"],"op":""}]'>
+				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('large_image_height', JText::_('EB_LARGE_IMAGE_HEIGHT'), JText::_('EB_LARGE_IMAGE_HEIGHT_EXPLAIN')); ?>
+				</div>
+				<div class="controls">
+					<input type="text" name="large_image_height" class="input-small" value="<?php echo $config->large_image_height ; ?>" />
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('show_fb_like_button', JText::_('EB_SHOW_FACEBOOK_LIKE_BUTTON'), JText::_('EB_SHOW_FACEBOOKING_LIKE_BUTTON_EXPLAIN')); ?>
 				</div>
 				<div class="controls">

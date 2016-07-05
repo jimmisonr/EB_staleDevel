@@ -594,4 +594,20 @@ abstract class EventbookingHelperHtml
 		$html .= '</ul>';
 		echo $html;
 	}
+
+	public static function getMediaInput($value, $fieldName = 'image')
+	{
+		JHtml::_('jquery.framework');
+		$field = JFormHelper::loadFieldType('Media');
+
+		$element = new SimpleXMLElement('<field />');
+		$element->addAttribute('name', $fieldName);
+		$element->addAttribute('class', 'readonly input-large');
+
+		$form = JForm::getInstance('sample-form', '<form> </form>');
+		$field->setForm($form);
+		$field->setup($element, $value);
+
+		return $field->input;
+	}
 }
