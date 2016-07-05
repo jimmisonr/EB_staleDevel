@@ -64,10 +64,10 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 							<?php
 							if ($this->item->thumb)
 							{
-							?>
+								?>
 								<a href="<?php echo JURI::root().'media/com_eventbooking/images/'.$this->item->thumb; ?>" class="modal"><img src="<?php echo JURI::root().'media/com_eventbooking/images/thumbs/'.$this->item->thumb; ?>" class="img_preview" /></a>
 								<input type="checkbox" name="del_thumb" value="1" /><?php echo JText::_('EB_DELETE_CURRENT_THUMB'); ?>
-							<?php
+								<?php
 							}
 							?>
 						</div>
@@ -162,10 +162,10 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 							echo $this->lists['available_attachment'];
 							if ($this->item->attachment)
 							{
-							?>
+								?>
 								<?php echo JText::_('EB_CURRENT_ATTACHMENT'); ?>&nbsp;<a href="<?php echo JURI::root().'media/com_eventbooking/'.$this->item->attachment; ?>" target="_blank"><?php echo $this->item->attachment; ?></a>
 								<input type="checkbox" name="del_attachment" value="1" /><?php echo JText::_('EB_DELETE_CURRENT_ATTACHMENT'); ?>
-							<?php
+								<?php
 							}
 							?>
 						</div>
@@ -271,21 +271,6 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 							<?php echo EventbookingHelperHtml::getBooleanInput('featured', $this->item->featured); ?>
 						</div>
 					</div>
-					<?php
-						if ($translatable)
-						{
-						?>
-							<div class="control-group">
-								<label class="control-label">
-									<?php echo JText::_('EB_LANGUAGE'); ?>
-								</label>
-								<div class="controls">
-									<?php echo $this->lists['language']; ?>
-								</div>
-							</div>
-						<?php
-						}
-					?>
 					<div class="control-group">
 						<label class="control-label">
 							<?php echo JText::_('EB_PUBLISHED'); ?>

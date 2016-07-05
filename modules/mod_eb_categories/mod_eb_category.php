@@ -25,11 +25,6 @@ $query->select('a.id, a.name' . $fieldSuffix . ' AS name')
 	->where('a.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
 	->order('a.ordering');
 
-if (JLanguageMultilang::isEnabled())
-{
-	$query->where('a.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
-}
-
 if ($numberCategories)
 {
 	$db->setQuery($query, 0, $numberCategories);
@@ -45,5 +40,4 @@ if (!$itemId)
 {
 	$itemId = EventbookingHelper::getItemid();
 }
-
 require(JModuleHelper::getLayoutPath('mod_eb_category', 'default'));

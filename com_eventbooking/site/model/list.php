@@ -259,11 +259,6 @@ class EventbookingModelList extends RADModelList
 			}
 		}
 
-		if (JLanguageMultilang::isEnabled())
-		{
-			$query->where('tbl.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
-		}
-
 		return $this;
 	}
 

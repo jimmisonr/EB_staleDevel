@@ -34,8 +34,6 @@ else
 		$coordinates = '37.09024,-95.712891';
 	}
 }
-
-$translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function(pressbutton) {
@@ -234,7 +232,7 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 			</div>
 		</div>
 		<?php
-			if ($translatable)
+			if (JLanguageMultilang::isEnabled())
 			{
 			?>
 				<div class="control-group">
