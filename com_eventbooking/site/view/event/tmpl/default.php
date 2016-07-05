@@ -101,7 +101,13 @@ $offset = JFactory::getConfig()->get('offset');
 		?>
 		<div class="eb-description-details clearfix" itemprop="description">
 			<?php
-				if ($item->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$item->thumb))
+				if ($this->config->display_large_image && $item->image && file_exists(JPATH_ROOT . '/' . $item->image))
+				{
+				?>
+					<img src="<?php echo JUri::base(true) . '/' . $item->image; ?>" class="img-polaroid"/>
+				<?php
+				}
+				elseif ($item->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $item->thumb))
 				{
 				?>
 					<a href="<?php echo JUri::base(true).'/media/com_eventbooking/images/'.$item->thumb; ?>" class="eb-modal"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$item->thumb; ?>" class="eb-thumb-left"/></a>
