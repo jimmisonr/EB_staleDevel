@@ -63,6 +63,17 @@ class EventbookingModelList extends RADModelList
 	);
 
 	/**
+	 * Fields which could be translated
+	 *
+	 * @var array
+	 */
+	public static $translatableFields = array(
+		'tbl.title',
+		'tbl.short_description',
+		'tbl.description'
+	);
+
+	/**
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
@@ -149,7 +160,14 @@ class EventbookingModelList extends RADModelList
 		$config      = EventbookingHelper::getConfig();
 		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$query->select(static::$fields)
+
+		$fieldsToSelect = static::$fields;
+		if ($fieldSuffix)
+		{
+			$fieldsToSelect = array_diff($fieldsToSelect, static::$translatableFields);
+		}
+
+		$query->select($fieldsToSelect)
 			->select("DATEDIFF(tbl.early_bird_discount_date, '$currentDate') AS date_diff")
 			->select("DATEDIFF('$currentDate', tbl.late_fee_date) AS late_fee_date_diff")
 			->select("DATEDIFF(tbl.event_date, '$currentDate') AS number_event_dates")
@@ -257,6 +275,13 @@ class EventbookingModelList extends RADModelList
 			{
 				$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.cut_off_date) >= ' . $currentDate . ')');
 			}
+		}
+
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		if ($fieldSuffix)
+		{
+			$query->where($db->quoteName('tbl.title' . $fieldSuffix) . ' != ""')
+				->where($db->quoteName('tbl.title' . $fieldSuffix) . ' IS NOT NULL');
 		}
 
 		return $this;

@@ -60,6 +60,8 @@ if ($params->get('only_show_featured_events', 0))
 if ($fieldSuffix)
 {
 	$query->select('a.title' . $fieldSuffix . ' AS title');
+	$query->where($db->quoteName('a.title' . $fieldSuffix) . ' != ""')
+		->where($db->quoteName('a.title' . $fieldSuffix) . ' IS NOT NULL');
 }
 
 if ($categoryIds)
@@ -80,8 +82,8 @@ for ($i = 0, $n = count($rows); $i < $n; $i++)
 	$row = $rows[$i];
 	$query->where('b.event_id = ' . $row->id);
 	$db->setQuery($query);
-	$categories = $db->loadObjectList();
-	$row->number_categories  = count($categories);
+	$categories             = $db->loadObjectList();
+	$row->number_categories = count($categories);
 	if (count($categories))
 	{
 		$itemCategories = array();

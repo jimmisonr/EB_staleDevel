@@ -90,6 +90,14 @@ class EventbookingModelCategories extends RADModelList
 			->where('tbl.parent=' . $this->state->id)
 			->where('tbl.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
 
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		if ($fieldSuffix)
+		{
+			$db = $this->getDbo();
+			$query->where($db->quoteName('tbl.name' . $fieldSuffix) . ' != ""')
+				->where($db->quoteName('tbl.name' . $fieldSuffix) . ' IS NOT NULL');
+		}
+
 		return $this;
 	}
 }

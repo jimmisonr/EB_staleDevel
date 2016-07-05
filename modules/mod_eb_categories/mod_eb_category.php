@@ -25,6 +25,12 @@ $query->select('a.id, a.name' . $fieldSuffix . ' AS name')
 	->where('a.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
 	->order('a.ordering');
 
+if ($fieldSuffix)
+{
+	$query->where($db->quoteName('a.name' . $fieldSuffix) . ' != ""')
+		->where($db->quoteName('a.name' . $fieldSuffix) . ' IS NOT NULL ');
+}
+
 if ($numberCategories)
 {
 	$db->setQuery($query, 0, $numberCategories);
