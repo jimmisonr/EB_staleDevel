@@ -482,6 +482,38 @@ class EventbookingController extends RADControllerAdmin
 		//Events table
 		$fields = array_keys($db->getTableColumns('#__eb_events'));
 
+		if (!in_array('image', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `image` VARCHAR( 255 ) NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+
+			if (!JFolder::exists(JPATH_ROOT . '/images/com_eventbooking'))
+			{
+				JFolder::create(JPATH_ROOT . '/images/com_eventbooking');
+			}
+
+			$sql = 'SELECT thumb FROM #__eb_events WHERE thumb IS NOT NULL';
+			$db->setQuery($sql);
+			$thumbs = $db->loadColumn();
+			if (count($thumbs))
+			{
+				$oldImagePath = JPATH_ROOT . '/media/com_eventbooking/images/';
+				$newImagePath = JPATH_ROOT . '/images/com_eventbooking/';
+				foreach ($thumbs as $thumb)
+				{
+					if ($thumb && file_exists($oldImagePath . $thumb))
+					{
+						JFile::copy($oldImagePath . $thumb, $newImagePath . $thumb);
+					}
+				}
+
+				$sql = 'UPDATE #__eb_events SET `image` = CONCAT("images/com_eventbooking/", `thumb`) WHERE thumb IS NOT NULL';
+				$db->setQuery($sql);
+				$db->execute();
+			}
+		}
+
 		if (!in_array('featured', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `featured` TINYINT NOT NULL DEFAULT  '0' ;";
