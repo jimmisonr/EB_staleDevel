@@ -603,6 +603,7 @@ abstract class EventbookingHelperHtml
 		$element = new SimpleXMLElement('<field />');
 		$element->addAttribute('name', $fieldName);
 		$element->addAttribute('class', 'readonly input-large');
+		$element->addAttribute('preview','true');
 
 		$form = JForm::getInstance('sample-form', '<form> </form>');
 		$field->setForm($form);
