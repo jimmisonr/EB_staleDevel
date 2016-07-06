@@ -37,6 +37,7 @@
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_membershippro.zip</file>
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_field.zip</file>
 	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_dates.zip</file>
+	   <file type="plugin" id="eventbooking" group="eventbooking">plug_eventbooking_tickettypes.zip</file>
 	   <file type="plugin" id="eventbooking" group="content">plug_content_ebevent.zip</file>
 	   <file type="plugin" id="eventbooking" group="content">plug_content_ebregister.zip</file>	   
 	   <file type="plugin" id="eventbooking" group="content">plug_content_ebcategory.zip</file>	   
