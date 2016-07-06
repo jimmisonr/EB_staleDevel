@@ -250,6 +250,11 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			$form->setEventId($eventId);
 		}
 
+		if ($event->has_multiple_ticket_types)
+		{
+			$this->ticketTypes = EventbookingHelperData::getTicketTypes($event->id);
+		}
+
 		// Assign these parameters
 		$this->paymentMethod        = $paymentMethod;
 		$this->config               = $config;

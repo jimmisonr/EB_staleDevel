@@ -85,6 +85,12 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	<div class="eb-message"><?php echo $msg ; ?></div>
 	<?php
 	}
+
+	if (!$this->waitingList && !empty($this->ticketTypes))
+	{
+		echo $this->loadTemplate('tickets');
+	}
+
 	if (!$this->userId && $this->config->user_registration)
 	{
 		$validateLoginForm = true;
