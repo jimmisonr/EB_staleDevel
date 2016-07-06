@@ -86,11 +86,6 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	<?php
 	}
 
-	if (!$this->waitingList && !empty($this->ticketTypes))
-	{
-		echo $this->loadTemplate('tickets');
-	}
-
 	if (!$this->userId && $this->config->user_registration)
 	{
 		$validateLoginForm = true;
@@ -141,6 +136,11 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	?>
 	<form method="post" name="adminForm" id="adminForm" action="<?php echo $url; ?>" autocomplete="off" class="form form-horizontal" enctype="multipart/form-data">
 	<?php
+		if (!$this->waitingList && !empty($this->ticketTypes))
+		{
+			echo $this->loadTemplate('tickets');
+		}
+
 		if (!$this->userId && $this->config->user_registration)
 		{
 			$params = JComponentHelper::getParams('com_users');
