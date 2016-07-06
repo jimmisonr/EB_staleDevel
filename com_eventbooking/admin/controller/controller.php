@@ -521,6 +521,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('has_multiple_ticket_types', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `has_multiple_ticket_types` TINYINT NOT NULL DEFAULT  '0' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		// Discounts
 		if (!in_array('discount_groups', $fields))
 		{
