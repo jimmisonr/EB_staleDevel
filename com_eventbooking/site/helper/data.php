@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @version            2.7.1
  * @package            Joomla
@@ -348,6 +349,34 @@ class EventbookingHelperData
 		return $parents;
 	}
 
+	/**
+	 * Get all ticket types of this event
+	 *
+	 * @param $eventId
+	 *
+	 * @return array
+	 */
+	public static function getTicketTypes($eventId)
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('*')
+			->from('#__eb_ticket_types')
+			->where('event_id = ' . $eventId)
+			->order('id');
+		$db->setQuery($query);
+
+		return $db->loadObjectList();
+	}
+
+	/***
+	 * Get categories used to generate breadcrump
+	 *
+	 * @param $id
+	 * @param $parentId
+	 *
+	 * @return array
+	 */
 	public static function getCategoriesBreadcrumb($id, $parentId)
 	{
 		$db          = JFactory::getDbo();
@@ -417,7 +446,7 @@ class EventbookingHelperData
 	 * @param $rows
 	 * @param $config
 	 * @param $rowFields
-	 * @param $fieldValues		
+	 * @param $fieldValues
 	 *
 	 * @throws Exception
 	 */
@@ -457,11 +486,11 @@ class EventbookingHelperData
 			}
 
 			// Determine whether we need to show payment method column
-			$db = JFactory::getDbo();
+			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('name, title')
-					->from('#__eb_payment_plugins')
-					->where('published=1');
+				->from('#__eb_payment_plugins')
+				->where('published=1');
 			$db->setQuery($query);
 			$plugins = $db->loadObjectList('name');
 
