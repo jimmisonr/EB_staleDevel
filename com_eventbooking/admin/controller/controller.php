@@ -2261,6 +2261,29 @@ class EventbookingController extends RADControllerAdmin
 			}
 		}
 
+		// Ticket types db structure
+		$sql = 'CREATE TABLE IF NOT EXISTS `#__eb_ticket_types` (
+			  `id` int(11) NOT NULL AUTO_INCREMENT,
+			  `event_id` int(11) DEFAULT NULL,
+			  `title` varchar(255) DEFAULT NULL,
+			  `description` text,
+			  `price` decimal(10,2) DEFAULT NULL,
+			  `capacity` int(11) DEFAULT NULL,
+			  PRIMARY KEY (`id`)
+		  ) DEFAULT CHARSET=utf8;';
+		$db->setQuery($sql);
+		$db->execute();
+
+		$sql = 'CREATE TABLE IF NOT EXISTS `#__eb_registrant_tickets` (
+			  `id` int(11) NOT NULL AUTO_INCREMENT,
+			  `registrant_id` int(11) DEFAULT NULL,
+			  `ticket_type_id` int(11) DEFAULT NULL,
+			  `quantity` int(11) DEFAULT NULL,
+			  PRIMARY KEY (`id`)
+			)DEFAULT CHARSET=utf8;';
+		$db->setQuery($sql);
+		$db->execute();
+
 		// Try to delete the file com_eventbooking.zip from tmp folder
 		$tmpFolder = JFactory::getConfig()->get('tmp_path');
 		if (!JFolder::exists($tmpFolder))
