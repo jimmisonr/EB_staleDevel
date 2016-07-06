@@ -996,6 +996,19 @@ class EventbookingHelper
 		$couponCode = isset($data['coupon_code']) ? $data['coupon_code'] : '';
 
 		$totalAmount           = $event->individual_price + $form->calculateFee(array('NUMBER_REGISTRANTS' => 1, 'INDIVIDUAL_PRICE' => $event->individual_price));
+
+		if ($event->has_multiple_ticket_types)
+		{
+			$ticketTypes = EventbookingHelperData::getTicketTypes($event->id);
+			foreach ($ticketTypes as $ticketType)
+			{
+				if (!empty($data['ticket_type_' . $ticketType->id]))
+				{
+					$totalAmount += (int) $data['ticket_type_' . $ticketType->id] * $ticketType->price;
+				}
+			}
+		}
+
 		$discountAmount        = 0;
 		$fees['discount_rate'] = 0;
 		$nullDate              = $db->getNullDate();

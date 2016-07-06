@@ -175,7 +175,7 @@ function calculateIndividualRegistrationFee()
 		$.ajax({
 			type: 'POST',
 			url: siteUrl + 'index.php?option=com_eventbooking&task=register.calculate_individual_registration_fee&payment_method=' + paymentMethod + langLinkForAjax,
-			data: $('#adminForm input[name=\'event_id\'], #adminForm input[name=\'coupon_code\'], #adminForm .payment-calculation input[type=\'text\'], #adminForm .payment-calculation input[type=\'checkbox\']:checked, #adminForm .payment-calculation input[type=\'radio\']:checked, #adminForm .payment-calculation select'),
+			data: $('select.ticket_type_quantity, #adminForm input[name=\'event_id\'], #adminForm input[name=\'coupon_code\'], #adminForm .payment-calculation input[type=\'text\'], #adminForm .payment-calculation input[type=\'checkbox\']:checked, #adminForm .payment-calculation input[type=\'radio\']:checked, #adminForm .payment-calculation select'),
 			dataType: 'json',
 			success: function(msg, textStatus, xhr) {
 				$('#btn-submit').removeAttr('disabled');
