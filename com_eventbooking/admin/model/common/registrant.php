@@ -140,6 +140,9 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 					$memberForm->storeData($rowMember->id, $memberData);
 				}
 			}
+
+			$this->storeRegistrantTickets($row, $data);
+
 			if ($row->published == 1 && $published == 0)
 			{
 				//Change from pending to paid, trigger event, send emails
@@ -172,7 +175,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				$row->payment_method = 'os_offline';
 			}
 
-			$row->register_date  = JFactory::getDate()->toSql();
+			$row->register_date = JFactory::getDate()->toSql();
 
 			// In case total amount is not entered, calculate it automatically
 			if (empty($row->total_amount))
@@ -196,6 +199,8 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			}
 			$row->store();
 			$form->storeData($row->id, $data);
+
+			$this->storeRegistrantTickets($row, $data);
 
 			if ($row->published == 1)
 			{
@@ -346,5 +351,50 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 		$row->checked_in       = 0;
 
 		$row->store();
+	}
+
+	/**
+	 * Store registrant tickets data when the record is created/updated in the backend
+	 *
+	 * @param JTable $row
+	 * @param array  $data
+	 */
+	private function storeRegistrantTickets($row, $data)
+	{
+		$event = EventbookingHelperDatabase::getEvent($row->event_id);
+		if ($event->has_multiple_ticket_types)
+		{
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->delete('#__eb_registrant_tickets')
+				->where('registrant_id = ' . $row->id);
+			$db->setQuery($query)
+				->execute();
+
+			$ticketTypes       = EventbookingHelperData::getTicketTypes($row->event_id);
+			$numberRegistrants = 0;
+			foreach ($ticketTypes as $ticketType)
+			{
+				if (!empty($data['ticket_type_' . $ticketType->id]))
+				{
+					$quantity = (int) $data['ticket_type_' . $ticketType->id];
+					$query->clear()
+						->insert('#__eb_registrant_tickets')
+						->columns('registrant_id, ticket_type_id, quantity')
+						->values("$row->id, $ticketType->id, $quantity");
+					$db->setQuery($query)
+						->execute();
+
+					$numberRegistrants += $quantity;
+				}
+			}
+
+			$query->clear('')
+				->update('#__eb_registrants')
+				->set('number_registrants = ' . $numberRegistrants)
+				->where('id = ' . $row->id);
+			$db->setQuery($query)
+				->execute();
+		}
 	}
 }
