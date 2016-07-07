@@ -1170,3 +1170,11 @@ span.eb-uploaded-file
     margin-top: 5px;
     font-weight: bold;
 }
+.table th.eb-text-right, .table td.eb-text-right
+{
+    text-align: right !important;
+}
+.table th.eb-text-left, .table td.eb-text-left
+{
+    text-align: left;
+}

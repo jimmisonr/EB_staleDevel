@@ -11,6 +11,55 @@
 defined('_JEXEC') or die;
 $nullDate = JFactory::getDbo()->getNullDate();
 ?>
+<?php
+if (!empty($ticketTypes))
+{
+?>
+	<h3 class="eb-heading"><?php echo JText::_('EB_TICKET_INFORMATION'); ?></h3>
+	<table class="table table-striped table-bordered table-condensed">
+		<thead>
+		<tr>
+			<th>
+				<?php echo JText::_('EB_TICKET_TYPE'); ?>
+			</th>
+			<th class="eb-text-right">
+				<?php echo JText::_('EB_PRICE'); ?>
+			</th>
+			<th class="center">
+				<?php echo JText::_('EB_QUANTITY'); ?>
+			</th>
+			<th class="eb-text-right">
+				<?php echo JText::_('EB_SUB_TOTAL'); ?>
+			</th>
+		</tr>
+		</thead>
+		<tbody>
+		<?php
+		foreach ($ticketTypes as $ticketType)
+		{
+		?>
+			<tr>
+				<td>
+					<?php echo $ticketType->title; ?>
+				</td>
+				<td class="eb-text-right">
+					<?php echo EventbookingHelper::formatCurrency($ticketType->price, $config); ?>
+				</td>
+				<td class="center">
+					<?php echo $ticketType->quantity; ?>
+				</td>
+				<td class="eb-text-right">
+					<?php echo EventbookingHelper::formatCurrency($ticketType->price*$ticketType->quantity, $config); ?>
+				</td>
+			</tr>
+		<?php
+		}
+		?>
+		</tbody>
+	</table>
+<?php
+}
+?>
 <table width="100%" class="os_table" cellspacing="2" cellpadding="2">
 	<tr>
 		<td class="title_cell">

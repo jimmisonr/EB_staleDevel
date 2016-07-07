@@ -995,7 +995,7 @@ class EventbookingHelper
 		$query      = $db->getQuery(true);
 		$couponCode = isset($data['coupon_code']) ? $data['coupon_code'] : '';
 
-		$totalAmount           = $event->individual_price + $form->calculateFee(array('NUMBER_REGISTRANTS' => 1, 'INDIVIDUAL_PRICE' => $event->individual_price));
+		$totalAmount = $event->individual_price + $form->calculateFee(array('NUMBER_REGISTRANTS' => 1, 'INDIVIDUAL_PRICE' => $event->individual_price));
 
 		if ($event->has_multiple_ticket_types)
 		{
@@ -2602,6 +2602,17 @@ class EventbookingHelper
 				$db->setQuery($query);
 				$rowMembers         = $db->loadObjectList();
 				$data['rowMembers'] = $rowMembers;
+			}
+
+			if ($rowEvent->has_multiple_ticket_types)
+			{
+				$query->clear()
+					->select('a.*, b.quantity')
+					->from('#__eb_ticket_types AS a')
+					->innerJoin('#__eb_registrant_tickets AS b ON a.id = ticket_type_id')
+					->where('b.registrant_id = ' . $row->id);
+				$db->setQuery($query);
+				$data['ticketTypes'] = $db->loadObjectList();
 			}
 		}
 
@@ -4624,8 +4635,8 @@ class EventbookingHelper
 	 */
 	public static function updateParentMaxEventDate($parentId)
 	{
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
+		$db       = JFactory::getDbo();
+		$query    = $db->getQuery(true);
 		$nullDate = $db->getNullDate();
 		$query->select('MAX(event_date) AS max_event_date, MAX(cut_off_date) AS max_cut_off_date')
 			->from('#__eb_events')
