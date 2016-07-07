@@ -266,24 +266,33 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 					}
 				}
 			}
+
 			$cids = implode(',', $cid);
 			$query->select('id')
 				->from('#__eb_registrants')
 				->where('group_id IN (' . $cids . ')');
 			$db->setQuery($query);
-			$cid = array_merge($cid, $db->loadColumn());
-			$query->clear();
 
+			$cid           = array_merge($cid, $db->loadColumn());
 			$registrantIds = implode(',', $cid);
 
-			$query->delete('#__eb_field_values')->where('registrant_id IN (' . $registrantIds . ')');
-			$db->setQuery($query);
-			$db->execute();
-			$query->clear();
+			$query->clear()
+				->delete('#__eb_field_values')
+				->where('registrant_id IN (' . $registrantIds . ')');
+			$db->setQuery($query)
+				->execute();
 
-			$query->delete('#__eb_registrants')->where('id IN (' . $registrantIds . ')');
-			$db->setQuery($query);
-			$db->execute();
+			$query->clear()
+				->delete('#__eb_registrants')
+				->where('id IN (' . $registrantIds . ')');
+			$db->setQuery($query)
+				->execute();
+
+			$query->clear()
+				->delete('#__eb_registrant_tickets')
+				->where('registrant_id IN (' . $registrantIds . ')');
+			$db->setQuery($query)
+				->execute();
 		}
 
 		return true;
