@@ -360,10 +360,13 @@ class EventbookingHelperData
 	{
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('*')
-			->from('#__eb_ticket_types')
-			->where('event_id = ' . $eventId)
-			->order('id');
+		$query->select('a.*')
+			->select('IFNULL(SUM(b.quantity), 0) AS registered')
+			->from('#__eb_ticket_types AS a')
+			->leftJoin('#__eb_registrant_tickets AS b ON a.id = b.ticket_type_id')
+			->leftJoin('#__eb_registrants AS c ON b.registrant_id = c.id AND c.event_id= ' . $eventId . ' AND c.group_id = 0 AND (c.published = 1 OR (c.payment_method LIKE "os_offline%" AND c.published NOT IN (2,3)))')
+			->where('a.event_id = ' . $eventId)
+			->group('a.id');
 		$db->setQuery($query);
 
 		return $db->loadObjectList();

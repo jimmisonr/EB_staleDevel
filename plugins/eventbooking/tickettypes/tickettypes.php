@@ -157,31 +157,19 @@ class plgEventBookingTicketTypes extends JPlugin
 		$event = EventbookingHelperDatabase::getEvent($row->event_id);
 		if ($event->has_multiple_ticket_types)
 		{
-			$db = JFactory::getDbo();
+			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
-			$query->select('*')
+			$query->select('SUM(quantity)')
 				->from('#__eb_registrant_tickets')
-				->where('registrant_id = '. $row->id);
+				->where('registrant_id = ' . $row->id);
 			$db->setQuery($query);
-			$tickets = $db->loadObjectList();
-
-			$numberRegistrants = 0;
-			foreach($tickets as $ticket)
-			{
-				$numberRegistrants += $ticket->quantity;
-
-				$query->clear()
-					->update('#__eb_ticket_types')
-					->set('registered = registered + '.$ticket->quantity)
-					->where('id = '. $ticket->ticket_type_id);
-				$db->setQuery($query);
-				$db->execute();
-			}
+			$numberRegistrants = (int) $db->loadResult();
 
 			$row->number_registrants = $numberRegistrants;
 			$row->store();
 		}
 	}
+
 	/**
 	 * Display form allows users to change settings on subscription plan add/edit screen
 	 *
