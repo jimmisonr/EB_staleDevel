@@ -25,14 +25,6 @@ $selectedState = '';
 	</div>
 	<div class="control-group">
 		<label class="control-label">
-			<?php echo  JText::_('EB_USER'); ?>
-		</label>
-		<div class="controls">
-			<?php echo EventbookingHelper::getUserInput($this->item->user_id,'user_id',(int) $this->item->id) ; ?>
-		</div>
-	</div>
-	<div class="control-group">
-		<label class="control-label">
 			<?php echo  JText::_('EB_NB_REGISTRANTS'); ?>
 		</label>
 		<div class="controls">
@@ -52,6 +44,51 @@ $selectedState = '';
 		</div>
 	</div>
 	<?php
+		if (!empty($this->ticketTypes))
+		{
+		?>
+			<h3><?php echo JText::_('EB_TICKET_INFORMATION'); ?></h3>
+		<?php
+			foreach($this->ticketTypes AS $ticketType)
+			{
+				$available = $ticketType->capacity - $ticketType->registered;
+				?>
+				<div class="control-group">
+					<label class="control-label">
+						<?php echo  $ticketType->title; ?>
+					</label>
+					<div class="controls">
+						<?php
+						if ($available > 0)
+						{
+							$quantity = 0;
+							if (!empty($this->registrantTickets[$ticketType->id]))
+							{
+								$quantity = $this->registrantTickets[$ticketType->id]->quantity;
+							}
+							$fieldName = 'ticket_type_'.$ticketType->id;
+							echo JHtml::_('select.integerlist', 0, $available, 1, $fieldName, 'class="ticket_type_quantity input-small"', $quantity);
+						}
+						else
+						{
+							echo JText::_('EB_NA');
+						}
+						?>
+					</div>
+				</div>
+				<?php
+			}
+		}
+		?>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo  JText::_('EB_USER'); ?>
+			</label>
+			<div class="controls">
+				<?php echo EventbookingHelper::getUserInput($this->item->user_id,'user_id',(int) $this->item->id) ; ?>
+			</div>
+		</div>
+		<?php
 		$fields = $this->form->getFields();
 		if (isset($fields['state']))
 		{
