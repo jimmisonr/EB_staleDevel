@@ -120,6 +120,69 @@ class plgEventBookingTicketTypes extends JPlugin
 	}
 
 	/**
+	 * Generate invoice number after registrant complete payment for registration
+	 *
+	 * @param $row
+	 *
+	 * @return bool
+	 */
+	public function onAfterPaymentSuccess($row)
+	{
+		if (strpos($row->payment_method, 'os_offline') === false)
+		{
+			$this->processTicketTypes($row);
+		}
+	}
+
+	/**
+	 * Generate invoice number after registrant complete registration in case he uses offline payment
+	 *
+	 * @param $row
+	 */
+	public function onAfterStoreRegistrant($row)
+	{
+		if (strpos($row->payment_method, 'os_offline') !== false)
+		{
+			$this->processTicketTypes($row);
+		}
+	}
+
+	/**
+	 * Process ticket types data after registration is completed:
+	 *
+	 * @param $row
+	 */
+	private function processTicketTypes($row)
+	{
+		$event = EventbookingHelperDatabase::getEvent($row->event_id);
+		if ($event->has_multiple_ticket_types)
+		{
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('*')
+				->from('#__eb_registrant_tickets')
+				->where('registrant_id = '. $row->id);
+			$db->setQuery($query);
+			$tickets = $db->loadObjectList();
+
+			$numberRegistrants = 0;
+			foreach($tickets as $ticket)
+			{
+				$numberRegistrants += $ticket->quantity;
+
+				$query->clear()
+					->update('#__eb_ticket_types')
+					->set('registered = registered + '.$ticket->quantity)
+					->where('id = '. $ticket->ticket_type_id);
+				$db->setQuery($query);
+				$db->execute();
+			}
+
+			$row->number_registrants = $numberRegistrants;
+			$row->store();
+		}
+	}
+	/**
 	 * Display form allows users to change settings on subscription plan add/edit screen
 	 *
 	 * @param object $row
