@@ -638,17 +638,17 @@ $offset = JFactory::getConfig()->get('offset');
 							$registrationUrl = trim($item->registration_handle_url);
 							if ($registrationUrl)
 							{
-								?>
+							?>
 								<li>
 									<a class="<?php echo $btnClass; ?>" href="<?php echo $registrationUrl; ?>" target="_blank"><?php echo JText::_('EB_REGISTER');; ?></a>
 								</li>
-								<?php
+							<?php
 							}
 							else
 							{
 								if ($item->registration_type == 0 || $item->registration_type == 1)
 								{
-									if ($this->config->multiple_booking)
+									if ($this->config->multiple_booking && !$item->has_multiple_ticket_types)
 									{
 										$url        = 'index.php?option=com_eventbooking&task=cart.add_cart&id=' . (int) $item->id . '&Itemid=' . (int) $this->Itemid;
 										if ($item->event_password)
@@ -664,7 +664,15 @@ $offset = JFactory::getConfig()->get('offset');
 									else
 									{
 										$url        = JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id=' . $item->id . '&Itemid=' . $this->Itemid, false, $ssl);
-										$text       = JText::_('EB_REGISTER_INDIVIDUAL');
+										if ($item->has_multiple_ticket_types)
+										{
+											$text       = JText::_('EB_REGISTER');
+										}
+										else
+										{
+											$text       = JText::_('EB_REGISTER_INDIVIDUAL');
+										}
+
 										$extraClass = '';
 									}
 									?>
@@ -674,13 +682,14 @@ $offset = JFactory::getConfig()->get('offset');
 									</li>
 									<?php
 								}
-								if (($item->registration_type == 0 || $item->registration_type == 2) && !$this->config->multiple_booking)
+
+								if (($item->registration_type == 0 || $item->registration_type == 2) && !$this->config->multiple_booking && !$item->has_multiple_ticket_types)
 								{
-									?>
+								?>
 									<li>
 										<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
 									</li>
-									<?php
+								<?php
 								}
 							}
 						}

@@ -59,7 +59,8 @@ class EventbookingModelList extends RADModelList
 		'tbl.language',
 		'tbl.alias',
 		'tbl.tax_rate',
-		'tbl.featured'
+		'tbl.featured',
+		'tbl.has_multiple_ticket_types'
 	);
 
 	/**
