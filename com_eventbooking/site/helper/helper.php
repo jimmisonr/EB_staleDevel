@@ -3003,6 +3003,20 @@ class EventbookingHelper
 			}
 		}
 
+		if ($event->has_multiple_ticket_types)
+		{
+			$ticketTypes = EventbookingHelperData::getTicketTypes($event->id);
+
+			foreach ($ticketTypes as $ticketType)
+			{
+				if ($ticketType->capacity > $ticketType->registered)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
 
 		return true;
 	}
