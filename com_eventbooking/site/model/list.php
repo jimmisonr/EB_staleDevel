@@ -143,6 +143,18 @@ class EventbookingModelList extends RADModelList
 					}
 				}
 			}
+
+			if ($config->display_ticket_types)
+			{
+				foreach($rows as $row)
+				{
+					if ($row->has_multiple_ticket_types)
+					{
+						$row->ticketTypes = EventbookingHelperData::getTicketTypes($row->id);
+					}
+				}
+			}
+			
 			$this->data = $rows;
 		}
 

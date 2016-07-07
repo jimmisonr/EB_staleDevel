@@ -685,6 +685,21 @@ JHtml::_('script', 'jui/cms.js', false, true);
 					<?php echo $this->lists['order_direction'] ; ?>
 				</div>
 			</div>
+			<?php
+			if (JPluginHelper::isEnabled('eventbooking', 'tickettypes'))
+			{
+			?>
+				<div class="control-group">
+					<div class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('display_ticket_types', JText::_('EB_DISPLAY_TICKET_TYPES'), JText::_('EB_DISPLAY_TICKET_TYPES_EXPLAIN')); ?>
+					</div>
+					<div class="controls">
+						<?php echo EventbookingHelperHtml::getBooleanInput('display_ticket_types', $config->display_ticket_types); ?>
+					</div>
+				</div>
+			<?php
+			}
+			?>
 			<div class="control-group">
 				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('show_capacity', JText::_('EB_SHOW_EVENT_CAPACITY')); ?>

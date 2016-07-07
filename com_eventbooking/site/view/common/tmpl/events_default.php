@@ -446,6 +446,14 @@ $return = base64_encode(JUri::getInstance()->toString());
 						</div>
 				</div>
 				<?php
+				if (!empty($event->ticketTypes))
+				{
+					echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/tickettypes.php', array('ticketTypes' => $event->ticketTypes, 'config' => $config));
+				?>
+					<div class="clearfix"></div>
+				<?php
+				}
+
 				$ticketsLeft = $event->event_capacity - $event->total_registrants ;
 				if ($event->individual_price > 0 || $ticketsLeft > 0)
 				{

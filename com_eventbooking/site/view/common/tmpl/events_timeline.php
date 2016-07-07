@@ -248,7 +248,15 @@ $return = base64_encode(JUri::getInstance()->toString());
 						?>
 					</div>
 				<?php
-				} 
+				}
+
+	            if (!empty($event->ticketTypes))
+	            {
+		            echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/tickettypes.php', array('ticketTypes' => $event->ticketTypes, 'config' => $config));
+		        ?>
+		            <div class="clearfix"></div>
+		        <?php
+	            }
             ?>
 			<div class="eb-taskbar clearfix">
 				<ul>

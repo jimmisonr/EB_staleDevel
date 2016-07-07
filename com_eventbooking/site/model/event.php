@@ -100,6 +100,11 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 				}
 			}
 
+			if ($config->display_ticket_types && $row->has_multiple_ticket_types)
+			{
+				$row->ticketTypes = EventbookingHelperData::getTicketTypes($row->id);
+			}
+
 			return $rows[0];
 		}
 

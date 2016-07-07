@@ -601,6 +601,13 @@ $offset = JFactory::getConfig()->get('offset');
 	</div>
 	<div class="clearfix"></div>
 	<?php
+	if (!empty($item->ticketTypes))
+	{
+		echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/tickettypes.php', array('ticketTypes' => $item->ticketTypes, 'config' => $this->config));
+	?>
+		<div class="clearfix"></div>
+	<?php
+	}
 	$ticketsLeft = $item->event_capacity - $item->total_registrants ;
 	if ($item->individual_price > 0 || $ticketsLeft > 0)
 	{
