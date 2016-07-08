@@ -137,6 +137,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			}
 		}
 
+
 		if (count($rowMembers))
 		{
 			$this->memberFormFields = EventbookingHelper::getFormFields($item->event_id, 2, $item->language);
@@ -154,6 +155,34 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		else
 		{
 			$canChangeFeeFields = false;
+		}
+
+		$event = EventbookingHelperDatabase::getEvent($item->event_id);
+
+		if ($event->has_multiple_ticket_types)
+		{
+			$this->ticketTypes = EventbookingHelperData::getTicketTypes($event->id);
+
+			$registrantTickets = array();
+			if ($item->id)
+			{
+				$query->clear()
+					->select('*')
+					->from('#__eb_registrant_tickets')
+					->where('registrant_id = ' . (int) $item->id);
+				$db->setQuery($query);
+				$registrantTickets = $db->loadObjectList('ticket_type_id');
+			}
+
+			$this->registrantTickets = $registrantTickets;
+
+			$canChangeTicketsQuantity = false;
+			if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
+			{
+				$canChangeTicketsQuantity = true;
+			}
+
+			$this->canChangeTicketsQuantity = $canChangeTicketsQuantity;
 		}
 
 		$this->item               = $item;

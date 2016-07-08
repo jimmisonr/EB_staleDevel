@@ -18,7 +18,7 @@ $selectedState = '';
       method="post" name="adminForm" id="adminForm">
 	<table width="100%">
 		<tr>
-			<td width="100" class="title_cell">
+			<td class="title_cell">
 				<?php echo JText::_('EB_EVENT'); ?>
 			</td>
 			<td class="field_cell">
@@ -46,8 +46,8 @@ $selectedState = '';
 				}
 				else
 				{
-					?>
-					<input class="text_area validate[required,custom[number]]" type="text" name="number_registrants"
+				?>
+					<input class="input-small validate[required,custom[number]]" type="text" name="number_registrants"
 					       id="number_registrants" size="40" maxlength="250" value=""/>
 					<small><?php echo JText::_('EB_NUMBER_REGISTRANTS_EXPLAIN'); ?></small>
 				<?php
@@ -56,6 +56,59 @@ $selectedState = '';
 			</td>
 		</tr>
 		<?php
+
+		if (!empty($this->ticketTypes))
+		{
+		?>
+			<tr>
+				<td colspan="2">
+					<h3><?php echo JText::_('EB_TICKET_INFORMATION'); ?></h3>
+				</td>
+			</tr>
+			<?php
+			foreach ($this->ticketTypes AS $ticketType)
+			{
+				$available = $ticketType->capacity - $ticketType->registered;
+				$quantity  = 0;
+				if (!empty($this->registrantTickets[$ticketType->id]))
+				{
+					$quantity = $this->registrantTickets[$ticketType->id]->quantity;
+				}
+				?>
+				<tr>
+					<td class="title_cell">
+						<?php echo $ticketType->title; ?>
+					</td>
+					<td>
+						<?php
+						if ($available > 0 || $quantity > 0)
+						{
+							$fieldName = 'ticket_type_' . $ticketType->id;
+							if ($available < $quantity)
+							{
+								$available = $quantity;
+							}
+
+							if ($this->canChangeTicketsQuantity)
+							{
+								echo JHtml::_('select.integerlist', 0, $available, 1, $fieldName, 'class="ticket_type_quantity input-small"' . $extra, $quantity);
+							}
+							else
+							{
+								echo $quantity;
+							}
+						}
+						else
+						{
+							echo JText::_('EB_NA');
+						}
+						?>
+					</td>
+				</tr>
+				<?php
+			}
+		}
+
 		$fields = $this->form->getFields();
 		if (isset($fields['state']))
 		{
