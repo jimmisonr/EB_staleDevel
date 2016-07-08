@@ -358,18 +358,46 @@ class EventbookingHelperData
 	 */
 	public static function getTicketTypes($eventId)
 	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('a.*')
-			->select('IFNULL(SUM(b.quantity), 0) AS registered')
-			->from('#__eb_ticket_types AS a')
-			->leftJoin('#__eb_registrant_tickets AS b ON a.id = b.ticket_type_id')
-			->leftJoin('#__eb_registrants AS c ON b.registrant_id = c.id AND c.event_id= ' . $eventId . ' AND c.group_id = 0 AND (c.published = 1 OR (c.payment_method LIKE "os_offline%" AND c.published NOT IN (2,3)))')
-			->where('a.event_id = ' . $eventId)
-			->group('a.id');
-		$db->setQuery($query);
+		static $ticketTypes;
 
-		return $db->loadObjectList();
+		if (!isset($ticketTypes[$eventId]))
+		{
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('*, 0 AS registered')
+				->from('#__eb_ticket_types')
+				->where('event_id = ' . $eventId);
+			$db->setQuery($query);
+			$rows = $db->loadObjectList();
+
+			$query->clear()
+				->select('a.ticket_type_id')
+				->select('IFNULL(SUM(a.quantity), 0) AS registered')
+				->from('#__eb_registrant_tickets AS a')
+				->innerJoin('#__eb_registrants AS b ON a.registrant_id = b.id')
+				->where('b.event_id = '. $eventId)
+				->where('b.group_id = 0')
+				->where('(b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3)))')
+				->group('a.ticket_type_id');
+			$db->setQuery($query);
+			$rowTickets = $db->loadObjectList('ticket_type_id');
+
+			if (count($rowTickets))
+			{
+				foreach($rows as $row)
+				{
+					if (isset($rowTickets[$row->id]))
+					{
+						$row->registered = $rowTickets[$row->id]->registered;
+					}
+				}
+			}
+
+			$ticketTypes[$eventId] = $rows;
+		}
+
+		return $ticketTypes[$eventId];
+
 	}
 
 	/***
