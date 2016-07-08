@@ -52,6 +52,11 @@ $selectedState = '';
 			foreach($this->ticketTypes AS $ticketType)
 			{
 				$available = $ticketType->capacity - $ticketType->registered;
+				$quantity = 0;
+				if (!empty($this->registrantTickets[$ticketType->id]))
+				{
+					$quantity = $this->registrantTickets[$ticketType->id]->quantity;
+				}
 				?>
 				<div class="control-group">
 					<label class="control-label">
@@ -59,14 +64,13 @@ $selectedState = '';
 					</label>
 					<div class="controls">
 						<?php
-						if ($available > 0)
+						if ($available > 0 || $quantity > 0)
 						{
-							$quantity = 0;
-							if (!empty($this->registrantTickets[$ticketType->id]))
-							{
-								$quantity = $this->registrantTickets[$ticketType->id]->quantity;
-							}
 							$fieldName = 'ticket_type_'.$ticketType->id;
+							if ($available < $quantity)
+							{
+								$available = $quantity;
+							}
 							echo JHtml::_('select.integerlist', 0, $available, 1, $fieldName, 'class="ticket_type_quantity input-small"', $quantity);
 						}
 						else
