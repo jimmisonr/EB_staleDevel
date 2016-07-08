@@ -370,8 +370,9 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	 */
 	private function storeRegistrantTickets($row, $data)
 	{
+		$user  = JFactory::getUser();
 		$event = EventbookingHelperDatabase::getEvent($row->event_id);
-		if ($event->has_multiple_ticket_types)
+		if ($event->has_multiple_ticket_types && $user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
