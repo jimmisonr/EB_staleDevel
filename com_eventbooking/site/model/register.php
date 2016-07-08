@@ -177,6 +177,14 @@ class EventBookingModelRegister extends RADModel
 		if ($event->has_multiple_ticket_types && !$waitingList)
 		{
 			$ticketTypes = EventbookingHelperData::getTicketTypes($eventId);
+
+			$ticketTypesValues = explode(',', $data['ticket_type_values']);
+			foreach ($ticketTypesValues as $ticketValue)
+			{
+				$ticketInfo           = explode(':', $ticketValue);
+				$data[$ticketInfo[0]] = $ticketInfo[1];
+			}
+			
 			foreach ($ticketTypes as $ticketType)
 			{
 				if (!empty($data['ticket_type_' . $ticketType->id]))
