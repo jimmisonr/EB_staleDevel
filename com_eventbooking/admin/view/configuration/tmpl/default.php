@@ -697,6 +697,14 @@ JHtml::_('script', 'jui/cms.js', false, true);
 						<?php echo EventbookingHelperHtml::getBooleanInput('display_ticket_types', $config->display_ticket_types); ?>
 					</div>
 				</div>
+				<div class="control-group">
+					<div class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('calculate_number_registrants_base_on_tickets_quantity', JText::_('EB_NUMBER_REGISTRANTS_CALCULATION'), JText::_('EB_NUMBER_REGISTRANTS_CALCULATION_EXPLAIN')); ?>
+					</div>
+					<div class="controls">
+						<?php echo EventbookingHelperHtml::getBooleanInput('calculate_number_registrants_base_on_tickets_quantity', $config->calculate_number_registrants_base_on_tickets_quantity); ?>
+					</div>
+				</div>
 			<?php
 			}
 			?>

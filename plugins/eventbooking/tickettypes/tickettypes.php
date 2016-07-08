@@ -154,8 +154,9 @@ class plgEventBookingTicketTypes extends JPlugin
 	 */
 	private function processTicketTypes($row)
 	{
+		$config = EventbookingHelper::getConfig();
 		$event = EventbookingHelperDatabase::getEvent($row->event_id);
-		if ($event->has_multiple_ticket_types)
+		if ($event->has_multiple_ticket_types && $config->calculate_number_registrants_base_on_tickets_quantity)
 		{
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
@@ -177,14 +178,18 @@ class plgEventBookingTicketTypes extends JPlugin
 	 */
 	private function drawSettingForm($row)
 	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('*')
-			->from('#__eb_ticket_types')
-			->where('event_id=' . $row->id)
-			->order('id');
-		$db->setQuery($query);
-		$ticketTypes = $db->loadObjectList();
+		$ticketTypes = array();
+		if ($row->id)
+		{
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('*')
+				->from('#__eb_ticket_types')
+				->where('event_id=' . $row->id)
+				->order('id');
+			$db->setQuery($query);
+			$ticketTypes = $db->loadObjectList();
+		}
 		?>
 		<div class="row-fluid">
 			<div class="span5">

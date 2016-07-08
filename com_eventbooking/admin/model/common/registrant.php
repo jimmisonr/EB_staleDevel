@@ -399,12 +399,16 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				}
 			}
 
-			$query->clear('')
-				->update('#__eb_registrants')
-				->set('number_registrants = ' . $numberRegistrants)
-				->where('id = ' . $row->id);
-			$db->setQuery($query)
-				->execute();
+			$config = EventbookingHelper::getConfig();
+			if ($config->calculate_number_registrants_base_on_tickets_quantity)
+			{
+				$query->clear('')
+					->update('#__eb_registrants')
+					->set('number_registrants = ' . $numberRegistrants)
+					->where('id = ' . $row->id);
+				$db->setQuery($query)
+					->execute();
+			}
 		}
 	}
 }
