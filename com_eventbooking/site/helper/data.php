@@ -375,7 +375,7 @@ class EventbookingHelperData
 				->select('IFNULL(SUM(a.quantity), 0) AS registered')
 				->from('#__eb_registrant_tickets AS a')
 				->innerJoin('#__eb_registrants AS b ON a.registrant_id = b.id')
-				->where('b.event_id = '. $eventId)
+				->where('b.event_id = ' . $eventId)
 				->where('b.group_id = 0')
 				->where('(b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3)))')
 				->group('a.ticket_type_id');
@@ -384,7 +384,7 @@ class EventbookingHelperData
 
 			if (count($rowTickets))
 			{
-				foreach($rows as $row)
+				foreach ($rows as $row)
 				{
 					if (isset($rowTickets[$row->id]))
 					{
@@ -478,13 +478,15 @@ class EventbookingHelperData
 	 * @param $config
 	 * @param $rowFields
 	 * @param $fieldValues
+	 * @param $eventId
 	 *
 	 * @throws Exception
 	 */
-	public static function csvExport($rows, $config, $rowFields, $fieldValues)
+	public static function csvExport($rows, $config, $rowFields, $fieldValues, $eventId = 0)
 	{
 		if (count($rows))
 		{
+			error_reporting(E_ALL);
 			$browser   = JFactory::getApplication()->client->browser;
 			$mime_type = ($browser == JApplicationWebClient::IE || $browser == JApplicationWebClient::OPERA) ? 'application/octetstream' : 'application/octet-stream';
 			$filename  = "registrants_list";
@@ -531,6 +533,38 @@ class EventbookingHelperData
 				$showPaymentMethodColumn = true;
 			}
 
+			if ($eventId)
+			{
+				$event = EventbookingHelperDatabase::getEvent($eventId);
+				if ($event->has_multiple_ticket_types)
+				{
+					$ticketTypes = EventbookingHelperData::getTicketTypes($eventId);
+
+					$ticketTypeIds = array();
+					foreach ($ticketTypes as $ticketType)
+					{
+						$ticketTypeIds[] = $ticketType->id;
+					}
+
+
+					$db    = JFactory::getDbo();
+					$query = $db->getQuery(true);
+					$query->select('registrant_id, ticket_type_id, quantity')
+						->from('#__eb_registrant_tickets')
+						->where('ticket_type_id IN (' . implode(',', $ticketTypeIds) . ')');
+					$db->setQuery($query);
+
+
+					$registrantTickets = $db->loadObjectList();
+
+					$tickets = array();
+					foreach ($registrantTickets as $registrantTicket)
+					{
+						$tickets[$registrantTicket->registrant_id][$registrantTicket->ticket_type_id] = $registrantTicket->quantity;
+					}
+				}
+			}
+
 			$fields   = array();
 			$fields[] = JText::_('EB_EVENT');
 			if ($config->show_event_date)
@@ -546,6 +580,14 @@ class EventbookingHelperData
 				foreach ($rowFields as $rowField)
 				{
 					$fields[] = $rowField->title;
+				}
+			}
+
+			if (!empty($ticketTypes))
+			{
+				foreach ($ticketTypes as $ticketType)
+				{
+					$fields[] = $ticketType->title;
 				}
 			}
 			$fields[] = JText::_('EB_NUMBER_REGISTRANTS');
@@ -611,6 +653,21 @@ class EventbookingHelperData
 							$fieldValue = implode(', ', json_decode($fieldValue));
 						}
 						$fields[] = $fieldValue;
+					}
+				}
+
+				if (!empty($ticketTypes))
+				{
+					foreach ($ticketTypes as $ticketType)
+					{
+						if (!empty($tickets[$r->id][$ticketType->id]))
+						{
+							$fields[] = $tickets[$r->id][$ticketType->id];
+						}
+						else
+						{
+							$fields[] = 0;
+						}
 					}
 				}
 
