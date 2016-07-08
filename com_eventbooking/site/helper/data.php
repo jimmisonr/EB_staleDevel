@@ -366,7 +366,8 @@ class EventbookingHelperData
 			$query = $db->getQuery(true);
 			$query->select('*, 0 AS registered')
 				->from('#__eb_ticket_types')
-				->where('event_id = ' . $eventId);
+				->where('event_id = ' . $eventId)
+				->order('id');
 			$db->setQuery($query);
 			$rows = $db->loadObjectList();
 
