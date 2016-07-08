@@ -2269,25 +2269,26 @@ class EventbookingController extends RADControllerAdmin
 		}
 
 		// Ticket types db structure
-		$sql = 'CREATE TABLE IF NOT EXISTS `#__eb_ticket_types` (
+		$sql = "CREATE TABLE IF NOT EXISTS `#__eb_ticket_types` (
 			  `id` int(11) NOT NULL AUTO_INCREMENT,
 			  `event_id` int(11) DEFAULT NULL,
 			  `title` varchar(255) DEFAULT NULL,
 			  `description` text,
 			  `price` decimal(10,2) DEFAULT NULL,
 			  `capacity` int(11) DEFAULT NULL,
+			  `max_tickets_per_booking` int(11) NOT NULL DEFAULT '0',
 			  PRIMARY KEY (`id`)
-		  ) DEFAULT CHARSET=utf8;';
+		  ) DEFAULT CHARSET=utf8;";
 		$db->setQuery($sql);
 		$db->execute();
 
-		$sql = 'CREATE TABLE IF NOT EXISTS `#__eb_registrant_tickets` (
+		$sql = "CREATE TABLE IF NOT EXISTS `#__eb_registrant_tickets` (
 			  `id` int(11) NOT NULL AUTO_INCREMENT,
 			  `registrant_id` int(11) DEFAULT NULL,
 			  `ticket_type_id` int(11) DEFAULT NULL,
 			  `quantity` int(11) DEFAULT NULL,
 			  PRIMARY KEY (`id`)
-			)DEFAULT CHARSET=utf8;';
+			)DEFAULT CHARSET=utf8;";
 		$db->setQuery($sql);
 		$db->execute();
 

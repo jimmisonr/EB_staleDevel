@@ -63,7 +63,11 @@ defined('_JEXEC') or die;
 					<?php
 						if ($available > 0)
 						{
-							$fieldName = 'ticket_type_'.$ticketType->id;
+							$fieldName = 'ticket_type_' . $ticketType->id;
+							if ($ticketType->max_tickets_per_booking > 0)
+							{
+								$available = min($available, $ticketType->max_tickets_per_booking);
+							}
 							echo JHtml::_('select.integerlist', 0, $available, 1, $fieldName, 'class="ticket_type_quantity input-small" onchange="calculateIndividualRegistrationFee();"', $this->input->getInt($fieldName, 0));
 						}
 						else

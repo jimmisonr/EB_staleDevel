@@ -57,11 +57,12 @@ class plgEventBookingTicketTypes extends JPlugin
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 
-		$ids          = $data['ticket_type_id'];
-		$titles       = $data['ticket_type_title'];
-		$prices       = $data['ticket_type_price'];
-		$descriptions = $data['ticket_type_description'];
-		$capacities   = $data['ticket_type_capacity'];
+		$ids                   = $data['ticket_type_id'];
+		$titles                = $data['ticket_type_title'];
+		$prices                = $data['ticket_type_price'];
+		$descriptions          = $data['ticket_type_description'];
+		$capacities            = $data['ticket_type_capacity'];
+		$maxTicketsPerBookings = $data['ticket_type_max_tickets_per_booking'];
 
 		$hasMultipleTicketTypes = 0;
 		for ($i = 0, $n = count($titles); $i < $n; $i++)
@@ -83,10 +84,11 @@ class plgEventBookingTicketTypes extends JPlugin
 			}
 
 
-			$title       = $db->quote(trim($titles[$i]));
-			$description = $db->quote(trim($descriptions[$i]));
-			$price       = (float) $prices[$i];
-			$capacity    = (int) $capacities[$i];
+			$title                = $db->quote(trim($titles[$i]));
+			$description          = $db->quote(trim($descriptions[$i]));
+			$price                = (float) $prices[$i];
+			$capacity             = (int) $capacities[$i];
+			$maxTicketsPerBooking = (int) $maxTicketsPerBookings[$i];
 
 			$query->clear();
 			if ($id)
@@ -96,13 +98,14 @@ class plgEventBookingTicketTypes extends JPlugin
 					->set('description = ' . $description)
 					->set('price = ' . $price)
 					->set('capacity = ' . $capacity)
+					->set('max_tickets_per_booking = ' . $maxTicketsPerBooking)
 					->where('id = ' . $id);
 			}
 			else
 			{
 				$query->insert('#__eb_ticket_types')
-					->columns('event_id, title, description, price, capacity')
-					->values("$row->id, $title, $description ,$price, $capacity");
+					->columns('event_id, title, description, price, capacity, max_tickets_per_booking')
+					->values("$row->id, $title, $description ,$price, $capacity, $maxTicketsPerBooking");
 			}
 
 			$db->setQuery($query)
@@ -155,7 +158,7 @@ class plgEventBookingTicketTypes extends JPlugin
 	private function processTicketTypes($row)
 	{
 		$config = EventbookingHelper::getConfig();
-		$event = EventbookingHelperDatabase::getEvent($row->event_id);
+		$event  = EventbookingHelperDatabase::getEvent($row->event_id);
 		if ($event->has_multiple_ticket_types && $config->calculate_number_registrants_base_on_tickets_quantity)
 		{
 			$db    = JFactory::getDbo();
@@ -199,6 +202,7 @@ class plgEventBookingTicketTypes extends JPlugin
 						<th class="nowrap center"><?php echo JText::_('EB_TITLE'); ?></th>
 						<th class="nowrap center"><?php echo JText::_('EB_PRICE'); ?></th>
 						<th class="nowrap center"><?php echo JText::_('EB_CAPACITY'); ?></th>
+						<th class="nowrap center"><?php echo JText::_('EB_MAX_TICKETS_PER_BOOKING'); ?></th>
 						<th class="nowrap center"><?php echo JText::_('EB_DESCRIPTION'); ?></th>
 						<th class="nowrap center"><?php echo JText::_('EB_REMOVE'); ?></th>
 					</tr>
@@ -217,8 +221,8 @@ class plgEventBookingTicketTypes extends JPlugin
 							$ticketType              = new stdClass;
 							$ticketType->id          = 0;
 							$ticketType->title       = '';
-							$ticketType->description = '';
 							$ticketType->price       = '';
+							$ticketType->description = '';
 						}
 						?>
 						<tr id="option_<?php echo $i; ?>">
@@ -231,6 +235,8 @@ class plgEventBookingTicketTypes extends JPlugin
 							           value="<?php echo $ticketType->price; ?>"/></td>
 							<td><input type="text" class="input-mini" name="ticket_type_capacity[]"
 							           value="<?php echo $ticketType->capacity; ?>"/></td>
+							<td><input type="text" class="input-mini" name="ticket_type_max_tickets_per_booking[]"
+							           value="<?php echo $ticketType->max_tickets_per_booking; ?>"/></td>
 							<td><input type="text" class="input-xlarge" name="ticket_type_description[]"
 							           value="<?php echo $ticketType->description; ?>"/></td>
 							<td>
@@ -261,6 +267,7 @@ class plgEventBookingTicketTypes extends JPlugin
 					html += '<td><input type="hidden" name="ticket_type_id[]" value = "0" /><input type="text" class="input-medium" name="ticket_type_title[]" value="" /></td>';
 					html += '<td><input type="text" class="input-mini" name="ticket_type_price[]" value="" /></td>';
 					html += '<td><input type="text" class="input-mini" name="ticket_type_capacity[]" value="" /></td>';
+					html += '<td><input type="text" class="input-mini" name="ticket_type_max_tickets_per_booking[]" value="" /></td>';
 					html += '<td><input type="text" class="input-xlarge" name="ticket_type_description[]" value="" /></td>';
 					html += '<td><button type="button" class="btn btn-danger" onclick="removeEventContainer(' + countOption + ')"><i class="icon-remove"></i><?php echo JText::_('EB_REMOVE'); ?></button></td>';
 					html += '</tr>';
