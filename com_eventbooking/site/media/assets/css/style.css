@@ -1178,6 +1178,15 @@ span.eb-uploaded-file
 {
     text-align: left;
 }
+td.eb-ticket-type-title
+{
+	font-weight: bold;
+}
+p.eb-ticket-type-description
+{
+	font-weight: normal;
+	font-size: 85%;
+}
 .eb-event-large-image
 {
 }

@@ -38,8 +38,16 @@ defined('_JEXEC') or die;
 		{
 		?>
 			<tr>
-				<td>
+				<td class="eb-ticket-type-title">
 					<?php echo $ticketType->title; ?>
+					<?php 
+						if ($ticketType->description)
+						{
+						?>
+							<p class="eb-ticket-type-description"><?php echo $ticketType->description; ?></p>
+						<?php
+						}
+					?>
 				</td>
 				<td class="eb-text-right">
 					<?php echo EventbookingHelper::formatCurrency($ticketType->price, $config); ?>
