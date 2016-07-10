@@ -184,14 +184,7 @@ class plgEventBookingTicketTypes extends JPlugin
 		$ticketTypes = array();
 		if ($row->id)
 		{
-			$db    = JFactory::getDbo();
-			$query = $db->getQuery(true);
-			$query->select('*')
-				->from('#__eb_ticket_types')
-				->where('event_id=' . $row->id)
-				->order('id');
-			$db->setQuery($query);
-			$ticketTypes = $db->loadObjectList();
+			$ticketTypes = EventbookingHelperData::getTicketTypes($row->id);
 		}
 		?>
 		<div class="row-fluid">
@@ -204,6 +197,7 @@ class plgEventBookingTicketTypes extends JPlugin
 						<th class="nowrap center"><?php echo JText::_('EB_CAPACITY'); ?></th>
 						<th class="nowrap center"><?php echo JText::_('EB_MAX_TICKETS_PER_BOOKING'); ?></th>
 						<th class="nowrap center"><?php echo JText::_('EB_DESCRIPTION'); ?></th>
+						<th class="nowrap center"><?php echo JText::_('EB_REGISTERED'); ?></th>
 						<th class="nowrap center"><?php echo JText::_('EB_REMOVE'); ?></th>
 					</tr>
 					</thead>
@@ -223,6 +217,7 @@ class plgEventBookingTicketTypes extends JPlugin
 							$ticketType->title       = '';
 							$ticketType->price       = '';
 							$ticketType->description = '';
+							$ticketType->registered  = 0;
 						}
 						?>
 						<tr id="option_<?php echo $i; ?>">
@@ -239,6 +234,7 @@ class plgEventBookingTicketTypes extends JPlugin
 							           value="<?php echo $ticketType->max_tickets_per_booking; ?>"/></td>
 							<td><input type="text" class="input-xlarge" name="ticket_type_description[]"
 							           value="<?php echo $ticketType->description; ?>"/></td>
+							<td class="center"><?php echo $ticketType->registered; ?></td>
 							<td>
 								<button type="button" class="btn btn-danger"
 								        onclick="removeEventContainer(<?php echo $i; ?>)"><i
@@ -269,6 +265,7 @@ class plgEventBookingTicketTypes extends JPlugin
 					html += '<td><input type="text" class="input-mini" name="ticket_type_capacity[]" value="" /></td>';
 					html += '<td><input type="text" class="input-mini" name="ticket_type_max_tickets_per_booking[]" value="" /></td>';
 					html += '<td><input type="text" class="input-xlarge" name="ticket_type_description[]" value="" /></td>';
+					html += '<td class="center">0</td>';
 					html += '<td><button type="button" class="btn btn-danger" onclick="removeEventContainer(' + countOption + ')"><i class="icon-remove"></i><?php echo JText::_('EB_REMOVE'); ?></button></td>';
 					html += '</tr>';
 					$('#additional_options').append(html);
