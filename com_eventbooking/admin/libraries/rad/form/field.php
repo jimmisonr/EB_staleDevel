@@ -437,8 +437,7 @@ abstract class RADFormField
 		}
 		else
 		{
-			return '<tr>' . '<td class="title_cell">' . $this->title . '</td>' . '<td class="field_cell">' .
-			$fieldValue . '</td>' . '</tr>';
+			return '<tr><td class="title_cell">' . $this->title . '</td><td class="field_cell">' .$fieldValue . "</td></tr>\r\n";
 		}
 	}
 
