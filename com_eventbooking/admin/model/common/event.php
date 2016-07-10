@@ -858,19 +858,29 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		$db->setQuery($query);
 		$cid  = array_merge($cid, $db->loadColumn());
 		$cids = implode(',', $cid);
+
 		//Delete price setting for events
-		$query->clear();
-		$query->delete('#__eb_event_group_prices')->where('event_id IN (' . $cids . ')');
+		$query->clear()
+			->delete('#__eb_event_group_prices')->where('event_id IN (' . $cids . ')');
 		$db->setQuery($query);
 		$db->execute();
+
 		//Delete categories for the event
-		$query->clear();
-		$query->delete('#__eb_event_categories')->where('event_id IN (' . $cids . ')');
+		$query->clear()
+			->delete('#__eb_event_categories')->where('event_id IN (' . $cids . ')');
 		$db->setQuery($query);
 		$db->execute();
+
+		// Delete ticket types related to events
+		$query->clear()
+			->delete('#__eb_ticket_types')
+			->where('event_id IN (' . $cids . ')');
+		$db->setQuery($query);
+		$db->execute();
+
 		//Delete events themself
-		$query->clear();
-		$query->delete('#__eb_events')->where('id IN (' . $cids . ')');
+		$query->clear()
+			->delete('#__eb_events')->where('id IN (' . $cids . ')');
 		$db->setQuery($query);
 		$db->execute();
 
