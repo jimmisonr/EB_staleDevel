@@ -706,6 +706,13 @@ class EventbookingHelper
 		$query    = $db->getQuery(true);
 		$replaces = array();
 
+		$Itemid = JFactory::getApplication()->input->getInt('Itemid', 0);
+
+		if (!$Itemid)
+		{
+			$Itemid = self::getItemid();
+		}
+
 		// Event information
 		if ($config->multiple_booking)
 		{
@@ -739,6 +746,31 @@ class EventbookingHelper
 		$replaces['short_description'] = $event->short_description;
 		$replaces['description']       = $event->description;
 		$replaces['event_link']        = self::getSiteUrl() . 'index.php?option=com_eventbooking&view=event&id=' . $event->id . '&Itemid=' . $Itemid;
+
+		// Add support for group members name tags
+		if ($row->is_group_billing)
+		{
+			$groupMembersNames = array();
+
+			$query->clear()
+				->select('first_name, last_name')
+				->from('#__eb_registrants')
+				->where('group_id = '.$row->id)
+				->order('id');
+			$db->setQuery($query);
+			$rowMembers = $db->loadObjectList();
+
+			foreach ($rowMembers as $rowMember)
+			{
+				$groupMembersNames[] = trim($rowMember->first_name . ' ' . $rowMember->last_name);
+			}
+		}
+		else
+		{
+			$groupMembersNames = array(trim($row->first_name.' '.$row->last_name));
+		}
+
+		$replaces['group_members_names'] = implode(', ', $groupMembersNames);
 
 		// Event custom fields
 		if ($config->event_custom_field && file_exists(JPATH_ROOT . '/components/com_eventbooking/fields.xml'))
@@ -950,13 +982,6 @@ class EventbookingHelper
 		$enableCancel = $db->loadResult();
 		if ($enableCancel)
 		{
-			$Itemid = JFactory::getApplication()->input->getInt('Itemid', 0);
-
-			if (!$Itemid)
-			{
-				$Itemid = self::getItemid();
-			}
-
 			$replaces['cancel_registration_link'] = self::getSiteUrl() . 'index.php?option=com_eventbooking&task=registrant.cancel&cancel_code=' . $row->registration_code . '&Itemid=' . $Itemid;
 		}
 		else
