@@ -104,7 +104,7 @@ $offset = JFactory::getConfig()->get('offset');
 				if ($this->config->display_large_image && $item->image && file_exists(JPATH_ROOT . '/' . $item->image))
 				{
 				?>
-					<img src="<?php echo JUri::base(true) . '/' . $item->image; ?>" class="img-polaroid"/>
+					<img src="<?php echo JUri::base(true) . '/' . $item->image; ?>" class="eb-event-large-image img-polaroid"/>
 				<?php
 				}
 				elseif ($item->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $item->thumb))
