@@ -183,7 +183,6 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			echo $field->getControlGroup($bootstrapHelper);
 		}
 
-		if (($this->totalAmount > 0) || $this->form->containFeeFields())
 		{
 			$showPaymentInformation = true;
 		?>
