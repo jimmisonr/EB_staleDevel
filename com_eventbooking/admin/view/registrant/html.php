@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -119,17 +119,17 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 			$this->item->payment_status);
 
 		// Payment methods
-		$options                       = array();
-		$options[]                     = JHtml::_('select.option', '', JText::_('EB_PAYMENT_METHOD'), 'name', 'title');
+		$options   = array();
+		$options[] = JHtml::_('select.option', '', JText::_('EB_PAYMENT_METHOD'), 'name', 'title');
 		$query->clear()
 			->select('name, title')
 			->from('#__eb_payment_plugins')
 			->where('published = 1')
 			->order('ordering');
 		$db->setQuery($query);
-		$options = array_merge($options, $db->loadObjectList());
+		$options                       = array_merge($options, $db->loadObjectList());
 		$this->lists['payment_method'] = JHtml::_('select.genericlist', $options, 'payment_method', ' class="inputbox" ', 'name', 'title',
-				$this->item->payment_method ? $this->item->payment_method : 'os_offline');
+			$this->item->payment_method ? $this->item->payment_method : 'os_offline');
 
 		if (count($rowMembers))
 		{
@@ -139,6 +139,24 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		if ($config->activate_checkin_registrants)
 		{
 			$this->lists['checked_in'] = JHtml::_('select.booleanlist', 'checked_in', ' class="inputbox" ', $this->item->checked_in);
+		}
+
+		if ($event->has_multiple_ticket_types)
+		{
+			$this->ticketTypes = EventbookingHelperData::getTicketTypes($event->id);
+
+			$registrantTickets = array();
+			if ($this->item->id)
+			{
+				$query->clear()
+					->select('*')
+					->from('#__eb_registrant_tickets')
+					->where('registrant_id = ' . (int) $this->item->id);
+				$db->setQuery($query);
+				$registrantTickets = $db->loadObjectList('ticket_type_id');
+			}
+
+			$this->registrantTickets = $registrantTickets;
 		}
 
 		$this->config     = $config;

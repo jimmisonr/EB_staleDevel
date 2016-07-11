@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -59,7 +59,8 @@ class EventbookingModelList extends RADModelList
 		'tbl.language',
 		'tbl.alias',
 		'tbl.tax_rate',
-		'tbl.featured'
+		'tbl.featured',
+		'tbl.has_multiple_ticket_types'
 	);
 
 	/**
@@ -142,6 +143,18 @@ class EventbookingModelList extends RADModelList
 					}
 				}
 			}
+
+			if ($config->display_ticket_types)
+			{
+				foreach($rows as $row)
+				{
+					if ($row->has_multiple_ticket_types)
+					{
+						$row->ticketTypes = EventbookingHelperData::getTicketTypes($row->id);
+					}
+				}
+			}
+			
 			$this->data = $rows;
 		}
 

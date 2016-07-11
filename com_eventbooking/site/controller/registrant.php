@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -260,7 +260,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		$fieldValues = $model->getFieldsData($fieldIds);
 
-		EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues);
+		EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues, $eventId);
 	}
 
 	/**

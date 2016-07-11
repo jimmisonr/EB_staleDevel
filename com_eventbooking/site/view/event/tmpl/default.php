@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -101,7 +101,13 @@ $offset = JFactory::getConfig()->get('offset');
 		?>
 		<div class="eb-description-details clearfix" itemprop="description">
 			<?php
-				if ($item->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$item->thumb))
+				if ($this->config->display_large_image && $item->image && file_exists(JPATH_ROOT . '/' . $item->image))
+				{
+				?>
+					<img src="<?php echo JUri::base(true) . '/' . $item->image; ?>" class="eb-event-large-image img-polaroid"/>
+				<?php
+				}
+				elseif ($item->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $item->thumb))
 				{
 				?>
 					<a href="<?php echo JUri::base(true).'/media/com_eventbooking/images/'.$item->thumb; ?>" class="eb-modal"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$item->thumb; ?>" class="eb-thumb-left"/></a>
@@ -126,8 +132,13 @@ $offset = JFactory::getConfig()->get('offset');
 			}
 			else
 			{
+				$leftCssClass = 'span8';
+				if (empty($this->rowGroupRates))
+				{
+					$leftCssClass = 'span12';
+				}
 			?>
-				<div id="eb-event-info-left" class="<?php echo $bootstrapHelper->getClassMapping('span8'); ?>">
+				<div id="eb-event-info-left" class="<?php echo $bootstrapHelper->getClassMapping($leftCssClass); ?>">
 					<h3 id="eb-event-properties-heading">
 						<?php echo JText::_('EB_EVENT_PROPERTIES'); ?>
 					</h3>
@@ -538,63 +549,68 @@ $offset = JFactory::getConfig()->get('offset');
 					}
 					?>
 				</div>
+				<?php
+				if (count($this->rowGroupRates))
+				{
+				?>
 				<div id="eb-event-info-right" class="<?php echo $bootstrapHelper->getClassMapping('span4'); ?>">
-					<?php
-					if (count($this->rowGroupRates))
-					{
-						?>
-						<h3 id="eb-event-group-rates-heading">
-							<?php echo JText::_('EB_GROUP_RATE'); ?>
-						</h3>
-						<table class="table table-bordered table-striped">
-							<thead>
-							<tr>
-								<th class="eb_number_registrant_column">
-									<?php echo JText::_('EB_NUMBER_REGISTRANTS'); ?>
-								</th>
-								<th class="sectiontableheader eb_rate_column">
-									<?php echo JText::_('EB_RATE_PERSON'); ?>(<?php echo $this->item->currency_symbol ? $this->item->currency_symbol : $this->config->currency_symbol; ?>)
-								</th>
-							</tr>
-							</thead>
-							<tbody>
-							<?php
-							$i = 0 ;
-							if ($this->config->show_price_including_tax)
-							{
-								$taxRate = $this->item->tax_rate;
-							}
-							else
-							{
-								$taxRate = 0;
-							}
-							foreach ($this->rowGroupRates as $rowRate)
-							{
-								$groupRate = round($rowRate->price * (1 + $taxRate / 100), 2);
-								?>
-								<tr>
-									<td class="eb_number_registrant_column">
-										<?php echo $rowRate->registrant_number ; ?>
-									</td>
-									<td class="eb_rate_column">
-										<?php echo EventbookingHelper::formatAmount($groupRate, $this->config); ?>
-									</td>
-								</tr>
-								<?php
-							}
-							?>
-							</tbody>
-						</table>
+					<h3 id="eb-event-group-rates-heading">
+						<?php echo JText::_('EB_GROUP_RATE'); ?>
+					</h3>
+					<table class="table table-bordered table-striped">
+						<thead>
+						<tr>
+							<th class="eb_number_registrant_column">
+								<?php echo JText::_('EB_NUMBER_REGISTRANTS'); ?>
+							</th>
+							<th class="sectiontableheader eb_rate_column">
+								<?php echo JText::_('EB_RATE_PERSON'); ?>(<?php echo $this->item->currency_symbol ? $this->item->currency_symbol : $this->config->currency_symbol; ?>)
+							</th>
+						</tr>
+						</thead>
+						<tbody>
 						<?php
-					}
-					?>
+						$i = 0 ;
+						if ($this->config->show_price_including_tax)
+						{
+							$taxRate = $this->item->tax_rate;
+						}
+						else
+						{
+							$taxRate = 0;
+						}
+						foreach ($this->rowGroupRates as $rowRate)
+						{
+							$groupRate = round($rowRate->price * (1 + $taxRate / 100), 2);
+						?>
+							<tr>
+								<td class="eb_number_registrant_column">
+									<?php echo $rowRate->registrant_number ; ?>
+								</td>
+								<td class="eb_rate_column">
+									<?php echo EventbookingHelper::formatAmount($groupRate, $this->config); ?>
+								</td>
+							</tr>
+						<?php
+						}
+						?>
+						</tbody>
+					</table>
 				</div>
-			<?php
+				<?php
+				}
 			}
 			?>
 	</div>
 	<div class="clearfix"></div>
 	<?php
+	if (!empty($item->ticketTypes))
+	{
+		echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/tickettypes.php', array('ticketTypes' => $item->ticketTypes, 'config' => $this->config));
+	?>
+		<div class="clearfix"></div>
+	<?php
+	}
 	$ticketsLeft = $item->event_capacity - $item->total_registrants ;
 	if ($item->individual_price > 0 || $ticketsLeft > 0)
 	{
@@ -632,17 +648,17 @@ $offset = JFactory::getConfig()->get('offset');
 							$registrationUrl = trim($item->registration_handle_url);
 							if ($registrationUrl)
 							{
-								?>
+							?>
 								<li>
 									<a class="<?php echo $btnClass; ?>" href="<?php echo $registrationUrl; ?>" target="_blank"><?php echo JText::_('EB_REGISTER');; ?></a>
 								</li>
-								<?php
+							<?php
 							}
 							else
 							{
 								if ($item->registration_type == 0 || $item->registration_type == 1)
 								{
-									if ($this->config->multiple_booking)
+									if ($this->config->multiple_booking && !$item->has_multiple_ticket_types)
 									{
 										$url        = 'index.php?option=com_eventbooking&task=cart.add_cart&id=' . (int) $item->id . '&Itemid=' . (int) $this->Itemid;
 										if ($item->event_password)
@@ -658,7 +674,15 @@ $offset = JFactory::getConfig()->get('offset');
 									else
 									{
 										$url        = JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id=' . $item->id . '&Itemid=' . $this->Itemid, false, $ssl);
-										$text       = JText::_('EB_REGISTER_INDIVIDUAL');
+										if ($item->has_multiple_ticket_types)
+										{
+											$text       = JText::_('EB_REGISTER');
+										}
+										else
+										{
+											$text       = JText::_('EB_REGISTER_INDIVIDUAL');
+										}
+
 										$extraClass = '';
 									}
 									?>
@@ -668,13 +692,14 @@ $offset = JFactory::getConfig()->get('offset');
 									</li>
 									<?php
 								}
-								if (($item->registration_type == 0 || $item->registration_type == 2) && !$this->config->multiple_booking)
+
+								if (($item->registration_type == 0 || $item->registration_type == 2) && !$this->config->multiple_booking && !$item->has_multiple_ticket_types)
 								{
-									?>
+								?>
 									<li>
 										<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
 									</li>
-									<?php
+								<?php
 								}
 							}
 						}

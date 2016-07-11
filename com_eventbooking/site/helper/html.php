@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -593,5 +593,23 @@ abstract class EventbookingHelperHtml
 		}
 		$html .= '</ul>';
 		echo $html;
+	}
+
+	public static function getMediaInput($value, $fieldName = 'image')
+	{
+		JHtml::_('jquery.framework');
+		$field = JFormHelper::loadFieldType('Media');
+
+		$element = new SimpleXMLElement('<field />');
+		$element->addAttribute('name', $fieldName);
+		$element->addAttribute('class', 'readonly input-large');
+		$element->addAttribute('preview', 'tooltip');
+		$element->addAttribute('directory', 'com_eventbooking');
+
+		$form = JForm::getInstance('sample-form', '<form> </form>');
+		$field->setForm($form);
+		$field->setup($element, $value);
+
+		return $field->input;
 	}
 }

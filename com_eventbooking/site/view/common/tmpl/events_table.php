@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -315,7 +315,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 											{
 												if ($item->registration_type == 0 || $item->registration_type == 1)
 												{
-													if ($config->multiple_booking)
+													if ($config->multiple_booking && !$item->has_multiple_ticket_types)
 													{
 														$url        = 'index.php?option=com_eventbooking&task=cart.add_cart&id=' . (int) $item->id . '&Itemid=' . (int) $Itemid;
 														if ($item->event_password)
@@ -331,7 +331,15 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 													else
 													{
 														$url        = JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id=' . $item->id . '&Itemid=' . $Itemid, false, $ssl);
-														$text       = JText::_('EB_REGISTER_INDIVIDUAL');
+														if ($item->has_multiple_ticket_types)
+														{
+															$text       = JText::_('EB_REGISTER');
+														}
+														else
+														{
+															$text       = JText::_('EB_REGISTER_INDIVIDUAL');
+														}
+
 														$extraClass = '';
 													}
 													?>
@@ -341,7 +349,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 													</li>
 												<?php
 												}
-												if (($item->registration_type == 0 || $item->registration_type == 2) && !$config->multiple_booking)
+												if (($item->registration_type == 0 || $item->registration_type == 2) && !$config->multiple_booking && !$item->has_multiple_ticket_types)
 												{
 												?>
 													<li>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -112,7 +112,7 @@ class EventbookingControllerRegister extends EventbookingController
 			$data['email']    = $user->email;
 			$data['event_id'] = $eventId;
 			$model            = $this->getModel('Register');
-			$return = $model->processIndividualRegistration($data);
+			$return           = $model->processIndividualRegistration($data);
 			if ($return === 1)
 			{
 				// Redirect registrants to registration complete page
@@ -193,6 +193,48 @@ class EventbookingControllerRegister extends EventbookingController
 			}
 
 			return;
+		}
+
+		$event = EventbookingHelperDatabase::getEvent($eventId);
+		if ($event->has_multiple_ticket_types)
+		{
+			$ticketTypes = EventbookingHelperData::getTicketTypes($event->id);
+
+			$ticketTypesValues = explode(',', $data['ticket_type_values']);
+			foreach ($ticketTypesValues as $ticketValue)
+			{
+				$ticketInfo           = explode(':', $ticketValue);
+				$data[$ticketInfo[0]] = $ticketInfo[1];
+				$input->set($ticketInfo[0], $ticketInfo[1]);
+			}
+
+			// Validate ticket quantity before submitting
+			$quantityValid = true;
+			foreach ($ticketTypes as $ticketType)
+			{
+				if (!empty($data['ticket_type_' . $ticketType->id]))
+				{
+					$quantity          = $data['ticket_type_' . $ticketType->id];
+					$availableQuantity = $ticketType->capacity - $ticketType->registered;
+
+					if ($availableQuantity < $quantity)
+					{
+						$quantityValid = false;
+						$app->enqueueMessage(JText::sprintf('EB_TICKET_QUANTITY_INVALID_WARNING', $quantity, $ticketType->title, $availableQuantity), 'error');
+					}
+				}
+			}
+
+			if (!$quantityValid)
+			{
+				$input->set('captcha_invalid', 1);
+				$input->set('view', 'register');
+				$input->set('layout', 'default');
+
+				$this->display();
+
+				return;
+			}
 		}
 
 		$session->clear('eb_catpcha_invalid');
@@ -296,7 +338,7 @@ class EventbookingControllerRegister extends EventbookingController
 			{
 				$app->enqueueMessage($error, 'error');
 			}
-			
+
 			$session->set('eb_group_billing_data', serialize($data));
 			$input->set('captcha_invalid', 1);
 			$input->set('view', 'register');
@@ -421,6 +463,7 @@ class EventbookingControllerRegister extends EventbookingController
 
 		return $errors;
 	}
+
 	/**
 	 * Validate captcha on registration form
 	 *

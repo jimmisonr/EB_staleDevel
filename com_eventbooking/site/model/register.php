@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -172,6 +172,26 @@ class EventBookingModelRegister extends RADModel
 
 		$row->store();
 		$form->storeData($row->id, $data);
+
+		// Store registrant data
+		if ($event->has_multiple_ticket_types && !$waitingList)
+		{
+			$ticketTypes = EventbookingHelperData::getTicketTypes($eventId);
+			foreach ($ticketTypes as $ticketType)
+			{
+				if (!empty($data['ticket_type_' . $ticketType->id]))
+				{
+					$quantity = (int) $data['ticket_type_' . $ticketType->id];
+					$query->clear()
+						->insert('#__eb_registrant_tickets')
+						->columns('registrant_id, ticket_type_id, quantity')
+						->values("$row->id, $ticketType->id, $quantity");
+					$db->setQuery($query)
+						->execute();
+				}
+			}
+		}
+
 		$data['event_title'] = $event->title;
 		JPluginHelper::importPlugin('eventbooking');
 		$dispatcher = JEventDispatcher::getInstance();
@@ -234,10 +254,10 @@ class EventBookingModelRegister extends RADModel
 			{
 				$row->payment_date = gmdate('Y-m-d H:i:s');
 				$row->published    = 1;
-				$row->store();				
+				$row->store();
 				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
 				EventbookingHelper::sendEmails($row, $config);
-				
+
 				return 1;
 			}
 			else
@@ -511,10 +531,10 @@ class EventBookingModelRegister extends RADModel
 				if ($row->is_group_billing)
 				{
 					EventbookingHelper::updateGroupRegistrationRecord($row->id);
-				}				
+				}
 				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
 				EventbookingHelper::sendEmails($row, $config);
-				
+
 				return 1;
 			}
 			else

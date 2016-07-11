@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -55,6 +55,8 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				$imagePath = JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName;
 				$thumbPath = JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $fileName;
 				JFile::upload($_FILES['thumb_image']['tmp_name'], $imagePath);
+				JFile::copy($imagePath, JPATH_ROOT . '/images/com_eventbooking/' . $fileName);
+
 				if (!$config->thumb_width)
 				{
 					$config->thumb_width = 120;
@@ -69,6 +71,44 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					->toFile($thumbPath);
 
 				$data['thumb'] = $fileName;
+			}
+		}
+
+		if (JFactory::getApplication()->isAdmin())
+		{
+			if (!empty($data['image']))
+			{
+				$fileName = basename($data['image']);
+
+				if (!JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName))
+				{
+					JFile::copy(JPATH_ROOT . '/' . $data['image'], JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName);
+				}
+
+				$thumbPath = JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $fileName;
+
+				if (!JFile::exists($thumbPath))
+				{
+					if (!$config->thumb_width)
+					{
+						$config->thumb_width = 120;
+					}
+					if (!$config->thumb_height)
+					{
+						$config->thumb_height = 120;
+					}
+
+					$image = new JImage(JPATH_ROOT . '/' . $data['image']);
+					$image->resize($config->thumb_width, $config->thumb_height, false)
+						->toFile($thumbPath);
+				}
+
+				$data['thumb'] = $fileName;
+				$data['image'] = 'images/com_eventbooking/' . $fileName;
+			}
+			else
+			{
+				$data['thumb'] = '';
 			}
 		}
 
@@ -148,6 +188,11 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				{
 					$data['thumb'] = $sourceRow->thumb;
 				}
+
+				if (empty($data['image']))
+				{
+					$data['image'] = $sourceRow->image;
+				}
 			}
 		}
 
@@ -186,6 +231,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					}
 
 					$row->thumb = '';
+					$row->image = '';
 				}
 
 				if (isset($data['del_attachment']) && $row->attachment)
@@ -249,7 +295,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 			//Trigger event which allows plugins to save it own data
 			JPluginHelper::importPlugin('eventbooking');
-			$app =  JFactory::getApplication();
+			$app = JFactory::getApplication();
 			$app->triggerEvent('onAfterSaveEvent', array($row, $data, $isNew));
 
 			if ($isNew && $app->isSite())
@@ -417,7 +463,6 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		$data['id'] = $row->id;
 
 
-
 		// Store group registration rates
 		$this->storeEventGroupRegistrationRates($row->id, $data, $isNew);
 
@@ -487,7 +532,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			$deleteEventIds = array();
 			$eventDatesDate = array();
 
-			foreach($eventDates as $eventDate)
+			foreach ($eventDates as $eventDate)
 			{
 				$eventDatesDate[] = JHtml::_('date', $eventDate, 'Y-m-d', null);
 			}
@@ -513,6 +558,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				$fieldsToUpdate = array(
 					'category_id',
 					'thumb',
+					'image',
 					'location_id',
 					'tax_rate',
 					'registration_type',
@@ -541,7 +587,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					'custom_field_ids',
 					'custom_fields',
 					'published');
-				$rowChildEvent = $this->getTable();
+				$rowChildEvent  = $this->getTable();
 				foreach ($children as $childId)
 				{
 					$rowChildEvent->load($childId);
@@ -618,7 +664,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			// Insert new events
 			if (count($eventDatesDate))
 			{
-				foreach($eventDatesDate as $newEventDate)
+				foreach ($eventDatesDate as $newEventDate)
 				{
 					$rowChildEvent             = clone ($row);
 					$rowChildEvent->id         = 0;
@@ -675,13 +721,13 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			}
 			if (count($deleteEventIds))
 			{
-				foreach($deleteEventIds as $i => $deleteEventId)
+				foreach ($deleteEventIds as $i => $deleteEventId)
 				{
 					// Check to see if this event has registrants, if it doesn't have registrants, it is safe to delete
 					$query->clear();
 					$query->select('COUNT(*)')
 						->from('#__eb_registrants')
-						->where('event_id = '. $deleteEventId)
+						->where('event_id = ' . $deleteEventId)
 						->where('(published >= 1 OR payment_method LIKE "os_offline%")');
 					$db->setQuery($query);
 					$total = $db->loadResult();
@@ -700,7 +746,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 		//Trigger event which allows plugins to save it own data
 		JPluginHelper::importPlugin('eventbooking');
-		$app =  JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$app->triggerEvent('onAfterSaveEvent', array($row, $data, $isNew));
 
 		if ($isNew && $app->isSite())
@@ -723,7 +769,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		$this->data->event_date               = $db->getNullDate();
 		$this->data->event_end_date           = $db->getNullDate();
 		$this->data->registration_start_date  = $db->getNullDate();
-		$this->data->late_fee_date  		  = $db->getNullDate();
+		$this->data->late_fee_date            = $db->getNullDate();
 		$this->data->cut_off_date             = $db->getNullDate();
 		$this->data->registration_type        = isset($config->registration_type) ? $config->registration_type : 0;
 		$this->data->access                   = isset($config->access) ? $config->access : 1;
@@ -812,19 +858,29 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		$db->setQuery($query);
 		$cid  = array_merge($cid, $db->loadColumn());
 		$cids = implode(',', $cid);
+
 		//Delete price setting for events
-		$query->clear();
-		$query->delete('#__eb_event_group_prices')->where('event_id IN (' . $cids . ')');
+		$query->clear()
+			->delete('#__eb_event_group_prices')->where('event_id IN (' . $cids . ')');
 		$db->setQuery($query);
 		$db->execute();
+
 		//Delete categories for the event
-		$query->clear();
-		$query->delete('#__eb_event_categories')->where('event_id IN (' . $cids . ')');
+		$query->clear()
+			->delete('#__eb_event_categories')->where('event_id IN (' . $cids . ')');
 		$db->setQuery($query);
 		$db->execute();
+
+		// Delete ticket types related to events
+		$query->clear()
+			->delete('#__eb_ticket_types')
+			->where('event_id IN (' . $cids . ')');
+		$db->setQuery($query);
+		$db->execute();
+
 		//Delete events themself
-		$query->clear();
-		$query->delete('#__eb_events')->where('id IN (' . $cids . ')');
+		$query->clear()
+			->delete('#__eb_events')->where('id IN (' . $cids . ')');
 		$db->setQuery($query);
 		$db->execute();
 
@@ -897,22 +953,22 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			$data['payment_methods'] = implode(',', $data['payment_methods']);
 		}
 
-		if (empty($data['event_date_hour'] ))
+		if (empty($data['event_date_hour']))
 		{
 			$data['event_date_hour'] = '00';
 		}
 
-		if (empty($data['event_date_minute'] ))
+		if (empty($data['event_date_minute']))
 		{
 			$data['event_date_minute'] = '00';
 		}
 
-		if (empty($data['cut_off_hour'] ))
+		if (empty($data['cut_off_hour']))
 		{
 			$data['cut_off_hour'] = '00';
 		}
 
-		if (empty($data['cut_off_minute'] ))
+		if (empty($data['cut_off_minute']))
 		{
 			$data['cut_off_minute'] = '00';
 		}
@@ -927,7 +983,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 	 */
 	protected function storeEventCategories($eventId, $data, $isNew)
 	{
-		$db = $this->getDbo();
+		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 		if (!$isNew)
 		{

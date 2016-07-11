@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
@@ -446,6 +446,14 @@ $return = base64_encode(JUri::getInstance()->toString());
 						</div>
 				</div>
 				<?php
+				if (!empty($event->ticketTypes))
+				{
+					echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/tickettypes.php', array('ticketTypes' => $event->ticketTypes, 'config' => $config));
+				?>
+					<div class="clearfix"></div>
+				<?php
+				}
+
 				$ticketsLeft = $event->event_capacity - $event->total_registrants ;
 				if ($event->individual_price > 0 || $ticketsLeft > 0)
 				{
@@ -514,9 +522,9 @@ $return = base64_encode(JUri::getInstance()->toString());
 									{
 										if ($event->registration_type == 0 || $event->registration_type == 1)
 										{
-											if ($config->multiple_booking)
+											if ($config->multiple_booking && !$event->has_multiple_ticket_types)
 											{
-												$url        = 'index.php?option=com_eventbooking&task=cart.add_cart&id=' . (int) $event->id . '&Itemid=' . (int) $Itemid;
+												$url = 'index.php?option=com_eventbooking&task=cart.add_cart&id=' . (int) $event->id . '&Itemid=' . (int) $Itemid;
 												if ($event->event_password)
 												{
 													$extraClass = '';
@@ -525,12 +533,20 @@ $return = base64_encode(JUri::getInstance()->toString());
 												{
 													$extraClass = 'eb-colorbox-addcart';
 												}
-												$text       = JText::_('EB_REGISTER');
+												$text = JText::_('EB_REGISTER');
 											}
 											else
 											{
-												$url        = JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id=' . $event->id . '&Itemid=' . $Itemid, false, $ssl);
-												$text       = JText::_('EB_REGISTER_INDIVIDUAL');
+												$url = JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id=' . $event->id . '&Itemid=' . $Itemid, false, $ssl);
+												if ($event->has_multiple_ticket_types)
+												{
+													$text = JText::_('EB_REGISTER');
+												}
+												else
+												{
+													$text = JText::_('EB_REGISTER_INDIVIDUAL');
+												}
+
 												$extraClass = '';
 											}
 											?>
@@ -540,7 +556,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 											</li>
 											<?php
 										}
-										if (($event->registration_type == 0 || $event->registration_type == 2) && !$config->multiple_booking)
+										if (($event->registration_type == 0 || $event->registration_type == 2) && !$config->multiple_booking && !$event->has_multiple_ticket_types)
 										{
 											?>
 											<li>

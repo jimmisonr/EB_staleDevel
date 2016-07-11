@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -482,9 +482,26 @@ class EventbookingController extends RADControllerAdmin
 		//Events table
 		$fields = array_keys($db->getTableColumns('#__eb_events'));
 
+		$moveEventsImages = false;
+		if (!in_array('image', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `image` VARCHAR( 255 ) NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+
+			$moveEventsImages = true;
+		}
+
 		if (!in_array('featured', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `featured` TINYINT NOT NULL DEFAULT  '0' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('has_multiple_ticket_types', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `has_multiple_ticket_types` TINYINT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
@@ -2103,8 +2120,7 @@ class EventbookingController extends RADControllerAdmin
 				  	";
 		$db->setQuery($sql);
 		$db->execute();
-		$db->truncateTable('#__eb_urls');
-
+		
 		// Migrate waiting list data
 		$sql = 'SELECT COUNT(*) FROM #__eb_waiting_lists';
 		$db->setQuery($sql);
@@ -2228,6 +2244,30 @@ class EventbookingController extends RADControllerAdmin
 				$db->execute();
 			}
 		}
+
+		// Ticket types db structure
+		$sql = "CREATE TABLE IF NOT EXISTS `#__eb_ticket_types` (
+			  `id` int(11) NOT NULL AUTO_INCREMENT,
+			  `event_id` int(11) DEFAULT NULL,
+			  `title` varchar(255) DEFAULT NULL,
+			  `description` text,
+			  `price` decimal(10,2) DEFAULT NULL,
+			  `capacity` int(11) DEFAULT NULL,
+			  `max_tickets_per_booking` int(11) NOT NULL DEFAULT '0',
+			  PRIMARY KEY (`id`)
+		  ) DEFAULT CHARSET=utf8;";
+		$db->setQuery($sql);
+		$db->execute();
+
+		$sql = "CREATE TABLE IF NOT EXISTS `#__eb_registrant_tickets` (
+			  `id` int(11) NOT NULL AUTO_INCREMENT,
+			  `registrant_id` int(11) DEFAULT NULL,
+			  `ticket_type_id` int(11) DEFAULT NULL,
+			  `quantity` int(11) DEFAULT NULL,
+			  PRIMARY KEY (`id`)
+			)DEFAULT CHARSET=utf8;";
+		$db->setQuery($sql);
+		$db->execute();
 
 		// Try to delete the file com_eventbooking.zip from tmp folder
 		$tmpFolder = JFactory::getConfig()->get('tmp_path');
@@ -2442,6 +2482,63 @@ class EventbookingController extends RADControllerAdmin
 
 		// Redirect to dashboard view
 		$installType = $this->input->getCmd('install_type', '');
+
+		if ($moveEventsImages)
+		{
+			JFactory::getApplication()->redirect('index.php?option=com_eventbooking&task=migrate_event_images&install_type='.$installType);
+		}
+		else
+		{
+			if ($installType == 'install')
+			{
+				$msg = JText::_('The extension was successfully installed');
+			}
+			else
+			{
+				$msg = JText::_('The extension was successfully updated');
+			}
+
+			//Redirecting users to Dasboard
+			JFactory::getApplication()->redirect('index.php?option=com_eventbooking&view=dashboard', $msg);
+		}
+	}
+
+	/**
+	 * Move events images from media folder to images folder to use media manage
+	 *
+	 * @throws Exception
+	 */
+	public function migrate_event_images()
+	{
+		jimport('joomla.filesystem.folder');
+
+		$installType = $this->input->getCmd('install_type', '');
+
+		if (!JFolder::exists(JPATH_ROOT . '/images/com_eventbooking'))
+		{
+			JFolder::create(JPATH_ROOT . '/images/com_eventbooking');
+		}
+
+		$db = JFactory::getDbo();
+		$sql = 'SELECT thumb FROM #__eb_events WHERE thumb IS NOT NULL';
+		$db->setQuery($sql);
+		$thumbs = $db->loadColumn();
+		if (count($thumbs))
+		{
+			$oldImagePath = JPATH_ROOT . '/media/com_eventbooking/images/';
+			$newImagePath = JPATH_ROOT . '/images/com_eventbooking/';
+			foreach ($thumbs as $thumb)
+			{
+				if ($thumb && file_exists($oldImagePath . $thumb))
+				{
+					JFile::copy($oldImagePath . $thumb, $newImagePath . $thumb);
+				}
+			}
+
+			$sql = 'UPDATE #__eb_events SET `image` = CONCAT("images/com_eventbooking/", `thumb`) WHERE thumb IS NOT NULL';
+			$db->setQuery($sql);
+			$db->execute();
+		}
 		if ($installType == 'install')
 		{
 			$msg = JText::_('The extension was successfully installed');
@@ -2450,17 +2547,16 @@ class EventbookingController extends RADControllerAdmin
 		{
 			$msg = JText::_('The extension was successfully updated');
 		}
-		
-		//Redirecting users to dasdboard
+
+		//Redirecting users to Dasboard
 		JFactory::getApplication()->redirect('index.php?option=com_eventbooking&view=dashboard', $msg);
 	}
-
 	/**
 	 * Check to see the installed version is up to date or not
 	 *
 	 * @return int 0 : error, 1 : Up to date, 2 : outof date
 	 */
-	function check_update()
+	public function check_update()
 	{
 		$installedVersion = EventbookingHelper::getInstalledVersion();
 		$result           = array();

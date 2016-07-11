@@ -1170,3 +1170,28 @@ span.eb-uploaded-file
     margin-top: 5px;
     font-weight: bold;
 }
+.table th.eb-text-right, .table td.eb-text-right
+{
+    text-align: right !important;
+}
+.table th.eb-text-left, .table td.eb-text-left
+{
+    text-align: left;
+}
+td.eb-ticket-type-title
+{
+	font-weight: bold;
+}
+p.eb-ticket-type-description
+{
+	font-weight: normal;
+	font-size: 85%;
+}
+.eb-event-large-image
+{
+	margin: 0 0 20px;
+}
+.eb-ticket-information
+{
+
+}

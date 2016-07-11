@@ -1,6 +1,7 @@
 <?php
+
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -348,6 +349,66 @@ class EventbookingHelperData
 		return $parents;
 	}
 
+	/**
+	 * Get all ticket types of this event
+	 *
+	 * @param $eventId
+	 *
+	 * @return array
+	 */
+	public static function getTicketTypes($eventId)
+	{
+		static $ticketTypes;
+
+		if (!isset($ticketTypes[$eventId]))
+		{
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('*, 0 AS registered')
+				->from('#__eb_ticket_types')
+				->where('event_id = ' . $eventId)
+				->order('id');
+			$db->setQuery($query);
+			$rows = $db->loadObjectList();
+
+			$query->clear()
+				->select('a.ticket_type_id')
+				->select('IFNULL(SUM(a.quantity), 0) AS registered')
+				->from('#__eb_registrant_tickets AS a')
+				->innerJoin('#__eb_registrants AS b ON a.registrant_id = b.id')
+				->where('b.event_id = ' . $eventId)
+				->where('b.group_id = 0')
+				->where('(b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3)))')
+				->group('a.ticket_type_id');
+			$db->setQuery($query);
+			$rowTickets = $db->loadObjectList('ticket_type_id');
+
+			if (count($rowTickets))
+			{
+				foreach ($rows as $row)
+				{
+					if (isset($rowTickets[$row->id]))
+					{
+						$row->registered = $rowTickets[$row->id]->registered;
+					}
+				}
+			}
+
+			$ticketTypes[$eventId] = $rows;
+		}
+
+		return $ticketTypes[$eventId];
+
+	}
+
+	/***
+	 * Get categories used to generate breadcrump
+	 *
+	 * @param $id
+	 * @param $parentId
+	 *
+	 * @return array
+	 */
 	public static function getCategoriesBreadcrumb($id, $parentId)
 	{
 		$db          = JFactory::getDbo();
@@ -417,14 +478,16 @@ class EventbookingHelperData
 	 * @param $rows
 	 * @param $config
 	 * @param $rowFields
-	 * @param $fieldValues		
+	 * @param $fieldValues
+	 * @param $eventId
 	 *
 	 * @throws Exception
 	 */
-	public static function csvExport($rows, $config, $rowFields, $fieldValues)
+	public static function csvExport($rows, $config, $rowFields, $fieldValues, $eventId = 0)
 	{
 		if (count($rows))
 		{
+			error_reporting(E_ALL);
 			$browser   = JFactory::getApplication()->client->browser;
 			$mime_type = ($browser == JApplicationWebClient::IE || $browser == JApplicationWebClient::OPERA) ? 'application/octetstream' : 'application/octet-stream';
 			$filename  = "registrants_list";
@@ -457,11 +520,11 @@ class EventbookingHelperData
 			}
 
 			// Determine whether we need to show payment method column
-			$db = JFactory::getDbo();
+			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('name, title')
-					->from('#__eb_payment_plugins')
-					->where('published=1');
+				->from('#__eb_payment_plugins')
+				->where('published=1');
 			$db->setQuery($query);
 			$plugins = $db->loadObjectList('name');
 
@@ -469,6 +532,38 @@ class EventbookingHelperData
 			if (count($plugins) > 1)
 			{
 				$showPaymentMethodColumn = true;
+			}
+
+			if ($eventId)
+			{
+				$event = EventbookingHelperDatabase::getEvent($eventId);
+				if ($event->has_multiple_ticket_types)
+				{
+					$ticketTypes = EventbookingHelperData::getTicketTypes($eventId);
+
+					$ticketTypeIds = array();
+					foreach ($ticketTypes as $ticketType)
+					{
+						$ticketTypeIds[] = $ticketType->id;
+					}
+
+
+					$db    = JFactory::getDbo();
+					$query = $db->getQuery(true);
+					$query->select('registrant_id, ticket_type_id, quantity')
+						->from('#__eb_registrant_tickets')
+						->where('ticket_type_id IN (' . implode(',', $ticketTypeIds) . ')');
+					$db->setQuery($query);
+
+
+					$registrantTickets = $db->loadObjectList();
+
+					$tickets = array();
+					foreach ($registrantTickets as $registrantTicket)
+					{
+						$tickets[$registrantTicket->registrant_id][$registrantTicket->ticket_type_id] = $registrantTicket->quantity;
+					}
+				}
 			}
 
 			$fields   = array();
@@ -486,6 +581,14 @@ class EventbookingHelperData
 				foreach ($rowFields as $rowField)
 				{
 					$fields[] = $rowField->title;
+				}
+			}
+
+			if (!empty($ticketTypes))
+			{
+				foreach ($ticketTypes as $ticketType)
+				{
+					$fields[] = $ticketType->title;
 				}
 			}
 			$fields[] = JText::_('EB_NUMBER_REGISTRANTS');
@@ -551,6 +654,21 @@ class EventbookingHelperData
 							$fieldValue = implode(', ', json_decode($fieldValue));
 						}
 						$fields[] = $fieldValue;
+					}
+				}
+
+				if (!empty($ticketTypes))
+				{
+					foreach ($ticketTypes as $ticketType)
+					{
+						if (!empty($tickets[$r->id][$ticketType->id]))
+						{
+							$fields[] = $tickets[$r->id][$ticketType->id];
+						}
+						else
+						{
+							$fields[] = 0;
+						}
 					}
 				}
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -98,6 +98,11 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 						$row->discounted_price = round($row->discounted_price * (1 + $taxRate / 100), 2);
 					}
 				}
+			}
+
+			if ($config->display_ticket_types && $row->has_multiple_ticket_types)
+			{
+				$row->ticketTypes = EventbookingHelperData::getTicketTypes($row->id);
 			}
 
 			return $rows[0];

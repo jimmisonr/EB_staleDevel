@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -685,6 +685,29 @@ JHtml::_('script', 'jui/cms.js', false, true);
 					<?php echo $this->lists['order_direction'] ; ?>
 				</div>
 			</div>
+			<?php
+			if (JPluginHelper::isEnabled('eventbooking', 'tickettypes'))
+			{
+			?>
+				<div class="control-group">
+					<div class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('display_ticket_types', JText::_('EB_DISPLAY_TICKET_TYPES'), JText::_('EB_DISPLAY_TICKET_TYPES_EXPLAIN')); ?>
+					</div>
+					<div class="controls">
+						<?php echo EventbookingHelperHtml::getBooleanInput('display_ticket_types', $config->display_ticket_types); ?>
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('calculate_number_registrants_base_on_tickets_quantity', JText::_('EB_NUMBER_REGISTRANTS_CALCULATION'), JText::_('EB_NUMBER_REGISTRANTS_CALCULATION_EXPLAIN')); ?>
+					</div>
+					<div class="controls">
+						<?php echo EventbookingHelperHtml::getBooleanInput('calculate_number_registrants_base_on_tickets_quantity', $config->calculate_number_registrants_base_on_tickets_quantity); ?>
+					</div>
+				</div>
+			<?php
+			}
+			?>
 			<div class="control-group">
 				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('show_capacity', JText::_('EB_SHOW_EVENT_CAPACITY')); ?>
@@ -844,6 +867,30 @@ JHtml::_('script', 'jui/cms.js', false, true);
 				</div>
 				<div class="controls">
 					<?php echo EventbookingHelperHtml::getBooleanInput('show_event_date', $config->show_event_date); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('display_large_image', JText::_('EB_DISPLAY_LARGE_IMAGE'), JText::_('EB_DISPLAY_LARGE_IMAGE_EXPLAIN')); ?>
+				</div>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('display_large_image', $config->display_large_image); ?>
+				</div>
+			</div>
+			<div class="control-group" data-showon='[{"field":"display_large_image","values":["1"],"op":""}]'>
+				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('large_image_width', JText::_('EB_LARGE_IMAGE_WIDTH'), JText::_('EB_LARGE_IMAGE_WIDTH_EXPLAIN')); ?>
+				</div>
+				<div class="controls">
+					<input type="text" name="large_image_width" class="input-small" value="<?php echo $config->large_image_width ; ?>" />
+				</div>
+			</div>
+			<div class="control-group" data-showon='[{"field":"display_large_image","values":["1"],"op":""}]'>
+				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('large_image_height', JText::_('EB_LARGE_IMAGE_HEIGHT'), JText::_('EB_LARGE_IMAGE_HEIGHT_EXPLAIN')); ?>
+				</div>
+				<div class="controls">
+					<input type="text" name="large_image_height" class="input-small" value="<?php echo $config->large_image_height ; ?>" />
 				</div>
 			</div>
 			<div class="control-group">

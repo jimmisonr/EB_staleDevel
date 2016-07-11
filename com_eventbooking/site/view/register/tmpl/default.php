@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -85,6 +85,12 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	<div class="eb-message"><?php echo $msg ; ?></div>
 	<?php
 	}
+
+	if (!$this->waitingList && !empty($this->ticketTypes))
+	{
+		echo $this->loadTemplate('tickets');
+	}
+
 	if (!$this->userId && $this->config->user_registration)
 	{
 		$validateLoginForm = true;
@@ -177,7 +183,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			echo $field->getControlGroup($bootstrapHelper);
 		}
 
-		if (($this->totalAmount > 0) || $this->form->containFeeFields())
+		if (($this->totalAmount > 0) || !empty($this->ticketTypes) || $this->form->containFeeFields())
 		{
 			$showPaymentInformation = true;
 		?>
@@ -645,6 +651,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 		<?php
 		}
 	?>
+	<input type="hidden" id="ticket_type_values" name="ticket_type_values" value="" />
 	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
 	<input type="hidden" name="event_id" id="event_id" value="<?php echo $this->event->id ; ?>" />
 	<input type="hidden" name="option" value="com_eventbooking" />
@@ -667,6 +674,41 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 							form.on('submit', function(e) {
 								e.preventDefault();
 							});
+
+							// Check and make sure at least one ticket type quantity is selected
+							<?php
+							if (!$this->waitingList && !empty($this->ticketTypes))
+							{
+							?>
+								var ticketTypesValue = '';
+								var ticketName = '';
+								var ticketQuantity = 0;
+								$('select.ticket_type_quantity').each(function () {
+									ticketName = $(this).attr('name');
+									ticketQuantity = $(this).val();
+									if (ticketQuantity > 0)
+									{
+										ticketTypesValue = ticketTypesValue + ticketName + ':' + ticketQuantity + ',';
+									}
+								});
+
+								if (ticketTypesValue.length > 0)
+								{
+									ticketTypesValue = ticketTypesValue.substring(0, ticketTypesValue.length - 1);
+								}
+
+								// If no ticket type selected, prevent from from being submitted
+								if (!ticketTypesValue.length)
+								{
+									alert("<?php echo JText::_('EB_SELECT_TICKET_TYPE_FOR_REGISTRATION'); ?>");
+									return false;
+								}
+
+								$('#ticket_type_values').val(ticketTypesValue);
+							<?php
+							}
+							?>
+
 							form.find('#btn-submit').prop('disabled', true);
 
 							if (typeof stripePublicKey !== 'undefined' && $('#x_card_num').is(":visible"))

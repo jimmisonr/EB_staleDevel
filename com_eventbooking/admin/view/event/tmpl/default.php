@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -58,18 +58,9 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 						</div>
 					</div>
 					<div class="control-group">
-						<label class="control-label"><?php echo JText::_('EB_THUMB_IMAGE') ; ?></label>
+						<label class="control-label"><?php echo JText::_('EB_IMAGE') ; ?></label>
 						<div class="controls">
-							<input type="file" class="inputbox" name="thumb_image" size="60" />
-							<?php
-							if ($this->item->thumb)
-							{
-								?>
-								<a href="<?php echo JURI::root().'media/com_eventbooking/images/'.$this->item->thumb; ?>" class="modal"><img src="<?php echo JURI::root().'media/com_eventbooking/images/thumbs/'.$this->item->thumb; ?>" class="img_preview" /></a>
-								<input type="checkbox" name="del_thumb" value="1" /><?php echo JText::_('EB_DELETE_CURRENT_THUMB'); ?>
-								<?php
-							}
-							?>
+							<?php echo EventbookingHelperHtml::getMediaInput($this->item->image, 'image'); ?>
 						</div>
 					</div>
 					<div class="control-group">

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -78,7 +78,8 @@ class EventbookingControllerRegistrant extends EventbookingController
 			return;
 		}
 
-		$rowFields = EventbookingHelper::getAllEventFields((int) $model->getState('filter_event_id'));
+		$eventId   = (int) $model->getState('filter_event_id');
+		$rowFields = EventbookingHelper::getAllEventFields($eventId);
 		$fieldIds = array();
 		foreach($rowFields as $rowField)
 		{
@@ -87,7 +88,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		$fieldValues = $model->getFieldsData($fieldIds);
 
-		EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues);
+		EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues, $eventId);
 	}
 
 	/**

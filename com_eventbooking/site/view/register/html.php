@@ -1,6 +1,6 @@
 <?php
 /**
- * @version            2.7.1
+ * @version            2.8.0
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
@@ -248,6 +248,11 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		else
 		{
 			$form->setEventId($eventId);
+		}
+
+		if ($event->has_multiple_ticket_types)
+		{
+			$this->ticketTypes = EventbookingHelperData::getTicketTypes($event->id);
 		}
 
 		// Assign these parameters
