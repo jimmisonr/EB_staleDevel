@@ -65,21 +65,12 @@ class plgEventBookingTicketTypes extends JPlugin
 		$maxTicketsPerBookings = $data['ticket_type_max_tickets_per_booking'];
 
 		$hasMultipleTicketTypes = 0;
+		$ticketTypeIds          = array();
 		for ($i = 0, $n = count($titles); $i < $n; $i++)
 		{
 			$id = $ids[$i];
 			if (empty($titles[$i]))
 			{
-				if ($id)
-				{
-					$query->clear()
-						->delete('#__eb_ticket_types')
-						->where('id = ' . $id);
-
-					$db->setQuery($query)
-						->execute();
-				}
-
 				continue;
 			}
 
@@ -110,6 +101,14 @@ class plgEventBookingTicketTypes extends JPlugin
 
 			$db->setQuery($query)
 				->execute();
+			if ($id)
+			{
+				$ticketTypeIds[] = $id;
+			}
+			else
+			{
+				$ticketTypeIds[] = $db->insertid();
+			}
 
 			$hasMultipleTicketTypes = 1;
 		}
@@ -120,6 +119,16 @@ class plgEventBookingTicketTypes extends JPlugin
 			->where('id = ' . $row->id);
 		$db->setQuery($query);
 		$db->execute();
+
+		if (count($ticketTypeIds))
+		{
+			$query->clear()
+				->delete('#__eb_ticket_types')
+				->where('event_id = ' . $row->id)
+				->where('id NOT IN (' . implode(',', $ticketTypeIds) . ')');
+			$db->setQuery($query)
+				->execute();
+		}
 	}
 
 	/**
