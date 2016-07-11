@@ -604,6 +604,7 @@ abstract class EventbookingHelperHtml
 		$element->addAttribute('name', $fieldName);
 		$element->addAttribute('class', 'readonly input-large');
 		$element->addAttribute('preview', 'tooltip');
+		$element->addAttribute('directory', 'com_eventbooking');
 
 		$form = JForm::getInstance('sample-form', '<form> </form>');
 		$field->setForm($form);
