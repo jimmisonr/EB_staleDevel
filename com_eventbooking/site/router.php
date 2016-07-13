@@ -426,7 +426,6 @@ class EventbookingRouter extends JComponentRouterBase
 	}
 }
 
-
 function EventbookingBuildRoute(&$query)
 {
 	$router = new EventbookingRouter();
@@ -434,7 +433,7 @@ function EventbookingBuildRoute(&$query)
 	return $router->build($query);
 }
 
-function ContactParseRoute($segments)
+function EventbookingParseRoute($segments)
 {
 	$router = new EventbookingRouter;
 
