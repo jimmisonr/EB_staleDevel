@@ -383,7 +383,7 @@ class EventbookingRouter extends JComponentRouterBase
 	 *
 	 * @return    array    The URL attributes to be used by the application.
 	 */
-	function parse(&$segments)
+	public function parse(&$segments)
 	{
 		$vars = array();
 		if (count($segments))
