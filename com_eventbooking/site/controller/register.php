@@ -353,9 +353,9 @@ class EventbookingControllerRegister extends EventbookingController
 		{
 			$numberRegistrantsAvailable = $event->event_capacity - $event->total_registrants;
 
-			if ($numberRegistrantsAvailable > $numberRegistrants)
+			if ($numberRegistrantsAvailable < $numberRegistrants)
 			{
-				$errors[] = JText::sprintf('EB_NUMBER_REGISTRANTS_ERROR', $numberRegistrantsAvailable, $numberRegistrants);
+				$errors[] = JText::sprintf('EB_NUMBER_REGISTRANTS_ERROR', $numberRegistrants, $numberRegistrantsAvailable);
 			}
 		}
 
