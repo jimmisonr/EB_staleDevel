@@ -170,6 +170,17 @@ class EventbookingControllerRegister extends EventbookingController
 			$errors = array_merge($errors, $formErrors);
 		}
 
+		// Validate number slots left
+		if ($event->event_capacity)
+		{
+			$numberRegistrantsAvailable = $event->event_capacity - $event->total_registrants;
+
+			if ($numberRegistrantsAvailable <= 0)
+			{
+				$errors[] = JText::_('EB_EVENT_IS_FULL');
+			}
+		}
+
 		if (count($errors))
 		{
 			foreach ($errors as $error)
@@ -195,7 +206,6 @@ class EventbookingControllerRegister extends EventbookingController
 			return;
 		}
 
-		$event = EventbookingHelperDatabase::getEvent($eventId);
 		if ($event->has_multiple_ticket_types)
 		{
 			$ticketTypes = EventbookingHelperData::getTicketTypes($event->id);
@@ -301,7 +311,6 @@ class EventbookingControllerRegister extends EventbookingController
 	public function process_group_registration()
 	{
 		$app     = JFactory::getApplication();
-		$config  = EventbookingHelper::getConfig();
 		$session = JFactory::getSession();
 		$input   = $this->input;
 		$eventId = $input->getInt('event_id');
@@ -332,6 +341,24 @@ class EventbookingControllerRegister extends EventbookingController
 			$errors = array_merge($errors, $formErrors);
 		}
 
+		// Check to see if there is a valid number registrants
+		$numberRegistrants = (int) $session->get('eb_number_registrants', '');
+		if (!$numberRegistrants)
+		{
+			$errors[] = JText::_('Sorry, your session was expired. Please try again!');
+		}
+
+		// Validate number slots left
+		if ($event->event_capacity)
+		{
+			$numberRegistrantsAvailable = $event->event_capacity - $event->total_registrants;
+
+			if ($numberRegistrantsAvailable > $numberRegistrants)
+			{
+				$errors[] = JText::sprintf('EB_NUMBER_REGISTRANTS_ERROR', $numberRegistrantsAvailable, $numberRegistrants);
+			}
+		}
+
 		if (count($errors))
 		{
 			foreach ($errors as $error)
@@ -346,23 +373,6 @@ class EventbookingControllerRegister extends EventbookingController
 			$this->display();
 
 			return;
-		}
-
-		// Check to see if there is a valid number registrants
-		$numberRegistrants = (int) $session->get('eb_number_registrants', '');
-		if (!$numberRegistrants)
-		{
-			// Session was lost for some reasons, users will have to start over again
-			if ($config->use_https)
-			{
-				$ssl = 1;
-			}
-			else
-			{
-				$ssl = 0;
-			}
-			$signupUrl = JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id=' . $eventId . '&Itemid=' . $input->getInt('Itemid', 0), false, $ssl);
-			$app->redirect($signupUrl, JText::_('Sorry, your session was expired. Please try again!'));
 		}
 
 		$model  = $this->getModel('Register');
@@ -404,7 +414,7 @@ class EventbookingControllerRegister extends EventbookingController
 		$response['coupon_valid']           = $fees['coupon_valid'];
 
 		echo json_encode($response);
-		JFactory::getApplication()->close();
+		$this->app->close();
 	}
 
 	/**
