@@ -129,6 +129,15 @@ class plgEventBookingTicketTypes extends JPlugin
 			$db->setQuery($query)
 				->execute();
 		}
+
+		if (!$hasMultipleTicketTypes)
+		{
+			$query->clear()
+				->delete('#__eb_ticket_types')
+				->where('event_id = ' . $row->id);				
+			$db->setQuery($query)
+				->execute();
+		}
 	}
 
 	/**

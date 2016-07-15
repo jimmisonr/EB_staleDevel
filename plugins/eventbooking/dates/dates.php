@@ -349,9 +349,8 @@ class plgEventBookingDates extends JPlugin
 			}
 
 			(function($){
-				var countDate = '<?php echo $maxNumberDates + 1;?>';
-				addEventContainer  = (function(){
-					$('#count_event_dates').val(countDate);
+				var countDate = '<?php echo $maxNumberDates;?>';
+				addEventContainer  = (function(){					
 					var  html = '<fieldset id="date_' + countDate + '" class="form-inline form-inline-header">'
 					html += '<legend class="item_date_' + countDate + '"></legend>';
 					html += '<input type="hidden" name="event_id_' + countDate + '" value="0" />';
@@ -412,7 +411,9 @@ class plgEventBookingDates extends JPlugin
 					html += '</div>';
 					html += '</fieldset>';
 					$('#advance-date_content').append(html);
-					$('legend.item_date_'+countDate).text('Extra Event Date '+countDate);
+					var countNumber = countDate;
+					countNumber++;
+					$('legend.item_date_'+countDate).text('Extra Event Date '+ countNumber);
 					$("#date_"+countDate+" .event_date_hour").attr("name","event_date_hour_"+countDate);
 					$("#date_"+countDate+" .event_date_minute").attr("name","event_date_minute_"+countDate);
 					$("#date_"+countDate+" .event_end_date_hour").attr("name","event_end_date_hour_"+countDate);
@@ -471,6 +472,7 @@ class plgEventBookingDates extends JPlugin
 						firstDay: 0
 					});
 					countDate++;
+					$('#count_event_dates').val(countDate);
 				})
 			})(jQuery)
 		</script>
