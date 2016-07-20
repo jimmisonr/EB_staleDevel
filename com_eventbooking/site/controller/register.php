@@ -139,6 +139,7 @@ class EventbookingControllerRegister extends EventbookingController
 	{
 		$app     = JFactory::getApplication();
 		$session = JFactory::getSession();
+		$config  = EventbookingHelper::getConfig();
 		$input   = $this->input;
 		$eventId = $input->getInt('event_id', 0);
 
@@ -171,7 +172,7 @@ class EventbookingControllerRegister extends EventbookingController
 		}
 
 		// Validate number slots left
-		if ($event->event_capacity)
+		if ($event->event_capacity && !$config->activate_waitinglist_feature)
 		{
 			$numberRegistrantsAvailable = $event->event_capacity - $event->total_registrants;
 
@@ -312,6 +313,7 @@ class EventbookingControllerRegister extends EventbookingController
 	{
 		$app     = JFactory::getApplication();
 		$session = JFactory::getSession();
+		$config  = EventbookingHelper::getConfig();
 		$input   = $this->input;
 		$eventId = $input->getInt('event_id');
 		$event   = EventbookingHelperDatabase::getEvent($eventId);
@@ -349,7 +351,7 @@ class EventbookingControllerRegister extends EventbookingController
 		}
 
 		// Validate number slots left
-		if ($event->event_capacity)
+		if ($event->event_capacity && !$config->activate_waitinglist_feature)
 		{
 			$numberRegistrantsAvailable = $event->event_capacity - $event->total_registrants;
 
