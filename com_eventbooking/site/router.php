@@ -13,8 +13,22 @@ defined('_JEXEC') or die;
 JLoader::registerPrefix('Eventbooking', JPATH_ROOT . '/components/com_eventbooking');
 JLoader::register('RADConfig', JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/config/config.php');
 
+/**
+ * Routing class from com_eventbooking
+ *
+ * @since  2.8.1
+ */
 class EventbookingRouter extends JComponentRouterBase
 {
+	/**
+	 * Build the route for the com_eventbooking component
+	 *
+	 * @param   array &$query An array of URL arguments
+	 *
+	 * @return  array  The URL arguments to use to assemble the subsequent URL.
+	 *
+	 * @since   2.8.1
+	 */
 	public function build(&$query)
 	{
 		$segments = array();
@@ -376,12 +390,13 @@ class EventbookingRouter extends JComponentRouterBase
 	}
 
 	/**
-	 *
 	 * Parse the segments of a URL.
 	 *
-	 * @param    array    The segments of the URL to parse.
+	 * @param   array &$segments The segments of the URL to parse.
 	 *
-	 * @return    array    The URL attributes to be used by the application.
+	 * @return  array  The URL attributes to be used by the application.
+	 *
+	 * @since   2.8.1
 	 */
 	public function parse(&$segments)
 	{
@@ -426,6 +441,16 @@ class EventbookingRouter extends JComponentRouterBase
 	}
 }
 
+/**
+ * Contact router functions
+ *
+ * These functions are proxies for the new router interface
+ * for old SEF extensions.
+ *
+ * @param   array &$query An array of URL arguments
+ *
+ * @return  array  The URL arguments to use to assemble the subsequent URL.
+ */
 function EventbookingBuildRoute(&$query)
 {
 	$router = new EventbookingRouter();
@@ -435,7 +460,7 @@ function EventbookingBuildRoute(&$query)
 
 function EventbookingParseRoute($segments)
 {
-	$router = new EventbookingRouter;
+	$router = new EventbookingRouter();
 
 	return $router->parse($segments);
 }
