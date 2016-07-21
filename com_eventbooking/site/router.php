@@ -10,8 +10,9 @@
 
 // no direct access
 defined('_JEXEC') or die;
-JLoader::registerPrefix('Eventbooking', JPATH_ROOT . '/components/com_eventbooking');
+
 JLoader::register('RADConfig', JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/config/config.php');
+JLoader::register('EventbookingHelper', JPATH_ROOT . '/components/com_eventbooking/helper/helper.php');
 
 /**
  * Routing class from com_eventbooking
@@ -442,7 +443,7 @@ class EventbookingRouter extends JComponentRouterBase
 }
 
 /**
- * Contact router functions
+ * Events Booking router functions
  *
  * These functions are proxies for the new router interface
  * for old SEF extensions.
