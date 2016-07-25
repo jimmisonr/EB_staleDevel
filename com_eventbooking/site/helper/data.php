@@ -613,6 +613,10 @@ class EventbookingHelperData
 			}
 			$fields[] = JText::_('EB_TRANSACTION_ID');
 			$fields[] = JText::_('EB_PAYMENT_STATUS');
+			if ($config->activate_invoice_feature)
+			{
+				$fields[] = JText::_('EB_INVOICE_NUMBER');
+			}
 			$fields[] = JText::_('EB_ID');
 			fputcsv($fp, $fields, $delimiter);
 			foreach ($rows as $r)
@@ -724,6 +728,17 @@ class EventbookingHelperData
 					case 3:
 						$fields[] = JText::_('EB_WAITING_LIST');
 						break;
+				}
+				if ($config->activate_invoice_feature)
+				{
+					if ($r->invoice_number)
+					{
+						$fields[] = EventbookingHelper::formatInvoiceNumber($r->invoice_number, $config);
+					}
+					else
+					{
+						$fields[] = '';
+					}
 				}
 				$fields[] = $r->id;
 				fputcsv($fp, $fields, $delimiter);
