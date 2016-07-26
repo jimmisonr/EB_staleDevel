@@ -53,4 +53,4 @@ if (!$itemId)
 	$itemId = EventBookingHelper::getItemid();
 }
 
-require(JModuleHelper::getLayoutPath('mod_eb_locations', 'default'));
+require JModuleHelper::getLayoutPath('mod_eb_locations', 'default');

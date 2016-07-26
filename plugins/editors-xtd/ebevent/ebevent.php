@@ -31,13 +31,12 @@ class plgButtonEbevent extends JPlugin
         $this->loadLanguage();
     }
 
-
     /**
      * Display the button
      *
      * @return array A four element array of (article_id, article_title, category_id, object)
      */
-    function onDisplay($name)
+    public function onDisplay($name)
     {
 
         $app = JFactory::getApplication();
@@ -48,20 +47,20 @@ class plgButtonEbevent extends JPlugin
         $js = "
 			function jSelectEbevent(id) {
 				var tag = '{ebevent '+id+'}';
-				jInsertEditorText(tag, '".$name."');
+				jInsertEditorText(tag, '" . $name . "');
 				SqueezeBox.close();
 			}";
         JFactory::getDocument()->addScriptDeclaration($js);
         JHtml::_('behavior.modal');
-        $link = 'index.php?option=com_eventbooking&amp;view=events&amp;layout=modal&amp;function=jSelectEbevent&amp;tmpl=component&amp;'.JSession::getFormToken().'=1';
+        $link = 'index.php?option=com_eventbooking&amp;view=events&amp;layout=modal&amp;function=jSelectEbevent&amp;tmpl=component&amp;' . JSession::getFormToken() . '=1';
 
         $button = new JObject();
         $button->set('modal', true);
         $button->set('link', $link);
         $button->set('text', JText::_('EB Event'));
         $button->set('name', 'ebevent');
-        $button->set('options', "{handler: 'iframe', size: {x: 770, y: 400}}");               
-        $button->set('class', 'btn');        
+        $button->set('options', "{handler: 'iframe', size: {x: 770, y: 400}}");
+        $button->set('class', 'btn');
 
         return $button;
     }

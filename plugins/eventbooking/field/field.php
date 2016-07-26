@@ -13,7 +13,6 @@ defined('_JEXEC') or die;
 
 class plgEventBookingField extends JPlugin
 {
-
 	/**
 	 * Constructor
 	 *
@@ -43,7 +42,6 @@ class plgEventBookingField extends JPlugin
 		$fieldValues   = $this->params->get('field_values');
 		$priceFields   = $this->params->get('price_fields');
 		$fieldOrdering = $this->params->get('field_ordering');
-
 
 		if (empty($priceFields))
 		{
@@ -100,7 +98,6 @@ class plgEventBookingField extends JPlugin
 		{
 			$rowField->load($fieldId);
 		}
-
 
 		$rowField->event_id         = 1;
 		$rowField->name             = $fieldName;

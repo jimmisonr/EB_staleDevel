@@ -35,6 +35,7 @@ class plgContentEBRegister extends JPlugin
 		}
 		$regex = "#{ebregister (\d+)}#s";
 		$article->text = preg_replace_callback($regex, array(&$this, 'displayIndividualRegistrationForm'), $article->text);
+
 		return true;
 	}
 

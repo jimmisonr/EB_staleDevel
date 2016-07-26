@@ -13,7 +13,6 @@ defined('_JEXEC') or die;
 
 class plgEventBookingCB extends JPlugin
 {
-
 	public function __construct(& $subject, $config = array())
 	{
 		parent::__construct($subject, $config);
@@ -38,7 +37,6 @@ class plgEventBookingCB extends JPlugin
 			return $db->loadObjectList();
 		}
 	}
-
 
 	/**
 	 * Method to get data stored in CB profile of the given user
@@ -123,7 +121,6 @@ class plgEventBookingCB extends JPlugin
 				}
 			}
 
-
 			$profile                 = new stdClass();
 
 			$profile->id             = $row->user_id;
@@ -154,4 +151,4 @@ class plgEventBookingCB extends JPlugin
 			}
 		}
 	}
-}	
+}

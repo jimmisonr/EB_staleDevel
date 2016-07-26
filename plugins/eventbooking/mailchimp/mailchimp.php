@@ -35,7 +35,7 @@ class plgEventBookingMailchimp extends JPlugin
 		ob_end_clean();
 
 		return array('title' => JText::_('PLG_EB_MAILCHIMP_SETTINGS'),
-		             'form'  => $form
+		             'form'  => $form,
 		);
 	}
 

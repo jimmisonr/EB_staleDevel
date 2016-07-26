@@ -33,13 +33,12 @@ class plgButtonEbregister extends JPlugin
 		$this->loadLanguage();
 	}
 
-
 	/**
 	 * Display the button
 	 *
 	 * @return array A four element array of (article_id, article_title, category_id, object)
 	 */
-	function onDisplay($name)
+	public function onDisplay($name)
 	{
 
 		$app = JFactory::getApplication();
@@ -62,9 +61,9 @@ class plgButtonEbregister extends JPlugin
 		$button->set('link', $link);
 		$button->set('text', JText::_('EB Register'));
 		$button->set('name', 'ebregister');
-		$button->set('options', "{handler: 'iframe', size: {x: 770, y: 400}}");		
-		$button->set('class', 'btn');		
-		
+		$button->set('options', "{handler: 'iframe', size: {x: 770, y: 400}}");
+		$button->set('class', 'btn');
+
 		return $button;
 	}
 }

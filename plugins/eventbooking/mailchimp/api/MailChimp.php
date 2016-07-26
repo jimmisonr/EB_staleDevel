@@ -22,13 +22,12 @@ class MailChimp
 	 * Create a new instance
 	 * @param string $api_key Your MailChimp API key
 	 */
-	function __construct($api_key)
+	public function __construct($api_key)
 	{
 		$this->api_key = $api_key;
 		list(, $datacentre) = explode('-', $this->api_key);
 		$this->api_endpoint = str_replace('<dc>', $datacentre, $this->api_endpoint);
 	}
-
 
 	/**
 	 * Call an API method. Every request needs the API key, so that is added automatically -- you don't need to pass it in.
@@ -41,7 +40,6 @@ class MailChimp
 		return $this->_raw_request($method, $args);
 	}
 
-
 	/**
 	 * Performs the underlying HTTP request. Not very exciting
 	 * @param  string $method The API method to be called
@@ -49,16 +47,16 @@ class MailChimp
 	 * @return array          Assoc array of decoded result
 	 */
 	private function _raw_request($method, $args=array())
-	{      
+	{
 		$args['apikey'] = $this->api_key;
 
-		$url = $this->api_endpoint.'/'.$method.'.json';
+		$url = $this->api_endpoint . '/' . $method . '.json';
 
 		if (function_exists('curl_init') && function_exists('curl_setopt')){
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-			curl_setopt($ch, CURLOPT_USERAGENT, 'PHP-MCAPI/2.0');		
+			curl_setopt($ch, CURLOPT_USERAGENT, 'PHP-MCAPI/2.0');
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 			curl_setopt($ch, CURLOPT_POST, true);
@@ -73,7 +71,7 @@ class MailChimp
 			        'protocol_version' => 1.1,
 			        'user_agent'       => 'PHP-MCAPI/2.0',
 			        'method'           => 'POST',
-			        'header'           => "Content-type: application/json\r\n".
+			        'header'           => "Content-type: application/json\r\n" .
 			                              "Connection: close\r\n" .
 			                              "Content-length: " . strlen($json_data) . "\r\n",
 			        'content'          => $json_data,

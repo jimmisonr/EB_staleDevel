@@ -13,7 +13,6 @@ defined('_JEXEC') or die;
 
 class plgEventbookingInvoice extends JPlugin
 {
-
 	/**
 	 * Generate invoice number after registrant complete payment for registration
 	 *
@@ -43,7 +42,6 @@ class plgEventbookingInvoice extends JPlugin
 			$this->processInvoiceNumber($row);
 		}
 	}
-
 
 	private function processInvoiceNumber($row)
 	{

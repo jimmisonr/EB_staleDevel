@@ -96,7 +96,6 @@ class plgEventbookingJomSocial extends JPlugin
 			$db->setQuery($sql);
 			$fieldList = $db->loadObjectList('fieldcode');
 
-
 			$config = EventbookingHelper::getConfig();
 			if ($config->multiple_booking)
 			{

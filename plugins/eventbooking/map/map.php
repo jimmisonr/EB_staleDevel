@@ -33,7 +33,7 @@ class plgEventBookingMap extends JPlugin
 		$query->select('a.*')
 			->from('#__eb_locations AS a')
 			->innerJoin('#__eb_events AS b ON a.id = b.location_id')
-			->where('b.id = ' . (int) $row->id);;
+			->where('b.id = ' . (int) $row->id);
 		$db->setQuery($query);
 		$location = $db->loadObject();
 
@@ -47,7 +47,7 @@ class plgEventBookingMap extends JPlugin
 		else
 		{
 			return array('title' => JText::_('PLG_EB_MAP'),
-			             'form'  => $form
+			             'form'  => $form,
 			);
 		}
 	}
@@ -132,4 +132,4 @@ class plgEventBookingMap extends JPlugin
 		</div>
 	<?php
 	}
-}	
+}

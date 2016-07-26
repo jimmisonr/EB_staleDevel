@@ -35,7 +35,7 @@ class plgEventBookingTicketTypes extends JPlugin
 
 		return array(
 			'title' => JText::_('EB_TICKET_TYPES'),
-			'form'  => $form
+			'form'  => $form,
 		);
 	}
 
@@ -73,7 +73,6 @@ class plgEventBookingTicketTypes extends JPlugin
 			{
 				continue;
 			}
-
 
 			$title                = $db->quote(trim($titles[$i]));
 			$description          = $db->quote(trim($descriptions[$i]));
@@ -134,7 +133,7 @@ class plgEventBookingTicketTypes extends JPlugin
 		{
 			$query->clear()
 				->delete('#__eb_ticket_types')
-				->where('event_id = ' . $row->id);				
+				->where('event_id = ' . $row->id);
 			$db->setQuery($query)
 				->execute();
 		}
@@ -293,4 +292,4 @@ class plgEventBookingTicketTypes extends JPlugin
 		</script>
 		<?php
 	}
-}	
+}

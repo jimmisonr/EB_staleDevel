@@ -107,7 +107,7 @@ class plgSystemEBReminder extends JPlugin
 					$options = array(
 						'defaultgroup' => $group,
 						'cachebase'    => ($client_id) ? JPATH_ADMINISTRATOR . '/cache' :
-							$conf->get('cache_path', JPATH_SITE . '/cache')
+							$conf->get('cache_path', JPATH_SITE . '/cache'),
 					);
 					$cache   = JCache::getInstance('callback', $options);
 					$cache->clean();

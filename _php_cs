@@ -44,13 +44,22 @@ $mainFinder = Symfony\CS\Finder\DefaultFinder::create()
 	)
 	->append($topFilesFinder);
 */	
-$mainFinder = Symfony\CS\Finder\DefaultFinder::create()
+/*$mainFinder = Symfony\CS\Finder\DefaultFinder::create()
 	->in(
 		array(
 			__DIR__ . '/com_eventbooking/site/view',
 			__DIR__ . '/com_eventbooking/admin/view'		
 		)
 	)->notPath('tmpl');	
+*/
+$mainFinder = Symfony\CS\Finder\DefaultFinder::create()
+	->in(
+		array(
+			__DIR__ . '/plugins',
+			__DIR__ . '/modules'		
+		)
+	)->files()->name('*.php')
+	->notPath('tmpl');		
 return Symfony\CS\Config\Config::create()
     ->setUsingLinter(false)
     ->setUsingCache(true)

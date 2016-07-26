@@ -9,41 +9,41 @@
  */
 // no direct access
 defined('_JEXEC') or die ;
-require_once( JPATH_BASE.'/components/com_community/libraries/core.php');
+require_once JPATH_BASE . '/components/com_community/libraries/core.php';
 
 class plgCommunityEB_RegistrationHistory extends CApplications
 {
+	public $name 		= "Event Booking Application";
+	public $_name		= 'EventBooking';
+	public $_path		= '';
+	public $_user		= '';
+	public $_my		= '';
 
-	var $name 		= "Event Booking Application";
-	var $_name		= 'EventBooking';
-	var $_path		= '';
-	var $_user		= '';
-	var $_my		= '';
-
-    function plgCommunityEB_RegistrationHistory(& $subject, $config)
+    public function plgCommunityEB_RegistrationHistory(& $subject, $config)
     {
-    	$this->_path	= JPATH_BASE.'/administrator/components/com_eventbooking';
+    	$this->_path	= JPATH_BASE . '/administrator/components/com_eventbooking';
 		$this->_user	= CFactory::getActiveProfile();
-		$this->_my		= CFactory::getUser();			
+		$this->_my		= CFactory::getUser();
 		parent::__construct($subject, $config);
     }
-		
-	function onProfileDisplay()
-	{								
-		if( !file_exists( $this->_path . '/eventbooking.php' ) ){			
-			$content = "<div class=\"icon-nopost\"><img src='".JURI::base()."components/com_community/assets/error.gif' alt=\"\" /></div>";	
-			$content .= "<div class=\"content-nopost\">".JText::_('Event Booking is not installed. Please contact site administrator.')."</div>";
-		}else{			
-			$user		= CFactory::getActiveProfile();			
+
+	public function onProfileDisplay()
+	{
+		if(!file_exists($this->_path . '/eventbooking.php')){
+			$content = "<div class=\"icon-nopost\"><img src='" . JURI::base() . "components/com_community/assets/error.gif' alt=\"\" /></div>";
+			$content .= "<div class=\"content-nopost\">" . JText::_('Event Booking is not installed. Please contact site administrator.') . "</div>";
+		}else{
+			$user		= CFactory::getActiveProfile();
 			$userId = $user->id;
 			$currentUserId = $this->_my->id ;
 			if ($userId != $currentUserId)
-				return null;
+				return;
 			$numberRecord = $this->params->get('number_records', 10);
 			$rows	= $this->_getRegistrationHistorys($userId, $numberRecord);
-			$total = $this->_getTotal($userId) ;														
+			$total = $this->_getTotal($userId) ;
 			$content = $this->_getRegistrationHistoryHTML($rows, $userId, $currentUserId, $total) ;
-		}	
+		}
+
 		return $content;
 	}
 	/**
@@ -54,14 +54,14 @@ class plgCommunityEB_RegistrationHistory extends CApplications
 	 * @param int $currentUserId
 	 * @param int $total
 	 * @return string
-	 */	
-	function _getRegistrationHistoryHTML($rows, $userId, $currentUserId, $total){			
-		require_once (JPATH_ROOT.'/components/com_eventbooking/helper/helper.php');
-		EventBookingHelper::loadLanguage();		
+	 */
+	public function _getRegistrationHistoryHTML($rows, $userId, $currentUserId, $total){
+		require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
+		EventBookingHelper::loadLanguage();
 		$symbol = EventBookingHelper::getConfigValue('currency_symbol') ;
-		$dateFormat = EventBookingHelper::getConfigValue('date_format') ;		
-		$itemId = EventBookingHelper::getItemid() ;		
-		ob_start();		
+		$dateFormat = EventBookingHelper::getConfigValue('date_format') ;
+		$itemId = EventBookingHelper::getItemid() ;
+		ob_start();
 		if (count($rows)) {
 		?>
 			<table width="100%" cellspacing="3" cellpadding="3" class="eb_registration_history">
@@ -79,7 +79,7 @@ class plgCommunityEB_RegistrationHistory extends CApplications
 						<?php echo JText::_('EB_REGISTRATION_DATE') ; ?>
 					</td>
 					<td class="sectiontableheader" align="right">
-						<?php echo JText::_('EB_AMOUNT').' ('.$symbol.')';?>
+						<?php echo JText::_('EB_AMOUNT') . ' (' . $symbol . ')';?>
 					</td>									
 				</tr>
 				<?php
@@ -91,10 +91,10 @@ class plgCommunityEB_RegistrationHistory extends CApplications
 					?>
 					<tr class="<?php echo $tab; ?>">
 						<td>
-							<?php echo ($i + 1); ?>
+							<?php echo $i + 1; ?>
 						</td>
 						<td>
-							<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=view_event&event_id='.$row->event_id.'&Itemid='.$itemId); ?>" target="_blank"><?php echo $row->event_title ; ?></a>
+							<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=view_event&event_id=' . $row->event_id . '&Itemid=' . $itemId); ?>" target="_blank"><?php echo $row->event_title ; ?></a>
 						</td>
 						<td align="center">
 							<?php echo $row->number_registrants ; ?>
@@ -107,41 +107,42 @@ class plgCommunityEB_RegistrationHistory extends CApplications
 						</td>						
 					</tr>
 					<?php	
-						$k =  1 - $k;	
-					}										
+						$k =  1 - $k;
+					}
 				?>												
 			</table>
 		<?php	
-		}		
+		}
 		$output = ob_get_contents();
-		ob_end_clean();			
-		return $output ;					
-	}	
+		ob_end_clean();
+
+		return $output ;
+	}
 	/**
 	 * Get list of registration records of the current user
 	 *
 	 * @param int $userId
 	 * @param int $numberRecords
 	 * @return array
-	 */		 
-	function _getRegistrationHistorys($userId, $numberRecords)
+	 */
+	public function _getRegistrationHistorys($userId, $numberRecords)
 	{
 		$db		= & JFactory::getDBO();
 		$sql=" SELECT a.*, b.title AS event_title FROM #__eb_registrants AS a INNER JOIN #__eb_events AS b ON a.event_id=b.id WHERE (a.published = 1 OR a.payment_method = 'os_offline') AND a.user_id=$userId "
-			. " Order by a.id DESC "			
-			. "\n LIMIT ".$numberRecords;
-		;
-		$db->setQuery($sql);		
-		return $db->loadObjectList();									
+			. " Order by a.id DESC "
+			. "\n LIMIT " . $numberRecords;
+		$db->setQuery($sql);
+
+		return $db->loadObjectList();
 	}
 	/**
 	 * Get total number of registration records
-	 *
 	 */
-	function _getTotal($userId) {
+	public function _getTotal($userId) {
 		$db		= JFactory::getDBO();
-		$sql = 'SELECT COUNT(*) FROM #__eb_registrants  WHERE user_id='.$userId.' AND (published=1 OR payment_method = "os_offline") ';
-		$db->setQuery($sql);		
+		$sql = 'SELECT COUNT(*) FROM #__eb_registrants  WHERE user_id=' . $userId . ' AND (published=1 OR payment_method = "os_offline") ';
+		$db->setQuery($sql);
+
 		return $db->loadResult();
-	}		
+	}
 }

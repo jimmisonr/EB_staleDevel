@@ -19,7 +19,7 @@ class plgEventbookingJoomlagroups extends JPlugin
 		JFactory::getLanguage()->load('plg_eventbooking_joomlagroups', JPATH_ADMINISTRATOR);
 		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/table');
 	}
-	
+
 	/**
 	 * Render settings form
 	 *
@@ -35,7 +35,7 @@ class plgEventbookingJoomlagroups extends JPlugin
 		ob_end_clean();
 
 		return array('title' => JText::_('PLG_EVENTBOOKING_JOOMLA_GROUPS_SETTINGS'),
-		             'form'  => $form
+		             'form'  => $form,
 		);
 	}
 
@@ -100,7 +100,6 @@ class plgEventbookingJoomlagroups extends JPlugin
 	 * Display form allows users to change setting for this subscription plan
 	 *
 	 * @param object $row
-	 *
 	 */
 	private function drawSettingForm($row)
 	{
@@ -124,4 +123,4 @@ class plgEventbookingJoomlagroups extends JPlugin
 		</table>
 	<?php
 	}
-}	
+}

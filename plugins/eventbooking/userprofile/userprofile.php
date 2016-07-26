@@ -85,7 +85,7 @@ class plgEventbookingUserprofile extends JPlugin
 				'profile.website',
 				'profile.favoritebook',
 				'profile.aboutme',
-				'profile.dob'
+				'profile.dob',
 			);
 			//Delete old profile data			
 			$db->setQuery(
@@ -129,9 +129,8 @@ class plgEventbookingUserprofile extends JPlugin
 				'website',
 				'favoritebook',
 				'aboutme',
-				'dob'
+				'dob',
 			);
-
 
 			$tuples = array();
 			$order  = 1;

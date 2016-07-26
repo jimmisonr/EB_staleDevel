@@ -11,7 +11,6 @@ defined('_JEXEC') or die;
 
 class plgContentEbCategory extends JPlugin
 {
-
 	public function onContentPrepare($context, &$article, &$params, $limitstart)
 	{
 		if (file_exists(JPATH_ROOT . '/components/com_eventbooking/eventbooking.php'))

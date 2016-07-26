@@ -11,7 +11,6 @@ defined('_JEXEC') or die;
 
 class plgContentEBRestriction extends JPlugin
 {
-
 	public function onContentPrepare($context, &$row, &$params, $page = 0)
 	{
 		if (file_exists(JPATH_ROOT . '/components/com_eventbooking/eventbooking.php') && is_object($row))

@@ -11,7 +11,6 @@ defined('_JEXEC') or die;
 
 class plgContentEBEvent extends JPlugin
 {
-
 	/**
 	 * Display event detail in the article
 	 *
@@ -23,7 +22,7 @@ class plgContentEBEvent extends JPlugin
 	 * @return bool
 	 * @throws Exception
 	 */
-	function onContentPrepare($context, &$article, &$params, $limitstart)
+	public function onContentPrepare($context, &$article, &$params, $limitstart)
 	{
 		error_reporting(0);
 		$app = JFactory::getApplication();

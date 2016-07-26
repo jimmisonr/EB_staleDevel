@@ -155,4 +155,4 @@ class plgEventbookingEasySocial extends JPlugin
 
 		return true;
 	}*/
-}	
+}

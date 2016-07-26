@@ -7,7 +7,7 @@
  * @copyright      Copyright (C) 2010 Ossolution Team
  * @license        GNU/GPL, see LICENSE.php
  */
-defined('_JEXEC') or die ('');
+defined('_JEXEC') or die('');
 
 JFactory::getDocument()->addStylesheet(JUri::base(true) . '/media/com_eventbooking/assets/css/style.css', 'text/css', null, null);
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
@@ -81,7 +81,7 @@ if ($showCategory)
 
 //Build location dropdown
 if ($showLocation)
-{	
+{
 	$options   			  = array();
 	$options[]            = JHtml::_('select.option', 0, JText::_('EB_SELECT_LOCATION'), 'id', 'name');
 	$options              = array_merge($options, EventbookingHelperDatabase::getAllLocations());
@@ -95,4 +95,4 @@ if (!$itemId)
 
 $layout = $params->get('layout_type', 'default');
 
-require(JModuleHelper::getLayoutPath('mod_eb_search', $params->get('module_layout', 'default')));
+require JModuleHelper::getLayoutPath('mod_eb_search', $params->get('module_layout', 'default'));

@@ -12,8 +12,8 @@ defined('_JEXEC') or die;
 error_reporting(0);
 
 if (file_exists(JPATH_ROOT . '/components/com_eventbooking/eventbooking.php'))
-{	
-	require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';	
+{
+	require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
 	$view = $params->get('view', 'categories');
 	$queryString = $params->get('query_string', '');
 	EventbookingHelper::loadLanguage();
@@ -23,10 +23,10 @@ if (file_exists(JPATH_ROOT . '/components/com_eventbooking/eventbooking.php'))
 		parse_str($queryString, $vars);
 		$request = array_merge($request, $vars);
 	}
-		
+
 	if (!isset($request['Itemid']))
 	{
-		$request['Itemid'] = EventbookingHelper::getItemid();	
+		$request['Itemid'] = EventbookingHelper::getItemid();
 	}
 
 	if (!isset($request['limitstart']))

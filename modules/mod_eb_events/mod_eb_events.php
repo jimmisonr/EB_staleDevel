@@ -97,7 +97,6 @@ for ($i = 0, $n = count($rows); $i < $n; $i++)
 	$query->clear('where');
 }
 
-
 $layout = $params->get('layout', 'default');
 if ($layout == 'default')
 {
@@ -121,4 +120,4 @@ else
 }
 
 $document->addStyleSheet($baseUrl . '/media/com_eventbooking/assets/css/themes/' . $theme . '.css');
-require(JModuleHelper::getLayoutPath('mod_eb_events', $layout));
+require JModuleHelper::getLayoutPath('mod_eb_events', $layout);

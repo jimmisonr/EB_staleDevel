@@ -11,7 +11,6 @@ defined('_JEXEC') or die;
 
 class plgEventbookingEasyprofile extends JPlugin
 {
-
 	/**
 	 * Constructor
 	 *
@@ -162,4 +161,4 @@ class plgEventbookingEasyprofile extends JPlugin
 			}
 		}
 	}
-}	
+}

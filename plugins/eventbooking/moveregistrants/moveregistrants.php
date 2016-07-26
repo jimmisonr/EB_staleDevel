@@ -83,4 +83,4 @@ class plgEventBookingMoveRegistrants extends JPlugin
 
 		return true;
 	}
-}	
+}

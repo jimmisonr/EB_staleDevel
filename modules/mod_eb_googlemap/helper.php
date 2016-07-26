@@ -20,7 +20,6 @@ class modEventBookingGoogleMapHelper
 
 	/**
 	 * initialization class
-	 *
 	 */
 	public function __construct($module, $params)
 	{
@@ -64,7 +63,7 @@ class modEventBookingGoogleMapHelper
 		foreach($rows as $row)
 		{
 			$query->clear('where')
-				->where('a.location_id = '. $row->id)
+				->where('a.location_id = ' . $row->id)
 				->where('a.published = 1')
 				->where('a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
 				->where('c.main_category = 1');
@@ -93,7 +92,6 @@ class modEventBookingGoogleMapHelper
 
 	/**
 	 * general google map for event
-	 *
 	 */
 	protected function loadMapInListing()
 	{
@@ -167,7 +165,7 @@ class modEventBookingGoogleMapHelper
 						makeMarker({
 							position: eventListing<?php echo $location->id?>,
 							title: "<?php echo addslashes($location->title);?>",
-							content: '<div class="row-fluid"><ul><?php foreach ($events as $event){ echo '<li><h4>'. JHtml::link(EventbookingHelperRoute::getEventRoute($event->id, $event->catid, $this->Itemid), addslashes($event->title)).'</h4></li>'; }?></ul></div>',
+							content: '<div class="row-fluid"><ul><?php foreach ($events as $event){ echo '<li><h4>' . JHtml::link(EventbookingHelperRoute::getEventRoute($event->id, $event->catid, $this->Itemid), addslashes($event->title)) . '</h4></li>'; }?></ul></div>',
 							icon: new google.maps.MarkerImage('<?php echo $rootUri; ?>modules/mod_eb_googlemap/asset/marker/marker.png')
 						});
 					<?php

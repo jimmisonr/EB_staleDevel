@@ -13,7 +13,6 @@ defined('_JEXEC') or die;
 
 class plgEventBookingCartUpdate extends JPlugin
 {
-
 	/**
 	 * Mark all registration records in cart paid when the payment completed
 	 *

@@ -42,4 +42,4 @@ $width  = $params->get('width', 100);
 $height = $params->get('height', 400);
 $ebMap  = new modEventBookingGoogleMapHelper($module, $params);
 
-require(JModuleHelper::getLayoutPath('mod_eb_googlemap'));
+require JModuleHelper::getLayoutPath('mod_eb_googlemap');

@@ -32,7 +32,7 @@ class plgEventBookingAcymailing extends JPlugin
 		if (!is_dir(JPATH_ADMINISTRATOR . '/components/com_acymailing'))
 		{
 			return array('title' => JText::_('PLG_EB_ACYMAILING_LIST_SETTINGS'),
-			             'form'  => JText::_('Please install component Acymailing')
+			             'form'  => JText::_('Please install component Acymailing'),
 			);
 		}
 		ob_start();
@@ -41,7 +41,7 @@ class plgEventBookingAcymailing extends JPlugin
 		ob_end_clean();
 
 		return array('title' => JText::_('PLG_EB_ACYMAILING_LIST_SETTINGS'),
-		             'form'  => $form
+		             'form'  => $form,
 		);
 	}
 
@@ -98,7 +98,7 @@ class plgEventBookingAcymailing extends JPlugin
 				$newList['status'] = 1;
 				$newEvent[$listId] = $newList;
 			}
-			
+
 			$userClass->saveSubscription($subId, $newEvent);
 		}
 	}
@@ -131,4 +131,4 @@ class plgEventBookingAcymailing extends JPlugin
 		</table>
 	<?php
 	}
-}	
+}

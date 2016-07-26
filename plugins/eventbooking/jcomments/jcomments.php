@@ -27,7 +27,7 @@ class plgEventBookingJcomments extends JPlugin
 		ob_end_clean();
 
 		return array('title' => JText::_('Comment'),
-		             'form'  => $form
+		             'form'  => $form,
 		);
 	}
 
@@ -41,9 +41,9 @@ class plgEventBookingJcomments extends JPlugin
 		$comments = JPATH_ROOT . '/components/com_jcomments/jcomments.php';
 		if (file_exists($comments))
 		{
-			require_once($comments);
+			require_once $comments;
 			echo '<div style="clear:both; padding-top: 10px;"></div>';
 			echo JComments::showComments($row->id, 'com_eventbooking', $row->title);
 		}
 	}
-}	
+}

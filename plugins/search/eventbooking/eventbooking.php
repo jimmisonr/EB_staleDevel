@@ -34,7 +34,7 @@ class plgSearchEventBooking extends JPlugin
 	public function onContentSearchAreas()
 	{
 		static $areas = array(
-			'eb_search' => 'Events'
+			'eb_search' => 'Events',
 		);
 
 		return $areas;

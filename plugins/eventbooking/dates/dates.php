@@ -39,7 +39,7 @@ class plgEventBookingDates extends JPlugin
 		$form = ob_get_clean();
 
 		return array('title' => JText::_('EB_ADDITIONAL_DATES'),
-		             'form'  => $form
+		             'form'  => $form,
 		);
 	}
 
@@ -70,7 +70,7 @@ class plgEventBookingDates extends JPlugin
 				continue;
 			}
 
-			$rowEvent     = clone ($row);
+			$rowEvent     = clone $row;
 			$id           = isset($data['event_id_' . $i]) ? $data['event_id_' . $i] : 0;
 			$rowEvent->id = $id;
 
@@ -90,7 +90,6 @@ class plgEventBookingDates extends JPlugin
 				$rowEvent->alias = JApplicationHelper::stringURLSafe($rowEvent->title . '-' . JHtml::_('date', $rowEvent->event_date, $config->date_format, null));
 				$rowEvent->hits = 0;
 			}
-
 
 			$rowEvent->store();
 
@@ -121,8 +120,6 @@ class plgEventBookingDates extends JPlugin
 
 		$row->store();
 
-
-
 		// Remove the events which are removed by users
 		if (!$isNew)
 		{
@@ -130,7 +127,7 @@ class plgEventBookingDates extends JPlugin
 			$query = $db->getQuery(true);
 			$query->select('id')
 					->from('#__eb_events')
-					->where('parent_id = '. $row->id)
+					->where('parent_id = ' . $row->id)
 					->where('is_additional_date = 1');
 			$db->setQuery($query);
 			$allChildrenEventIds = $db->loadColumn();
@@ -168,7 +165,7 @@ class plgEventBookingDates extends JPlugin
 
 		$query->select('id, event_date, event_end_date, cut_off_date, registration_start_date, location_id')
 				->from('#__eb_events')
-				->where('parent_id = '. (int) $row->id)
+				->where('parent_id = ' . (int) $row->id)
 				->where('is_additional_date = 1')
 				->order('id');
 		$db->setQuery($query);
@@ -284,9 +281,9 @@ class plgEventBookingDates extends JPlugin
 							<?php echo JText::_('EB_EVENT_START_DATE'); ?>
 						</label>
 						<div class="controls">
-							<?php echo JHtml::_('calendar', ($eventDate == $nullDate) ? '' : JHtml::_('date', $eventDate, $format, null), 'event_date_'.$i, 'event_date_'.$i, '%Y-%m-%d', array('class' => 'input-small')) ; ?>
-							<?php echo JHtml::_('select.integerlist', 0, 23, 1, 'event_date_hour_'.$i, ' class="input-mini" ', $eventDateHour); ?>
-							<?php echo JHtml::_('select.integerlist', 0, 55, 5, 'event_date_minute_'.$i, ' class="input-mini" ', $eventDateMinute, '%02d'); ?>
+							<?php echo JHtml::_('calendar', ($eventDate == $nullDate) ? '' : JHtml::_('date', $eventDate, $format, null), 'event_date_' . $i, 'event_date_' . $i, '%Y-%m-%d', array('class' => 'input-small')) ; ?>
+							<?php echo JHtml::_('select.integerlist', 0, 23, 1, 'event_date_hour_' . $i, ' class="input-mini" ', $eventDateHour); ?>
+							<?php echo JHtml::_('select.integerlist', 0, 55, 5, 'event_date_minute_' . $i, ' class="input-mini" ', $eventDateMinute, '%02d'); ?>
 						</div>
 					</div>
 					<div class="control-group">
@@ -294,9 +291,9 @@ class plgEventBookingDates extends JPlugin
 							<?php echo JText::_('EB_EVENT_END_DATE'); ?>
 						</label>
 						<div class="controls">
-							<?php echo JHtml::_('calendar', ($eventEndDate == $nullDate) ? '' : JHtml::_('date', $eventEndDate, $format, null), 'event_end_date_'.$i, 'event_end_date_'.$i, '%Y-%m-%d', array('class' => 'input-small')) ; ?>
-							<?php echo JHtml::_('select.integerlist', 0, 23, 1, 'event_end_date_hour_'.$i, ' class="input-mini" ', $eventEndDateHour); ?>
-							<?php echo JHtml::_('select.integerlist', 0, 55, 5, 'event_end_date_minute_'.$i, ' class="input-mini" ', $eventEndDateMinute, '%02d'); ?>
+							<?php echo JHtml::_('calendar', ($eventEndDate == $nullDate) ? '' : JHtml::_('date', $eventEndDate, $format, null), 'event_end_date_' . $i, 'event_end_date_' . $i, '%Y-%m-%d', array('class' => 'input-small')) ; ?>
+							<?php echo JHtml::_('select.integerlist', 0, 23, 1, 'event_end_date_hour_' . $i, ' class="input-mini" ', $eventEndDateHour); ?>
+							<?php echo JHtml::_('select.integerlist', 0, 55, 5, 'event_end_date_minute_' . $i, ' class="input-mini" ', $eventEndDateMinute, '%02d'); ?>
 						</div>
 					</div>
 					<div class="control-group">
@@ -304,9 +301,9 @@ class plgEventBookingDates extends JPlugin
 							<?php echo JText::_('EB_REGISTRATION_START_DATE'); ?>
 						</label>
 						<div class="controls">
-							<?php echo JHtml::_('calendar', ($registrationStartDate == $nullDate) ? '' : JHtml::_('date', $registrationStartDate, $format, null), 'registration_start_date_'.$i, 'registration_start_date_'.$i, '%Y-%m-%d', array('class' => 'input-small')) ; ?>
-							<?php echo JHtml::_('select.integerlist', 0, 23, 1, 'registration_start_date_hour_'.$i, ' class="input-mini" ', $registrationStartDateHour); ?>
-							<?php echo JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_date_minute_'.$i, ' class="input-mini" ', $registrationStartDateMinute, '%02d'); ?>
+							<?php echo JHtml::_('calendar', ($registrationStartDate == $nullDate) ? '' : JHtml::_('date', $registrationStartDate, $format, null), 'registration_start_date_' . $i, 'registration_start_date_' . $i, '%Y-%m-%d', array('class' => 'input-small')) ; ?>
+							<?php echo JHtml::_('select.integerlist', 0, 23, 1, 'registration_start_date_hour_' . $i, ' class="input-mini" ', $registrationStartDateHour); ?>
+							<?php echo JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_date_minute_' . $i, ' class="input-mini" ', $registrationStartDateMinute, '%02d'); ?>
 						</div>
 					</div>
 					<div class="control-group">
@@ -314,9 +311,9 @@ class plgEventBookingDates extends JPlugin
 							<?php echo JText::_('EB_CUT_OFF_DATE'); ?>
 						</label>
 						<div class="controls">
-							<?php echo JHtml::_('calendar', ($cutOffDate == $nullDate) ? '' : JHtml::_('date', $cutOffDate, $format, null), 'cut_off_date_'.$i, 'cut_off_date_'.$i, '%Y-%m-%d', array('class' => 'input-small')) ; ?>
-							<?php echo JHtml::_('select.integerlist', 0, 23, 1, 'cut_off_date_hour_'.$i, ' class="input-mini" ', $cutOffDateHour); ?>
-							<?php echo JHtml::_('select.integerlist', 0, 55, 5, 'cut_off_date_minute_'.$i, ' class="input-mini" ', $cutOffDateMinute, '%02d'); ?>
+							<?php echo JHtml::_('calendar', ($cutOffDate == $nullDate) ? '' : JHtml::_('date', $cutOffDate, $format, null), 'cut_off_date_' . $i, 'cut_off_date_' . $i, '%Y-%m-%d', array('class' => 'input-small')) ; ?>
+							<?php echo JHtml::_('select.integerlist', 0, 23, 1, 'cut_off_date_hour_' . $i, ' class="input-mini" ', $cutOffDateHour); ?>
+							<?php echo JHtml::_('select.integerlist', 0, 55, 5, 'cut_off_date_minute_' . $i, ' class="input-mini" ', $cutOffDateMinute, '%02d'); ?>
 						</div>
 					</div>
 					<div class="control-group">
@@ -324,7 +321,7 @@ class plgEventBookingDates extends JPlugin
 							<?php echo JText::_('EB_LOCATION'); ?>
 						</label>
 						<div class="controls">
-							<?php echo JHtml::_('select.genericlist', $options, 'location_id_'.$i, '', 'id', 'name', $locationId); ?>
+							<?php echo JHtml::_('select.genericlist', $options, 'location_id_' . $i, '', 'id', 'name', $locationId); ?>
 						</div>
 					</div>
 					<div class="control-group">
@@ -362,7 +359,7 @@ class plgEventBookingDates extends JPlugin
 					html += '<input type="text" style="width: 100px;" class="input-medium hasTooltip" value="" id="event_date_'+countDate+'" name="event_date_'+countDate+'">';
 					html += '<button id="event_date_'+countDate+'_img" class="btn" type="button"><i class="icon-calendar"></i></button>';
 					html += '</div>';
-					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 23, 1, 'event_date_hour_'.$i, ' class="input-mini event_date_hour" ', $eventDateHour)); ?><?php echo preg_replace(array('/\r/', '/\n/'), '',JHtml::_('select.integerlist', 0, 55, 5, 'event_date_minute_'.$i, ' class="input-mini event_date_minute" ', $eventDateMinute, '%02d')); ?>';
+					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 23, 1, 'event_date_hour_' . $i, ' class="input-mini event_date_hour" ', $eventDateHour)); ?><?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 55, 5, 'event_date_minute_' . $i, ' class="input-mini event_date_minute" ', $eventDateMinute, '%02d')); ?>';
 					html += '</div>';
 					html += '</div>';
 					//event end date
@@ -373,7 +370,7 @@ class plgEventBookingDates extends JPlugin
 					html += '<input type="text" style="width: 100px;" class="input-medium hasTooltip" value="" id="event_end_date_'+countDate+'" name="event_end_date_'+countDate+'">';
 					html += '<button id="event_end_date_'+countDate+'_img" class="btn" type="button"><i class="icon-calendar"></i></button>';
 					html += '</div>';
-					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 23, 1, 'event_end_date_hour_'.$i, ' class="input-mini event_end_date_hour" ', $eventEndDateHour)); ?> <?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 55, 5, 'event_end_date_minute_'.$i, ' class="input-mini event_end_date_minute" ', $eventEndDateMinute, '%02d')); ?>';
+					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 23, 1, 'event_end_date_hour_' . $i, ' class="input-mini event_end_date_hour" ', $eventEndDateHour)); ?> <?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 55, 5, 'event_end_date_minute_' . $i, ' class="input-mini event_end_date_minute" ', $eventEndDateMinute, '%02d')); ?>';
 					html += '</div>';
 					html += '</div>';
 					//registranstart date
@@ -384,7 +381,7 @@ class plgEventBookingDates extends JPlugin
 					html += '<input type="text" style="width: 100px;" class="input-medium hasTooltip" value="" id="registration_start_date_'+countDate+'" name="registration_start_date_'+countDate+'">';
 					html += '<button id="registration_start_date_'+countDate+'_img" class="btn" type="button"><i class="icon-calendar"></i></button>';
 					html += '</div>';
-					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 23, 1, 'registration_start_date_hour_'.$i, ' class="registration_start_date_hour input-mini" ', $registrationStartDateHour)); ?> <?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_date_minute_'.$i, ' class="registration_start_date_minute input-mini" ', $registrationStartDateMinute, '%02d')); ?>';
+					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 23, 1, 'registration_start_date_hour_' . $i, ' class="registration_start_date_hour input-mini" ', $registrationStartDateHour)); ?> <?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_date_minute_' . $i, ' class="registration_start_date_minute input-mini" ', $registrationStartDateMinute, '%02d')); ?>';
 					html += '</div>';
 					html += '</div>';
 					//cut of date
@@ -395,14 +392,14 @@ class plgEventBookingDates extends JPlugin
 					html += '<input type="text" style="width: 100px;" class="input-medium hasTooltip" value="" id="cut_off_date_'+countDate+'" name="cut_off_date_'+countDate+'">';
 					html += '<button id="cut_off_date_'+countDate+'_img" class="btn" type="button"><i class="icon-calendar"></i></button>';
 					html += '</div>';
-					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 23, 1, 'cut_off_date_hour_'.$i, ' class="cut_off_date_hour input-mini" ', $cutOffDateHour)); ?> <?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 55, 5, 'cut_off_date_minute_'.$i, ' class="cut_off_date_minute input-mini" ', $cutOffDateMinute, '%02d')); ?>';
+					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 23, 1, 'cut_off_date_hour_' . $i, ' class="cut_off_date_hour input-mini" ', $cutOffDateHour)); ?> <?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 55, 5, 'cut_off_date_minute_' . $i, ' class="cut_off_date_minute input-mini" ', $cutOffDateMinute, '%02d')); ?>';
 					html += '</div>';
 					html += '</div>';
 					//location
 					html += '<div class="control-group">';
 					html += '<label class="control-label"><?php echo JText::_('EB_SELECT_LOCATION'); ?></label>';
 					html += '<div class="controls">';
-					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.genericlist', $options, 'location_id_'.$i, 'class="location_id"', 'id', 'name', $locationId)); ?>';
+					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.genericlist', $options, 'location_id_' . $i, 'class="location_id"', 'id', 'name', $locationId)); ?>';
 					html += '</div>';
 					html += '</div>';
 					//remove button

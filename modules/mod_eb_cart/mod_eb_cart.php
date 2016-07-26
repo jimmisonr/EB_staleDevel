@@ -34,5 +34,5 @@ if (file_exists(JPATH_ROOT . '/components/com_eventbooking/helper/helper.php'))
 			$row->rate = $row->discounted_rate;
 		}
 	}
-	require(JModuleHelper::getLayoutPath('mod_eb_cart'));
+	require JModuleHelper::getLayoutPath('mod_eb_cart');
 }
