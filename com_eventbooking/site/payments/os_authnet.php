@@ -27,7 +27,7 @@ class os_authnet extends RADPaymentOmnipay
 		$config['params_map'] = array(
 			'apiLoginId'     => 'x_login',
 			'transactionKey' => 'x_tran_key',
-			'developerMode'  => 'authnet_mode'
+			'developerMode'  => 'authnet_mode',
 		);
 
 		parent::__construct($params, $config);

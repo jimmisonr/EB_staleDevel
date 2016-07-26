@@ -550,7 +550,6 @@ class EventBookingModelRegister extends RADModel
 		}
 	}
 
-
 	/**
 	 * Process payment confirmation, update status of the registration records, sending emails...
 	 *
@@ -567,7 +566,6 @@ class EventBookingModelRegister extends RADModel
 
 	/**
 	 * Process registration cancellation
-	 *
 	 */
 	public function cancelRegistration($id)
 	{
@@ -734,4 +732,4 @@ class EventBookingModelRegister extends RADModel
 		// Notify waiting list ?
 		EventbookingHelper::notifyWaitingList($row, $config);
 	}
-} 
+}

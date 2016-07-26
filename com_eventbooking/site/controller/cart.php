@@ -200,7 +200,6 @@ class EventbookingControllerCart extends EventbookingController
 		$this->app->close();
 	}
 
-
 	/**
 	 * Validate form data, make sure the required fields are entered
 	 *
@@ -241,7 +240,7 @@ class EventbookingControllerCart extends EventbookingController
 		$config = EventbookingHelper::getConfig();
 		$result = array(
 			'success' => true,
-			'message' => ''
+			'message' => '',
 		);
 
 		if ($config->prevent_duplicate_registration && !$config->multiple_booking)

@@ -108,7 +108,7 @@ class EventbookingHelperBootstrap
 				'img-polaroid'    => 'img-thumbnail',
 				'control-label'   => 'col-sm-3 control-label',
 				'controls'        => 'col-sm-9',
-				'icon-location'	  => 'icon-location'
+				'icon-location'	  => 'icon-location',
 			);
 		}
 	}
@@ -150,7 +150,7 @@ class EventbookingHelperBootstrap
 		}
 		else
 		{
-			return null;
+			return;
 		}
 
 	}

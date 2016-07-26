@@ -33,7 +33,6 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 	/**
 	 * Delete the selected registration record
-	 *
 	 */
 	public function delete()
 	{
@@ -211,7 +210,6 @@ class EventbookingControllerRegistrant extends EventbookingController
 			}
 		}
 
-
 		if (!$canDownload)
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('You do not have permission to download the invoice'));
@@ -301,7 +299,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 	public function check_in_webapp()
 	{
 		JSession::checkToken('get');
-		
+
 		$user = JFactory::getUser();
 		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{

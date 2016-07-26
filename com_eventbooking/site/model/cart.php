@@ -260,8 +260,8 @@ class EventbookingModelCart extends RADModel
 			$sql = 'UPDATE #__eb_coupons SET used = used + 1 WHERE id=' . (int) $couponId;
 			$db->setQuery($sql);
 			$db->execute();
-		}		
-		
+		}
+
 		$session = JFactory::getSession();
 		$session->set('eb_registration_code', $row->registration_code);
 		if ($fees['amount'] > 0)
@@ -316,10 +316,10 @@ class EventbookingModelCart extends RADModel
 				->set('payment_date=NOW()')
 				->where('cart_id = ' . $row->id);
 			$db->setQuery($query);
-			$db->execute();			
+			$db->execute();
 			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
 			EventbookingHelper::sendEmails($row, $config);
-			
+
 			return 1;
 		}
 	}
@@ -329,7 +329,7 @@ class EventbookingModelCart extends RADModel
 	 *
 	 * @return array|mixed
 	 */
-	function getData()
+	public function getData()
 	{
 		$config = EventbookingHelper::getConfig();
 		$cart   = new EventbookingHelperCart();
@@ -350,4 +350,4 @@ class EventbookingModelCart extends RADModel
 
 		return $rows;
 	}
-} 
+}

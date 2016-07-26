@@ -12,51 +12,50 @@ defined('_JEXEC') or die;
 
 class os_payment
 {
-
 	/**
 	 * Name of payment method
 	 *
 	 * @var string
 	 */
-	var $_name = null;
+	public $_name = null;
 
 	/**
 	 * Payment Method title
 	 * @var string
 	 */
-	var $_title = null;
+	public $_title = null;
 
 	/**
 	 * Creditcard payment method ?
 	 *
 	 * @var string
 	 */
-	var $_creditCard = false;
+	public $_creditCard = false;
 
 	/**
 	 * Require card cvv code ?
 	 *
 	 * @var boolean
 	 */
-	var $_cardCvv = false;
+	public $_cardCvv = false;
 
 	/**
 	 * Require creditcard type ?
 	 *
 	 * @var boolean
 	 */
-	var $_cardType = false;
+	public $_cardType = false;
 
 	/**
 	 * Require card holder name ?
 	 *
 	 * @var boolean
 	 */
-	var $_cardHolderName = false;
+	public $_cardHolderName = false;
 
-	var $paymentFee = false;
+	public $paymentFee = false;
 
-	function os_payment()
+	public function os_payment()
 	{
 		$this->loadLanguage();
 	}
@@ -66,17 +65,17 @@ class os_payment
 	 *
 	 * @return string
 	 */
-	function getName()
+	public function getName()
 	{
 		return $this->_name;
 	}
 
-	function setTitle($title)
+	public function setTitle($title)
 	{
 		$this->_title = $title;
 	}
 
-	function getTitle()
+	public function getTitle()
 	{
 		return $this->_title;
 	}
@@ -86,7 +85,7 @@ class os_payment
 	 *
 	 * @param string $value
 	 */
-	function setName($value)
+	public function setName($value)
 	{
 		$this->_name = $value;
 	}
@@ -96,16 +95,16 @@ class os_payment
 	 *
 	 * @return boolean
 	 */
-	function getCreditCard()
+	public function getCreditCard()
 	{
 		if ($this->_creditCard)
 		{
 			return 1;
-		}			
+		}
 		else
 		{
 			return 0;
-		}			
+		}
 	}
 
 	/**
@@ -113,7 +112,7 @@ class os_payment
 	 *
 	 * @param  $value
 	 */
-	function setCreditCard($value)
+	public function setCreditCard($value)
 	{
 		$this->_creditCard = $value;
 	}
@@ -123,16 +122,16 @@ class os_payment
 	 *
 	 * @return boolean
 	 */
-	function getCardCvv()
+	public function getCardCvv()
 	{
 		if ($this->_cardCvv)
 		{
 			return 1;
-		}			
+		}
 		else
 		{
 			return 0;
-		}			
+		}
 	}
 
 	/**
@@ -140,7 +139,7 @@ class os_payment
 	 *
 	 * @param boolean
 	 */
-	function setCardCvv($value)
+	public function setCardCvv($value)
 	{
 		$this->_cardCvv = $value;
 	}
@@ -150,16 +149,16 @@ class os_payment
 	 *
 	 * @return boolean
 	 */
-	function getCardType()
+	public function getCardType()
 	{
 		if ($this->_cardType)
 		{
 			return 1;
-		}			
+		}
 		else
 		{
 			return 0;
-		}			
+		}
 	}
 
 	/**
@@ -167,7 +166,7 @@ class os_payment
 	 *
 	 * @param boolean $value
 	 */
-	function setCardType($value)
+	public function setCardType($value)
 	{
 		$this->_cardType = $value;
 	}
@@ -177,16 +176,16 @@ class os_payment
 	 *
 	 * @return boolean
 	 */
-	function getCardHolderName()
+	public function getCardHolderName()
 	{
 		if ($this->_cardHolderName)
 		{
 			return 1;
-		}			
+		}
 		else
 		{
 			return 0;
-		}			
+		}
 	}
 
 	/**
@@ -194,16 +193,15 @@ class os_payment
 	 *
 	 * @param boolean $value
 	 */
-	function setCardHolderName($value)
+	public function setCardHolderName($value)
 	{
 		$this->_cardHolderName = $value;
 	}
 
 	/**
 	 * Load language file for this payment plugin
-	 *
 	 */
-	function loadLanguage()
+	public function loadLanguage()
 	{
 		$pluginName = $this->getName();
 		$lang = JFactory::getLanguage();
@@ -211,7 +209,7 @@ class os_payment
 		if (!$tag)
 		{
 			$tag = 'en-GB';
-		}			
+		}
 		$lang->load($pluginName, JPATH_ROOT, $tag);
 	}
 }

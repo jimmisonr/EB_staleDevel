@@ -29,7 +29,7 @@ class EventbookingHelperData
 				JText::_('EB_WEDNESDAY'),
 				JText::_('EB_THURSDAY'),
 				JText::_('EB_FRIDAY'),
-				JText::_('EB_SATURDAY')
+				JText::_('EB_SATURDAY'),
 			);
 		}
 		$i = $dayNumber % 7;
@@ -77,7 +77,7 @@ class EventbookingHelperData
 		{
 			$dayName = '<span class="sunday">' . self::getDayName($i) . '</span>';
 		}
-		else if ($i == '6' && $colored === true)
+		elseif ($i == '6' && $colored === true)
 		{
 			$dayName = '<span class="saturday">' . self::getDayName($i) . '</span>';
 		}
@@ -104,7 +104,7 @@ class EventbookingHelperData
 		{
 			$dayName = '<span class="sunday">' . self::getDayNameMini($i) . '</span>';
 		}
-		else if ($i == '6' && $colored === true)
+		elseif ($i == '6' && $colored === true)
 		{
 			$dayName = '<span class="saturday">' . self::getDayNameMini($i) . '</span>';
 		}
@@ -176,7 +176,6 @@ class EventbookingHelperData
 		$todayDay   = $todayDate->format('d');
 		$todayMonth = $todayDate->format('m');
 		$todayYear  = $todayDate->format('Y');
-
 
 		//Current month
 		$end = date('t', mktime(0, 0, 0, ($month + 1), 0, $year));
@@ -547,14 +546,12 @@ class EventbookingHelperData
 						$ticketTypeIds[] = $ticketType->id;
 					}
 
-
 					$db    = JFactory::getDbo();
 					$query = $db->getQuery(true);
 					$query->select('registrant_id, ticket_type_id, quantity')
 						->from('#__eb_registrant_tickets')
 						->where('ticket_type_id IN (' . implode(',', $ticketTypeIds) . ')');
 					$db->setQuery($query);
-
 
 					$registrantTickets = $db->loadObjectList();
 

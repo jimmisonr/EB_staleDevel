@@ -14,5 +14,4 @@ require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/common/re
 
 class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 {
-
 }

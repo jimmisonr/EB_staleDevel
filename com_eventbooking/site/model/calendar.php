@@ -26,14 +26,13 @@ class EventbookingModelCalendar extends RADModel
 			'a.event_end_date',
 			'a.thumb',
 			'a.alias',
-			'a.featured'
+			'a.featured',
 	);
 
 	/**
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 
 	public function __construct($config = array())
@@ -130,7 +129,7 @@ class EventbookingModelCalendar extends RADModel
 
 		if (!empty($excludeCategoryIds))
 		{
-			$query->where('a.id NOT IN (SELECT event_id FROM #__eb_event_categories WHERE category_id IN ('.implode(',', $excludeCategoryIds).'))');
+			$query->where('a.id NOT IN (SELECT event_id FROM #__eb_event_categories WHERE category_id IN (' . implode(',', $excludeCategoryIds) . '))');
 		}
 
 		$db->setQuery($query);
@@ -155,7 +154,7 @@ class EventbookingModelCalendar extends RADModel
 				while ($startTime < $endTime)
 				{
 					$count++;
-					$rowNew             = clone ($row);
+					$rowNew             = clone $row;
 					$rowNew->event_date = date('Y-m-d H:i:s', $startDateTime + $count * 24 * 3600);
 					$arrDates           = explode('-', $rowNew->event_date);
 					if ($arrDates[0] == $year && $arrDates[1] == $month)

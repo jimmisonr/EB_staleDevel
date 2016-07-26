@@ -104,7 +104,7 @@ class EventbookingHelperHtml2text
 		"\n\n", // <table> and </table>
 		"\n", // <tr> and </tr>
 		"\t\t\\1\n", // <td> and </td>
-		"" // <span class="_html2text_ignore">...</span>
+		"", // <span class="_html2text_ignore">...</span>
 	);
 
 	/**
@@ -160,7 +160,7 @@ class EventbookingHelperHtml2text
 		"/\t/",
 		'/ /',
 		'/<pre[^>]*>/',
-		'/<\/pre>/'
+		'/<\/pre>/',
 	);
 
 	/**

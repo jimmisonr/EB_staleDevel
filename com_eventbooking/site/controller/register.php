@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingControllerRegister extends EventbookingController
 {
-
 	/**
 	 * Check the entered event password and make sure the entered password is valid
 	 */
@@ -449,7 +448,6 @@ class EventbookingControllerRegister extends EventbookingController
 		$this->app->close();
 	}
 
-
 	/**
 	 * Validate form data, make sure the required fields are entered
 	 *
@@ -522,7 +520,7 @@ class EventbookingControllerRegister extends EventbookingController
 		$config = EventbookingHelper::getConfig();
 		$result = array(
 			'success' => true,
-			'message' => ''
+			'message' => '',
 		);
 
 		if ($config->prevent_duplicate_registration && !$config->multiple_booking)

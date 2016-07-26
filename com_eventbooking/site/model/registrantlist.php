@@ -16,12 +16,11 @@ class EventbookingModelRegistrantlist extends EventbookingModelRegistrants
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{
 		$config['remember_states'] = false;
-		
+
 		parent::__construct($config);
 
 		$this->state->insert('id', 'int', 0);

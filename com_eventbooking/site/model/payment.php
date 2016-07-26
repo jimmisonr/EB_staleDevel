@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventBookingModelPayment extends RADModel
 {
-
 	/**
 	 * Process individual registration
 	 *
@@ -98,4 +97,4 @@ class EventBookingModelPayment extends RADModel
 			echo JText::_('EB_INVALID_DEPOSIT_PAYMENT');
 		}
 	}
-} 
+}

@@ -36,7 +36,7 @@ abstract class EventbookingHelperJquery
 			$activeLanguageTag   = JFactory::getLanguage()->getTag();
 			$allowedLanguageTags = array('ar-AA', 'bg-BG', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'es-ES', 'et-EE',
 				'fa-IR', 'fi-FI', 'fr-FR', 'he-IL', 'hr-HR', 'hu-HU', 'it-IT', 'ja-JP', 'ko-KR', 'lv-LV', 'nb-NO', 'nl-NL',
-				'pl-PL', 'pt-BR', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'zh-CN', 'zh-TW'
+				'pl-PL', 'pt-BR', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-RS', 'sv-SE', 'tr-TR', 'uk-UA', 'zh-CN', 'zh-TW',
 			);
 
 			// English is bundled into the source therefore we don't have to load it.
@@ -52,7 +52,7 @@ abstract class EventbookingHelperJquery
 		{
 			$options = array(
 				'maxWidth'  => '80%',
-				'maxHeight' => '80%'
+				'maxHeight' => '80%',
 			);
 			$script  = 'Eb.jQuery(document).ready(function($){$("' . $class . '").colorbox(' . self::getJSObject($options) . ');});';
 		}
@@ -64,7 +64,7 @@ abstract class EventbookingHelperJquery
 				'inline'     => $inline,
 				'width'      => $width,
 				'height'     => $height,
-				'scrolling'  => $scrolling
+				'scrolling'  => $scrolling,
 			);
 			$script  = 'Eb.jQuery(document).ready(function($){$(".' . $class . '").colorbox(' . self::getJSObject($options) . ');});';
 		}
@@ -90,7 +90,7 @@ abstract class EventbookingHelperJquery
 			{
 				continue;
 			}
-			
+
 			if ($v === 'true')
 			{
 				$v = true;
@@ -381,7 +381,6 @@ abstract class EventbookingHelperJquery
 	 * Example 2: $(".cols").equalHeights(400); Sets all cols to at least 400px tall.
 	 * Example 3: $(".cols").equalHeights(100,300); Cols are at least 100 but no more
 	 * than 300 pixels tall. Elements with too much content will gain a scrollbar.
-	 *
 	 */
 	public static function equalHeights()
 	{

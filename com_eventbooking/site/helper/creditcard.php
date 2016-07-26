@@ -10,7 +10,6 @@
 // no direct access
 defined('_JEXEC') or die;
 
-
 class EventbookingHelperCreditcard
 {
 	/**
@@ -96,7 +95,7 @@ class EventbookingHelperCreditcard
 			}
 		}
 
-		return null;
+		return;
 	}
 
 	/**

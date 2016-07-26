@@ -60,7 +60,7 @@ class EventbookingModelList extends RADModelList
 		'tbl.alias',
 		'tbl.tax_rate',
 		'tbl.featured',
-		'tbl.has_multiple_ticket_types'
+		'tbl.has_multiple_ticket_types',
 	);
 
 	/**
@@ -71,14 +71,13 @@ class EventbookingModelList extends RADModelList
 	public static $translatableFields = array(
 		'tbl.title',
 		'tbl.short_description',
-		'tbl.description'
+		'tbl.description',
 	);
 
 	/**
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -154,7 +153,7 @@ class EventbookingModelList extends RADModelList
 					}
 				}
 			}
-			
+
 			$this->data = $rows;
 		}
 
@@ -336,4 +335,4 @@ class EventbookingModelList extends RADModelList
 
 		return $this;
 	}
-} 
+}

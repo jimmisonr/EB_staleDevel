@@ -13,7 +13,6 @@ defined('_JEXEC') or die;
 
 class EventbookingHelperRoute
 {
-
 	protected static $config;
 
 	protected static $lookup;
@@ -21,7 +20,6 @@ class EventbookingHelperRoute
 	protected static $events;
 
 	/**
-	 *
 	 * Function to get Event Route
 	 *
 	 * @param int $id
@@ -61,7 +59,6 @@ class EventbookingHelperRoute
 	}
 
 	/**
-	 *
 	 * Function to get Category Route
 	 *
 	 * @param int $id
@@ -88,7 +85,6 @@ class EventbookingHelperRoute
 	}
 
 	/**
-	 *
 	 * Function to get View Route
 	 *
 	 * @param string $view (cart, checkout)
@@ -201,7 +197,6 @@ class EventbookingHelperRoute
 	}
 
 	/**
-	 *
 	 * Function to find Itemid
 	 *
 	 * @param string $needles

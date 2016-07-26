@@ -458,5 +458,5 @@ $mime_extension_map = array('__MAXPERIOD__' => '1',
     'zip' => 'application/zip',
     'zoo' => 'application/x-zoo',
     '123' => 'application/vnd.lotus-1-2-3',
-    '669' => 'audio/x-mod'
+    '669' => 'audio/x-mod',
     );

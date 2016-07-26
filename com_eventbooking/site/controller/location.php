@@ -14,7 +14,6 @@ class EventbookingControllerLocation extends EventbookingController
 {
 	/**
 	 * save location
-	 *
 	 */
 	public function save()
 	{
@@ -80,7 +79,6 @@ class EventbookingControllerLocation extends EventbookingController
 
 			return;
 		}
-
 
 		$model = $this->getModel();
 		$cid   = JRequest::getVar('cid', array());

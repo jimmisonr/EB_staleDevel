@@ -16,7 +16,6 @@ class EventbookingModelLocations extends RADModelList
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -35,9 +34,10 @@ class EventbookingModelLocations extends RADModelList
 	{
 		$query->select('tbl.*')
 			->select('c.name AS country_name');
+
 		return $this;
 	}
-    
+
    	/**
 	 * Builds JOINS clauses for the query
 	 *

@@ -9,7 +9,6 @@
  */
 abstract class EventbookingHelperHtml
 {
-
 	public static function getCalendarSetupJs($fields)
 	{
 		$firstDay   = JFactory::getLanguage()->getFirstDay();
@@ -33,8 +32,8 @@ abstract class EventbookingHelperHtml
 		}
 
 		return implode("\n", $output);
-	}	
-	
+	}
+
 	/**
 	 * Build category dropdown
 	 *
@@ -80,7 +79,7 @@ abstract class EventbookingHelperHtml
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => 'class="inputbox" ' . $attr,
-				'list.select'        => $selected));
+				'list.select'        => $selected, ));
 	}
 
 	/**
@@ -115,7 +114,7 @@ abstract class EventbookingHelperHtml
 
 		$paths[] = JPATH_THEMES . '/' . $app->getTemplate() . '/html/com_eventbooking/' . $themeFile;
 		$paths[] = JPATH_ROOT . '/components/com_eventbooking/view/' . $layout;
-		
+
 		$path = '';
 
 		foreach ($paths as $possiblePath)
@@ -131,7 +130,6 @@ abstract class EventbookingHelperHtml
 		{
 			throw new RuntimeException(JText::sprintf('The given common layout %s does not exist', $layout));
 		}
-
 
 		// Start an output buffer.
 		ob_start();

@@ -72,7 +72,7 @@ class os_paypal extends RADPayment
 		{
 			$this->setParameter('return', $siteUrl . 'index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid);
 		}
-		
+
 		$this->setParameter('cancel_return', $siteUrl . 'index.php?option=com_eventbooking&task=cancel&id=' . $row->id . '&Itemid=' . $Itemid);
 		$this->setParameter('notify_url', $siteUrl . 'index.php?option=com_eventbooking&task=payment_confirm&payment_method=os_paypal');
 		$this->setParameter('address1', $row->address);
@@ -84,7 +84,6 @@ class os_paypal extends RADPayment
 		$this->setParameter('state', $row->state);
 		$this->setParameter('zip', $row->zip);
 		$this->setParameter('email', $row->email);
-
 
 		$this->renderRedirectForm();
 	}
@@ -159,7 +158,7 @@ class os_paypal extends RADPayment
 			'TWD',
 			'THB',
 			'TRY',
-			'USD'
+			'USD',
 		);
 	}
 

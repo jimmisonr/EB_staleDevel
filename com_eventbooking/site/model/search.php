@@ -16,7 +16,6 @@ class EventbookingModelSearch extends EventbookingModelList
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -28,4 +27,4 @@ class EventbookingModelSearch extends EventbookingModelList
 			->insert('created_by', 'int', 0)
 			->insert('search', 'string', '');
 	}
-}  
+}

@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class os_payments
 {
-
 	public static $methods = null;
 
 	/**
@@ -32,7 +31,7 @@ class os_payments
 			$query->select('*')
 				->from('#__eb_payment_plugins')
 				->where('published=1')
-				->where('`access` IN ('.implode(',', JFactory::getUser()->getAuthorisedViewLevels()).')')
+				->where('`access` IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
 				->order('ordering');
 			if ($methodIds)
 			{
@@ -62,6 +61,7 @@ class os_payments
 				}
 			}
 		}
+
 		return self::$methods;
 	}
 
@@ -98,7 +98,7 @@ class os_payments
 		$query = $db->getQuery(true);
 		$query->select('*')
 			->from('#__eb_payment_plugins')
-			->where('name = '. $db->quote($name));
+			->where('name = ' . $db->quote($name));
 		$db->setQuery($query);
 
 		return $db->loadObject();
@@ -118,7 +118,7 @@ class os_payments
 		$query->select('name')
 			->from('#__eb_payment_plugins')
 			->where('published=1')
-			->where('`access` IN ('.implode(',', JFactory::getUser()->getAuthorisedViewLevels()).')')
+			->where('`access` IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
 			->order('ordering');
 		if ($methodIds)
 		{
@@ -145,7 +145,8 @@ class os_payments
 				return $method;
 			}
 		}
-		return null;
+
+		return;
 	}
 }
 ?>

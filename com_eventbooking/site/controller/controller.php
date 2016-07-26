@@ -12,10 +12,8 @@ defined('_JEXEC') or die;
 
 class EventbookingController extends RADController
 {
-
 	/**
 	 * Display information
-	 *
 	 */
 	public function display($cachable = false, array $urlparams = array())
 	{
@@ -109,7 +107,6 @@ class EventbookingController extends RADController
 		$model->sendReminder();
 		JFactory::getApplication()->close();
 	}
-
 
 	/**
 	 * Process download a file
@@ -285,7 +282,7 @@ class EventbookingController extends RADController
 		$query->clear();
 		$query->select('state_name AS value, state_name AS text')
 			->from('#__eb_states')
-			->where('country_id=' . (int) $countryId);;
+			->where('country_id=' . (int) $countryId);
 		$db->setQuery($query);
 		$states  = $db->loadObjectList();
 		$options = array();
@@ -305,7 +302,6 @@ class EventbookingController extends RADController
 
 	/**
 	 * Get depend fields status
-	 *
 	 */
 	public function get_depend_fields_status()
 	{

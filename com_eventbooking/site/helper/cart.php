@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingHelperCart
 {
-
 	public function __construct()
 	{
 		$session = JFactory::getSession();
@@ -140,7 +139,6 @@ class EventbookingHelperCart
 
 	/**
 	 * Reset the cart
-	 *
 	 */
 	public function reset()
 	{
@@ -329,7 +327,6 @@ class EventbookingHelperCart
 	/**
 	 * Calculate total discount for the registration
 	 * @return float
-	 *
 	 */
 	public function calculateTotalDiscount()
 	{

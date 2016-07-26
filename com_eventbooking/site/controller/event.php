@@ -49,7 +49,6 @@ class EventbookingControllerEvent extends EventbookingController
 
 	/**
 	 * Publish the selected events
-	 *
 	 */
 	public function publish()
 	{
@@ -184,7 +183,6 @@ class EventbookingControllerEvent extends EventbookingController
 
 	/**
 	 * Redirect user to events mangement page
-	 *
 	 */
 	public function cancel()
 	{

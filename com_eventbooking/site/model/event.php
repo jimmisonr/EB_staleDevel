@@ -18,7 +18,6 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -26,7 +25,6 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 
 		$this->state->insert('catid', 'int', 0);
 	}
-
 
 	/**
 	 * Get all necessary data of an event
@@ -108,7 +106,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 			return $rows[0];
 		}
 
-		return null;
+		return;
 	}
 
 	/**
@@ -172,4 +170,4 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 
 		return $rows;
 	}
-} 
+}

@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class os_offline extends RADPayment
 {
-
 	/**
 	 * Constructor
 	 *
@@ -26,7 +25,6 @@ class os_offline extends RADPayment
 
 	/**
 	 * Process payment
-	 *
 	 */
 	public function processPayment($row, $data)
 	{

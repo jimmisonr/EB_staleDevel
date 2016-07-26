@@ -13,7 +13,7 @@ defined('_JEXEC') or die;
 class os_worldpay extends RADPaymentOmnipay
 {
 	protected $omnipayPackage = 'WorldPay';
-	
+
 	/**
 	 * Constructor
 	 *
@@ -25,7 +25,7 @@ class os_worldpay extends RADPaymentOmnipay
 		$config['params_map'] = array(
 			'installationId'   => 'wp_installation_id',
 			'callbackPassword' => 'wp_callback_password',
-			'testMode'         => 'worldpay_mode'
+			'testMode'         => 'worldpay_mode',
 		);
 
 		parent::__construct($params, $config);

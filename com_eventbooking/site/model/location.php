@@ -16,7 +16,6 @@ class EventbookingModelLocation extends EventbookingModelList
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -57,7 +56,7 @@ class EventbookingModelLocation extends EventbookingModelList
 		$row          = $this->getTable();
 		$user         = JFactory::getUser();
 		$row->user_id = $user->id;
-        $coordinates = explode(',',$data['coordinates']);
+        $coordinates = explode(',', $data['coordinates']);
        	$row->lat  =  $coordinates[0];
 		$row->long =  $coordinates[1];
 		if ($data['id'])

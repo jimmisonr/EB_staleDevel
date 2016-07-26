@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingHelper
 {
-
 	/**
 	 * Return the current installed version
 	 */
@@ -88,7 +87,7 @@ class EventbookingHelper
 		// basic date format yyyy-mm-dd
 		$expr = '/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$/D';
 
-		return (preg_match($expr, $value, $match) && checkdate($match[2], $match[3], $match[1]));
+		return preg_match($expr, $value, $match) && checkdate($match[2], $match[3], $match[1]);
 	}
 
 	/**
@@ -166,7 +165,6 @@ class EventbookingHelper
 			$session->set('eb_device_type', $deviceType);
 		}
 
-
 		return $deviceType;
 	}
 
@@ -189,7 +187,6 @@ class EventbookingHelper
 	}
 
 	/**
-	 *
 	 * Apply some fixes for request data
 	 *
 	 * @return void
@@ -599,7 +596,6 @@ class EventbookingHelper
 		return (int) $db->loadResult();
 	}
 
-
 	/**
 	 * Method to build common tags use for email messages
 	 *
@@ -755,7 +751,7 @@ class EventbookingHelper
 			$query->clear()
 				->select('first_name, last_name')
 				->from('#__eb_registrants')
-				->where('group_id = '.$row->id)
+				->where('group_id = ' . $row->id)
 				->order('id');
 			$db->setQuery($query);
 			$rowMembers = $db->loadObjectList();
@@ -767,7 +763,7 @@ class EventbookingHelper
 		}
 		else
 		{
-			$groupMembersNames = array(trim($row->first_name.' '.$row->last_name));
+			$groupMembersNames = array(trim($row->first_name . ' ' . $row->last_name));
 		}
 
 		$replaces['group_members_names'] = implode(', ', $groupMembersNames);
@@ -968,7 +964,6 @@ class EventbookingHelper
 		{
 			$replaces['payment_method'] = '';
 		}
-
 
 		// Registration detail tags
 		$replaces['registration_detail'] = self::getEmailContent($config, $row, $loadCss, $form);
@@ -1348,7 +1343,6 @@ class EventbookingHelper
 		{
 			$fees['coupon_valid'] = 1;
 		}
-
 
 		if (($event->early_bird_discount_date != $nullDate) && ($event->date_diff >= 0))
 		{
@@ -2251,8 +2245,6 @@ class EventbookingHelper
 	}
 
 	/**
-	 *
-	 *
 	 * @return string
 	 */
 	public static function validateEngine()
@@ -2275,11 +2267,10 @@ class EventbookingHelper
 			"validate[minSize[6]]",
 			"validate[maxSize[12]]",
 			"validate[custom[integer],min[-5]]",
-			"validate[custom[integer],max[50]]");
+			"validate[custom[integer],max[50]]", );
 
 		return json_encode($validClass);
 	}
-
 
 	public static function getURL()
 	{
@@ -2707,7 +2698,7 @@ class EventbookingHelper
 					'option.text'        => 'text',
 					'option.value'       => 'value',
 					'list.attr'          => 'class="inputbox" onchange="submit();"',
-					'list.select'        => $selected));
+					'list.select'        => $selected, ));
 		else
 			return JHtml::_('select.genericlist', $options, $name,
 				array(
@@ -2715,7 +2706,7 @@ class EventbookingHelper
 					'option.text'        => 'text',
 					'option.value'       => 'value',
 					'list.attr'          => 'class="inputbox" ',
-					'list.select'        => $selected));
+					'list.select'        => $selected, ));
 	}
 
 	/**
@@ -2773,7 +2764,7 @@ class EventbookingHelper
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => ' class="inputbox" ',
-				'list.select'        => $row->parent));
+				'list.select'        => $row->parent, ));
 	}
 
 	/**
@@ -3207,7 +3198,6 @@ class EventbookingHelper
 			{
 				$subject = $message->registrant_waitinglist_notification_subject;
 			}
-
 
 			if (empty($subject))
 			{
@@ -3741,7 +3731,6 @@ class EventbookingHelper
 			$body    = str_ireplace("[$key]", $value, $body);
 		}
 		$body = self::convertImgTags($body);
-
 
 		if (strpos($body, '[QRCODE]') !== false)
 		{
@@ -4528,7 +4517,6 @@ class EventbookingHelper
 
 	/**
 	 * Display copy right information
-	 *
 	 */
 	public static function displayCopyRight()
 	{
@@ -4728,8 +4716,8 @@ class EventbookingHelper
 		$pdf->SetTitle('Invoice');
 		$pdf->SetSubject('Invoice');
 		$pdf->SetKeywords('Invoice');
-		$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-		$pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+		$pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+		$pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
 		$pdf->setPrintHeader(false);
 		$pdf->setPrintFooter(false);
 		$pdf->SetMargins(PDF_MARGIN_LEFT, 0, PDF_MARGIN_RIGHT);
@@ -4831,7 +4819,7 @@ class EventbookingHelper
 					'taxAmount'      => $taxAmount,
 					'discountAmount' => $discountAmount,
 					'total'          => $total,
-					'config'         => $config));
+					'config'         => $config, ));
 			$replaces['SUB_TOTAL']              = EventbookingHelper::formatCurrency($subTotal, $config);
 			$replaces['DISCOUNT_AMOUNT']        = EventbookingHelper::formatCurrency($discountAmount, $config);
 			$replaces['TAX_AMOUNT']             = EventbookingHelper::formatCurrency($taxAmount, $config);
@@ -5081,7 +5069,6 @@ class EventbookingHelper
 	}
 
 	/**
-	 *
 	 * Check to see whether this users has permission to edit registrant
 	 */
 	public static function checkEditRegistrant($rowRegistrant)
@@ -5152,7 +5139,7 @@ class EventbookingHelper
 			}
 			else
 			{
-				return (($createdBy > 0 && $createdBy == $user->id) || $user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'));
+				return ($createdBy > 0 && $createdBy == $user->id) || $user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking');
 			}
 
 		}
@@ -5319,13 +5306,12 @@ class EventbookingHelper
 
 	/**
 	 * Check to see whether the current users can add events from front-end
-	 *
 	 */
 	public static function checkAddEvent()
 	{
 		$user = JFactory::getUser();
 
-		return ($user->id > 0 && $user->authorise('eventbooking.addevent', 'com_eventbooking'));
+		return $user->id > 0 && $user->authorise('eventbooking.addevent', 'com_eventbooking');
 	}
 
 	/**
@@ -5631,7 +5617,6 @@ class EventbookingHelper
 		return $eventDates;
 	}
 
-
 	/**
 	 * Get list of event dates for recurring events happen on specific date in a month
 	 *
@@ -5697,7 +5682,6 @@ class EventbookingHelper
 
 		return $eventDates;
 	}
-
 
 	public static function getDeliciousButton($title, $link)
 	{

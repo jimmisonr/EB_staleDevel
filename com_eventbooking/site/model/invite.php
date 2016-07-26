@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventBookingModelInvite extends RADModel
 {
-
 	/**
 	 * Send invitation to users
 	 *
@@ -92,4 +91,4 @@ class EventBookingModelInvite extends RADModel
 			}
 		}
 	}
-} 
+}

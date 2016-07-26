@@ -12,5 +12,4 @@ defined('_JEXEC') or die;
 
 class EventbookingModelCategory extends EventbookingModelList
 {
-	
-} 
+}

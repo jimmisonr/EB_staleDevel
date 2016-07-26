@@ -10,7 +10,6 @@
 class EventbookingHelperIcs
 {
 	/**
-	 *
 	 * The name of the event
 	 * @var string
 	 */
@@ -93,20 +92,18 @@ class EventbookingHelperIcs
 	 */
 	public function setEnd($end)
 	{
-		$this->eventEndDate = JFactory::getDate($end, new DateTimeZone(JFactory::getConfig()->get('offset')));;
+		$this->eventEndDate = JFactory::getDate($end, new DateTimeZone(JFactory::getConfig()->get('offset')));
 
 		return $this;
 	}
 
 	/**
-	 *
 	 * Set event organizer
 	 *
 	 * @param string $email
 	 * @param string $name
 	 *
 	 * @return \EventbookingHelperIcs
-	 *
 	 */
 	public function setOrganizer($email, $name = null)
 	{
@@ -136,7 +133,6 @@ class EventbookingHelperIcs
 	}
 
 	/**
-	 *
 	 * Set the invite body content
 	 *
 	 * @param string $body
@@ -154,7 +150,6 @@ class EventbookingHelperIcs
 	}
 
 	/**
-	 *
 	 * Set the location where the event will take place
 	 *
 	 * @param string $location
@@ -169,7 +164,6 @@ class EventbookingHelperIcs
 	}
 
 	/**
-	 *
 	 * Get the location where the event will be held
 	 *
 	 * @return type
@@ -180,7 +174,6 @@ class EventbookingHelperIcs
 	}
 
 	/**
-	 *
 	 * Get the event name
 	 * @return string
 	 */
@@ -247,14 +240,12 @@ class EventbookingHelperIcs
 	}
 
 	/**
-	 *
 	 * Save the invite to a file
 	 *
 	 * @param string $path
 	 * @param string $name
 	 *
 	 * @return string
-	 *
 	 */
 	public function save($path, $name = null)
 	{
@@ -283,7 +274,7 @@ class EventbookingHelperIcs
 	public function download()
 	{
 		while (@ob_end_clean());
-		$fileName = JApplication::stringURLSafe($this->name).'.ics';
+		$fileName = JApplication::stringURLSafe($this->name) . '.ics';
 		$data = $this->generate();
 		header("Pragma: public");
 		header("Expires: 0");
@@ -297,7 +288,6 @@ class EventbookingHelperIcs
 		print $data;
 	}
 	/**
-	 *
 	 * The function generates the actual content of the ICS
 	 * file and returns it.
 	 *
@@ -321,7 +311,7 @@ class EventbookingHelperIcs
 		$content .= "LAST-MODIFIED:{$this->getStart()}\n";
 		$content .= "LOCATION:{$this->getLocation()}\n";
 		$content .= "SUMMARY:{$this->getName()}\n";
-		$content .= "SEQUENCE:0\n";		
+		$content .= "SEQUENCE:0\n";
 		$content .= "TRANSP:OPAQUE\n";
 		$content .= "END:VEVENT\n";
 		$content .= "END:VCALENDAR";

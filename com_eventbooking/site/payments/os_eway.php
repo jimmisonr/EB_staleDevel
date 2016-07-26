@@ -12,11 +12,9 @@ defined('_JEXEC') or die;
 
 /**
  * Eway payment class
- *
  */
 class os_eway extends RADPaymentOmnipay
 {
-
 	protected $omnipayPackage = 'Eway_Direct';
 
 	/**
@@ -29,7 +27,7 @@ class os_eway extends RADPaymentOmnipay
 	{
 		$config['params_map'] = array(
 			'customerId' => 'eway_customer_id',
-			'testMode'         => 'eway_mode'
+			'testMode'         => 'eway_mode',
 		);
 
 		parent::__construct($params, $config);

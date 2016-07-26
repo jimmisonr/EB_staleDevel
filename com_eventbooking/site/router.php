@@ -108,7 +108,6 @@ class EventbookingRouter extends JComponentRouterBase
 			}
 		}
 
-
 		$view    = isset($query['view']) ? $query['view'] : '';
 		$id      = isset($query['id']) ? (int) $query['id'] : 0;
 		$catId   = isset($query['catid']) ? (int) $query['catid'] : 0;
@@ -353,7 +352,7 @@ class EventbookingRouter extends JComponentRouterBase
 				'search',
 				'start',
 				'limitstart',
-				'limit'
+				'limit',
 			);
 
 			if ($view != 'location' && $view != 'map')

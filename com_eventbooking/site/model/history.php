@@ -16,7 +16,6 @@ class EventbookingModelHistory extends EventbookingModelRegistrants
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -24,7 +23,7 @@ class EventbookingModelHistory extends EventbookingModelRegistrants
 
 		parent::__construct($config);
 	}
-	
+
 	/**
 	 * Builds a WHERE clause for the query
 	 *
