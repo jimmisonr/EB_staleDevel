@@ -17,7 +17,6 @@ defined('_JEXEC') or die;
  */
 class RADModelState
 {
-
 	/**
 	 * The state data container
 	 *
@@ -224,7 +223,7 @@ class RADModelState
 	{
 		return array_keys($this->data);
 	}
-	
+
 	/**
 	 * Magic method to get state value
 	 *

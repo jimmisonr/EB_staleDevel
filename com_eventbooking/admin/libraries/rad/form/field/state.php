@@ -12,17 +12,16 @@ class RADFormFieldState extends RADFormFieldList
 	 *
 	 * @var    string
 	 */
-	public $type = 'State';		
+	public $type = 'State';
 	/**
 	 * Method to instantiate the form field object.
 	 *
 	 * @param   JTable  $row  the table object store form field definitions
 	 * @param	mixed	$value the initial value of the form field
-	 *
 	 */
 	public function __construct($row, $value)
 	{
-		parent::__construct($row, $value);				
+		parent::__construct($row, $value);
 	}
 
 	/**
@@ -30,12 +29,12 @@ class RADFormFieldState extends RADFormFieldList
 	 * Use the query attribute to supply a query to generate the list.
 	 *
 	 * @return  array  The field option objects.
-	 *
 	 */
 	protected function getOptions()
 	{
 		$options = array();
-		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_STATE'));						
+		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_STATE'));
+
 		return $options;
-	}		
+	}
 }

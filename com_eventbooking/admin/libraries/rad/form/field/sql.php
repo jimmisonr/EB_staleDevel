@@ -7,27 +7,25 @@
  */
 class RADFormFieldSQL extends RADFormFieldList
 {
-
 	/**
 	 * The form field type.
 	 *
 	 * @var    string
 	 */
 	protected $type = 'SQL';
-			
+
 	/**
 	 * The query.
 	 *
 	 * @var    string	 
 	 */
 	protected $query;
-	
+
 	/**
 	 * Method to instantiate the form field object.
 	 *
 	 * @param   JTable  $row  the table object store form field definitions
 	 * @param	mixed	$value the initial value of the form field
-	 *
 	 */
 	public function __construct($row, $value)
 	{
@@ -53,7 +51,7 @@ class RADFormFieldSQL extends RADFormFieldList
 		{
 			$options = array();
 		}
-		
+
 		return $options;
 	}
 }

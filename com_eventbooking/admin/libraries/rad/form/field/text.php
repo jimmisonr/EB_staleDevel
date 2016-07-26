@@ -8,7 +8,6 @@
  */
 class RADFormFieldText extends RADFormField
 {
-
 	/**
 	 * Field Type
 	 * 
@@ -21,7 +20,6 @@ class RADFormFieldText extends RADFormField
 	 *
 	 * @param   JTable  $row  the table object store form field definitions
 	 * @param	mixed	$value the initial value of the form field
-	 *
 	 */
 	public function __construct($row, $value = null)
 	{
@@ -44,11 +42,11 @@ class RADFormFieldText extends RADFormField
 	 * Method to get the field input markup.
 	 *
 	 * @return  string  The field input markup.
-	 *
 	 */
 	public function getInput($bootstrapHelper = null)
 	{
 		$attributes = $this->buildAttributes();
+
 		return '<input type="text" name="' . $this->name . '" id="' . $this->name . '" value="' . htmlspecialchars($this->value, ENT_COMPAT, 'UTF-8') .
 			 '"' . $attributes . $this->row->extra_attributes . ' />';
 	}

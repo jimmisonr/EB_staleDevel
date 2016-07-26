@@ -8,8 +8,8 @@ class RADSynchronizerMembershippro
 		$query = $db->getQuery(true);
 		$query->select('*')
 			->from('#__osmembership_subscribers')
-			->where('user_id='.$userId.' AND is_profile=1');
-		$db->setQuery($query);		
+			->where('user_id=' . $userId . ' AND is_profile=1');
+		$db->setQuery($query);
 		$rowProfile = $db->loadObject();
 		if ($rowProfile)
 		{
@@ -17,7 +17,7 @@ class RADSynchronizerMembershippro
 				' WHERE b.subscriber_id=' . $rowProfile->id;
 			$db->setQuery($sql);
 			$fieldValues = $db->loadObjectList('name');
-			
+
 			foreach ($mappings as $fieldName => $mappingFieldName)
 			{
 				if ($mappingFieldName)
@@ -30,9 +30,10 @@ class RADSynchronizerMembershippro
 					{
 						$data[$fieldName] = $fieldValues[$mappingFieldName]->field_value;
 					}
-				}								
-			}									
-		}						
+				}
+			}
+		}
+
 		return $data;
 	}
 }

@@ -2,12 +2,10 @@
 
 class RADFormFieldFile extends RADFormField
 {
-
 	/**
 	 * The form field type.
 	 *
 	 * @var    string
-	 *
 	 */
 	protected $type = 'File';
 
@@ -16,7 +14,6 @@ class RADFormFieldFile extends RADFormField
 	 *
 	 * @param   JTable $row   the table object store form field definitions
 	 * @param    mixed $value the initial value of the form field
-	 *
 	 */
 	public function __construct($row, $value = null, $fieldSuffix = null)
 	{
@@ -31,18 +28,17 @@ class RADFormFieldFile extends RADFormField
 	 * Method to get the field input markup.
 	 *
 	 * @return  string  The field input markup.
-	 *
 	 */
 	protected function getInput($bootstrapHelper = null)
 	{
 		$html = '<input type="button" value="' . JText::_('EB_SELECT_FILE') . '" id="button-file-' . $this->name . '" class="btn btn-primary" />';
 		if ($this->value && file_exists(JPATH_ROOT . '/media/com_eventbooking/files/' . $this->value))
 		{
-			$html .= '<span class="eb-uploaded-file" id="uploaded-file-'.$this->name.'"><a href="index.php?option=com_eventbooking&task=download_file&file_name=' . $this->value . '"><i class="icon-donwload"></i><strong>' . $this->value . '</strong></a></span>';
+			$html .= '<span class="eb-uploaded-file" id="uploaded-file-' . $this->name . '"><a href="index.php?option=com_eventbooking&task=download_file&file_name=' . $this->value . '"><i class="icon-donwload"></i><strong>' . $this->value . '</strong></a></span>';
 		}
 		else
 		{
-			$html .= '<span class="eb-uploaded-file" id="uploaded-file-'.$this->name.'"></span>';
+			$html .= '<span class="eb-uploaded-file" id="uploaded-file-' . $this->name . '"></span>';
 		}
 
 		$html .= '<input type="hidden" name="' . $this->name . '"  value="' . $this->value . '" />';

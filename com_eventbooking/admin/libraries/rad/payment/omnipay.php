@@ -82,7 +82,6 @@ class RADPaymentOmnipay extends OmnipayPayment
 		}
 	}
 
-
 	/**
 	 * This method need to be implemented by the payment plugin class. It needs to set url which users will be
 	 * redirected to when the payment is not success for some reasons. The url is stored in paymentFailureUrl property

@@ -17,7 +17,6 @@ defined('_JEXEC') or die;
  */
 class RADModelAdmin extends RADModel
 {
-
 	/**
 	 * Context, used to get user session data and also trigger plugin
 	 *
@@ -268,7 +267,7 @@ class RADModelAdmin extends RADModel
 		{
 			if ($this->triggerEvents)
 			{
-				$dispatcher = JEventDispatcher::getInstance();;
+				$dispatcher = JEventDispatcher::getInstance();
 				JPluginHelper::importPlugin($this->pluginGroup);
 			}
 
@@ -434,7 +433,6 @@ class RADModelAdmin extends RADModel
 
 	/**
 	 * Load the record from database
-	 *
 	 */
 	protected function loadData()
 	{
@@ -507,7 +505,6 @@ class RADModelAdmin extends RADModel
 	 * @param JTable $row A JTable object.
 	 *
 	 * @return array An array of conditions to add to ordering queries.
-	 *
 	 */
 	protected function getReorderConditions($row)
 	{
@@ -528,7 +525,6 @@ class RADModelAdmin extends RADModel
 	 * @param int    $sourceId
 	 *
 	 * @return void
-	 *
 	 */
 	protected function prepareTable($row, $task, $sourceId = 0)
 	{
@@ -576,7 +572,6 @@ class RADModelAdmin extends RADModel
 		{
 			$row->{$titleField} = htmlspecialchars_decode($row->{$titleField}, ENT_QUOTES);
 		}
-
 
 		if (property_exists($row, 'alias'))
 		{

@@ -7,7 +7,6 @@
  */
 abstract class RADFormField
 {
-
 	/**
 	 * The form field type.
 	 *
@@ -110,7 +109,6 @@ abstract class RADFormField
 	 *
 	 * @param   JTable $row   the table object store form field definitions
 	 * @param    mixed $value the initial value of the form field
-	 *
 	 */
 	public function __construct($row, $value = null)
 	{
@@ -144,7 +142,6 @@ abstract class RADFormField
 	 * @param   string $name The property name for which to the the value.
 	 *
 	 * @return  mixed  The property value or null.
-	 *
 	 */
 	public function __get($name)
 	{
@@ -190,14 +187,13 @@ abstract class RADFormField
 				break;
 		}
 
-		return null;
+		return;
 	}
 
 	/**
 	 * Simple method to set the value for the form field
 	 *
 	 * @param   mixed $value Value to set
-	 *
 	 */
 	public function setValue($value)
 	{
@@ -256,7 +252,7 @@ abstract class RADFormField
 	 *
 	 * @param $name
 	 */
-	function removeAttribute($name)
+	public function removeAttribute($name)
 	{
 		if (isset($this->attributes[$name]))
 		{
@@ -273,7 +269,6 @@ abstract class RADFormField
 	{
 		$this->feeCalculation = $feeCalculation;
 	}
-
 
 	public function setMasterField($isMasterField)
 	{
@@ -302,7 +297,6 @@ abstract class RADFormField
 	 * Method to get the field input markup.
 	 *
 	 * @return  string  The field input markup.
-	 *
 	 */
 	abstract protected function getInput($bootstrapHelper = null);
 
@@ -310,7 +304,6 @@ abstract class RADFormField
 	 * Method to get the field label markup.
 	 *
 	 * @return  string  The field label markup.
-	 *
 	 */
 	protected function getLabel()
 	{
@@ -345,7 +338,6 @@ abstract class RADFormField
 	 * Method to get a control group with label and input.
 	 *
 	 * @return  string  A string containing the html for the control goup
-	 *
 	 */
 	public function getControlGroup($bootstrapHelper = null)
 	{
@@ -437,7 +429,7 @@ abstract class RADFormField
 		}
 		else
 		{
-			return '<tr><td class="title_cell">' . $this->title . '</td><td class="field_cell">' .$fieldValue . "</td></tr>\r\n";
+			return '<tr><td class="title_cell">' . $this->title . '</td><td class="field_cell">' . $fieldValue . "</td></tr>\r\n";
 		}
 	}
 

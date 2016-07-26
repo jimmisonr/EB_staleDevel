@@ -9,12 +9,10 @@
  */
 class RADFormFieldRadio extends RADFormField
 {
-
 	/**
 	 * The form field type.
 	 *
 	 * @var string
-	 *
 	 */
 	protected $type = 'Radio';
 
@@ -22,7 +20,6 @@ class RADFormFieldRadio extends RADFormField
 	 * Method to get the field input markup.
 	 *
 	 * @return string The field input markup.
-	 *
 	 */
 	protected function getInput($bootstrapHelper = null)
 	{
@@ -98,8 +95,9 @@ class RADFormFieldRadio extends RADFormField
 
 		if (count($values) == 0)
 		{
-			JFactory::getApplication()->enqueueMessage('There is no available option left for the field '. $this->title, 'warning');
+			JFactory::getApplication()->enqueueMessage('There is no available option left for the field ' . $this->title, 'warning');
 		}
+
 		return $values;
 	}
 }

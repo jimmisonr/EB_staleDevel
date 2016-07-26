@@ -17,7 +17,6 @@ defined('_JEXEC') or die;
  */
 class RADControllerAdmin extends RADController
 {
-
 	/**
 	 * The URL view item variable.
 	 *
@@ -117,7 +116,6 @@ class RADControllerAdmin extends RADController
 	 * Method to save a record.
 	 *
 	 * @return boolean True if successful, false otherwise.
-	 *
 	 */
 	public function save()
 	{
@@ -176,7 +174,6 @@ class RADControllerAdmin extends RADController
 
 	/**
 	 * Method to cancel an add/edit. We simply redirect users to view which display list of records
-	 *
 	 */
 	public function cancel()
 	{
@@ -187,7 +184,6 @@ class RADControllerAdmin extends RADController
 	 * Method to save the submitted ordering values for records.
 	 *
 	 * @return boolean True on success
-	 *
 	 */
 	public function saveorder()
 	{
@@ -230,7 +226,6 @@ class RADControllerAdmin extends RADController
 	 * Changes the order of one or more records.
 	 *
 	 * @return boolean True on success
-	 *
 	 */
 	public function reorder()
 	{
@@ -265,7 +260,6 @@ class RADControllerAdmin extends RADController
 	 * Delete selected items
 	 *
 	 * @return void
-	 *
 	 */
 	public function delete()
 	{
@@ -403,7 +397,6 @@ class RADControllerAdmin extends RADController
 	 * @param   array $data An array of input data.
 	 *
 	 * @return  boolean
-	 *
 	 */
 	protected function allowAdd($data = array())
 	{
@@ -457,7 +450,6 @@ class RADControllerAdmin extends RADController
 	 * @param   int  id  Record ID
 	 *
 	 * @return  boolean  True if allowed to delete the record. Defaults to the permission for the component.
-	 *
 	 */
 	protected function allowDelete($id)
 	{
@@ -470,7 +462,6 @@ class RADControllerAdmin extends RADController
 	 * @param   int $id Id of the record
 	 *
 	 * @return  boolean  True if allowed to change the state of the record. Defaults to the permission for the component.
-	 *
 	 */
 	protected function allowEditState($id)
 	{

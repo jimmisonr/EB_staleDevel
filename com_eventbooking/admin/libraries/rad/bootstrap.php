@@ -4,7 +4,6 @@
  */
 defined('_JEXEC') or die;
 
-
 define('EB_TBC_DATE', '2099-12-31 00:00:00');
 
 JLoader::registerPrefix('RAD', dirname(__FILE__));
@@ -14,7 +13,7 @@ if ($app->isAdmin())
 {
 	JLoader::register('EventbookingHelper', JPATH_ROOT . '/components/com_eventbooking/helper/helper.php');
 	JLoader::register('EventbookingHelperIcs', JPATH_ROOT . '/components/com_eventbooking/helper/ics.php');
-	JLoader::register('EventbookingHelperHtml', JPATH_ROOT . '/components/com_eventbooking/helper/html.php');	
+	JLoader::register('EventbookingHelperHtml', JPATH_ROOT . '/components/com_eventbooking/helper/html.php');
 	JLoader::register('EventbookingHelperCart', JPATH_ROOT . '/components/com_eventbooking/helper/cart.php');
 	JLoader::register('EventbookingHelperRoute', JPATH_ROOT . '/components/com_eventbooking/helper/route.php');
 	JLoader::register('EventbookingHelperJquery', JPATH_ROOT . '/components/com_eventbooking/helper/jquery.php');
@@ -39,5 +38,3 @@ else
 {
 	error_reporting(0);
 }
-
-

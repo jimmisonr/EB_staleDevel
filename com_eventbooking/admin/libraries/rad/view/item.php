@@ -18,7 +18,6 @@ defined('_JEXEC') or die;
  */
 class RADViewItem extends RADViewHtml
 {
-
 	/**
 	 * The model state.
 	 *

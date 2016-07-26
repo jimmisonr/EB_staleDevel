@@ -69,7 +69,6 @@ class RADModelList extends RADModel
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -186,7 +185,6 @@ class RADModelList extends RADModel
 	 * Get total record. Child class should override this method if needed
 	 *
 	 * @return integer Number of records
-	 *
 	 */
 	public function getTotal()
 	{

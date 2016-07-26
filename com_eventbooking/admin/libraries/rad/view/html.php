@@ -19,7 +19,6 @@ jimport('joomla.filesystem.path');
 
 class RADViewHtml extends RADView
 {
-
 	/**
 	 * The view layout.
 	 *
@@ -75,7 +74,6 @@ class RADViewHtml extends RADView
 	 * Method to instantiate the view.
 	 *
 	 * @param array $config A named configuration array for object construction
-	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -191,7 +189,6 @@ class RADViewHtml extends RADView
 	 * Method to get the view paths.
 	 *
 	 * @return SplPriorityQueue The paths queue.
-	 *
 	 */
 	public function getPaths()
 	{
@@ -275,7 +272,6 @@ class RADViewHtml extends RADView
 	 * @param $paths The paths queue.
 	 *
 	 * @return RADViewHtml Method supports chaining.
-	 *
 	 */
 	public function setPaths($paths)
 	{

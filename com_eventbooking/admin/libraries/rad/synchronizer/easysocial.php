@@ -8,7 +8,6 @@
  */
 class RADSynchronizerEasysocial
 {
-
 	public function getData($userId, $mappings)
 	{
 		$data = array();
@@ -16,7 +15,7 @@ class RADSynchronizerEasysocial
 		$sql  = 'SELECT cf.unique_key , fv.data FROM #__social_fields AS cf ' . ' INNER JOIN #__social_fields_data AS fv ' .
 			' ON cf.id = fv.field_id ' . ' WHERE fv.uid = ' . $userId;
 		$db->setQuery($sql);
-		$rows = $db->loadObjectList('unique_key');		
+		$rows = $db->loadObjectList('unique_key');
 		foreach ($mappings as $fieldName => $mappingFieldName)
 		{
 			if ($mappingFieldName && isset($rows[$mappingFieldName]))
@@ -29,9 +28,10 @@ class RADSynchronizerEasysocial
 				if ($fieldName == 'address' && is_array($data[$fieldName]))
 				{
 					$data[$fieldName] = implode(',', $data[$fieldName]);
-				}				
+				}
 			}
-		}		
+		}
+
 		return $data;
 	}
 }

@@ -8,12 +8,10 @@
  */
 class RADFormFieldMessage extends RADFormField
 {
-
 	/**
 	 * The form field type.
 	 *
 	 * @var string
-	 *
 	 */
 	protected $type = 'Message';
 
@@ -21,7 +19,6 @@ class RADFormFieldMessage extends RADFormField
 	 * Method to get the field input markup.
 	 *
 	 * @return string The field input markup.
-	 *        
 	 */
 	public function getInput($bootstrapHelper = null)
 	{
@@ -30,7 +27,7 @@ class RADFormFieldMessage extends RADFormField
 		{
 			$controlGroupAttributes .= ' style="display:none;" ';
 		}
-		
+
 		return '<div class="control-group eb-message" ' . $controlGroupAttributes . '>' . $this->description . '</div>';
 	}
 

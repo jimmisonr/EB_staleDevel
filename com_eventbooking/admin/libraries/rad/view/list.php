@@ -17,7 +17,6 @@ defined('_JEXEC') or die;
  */
 class RADViewList extends RADViewHtml
 {
-
 	/**
 	 * The model state
 	 *
@@ -71,7 +70,6 @@ class RADViewList extends RADViewHtml
 
 	/**
 	 * Prepare the view before it is displayed
-	 *
 	 */
 	protected function prepareView()
 	{
@@ -94,7 +92,6 @@ class RADViewList extends RADViewHtml
 
 	/**
 	 * Method to add toolbar buttons
-	 *
 	 */
 	protected function addToolbar()
 	{
@@ -107,7 +104,7 @@ class RADViewList extends RADViewHtml
 		{
 			$canDo = call_user_func(array('RADHelper', 'getActions'), $this->option, $this->name, $this->state);
 		}
-		
+
 		$languagePrefix = $this->viewConfig['language_prefix'];
 		JToolBarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')), 'link ' . $this->name);
 

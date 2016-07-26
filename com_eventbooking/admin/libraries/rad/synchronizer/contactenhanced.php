@@ -1,7 +1,6 @@
 <?php
 class RADSynchronizerContactenhanced
 {
-
 	public function getData($userId, $mappings)
 	{
 		$data = array();
@@ -24,5 +23,5 @@ class RADSynchronizerContactenhanced
 		}
 
 		return $data;
-	}	
+	}
 }

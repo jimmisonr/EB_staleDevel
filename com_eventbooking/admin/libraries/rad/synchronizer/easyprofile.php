@@ -8,7 +8,6 @@
  */
 class RADSynchronizerEasyprofile
 {
-
 	public function getData($userId, $mappings)
 	{
 		$data  = array();

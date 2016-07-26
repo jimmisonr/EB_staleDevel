@@ -103,7 +103,6 @@ abstract class RADPayment
 	}
 
 	/**
-	 *
 	 * Set data for a parameter
 	 *
 	 * @param string $name

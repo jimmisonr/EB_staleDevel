@@ -8,7 +8,6 @@
  */
 class RADFormFieldList extends RADFormField
 {
-
 	/**
 	 * The form field type.
 	 *
@@ -20,15 +19,14 @@ class RADFormFieldList extends RADFormField
 	 *
 	 * @param   JTable  $row  the table object store form field definitions
 	 * @param	mixed	$value the initial value of the form field
-	 *
 	 */
 	public function __construct($row, $value)
 	{
-		parent::__construct($row, $value);		
+		parent::__construct($row, $value);
 		if ($row->multiple)
 		{
-			$this->attributes['multiple'] = true;			
-		}		
+			$this->attributes['multiple'] = true;
+		}
 	}
 
 	/**
@@ -36,7 +34,6 @@ class RADFormFieldList extends RADFormField
 	 * Use the multiple attribute to enable multiselect.
 	 *
 	 * @return  string  The field input markup.
-	 *
 	 */
 	protected function getInput($bootstrapHelper = null)
 	{
@@ -66,7 +63,8 @@ class RADFormFieldList extends RADFormField
 		{
 			$selectedOptions = $this->value;
 		}
-		return JHtml::_('select.genericlist', $options, $this->name . ($this->row->multiple ? '[]' : ''), trim($attributes . $this->row->extra_attributes), 
+
+		return JHtml::_('select.genericlist', $options, $this->name . ($this->row->multiple ? '[]' : ''), trim($attributes . $this->row->extra_attributes),
 			'value', 'text', $selectedOptions);
 	}
 
@@ -74,17 +72,16 @@ class RADFormFieldList extends RADFormField
 	 * Method to get the field options.
 	 *
 	 * @return  array  The field option objects.
-	 *
 	 */
 	protected function getOptions()
 	{
-		$options = array();	
-		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT'));	
+		$options = array();
+		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT'));
 		if (is_array($this->row->values))
 		{
 			$values = $this->row->values;
 		}
-		elseif (strpos($this->row->values, "\r\n") !== FALSE)
+		elseif (strpos($this->row->values, "\r\n") !== false)
 		{
 			$values = explode("\r\n", $this->row->values);
 		}
@@ -93,7 +90,6 @@ class RADFormFieldList extends RADFormField
 			$values = explode(",", $this->row->values);
 		}
 		$quantityValues = explode("\r\n", $this->row->quantity_values);
-
 
 		if ($this->row->quantity_field && count($values) && count($quantityValues) && $this->eventId)
 		{
@@ -108,7 +104,7 @@ class RADFormFieldList extends RADFormField
 
 		if (count($values) == 0)
 		{
-			JFactory::getApplication()->enqueueMessage('There is no available option left for the field '. $this->title, 'warning');
+			JFactory::getApplication()->enqueueMessage('There is no available option left for the field ' . $this->title, 'warning');
 
 			return $values;
 		}
@@ -117,6 +113,7 @@ class RADFormFieldList extends RADFormField
 		{
 			$options[] = JHtml::_('select.option', trim($value), $value);
 		}
+
 		return $options;
 	}
 }

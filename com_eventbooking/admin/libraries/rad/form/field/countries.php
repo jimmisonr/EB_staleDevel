@@ -8,7 +8,6 @@
  */
 class RADFormFieldCountries extends RADFormFieldList
 {
-
 	/**
 	 * The form field type.
 	 *
@@ -29,7 +28,6 @@ class RADFormFieldCountries extends RADFormFieldList
 	 *
 	 * @param   JTable $row   the table object store form field definitions
 	 * @param    mixed $value the initial value of the form field
-	 *
 	 */
 	public function __construct($row, $value)
 	{
@@ -43,7 +41,6 @@ class RADFormFieldCountries extends RADFormFieldList
 	 * Use the query attribute to supply a query to generate the list.
 	 *
 	 * @return  array  The field option objects.
-	 *
 	 */
 	protected function getOptions()
 	{
@@ -54,12 +51,12 @@ class RADFormFieldCountries extends RADFormFieldList
 			$db->setQuery($this->query);
 			$options   = array();
 			$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_COUNTRY'));
-			
+
 			$countries = $db->loadObjectlist();
 			foreach($countries as $country)
 			{
 				$options[] = JHtml::_('select.option', $country->value, JText::_($country->text));
-			}			
+			}
 		}
 		catch (Exception $e)
 		{

@@ -8,7 +8,6 @@
  */
 class RADForm
 {
-
 	/**
 	 * The array hold list of custom fields
 	 *
@@ -17,8 +16,6 @@ class RADForm
 	protected $fields;
 
 	/**
-	 *
-	 *
 	 * @var string
 	 */
 	protected $fieldSuffix = null;
@@ -125,7 +122,6 @@ class RADForm
 	}
 
 	/**
-	 *
 	 * Add event handle to the custom fee field
 	 *
 	 * @param string $calculationFeeMethod
@@ -421,7 +417,7 @@ class RADForm
 			{
 				continue;
 			}
-			
+
 			if ($fieldType == 'date')
 			{
 				$fieldValue = $data[$field->name];

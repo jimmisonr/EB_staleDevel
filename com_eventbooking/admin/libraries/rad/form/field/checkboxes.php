@@ -8,12 +8,10 @@
  */
 class RADFormFieldCheckboxes extends RADFormField
 {
-
 	/**
 	 * The form field type.
 	 *
 	 * @var string
-	 *
 	 */
 	protected $type = 'Checkboxes';
 
@@ -24,7 +22,6 @@ class RADFormFieldCheckboxes extends RADFormField
 	 *            the table object store form field definitions
 	 * @param mixed  $value
 	 *            initial value of the form field
-	 *
 	 */
 	public function __construct($row, $value)
 	{
@@ -35,7 +32,6 @@ class RADFormFieldCheckboxes extends RADFormField
 	 * Method to get the field input markup.
 	 *
 	 * @return string The field input markup.
-	 *
 	 */
 	protected function getInput($bootstrapHelper = null)
 	{

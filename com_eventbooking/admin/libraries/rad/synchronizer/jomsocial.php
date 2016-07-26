@@ -1,7 +1,6 @@
 <?php
 class RADSynchronizerJomsocial
 {
-
 	public function getData($userId, $mappings)
 	{
 		$data = array();
@@ -16,7 +15,8 @@ class RADSynchronizerJomsocial
 			{
 				$data[$fieldName] = $rows[$mappingFieldName]->value;
 			}
-		}		
+		}
+
 		return $data;
 	}
 }

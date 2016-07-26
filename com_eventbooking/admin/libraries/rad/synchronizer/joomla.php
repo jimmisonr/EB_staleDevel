@@ -1,7 +1,6 @@
 <?php
 class RADSynchronizerJoomla
 {
-
 	public function getData($userId, $mappings)
 	{
 		$data = array();
@@ -24,5 +23,5 @@ class RADSynchronizerJoomla
 		}
 
 		return $data;
-	}	
+	}
 }

@@ -2,12 +2,10 @@
 
 class RADFormFieldHeading extends RADFormField
 {
-
 	/**
 	 * The form field type.
 	 *
 	 * @var string
-	 *
 	 */
 	protected $type = 'Heading';
 
@@ -15,7 +13,6 @@ class RADFormFieldHeading extends RADFormField
 	 * Method to get the field input markup.
 	 *
 	 * @return string The field input markup.
-	 *        
 	 */
 	protected function getInput($bootstrapHelper = null)
 	{
@@ -24,6 +21,7 @@ class RADFormFieldHeading extends RADFormField
 		{
 			$controlGroupAttributes .= ' style="display:none;" ';
 		}
+
 		return '<h3 class="eb-heading" ' . $controlGroupAttributes . '>' . $this->title . '</h3>';
 	}
 

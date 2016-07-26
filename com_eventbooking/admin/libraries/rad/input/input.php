@@ -23,7 +23,6 @@ class RADInput extends JInput
 	 *
 	 * @param   array $source  Source data (Optional, default is $_REQUEST)
 	 * @param   array $options Array of configuration parameters (Optional)
-	 *
 	 */
 	public function __construct($source = null, array $options = array())
 	{
@@ -37,7 +36,6 @@ class RADInput extends JInput
 	}
 
 	/**
-	 *
 	 * Get data from the input
 	 *
 	 * @param int $mask

@@ -196,7 +196,6 @@ class RADModel
 			$this->table = $tablePrefix . strtolower(RADInflector::pluralize($this->name));
 		}
 
-
 		if (isset($config['ignore_request']))
 		{
 			$this->ignoreRequest = $config['ignore_request'];
@@ -392,9 +391,8 @@ class RADModel
 			return $this->set($method, $args[0]);
 		}
 
-		return null;
+		return;
 	}
-
 
 	/**
 	 * Gets the value of a user state variable.
@@ -434,21 +432,20 @@ class RADModel
 	 * @param   integer $client_id The ID of the client
 	 *
 	 * @return  void
-	 *
 	 */
 	protected function cleanCache($group = null, $client_id = 0)
 	{
 		$conf    = JFactory::getConfig();
 		$options = array(
 			'defaultgroup' => ($group) ? $group : $this->option,
-			'cachebase'    => ($client_id) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache'));
+			'cachebase'    => ($client_id) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache'), );
 
 		$cache = JCache::getInstance('callback', $options);
 		$cache->clean();
 		// Trigger the onContentCleanCache event.
 		if (!empty($this->eventCleanCache))
 		{
-			$dispatcher = JEventDispatcher::getInstance();;
+			$dispatcher = JEventDispatcher::getInstance();
 			$dispatcher->trigger($this->event_clean_cache, $options);
 		}
 	}

@@ -62,7 +62,6 @@ abstract class RADView
 	 * @param array  $config Configuration array for view
 	 *
 	 * @return RADView A view object
-	 *
 	 */
 	public static function getInstance($name, $type, $prefix, array $config = array())
 	{
@@ -181,7 +180,6 @@ abstract class RADView
 	 * @param string $output The output to escape.
 	 *
 	 * @return string The escaped output.
-	 *
 	 */
 	public function escape($output)
 	{

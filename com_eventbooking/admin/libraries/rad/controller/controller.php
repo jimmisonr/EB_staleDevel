@@ -20,7 +20,6 @@ defined('_JEXEC') or die;
  */
 class RADController
 {
-
 	/**
 	 * Array which hold all the controller objects has been created
 	 *
@@ -152,7 +151,7 @@ class RADController
 		{
 			if (empty($config['class_prefix']))
 			{
-				$config['class_prefix'] = ucfirst($component);;
+				$config['class_prefix'] = ucfirst($component);
 			}
 
 			$class = ucfirst($config['class_prefix']) . 'Controller' . ucfirst($name);
@@ -303,7 +302,6 @@ class RADController
 	 * @param array  $config Configuration array for model. Optional.
 	 *
 	 * @return RADModel The model.
-	 *
 	 */
 	public function getModel($name = '', array $config = array())
 	{
@@ -358,7 +356,6 @@ class RADController
 	 * @param array  $config Configuration array for view. Optional.
 	 *
 	 * @return RADView Reference to the view
-	 *
 	 */
 	public function getView($name, $type = 'html', $layout = 'default', array $config = array())
 	{
@@ -416,7 +413,6 @@ class RADController
 	 * @param string $type Message type. Optional, defaults to 'message'.
 	 *
 	 * @return string Previous message
-	 *
 	 */
 	public function setMessage($text, $type = 'message')
 	{
@@ -437,7 +433,6 @@ class RADController
 	 * @param string $type Message type. Optional, defaults to 'message' or the type set by a previous call to setMessage.
 	 *
 	 * @return RADController This object to support chaining.
-	 *
 	 */
 	public function setRedirect($url, $msg = null, $type = null)
 	{
@@ -469,7 +464,6 @@ class RADController
 	 * Redirects the browser or returns false if no redirect is set.
 	 *
 	 * @return boolean False if no redirect exists.
-	 *
 	 */
 	public function redirect()
 	{
@@ -486,7 +480,6 @@ class RADController
 	 * Get the last task that is being performed or was most recently performed.
 	 *
 	 * @return string The task that is being performed or was most recently performed.
-	 *
 	 */
 	public function getTask()
 	{
@@ -501,7 +494,6 @@ class RADController
 	 * @param string $method The name of the method in the derived class to perform for this task.
 	 *
 	 * @return RADController A RADController object to support chaining.
-	 *
 	 */
 	public function registerTask($task, $method)
 	{
@@ -517,7 +509,6 @@ class RADController
 	 * Get the application object.
 	 *
 	 * @return JApplicationBase The application object.
-	 *
 	 */
 	public function getApplication()
 	{
@@ -528,7 +519,6 @@ class RADController
 	 * Get the input object.
 	 *
 	 * @return RADInput The input object.
-	 *
 	 */
 	public function getInput()
 	{
