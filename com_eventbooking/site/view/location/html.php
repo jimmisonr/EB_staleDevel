@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewLocationHtml extends RADViewHtml
 {
-
 	/**
 	 * Display events from a location
 	 */
@@ -60,7 +59,7 @@ class EventbookingViewLocationHtml extends RADViewHtml
 				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', 'false', 'false', 'false', 'false');
 			}
 		}
-		
+
 		if ($config->show_location_in_category_view)
 		{
 			$width  = (int) $config->get('map_width', 800);
@@ -130,7 +129,7 @@ class EventbookingViewLocationHtml extends RADViewHtml
 		);
 		$config             = EventbookingHelper::getConfig();
 		$item               = $this->model->getLocationData();
-		
+
 		$options            = array();
 		$options[]          = JHtml::_('select.option', '', JText::_('EB_SELECT_COUNTRY'), 'id', 'name');
 		$countries = EventbookingHelperDatabase::getAllCountries();

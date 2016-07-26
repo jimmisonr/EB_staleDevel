@@ -45,7 +45,7 @@ class EventbookingViewFieldsHtml extends RADViewList
 					'option.text'        => 'text',
 					'option.value'       => 'value',
 					'list.attr'          => ' onchange="submit();" ',
-					'list.select'        => $this->state->filter_category_id));
+					'list.select'        => $this->state->filter_category_id, ));
 		}
 		else
 		{

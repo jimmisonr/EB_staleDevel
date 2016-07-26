@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewRegistrantHtml extends RADViewItem
 {
-
 	protected function prepareView()
 	{
 		parent::prepareView();

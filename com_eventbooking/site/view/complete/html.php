@@ -35,7 +35,7 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		{
 			$query->select('id')
 				->from('#__eb_registrants')
-				->where('registration_code = '. $db->quote($registrationCode));
+				->where('registration_code = ' . $db->quote($registrationCode));
 			$db->setQuery($query);
 			$id = (int) $db->loadResult();
 		}
@@ -140,7 +140,7 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		if (strpos($thankMessage, '[QRCODE]') !== false)
 		{
 			EventbookingHelper::generateQrcode($rowRegistrant->id);
-			$imgTag = '<img src="media/com_eventbooking/qrcodes/'.$rowRegistrant->id.'.png" border="0" />';
+			$imgTag = '<img src="media/com_eventbooking/qrcodes/' . $rowRegistrant->id . '.png" border="0" />';
 			$thankMessage = str_ireplace("[QRCODE]", $imgTag, $thankMessage);
 		}
 
@@ -158,7 +158,7 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		$this->registrationCode = $registrationCode;
 		$this->tmpl             = $this->input->getString('tmpl');
 		$this->conversionTrackingCode = $trackingCode;
-		
+
 		// Reset cart
 		$cart = new EventbookingHelperCart();
 		$cart->reset();

@@ -12,15 +12,12 @@ defined('_JEXEC') or die;
 
 class EventbookingViewEventsHtml extends RADViewList
 {
-
 	protected function prepareView()
 	{
 		parent::prepareView();
 
-
 		$this->lists['filter_category_id'] = EventbookingHelperHtml::buildCategoryDropdown($this->state->filter_category_id, 'filter_category_id',
 			'onchange="submit();"');
-
 
 		$options                           = array();
 		$options[]                         = JHtml::_('select.option', 0, JText::_('EB_SELECT_LOCATION'), 'id', 'name');
@@ -34,7 +31,6 @@ class EventbookingViewEventsHtml extends RADViewList
 		$options[]                         = JHtml::_('select.option', 1, JText::_('EB_SHOW'));
 		$this->lists['filter_past_events'] = JHtml::_('select.genericlist', $options, 'filter_past_events', ' class="input-medium" onchange="submit();" ',
 			'value', 'text', $this->state->filter_past_events);
-
 
 		$this->config = EventbookingHelper::getConfig();
 	}

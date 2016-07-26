@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewRegistrantHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		$document = JFactory::getDocument();
@@ -72,7 +71,6 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			$rowMembers = array();
 		}
 
-
 		$form = new RADForm($rowFields);
 		$form->bind($data, $useDefault);
 
@@ -94,7 +92,6 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		{
 			$canChangeStatus = false;
 		}
-
 
 		if (empty($item->id))
 		{
@@ -136,7 +133,6 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 				$rowMembers[] = $rowMember;
 			}
 		}
-
 
 		if (count($rowMembers))
 		{

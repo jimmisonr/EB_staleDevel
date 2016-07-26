@@ -15,7 +15,6 @@ defined('_JEXEC') or die;
  */
 class EventbookingViewRegistrantlistHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		if (!EventbookingHelper::canViewRegistrantList())

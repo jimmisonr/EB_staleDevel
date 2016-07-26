@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewFailureHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		$this->setLayout('default');

@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewLocationsHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		if (!JFactory::getUser()->authorise('eventbooking.addlocation', 'com_eventbooking'))

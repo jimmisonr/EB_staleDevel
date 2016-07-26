@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewPasswordHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		$this->setLayout('default');

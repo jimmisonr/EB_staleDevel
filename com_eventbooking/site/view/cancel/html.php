@@ -30,7 +30,6 @@ class EventbookingViewCancelHtml extends RADViewHtml
 		$db->setQuery($query);
 		$eventTitle = $db->loadResult();
 
-
 		if (strlen(trim(strip_tags($message->{'cancel_message' . $fieldSuffix}))))
 		{
 			$cancelMessage = $message->{'cancel_message' . $fieldSuffix};

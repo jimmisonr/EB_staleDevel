@@ -14,7 +14,6 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 {
 	/**
 	 * Display interface to user
-	 *
 	 */
 	public function display()
 	{

@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewMassmailHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		$config    = EventbookingHelper::getConfig();

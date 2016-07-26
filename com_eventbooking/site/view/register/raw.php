@@ -10,7 +10,6 @@
  */
 class EventbookingViewRegisterRaw extends RADViewHtml
 {
-
 	/**
 	 * Display Group registration forms to user
 	 *
@@ -99,7 +98,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 	 *
 	 * @throws Exception
 	 */
-	function displayGroupMembersForm($event)
+	public function displayGroupMembersForm($event)
 	{
 		$session           = JFactory::getSession();
 		$config            = EventbookingHelper::getConfig();
@@ -179,7 +178,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 	 *
 	 * @throws Exception
 	 */
-	function displayGroupBillingForm($event, $input)
+	public function displayGroupBillingForm($event, $input)
 	{
 		$session          = JFactory::getSession();
 		$user             = JFactory::getUser();
@@ -196,8 +195,8 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		else
 		{
 			$captchaInvalid = 0;
-			$data           = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);			
-			
+			$data           = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);
+
 			// IN case there is no data, get it from URL (get for example)
 			if (empty($data))
 			{

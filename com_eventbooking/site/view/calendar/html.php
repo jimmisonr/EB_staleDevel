@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewCalendarHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		$app    = JFactory::getApplication();
@@ -34,7 +33,7 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 
 			return;
 		}
-		else if ($layout == 'daily')
+		elseif ($layout == 'daily')
 		{
 			$this->displayDailyView();
 
@@ -47,7 +46,6 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 		$state = $model->getState();
 		$year  = $state->year;
 		$month = $state->month;
-
 
 		$this->data  = EventbookingHelperData::getCalendarData($rows, $year, $month);
 		$this->month = $month;
@@ -64,7 +62,7 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 			JText::_('EB_SEP'),
 			JText::_('EB_OCT'),
 			JText::_('EB_NOV'),
-			JText::_('EB_DEC'));
+			JText::_('EB_DEC'), );
 		$options     = array();
 		foreach ($listMonth as $key => $monthName)
 		{
@@ -121,7 +119,7 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 			foreach($rows as $row)
 			{
 				$row->short_description = JHtml::_('content.prepare', $row->short_description);
-			}			
+			}
 		}
 		$this->events            = $rows;
 		$this->first_day_of_week = $model->getState('date');
@@ -135,7 +133,7 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 	private function displayDailyView()
 	{
 		EventbookingHelperJquery::colorbox('eb-colorbox-addlocation');
-		$config 	  = EventbookingHelper::getConfig();		
+		$config 	  = EventbookingHelper::getConfig();
 		$model        = $this->getModel();
 		$rows 		  = $model->getEventsByDaily();
 		if ($config->process_plugin)
@@ -143,7 +141,7 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 			foreach($rows as $row)
 			{
 				$row->short_description = JHtml::_('content.prepare', $row->short_description);
-			}			
+			}
 		}
 		$this->events = $rows;
 		$this->day    = $model->getState('day');

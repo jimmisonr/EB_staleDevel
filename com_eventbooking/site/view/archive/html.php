@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewArchiveHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		$app    = JFactory::getApplication();

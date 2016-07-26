@@ -19,7 +19,6 @@ defined('_JEXEC') or die;
  */
 class EventbookingViewEventsHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		if (JFactory::getUser()->get('guest'))

@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewMessageHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		$languages = EventbookingHelper::getLanguages();
@@ -79,7 +78,6 @@ class EventbookingViewMessageHtml extends RADViewHtml
 
 		parent::display();
 	}
-
 
 	protected function addToolbar()
 	{

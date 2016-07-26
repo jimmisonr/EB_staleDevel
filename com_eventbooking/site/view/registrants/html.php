@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewRegistrantsHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		$user = JFactory::getUser();

@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewWaitinglistHtml extends RADViewHtml
 {
-
 	/**
 	 * Display interface to user
 	 *

@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewCategoryHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		$app        = JFactory::getApplication();
@@ -103,7 +102,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 				array(
 					'table_prefix'    => '#__eb_',
 					'remember_states' => false,
-					'ignore_request'  => true
+					'ignore_request'  => true,
 				)
 			);
 			$this->categories = $model->setState('limitstart', 0)
@@ -191,7 +190,6 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 
 	/**
 	 * Display calendar view to user in a category
-	 *
 	 */
 	protected function displayCalendar()
 	{
@@ -240,7 +238,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 			JText::_('EB_SEP'),
 			JText::_('EB_OCT'),
 			JText::_('EB_NOV'),
-			JText::_('EB_DEC'));
+			JText::_('EB_DEC'), );
 		$options     = array();
 		foreach ($listMonth as $key => $monthName)
 		{

@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewFieldHtml extends RADViewItem
 {
-
 	protected function prepareView()
 	{
 		parent::prepareView();
@@ -80,7 +79,7 @@ class EventbookingViewFieldHtml extends RADViewItem
 					'option.text'        => 'text',
 					'option.value'       => 'value',
 					'list.attr'          => ' class="input-xlarge" multiple="multiple" ',
-					'list.select'        => $selectedCategoryIds));
+					'list.select'        => $selectedCategoryIds, ));
 		}
 		else
 		{
@@ -120,9 +119,9 @@ class EventbookingViewFieldHtml extends RADViewItem
 		}
 
 		// Trigger plugins to get list of fields for mapping
-		JPluginHelper::importPlugin( 'eventbooking');
+		JPluginHelper::importPlugin('eventbooking');
 
-		$results = JFactory::getApplication()->triggerEvent( 'onGetFields', array());
+		$results = JFactory::getApplication()->triggerEvent('onGetFields', array());
 		$fields = array();
 		if (count($results))
 		{

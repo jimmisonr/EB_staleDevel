@@ -44,14 +44,13 @@ class EventbookingViewDashboardHtml extends RADViewHtml
 	}
 
 	/**
-	 *
 	 * Function to create the buttons view.
 	 *
 	 * @param string $link  target url
 	 * @param string $image path to image
 	 * @param string $text  image description
 	 */
-	function quickIconButton($link, $image, $text, $id = null)
+	public function quickIconButton($link, $image, $text, $id = null)
 	{
 		$language = JFactory::getLanguage();
 		?>

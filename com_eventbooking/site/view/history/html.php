@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewHistoryHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		if (!JFactory::getUser()->id)

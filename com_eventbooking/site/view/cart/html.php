@@ -12,12 +12,11 @@ defined('_JEXEC') or die;
 
 class EventbookingViewCartHtml extends RADViewHtml
 {
-
 	/**
 	 * Display interface to user
 	 */
 	public function display()
-	{		
+	{
 		$layout = $this->getLayout();
 		if ($layout != 'mini')
 		{

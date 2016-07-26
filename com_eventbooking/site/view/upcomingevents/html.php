@@ -13,7 +13,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		$app    = JFactory::getApplication();
@@ -34,7 +33,7 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 			}
 			if ($config->process_plugin && !empty($category->description))
 			{
-				$category->description = JHtml::_('content.prepare', $category->description);	
+				$category->description = JHtml::_('content.prepare', $category->description);
 			}
 		}
 		else
@@ -48,7 +47,7 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 			{
 				$item                    = $items[$i];
 				$item->short_description = JHtml::_('content.prepare', $item->short_description);
-			}						
+			}
 		}
 
 		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)

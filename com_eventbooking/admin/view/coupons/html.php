@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewCouponsHtml extends RADViewList
 {
-
 	protected function prepareView()
 	{
 		parent::prepareView();

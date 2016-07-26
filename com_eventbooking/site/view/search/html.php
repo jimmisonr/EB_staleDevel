@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewSearchHtml extends RADViewHtml
 {
-
 	public function display()
 	{
 		$document   = JFactory::getDocument();
@@ -26,7 +25,7 @@ class EventbookingViewSearchHtml extends RADViewHtml
 			for ($i = 0, $n = count($items); $i < $n; $i++)
 			{
 				$item                    = $items[$i];
-				$item->short_description = JHtml::_('content.prepare', $item->short_description);;
+				$item->short_description = JHtml::_('content.prepare', $item->short_description);
 			}
 		}
 		if ($config->multiple_booking)

@@ -14,7 +14,6 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 {
 	/**
 	 * Display interface to user
-	 *
 	 */
 	public function display()
 	{
@@ -577,7 +576,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			$pathway->addItem(JText::_('EB_GROUP_REGISTRATION'));
 		}
 	}
-	
+
 	/**
 	 * Load captcha for registration form
 	 * @param bool $initOnly

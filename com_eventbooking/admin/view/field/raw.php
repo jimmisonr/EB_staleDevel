@@ -12,8 +12,7 @@ defined('_JEXEC') or die;
 
 class EventbookingViewFieldRaw extends RADViewHtml
 {
-
-	function display()
+	public function display()
 	{
 		$this->setLayout('options');
 		$db      = JFactory::getDbo();

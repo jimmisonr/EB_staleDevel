@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingViewCalendarRaw extends RADViewHtml
 {
-
 	public function display()
 	{
 		$currentDateData = EventbookingModelCalendar::getCurrentDateData();
@@ -58,7 +57,7 @@ class EventbookingViewCalendarRaw extends RADViewHtml
 			JText::_('EB_SEP'),
 			JText::_('EB_OCT'),
 			JText::_('EB_NOV'),
-			JText::_('EB_DEC'));
+			JText::_('EB_DEC'), );
 
 		$this->days      = $days;
 		$this->listMonth = $listMonth;

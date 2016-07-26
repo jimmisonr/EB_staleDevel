@@ -76,7 +76,7 @@ class EventbookingViewEventHtml extends RADViewItem
 			'option.text'        => 'text',
 			'option.value'       => 'value',
 			'list.attr'          => 'class="advancedSelect input-xlarge"',
-			'list.select'        => $mainCategoryId
+			'list.select'        => $mainCategoryId,
 		));
 
 		array_shift($options);
@@ -86,7 +86,7 @@ class EventbookingViewEventHtml extends RADViewItem
 			'option.text'        => 'text',
 			'option.value'       => 'value',
 			'list.attr'          => 'class="advancedSelect input-xlarge"  size="5" multiple="multiple"',
-			'list.select'        => $additionalCategories
+			'list.select'        => $additionalCategories,
 		));
 		$options                                 = array();
 		$options[]                               = JHtml::_('select.option', 1, JText::_('%'));
@@ -170,7 +170,6 @@ class EventbookingViewEventHtml extends RADViewItem
 		}
 		$this->lists['registration_start_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'registration_start_hour', ' class="inputbox input-mini" ', $selectedHour);
 		$this->lists['registration_start_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d');
-
 
 		$nullDate = $db->getNullDate();
 		//Custom field handles
