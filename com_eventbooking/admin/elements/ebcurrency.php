@@ -14,7 +14,6 @@ JFormHelper::loadFieldClass('list');
 
 class JFormFieldEBCurrency extends JFormFieldList
 {
-
 	/**
 	 * The form field type.
 	 *
@@ -36,4 +35,4 @@ class JFormFieldEBCurrency extends JFormFieldList
 
 		return array_merge($options, $db->loadObjectList());
 	}
-}   
+}

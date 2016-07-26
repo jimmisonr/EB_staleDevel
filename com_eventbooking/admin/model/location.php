@@ -13,7 +13,6 @@ defined('_JEXEC') or die;
 
 class EventbookingModelLocation extends RADModelAdmin
 {
-
 	/**
 	 * Pre-process location data before it is being saved to database
 	 *

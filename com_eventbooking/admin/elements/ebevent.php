@@ -14,7 +14,6 @@ JFormHelper::loadFieldClass('list');
 
 class JFormFieldEBEvent extends JFormFieldList
 {
-
 	/**
 	 * The form field type.
 	 *

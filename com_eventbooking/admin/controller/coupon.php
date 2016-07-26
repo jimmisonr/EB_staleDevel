@@ -18,7 +18,6 @@ defined('_JEXEC') or die;
  */
 class EventbookingControllerCoupon extends EventbookingController
 {
-
 	/**
 	 * Method to import coupon codes from a csv file
 	 */
@@ -95,15 +94,15 @@ class EventbookingControllerCoupon extends EventbookingController
 				{
 					$results_arr[] = $r->title;
 				}
-				else 
+				else
 				{
 					$query->clear();
 					$query->select('a.id')
 						->from('#__eb_events AS a')
 						->leftJoin('#__eb_coupon_events AS b ON a.id=b.event_id')
-						->where('b.coupon_id='.(int)$r->id);
+						->where('b.coupon_id=' . (int) $r->id);
 					$db->setQuery($query);
-					$results_arr[] = implode(',',$db->loadColumn());
+					$results_arr[] = implode(',', $db->loadColumn());
 				}
 				$results_arr[] = $r->code;
 				$results_arr[] = round($r->discount, 2);

@@ -14,7 +14,6 @@ JFormHelper::loadFieldClass('list');
 
 class JFormFieldEbeventfield extends JFormFieldList
 {
-
 	/**
 	 * The form field type.
 	 *
@@ -45,4 +44,3 @@ class JFormFieldEbeventfield extends JFormFieldList
 		return $options;
 	}
 }
-

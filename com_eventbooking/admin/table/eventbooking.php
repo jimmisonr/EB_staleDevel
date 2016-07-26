@@ -12,17 +12,15 @@ defined('_JEXEC') or die;
 
 /**
  * Event Table Class
- *
  */
 class EventEventBooking extends JTable
 {
-
 	/**
 	 * Constructor
 	 *
 	 * @param object Database connector object
 	 */
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
 		parent::__construct('#__eb_events', 'id', $db);
 	}
@@ -30,17 +28,15 @@ class EventEventBooking extends JTable
 
 /**
  * Field Table Class
- *
  */
 class FieldEventBooking extends JTable
 {
-
 	/**
 	 * Constructor
 	 *
 	 * @param object Database connector object
 	 */
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
 		parent::__construct('#__eb_fields', 'id', $db);
 	}
@@ -48,17 +44,15 @@ class FieldEventBooking extends JTable
 
 /**
  * Registrant Event Booking
- *
  */
 class RegistrantEventBooking extends JTable
 {
-
 	/**
 	 * Constructor
 	 *
 	 * @param object Database connector object
 	 */
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
 		parent::__construct('#__eb_registrants', 'id', $db);
 	}
@@ -66,17 +60,15 @@ class RegistrantEventBooking extends JTable
 
 /**
  * Category Table Class
- *
  */
 class CategoryEventBooking extends JTable
 {
-
 	/**
 	 * Constructor
 	 *
 	 * @param object Database connector object
 	 */
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
 		parent::__construct('#__eb_categories', 'id', $db);
 	}
@@ -84,17 +76,15 @@ class CategoryEventBooking extends JTable
 
 /**
  * Location Table Class
- *
  */
 class LocationEventBooking extends JTable
 {
-
 	/**
 	 * Constructor
 	 *
 	 * @param object Database connector object
 	 */
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
 		parent::__construct('#__eb_locations', 'id', $db);
 	}
@@ -102,17 +92,15 @@ class LocationEventBooking extends JTable
 
 /**
  * Plugin table class
- *
  */
 class PluginEventBooking extends JTable
 {
-
 	/**
 	 * Constructor
 	 *
 	 * @param object Database connector object
 	 */
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
 		parent::__construct('#__eb_payment_plugins', 'id', $db);
 	}
@@ -120,17 +108,15 @@ class PluginEventBooking extends JTable
 
 /**
  * Coupon Table
- *
  */
 class CouponEventBooking extends JTable
 {
-
 	/**
 	 * Constructor
 	 *
 	 * @param object Database connector object
 	 */
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
 		parent::__construct('#__eb_coupons', 'id', $db);
 	}
@@ -138,17 +124,15 @@ class CouponEventBooking extends JTable
 
 /**
  * Event Table Class
- *
  */
 class ConfigEventBooking extends JTable
 {
-
 	/**
 	 * Constructor
 	 *
 	 * @param object Database connector object
 	 */
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
 		parent::__construct('#__eb_configs', 'id', $db);
 	}
@@ -156,17 +140,15 @@ class ConfigEventBooking extends JTable
 
 /**
  * Waiting list table class
- *
  */
 class WaitingListEventBooking extends JTable
 {
-
 	/**
 	 * Constructor
 	 *
 	 * @param object Database connector object
 	 */
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
 		parent::__construct('#__eb_waiting_lists', 'id', $db);
 	}
@@ -174,17 +156,15 @@ class WaitingListEventBooking extends JTable
 
 /**
  * Waiting list table class
- *
  */
 class FieldvalueEventBooking extends JTable
 {
-
 	/**
 	 * Constructor
 	 *
 	 * @param object Database connector object
 	 */
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
 		parent::__construct('#__eb_field_values', 'id', $db);
 	}
@@ -192,17 +172,15 @@ class FieldvalueEventBooking extends JTable
 
 /**
  * State Table Class
- *
  */
 class StateEventBooking extends JTable
 {
-
 	/**
 	 * Constructor
 	 *
 	 * @param object Database connector object
 	 */
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
 		parent::__construct('#__eb_states', 'id', $db);
 	}
@@ -210,17 +188,15 @@ class StateEventBooking extends JTable
 
 /**
  * State Table Class
- *
  */
 class CountryEventBooking extends JTable
 {
-
 	/**
 	 * Constructor
 	 *
 	 * @param object Database connector object
 	 */
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
 		parent::__construct('#__eb_countries', 'id', $db);
 	}

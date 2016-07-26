@@ -16,7 +16,6 @@ class EventbookingModelPlugin extends RADModelAdmin
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config)
 	{
@@ -77,10 +76,10 @@ class EventbookingModelPlugin extends RADModelAdmin
 		{
 			$uploaded       = JFile::upload($plugin['tmp_name'], $destinationDir, false, true);
 		}
-		else 
+		else
 		{
 			$uploaded       = JFile::upload($plugin['tmp_name'], $destinationDir);
-		}		
+		}
 		if (!$uploaded)
 		{
 			throw new Exception(JText::_('Upload plugin package'));
@@ -177,8 +176,8 @@ class EventbookingModelPlugin extends RADModelAdmin
 			$file = $files[$i];
 			if ($file->getName() == 'filename')
 			{
-				$fileName = $file;							
-				JFile::copy($extractDir . '/' . $fileName, $pluginDir . '/' . $fileName);				
+				$fileName = $file;
+				JFile::copy($extractDir . '/' . $fileName, $pluginDir . '/' . $fileName);
 			}
 			elseif ($file->getName() == 'folder')
 			{

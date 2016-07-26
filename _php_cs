@@ -1,6 +1,6 @@
 <?php
 
-$topFilesFinder = Symfony\CS\Finder\DefaultFinder::create()
+/*$topFilesFinder = Symfony\CS\Finder\DefaultFinder::create()
 	->in(array(__DIR__ . '/com_eventbooking/admin/libraries'))
 	->files()
 	->depth(0);
@@ -12,7 +12,22 @@ $mainFinder = Symfony\CS\Finder\DefaultFinder::create()
 		)
 	)
 	->append($topFilesFinder);
+*/
 
+$topFilesFinder = Symfony\CS\Finder\DefaultFinder::create()
+	->in(array(__DIR__ . '/com_eventbooking/admin'))
+	->files()
+	->depth(0);
+$mainFinder = Symfony\CS\Finder\DefaultFinder::create()
+	->in(
+		array(
+			__DIR__ . '/com_eventbooking/admin/controller',
+			__DIR__ . '/com_eventbooking/admin/model',
+			__DIR__ . '/com_eventbooking/admin/table',
+			__DIR__ . '/com_eventbooking/admin/elements',			
+		)
+	)
+	->append($topFilesFinder);
 return Symfony\CS\Config\Config::create()
     ->setUsingLinter(false)
     ->setUsingCache(true)

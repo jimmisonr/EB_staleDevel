@@ -12,12 +12,10 @@ defined('_JEXEC') or die;
 
 class EventbookingModelRegistrants extends RADModelList
 {
-
 	/**
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -37,7 +35,6 @@ class EventbookingModelRegistrants extends RADModelList
 			->insert('filter_checked_in', 'int', -1)
 			->setDefault('filter_order_Dir', 'DESC');
 	}
-
 
 	/**
 	 * Get list group name for group members records
@@ -256,7 +253,7 @@ class EventbookingModelRegistrants extends RADModelList
 
 		$data['today'] = array(
 			'total_registrants' => (int) $row->total_registrants,
-			'total_amount'      => floatval($row->total_amount)
+			'total_amount'      => floatval($row->total_amount),
 		);
 
 		// Yesterday
@@ -281,7 +278,7 @@ class EventbookingModelRegistrants extends RADModelList
 
 		$data['yesterday'] = array(
 			'total_registrants' => (int) $row->total_registrants,
-			'total_amount'      => floatval($row->total_amount)
+			'total_amount'      => floatval($row->total_amount),
 		);
 
 		// This week
@@ -305,7 +302,7 @@ class EventbookingModelRegistrants extends RADModelList
 
 		$data['this_week'] = array(
 			'total_registrants' => (int) $row->total_registrants,
-			'total_amount'      => floatval($row->total_amount)
+			'total_amount'      => floatval($row->total_amount),
 		);
 
 		// Last week, re-use data from this week
@@ -324,7 +321,7 @@ class EventbookingModelRegistrants extends RADModelList
 
 		$data['last_week'] = array(
 			'total_registrants' => (int) $row->total_registrants,
-			'total_amount'      => floatval($row->total_amount)
+			'total_amount'      => floatval($row->total_amount),
 		);
 
 		// This month
@@ -349,7 +346,7 @@ class EventbookingModelRegistrants extends RADModelList
 
 		$data['this_month'] = array(
 			'total_registrants' => (int) $row->total_registrants,
-			'total_amount'      => floatval($row->total_amount)
+			'total_amount'      => floatval($row->total_amount),
 		);
 
 		// Last month
@@ -372,7 +369,7 @@ class EventbookingModelRegistrants extends RADModelList
 
 		$data['last_month'] = array(
 			'total_registrants' => (int) $row->total_registrants,
-			'total_amount'      => floatval($row->total_amount)
+			'total_amount'      => floatval($row->total_amount),
 		);
 
 		// This year
@@ -397,7 +394,7 @@ class EventbookingModelRegistrants extends RADModelList
 
 		$data['this_year'] = array(
 			'total_registrants' => (int) $row->total_registrants,
-			'total_amount'      => floatval($row->total_amount)
+			'total_amount'      => floatval($row->total_amount),
 		);
 
 		// Last year
@@ -422,7 +419,7 @@ class EventbookingModelRegistrants extends RADModelList
 
 		$data['last_year'] = array(
 			'total_registrants' => (int) $row->total_registrants,
-			'total_amount'      => floatval($row->total_amount)
+			'total_amount'      => floatval($row->total_amount),
 		);
 
 		// Total registration
@@ -436,7 +433,7 @@ class EventbookingModelRegistrants extends RADModelList
 
 		$data['total_registration'] = array(
 			'total_registrants' => (int) $row->total_registrants,
-			'total_amount'      => floatval($row->total_amount)
+			'total_amount'      => floatval($row->total_amount),
 		);
 
 		return $data;

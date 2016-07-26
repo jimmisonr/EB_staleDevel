@@ -16,7 +16,6 @@ class EventbookingModelCategories extends RADModelList
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -41,7 +40,7 @@ class EventbookingModelCategories extends RADModelList
 			$query  = $this->buildListQuery();
 			$db->setQuery($query);
 			$rows = $db->loadObjectList();
-			
+
 			$children = array();
 			// first pass - collect children
 			if (count($rows))

@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingTableCategory extends JTable
 {
-
 	/**
 	 * Constructor
 	 *

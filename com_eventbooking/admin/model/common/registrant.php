@@ -18,12 +18,10 @@ defined('_JEXEC') or die;
  */
 class EventbookingModelCommonRegistrant extends RADModelAdmin
 {
-
 	/**
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{

@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingModelCommonEvent extends RADModelAdmin
 {
-
 	/**
 	 * Method to store an event
 	 *
@@ -271,7 +270,6 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			$row->registration_start_date .= ' ' . $data['registration_start_hour'] . ':' . $data['registration_start_minute'] . ':00';
 			$row->cut_off_date .= ' ' . $data['cut_off_hour'] . ':' . $data['cut_off_minute'] . ':00';
 
-
 			$eventCustomField = EventbookingHelper::getConfigValue('event_custom_field');
 			if ($eventCustomField)
 			{
@@ -341,7 +339,6 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		{
 			throw new Exception($db->getErrorMsg());
 		}
-
 
 		$row->event_type = 1;
 		$eventDateHour   = $data['event_date_hour'];
@@ -462,7 +459,6 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 		$data['id'] = $row->id;
 
-
 		// Store group registration rates
 		$this->storeEventGroupRegistrationRates($row->id, $data, $isNew);
 
@@ -475,7 +471,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		{
 			for ($i = 1, $n = count($eventDates); $i < $n; $i++)
 			{
-				$rowChildEvent             = clone ($row);
+				$rowChildEvent             = clone $row;
 				$rowChildEvent->id         = 0;
 				$rowChildEvent->event_date = $eventDates[$i];
 				if ($eventDuration)
@@ -519,7 +515,6 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				$rowChildEvent->store();
 
 				$this->storeEventGroupRegistrationRates($rowChildEvent->id, $data, false);
-
 
 				$sql = 'INSERT INTO #__eb_event_categories(event_id, category_id, main_category) '
 					. "SELECT $rowChildEvent->id, category_id, main_category FROM #__eb_event_categories WHERE event_id=$row->id";
@@ -586,7 +581,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					'currency_symbol',
 					'custom_field_ids',
 					'custom_fields',
-					'published');
+					'published', );
 				$rowChildEvent  = $this->getTable();
 				foreach ($children as $childId)
 				{
@@ -666,7 +661,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			{
 				foreach ($eventDatesDate as $newEventDate)
 				{
-					$rowChildEvent             = clone ($row);
+					$rowChildEvent             = clone $row;
 					$rowChildEvent->id         = 0;
 					$rowChildEvent->event_date = $newEventDate;
 					$rowChildEvent->event_date = JHtml::_('date', $rowChildEvent->event_date, 'Y-m-d', null) . ' ' . JHtml::_('date', $row->event_date, 'H:i:s', null);
@@ -759,7 +754,6 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 	/**
 	 * Init event data
-	 *
 	 */
 	public function initData()
 	{
@@ -817,7 +811,6 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				$this->data->number_weeks  = 0;
 			}
 		}
-
 
 		if ($this->data->recurring_type)
 		{

@@ -13,7 +13,6 @@ JFormHelper::loadFieldClass('list');
 
 class JFormFieldEBCategory extends JFormFieldList
 {
-
 	/**
 	 * The form field type.
 	 *

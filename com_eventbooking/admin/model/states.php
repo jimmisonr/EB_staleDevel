@@ -16,7 +16,6 @@ class EventbookingModelStates extends RADModelList
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{

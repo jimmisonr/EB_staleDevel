@@ -132,7 +132,7 @@ class EventbookingModelMassmail extends RADModel
 				}
 			}
 		}
-		
+
 		return true;
 	}
 }

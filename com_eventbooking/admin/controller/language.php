@@ -39,7 +39,6 @@ class EventbookingControllerLanguage extends EventbookingController
 
 	/**
 	 * Cancel registration, redirect to dashboard page
-	 *
 	 */
 	public function cancel()
 	{

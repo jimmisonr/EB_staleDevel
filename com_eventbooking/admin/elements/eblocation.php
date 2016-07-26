@@ -14,7 +14,6 @@ JFormHelper::loadFieldClass('list');
 
 class JFormFieldEBLocation extends JFormFieldList
 {
-
 	/**
 	 * The form field type.
 	 *

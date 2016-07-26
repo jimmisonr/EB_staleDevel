@@ -25,12 +25,12 @@ class EventbookingControllerPlugin extends EventbookingController
 	{
 		if (version_compare(JVERSION, '3.4.0', 'ge'))
 		{
-			$plugin = $this->input->files->get('plugin_package', null, 'raw');			
+			$plugin = $this->input->files->get('plugin_package', null, 'raw');
 		}
 		else
 		{
-			$plugin = $this->input->files->get('plugin_package', null, 'none');			
-		}		
+			$plugin = $this->input->files->get('plugin_package', null, 'none');
+		}
 		$model  = $this->getModel();
 		try
 		{

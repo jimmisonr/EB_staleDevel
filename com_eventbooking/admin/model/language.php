@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingModelLanguage extends RADModel
 {
-
 	/**
 	 * List total
 	 *
@@ -38,7 +37,6 @@ class EventbookingModelLanguage extends RADModel
 	 * Instantiate the model.
 	 *
 	 * @param   array $config The configuration data for the model
-	 *
 	 */
 	public function __construct($config)
 	{
@@ -53,7 +51,6 @@ class EventbookingModelLanguage extends RADModel
 
 	/**
 	 * Get language items and store them in an array
-	 *
 	 */
 	public function getData()
 	{

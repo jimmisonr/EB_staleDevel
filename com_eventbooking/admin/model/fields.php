@@ -12,12 +12,10 @@ defined('_JEXEC') or die;
 
 class EventbookingModelFields extends RADModelList
 {
-
 	/**
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -50,7 +48,7 @@ class EventbookingModelFields extends RADModelList
 
 		if ($state->filter_fee_field != -1)
 		{
-			$query->where('fee_field = '. $state->filter_fee_field);
+			$query->where('fee_field = ' . $state->filter_fee_field);
 		}
 
 		return parent::buildQueryWhere($query);

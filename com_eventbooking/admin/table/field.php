@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingTableField extends JTable
 {
-
 	/**
 	 * Constructor
 	 *

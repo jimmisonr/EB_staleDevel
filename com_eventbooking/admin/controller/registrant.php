@@ -14,7 +14,6 @@ class EventbookingControllerRegistrant extends EventbookingController
 {
 	/**
 	 * Send batch mail to registrants
-	 *
 	 */
 	public function batch_mail()
 	{

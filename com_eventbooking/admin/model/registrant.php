@@ -12,12 +12,10 @@ defined('_JEXEC') or die;
 
 class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 {
-
 	/**
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
-	 *
 	 */
 	public function __construct($config = array())
 	{
@@ -153,7 +151,6 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 				$replaces['short_description'] = $row->short_description;
 				$replaces['description']       = $row->description;
 				$replaces['first_name']        = $row->first_name;
-
 
 				foreach ($replaces as $key => $value)
 				{

@@ -12,13 +12,12 @@ defined('_JEXEC') or die;
 
 class EventbookingController extends RADControllerAdmin
 {
-
 	public function display($cachable = false, array $urlparams = array())
 	{
 		JFactory::getDocument()->addStyleSheet(JURI::base(true) . '/components/com_eventbooking/assets/css/style.css');
 
 		parent::display($cachable, $urlparams);
-		
+
 		if ($this->input->getCmd('format', 'html') != 'raw')
 		{
 			EventbookingHelper::displayCopyRight();
@@ -127,7 +126,6 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($query);
 			$db->execute();
 		}
-
 
 		//Set up default payment plugins table
 		$sql = 'SELECT COUNT(*) FROM #__eb_payment_plugins';
@@ -442,7 +440,6 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
-
 		// Quantity field
 		if (!in_array('quantity_field', $fields))
 		{
@@ -471,7 +468,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('hide_on_email', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_fields` ADD  `hide_on_email` TINYINT NOT NULL DEFAULT  '0';";
@@ -532,14 +529,12 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
-
 		if (!in_array('event_end_date', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `event_end_date` DATETIME NULL AFTER  `event_date` ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
-
 
 		if (!in_array('registration_start_date', $fields))
 		{
@@ -1222,7 +1217,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('deposit_amount', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD `deposit_amount` DECIMAL( 10, 2 ) NULL DEFAULT '0' ;";
@@ -1783,7 +1778,7 @@ class EventbookingController extends RADControllerAdmin
 				6 => 'Radio',
 				7 => 'Date',
 				8 => 'Heading',
-				9 => 'Message');
+				9 => 'Message', );
 
 			foreach ($typeMapping as $key => $value)
 			{
@@ -1864,7 +1859,7 @@ class EventbookingController extends RADControllerAdmin
 					'gs_phone',
 					'gs_fax',
 					'gs_email',
-					'gs_comment');
+					'gs_comment', );
 				foreach ($keys as $key)
 				{
 					$config->$key = $params->get($key, 0);
@@ -1884,7 +1879,7 @@ class EventbookingController extends RADControllerAdmin
 				'phone'        => $config->s_phone,
 				'fax'          => $config->s_fax,
 				'comment'      => $config->s_comment,
-				'email'        => 1);
+				'email'        => 1, );
 
 			foreach ($publishStatus as $key => $value)
 			{
@@ -1907,7 +1902,7 @@ class EventbookingController extends RADControllerAdmin
 				'phone'        => $config->r_phone,
 				'fax'          => $config->r_fax,
 				'comment'      => $config->r_comment,
-				'email'        => 1);
+				'email'        => 1, );
 
 			foreach ($requiredStatus as $key => $value)
 			{
@@ -1928,7 +1923,7 @@ class EventbookingController extends RADControllerAdmin
 				'country'      => $config->gs_country,
 				'phone'        => $config->gs_phone,
 				'fax'          => $config->gs_fax,
-				'comment'      => $config->gs_comment);
+				'comment'      => $config->gs_comment, );
 			foreach ($groupMemberFields as $fieldName => $showed)
 			{
 				$showed = (int) $showed;
@@ -2073,7 +2068,7 @@ class EventbookingController extends RADControllerAdmin
 				'watinglist_confirmation_subject',
 				'watinglist_confirmation_body',
 				'watinglist_notification_subject',
-				'watinglist_notification_body');
+				'watinglist_notification_body', );
 			foreach ($keys as $key)
 			{
 				$row->id          = 0;
@@ -2120,9 +2115,9 @@ class EventbookingController extends RADControllerAdmin
 				  	";
 		$db->setQuery($sql);
 		$db->execute();
-		
-		$db->truncateTable('#__eb_urls');		
-		
+
+		$db->truncateTable('#__eb_urls');
+
 		// Migrate waiting list data
 		$sql = 'SELECT COUNT(*) FROM #__eb_waiting_lists';
 		$db->setQuery($sql);
@@ -2450,7 +2445,7 @@ class EventbookingController extends RADControllerAdmin
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/countries/tmpl/default.joomla3.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/coupons/tmpl/default.joomla3.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/events/tmpl/default.joomla3.php',
-			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/locations/tmpl/default.joomla3.php'
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/locations/tmpl/default.joomla3.php',
 		);
 
 		$deleteFolders = array(
@@ -2463,7 +2458,7 @@ class EventbookingController extends RADControllerAdmin
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/view/waitings',
 			JPATH_ROOT . '/components/com_eventbooking/models',
 			JPATH_ROOT . '/components/com_eventbooking/assets',
-			JPATH_ROOT . '/components/com_eventbooking/views'			
+			JPATH_ROOT . '/components/com_eventbooking/views',
 		);
 
 		foreach ($deleteFiles as $file)
@@ -2487,7 +2482,7 @@ class EventbookingController extends RADControllerAdmin
 
 		if ($moveEventsImages)
 		{
-			JFactory::getApplication()->redirect('index.php?option=com_eventbooking&task=migrate_event_images&install_type='.$installType);
+			JFactory::getApplication()->redirect('index.php?option=com_eventbooking&task=migrate_event_images&install_type=' . $installType);
 		}
 		else
 		{
@@ -2627,7 +2622,6 @@ class EventbookingController extends RADControllerAdmin
 
 	/**
 	 * Get profile data of the registrant, return reson format using for ajax request
-	 *
 	 */
 	public function get_profile_data()
 	{
@@ -2639,7 +2633,7 @@ class EventbookingController extends RADControllerAdmin
 		if ($userId && $eventId)
 		{
 			$rowFields = EventbookingHelper::getFormFields($eventId, 0);
-			$data      = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);		
+			$data      = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);
 		}
 
 		if ($userId && !isset($data['first_name']))
@@ -2696,7 +2690,7 @@ class EventbookingController extends RADControllerAdmin
 			$mailFrom = $jConfig->get('mailfrom');
 			$fromName = $jConfig->get('fromname');
 			$mailer->setSender(array($mailFrom, $fromName));
-			$mailer->addRecipient('tuanpn@joomdonation.com');			
+			$mailer->addRecipient('tuanpn@joomdonation.com');
 			$mailer->setSubject('Language Packages for Events Booking shared by ' . JUri::root());
 			$mailer->setBody('Dear Tuan \n. I am happy to share my language packages for Events Booking.\n Enjoy!');
 			foreach ($languages as $language)
@@ -2727,7 +2721,7 @@ class EventbookingController extends RADControllerAdmin
 					'username'       => $jConfig->get('user'),
 					'password'       => $jConfig->get('password'),
 					'db_name'        => $jConfig->get('db'),
-					'include_tables' => $tables
+					'include_tables' => $tables,
 				);
 				$dumper  = Shuttle_Dumper::create($options);
 				$dumper->dump(JPATH_ROOT . '/tmp/' . $sqlFile);

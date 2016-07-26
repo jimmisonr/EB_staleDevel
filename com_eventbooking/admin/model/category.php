@@ -12,14 +12,12 @@ defined('_JEXEC') or die;
 
 class EventbookingModelCategory extends RADModelAdmin
 {
-
 	/**
 	 * Prepare and sanitise the table data prior to saving.
 	 *
 	 * @param JTable $row A reference to a JTable object.
 	 *
 	 * @return void
-	 *
 	 */
 	protected function prepareTable($row, $task, $sourceId)
 	{

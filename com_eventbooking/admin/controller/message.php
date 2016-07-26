@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 class EventbookingControllerMessage extends EventbookingController
 {
-
 	public function save()
 	{
 		$data = $this->input->getData(RAD_INPUT_ALLOWRAW);
@@ -29,7 +28,7 @@ class EventbookingControllerMessage extends EventbookingController
 			$this->setRedirect('index.php?option=com_eventbooking&view=message', JText::_('EB_MESSAGES_SAVED'));
 		}
 	}
-	
+
 	public function cancel()
 	{
 		$this->setRedirect('index.php?option=com_eventbooking&view=dashboard');
