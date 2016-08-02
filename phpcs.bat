@@ -1,0 +1,1 @@
+E:\xampp\php\php.exe E:\xampp\php\php-cs-fixer.phar fix --config-file=E:\www\eventbooking\_php_cs
