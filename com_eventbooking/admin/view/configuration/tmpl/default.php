@@ -823,6 +823,14 @@ JHtml::_('script', 'jui/cms.js', false, true);
 			</div>
 			<div class="control-group">
 				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('show_image_in_event_detail', JText::_('EB_SHOW_EVENT_IMAGE_IN_EVENT_DETAIL')); ?>
+				</div>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('show_image_in_event_detail', $config->get('show_image_in_event_detail', 1)); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('show_event_end_date_in_table_layout', JText::_('EB_SHOW_EVENT_END_DATE_IN_TABLE_LAYOUT')); ?>
 				</div>
 				<div class="controls">

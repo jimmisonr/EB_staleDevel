@@ -10,6 +10,7 @@
 	  <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	  <version>2.8.1</version>	  
 	  <description>Event Booking is a simple, secure, extendable, intuititive event registration extension for Joomla 2.5 and Joomla 3.x</description>
+	  <scriptfile>script.php</scriptfile>
 	 <files folder="packages">	   
 	   <file type="module" id="eventbooking" client="site">mod_eb_cart.zip</file>
 	   <file type="module" id="eventbooking" client="site">mod_eb_categories.zip</file>

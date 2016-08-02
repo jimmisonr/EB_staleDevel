@@ -32,7 +32,7 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 					<div class="control-group">
 						<label class="control-label"><?php echo JText::_('EB_TITLE') ; ?></label>
 						<div class="controls">
-							<input type="text" name="title" value="<?php echo $this->item->title; ?>" class="input-xlarge" size="70" />
+							<input type="text" name="title" value="<?php echo htmlspecialchars($this->item->title, ENT_COMPAT, 'UTF-8'); ?>" class="input-xlarge" size="70" />
 						</div>
 					</div>
 					<div class="control-group">
