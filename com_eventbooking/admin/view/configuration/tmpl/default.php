@@ -1012,6 +1012,14 @@ JHtml::_('script', 'jui/cms.js', false, true);
 			</div>
 			<div class="control-group">
 				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('always_generate_invoice', JText::_('EB_ALWAYS_GENERATE_INVOICE'), JText::_('EB_ALWAYS_GENERATE_INVOICE_EXPLAIN')); ?>
+				</div>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('always_generate_invoice', $config->always_generate_invoice); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('send_invoice_to_customer', JText::_('EB_SEND_INVOICE_TO_SUBSCRIBERS'), JText::_('EB_SEND_INVOICE_TO_SUBSCRIBERS_EXPLAIN')); ?>
 				</div>
 				<div class="controls">

@@ -105,12 +105,17 @@ class EventbookingHelper
 			return false;
 		}
 
-		if ($row->amount > 0)
+		$config = self::getConfig();
+
+		if ($config->always_generate_invoice)
 		{
 			return true;
 		}
 
-		$config = self::getConfig();
+		if ($row->amount > 0)
+		{
+			return true;
+		}
 
 		if ($config->multiple_booking)
 		{
