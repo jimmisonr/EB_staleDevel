@@ -318,6 +318,44 @@ class EventbookingHelperData
 	}
 
 	/**
+	 * Get all children categories of a given category
+	 *
+	 * @param int $id
+	 *
+	 * @return array
+	 */
+	public static function getAllChildrenCategories($id)
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+
+		$queue       = array($id);
+		$categoryIds = array($id);
+
+		while (count($queue))
+		{
+			$categoryId = array_pop($queue);
+
+			//Get list of children categories of the current category
+			$query->clear()
+				->select('id')
+				->from('#__eb_categories')
+				->where('parent = ' . $categoryId)
+				->where('published = 1');
+			$db->setQuery($query);
+			$db->setQuery($query);
+			$children = $db->loadColumn();
+			if (count($children))
+			{
+				$queue       = array_merge($queue, $children);
+				$categoryIds = array_merge($categoryIds, $children);
+			}
+		}
+
+		return $categoryIds;
+	}
+
+	/**
 	 * Get parent categories of the given category
 	 *
 	 * @param $categoryId

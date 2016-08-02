@@ -145,7 +145,7 @@ class EventbookingModelList extends RADModelList
 
 			if ($config->display_ticket_types)
 			{
-				foreach($rows as $row)
+				foreach ($rows as $row)
 				{
 					if ($row->has_multiple_ticket_types)
 					{
@@ -252,7 +252,15 @@ class EventbookingModelList extends RADModelList
 
 		if ($categoryId)
 		{
-			$query->where(' tbl.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id=' . $categoryId . ')');
+			if ($config->show_events_from_all_children_categories)
+			{
+				$childrenCategories = EventbookingHelperData::getAllChildrenCategories($categoryId);
+				$query->where(' tbl.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id IN (' . implode(',', $childrenCategories) . '))');
+			}
+			else
+			{
+				$query->where(' tbl.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id = ' . $categoryId . ')');
+			}
 		}
 
 		if ($state->location_id)

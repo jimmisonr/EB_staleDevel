@@ -710,6 +710,14 @@ JHtml::_('script', 'jui/cms.js', false, true);
 			?>
 			<div class="control-group">
 				<div class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('show_events_from_all_children_categories', JText::_('EB_SHOW_EVENTS_FROM_ALL_CHILDREN_CATEGORIES'), JText::_('EB_SHOW_EVENTS_FROM_ALL_CHILDREN_CATEGORIES_EXPLAIN')); ?>
+				</div>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('show_events_from_all_children_categories', $config->show_events_from_all_children_categories); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('show_capacity', JText::_('EB_SHOW_EVENT_CAPACITY')); ?>
 				</div>
 				<div class="controls">
