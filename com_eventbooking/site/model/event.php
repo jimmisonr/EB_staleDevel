@@ -68,12 +68,12 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 		// Get additional information about the event
 		if ($row)
 		{
-			EventbookingHelperData::preProcessEventData(array($row));
+			EventbookingHelperData::preProcessEventData(array($row), 'item');
 		}
 
 		return $row;
 	}
-	
+
 	/**
 	 * Get all children events of this event
 	 *

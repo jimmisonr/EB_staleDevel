@@ -126,7 +126,7 @@ class EventbookingModelList extends RADModelList
 			return;
 		}
 
-		EventbookingHelperData::preProcessEventData($rows);
+		EventbookingHelperData::preProcessEventData($rows,  'list');
 	}
 
 	/**

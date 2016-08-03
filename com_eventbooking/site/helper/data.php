@@ -472,11 +472,12 @@ class EventbookingHelperData
 	}
 
 	/**
-	 *  Pre-process event's data before passing to the view for displaying
+	 * Pre-process event's data before passing to the view for displaying
 	 *
-	 * @param array $rows
+	 * @param array  $rows
+	 * @param string $context
 	 */
-	public static function preProcessEventData($rows)
+	public static function preProcessEventData($rows, $context = 'list')
 	{
 		// Calculate discounted price
 		self::calculateDiscount($rows);
@@ -505,7 +506,26 @@ class EventbookingHelperData
 			$query->clear('where');
 		}
 
+		// Process content plugin
+		foreach ($rows as $row)
+		{
+			if ($context == 'list')
+			{
+				$row->short_description = JHtml::_('content.prepare', $row->short_description);
+			}
+			else
+			{
+				$row->description = JHtml::_('content.prepare', $row->description);
+			}
+		}
+
 		$config = EventbookingHelper::getConfig();
+
+		// Process event custom fields data
+		if ($config->event_custom_field && ($config->show_event_custom_field_in_category_layout || $context == 'item'))
+		{
+			EventbookingHelperData::prepareCustomFieldsData($rows);
+		}
 
 		// Calculate price including tax
 		if ($config->show_price_including_tax)
