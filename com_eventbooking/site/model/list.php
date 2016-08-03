@@ -154,6 +154,31 @@ class EventbookingModelList extends RADModelList
 				}
 			}
 
+			$db          = $this->getDbo();
+			$query       = $db->getQuery(true);
+			$fieldSuffix = EventbookingHelper::getFieldSuffix();
+
+			$query->select('a.id, a.name, a.alias FROM #__eb_categories AS a')
+				->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id')
+				->order('b.main_category DESC');
+
+			if ($fieldSuffix)
+			{
+				EventbookingHelperDatabase::getMultilingualFields($query, array('a.name', 'a.alias'), $fieldSuffix);
+			}
+
+			foreach ($rows as $row)
+			{
+				$query->where('event_id=' . $row->id);
+				$db->setQuery($query);
+				$row->categories = $db->loadObjectList();
+				$row->category_id = $row->categories[0]->id;
+				$row->category_name = $row->categories[0]->name;
+				$row->category_alias = $row->categories[0]->alias;
+
+				$query->clear('where');
+			}
+
 			$this->data = $rows;
 		}
 
