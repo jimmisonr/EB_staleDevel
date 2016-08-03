@@ -80,7 +80,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 		{
 			$this->location = EventbookingHelperDatabase::getLocation($item->location_id);
 		}
-		
+
 		$params = EventbookingHelper::getViewParams($active, array('event'));
 
 		// Process page meta data
@@ -277,14 +277,14 @@ class EventbookingViewEventHtml extends RADViewHtml
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => '',
-				'list.select'        => $mainCategoryId,));
+				'list.select'        => $mainCategoryId, ));
 		$lists['category_id']                = JHtml::_('select.genericlist', $options, 'category_id[]',
 			array(
 				'option.text.toHtml' => false,
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => 'class="inputbox"  size="5" multiple="multiple"',
-				'list.select'        => $additionalCategories,));
+				'list.select'        => $additionalCategories, ));
 		$options                             = array();
 		$options[]                           = JHtml::_('select.option', 1, JText::_('%'));
 		$options[]                           = JHtml::_('select.option', 2, $config->currency_symbol);

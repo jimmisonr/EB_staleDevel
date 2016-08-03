@@ -226,7 +226,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 			JText::_('EB_SEP'),
 			JText::_('EB_OCT'),
 			JText::_('EB_NOV'),
-			JText::_('EB_DEC'),);
+			JText::_('EB_DEC'), );
 		$options     = array();
 		foreach ($listMonth as $key => $monthName)
 		{
