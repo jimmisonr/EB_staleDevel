@@ -115,7 +115,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 				$isMultipleDate = true;
 			}
 		?>
-			<tr>
+			<tr class="<?php echo $item->category_alias; ?>">
 				<?php
 					if ($config->show_image_in_table_layout)
 					{

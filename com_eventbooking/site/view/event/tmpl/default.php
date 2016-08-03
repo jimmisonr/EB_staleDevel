@@ -44,7 +44,7 @@ else
 
 $offset = JFactory::getConfig()->get('offset');
 ?>
-<div id="eb-event-page" class="eb-container eb-event" itemscope itemtype="http://schema.org/Event">
+<div id="eb-event-page" class="eb-container <?php echo $item->category_alias; ?> eb-event" itemscope itemtype="http://schema.org/Event">
 	<div class="eb-box-heading clearfix">
 		<h1 class="eb-page-heading">
 			<span itemprop="name"><?php echo $item->title; ?></span>

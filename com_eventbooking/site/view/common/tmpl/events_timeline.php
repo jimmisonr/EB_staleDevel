@@ -54,7 +54,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 				$isMultipleDate = true;
 			}
 		?>
-		<div class="eb-event-container" itemscope itemtype="http://schema.org/Event">
+		<div class="<?php echo $event->category_alias; ?> eb-event-container" itemscope itemtype="http://schema.org/Event">
 			<div class="eb-event-date-container">
 				<div class="eb-event-date <?php echo $btnInverseClass; ?>">
 					<?php
