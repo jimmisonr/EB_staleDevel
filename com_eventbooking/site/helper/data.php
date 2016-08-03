@@ -472,6 +472,70 @@ class EventbookingHelperData
 	}
 
 	/**
+	 *  Pre-process event's data before passing to the view for displaying
+	 *
+	 * @param array $rows
+	 */
+	public static function preProcessEventData($rows)
+	{
+		// Calculate discounted price
+		self::calculateDiscount($rows);
+
+		// Get categories data for each events
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('a.id, a.name, a.alias FROM #__eb_categories AS a')
+			->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id')
+			->order('b.id');
+
+		if ($fieldSuffix = EventbookingHelper::getFieldSuffix())
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('a.name', 'a.alias'), $fieldSuffix);
+		}
+
+		foreach ($rows as $row)
+		{
+			$query->where('event_id=' . $row->id);
+			$db->setQuery($query);
+			$row->categories     = $db->loadObjectList();
+			$row->category_id    = $row->categories[0]->id;
+			$row->category_name  = $row->categories[0]->name;
+			$row->category_alias = $row->categories[0]->alias;
+
+			$query->clear('where');
+		}
+
+		$config = EventbookingHelper::getConfig();
+
+		// Calculate price including tax
+		if ($config->show_price_including_tax)
+		{
+			foreach ($rows as $row)
+			{
+				$taxRate                = $row->tax_rate;
+				$row->individual_price  = round($row->individual_price * (1 + $taxRate / 100), 2);
+				$row->fixed_group_price = round($row->fixed_group_price * (1 + $taxRate / 100), 2);
+				if ($config->show_discounted_price)
+				{
+					$row->discounted_price = round($row->discounted_price * (1 + $taxRate / 100), 2);
+				}
+			}
+		}
+
+		// Get ticket types for events
+		if ($config->display_ticket_types)
+		{
+			foreach ($rows as $row)
+			{
+				if ($row->has_multiple_ticket_types)
+				{
+					$row->ticketTypes = self::getTicketTypes($row->id);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Decode custom fields data and store it for each event record
 	 *
 	 * @param $items
