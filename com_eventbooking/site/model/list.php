@@ -115,74 +115,72 @@ class EventbookingModelList extends RADModelList
 	}
 
 	/**
-	 * Method to get Events data
+	 * Pre-process data before returning to the view for displaying
 	 *
-	 * @access public
-	 * @return array
+	 * @param array $rows
 	 */
-	public function getData()
+	protected function beforeReturnData($rows)
 	{
-		// Lets load the content if it doesn't already exist
-		if (empty($this->data))
+		if (empty($rows))
 		{
-			$rows = parent::getData();
-			EventbookingHelperData::calculateDiscount($rows);
-			$config = EventbookingHelper::getConfig();
-			if ($config->show_price_including_tax)
-			{
-				for ($i = 0, $n = count($rows); $i < $n; $i++)
-				{
-					$row                    = $rows[$i];
-					$taxRate                = $row->tax_rate;
-					$row->individual_price  = round($row->individual_price * (1 + $taxRate / 100), 2);
-					$row->fixed_group_price = round($row->fixed_group_price * (1 + $taxRate / 100), 2);
-					if ($config->show_discounted_price)
-					{
-						$row->discounted_price = round($row->discounted_price * (1 + $taxRate / 100), 2);
-					}
-				}
-			}
-
-			if ($config->display_ticket_types)
-			{
-				foreach ($rows as $row)
-				{
-					if ($row->has_multiple_ticket_types)
-					{
-						$row->ticketTypes = EventbookingHelperData::getTicketTypes($row->id);
-					}
-				}
-			}
-
-			$db          = $this->getDbo();
-			$query       = $db->getQuery(true);
-			$fieldSuffix = EventbookingHelper::getFieldSuffix();
-
-			$query->select('a.id, a.name, a.alias FROM #__eb_categories AS a')
-				->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id')
-				->order('b.id');
-
-			if ($fieldSuffix)
-			{
-				EventbookingHelperDatabase::getMultilingualFields($query, array('a.name', 'a.alias'), $fieldSuffix);
-			}
-
-			foreach ($rows as $row)
-			{
-				$query->where('event_id=' . $row->id);
-				$db->setQuery($query);
-				$row->categories = $db->loadObjectList();
-				$row->category_id = $row->categories[0]->id;
-				$row->category_name = $row->categories[0]->name;
-				$row->category_alias = $row->categories[0]->alias;
-
-				$query->clear('where');
-			}
-
-			$this->data = $rows;
+			return;
 		}
 
-		return $this->data;
+		// Calculate discounted price
+		EventbookingHelperData::calculateDiscount($rows);
+
+		// Get categories data for each events
+		$db    = $this->getDbo();
+		$query = $db->getQuery(true);
+		$query->select('a.id, a.name, a.alias FROM #__eb_categories AS a')
+			->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id')
+			->order('b.id');
+
+		if ($fieldSuffix = EventbookingHelper::getFieldSuffix())
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('a.name', 'a.alias'), $fieldSuffix);
+		}
+
+		foreach ($rows as $row)
+		{
+			$query->where('event_id=' . $row->id);
+			$db->setQuery($query);
+			$row->categories     = $db->loadObjectList();
+			$row->category_id    = $row->categories[0]->id;
+			$row->category_name  = $row->categories[0]->name;
+			$row->category_alias = $row->categories[0]->alias;
+
+			$query->clear('where');
+		}
+
+		$config = EventbookingHelper::getConfig();
+
+		// Calculate price including tax
+		if ($config->show_price_including_tax)
+		{
+			foreach ($rows as $row)
+			{
+				$taxRate                = $row->tax_rate;
+				$row->individual_price  = round($row->individual_price * (1 + $taxRate / 100), 2);
+				$row->fixed_group_price = round($row->fixed_group_price * (1 + $taxRate / 100), 2);
+				if ($config->show_discounted_price)
+				{
+					$row->discounted_price = round($row->discounted_price * (1 + $taxRate / 100), 2);
+				}
+			}
+		}
+
+		// Get ticket types for events
+		if ($config->display_ticket_types)
+		{
+			foreach ($rows as $row)
+			{
+				if ($row->has_multiple_ticket_types)
+				{
+					$row->ticketTypes = EventbookingHelperData::getTicketTypes($row->id);
+				}
+			}
+		}
 	}
 
 	/**
