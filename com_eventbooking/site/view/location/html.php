@@ -31,19 +31,7 @@ class EventbookingViewLocationHtml extends RADViewHtml
 		$items    = $model->getData();
 		$location = EventbookingHelperDatabase::getLocation($this->input->getInt('location_id'));
 		$config   = EventbookingHelper::getConfig();
-		if ($config->process_plugin)
-		{
-			for ($i = 0, $n = count($items); $i < $n; $i++)
-			{
-				$item                    = $items[$i];
-				$item->short_description = JHtml::_('content.prepare', $item->short_description);
-			}
-		}
 
-		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)
-		{
-			EventbookingHelperData::prepareCustomFieldsData($items);
-		}
 		if ($config->show_list_of_registrants)
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');

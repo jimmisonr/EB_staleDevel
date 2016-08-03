@@ -41,20 +41,6 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 			$category = null;
 		}
 
-		if ($config->process_plugin)
-		{
-			for ($i = 0, $n = count($items); $i < $n; $i++)
-			{
-				$item                    = $items[$i];
-				$item->short_description = JHtml::_('content.prepare', $item->short_description);
-			}
-		}
-
-		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)
-		{
-			EventbookingHelperData::prepareCustomFieldsData($items);
-		}
-
 		$params = EventbookingHelper::getViewParams($active, array('upcomingevents'));
 		if (!$params->get('page_title'))
 		{

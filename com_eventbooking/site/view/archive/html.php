@@ -21,20 +21,6 @@ class EventbookingViewArchiveHtml extends RADViewHtml
 		$items  = $model->getData();
 		$config = EventbookingHelper::getConfig();
 
-		if ($config->process_plugin)
-		{
-			for ($i = 0, $n = count($items); $i < $n; $i++)
-			{
-				$item                    = $items[$i];
-				$item->short_description = JHtml::_('content.prepare', $item->short_description);
-			}
-		}
-
-		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)
-		{
-			EventbookingHelperData::prepareCustomFieldsData($items);
-		}
-
 		$category = null;
 		if ($state->id)
 		{

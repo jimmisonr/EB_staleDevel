@@ -76,19 +76,11 @@ class EventbookingViewEventHtml extends RADViewHtml
 			}
 		}
 
-		$item->description = JHtml::_('content.prepare', $item->description);
-
 		if ($item->location_id)
 		{
 			$this->location = EventbookingHelperDatabase::getLocation($item->location_id);
 		}
-
-		if ($config->event_custom_field && file_exists(JPATH_ROOT . '/components/com_eventbooking/fields.xml'))
-		{
-			EventbookingHelperData::prepareCustomFieldsData(array($item));
-			$this->paramData = $item->paramData;
-		}
-
+		
 		$params = EventbookingHelper::getViewParams($active, array('event'));
 
 		// Process page meta data
@@ -285,14 +277,14 @@ class EventbookingViewEventHtml extends RADViewHtml
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => '',
-				'list.select'        => $mainCategoryId, ));
+				'list.select'        => $mainCategoryId,));
 		$lists['category_id']                = JHtml::_('select.genericlist', $options, 'category_id[]',
 			array(
 				'option.text.toHtml' => false,
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => 'class="inputbox"  size="5" multiple="multiple"',
-				'list.select'        => $additionalCategories, ));
+				'list.select'        => $additionalCategories,));
 		$options                             = array();
 		$options[]                           = JHtml::_('select.option', 1, JText::_('%'));
 		$options[]                           = JHtml::_('select.option', 2, $config->currency_symbol);
@@ -374,10 +366,10 @@ class EventbookingViewEventHtml extends RADViewHtml
 			->where('`state` = 1')
 			->order('title');
 		$db->setQuery($query);
-		$rows                      = $db->loadObjectList();
-		$options                   = array();
-		$options[]                 = JHtml::_('select.option', 0, JText::_('EB_SELECT_ARTICLE'), 'id', 'title');
-		$options                   = array_merge($options, $rows);
+		$rows                = $db->loadObjectList();
+		$options             = array();
+		$options[]           = JHtml::_('select.option', 0, JText::_('EB_SELECT_ARTICLE'), 'id', 'title');
+		$options             = array_merge($options, $rows);
 		$lists['article_id'] = JHtml::_('select.genericlist', $options, 'article_id', 'class="inputbox"', 'id', 'title', $item->article_id);
 
 		//Custom field handles

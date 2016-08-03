@@ -20,14 +20,7 @@ class EventbookingViewSearchHtml extends RADViewHtml
 		$pagination = $model->getPagination();
 		$document->setTitle(JText::_('EB_SEARCH_RESULT'));
 		$config = EventbookingHelper::getConfig();
-		if ($config->process_plugin)
-		{
-			for ($i = 0, $n = count($items); $i < $n; $i++)
-			{
-				$item                    = $items[$i];
-				$item->short_description = JHtml::_('content.prepare', $item->short_description);
-			}
-		}
+
 		if ($config->multiple_booking)
 		{
 			if ($this->deviceType == 'mobile')
@@ -39,6 +32,7 @@ class EventbookingViewSearchHtml extends RADViewHtml
 				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', 'false', 'false', 'false', 'false');
 			}
 		}
+
 		if ($config->show_list_of_registrants)
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
@@ -57,10 +51,6 @@ class EventbookingViewSearchHtml extends RADViewHtml
 			}
 		}
 
-		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)
-		{
-			EventbookingHelperData::prepareCustomFieldsData($items);
-		}
 		$this->viewLevels      = JFactory::getUser()->getAuthorisedViewLevels();
 		$this->items           = $items;
 		$this->pagination      = $pagination;

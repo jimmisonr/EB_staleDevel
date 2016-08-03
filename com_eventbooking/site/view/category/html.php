@@ -39,21 +39,9 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		{
 			$category = null;
 		}
+
 		$items      = $model->getData();
 		$pagination = $model->getPagination();
-		if ($config->process_plugin)
-		{
-			for ($i = 0, $n = count($items); $i < $n; $i++)
-			{
-				$item                    = $items[$i];
-				$item->short_description = JHtml::_('content.prepare', $item->short_description);
-			}
-		}
-
-		if ($config->event_custom_field && $config->show_event_custom_field_in_category_layout)
-		{
-			EventbookingHelperData::prepareCustomFieldsData($items);
-		}
 
 		//Handle breadcrumb
 		if ($active)
@@ -238,7 +226,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 			JText::_('EB_SEP'),
 			JText::_('EB_OCT'),
 			JText::_('EB_NOV'),
-			JText::_('EB_DEC'), );
+			JText::_('EB_DEC'),);
 		$options     = array();
 		foreach ($listMonth as $key => $monthName)
 		{
