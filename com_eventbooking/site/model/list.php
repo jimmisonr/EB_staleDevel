@@ -160,7 +160,7 @@ class EventbookingModelList extends RADModelList
 
 			$query->select('a.id, a.name, a.alias FROM #__eb_categories AS a')
 				->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id')
-				->order('b.main_category DESC');
+				->order('b.id');
 
 			if ($fieldSuffix)
 			{
