@@ -2424,6 +2424,8 @@ class EventbookingController extends RADControllerAdmin
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller/daylightsaving.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller/event.php',
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller.php',
+			JPATH_ROOT . '/components/com_eventbooking/controller.php',
 			JPATH_ROOT . '/components/com_eventbooking/helper/os_cart.php',
 			JPATH_ROOT . '/components/com_eventbooking/helper/fields.php',
 			JPATH_ROOT . '/components/com_eventbooking/helper/captcha.php',
