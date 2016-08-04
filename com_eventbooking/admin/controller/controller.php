@@ -2547,6 +2547,7 @@ class EventbookingController extends RADControllerAdmin
 		//Redirecting users to Dasboard
 		JFactory::getApplication()->redirect('index.php?option=com_eventbooking&view=dashboard', $msg);
 	}
+
 	/**
 	 * Check to see the installed version is up to date or not
 	 *
@@ -2557,14 +2558,13 @@ class EventbookingController extends RADControllerAdmin
 		$installedVersion = EventbookingHelper::getInstalledVersion();
 		$result           = array();
 		$result['status'] = 0;
-		if (function_exists('curl_init'))
+
+		$http     = JHttpFactory::getHttp();
+		$url      = 'http://joomdonationdemo.com/versions/membershipproj3.txt';
+		$response = $http->get($url);
+		if ($response->code == 200)
 		{
-			$url = 'http://joomdonationdemo.com/versions/eventbookingj3.txt';
-			$ch  = curl_init();
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			$latestVersion = curl_exec($ch);
-			curl_close($ch);
+			$latestVersion = $response->body;
 			if ($latestVersion)
 			{
 				if (version_compare($latestVersion, $installedVersion, 'gt'))
@@ -2579,8 +2579,9 @@ class EventbookingController extends RADControllerAdmin
 				}
 			}
 		}
+
 		echo json_encode($result);
-		JFactory::getApplication()->close();
+		$this->app->close();
 	}
 
 	/**
