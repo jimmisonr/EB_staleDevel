@@ -76,7 +76,6 @@
  *
  * @package com.tecnick.tcpdf
  * @author Nicola Asuni
- * @version 1.0.010
  */
 
 // definitions
@@ -286,7 +285,6 @@ if (!function_exists('str_split')) {
  *
  * @package com.tecnick.tcpdf
  * @author Nicola Asuni
- * @version 1.0.010
  */
 class QRcode {
 

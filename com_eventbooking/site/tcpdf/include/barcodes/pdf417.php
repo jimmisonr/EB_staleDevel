@@ -50,7 +50,6 @@
  * (requires PHP bcmath extension)
  * @package com.tecnick.tcpdf
  * @author Nicola Asuni
- * @version 1.0.005
  */
 
 // definitions
@@ -88,7 +87,6 @@ if (!defined('PDF417DEFS')) {
  * PDF417 (ISO/IEC 15438:2006) is a 2-dimensional stacked bar code created by Symbol Technologies in 1991.
  * @package com.tecnick.tcpdf
  * @author Nicola Asuni
- * @version 1.0.003
  */
 class PDF417 {
 

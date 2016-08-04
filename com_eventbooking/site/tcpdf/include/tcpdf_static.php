@@ -38,7 +38,6 @@
  * This is a PHP class that contains static methods for the TCPDF class.<br>
  * @package com.tecnick.tcpdf
  * @author Nicola Asuni
- * @version 1.1.2
  */
 
 /**
@@ -46,7 +45,6 @@
  * Static methods used by the TCPDF class.
  * @package com.tecnick.tcpdf
  * @brief PHP class for generating PDF documents without requiring external extensions.
- * @version 1.1.1
  * @author Nicola Asuni - info@tecnick.com
  */
 class TCPDF_STATIC {

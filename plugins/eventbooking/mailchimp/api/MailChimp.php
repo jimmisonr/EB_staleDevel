@@ -10,7 +10,6 @@
  * Lorna Jane Mitchell, github.com/lornajane
  * 
  * @author Drew McLellan <drew.mclellan@gmail.com> 
- * @version 1.1
  */
 class MailChimp
 {

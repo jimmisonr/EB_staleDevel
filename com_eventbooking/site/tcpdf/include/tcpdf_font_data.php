@@ -42,7 +42,6 @@
  * @class TCPDF_FONT_DATA
  * Unicode data and encoding maps for TCPDF.
  * @package com.tecnick.tcpdf
- * @version 1.0.001
  * @author Nicola Asuni - info@tecnick.com
  */
 class TCPDF_FONT_DATA {

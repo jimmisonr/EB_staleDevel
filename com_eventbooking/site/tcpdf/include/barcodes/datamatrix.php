@@ -40,7 +40,6 @@
 *
 * @package com.tecnick.tcpdf
 * @author Nicola Asuni
-* @version 1.0.008
 */
 
 // custom definitions
@@ -105,7 +104,6 @@ define('ENC_ASCII_NUM', 7);
 *
 * @package com.tecnick.tcpdf
 * @author Nicola Asuni
-* @version 1.0.004
 */
 class Datamatrix {
 

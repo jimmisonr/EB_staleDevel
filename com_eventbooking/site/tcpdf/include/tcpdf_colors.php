@@ -42,7 +42,6 @@
  * @class TCPDF_COLORS
  * PHP color class for TCPDF
  * @package com.tecnick.tcpdf
- * @version 1.0.004
  * @author Nicola Asuni - info@tecnick.com
  */
 class TCPDF_COLORS {

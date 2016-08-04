@@ -39,7 +39,6 @@
  * This is a PHP class extension of the TCPDF (http://www.tcpdf.org) library to import existing PDF documents.<br>
  * @package com.tecnick.tcpdf
  * @author Nicola Asuni
- * @version 1.0.001
  */
 
 // include the TCPDF class
@@ -53,7 +52,6 @@ require_once(dirname(__FILE__).'/tcpdf_parser.php');
  * PHP class extension of the TCPDF (http://www.tcpdf.org) library to import existing PDF documents.<br>
  * @package com.tecnick.tcpdf
  * @brief PHP class extension of the TCPDF library to import existing PDF documents.
- * @version 1.0.001
  * @author Nicola Asuni - info@tecnick.com
  */
 class TCPDF_IMPORT extends TCPDF {

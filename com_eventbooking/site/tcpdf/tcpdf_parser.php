@@ -37,7 +37,6 @@
  * This is a PHP class for parsing PDF documents.<br>
  * @package com.tecnick.tcpdf
  * @author Nicola Asuni
- * @version 1.0.15
  */
 
 // include class for decoding filters
@@ -48,7 +47,6 @@ require_once(dirname(__FILE__).'/include/tcpdf_filters.php');
  * This is a PHP class for parsing PDF documents.<br>
  * @package com.tecnick.tcpdf
  * @brief This is a PHP class for parsing PDF documents..
- * @version 1.0.15
  * @author Nicola Asuni - info@tecnick.com
  */
 class TCPDF_PARSER {

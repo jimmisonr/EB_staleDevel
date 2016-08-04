@@ -42,7 +42,6 @@
  * @class TCPDF_FONTS
  * Font methods for TCPDF library.
  * @package com.tecnick.tcpdf
- * @version 1.1.0
  * @author Nicola Asuni - info@tecnick.com
  */
 class TCPDF_FONTS {

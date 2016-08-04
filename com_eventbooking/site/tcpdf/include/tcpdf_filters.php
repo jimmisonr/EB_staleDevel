@@ -37,7 +37,6 @@
  * This is a PHP class for decoding common PDF filters (PDF 32000-2008 - 7.4 Filters).<br>
  * @package com.tecnick.tcpdf
  * @author Nicola Asuni
- * @version 1.0.001
  */
 
 /**
@@ -45,7 +44,6 @@
  * This is a PHP class for decoding common PDF filters (PDF 32000-2008 - 7.4 Filters).<br>
  * @package com.tecnick.tcpdf
  * @brief This is a PHP class for decoding common PDF filters.
- * @version 1.0.001
  * @author Nicola Asuni - info@tecnick.com
  */
 class TCPDF_FILTERS {
