@@ -9,6 +9,47 @@
 // no direct access
 defined('_JEXEC') or die;
 
+/**
+ * Class EventbookingTableRegistrant
+ *
+ * @property $id
+ * @property $event_id
+ * @property $user_id
+ * @property $group_id
+ * @property $first_name
+ * @property $last_name
+ * @property $organization
+ * @property $address
+ * @property $address2
+ * @property $city
+ * @property $state
+ * @property $country
+ * @property $zip
+ * @property $phone
+ * @property $fax
+ * @property $email
+ * @property $number_registrants
+ * @property $total_amount
+ * @property $discount_amount
+ * @property $tax_amount
+ * @property $payment_processing_fee
+ * @property $amount
+ * @property $coupon_id
+ * @property $register_date
+ * @property $payment_date
+ * @property $payment_method
+ * @property $transaction_id
+ * @property $published
+ * @property $is_group_billing
+ * @property $invoice_number
+ * @property $registration_code
+ * @property $params
+ * @property $cart_id
+ * @property $deposit_amount
+ * @property $payment_status
+ * @property $user_ip
+ * @property $language
+ */
 class EventbookingTableRegistrant extends JTable
 {
 	/**
