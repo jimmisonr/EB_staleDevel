@@ -258,8 +258,21 @@ if (!$this->userId && $this->config->user_registration)
 				?>
 					<h4 class="eb-heading"><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1); ?></h4>
 				<?php
+					$j = 0;
 					foreach ($fields as $field)
 					{
+						$j++;
+
+						if ($j > 1 && $field->row->only_show_for_first_member)
+						{
+							continue;
+						}
+
+						if ($j > 1 && $field->row->only_require_for_first_member)
+						{
+							$field->makeFieldOptional();
+						}
+
 						echo $field->getControlGroup($bootstrapHelper);
 					}
 				}
