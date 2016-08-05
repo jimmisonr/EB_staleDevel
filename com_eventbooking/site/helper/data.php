@@ -138,7 +138,8 @@ class EventbookingHelperData
 		{
 			$month = '0' . $month;
 		}
-		// get days in week
+
+		// Get days in week
 		for ($i = 0; $i < 7; $i++)
 		{
 			if ($mini)
@@ -150,16 +151,23 @@ class EventbookingHelperData
 				$data["daynames"][$i] = self::getDayName(($i + $startDay) % 7);
 			}
 		}
-		//Start days
-		$start = ((date('w', mktime(0, 0, 0, $month, 1, $year)) - $startDay + 7) % 7);
+
+		// Today date data
+		$date       = new DateTime('now', new DateTimeZone(JFactory::getConfig()->get('offset')));
+		$todayDay   = $date->format('d');
+		$todayMonth = $date->format('m');
+		$todayYear  = $date->format('Y');
+
+		// Start days in month
+		$date->setDate($year, $month, 1);
+		$start = ($date->format('w') - $startDay + 7) % 7;
+
 		//Previous month
-		$priorMonth = $month - 1;
-		$priorYear  = $year;
-		if ($priorMonth <= 0)
-		{
-			$priorMonth += 12;
-			$priorYear -= 1;
-		}
+		$preMonth = clone $date;
+		$preMonth->modify('-1 month');
+		$priorMonth = $preMonth->format('m');
+		$priorYear  = $preMonth->format('Y');
+
 		$dayCount = 0;
 		for ($a = $start; $a > 0; $a--)
 		{
@@ -171,13 +179,9 @@ class EventbookingHelperData
 			$dayCount++;
 		}
 		sort($data["dates"]);
-		$todayDate  = JFactory::getDate('+0 seconds');
-		$todayDay   = $todayDate->format('d');
-		$todayMonth = $todayDate->format('m');
-		$todayYear  = $todayDate->format('Y');
 
-		//Current month
-		$end = date('t', mktime(0, 0, 0, ($month + 1), 0, $year));
+		// Current month
+		$end = $date->format('t');
 		for ($d = 1; $d <= $end; $d++)
 		{
 			$data["dates"][$dayCount]                 = array();
@@ -212,15 +216,12 @@ class EventbookingHelperData
 			$dayCount++;
 		}
 
-		//Following month
-		$days        = (7 - date('w', mktime(0, 0, 0, $month + 1, 1, $year)) + $startDay) % 7;
-		$followMonth = $month + 1;
-		$followYear  = $year;
-		if ($followMonth > 12)
-		{
-			$followMonth -= 12;
-			$followYear += 1;
-		}
+		// Following month
+		$date->modify('+1 month');
+		$days        = (7 - $date->format('w') + $startDay) % 7;
+		$followMonth = $date->format('m');
+		$followYear  = $date->format('Y');
+
 		$data["followingMonth"] = array();
 		for ($d = 1; $d <= $days; $d++)
 		{
