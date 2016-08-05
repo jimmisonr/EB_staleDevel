@@ -484,7 +484,8 @@ class EventbookingHelperData
 		// Get categories data for each events
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('a.id, a.name, a.alias FROM #__eb_categories AS a')
+		$query->select('a.id, a.name, a.alias')
+			->from('#__eb_categories AS a')
 			->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id')
 			->order('b.id');
 
