@@ -38,7 +38,7 @@ if ($this->waitingList)
 else
 {
 	$headerText = JText::_('EB_GROUP_REGISTRATION') ;
-	if (strlen(strip_tags($this->message->{'registration_form_message_group'.$this->fieldSuffix})))
+	if ($this->fieldSuffix && strlen(strip_tags($this->message->{'registration_form_message_group' . $this->fieldSuffix})))
 	{
 		$msg = $this->message->{'registration_form_message_group'.$this->fieldSuffix};
 	}
