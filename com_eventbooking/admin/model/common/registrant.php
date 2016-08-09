@@ -53,6 +53,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 		$config = EventbookingHelper::getConfig();
 		$db     = $this->getDbo();
 		$query  = $db->getQuery(true);
+		/* @var EventbookingTableRegistrant $row*/
 		$row    = $this->getTable();
 		$data   = $input->getData();
 		if ($data['id'])
@@ -86,6 +87,59 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 
 			$row->bind($data);
 
+			if (true)
+			{
+				if ($row->is_group_billing)
+				{
+					$event = EventbookingHelperDatabase::getEvent($row->event_id, $row->register_date);
+					$form  = new RADForm($rowFields);
+					$form->bind($data);
+
+					if ($row->coupon_id)
+					{
+						$query->clear()
+							->select($db->quoteName('code'))
+							->from('#__eb_coupons')
+							->where('id = ' . $row->coupon_id);
+						$db->setQuery($query);
+						$data['coupon_code'] = $db->loadResult();
+					}
+
+					$data['number_registrants'] = $row->number_registrants;
+					$data['re_calculate_fee'] = true;
+
+					$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $row->payment_method);
+
+					$row->total_amount    = round($fees['total_amount'], 2);
+					$row->discount_amount = round($fees['discount_amount'], 2);
+					$row->tax_amount      = round($fees['tax_amount'], 2);
+					$row->amount          = round($fees['amount'], 2);
+				}
+				else
+				{
+					// Individual registration
+					$event = EventbookingHelperDatabase::getEvent($row->event_id, $row->register_date);
+					$form  = new RADForm($rowFields);
+					$form->bind($data);
+
+					if ($row->coupon_id)
+					{
+						$query->clear()
+							->select($db->quoteName('code'))
+							->from('#__eb_coupons')
+							->where('id = ' . $row->coupon_id);
+						$db->setQuery($query);
+						$data['coupon_code'] = $db->loadResult();
+					}
+
+					$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $row->payment_method);
+
+					$row->total_amount    = round($fees['total_amount'], 2);
+					$row->discount_amount = round($fees['discount_amount'], 2);
+					$row->tax_amount      = round($fees['tax_amount'], 2);
+					$row->amount          = round($fees['amount'], 2);
+				}
+			}
 			$row->store();
 			$form = new RADForm($rowFields);
 			$form->storeData($row->id, $data, $excludeFeeFields);

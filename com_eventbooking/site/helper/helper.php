@@ -1003,11 +1003,11 @@ class EventbookingHelper
 	/**
 	 * Calculate fees use for individual registration
 	 *
-	 * @param $event
-	 * @param $form
-	 * @param $data
-	 * @param $config
-	 * @param $paymentMethod
+	 * @param object    $event
+	 * @param RADForm   $form
+	 * @param array     $data
+	 * @param RADConfig $config
+	 * @param string    $paymentMethod
 	 *
 	 * @return array
 	 */
@@ -1189,11 +1189,11 @@ class EventbookingHelper
 	/**
 	 * Calculate fees use for group registration
 	 *
-	 * @param $event
-	 * @param $form
-	 * @param $data
-	 * @param $config
-	 * @param $paymentMethod
+	 * @param object    $event
+	 * @param RADForm   $form
+	 * @param array     $data
+	 * @param RADConfig $config
+	 * @param string    $paymentMethod
 	 *
 	 * @return array
 	 */
@@ -1207,8 +1207,14 @@ class EventbookingHelper
 		$couponCode        = isset($data['coupon_code']) ? $data['coupon_code'] : '';
 		$eventId           = $event->id;
 		$numberRegistrants = (int) $session->get('eb_number_registrants', '');
-		$memberFormFields  = EventbookingHelper::getFormFields($eventId, 2);
-		$rate              = EventbookingHelper::getRegistrationRate($eventId, $numberRegistrants);
+
+		if (!$numberRegistrants && isset($data['number_registrants']))
+		{
+			$numberRegistrants = (int) $data['number_registrants'];
+		}
+
+		$memberFormFields = EventbookingHelper::getFormFields($eventId, 2);
+		$rate             = EventbookingHelper::getRegistrationRate($eventId, $numberRegistrants);
 
 		$extraFee = $form->calculateFee(array('NUMBER_REGISTRANTS' => $numberRegistrants, 'INDIVIDUAL_PRICE' => $rate));
 
@@ -1225,6 +1231,10 @@ class EventbookingHelper
 			if ($membersData)
 			{
 				$membersData = unserialize($membersData);
+			}
+			elseif (!empty($data['re_calculate_fee']))
+			{
+				$membersData = $data;
 			}
 			else
 			{
@@ -2271,7 +2281,7 @@ class EventbookingHelper
 			"validate[minSize[6]]",
 			"validate[maxSize[12]]",
 			"validate[custom[integer],min[-5]]",
-			"validate[custom[integer],max[50]]", );
+			"validate[custom[integer],max[50]]",);
 
 		return json_encode($validClass);
 	}
@@ -2702,7 +2712,7 @@ class EventbookingHelper
 					'option.text'        => 'text',
 					'option.value'       => 'value',
 					'list.attr'          => 'class="inputbox" onchange="submit();"',
-					'list.select'        => $selected, ));
+					'list.select'        => $selected,));
 		else
 			return JHtml::_('select.genericlist', $options, $name,
 				array(
@@ -2710,7 +2720,7 @@ class EventbookingHelper
 					'option.text'        => 'text',
 					'option.value'       => 'value',
 					'list.attr'          => 'class="inputbox" ',
-					'list.select'        => $selected, ));
+					'list.select'        => $selected,));
 	}
 
 	/**
@@ -2768,7 +2778,7 @@ class EventbookingHelper
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => ' class="inputbox" ',
-				'list.select'        => $row->parent, ));
+				'list.select'        => $row->parent,));
 	}
 
 	/**
@@ -4823,7 +4833,7 @@ class EventbookingHelper
 					'taxAmount'      => $taxAmount,
 					'discountAmount' => $discountAmount,
 					'total'          => $total,
-					'config'         => $config, ));
+					'config'         => $config,));
 			$replaces['SUB_TOTAL']              = EventbookingHelper::formatCurrency($subTotal, $config);
 			$replaces['DISCOUNT_AMOUNT']        = EventbookingHelper::formatCurrency($discountAmount, $config);
 			$replaces['TAX_AMOUNT']             = EventbookingHelper::formatCurrency($taxAmount, $config);
