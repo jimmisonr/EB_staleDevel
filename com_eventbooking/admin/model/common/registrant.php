@@ -327,6 +327,10 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				{
 					$query->update('#__eb_registrants')
 						->set('number_registrants = number_registrants -1')
+						->set('total_amount = total_amount - ' . $row->total_amount)
+						->set('discount_amount = discount_amount - ' . $row->discount_amount)
+						->set('tax_amount = tax_amount - ' . $row->tax_amount)
+						->set('amount = amount - ' . $row->amount)
 						->where('id=' . $row->group_id);
 					$db->setQuery($query);
 					$db->execute();
