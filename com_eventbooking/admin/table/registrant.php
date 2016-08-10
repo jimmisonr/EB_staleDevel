@@ -33,6 +33,7 @@ defined('_JEXEC') or die;
  * @property $discount_amount
  * @property $tax_amount
  * @property $payment_processing_fee
+ * @property $late_fee
  * @property $amount
  * @property $coupon_id
  * @property $register_date

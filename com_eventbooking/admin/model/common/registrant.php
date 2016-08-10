@@ -51,12 +51,17 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	 */
 	public function store($input, $ignore = array())
 	{
+		$app = JFactory::getApplication();
+		$user = JFactory::getUser();
 		$config = EventbookingHelper::getConfig();
 		$db     = $this->getDbo();
 		$query  = $db->getQuery(true);
 		/* @var EventbookingTableRegistrant $row */
 		$row  = $this->getTable();
 		$data = $input->getData();
+
+		$recalculateFee = false;
+
 		if ($data['id'])
 		{
 			//We will need to calculate total amount here now
@@ -70,7 +75,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			{
 				$rowFields = EventbookingHelper::getFormFields($data['event_id'], 0);
 			}
-			$user = JFactory::getUser();
+
 			if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking') || empty($row->published))
 			{
 				$excludeFeeFields = false;
@@ -88,8 +93,13 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 
 			$row->bind($data);
 
-			if (true)
+			/*
+				Re - calculate registration fee in the following cases:
+			*/
+			if (!empty($data['re_calculate_fee']) || ($row->published == 0 && $app->isSite() && $user->id == $row->user_id))
 			{
+				$recalculateFee = true;
+
 				if ($row->is_group_billing)
 				{
 					$event = EventbookingHelperDatabase::getEvent($row->event_id, $row->register_date);
@@ -115,6 +125,11 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 					$row->discount_amount = round($fees['discount_amount'], 2);
 					$row->tax_amount      = round($fees['tax_amount'], 2);
 					$row->amount          = round($fees['amount'], 2);
+
+					$membersTotalAmount    = $fees['members_total_amount'];
+					$membersDiscountAmount = $fees['members_discount_amount'];
+					$membersTaxAmount      = $fees['members_tax_amount'];
+					$membersLateFee        = $fees['members_late_fee'];
 				}
 				else
 				{
@@ -176,6 +191,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				for ($i = 0, $n = count($ids); $i < $n; $i++)
 				{
 					$memberId  = $ids[$i];
+					/* @var $rowMember EventbookingTableRegistrant */
 					$rowMember = $this->getTable();
 					$rowMember->load($memberId);
 					$rowMember->event_id       = $row->event_id;
@@ -188,6 +204,16 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 					$memberForm->removeFieldSuffix();
 					$memberData = $memberForm->getFormData();
 					$rowMember->bind($memberData);
+
+					if ($recalculateFee)
+					{
+						$rowMember->total_amount       = $membersTotalAmount[$i];
+						$rowMember->discount_amount    = $membersDiscountAmount[$i];
+						$rowMember->late_fee           = $membersLateFee[$i];
+						$rowMember->tax_amount         = $membersTaxAmount[$i];
+						$rowMember->amount             = $rowMember->total_amount - $rowMember->discount_amount + $rowMember->tax_amount + $rowMember->late_fee;
+					}
+
 					$rowMember->store();
 					$memberForm->storeData($rowMember->id, $memberData);
 				}

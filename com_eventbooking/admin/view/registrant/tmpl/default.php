@@ -11,6 +11,9 @@ defined('_JEXEC') or die;
 
 JHtml::_('formbehavior.chosen', 'select');
 $selectedState = '';
+JHtml::_('bootstrap.tooltip');
+$document = JFactory::getDocument();
+$document->addStyleDeclaration(".hasTip{display:block !important}");
 ?>
 <form action="index.php?option=com_eventbooking&view=registrant" method="post" name="adminForm" id="adminForm" class="form form-horizontal" enctype="multipart/form-data">
 <div class="row-fluid">
@@ -253,6 +256,20 @@ $selectedState = '';
 				</label>
 				<div class="controls">
 					<?php echo $this->lists['payment_status'];?>
+				</div>
+			</div>
+		<?php
+		}
+
+		if ($this->item->id && $this->item->total_amount > 0)
+		{
+		?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo  EventbookingHelperHtml::getFieldLabel('re_calculate_fee', JText::_('EB_RE_CALCULATE_FEE'), JText::_('EB_RE_CALCULATE_FEE_EXPLAIN')); ?>
+				</label>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('re_calculate_fee', 0); ?>
 				</div>
 			</div>
 		<?php
