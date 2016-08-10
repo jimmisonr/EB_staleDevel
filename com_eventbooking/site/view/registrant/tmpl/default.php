@@ -408,6 +408,20 @@ $selectedState = '';
 			</tr>
 		<?php
 		}
+
+		if ($this->canChangeStatus && $this->item->id && $this->item->total_amount > 0)
+		{
+		?>
+		<tr>
+			<td class="title_cell">
+				<?php echo JText::_('EB_RE_CALCULATE_FEE'); ?>
+			</td>
+			<td class="field_cell">
+				<input type="checkbox" value="1" id="re_calculate_fee" name="re_calculate_fee" />
+			</td>
+		</tr>
+		<?php
+		}
 		?>
 	</table>
 	<?php
@@ -428,6 +442,10 @@ $selectedState = '';
 				$form->setEventId($this->item->event_id);
 				$form->bind($memberData);
 				$form->setFieldSuffix($i + 1);
+				if ($this->canChangeStatus)
+				{
+					$form->prepareFormFields('setRecalculateFee();');
+				}
 				$form->buildFieldsDependency();
 				if ($i % 2 == 0)
 				{
@@ -543,6 +561,10 @@ $selectedState = '';
 				$("#adminForm").validationEngine();
 				buildStateField('state', 'country', '<?php echo $selectedState; ?>');
 			})
+
+			setRecalculateFee = (function() {
+				$('#re_calculate_fee').prop('checked', true);
+			});
 		})(jQuery);
 
 		function registrantList()
