@@ -33,7 +33,9 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 			<?php
 				if ($this->item->number_registrants > 0)
 				{
-					echo $this->item->number_registrants ;
+				?>
+					<input type="text" name="number_registrants" value="<?php echo $this->item->number_registrants ?>" readonly="readonly" />
+				<?php
 				}
 				else
 				{
@@ -380,14 +382,26 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 	if ($this->config->collect_member_information && count($this->rowMembers)) 
 	{
 	?>
-		<h3 class="eb-heading"><?php echo JText::_('EB_MEMBERS_INFORMATION') ; ?></h3>
-	<?php			
-		for ($i = 0 , $n = count($this->rowMembers) ; $i < $n ; $i++) 
+		<h3 class="eb-heading"><?php echo JText::_('EB_MEMBERS_INFORMATION') ; ?> <button type="button" class="btn btn-small btn-success" onclick="addGroupMember();"><span class="icon-new icon-white"></span><?php echo JText::_('EB_ADD_MEMBER'); ?></button></h3>
+	<?php
+		$n = count($this->rowMembers) + 4;
+		for ($i = 0 ; $i < $n ; $i++)
 		{
-			$rowMember = $this->rowMembers[$i] ;			
-			$memberId = $rowMember->id ;
+			if (isset($this->rowMembers[$i]))
+			{
+				$rowMember = $this->rowMembers[$i] ;
+				$memberId = $rowMember->id ;
+				$memberData = EventbookingHelper::getRegistrantData($rowMember, $this->memberFormFields);
+				$style = '';
+			}
+			else
+			{
+				$memberId = 0;
+				$memberData = array();
+				$style = ' style="display:none;"';
+			}
+
 			$form = new RADForm($this->memberFormFields);
-			$memberData = EventbookingHelper::getRegistrantData($rowMember, $this->memberFormFields);
 			$form->setEventId($this->item->event_id);
 			$form->bind($memberData);
 			$form->setFieldSuffix($i+1);
@@ -398,8 +412,8 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 				echo "<div class=\"row-fluid\">\n" ;
 			}					
 			?>
-				<div class="span6">
-					<h4><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1); ;?></h4>
+				<div class="span6" id="group_member_<?php echo $i + 1; ?>"<?php echo $style; ?>>
+					<h4><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1); ;?><button type="button" class="btn btn-small btn-danger" onclick="removeGroupMember(<?php echo $memberId; ?>);"><span class="icon-remove icon-white"></span><?php echo JText::_('EB_REMOVE'); ?></button></h4>
 					<?php
 						$fields = $form->getFields();
 						foreach ($fields as $field)
@@ -445,7 +459,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 							}
 						}
 					?>
-					<input type="hidden" name="ids[]" value="<?php echo $rowMember->id; ?>" />
+					<input type="hidden" name="ids[]" value="<?php echo $memberId; ?>" />
 				</div>
 			<?php	
 			if (($i + 1) %2 == 0)
@@ -468,10 +482,47 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 	<input type="hidden" name="task" value="" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 	<script type="text/javascript">
+		var newMemberAdded = 0;
+		var numberMembers = <?php echo (int) count($this->rowMembers); ?>;
 		(function($){
 			setRecalculateFee = (function() {
 				$('#re_calculate_fee').prop('checked', true);
 			});
+
+			addGroupMember = (function() {
+				if (newMemberAdded < 4)
+				{
+					newMemberAdded++;
+					$('input[name=number_registrants]').val(newMemberAdded + numberMembers);
+					var newMemberContainerId = 'group_member_' + (newMemberAdded + numberMembers);
+					$('#' + newMemberContainerId).show();
+
+					$('#re_calculate_fee').prop('checked', true);
+				}
+				else
+				{
+					alert('<?php echo JText::_('EB_ADD_MEMBER_MAXIMUM_WARNING'); ?>');
+				}
+			});
+
+			removeGroupMember = (function(memberId) {
+				if (memberId == 0)
+				{
+					var newMemberContainerId = 'group_member_' + (newMemberAdded + numberMembers);
+					$('#' + newMemberContainerId).hide();
+					newMemberAdded--;
+					$('input[name=number_registrants]').val(newMemberAdded + numberMembers);
+					$('#re_calculate_fee').prop('checked', true);
+				}
+				else
+				{
+					if (confirm('<?php echo JText::_('EB_REMOVE_EXISTING_MEMBER_CONFIRM'); ?>'))
+					{
+
+					}
+				}
+			});
+
 			showHideDependFields = (function(fieldId, fieldName, fieldType, fieldSuffix) {
 				$('#ajax-loading-animation').show();
 				var masterFieldsSelector;

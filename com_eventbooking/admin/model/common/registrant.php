@@ -188,9 +188,10 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			{
 				$ids              = (array) $data['ids'];
 				$memberFormFields = EventbookingHelper::getFormFields($row->event_id, 2);
-				for ($i = 0, $n = count($ids); $i < $n; $i++)
+				for ($i = 0; $i < $row->number_registrants; $i++)
 				{
 					$memberId  = $ids[$i];
+
 					/* @var $rowMember EventbookingTableRegistrant */
 					$rowMember = $this->getTable();
 					$rowMember->load($memberId);
@@ -198,6 +199,12 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 					$rowMember->published      = $row->published;
 					$rowMember->payment_method = $row->payment_method;
 					$rowMember->transaction_id = $row->transaction_id;
+					if (!$memberId)
+					{
+						$rowMember->group_id       = $row->id;
+						$rowMember->user_id         = $row->user_id;
+					}
+
 					$memberForm                = new RADForm($memberFormFields);
 					$memberForm->setFieldSuffix($i + 1);
 					$memberForm->bind($data);
@@ -213,7 +220,6 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 						$rowMember->tax_amount         = $membersTaxAmount[$i];
 						$rowMember->amount             = $rowMember->total_amount - $rowMember->discount_amount + $rowMember->tax_amount + $rowMember->late_fee;
 					}
-
 					$rowMember->store();
 					$memberForm->storeData($rowMember->id, $memberData);
 				}
