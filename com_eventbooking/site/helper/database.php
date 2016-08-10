@@ -39,15 +39,21 @@ class EventbookingHelperDatabase
 	 * Get event information from database
 	 *
 	 * @param $id
+	 * @param $currentDate
 	 *
 	 * @return mixed
 	 */
-	public static function getEvent($id)
+	public static function getEvent($id, $currentDate = null)
 	{
 		$db          = JFactory::getDbo();
 		$query       = $db->getQuery(true);
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+
+		if (empty($currentDate))
+		{
+			$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		}
+
 		$query->select('a.*, IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
 			->from('#__eb_events AS a')
 			->select("DATEDIFF(event_date, '$currentDate') AS number_event_dates")

@@ -36,6 +36,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	public function initData()
 	{
 		parent::initData();
+
 		$this->data->event_id = $this->state->filter_event_id;
 	}
 
@@ -53,9 +54,9 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 		$config = EventbookingHelper::getConfig();
 		$db     = $this->getDbo();
 		$query  = $db->getQuery(true);
-		/* @var EventbookingTableRegistrant $row*/
-		$row    = $this->getTable();
-		$data   = $input->getData();
+		/* @var EventbookingTableRegistrant $row */
+		$row  = $this->getTable();
+		$data = $input->getData();
 		if ($data['id'])
 		{
 			//We will need to calculate total amount here now
@@ -106,7 +107,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 					}
 
 					$data['number_registrants'] = $row->number_registrants;
-					$data['re_calculate_fee'] = true;
+					$data['re_calculate_fee']   = true;
 
 					$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $row->payment_method);
 
@@ -282,7 +283,9 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	{
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
-		$row   = $this->getTable();
+
+		/* @var EventbookingTableRegistrant $row */
+		$row = $this->getTable();
 		if (count($cid))
 		{
 			foreach ($cid as $registrantId)
@@ -308,11 +311,12 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 						$query->delete('#__eb_field_values')->where('registrant_id=' . $row->group_id);
 						$db->setQuery($query);
 						$db->execute();
-						$query->clear();
 
-						$sql = 'DELETE FROM #__eb_registrants WHERE id = ' . $row->group_id;
-						$db->setQuery($sql);
-						$db->execute();
+						$query->clear()
+							->delete('#__eb_registrants')
+							->where('id = ' . $row->group_id);
+						$db->setQuery($query)
+							->execute();
 						$query->clear();
 					}
 				}
@@ -359,6 +363,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	 */
 	public function checkin($id, $group = false)
 	{
+		/* @var EventbookingTableRegistrant $row */
 		$row = $this->getTable();
 		$row->load($id);
 
@@ -399,6 +404,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	 */
 	public function resetCheckin($id)
 	{
+		/* @var EventbookingTableRegistrant $row */
 		$row = $this->getTable();
 		$row->load($id);
 

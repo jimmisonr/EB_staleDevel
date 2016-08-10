@@ -49,6 +49,8 @@ defined('_JEXEC') or die;
  * @property $payment_status
  * @property $user_ip
  * @property $language
+ * @property $checked_in
+ * @property $checked_in_count
  */
 class EventbookingTableRegistrant extends JTable
 {
