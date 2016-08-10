@@ -269,7 +269,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 					<?php echo  EventbookingHelperHtml::getFieldLabel('re_calculate_fee', JText::_('EB_RE_CALCULATE_FEE'), JText::_('EB_RE_CALCULATE_FEE_EXPLAIN')); ?>
 				</label>
 				<div class="controls">
-					<?php echo EventbookingHelperHtml::getBooleanInput('re_calculate_fee', 0); ?>
+					<input type="checkbox" value="1" id="re_calculate_fee" name="re_calculate_fee" />
 				</div>
 			</div>
 		<?php
@@ -389,8 +389,9 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 			$form = new RADForm($this->memberFormFields);
 			$memberData = EventbookingHelper::getRegistrantData($rowMember, $this->memberFormFields);
 			$form->setEventId($this->item->event_id);
-			$form->bind($memberData);	
+			$form->bind($memberData);
 			$form->setFieldSuffix($i+1);
+			$form->prepareFormFields('setRecalculateFee();');
 			$form->buildFieldsDependency();
 			if ($i%2 == 0)
 			{
@@ -464,11 +465,13 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 </div>		
 <div class="clearfix"></div>	
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
-	<input type="hidden" name="task" value="" />			
+	<input type="hidden" name="task" value="" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 	<script type="text/javascript">
 		(function($){
-
+			setRecalculateFee = (function() {
+				$('#re_calculate_fee').prop('checked', true);
+			});
 			showHideDependFields = (function(fieldId, fieldName, fieldType, fieldSuffix) {
 				$('#ajax-loading-animation').show();
 				var masterFieldsSelector;
