@@ -487,7 +487,7 @@ class EventbookingHelper
 						$db->execute();
 					}
 				}
-				
+
 				$fieldName = 'title_' . $prefix;
 				if (!in_array($fieldName, $fieldTableFields))
 				{
@@ -3295,7 +3295,7 @@ class EventbookingHelper
 		// Notification email send to user
 		if ($config->send_emails == 0 || $config->send_emails == 2)
 		{
-			if (strlen($message->{'user_email_subject' . $fieldSuffix}))
+			if ($fieldSuffix && strlen($message->{'user_email_subject' . $fieldSuffix}))
 			{
 				$subject = $message->{'user_email_subject' . $fieldSuffix};
 			}
@@ -3303,15 +3303,20 @@ class EventbookingHelper
 			{
 				$subject = $message->user_email_subject;
 			}
+
 			if (!$row->published && strpos($row->payment_method, 'os_offline') !== false)
 			{
-				if (self::isValidMessage($event->user_email_body_offline))
+				if ($fieldSuffix && self::isValidMessage($event->{'user_email_body_offline' . $fieldSuffix}))
 				{
-					$body = $event->user_email_body_offline;
+					$body = $event->{'user_email_body_offline' . $fieldSuffix};
 				}
-				elseif (self::isValidMessage($message->{'user_email_body_offline' . $fieldSuffix}))
+				elseif ($fieldSuffix && self::isValidMessage($message->{'user_email_body_offline' . $fieldSuffix}))
 				{
 					$body = $message->{'user_email_body_offline' . $fieldSuffix};
+				}
+				elseif (self::isValidMessage($event->user_email_body_offline))
+				{
+					$body = $event->user_email_body_offline;
 				}
 				else
 				{
@@ -3320,13 +3325,17 @@ class EventbookingHelper
 			}
 			else
 			{
-				if (self::isValidMessage($event->user_email_body))
+				if ($fieldSuffix && self::isValidMessage($event->{'user_email_body' . $fieldSuffix}))
 				{
-					$body = $event->user_email_body;
+					$body = $event->{'user_email_body' . $fieldSuffix};
 				}
-				elseif (self::isValidMessage($message->{'user_email_body' . $fieldSuffix}))
+				elseif ($fieldSuffix && self::isValidMessage($message->{'user_email_body' . $fieldSuffix}))
 				{
 					$body = $message->{'user_email_body' . $fieldSuffix};
+				}
+				elseif (self::isValidMessage($event->user_email_body))
+				{
+					$body = $event->user_email_body;
 				}
 				else
 				{
