@@ -111,6 +111,25 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 				<?php echo $editor->display( 'registration_cancel_message_paid',  $this->message->registration_cancel_message_paid, '100%', '250', '75', '8' ) ;?>
 			</div>
 		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('user_registration_cancel_subject', JText::_('EB_USER_REGISTRATION_CANCEL_SUBJECT')); ?>
+				<p class="eb-available-tags">
+					<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong>[EVENT_TITLE]</strong>
+				</p>
+			</div>
+			<div class="controls">
+				<input type="text" name="user_registration_cancel_subject" class="input-xlarge" value="<?php echo $this->message->user_registration_cancel_subject; ?>" size="50" />
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('user_registration_cancel_message', JText::_('EB_USER_REGISTRATION_CANCEL_MESSAGE'), JText::_('EB_USER_REGISTRATION_CANCEL_MESSAGE_EXPLAIN'));?>
+			</div>
+			<div class="controls">
+				<?php echo $editor->display( 'user_registration_cancel_message',  $this->message->user_registration_cancel_message, '100%', '250', '75', '8' ) ;?>
+			</div>
+		</div>
 	<?php echo JHtml::_('bootstrap.endTab'); ?>
 	<?php echo JHtml::_('bootstrap.addTab', 'message', 'registration-email-messages-page', JText::_('EB_REGISTRATION_EMAIL_MESSAGES', true)); ?>
 		<div class="control-group">
@@ -713,6 +732,28 @@ $fields = EventbookingHelperHtml::getAvailableMessagesTags();
 					</td>
 					<td>
 						<strong><?php echo JText::_('EB_REGISTRATION_CANCEL_MESSAGE_PAID_EXPLAIN'); ?></strong>
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<?php echo JText::_('EB_USER_REGISTRATION_CANCEL_SUBJECT'); ?>
+					</td>
+					<td class="controls">
+						<input type="text" name="user_registration_cancel_subject_<?php echo $sef; ?>" class="input-xlarge" value="<?php echo $this->message->{'user_registration_cancel_subject_'.$sef}; ?>" size="50" />
+					</td>
+					<td>
+						&nbsp;
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<?php echo JText::_('EB_USER_REGISTRATION_CANCEL_MESSAGE'); ?>
+					</td>
+					<td>
+						<?php echo $editor->display( 'user_registration_cancel_message_'.$sef,  $this->message->{'user_registration_cancel_message_'.$sef}, '100%', '250', '75', '8' ) ;?>
+					</td>
+					<td>
+						&nbsp;
 					</td>
 				</tr>
 				<tr>

@@ -3745,6 +3745,118 @@ class EventbookingHelper
 		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
 	}
 
+
+	/**
+	 * Send email to registrant when admin change the status to cancelled
+	 *
+	 * @param EventbookingTableRegistrant $row
+	 * @param object                 $config
+	 */
+	public static function sendRegistrationCancelledEmail($row, $config)
+	{
+		$mailer = JFactory::getMailer();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+
+		if($row->language && $row->language != '*')
+		{
+			$tag = $row->language;
+		}
+		else
+		{
+			$tag = self::getDefaultLanguage();
+		}
+
+		JFactory::getLanguage()->load('com_eventbooking', JPATH_ROOT, $tag);
+		$message     = self::getMessages();
+		$fieldSuffix = self::getFieldSuffix($row->language);
+
+		if ($fieldSuffix && strlen($message->{'user_registration_cancel_subject' . $fieldSuffix}))
+		{
+			$subject = $message->{'user_registration_cancel_subject' . $fieldSuffix};
+		}
+		else
+		{
+			$subject = $message->user_registration_cancel_subject;
+		}
+
+		if (empty($subject))
+		{
+			return;
+		}
+
+		if ($fieldSuffix && self::isValidMessage($message->{'user_registration_cancel_message' . $fieldSuffix}))
+		{
+			$body = $message->{'user_registration_cancel_message' . $fieldSuffix};
+		}
+		else
+		{
+			$body = $message->user_registration_cancel_message;
+		}
+
+		if (empty($body))
+		{
+			return;
+		}
+
+		if (!JMailHelper::isEmailAddress($row->email))
+		{
+			return;
+		}
+
+		if ($config->from_name)
+		{
+			$fromName = $config->from_name;
+		}
+		else
+		{
+			$fromName = JFactory::getConfig()->get('fromname');
+		}
+
+		if ($config->from_email)
+		{
+			$fromEmail = $config->from_email;
+		}
+		else
+		{
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
+		}
+
+		if ($config->multiple_booking)
+		{
+			$rowFields = self::getFormFields($row->id, 4);
+		}
+		elseif ($row->is_group_billing)
+		{
+			$rowFields = self::getFormFields($row->event_id, 1);
+		}
+		else
+		{
+			$rowFields = self::getFormFields($row->event_id, 0);
+		}
+
+		$form = new RADForm($rowFields);
+		$data = self::getRegistrantData($row, $rowFields);
+		$form->bind($data);
+		$form->buildFieldsDependency();
+		$query->select('*, title' . $fieldSuffix . ' AS title')
+			->from('#__eb_events')
+			->where('id=' . $row->event_id);
+		$db->setQuery($query);
+		$event    = $db->loadObject();
+		$replaces = self::buildTags($row, $form, $event, $config);
+
+		foreach ($replaces as $key => $value)
+		{
+			$key     = strtoupper($key);
+			$subject = str_ireplace("[$key]", $value, $subject);
+			$body    = str_ireplace("[$key]", $value, $body);
+		}
+		$body = self::convertImgTags($body);
+
+		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
+	}
+
 	/**
 	 * Send email when users fill-in waitinglist
 	 *
