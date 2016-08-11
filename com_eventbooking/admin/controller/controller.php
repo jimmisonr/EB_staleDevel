@@ -2297,6 +2297,15 @@ class EventbookingController extends RADControllerAdmin
 			}
 		}
 
+		// Make sure the Events Booking - System plugin always published
+		$query->clear()
+			->update('#__extensions')
+			->set('enabled = 1')
+			->set('element = "system"')
+			->where('folder = "eventbooking"');
+		$db->setQuery($query)
+			->execute();
+
 		// Try to delete the file com_eventbooking.zip from tmp folder
 		$tmpFolder = JFactory::getConfig()->get('tmp_path');
 		if (!JFolder::exists($tmpFolder))
