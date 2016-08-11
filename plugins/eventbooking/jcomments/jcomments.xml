@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension version="1.6.0" type="plugin" group="eventbooking" method="upgrade">
-	<name>Eventbooking - Jcomments plugin</name>
+	<name>Events Booking - Jcomments plugin</name>
 	<author>Tuan Pham Ngoc</author>
 	<creationDate>October 2012</creationDate>
 	<copyright>Ossolution Team</copyright>
