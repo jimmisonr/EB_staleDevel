@@ -449,22 +449,6 @@ class EventbookingHelper
 					$db->execute();
 				}
 
-				$fieldName = 'short_description_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
-				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-				}
-
-				$fieldName = 'description_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
-				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-				}
-
 				$fieldName = 'meta_keywords_' . $prefix;
 				if (!in_array($fieldName, $eventTableFields))
 				{
@@ -481,46 +465,29 @@ class EventbookingHelper
 					$db->execute();
 				}
 
-				$fieldName = 'user_email_body_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
-				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-				}
+				$eventTextFields = array(
+					'short_description',
+					'description',
+					'registration_form_message',
+					'registration_form_message_group',
+					'user_email_body',
+					'user_email_body_offline',
+					'thanks_message',
+					'thanks_message_offline',
+					'registration_approved_email_body',
+				);
 
-				$fieldName = 'user_email_body_offline_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
+				foreach ($eventTextFields as $eventTextField)
 				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
+					$fieldName = $eventTextField . '_' . $prefix;
+					if (!in_array($fieldName, $eventTableFields))
+					{
+						$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+						$db->setQuery($sql);
+						$db->execute();
+					}
 				}
-
-				$fieldName = 'thanks_message_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
-				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-				}
-
-				$fieldName = 'thanks_message_offline_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
-				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-				}
-
-				$fieldName = 'registration_approved_email_body_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
-				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-				}
-
+				
 				$fieldName = 'title_' . $prefix;
 				if (!in_array($fieldName, $fieldTableFields))
 				{
