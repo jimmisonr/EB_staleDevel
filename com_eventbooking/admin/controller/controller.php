@@ -2265,6 +2265,38 @@ class EventbookingController extends RADControllerAdmin
 		$db->setQuery($sql);
 		$db->execute();
 
+		// Uninstall the old plugins which is not needed from version 2.9.0
+		$installer = new JInstaller();
+
+		$plugins = array(
+			array('eventbooking', 'cartupdate'),
+			array('eventbooking', 'invoice'),
+			array('eventbooking', 'unpublishevents'),
+		);
+
+		$query = $db->getQuery(true);
+		foreach ($plugins as $plugin)
+		{
+			$query->clear()
+				->select('extension_id')
+				->from('#__extensions')
+				->where($db->quoteName('folder') . ' = ' . $db->quote($plugin[0]))
+				->where($db->quoteName('element') . ' = ' . $db->quote($plugin[1]));
+			$db->setQuery($query);
+			$id = $db->loadResult();
+			if ($id)
+			{
+				try
+				{
+					$installer->uninstall('plugin', $id, 0);
+				}
+				catch (\Exception $e)
+				{
+
+				}
+			}
+		}
+
 		// Try to delete the file com_eventbooking.zip from tmp folder
 		$tmpFolder = JFactory::getConfig()->get('tmp_path');
 		if (!JFolder::exists($tmpFolder))
