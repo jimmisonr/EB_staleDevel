@@ -715,6 +715,14 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 				?>
 				<div class="control-group">
 					<label class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('use_data_from_default_language_'.$sef, JText::_('EB_USE_DATA_FROM_DEFAULT_LANGUAGE'), JText::_('EB_USE_DATA_FROM_DEFAULT_LANGUAGE_EXPLAIN')) ?>
+					</label>
+					<div class="controls">
+						<input type="checkbox" name="use_data_from_default_language_<?php echo $sef; ?>" value="1" />
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">
 						<?php echo  JText::_('EB_TITLE'); ?>
 					</label>
 					<div class="controls">
