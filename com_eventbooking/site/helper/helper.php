@@ -3689,6 +3689,8 @@ class EventbookingHelper
 		$db->setQuery($query);
 		$event    = $db->loadObject();
 		$replaces = self::buildTags($row, $form, $event, $config);
+
+
 		if (strlen(trim($event->registration_approved_email_subject)))
 		{
 			$subject = $event->registration_approved_email_subject;
@@ -3702,18 +3704,23 @@ class EventbookingHelper
 			$subject = $message->registration_approved_email_subject;
 		}
 
-		if (self::isValidMessage($event->registration_approved_email_body))
+		if ($fieldSuffix && self::isValidMessage($event->{'registration_approved_email_body' . $fieldSuffix}))
 		{
-			$body = $event->registration_approved_email_body;
+			$body = $event->{'registration_approved_email_body' . $fieldSuffix};
 		}
-		elseif (self::isValidMessage($message->{'registration_approved_email_body' . $fieldSuffix}))
+		elseif ($fieldSuffix && self::isValidMessage($message->{'registration_approved_email_body' . $fieldSuffix}))
 		{
 			$body = $message->{'registration_approved_email_body' . $fieldSuffix};
+		}
+		elseif (self::isValidMessage($event->registration_approved_email_body))
+		{
+			$body = $event->registration_approved_email_body;
 		}
 		else
 		{
 			$body = $message->registration_approved_email_body;
 		}
+
 		foreach ($replaces as $key => $value)
 		{
 			$key     = strtoupper($key);
