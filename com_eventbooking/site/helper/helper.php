@@ -3754,20 +3754,25 @@ class EventbookingHelper
 	 */
 	public static function sendRegistrationCancelledEmail($row, $config)
 	{
+		$app    = JFactory::getApplication();
 		$mailer = JFactory::getMailer();
 		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
 
-		if($row->language && $row->language != '*')
+		if ($app->isSite())
 		{
-			$tag = $row->language;
-		}
-		else
-		{
-			$tag = self::getDefaultLanguage();
+			if($row->language && $row->language != '*')
+			{
+				$tag = $row->language;
+			}
+			else
+			{
+				$tag = self::getDefaultLanguage();
+			}
+
+			JFactory::getLanguage()->load('com_eventbooking', JPATH_ROOT, $tag);
 		}
 
-		JFactory::getLanguage()->load('com_eventbooking', JPATH_ROOT, $tag);
 		$message     = self::getMessages();
 		$fieldSuffix = self::getFieldSuffix($row->language);
 

@@ -302,6 +302,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			// In case individual registration, we will send notification email to registrant
 			if ($row->number_registrants == 1)
 			{
+				EventbookingHelper::loadLanguage();
 				EventbookingHelper::sendEmails($row, $config);
 			}
 
