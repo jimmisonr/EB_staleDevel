@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6.0" method="upgrade">
-	<name>EB Cart</name>
+	<name>Events Booking - Cart Module</name>
 	<author>Tuan Pham Ngoc</author>
 	<creationDate>Jan 2010</creationDate>
 	<copyright>Ossolution Team</copyright>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.5.0" position="left" method="upgrade">
-    <name>Events Booking Google Map</name>
+    <name>Events Booking - Google Map</name>
     <author>Tuan Pham Ngoc</author>
     <authorEmail>tuanpn@joomdonation.com</authorEmail>
     <authorUrl></authorUrl>

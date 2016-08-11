@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6.0" method="upgrade">
-	<name>Events By Location</name>
+	<name>Events Booking - Events By Location</name>
 	<author>Tuan Pham Ngoc</author>
 	<creationDate>July 2011</creationDate>
     <copyright>Copyright (C) 2010 - 2016 Ossolution Team</copyright>
