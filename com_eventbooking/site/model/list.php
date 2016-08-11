@@ -236,6 +236,16 @@ class EventbookingModelList extends RADModelList
 			$query->where('tbl.location_id=' . $state->location_id);
 		}
 
+		if ($state->filter_city)
+		{
+			$query->where(' tbl.location_id IN (SELECT id FROM #__eb_locations WHERE LOWER(`city`) = ' . JString::strtolower($state->filter_city) . ')');
+		}
+
+		if ($state->filter_state)
+		{
+			$query->where(' tbl.location_id IN (SELECT id FROM #__eb_locations WHERE LOWER(`state`) = ' . JString::strtolower($state->filter_state) . ')');
+		}
+
 		if ($state->created_by)
 		{
 			$query->where('tbl.created_by =' . $state->created_by);
