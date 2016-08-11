@@ -14,21 +14,13 @@ if ($this->config->accept_term ==1 && !$this->config->fix_term_and_condition_pop
 {
 	EventbookingHelperJquery::colorbox();
 }
-if (strlen(strip_tags($this->message->{'registration_form_message_group'.$this->fieldSuffix})))
-{
-	$msg = $this->message->{'registration_form_message_group'.$this->fieldSuffix};
-}
-else
-{
-	$msg = $this->message->registration_form_message_group;
-}
 
 if ($this->waitingList)
 {
 	$headerText = JText::_('EB_JOIN_WAITINGLIST');
-	if (strlen(strip_tags($this->message->{'waitinglist_form_message'.$this->fieldSuffix})))
+	if (strlen(strip_tags($this->message->{'waitinglist_form_message' . $this->fieldSuffix})))
 	{
-		$msg = $this->message->{'waitinglist_form_message'.$this->fieldSuffix};
+		$msg = $this->message->{'waitinglist_form_message' . $this->fieldSuffix};
 	}
 	else
 	{
@@ -37,23 +29,25 @@ if ($this->waitingList)
 }
 else
 {
-	$headerText = JText::_('EB_GROUP_REGISTRATION') ;
-	if ($this->fieldSuffix && strlen(strip_tags($this->message->{'registration_form_message_group' . $this->fieldSuffix})))
+	$headerText = JText::_('EB_GROUP_REGISTRATION');
+	if ($this->fieldSuffix && strlen(strip_tags($this->event->{'registration_form_message_group' . $this->fieldSuffix})))
 	{
-		$msg = $this->message->{'registration_form_message_group'.$this->fieldSuffix};
+		$msg = $this->event->{'registration_form_message_group' . $this->fieldSuffix};
+	}
+	elseif ($this->fieldSuffix && strlen(strip_tags($this->message->{'registration_form_message_group' . $this->fieldSuffix})))
+	{
+		$msg = $this->message->{'registration_form_message_group' . $this->fieldSuffix};
+	}
+	elseif (strlen(strip_tags($this->event->registration_form_message_group)))
+	{
+		$msg = $this->event->registration_form_message_group;
 	}
 	else
 	{
-		if (strlen(strip_tags($this->event->registration_form_message_group)))
-		{
-			$msg = $this->event->registration_form_message_group;
-		}
-		else
-		{
-			$msg = $this->message->registration_form_message_group;
-		}
+		$msg = $this->message->registration_form_message_group;
 	}
 }
+
 $replaces = EventbookingHelper::buildEventTags($this->event, $this->config);
 foreach ($replaces as $key => $value)
 {
