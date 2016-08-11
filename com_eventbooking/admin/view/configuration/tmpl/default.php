@@ -383,6 +383,14 @@ JHtml::_('script', 'jui/cms.js', false, true);
 					</div>
 					<div class="control-group">
 						<div class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('unpublish_event_when_full', JText::_('EB_UNPUBLISH_EVENT_WHEN_FULL'), JText::_('EB_UNPUBLISH_EVENT_WHEN_FULL_EXPLAIN')); ?>
+						</div>
+						<div class="controls">
+							<?php echo EventbookingHelperHtml::getBooleanInput('unpublish_event_when_full', $config->unpublish_event_when_full); ?>
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('send_ics_file', JText::_('EB_SEND_ICS_FILE'), JText::_('EB_SEND_ICS_FILE_EXPLAIN')); ?>
 						</div>
 						<div class="controls">
