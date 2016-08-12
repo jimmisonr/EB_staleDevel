@@ -7,7 +7,7 @@
 	<copyright>Copyright (C) 2010 - 2016 Ossolution Team</copyright>
 	<license>GNU General Public License version 3, or later</license>
 	<creationDate>December 2015</creationDate>
-	<version>2.8.1</version>
+	<version>2.9.0</version>
 	<description>This plugin is used to create a EasySocial account for registrants when they register for an event in Events Booking</description>
 	<files>
 		<filename plugin="easysocial">easysocial.php</filename>
