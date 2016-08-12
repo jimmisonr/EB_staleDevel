@@ -332,6 +332,10 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				$row->load($registrantId);
 				if ($row->group_id > 0)
 				{
+					$row->total_amount    = (float) $row->total_amount;
+					$row->discount_amount = (float) $row->discount_amount;
+					$row->tax_amount      = (float) $row->tax_amount;
+					$row->amount          = (float) $row->amount;
 					$query->update('#__eb_registrants')
 						->set('number_registrants = number_registrants -1')
 						->set('total_amount = total_amount - ' . $row->total_amount)
