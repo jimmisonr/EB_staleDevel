@@ -480,6 +480,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 <div class="clearfix"></div>	
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 	<input type="hidden" name="task" value="" />
+	<input type="hidden" name="group_member_id" value="0" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 	<script type="text/javascript">
 		var newMemberAdded = 0;
@@ -518,7 +519,10 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 				{
 					if (confirm('<?php echo JText::_('EB_REMOVE_EXISTING_MEMBER_CONFIRM'); ?>'))
 					{
-
+						var form = document.adminForm;
+						form.group_member_id.value = memberId;
+						form.task.value = 'registrant.remove_group_member';
+						form.submit();
 					}
 				}
 			});
