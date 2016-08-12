@@ -62,7 +62,7 @@ $rootUri = JUri::root(true);
 			<td style="float: right;">
 				<?php echo $this->lists['filter_published'] ; ?>
 				<?php echo $this->lists['filter_event_id'] ; ?>
-				<input type="button" class="btn btn-small btn-primary" onclick="checkData('add_registrant');" value="<?php echo JText::_('EB_NEW_REGISTRANTS'); ?>" />
+				<button type="button" class="btn btn-small btn-primary" onclick="checkData('add_registrant');"><i class="icon-new icon-white"></i><?php echo JText::_('EB_NEW_REGISTRANTS'); ?></button>
 			</td>
 		</tr>
 	</table>

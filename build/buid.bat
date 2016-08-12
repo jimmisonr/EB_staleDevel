@@ -24,6 +24,10 @@ cd E:\www\eventbooking\modules\mod_eb_googlemap\
 7z a -tzip E:\www\eventbooking\build/packages/mod_eb_googlemap.zip *
 cd E:\www\eventbooking\modules\mod_eb_view\
 7z a -tzip E:\www\eventbooking\build/packages/mod_eb_view.zip *
+cd E:\www\eventbooking\modules\mod_eb_cities\
+7z a -tzip E:\www\eventbooking\build/packages/mod_eb_cities.zip *
+cd E:\www\eventbooking\modules\mod_eb_states\
+7z a -tzip E:\www\eventbooking\build/packages/mod_eb_states.zip *
 REM Plugins
 cd E:\www\eventbooking\plugins\content\ebevent\
 7z a -tzip E:\www\eventbooking\build/packages/plug_content_ebevent.zip *
@@ -79,6 +83,8 @@ cd E:\www\eventbooking\plugins\eventbooking\dates\
 7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_dates.zip *
 cd E:\www\eventbooking\plugins\eventbooking\tickettypes\
 7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_tickettypes.zip *
+cd E:\www\eventbooking\plugins\eventbooking\system\
+7z a -tzip E:\www\eventbooking\build/packages/plug_eventbooking_system.zip *
 cd E:\www\eventbooking\plugins\search\eventbooking\
 7z a -tzip E:\www\eventbooking\build/packages/plug_search_eventbooking.zip *
 cd E:\www\eventbooking\plugins\system\ebreminder\

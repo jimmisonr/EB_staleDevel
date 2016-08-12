@@ -23,7 +23,15 @@ if ($showLocation)
 	{
 		$height = 600 ;
 	}
-	EventbookingHelperJquery::colorbox('eb-colorbox-map', $width.'px', $height.'px', 'true', 'false');
+	$deviceType = EventbookingHelper::getDeviceType();
+	if ($deviceType == 'mobile')
+	{
+		EventbookingHelperJquery::colorbox('eb-colorbox-map', '100%', $height . 'px', 'true', 'false');
+	}
+	else
+	{
+		EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
+	}
 }
 if (count($rows))
 {

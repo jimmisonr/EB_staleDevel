@@ -16,7 +16,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '2.8.1';
+		return '2.9.0';
 	}
 
 	/**
@@ -449,22 +449,6 @@ class EventbookingHelper
 					$db->execute();
 				}
 
-				$fieldName = 'short_description_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
-				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-				}
-
-				$fieldName = 'description_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
-				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-				}
-
 				$fieldName = 'meta_keywords_' . $prefix;
 				if (!in_array($fieldName, $eventTableFields))
 				{
@@ -481,44 +465,27 @@ class EventbookingHelper
 					$db->execute();
 				}
 
-				$fieldName = 'user_email_body_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
-				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-				}
+				$eventTextFields = array(
+					'short_description',
+					'description',
+					'registration_form_message',
+					'registration_form_message_group',
+					'user_email_body',
+					'user_email_body_offline',
+					'thanks_message',
+					'thanks_message_offline',
+					'registration_approved_email_body',
+				);
 
-				$fieldName = 'user_email_body_offline_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
+				foreach ($eventTextFields as $eventTextField)
 				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-				}
-
-				$fieldName = 'thanks_message_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
-				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-				}
-
-				$fieldName = 'thanks_message_offline_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
-				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
-				}
-
-				$fieldName = 'registration_approved_email_body_' . $prefix;
-				if (!in_array($fieldName, $eventTableFields))
-				{
-					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
-					$db->setQuery($sql);
-					$db->execute();
+					$fieldName = $eventTextField . '_' . $prefix;
+					if (!in_array($fieldName, $eventTableFields))
+					{
+						$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
+						$db->setQuery($sql);
+						$db->execute();
+					}
 				}
 
 				$fieldName = 'title_' . $prefix;
@@ -1003,11 +970,11 @@ class EventbookingHelper
 	/**
 	 * Calculate fees use for individual registration
 	 *
-	 * @param $event
-	 * @param $form
-	 * @param $data
-	 * @param $config
-	 * @param $paymentMethod
+	 * @param object    $event
+	 * @param RADForm   $form
+	 * @param array     $data
+	 * @param RADConfig $config
+	 * @param string    $paymentMethod
 	 *
 	 * @return array
 	 */
@@ -1189,11 +1156,11 @@ class EventbookingHelper
 	/**
 	 * Calculate fees use for group registration
 	 *
-	 * @param $event
-	 * @param $form
-	 * @param $data
-	 * @param $config
-	 * @param $paymentMethod
+	 * @param object    $event
+	 * @param RADForm   $form
+	 * @param array     $data
+	 * @param RADConfig $config
+	 * @param string    $paymentMethod
 	 *
 	 * @return array
 	 */
@@ -1207,8 +1174,14 @@ class EventbookingHelper
 		$couponCode        = isset($data['coupon_code']) ? $data['coupon_code'] : '';
 		$eventId           = $event->id;
 		$numberRegistrants = (int) $session->get('eb_number_registrants', '');
-		$memberFormFields  = EventbookingHelper::getFormFields($eventId, 2);
-		$rate              = EventbookingHelper::getRegistrationRate($eventId, $numberRegistrants);
+
+		if (!$numberRegistrants && isset($data['number_registrants']))
+		{
+			$numberRegistrants = (int) $data['number_registrants'];
+		}
+
+		$memberFormFields = EventbookingHelper::getFormFields($eventId, 2);
+		$rate             = EventbookingHelper::getRegistrationRate($eventId, $numberRegistrants);
 
 		$extraFee = $form->calculateFee(array('NUMBER_REGISTRANTS' => $numberRegistrants, 'INDIVIDUAL_PRICE' => $rate));
 
@@ -1225,6 +1198,10 @@ class EventbookingHelper
 			if ($membersData)
 			{
 				$membersData = unserialize($membersData);
+			}
+			elseif (!empty($data['re_calculate_fee']))
+			{
+				$membersData = $data;
 			}
 			else
 			{
@@ -2271,7 +2248,7 @@ class EventbookingHelper
 			"validate[minSize[6]]",
 			"validate[maxSize[12]]",
 			"validate[custom[integer],min[-5]]",
-			"validate[custom[integer],max[50]]", );
+			"validate[custom[integer],max[50]]",);
 
 		return json_encode($validClass);
 	}
@@ -2702,7 +2679,7 @@ class EventbookingHelper
 					'option.text'        => 'text',
 					'option.value'       => 'value',
 					'list.attr'          => 'class="inputbox" onchange="submit();"',
-					'list.select'        => $selected, ));
+					'list.select'        => $selected,));
 		else
 			return JHtml::_('select.genericlist', $options, $name,
 				array(
@@ -2710,7 +2687,7 @@ class EventbookingHelper
 					'option.text'        => 'text',
 					'option.value'       => 'value',
 					'list.attr'          => 'class="inputbox" ',
-					'list.select'        => $selected, ));
+					'list.select'        => $selected,));
 	}
 
 	/**
@@ -2768,7 +2745,7 @@ class EventbookingHelper
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => ' class="inputbox" ',
-				'list.select'        => $row->parent, ));
+				'list.select'        => $row->parent,));
 	}
 
 	/**
@@ -3318,7 +3295,7 @@ class EventbookingHelper
 		// Notification email send to user
 		if ($config->send_emails == 0 || $config->send_emails == 2)
 		{
-			if (strlen($message->{'user_email_subject' . $fieldSuffix}))
+			if ($fieldSuffix && strlen($message->{'user_email_subject' . $fieldSuffix}))
 			{
 				$subject = $message->{'user_email_subject' . $fieldSuffix};
 			}
@@ -3326,15 +3303,20 @@ class EventbookingHelper
 			{
 				$subject = $message->user_email_subject;
 			}
+
 			if (!$row->published && strpos($row->payment_method, 'os_offline') !== false)
 			{
-				if (self::isValidMessage($event->user_email_body_offline))
+				if ($fieldSuffix && self::isValidMessage($event->{'user_email_body_offline' . $fieldSuffix}))
 				{
-					$body = $event->user_email_body_offline;
+					$body = $event->{'user_email_body_offline' . $fieldSuffix};
 				}
-				elseif (self::isValidMessage($message->{'user_email_body_offline' . $fieldSuffix}))
+				elseif ($fieldSuffix && self::isValidMessage($message->{'user_email_body_offline' . $fieldSuffix}))
 				{
 					$body = $message->{'user_email_body_offline' . $fieldSuffix};
+				}
+				elseif (self::isValidMessage($event->user_email_body_offline))
+				{
+					$body = $event->user_email_body_offline;
 				}
 				else
 				{
@@ -3343,13 +3325,17 @@ class EventbookingHelper
 			}
 			else
 			{
-				if (self::isValidMessage($event->user_email_body))
+				if ($fieldSuffix && self::isValidMessage($event->{'user_email_body' . $fieldSuffix}))
 				{
-					$body = $event->user_email_body;
+					$body = $event->{'user_email_body' . $fieldSuffix};
 				}
-				elseif (self::isValidMessage($message->{'user_email_body' . $fieldSuffix}))
+				elseif ($fieldSuffix && self::isValidMessage($message->{'user_email_body' . $fieldSuffix}))
 				{
 					$body = $message->{'user_email_body' . $fieldSuffix};
+				}
+				elseif (self::isValidMessage($event->user_email_body))
+				{
+					$body = $event->user_email_body;
 				}
 				else
 				{
@@ -3703,6 +3689,8 @@ class EventbookingHelper
 		$db->setQuery($query);
 		$event    = $db->loadObject();
 		$replaces = self::buildTags($row, $form, $event, $config);
+
+
 		if (strlen(trim($event->registration_approved_email_subject)))
 		{
 			$subject = $event->registration_approved_email_subject;
@@ -3716,18 +3704,23 @@ class EventbookingHelper
 			$subject = $message->registration_approved_email_subject;
 		}
 
-		if (self::isValidMessage($event->registration_approved_email_body))
+		if ($fieldSuffix && self::isValidMessage($event->{'registration_approved_email_body' . $fieldSuffix}))
 		{
-			$body = $event->registration_approved_email_body;
+			$body = $event->{'registration_approved_email_body' . $fieldSuffix};
 		}
-		elseif (self::isValidMessage($message->{'registration_approved_email_body' . $fieldSuffix}))
+		elseif ($fieldSuffix && self::isValidMessage($message->{'registration_approved_email_body' . $fieldSuffix}))
 		{
 			$body = $message->{'registration_approved_email_body' . $fieldSuffix};
+		}
+		elseif (self::isValidMessage($event->registration_approved_email_body))
+		{
+			$body = $event->registration_approved_email_body;
 		}
 		else
 		{
 			$body = $message->registration_approved_email_body;
 		}
+
 		foreach ($replaces as $key => $value)
 		{
 			$key     = strtoupper($key);
@@ -3748,6 +3741,123 @@ class EventbookingHelper
 			self::generateInvoicePDF($row);
 			$mailer->addAttachment(JPATH_ROOT . '/media/com_eventbooking/invoices/' . self::formatInvoiceNumber($row->invoice_number, $config) . '.pdf');
 		}
+
+		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
+	}
+
+
+	/**
+	 * Send email to registrant when admin change the status to cancelled
+	 *
+	 * @param EventbookingTableRegistrant $row
+	 * @param object                 $config
+	 */
+	public static function sendRegistrationCancelledEmail($row, $config)
+	{
+		$app    = JFactory::getApplication();
+		$mailer = JFactory::getMailer();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+
+		if ($app->isSite())
+		{
+			if($row->language && $row->language != '*')
+			{
+				$tag = $row->language;
+			}
+			else
+			{
+				$tag = self::getDefaultLanguage();
+			}
+
+			JFactory::getLanguage()->load('com_eventbooking', JPATH_ROOT, $tag);
+		}
+
+		$message     = self::getMessages();
+		$fieldSuffix = self::getFieldSuffix($row->language);
+
+		if ($fieldSuffix && strlen($message->{'user_registration_cancel_subject' . $fieldSuffix}))
+		{
+			$subject = $message->{'user_registration_cancel_subject' . $fieldSuffix};
+		}
+		else
+		{
+			$subject = $message->user_registration_cancel_subject;
+		}
+
+		if (empty($subject))
+		{
+			return;
+		}
+
+		if ($fieldSuffix && self::isValidMessage($message->{'user_registration_cancel_message' . $fieldSuffix}))
+		{
+			$body = $message->{'user_registration_cancel_message' . $fieldSuffix};
+		}
+		else
+		{
+			$body = $message->user_registration_cancel_message;
+		}
+
+		if (empty($body))
+		{
+			return;
+		}
+
+		if (!JMailHelper::isEmailAddress($row->email))
+		{
+			return;
+		}
+
+		if ($config->from_name)
+		{
+			$fromName = $config->from_name;
+		}
+		else
+		{
+			$fromName = JFactory::getConfig()->get('fromname');
+		}
+
+		if ($config->from_email)
+		{
+			$fromEmail = $config->from_email;
+		}
+		else
+		{
+			$fromEmail = JFactory::getConfig()->get('mailfrom');
+		}
+
+		if ($config->multiple_booking)
+		{
+			$rowFields = self::getFormFields($row->id, 4);
+		}
+		elseif ($row->is_group_billing)
+		{
+			$rowFields = self::getFormFields($row->event_id, 1);
+		}
+		else
+		{
+			$rowFields = self::getFormFields($row->event_id, 0);
+		}
+
+		$form = new RADForm($rowFields);
+		$data = self::getRegistrantData($row, $rowFields);
+		$form->bind($data);
+		$form->buildFieldsDependency();
+		$query->select('*, title' . $fieldSuffix . ' AS title')
+			->from('#__eb_events')
+			->where('id=' . $row->event_id);
+		$db->setQuery($query);
+		$event    = $db->loadObject();
+		$replaces = self::buildTags($row, $form, $event, $config);
+
+		foreach ($replaces as $key => $value)
+		{
+			$key     = strtoupper($key);
+			$subject = str_ireplace("[$key]", $value, $subject);
+			$body    = str_ireplace("[$key]", $value, $body);
+		}
+		$body = self::convertImgTags($body);
 
 		$mailer->sendMail($fromEmail, $fromName, $row->email, $subject, $body, 1);
 	}
@@ -4823,7 +4933,7 @@ class EventbookingHelper
 					'taxAmount'      => $taxAmount,
 					'discountAmount' => $discountAmount,
 					'total'          => $total,
-					'config'         => $config, ));
+					'config'         => $config,));
 			$replaces['SUB_TOTAL']              = EventbookingHelper::formatCurrency($subTotal, $config);
 			$replaces['DISCOUNT_AMOUNT']        = EventbookingHelper::formatCurrency($discountAmount, $config);
 			$replaces['TAX_AMOUNT']             = EventbookingHelper::formatCurrency($taxAmount, $config);

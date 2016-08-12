@@ -33,6 +33,7 @@ defined('_JEXEC') or die;
  * @property $discount_amount
  * @property $tax_amount
  * @property $payment_processing_fee
+ * @property $late_fee
  * @property $amount
  * @property $coupon_id
  * @property $register_date
@@ -49,6 +50,8 @@ defined('_JEXEC') or die;
  * @property $payment_status
  * @property $user_ip
  * @property $language
+ * @property $checked_in
+ * @property $checked_in_count
  */
 class EventbookingTableRegistrant extends JTable
 {

@@ -11,6 +11,9 @@ defined('_JEXEC') or die;
 
 JHtml::_('formbehavior.chosen', 'select');
 $selectedState = '';
+JHtml::_('bootstrap.tooltip');
+$document = JFactory::getDocument();
+$document->addStyleDeclaration(".hasTip{display:block !important}");
 ?>
 <form action="index.php?option=com_eventbooking&view=registrant" method="post" name="adminForm" id="adminForm" class="form form-horizontal" enctype="multipart/form-data">
 <div class="row-fluid">
@@ -30,7 +33,9 @@ $selectedState = '';
 			<?php
 				if ($this->item->number_registrants > 0)
 				{
-					echo $this->item->number_registrants ;
+				?>
+					<input type="text" name="number_registrants" value="<?php echo $this->item->number_registrants ?>" readonly="readonly" />
+				<?php
 				}
 				else
 				{
@@ -258,6 +263,20 @@ $selectedState = '';
 		<?php
 		}
 
+		if ($this->item->id && $this->item->total_amount > 0)
+		{
+		?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo  EventbookingHelperHtml::getFieldLabel('re_calculate_fee', JText::_('EB_RE_CALCULATE_FEE'), JText::_('EB_RE_CALCULATE_FEE_EXPLAIN')); ?>
+				</label>
+				<div class="controls">
+					<input type="checkbox" value="1" id="re_calculate_fee" name="re_calculate_fee" />
+				</div>
+			</div>
+		<?php
+		}
+
 		if (!$this->item->id || $this->item->amount > 0)
 		{
 		?>
@@ -363,25 +382,38 @@ $selectedState = '';
 	if ($this->config->collect_member_information && count($this->rowMembers)) 
 	{
 	?>
-		<h3 class="eb-heading"><?php echo JText::_('EB_MEMBERS_INFORMATION') ; ?></h3>
-	<?php			
-		for ($i = 0 , $n = count($this->rowMembers) ; $i < $n ; $i++) 
+		<h3 class="eb-heading"><?php echo JText::_('EB_MEMBERS_INFORMATION') ; ?> <button type="button" class="btn btn-small btn-success" onclick="addGroupMember();"><span class="icon-new icon-white"></span><?php echo JText::_('EB_ADD_MEMBER'); ?></button></h3>
+	<?php
+		$n = count($this->rowMembers) + 4;
+		for ($i = 0 ; $i < $n ; $i++)
 		{
-			$rowMember = $this->rowMembers[$i] ;			
-			$memberId = $rowMember->id ;
+			if (isset($this->rowMembers[$i]))
+			{
+				$rowMember = $this->rowMembers[$i] ;
+				$memberId = $rowMember->id ;
+				$memberData = EventbookingHelper::getRegistrantData($rowMember, $this->memberFormFields);
+				$style = '';
+			}
+			else
+			{
+				$memberId = 0;
+				$memberData = array();
+				$style = ' style="display:none;"';
+			}
+
 			$form = new RADForm($this->memberFormFields);
-			$memberData = EventbookingHelper::getRegistrantData($rowMember, $this->memberFormFields);
 			$form->setEventId($this->item->event_id);
-			$form->bind($memberData);	
+			$form->bind($memberData);
 			$form->setFieldSuffix($i+1);
+			$form->prepareFormFields('setRecalculateFee();');
 			$form->buildFieldsDependency();
 			if ($i%2 == 0)
 			{
 				echo "<div class=\"row-fluid\">\n" ;
 			}					
 			?>
-				<div class="span6">
-					<h4><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1); ;?></h4>
+				<div class="span6" id="group_member_<?php echo $i + 1; ?>"<?php echo $style; ?>>
+					<h4><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1); ;?><button type="button" class="btn btn-small btn-danger" onclick="removeGroupMember(<?php echo $memberId; ?>);"><span class="icon-remove icon-white"></span><?php echo JText::_('EB_REMOVE'); ?></button></h4>
 					<?php
 						$fields = $form->getFields();
 						foreach ($fields as $field)
@@ -427,7 +459,7 @@ $selectedState = '';
 							}
 						}
 					?>
-					<input type="hidden" name="ids[]" value="<?php echo $rowMember->id; ?>" />
+					<input type="hidden" name="ids[]" value="<?php echo $memberId; ?>" />
 				</div>
 			<?php	
 			if (($i + 1) %2 == 0)
@@ -447,10 +479,53 @@ $selectedState = '';
 </div>		
 <div class="clearfix"></div>	
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
-	<input type="hidden" name="task" value="" />			
+	<input type="hidden" name="task" value="" />
+	<input type="hidden" name="group_member_id" value="0" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 	<script type="text/javascript">
+		var newMemberAdded = 0;
+		var numberMembers = <?php echo (int) count($this->rowMembers); ?>;
 		(function($){
+			setRecalculateFee = (function() {
+				$('#re_calculate_fee').prop('checked', true);
+			});
+
+			addGroupMember = (function() {
+				if (newMemberAdded < 4)
+				{
+					newMemberAdded++;
+					$('input[name=number_registrants]').val(newMemberAdded + numberMembers);
+					var newMemberContainerId = 'group_member_' + (newMemberAdded + numberMembers);
+					$('#' + newMemberContainerId).show();
+
+					$('#re_calculate_fee').prop('checked', true);
+				}
+				else
+				{
+					alert('<?php echo JText::_('EB_ADD_MEMBER_MAXIMUM_WARNING'); ?>');
+				}
+			});
+
+			removeGroupMember = (function(memberId) {
+				if (memberId == 0)
+				{
+					var newMemberContainerId = 'group_member_' + (newMemberAdded + numberMembers);
+					$('#' + newMemberContainerId).hide();
+					newMemberAdded--;
+					$('input[name=number_registrants]').val(newMemberAdded + numberMembers);
+					$('#re_calculate_fee').prop('checked', true);
+				}
+				else
+				{
+					if (confirm('<?php echo JText::_('EB_REMOVE_EXISTING_MEMBER_CONFIRM'); ?>'))
+					{
+						var form = document.adminForm;
+						form.group_member_id.value = memberId;
+						form.task.value = 'registrant.remove_group_member';
+						form.submit();
+					}
+				}
+			});
 
 			showHideDependFields = (function(fieldId, fieldName, fieldType, fieldSuffix) {
 				$('#ajax-loading-animation').show();

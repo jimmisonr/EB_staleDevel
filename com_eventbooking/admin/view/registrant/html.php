@@ -73,7 +73,7 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		}
 
 		$form->setEventId($this->item->event_id);
-
+		$form->prepareFormFields('setRecalculateFee();');
 		$form->buildFieldsDependency();
 
 		$options                  = array();

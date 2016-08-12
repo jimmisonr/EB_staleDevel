@@ -24,6 +24,8 @@ class EventbookingModelSearch extends EventbookingModelList
 			->insert('category_id', 'int', 0)
 			->insert('location_id', 'int', '0')
 			->insert('created_by', 'int', 0)
-			->insert('search', 'string', '');
+			->insert('search', 'string', '')
+			->insert('filter_city', 'string', '')
+			->insert('filter_state', 'string', '');
 	}
 }

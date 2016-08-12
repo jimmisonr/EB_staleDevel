@@ -35,25 +35,9 @@ class EventbookingModelConfiguration extends RADModel
 			$row->store();
 		}
 
-		$query = $db->getQuery(true);
-		if ($data['activate_invoice_feature'])
+		if (isset($data['custom_css']))
 		{
-			$query->update('#__extensions')
-				->set('`enabled`= 1')
-				->where('`element`="invoice"')
-				->where('`folder`="eventbooking"');
-			$db->setQuery($query);
-			$db->execute();
-		}
-		if ($data['multiple_booking'])
-		{
-			$query->clear();
-			$query->update('#__extensions')
-				->set('`enabled`= 1')
-				->where('`element`="cartupdate"')
-				->where('`folder`="eventbooking"');
-			$db->setQuery($query);
-			$db->execute();
+			JFile::write(JPATH_ROOT.'/media/com_eventbooking/assets/css/custom.css', trim($data['custom_css']));
 		}
 
 		return true;

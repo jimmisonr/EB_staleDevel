@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6.0" method="upgrade">
-	<name>Search Events</name>
+	<name>Events Booking - Search Events</name>
 	<author>Tuan Pham Ngoc</author>
 	<authorEmail>contact@joomdonation.com</authorEmail>
 	<authorUrl>http://www.joomdonation.com</authorUrl>

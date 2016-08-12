@@ -70,13 +70,6 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			$rowMembers = array();
 		}
 
-		$form = new RADForm($rowFields);
-		$form->bind($data, $useDefault);
-
-		$form->setEventId($item->event_id);
-
-		$form->buildFieldsDependency();
-
 		if ($userId && $user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
 			$canChangeStatus    = true;
@@ -91,6 +84,18 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		{
 			$canChangeStatus = false;
 		}
+
+		$form = new RADForm($rowFields);
+		$form->bind($data, $useDefault);
+
+		$form->setEventId($item->event_id);
+
+		if ($canChangeStatus)
+		{
+			$form->prepareFormFields('setRecalculateFee();');
+		}
+
+		$form->buildFieldsDependency();
 
 		if (empty($item->id))
 		{

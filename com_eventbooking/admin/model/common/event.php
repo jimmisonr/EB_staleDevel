@@ -34,6 +34,42 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		{
 			$data = $input->getData();
 		}
+
+		$languages = EventbookingHelper::getLanguages();
+		if (JLanguageMultilang::isEnabled() && count($languages))
+		{
+			$translableFields = array(
+				'title',
+				'alias',
+				'meta_keywords',
+				'meta_description',
+				'short_description',
+				'description',
+				'registration_form_message',
+				'registration_form_message_group',
+				'user_email_body',
+				'user_email_body_offline',
+				'thanks_message',
+				'thanks_message_offline',
+				'registration_approved_email_body',
+			);
+
+			foreach ($languages as $language)
+			{
+				$sef = $language->sef;
+				if (!empty($data['use_data_from_default_language_' . $sef]))
+				{
+					foreach ($translableFields as $translableField)
+					{
+						if (empty($data[$translableField . '_' . $sef]))
+						{
+							$data[$translableField . '_' . $sef] = $data[$translableField];
+						}
+					}
+				}
+			}
+		}
+
 		$config     = EventbookingHelper::getConfig();
 		$thumbImage = $input->files->get('thumb_image');
 		if ($thumbImage['name'])
@@ -302,7 +338,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 			if (!$isNew && $row->parent_id > 0)
 			{
-				EventBookingHelper::updateParentMaxEventDate($row->parent_id);
+				EventbookingHelper::updateParentMaxEventDate($row->parent_id);
 			}
 		}
 	}

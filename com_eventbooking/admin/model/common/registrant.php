@@ -36,6 +36,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	public function initData()
 	{
 		parent::initData();
+
 		$this->data->event_id = $this->state->filter_event_id;
 	}
 
@@ -50,11 +51,17 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	 */
 	public function store($input, $ignore = array())
 	{
+		$app = JFactory::getApplication();
+		$user = JFactory::getUser();
 		$config = EventbookingHelper::getConfig();
 		$db     = $this->getDbo();
 		$query  = $db->getQuery(true);
-		$row    = $this->getTable();
-		$data   = $input->getData();
+		/* @var EventbookingTableRegistrant $row */
+		$row  = $this->getTable();
+		$data = $input->getData();
+
+		$recalculateFee = false;
+
 		if ($data['id'])
 		{
 			//We will need to calculate total amount here now
@@ -68,7 +75,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			{
 				$rowFields = EventbookingHelper::getFormFields($data['event_id'], 0);
 			}
-			$user = JFactory::getUser();
+
 			if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking') || empty($row->published))
 			{
 				$excludeFeeFields = false;
@@ -86,6 +93,69 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 
 			$row->bind($data);
 
+			/*
+				Re - calculate registration fee in the following cases:
+			*/
+			if (!empty($data['re_calculate_fee']) || ($row->published == 0 && $app->isSite() && $user->id == $row->user_id))
+			{
+				$recalculateFee = true;
+
+				if ($row->is_group_billing)
+				{
+					$event = EventbookingHelperDatabase::getEvent($row->event_id, $row->register_date);
+					$form  = new RADForm($rowFields);
+					$form->bind($data);
+
+					if ($row->coupon_id)
+					{
+						$query->clear()
+							->select($db->quoteName('code'))
+							->from('#__eb_coupons')
+							->where('id = ' . $row->coupon_id);
+						$db->setQuery($query);
+						$data['coupon_code'] = $db->loadResult();
+					}
+
+					$data['number_registrants'] = $row->number_registrants;
+					$data['re_calculate_fee']   = true;
+
+					$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $row->payment_method);
+
+					$row->total_amount    = round($fees['total_amount'], 2);
+					$row->discount_amount = round($fees['discount_amount'], 2);
+					$row->tax_amount      = round($fees['tax_amount'], 2);
+					$row->amount          = round($fees['amount'], 2);
+
+					$membersTotalAmount    = $fees['members_total_amount'];
+					$membersDiscountAmount = $fees['members_discount_amount'];
+					$membersTaxAmount      = $fees['members_tax_amount'];
+					$membersLateFee        = $fees['members_late_fee'];
+				}
+				else
+				{
+					// Individual registration
+					$event = EventbookingHelperDatabase::getEvent($row->event_id, $row->register_date);
+					$form  = new RADForm($rowFields);
+					$form->bind($data);
+
+					if ($row->coupon_id)
+					{
+						$query->clear()
+							->select($db->quoteName('code'))
+							->from('#__eb_coupons')
+							->where('id = ' . $row->coupon_id);
+						$db->setQuery($query);
+						$data['coupon_code'] = $db->loadResult();
+					}
+
+					$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $row->payment_method);
+
+					$row->total_amount    = round($fees['total_amount'], 2);
+					$row->discount_amount = round($fees['discount_amount'], 2);
+					$row->tax_amount      = round($fees['tax_amount'], 2);
+					$row->amount          = round($fees['amount'], 2);
+				}
+			}
 			$row->store();
 			$form = new RADForm($rowFields);
 			$form->storeData($row->id, $data, $excludeFeeFields);
@@ -118,21 +188,38 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			{
 				$ids              = (array) $data['ids'];
 				$memberFormFields = EventbookingHelper::getFormFields($row->event_id, 2);
-				for ($i = 0, $n = count($ids); $i < $n; $i++)
+				for ($i = 0; $i < $row->number_registrants; $i++)
 				{
 					$memberId  = $ids[$i];
+
+					/* @var $rowMember EventbookingTableRegistrant */
 					$rowMember = $this->getTable();
 					$rowMember->load($memberId);
 					$rowMember->event_id       = $row->event_id;
 					$rowMember->published      = $row->published;
 					$rowMember->payment_method = $row->payment_method;
 					$rowMember->transaction_id = $row->transaction_id;
+					if (!$memberId)
+					{
+						$rowMember->group_id       = $row->id;
+						$rowMember->user_id         = $row->user_id;
+					}
+
 					$memberForm                = new RADForm($memberFormFields);
 					$memberForm->setFieldSuffix($i + 1);
 					$memberForm->bind($data);
 					$memberForm->removeFieldSuffix();
 					$memberData = $memberForm->getFormData();
 					$rowMember->bind($memberData);
+
+					if ($recalculateFee)
+					{
+						$rowMember->total_amount       = $membersTotalAmount[$i];
+						$rowMember->discount_amount    = $membersDiscountAmount[$i];
+						$rowMember->late_fee           = $membersLateFee[$i];
+						$rowMember->tax_amount         = $membersTaxAmount[$i];
+						$rowMember->amount             = $rowMember->total_amount - $rowMember->discount_amount + $rowMember->tax_amount + $rowMember->late_fee;
+					}
 					$rowMember->store();
 					$memberForm->storeData($rowMember->id, $memberData);
 				}
@@ -147,10 +234,16 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));
 				EventbookingHelper::sendRegistrationApprovedEmail($row, $config);
 			}
-			elseif ($row->published == 2 && $published != 2 && $config->activate_waitinglist_feature)
+			elseif ($row->published == 2 && $published != 2)
 			{
+				// Send registration cancelled email to registrant
+				EventbookingHelper::sendRegistrationCancelledEmail($row, $config);
+
 				//Registration is cancelled, send notification emails to waiting list
-				EventbookingHelper::notifyWaitingList($row, $config);
+				if ($config->activate_waitinglist_feature)
+				{
+					EventbookingHelper::notifyWaitingList($row, $config);
+				}
 			}
 			$input->set('id', $row->id);
 		}
@@ -209,6 +302,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			// In case individual registration, we will send notification email to registrant
 			if ($row->number_registrants == 1)
 			{
+				EventbookingHelper::loadLanguage();
 				EventbookingHelper::sendEmails($row, $config);
 			}
 
@@ -228,7 +322,9 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	{
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
-		$row   = $this->getTable();
+
+		/* @var EventbookingTableRegistrant $row */
+		$row = $this->getTable();
 		if (count($cid))
 		{
 			foreach ($cid as $registrantId)
@@ -236,8 +332,16 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				$row->load($registrantId);
 				if ($row->group_id > 0)
 				{
+					$row->total_amount    = (float) $row->total_amount;
+					$row->discount_amount = (float) $row->discount_amount;
+					$row->tax_amount      = (float) $row->tax_amount;
+					$row->amount          = (float) $row->amount;
 					$query->update('#__eb_registrants')
 						->set('number_registrants = number_registrants -1')
+						->set('total_amount = total_amount - ' . $row->total_amount)
+						->set('discount_amount = discount_amount - ' . $row->discount_amount)
+						->set('tax_amount = tax_amount - ' . $row->tax_amount)
+						->set('amount = amount - ' . $row->amount)
 						->where('id=' . $row->group_id);
 					$db->setQuery($query);
 					$db->execute();
@@ -254,11 +358,12 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 						$query->delete('#__eb_field_values')->where('registrant_id=' . $row->group_id);
 						$db->setQuery($query);
 						$db->execute();
-						$query->clear();
 
-						$sql = 'DELETE FROM #__eb_registrants WHERE id = ' . $row->group_id;
-						$db->setQuery($sql);
-						$db->execute();
+						$query->clear()
+							->delete('#__eb_registrants')
+							->where('id = ' . $row->group_id);
+						$db->setQuery($query)
+							->execute();
 						$query->clear();
 					}
 				}
@@ -305,6 +410,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	 */
 	public function checkin($id, $group = false)
 	{
+		/* @var EventbookingTableRegistrant $row */
 		$row = $this->getTable();
 		$row->load($id);
 
@@ -345,6 +451,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	 */
 	public function resetCheckin($id)
 	{
+		/* @var EventbookingTableRegistrant $row */
 		$row = $this->getTable();
 		$row->load($id);
 

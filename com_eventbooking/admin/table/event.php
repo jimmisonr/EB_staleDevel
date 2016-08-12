@@ -9,6 +9,42 @@
 // no direct access
 defined('_JEXEC') or die;
 
+/**
+ * Class EventbookingTableEvent
+ *
+ * @property $id
+ * @property $parent_id
+ * @property $location_id
+ * @property $title
+ * @property $alias
+ * @property $event_type
+ * @property $event_date
+ * @property $event_end_date
+ * @property $cut_off_date
+ * @property $registration_start_date
+ * @property $short_description
+ * @property $description
+ * @property $access
+ * @property $registration_access
+ * @property $individual_price
+ * @property $tax_rate
+ * @property $event_capacity
+ * @property $registration_type
+ * @property $registration_handle_url
+ * @property $discount_type
+ * @property $discount
+ * @property $early_bird_discount_type
+ * @property $early_bird_discount_date
+ * @property $early_bird_discount_amount
+ * @property $enable_cancel_registration
+ * @property $cancel_before_date
+ * @property $discount_groups
+ * @property $discount_amounts
+ * @property $params
+ * @property $created_by
+ * @property $ordering
+ * @property $published
+ */
 class EventbookingTableEvent extends JTable
 {
 	/**

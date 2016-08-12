@@ -24,7 +24,6 @@ else
 {
 	error_reporting(0);
 }
-
 $document = JFactory::getDocument();
 EventbookingHelper::loadLanguage();
 $db      = JFactory::getDbo();

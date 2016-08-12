@@ -383,6 +383,14 @@ JHtml::_('script', 'jui/cms.js', false, true);
 					</div>
 					<div class="control-group">
 						<div class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('unpublish_event_when_full', JText::_('EB_UNPUBLISH_EVENT_WHEN_FULL'), JText::_('EB_UNPUBLISH_EVENT_WHEN_FULL_EXPLAIN')); ?>
+						</div>
+						<div class="controls">
+							<?php echo EventbookingHelperHtml::getBooleanInput('unpublish_event_when_full', $config->unpublish_event_when_full); ?>
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('send_ics_file', JText::_('EB_SEND_ICS_FILE'), JText::_('EB_SEND_ICS_FILE_EXPLAIN')); ?>
 						</div>
 						<div class="controls">
@@ -1117,6 +1125,28 @@ JHtml::_('script', 'jui/cms.js', false, true);
 			echo JHtml::_('bootstrap.endTab');
 		}
 		echo JHtml::_('bootstrap.endTabSet');
+		echo JHtml::_('bootstrap.endTab');
+	}
+
+	$editorPlugin = null;
+	if (JPluginHelper::isEnabled('editors', 'codemirror'))
+	{
+		$editorPlugin = 'codemirror';
+	}
+	elseif(JPluginHelper::isEnabled('editor', 'none'))
+	{
+		$editorPlugin = 'none';
+	}
+
+	if ($editorPlugin)
+	{
+		echo JHtml::_('bootstrap.addTab', 'configuration', 'custom-css', JText::_('EB_CUSTOM_CSS', true));
+		$customCss = '';
+		if (file_exists(JPATH_ROOT.'/media/com_eventbooking/assets/css/custom.css'))
+		{
+			$customCss = file_get_contents(JPATH_ROOT.'/media/com_eventbooking/assets/css/custom.css');
+		}
+		echo JEditor::getInstance($editorPlugin)->display('custom_css', $customCss, '100%', '550', '75', '8', false, null, null, null, array('syntax' => 'css'));
 		echo JHtml::_('bootstrap.endTab');
 	}
 	?>

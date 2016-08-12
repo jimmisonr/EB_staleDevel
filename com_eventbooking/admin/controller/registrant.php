@@ -141,4 +141,38 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		$this->setRedirect('index.php?option=com_eventbooking&view=registrants');
 	}
+
+	/**
+	 * Remove group member from group registration
+	 *
+	 */
+	public function remove_group_member()
+	{
+		$id = $this->input->getInt('id');
+		$groupMemberId = $this->input->getInt('group_member_id');
+		/* @var $model EventbookingModelRegistrant*/
+		$model = $this->getModel();
+		$model->delete(array($groupMemberId));
+
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('COUNT(*)')
+			->from('#__eb_registrants')
+			->where('id = '. $id);
+		$db->setQuery($query);
+		$total = $db->loadResult();
+
+		if ($total)
+		{
+			// Redirect back to registrant edit screen
+			$url = JRoute::_('index.php?option=com_eventbooking&view=registrant&id='.$id, false);
+		}
+		else
+		{
+			// Redirect to registrants management
+			$url = JRoute::_('index.php?option=com_eventbooking&view=registrants', false);
+		}
+
+		$this->setRedirect($url, JText::_('EB_GROUP_MEMBER_REMOVED'));
+	}
 }

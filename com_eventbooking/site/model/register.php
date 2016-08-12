@@ -588,7 +588,7 @@ class EventBookingModelRegister extends RADModel
 		}
 		//Trigger the cancellation
 		JPluginHelper::importPlugin('eventbooking');
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$dispatcher->trigger('onRegistrationCancel', array($row));
 		$row->published = 2;
 		$row->store();
@@ -710,6 +710,7 @@ class EventBookingModelRegister extends RADModel
 		{
 			$config->notification_emails = $event->notification_emails;
 		}
+
 		if ($config->notification_emails == '')
 		{
 			$notificationEmails = $fromEmail;
@@ -725,7 +726,7 @@ class EventBookingModelRegister extends RADModel
 		{
 			$email = $emails[$i];
 			$mailer->sendMail($fromEmail, $fromName, $email, $subject, $body, 1);
-			$mailer->ClearAllRecipients();
+			$mailer->clearAllRecipients();
 		}
 
 		// Notify waiting list ?

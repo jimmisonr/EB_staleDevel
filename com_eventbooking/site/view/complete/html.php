@@ -58,25 +58,19 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		$rowEvent    = $db->loadObject();
 
 		$message     = EventbookingHelper::getMessages();
-
-		//Override thanks message
-		if (strlen(trim(strip_tags($rowEvent->thanks_message))))
-		{
-			$config->thanks_message = $rowEvent->thanks_message;
-		}
-		if (strlen(trim(strip_tags($rowEvent->thanks_message_offline))))
-		{
-			$config->thanks_message_offline = $rowEvent->thanks_message_offline;
-		}
 		if (strpos($rowEvent->payment_method, 'os_offline') !== false)
 		{
-			if (strlen(trim(strip_tags($rowEvent->thanks_message_offline))))
+			if ($fieldSuffix && EventbookingHelper::isValidMessage($rowEvent->{'thanks_message_offline' . $fieldSuffix}))
 			{
-				$thankMessage = $rowEvent->thanks_message_offline;
+				$thankMessage = $rowEvent->{'thanks_message_offline' . $fieldSuffix};
 			}
-			elseif (strlen(trim(strip_tags($message->{'thanks_message_offline' . $fieldSuffix}))))
+			elseif ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'thanks_message_offline' . $fieldSuffix}))
 			{
 				$thankMessage = $message->{'thanks_message_offline' . $fieldSuffix};
+			}
+			elseif (EventbookingHelper::isValidMessage($rowEvent->thanks_message_offline))
+			{
+				$thankMessage = $rowEvent->thanks_message_offline;
 			}
 			else
 			{
@@ -85,21 +79,26 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		}
 		else
 		{
-			if (strlen(trim(strip_tags($rowEvent->thanks_message))))
+			if ($fieldSuffix && EventbookingHelper::isValidMessage($rowEvent->{'thanks_message' . $fieldSuffix}))
 			{
-				$thankMessage = $rowEvent->thanks_message;
+				$thankMessage = $rowEvent->{'thanks_message' . $fieldSuffix};
 			}
-			elseif (strlen(trim(strip_tags($message->{'thanks_message' . $fieldSuffix}))))
+			elseif ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'thanks_message' . $fieldSuffix}))
 			{
 				$thankMessage = $message->{'thanks_message' . $fieldSuffix};
+			}
+			elseif (EventbookingHelper::isValidMessage($rowEvent->thanks_message))
+			{
+				$thankMessage = $rowEvent->thanks_message;
 			}
 			else
 			{
 				$thankMessage = $message->thanks_message;
 			}
 		}
-		$query->clear();
-		$query->select('*')
+
+		$query->clear()
+			->select('*')
 			->from('#__eb_registrants')
 			->where('id=' . $id);
 		$db->setQuery($query);
