@@ -60,15 +60,15 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		$message     = EventbookingHelper::getMessages();
 		if (strpos($rowEvent->payment_method, 'os_offline') !== false)
 		{
-			if ($fieldSuffix && self::isValidMessage($rowEvent->{'thanks_message_offline' . $fieldSuffix}))
+			if ($fieldSuffix && EventbookingHelper::isValidMessage($rowEvent->{'thanks_message_offline' . $fieldSuffix}))
 			{
 				$thankMessage = $rowEvent->{'thanks_message_offline' . $fieldSuffix};
 			}
-			elseif ($fieldSuffix && self::isValidMessage($message->{'thanks_message_offline' . $fieldSuffix}))
+			elseif ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'thanks_message_offline' . $fieldSuffix}))
 			{
 				$thankMessage = $message->{'thanks_message_offline' . $fieldSuffix};
 			}
-			elseif (self::isValidMessage($rowEvent->thanks_message_offline))
+			elseif (EventbookingHelper::isValidMessage($rowEvent->thanks_message_offline))
 			{
 				$thankMessage = $rowEvent->thanks_message_offline;
 			}
@@ -79,15 +79,15 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		}
 		else
 		{
-			if ($fieldSuffix && self::isValidMessage($rowEvent->{'thanks_message' . $fieldSuffix}))
+			if ($fieldSuffix && EventbookingHelper::isValidMessage($rowEvent->{'thanks_message' . $fieldSuffix}))
 			{
 				$thankMessage = $rowEvent->{'thanks_message' . $fieldSuffix};
 			}
-			elseif ($fieldSuffix && self::isValidMessage($message->{'thanks_message' . $fieldSuffix}))
+			elseif ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'thanks_message' . $fieldSuffix}))
 			{
 				$thankMessage = $message->{'thanks_message' . $fieldSuffix};
 			}
-			elseif (self::isValidMessage($rowEvent->thanks_message))
+			elseif (EventbookingHelper::isValidMessage($rowEvent->thanks_message))
 			{
 				$thankMessage = $rowEvent->thanks_message;
 			}
