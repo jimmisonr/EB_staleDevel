@@ -2603,7 +2603,7 @@ class EventbookingController extends RADControllerAdmin
 		$result['status'] = 0;
 
 		$http     = JHttpFactory::getHttp();
-		$url      = 'http://joomdonationdemo.com/versions/membershipproj3.txt';
+		$url      = 'http://joomdonationdemo.com/versions/eventbookingj3.txt';
 		$response = $http->get($url);
 		if ($response->code == 200)
 		{
