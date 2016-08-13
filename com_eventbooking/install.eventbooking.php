@@ -80,28 +80,44 @@ class com_eventbookingInstallerScript
 		// Fix mistake causes by a bug in version 2.9.0
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('extension_id')
+		$query->select('extension_id, manifest_cache')
 			->from('#__extensions')
 			->where('`type` = "plugin"')
 			->where('`folder` = "eventbooking"')
 			->where('`element` = "system"');
 		$db->setQuery($query);
-		$pluginIds = $db->loadResult();
+		$plugins = $db->loadObjectList();
 
-		if (count($pluginIds) > 1)
+		if (count($plugins) > 1)
 		{
-			// We will have to uninstall these plugin
+			$processedPlugins = array();
+
 			$installer = new JInstaller();
 
-			foreach($pluginIds as $pluginId)
+			foreach($plugins as $plugin)
 			{
-				try
+				$params = new JRegistry($plugin->manifest_cache);
+				$filename = $params->get('filename');
+				if ($filename && !in_array($filename, $processedPlugins))
 				{
-					$installer->uninstall('plugin', $pluginId, 0);
+					$processedPlugins[] = $filename;
+					$query->clear()
+						->update('#__extensions')
+						->set('`element` = '. $db->quote($filename))
+						->where('extension_id = ' . $plugin->extension_id);
+					$db->setQuery($query);
+					$db->execute();
 				}
-				catch (\Exception $e)
+				else
 				{
+					try
+					{
+						$installer->uninstall('plugin', $plugin->extension_id, 0);
+					}
+					catch (\Exception $e)
+					{
 
+					}
 				}
 			}
 
