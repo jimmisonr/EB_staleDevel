@@ -21,8 +21,9 @@ class com_eventbookingInstallerScript
 	/**
 	 * Method to run before installing the component
 	 */
-	function preflight($type, $parent)
+	public function preflight($type, $parent)
 	{
+
 		//Backup the old language files
 		foreach (self::$languageFiles as $languageFile)
 		{
@@ -75,6 +76,38 @@ class com_eventbookingInstallerScript
 		{
 			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/emailtemplates');
 		}
+
+		// Fix mistake causes by a bug in version 2.9.0
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('extension_id')
+			->from('#__extensions')
+			->where('`type` = "plugin"')
+			->where('`folder` = "eventbooking"')
+			->where('`element` = "system"');
+		$db->setQuery($query);
+		$pluginIds = $db->loadResult();
+
+		if (count($pluginIds) > 1)
+		{
+			// We will have to uninstall these plugin
+			$installer = new JInstaller();
+
+			foreach($pluginIds as $pluginId)
+			{
+				try
+				{
+					$installer->uninstall('plugin', $pluginId, 0);
+				}
+				catch (\Exception $e)
+				{
+
+				}
+			}
+
+			// Clear messages queue
+			JFactory::getApplication()->getMessageQueue();
+		}
 	}
 
 	/**
@@ -82,12 +115,12 @@ class com_eventbookingInstallerScript
 	 *
 	 * @return void
 	 */
-	function install($parent)
+	public function install($parent)
 	{
 		$this->installType = 'install';
 	}
 
-	function update($parent)
+	public function update($parent)
 	{
 		$this->installType = 'update';
 	}
@@ -95,7 +128,7 @@ class com_eventbookingInstallerScript
 	/**
 	 * Method to run after installing the component
 	 */
-	function postflight($type, $parent)
+	public function postflight($type, $parent)
 	{
 		//Restore the modified language strings by merging to language files
 		$registry = new JRegistry();
