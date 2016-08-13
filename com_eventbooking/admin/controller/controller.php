@@ -2301,7 +2301,7 @@ class EventbookingController extends RADControllerAdmin
 		$query->clear()
 			->update('#__extensions')
 			->set('enabled = 1')
-			->set('element = "system"')
+			->where('element = "system"')
 			->where('folder = "eventbooking"');
 		$db->setQuery($query)
 			->execute();
