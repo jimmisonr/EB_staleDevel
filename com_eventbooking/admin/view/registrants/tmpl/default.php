@@ -270,9 +270,9 @@ else
 					}
 					if ($this->config->show_coupon_code_in_registrant_list)
 					{
-						?>
+					?>
 						<td>
-							<?php echo $row->coupon_code ; ?>
+							<a href="index.php?option=com_eventbooking&view=coupon&id=<?php echo $row->coupon_id; ?>" target="_blank"><?php echo $row->coupon_code ; ?></a>
 						</td>
 					<?php
 					}

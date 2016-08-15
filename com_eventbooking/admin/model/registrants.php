@@ -144,7 +144,7 @@ class EventbookingModelRegistrants extends RADModelList
 	{
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
-		$query->select('tbl.*, ev.title' . $fieldSuffix . ' AS title, ev.event_date, ev.event_end_date, cp.code AS coupon_code');
+		$query->select('tbl.*, ev.title' . $fieldSuffix . ' AS title, ev.event_date, ev.event_end_date, cp.code AS coupon_code, cp.id AS coupon_id');
 
 		return $this;
 	}
