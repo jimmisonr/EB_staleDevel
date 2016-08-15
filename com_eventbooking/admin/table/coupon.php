@@ -9,12 +9,29 @@
 // no direct access
 defined('_JEXEC') or die;
 
+/**
+ * Class EventbookingTableCoupon
+ *
+ * @property $id
+ * @property $event_id
+ * @property $code
+ * @property $coupon_type
+ * @property $discount
+ * @property $times
+ * @property $used
+ * @property $valid_from
+ * @property $valid_to
+ * @property $user_id
+ * @property $apply_to
+ * @property $enable_for
+ * @property $published
+ */
 class EventbookingTableCoupon extends JTable
 {
 	/**
 	 * Constructor
 	 *
-	 * @param object Database connector object
+	 * @param JDatabaseDriver $db Database connector object
 	 */
 	public function __construct(& $db)
 	{

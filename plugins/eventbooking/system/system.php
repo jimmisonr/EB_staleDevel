@@ -134,6 +134,7 @@ class plgEventbookingSystem extends JPlugin
 		$query->update('#__eb_registrants')
 			->set('published = 1')
 			->set('payment_date = NOW()')
+			->set('transaction_id = '. $db->quote($row->transaction_id))
 			->where('cart_id = ' . (int) $row->id);
 		$db->setQuery($query);
 		$db->execute();

@@ -15,9 +15,9 @@ class EventbookingModelCoupon extends RADModelAdmin
 	/**
 	 * Post - process, Store coupon code mapping with events.
 	 *
-	 * @param JTable   $row
-	 * @param RADInput $input
-	 * @param bool     $isNew
+	 * @param EventbookingTableCoupon $row
+	 * @param RADInput                $input
+	 * @param bool                    $isNew
 	 */
 	protected function afterStore($row, $input, $isNew)
 	{
@@ -40,7 +40,7 @@ class EventbookingModelCoupon extends RADModelAdmin
 			$config = EventbookingHelper::getConfig();
 			if ($config->hide_past_events_from_events_dropdown)
 			{
-				$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+				$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
 				$query->where('event_id IN (SELECT id FROM #__eb_events AS a WHERE a.published = 1 AND (DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.event_end_date) >= ' . $currentDate . '))');
 			}
 			$db->setQuery($query);
@@ -102,11 +102,13 @@ class EventbookingModelCoupon extends RADModelAdmin
 		$query   = $db->getQuery(true);
 		$coupons = $this->getCouponCSV($input);
 
+		$imported = 0;
 		if (count($coupons))
 		{
 			$imported = 0;
 			foreach ($coupons as $coupon)
 			{
+				/* @var EventbookingTableCoupon $row */
 				$row = $this->getTable();
 
 				$eventIds = $coupon['event'];
@@ -213,8 +215,10 @@ class EventbookingModelCoupon extends RADModelAdmin
 
 		for ($i = 0; $i < $numberCoupon; $i++)
 		{
-			$salt         = $this->genRandomCoupon($length, $charactersSet);
-			$couponCode   = $prefix . $salt;
+			$salt       = $this->genRandomCoupon($length, $charactersSet);
+			$couponCode = $prefix . $salt;
+
+			/* @var EventbookingTableCoupon $row */
 			$row          = $this->getTable();
 			$data['code'] = $couponCode;
 
@@ -291,8 +295,8 @@ class EventbookingModelCoupon extends RADModelAdmin
 	/**
 	 * Generate random Coupon
 	 *
-	 * @param int $length
-	 * @param string    $charactersSet
+	 * @param int    $length
+	 * @param string $charactersSet
 	 *
 	 * @return string
 	 */
