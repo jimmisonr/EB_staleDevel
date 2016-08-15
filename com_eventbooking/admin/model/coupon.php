@@ -245,6 +245,31 @@ class EventbookingModelCoupon extends RADModelAdmin
 	}
 
 	/**
+	 * Get list of registration records which use the current coupon code
+	 *
+	 * @return array
+	 */
+	public function getRegistrants()
+	{
+		if ($this->state->id)
+		{
+			$db    = $this->getDbo();
+			$query = $db->getQuery(true);
+			$query->select('id, first_name, last_name, email, register_date, total_amount')
+				->from('#__eb_registrants')
+				->where('coupon_id = ' . $this->state->id)
+				->where('group_id = 0')
+				->where('(published = 1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))')
+				->order('id');
+			$db->setQuery($query);
+
+			return $db->loadObjectList();
+		}
+
+		return array();
+	}
+
+	/**
 	 * Get subscribers data from csv file
 	 *
 	 * @param $input

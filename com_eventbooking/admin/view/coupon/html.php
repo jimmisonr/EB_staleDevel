@@ -10,6 +10,11 @@
 // no direct access
 defined('_JEXEC') or die;
 
+/**
+ * Class EventbookingViewCouponHtml
+ *
+ * @property EventbookingModelCoupon $model
+ */
 class EventbookingViewCouponHtml extends RADViewItem
 {
 	protected function prepareView()
@@ -69,6 +74,7 @@ class EventbookingViewCouponHtml extends RADViewItem
 		$this->lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id[]', 'class="input-xlarge" multiple="multiple" ', 'id', 'title', $selectedEventIds);
 		$this->nullDate          = $db->getNullDate();
 		$this->config            = $config;
+		$this->registrants       = $this->model->getRegistrants();
 	}
 
 	/**

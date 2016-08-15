@@ -36,6 +36,13 @@ JHtml::_('formbehavior.chosen', 'select');
 	}
 </script>
 <form action="index.php?option=com_eventbooking&view=coupon" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
+	<?php
+	if (!empty($this->registrants))
+	{
+		echo JHtml::_('bootstrap.startTabSet', 'coupon', array('active' => 'coupon-page'));
+		echo JHtml::_('bootstrap.addTab', 'coupon', 'coupon-page', JText::_('EB_BASIC_INFORMATION', true));
+	}
+	?>
 	<div class="control-group">
 		<label class="control-label">
 			<?php echo JText::_('EB_CODE'); ?>
@@ -136,6 +143,16 @@ JHtml::_('formbehavior.chosen', 'select');
 			<?php echo $this->lists['published']; ?>
 		</div>
 	</div>
+	<?php
+	if (!empty($this->registrants))
+	{
+		echo JHtml::_('bootstrap.endTab');
+		echo JHtml::_('bootstrap.addTab', 'coupon', 'registrants-page', JText::_('EB_COUPON_USAGE', true));
+		echo $this->loadTemplate('registrants');
+		echo JHtml::_('bootstrap.endTab');
+		echo JHtml::_('bootstrap.endTabSet');
+	}
+	?>
 	<div class="clearfix"></div>
 	<?php echo JHtml::_('form.token'); ?>
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>"/>
