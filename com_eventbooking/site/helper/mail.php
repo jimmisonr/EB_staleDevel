@@ -739,11 +739,11 @@ class EventbookingHelperMail
 				$body = $message->deposit_payment_user_email_body;
 			}
 
-			$subject = str_ireplace('[EVENT_TITLE]', $event->title, $subject);
 			foreach ($replaces as $key => $value)
 			{
-				$key  = strtoupper($key);
-				$body = str_ireplace("[$key]", $value, $body);
+				$key     = strtoupper($key);
+				$body    = str_ireplace("[$key]", $value, $body);
+				$subject = str_ireplace("[$key]", $value, $subject);
 			}
 
 			static::send($mailer, array($row->email), $subject, $body);
@@ -956,7 +956,7 @@ class EventbookingHelperMail
 			}
 
 			$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
-			if (strlen($message->{'reminder_email_subject' . $fieldSuffix}))
+			if ($fieldSuffix && strlen($message->{'reminder_email_subject' . $fieldSuffix}))
 			{
 				$emailSubject = $message->{'reminder_email_subject' . $fieldSuffix};
 			}
@@ -969,7 +969,7 @@ class EventbookingHelperMail
 
 			$emailSubject = str_ireplace('[EVENT_TITLE]', $eventTitle, $emailSubject);
 
-			if (strlen($message->{'reminder_email_body' . $fieldSuffix}))
+			if ($fieldSuffix && strlen($message->{'reminder_email_body' . $fieldSuffix}))
 			{
 				$emailBody = $message->{'reminder_email_body' . $fieldSuffix};
 			}
