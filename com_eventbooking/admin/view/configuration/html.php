@@ -194,10 +194,10 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 	 */
 	protected function addToolbar()
 	{
-		JToolBarHelper::title(JText::_('EB_CONFIGURATION'), 'generic.png');
-		JToolBarHelper::apply('apply', 'JTOOLBAR_APPLY');
-		JToolBarHelper::save('save');
-		JToolBarHelper::cancel();
-		JToolBarHelper::preferences('com_eventbooking');
+		JToolbarHelper::title(JText::_('EB_CONFIGURATION'), 'generic.png');
+		JToolbarHelper::apply('apply', 'JTOOLBAR_APPLY');
+		JToolbarHelper::save('save');
+		JToolbarHelper::cancel();
+		JToolbarHelper::preferences('com_eventbooking');
 	}
 }

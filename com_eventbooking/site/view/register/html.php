@@ -157,6 +157,12 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			$data['email'] = $user->email;
 		}
+
+		if ($config->get('auto_populate_form_data') === '0')
+		{
+			$data = array();
+		}
+
 		if (!isset($data['country']) || !$data['country'])
 		{
 			$data['country'] = $config->default_country;
@@ -430,6 +436,12 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			$data['email'] = $user->email;
 		}
+
+		if ($config->get('auto_populate_form_data') === '0')
+		{
+			$data = array();
+		}
+
 		if (!isset($data['country']) || !$data['country'])
 		{
 			$data['country'] = $config->default_country;

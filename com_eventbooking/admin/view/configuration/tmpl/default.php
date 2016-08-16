@@ -327,6 +327,14 @@ JHtml::_('script', 'jui/cms.js', false, true);
 					?>
 					<div class="control-group">
 						<div class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('auto_populate_form_data', JText::_('EB_AUTO_POPULATE_FORM_DATA'), JText::_('EB_AUTO_POPULATE_FORM_DATA_EXPLAIN')); ?>
+						</div>
+						<div class="controls">
+							<?php echo EventbookingHelperHtml::getBooleanInput('auto_populate_form_data', $config->get('auto_populate_form_data', 1)); ?>
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('multiple_booking', JText::_('EB_MULTIPLE_BOOKING'), JText::_('EB_MULTIPLE_BOOKING_EXPLAIN')); ?>
 						</div>
 						<div class="controls">
