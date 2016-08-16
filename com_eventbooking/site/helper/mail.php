@@ -187,7 +187,7 @@ class EventbookingHelperMail
 				{
 					$ics->setLocation($rowLocation->name);
 				}
-				$fileName = JApplication::stringURLSafe($event->title) . '.ics';
+				$fileName = JApplicationHelper::stringURLSafe($event->title) . '.ics';
 				$mailer->addAttachment($ics->save(JPATH_ROOT . '/media/com_eventbooking/icsfiles/', $fileName));
 			}
 
@@ -373,6 +373,11 @@ class EventbookingHelperMail
 	 */
 	public static function sendRegistrationApprovedEmail($row, $config)
 	{
+		if (!JMailHelper::isEmailAddress($row->email))
+		{
+			return;
+		}
+
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 
@@ -474,6 +479,11 @@ class EventbookingHelperMail
 	 */
 	public static function sendRegistrationCancelledEmail($row, $config)
 	{
+		if (!JMailHelper::isEmailAddress($row->email))
+		{
+			return;
+		}
+
 		$app   = JFactory::getApplication();
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
@@ -826,7 +836,7 @@ class EventbookingHelperMail
 			$body = EventbookingHelper::convertImgTags($body);
 			if (JMailHelper::isEmailAddress($user->email))
 			{
-				static::send($message, array($user->email), $subject, $body);
+				static::send($mailer, array($user->email), $subject, $body);
 				$mailer->clearAllRecipients();
 			}
 		}
@@ -887,7 +897,7 @@ class EventbookingHelperMail
 
 		EventbookingHelper::loadLanguage();
 
-		if ($bccEmail)
+		if (JMailHelper::isEmailAddress($bccEmail))
 		{
 			$mailer->addBcc($bccEmail);
 		}
