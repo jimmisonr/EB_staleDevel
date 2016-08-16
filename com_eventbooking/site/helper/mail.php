@@ -44,16 +44,16 @@ class EventbookingHelperMail
 
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
-
 		$query->select('*')
 			->from('#__eb_events')
-			->where('id=' . $row->event_id);
+			->where('id = ' . $row->event_id);
 		$db->setQuery($query);
 		if ($fieldSuffix)
 		{
 			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
 		}
 		$event = $db->loadObject();
+
 		if (strlen(trim($event->notification_emails)) > 0)
 		{
 			$config->notification_emails = $event->notification_emails;
@@ -91,7 +91,7 @@ class EventbookingHelperMail
 		$query->clear()
 			->select('a.*')
 			->from('#__eb_locations AS a')
-			->innerJoin('#__eb_events AS b ON a.id=b.location_id')
+			->innerJoin('#__eb_events AS b ON a.id = b.location_id')
 			->where('b.id=' . $row->event_id);
 
 		$db->setQuery($query);
@@ -303,7 +303,7 @@ class EventbookingHelperMail
 			$mailer->clearReplyTos();
 		}
 
-		// Add invoice to admin email if needed
+		// Send notification emails to admin if needed
 		if ($config->send_emails == 0 || $config->send_emails == 1)
 		{
 			if ($config->send_invoice_to_admin && !empty($invoiceFilePath) && file_exists($invoiceFilePath))
@@ -318,7 +318,7 @@ class EventbookingHelperMail
 			}
 
 			$emails = $emails = explode(',', $config->notification_emails);
-			if (strlen($message->{'admin_email_subject' . $fieldSuffix}))
+			if ($fieldSuffix && strlen($message->{'admin_email_subject' . $fieldSuffix}))
 			{
 				$subject = $message->{'admin_email_subject' . $fieldSuffix};
 			}
@@ -327,7 +327,7 @@ class EventbookingHelperMail
 				$subject = $message->admin_email_subject;
 			}
 
-			if (EventbookingHelper::isValidMessage($message->{'admin_email_body' . $fieldSuffix}))
+			if ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'admin_email_body' . $fieldSuffix}))
 			{
 				$body = $message->{'admin_email_body' . $fieldSuffix};
 			}
@@ -406,7 +406,7 @@ class EventbookingHelperMail
 
 		$query->select('*')
 			->from('#__eb_events')
-			->where('id=' . $row->event_id);
+			->where('id = ' . $row->event_id);
 		$db->setQuery($query);
 		if ($fieldSuffix)
 		{
@@ -627,7 +627,7 @@ class EventbookingHelperMail
 		$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
 
 		//Notification email send to user
-		if (strlen($message->{'watinglist_confirmation_subject' . $fieldSuffix}))
+		if ($fieldSuffix && strlen($message->{'watinglist_confirmation_subject' . $fieldSuffix}))
 		{
 			$subject = $message->{'watinglist_confirmation_subject' . $fieldSuffix};
 		}
@@ -635,7 +635,8 @@ class EventbookingHelperMail
 		{
 			$subject = $message->watinglist_confirmation_subject;
 		}
-		if (EventbookingHelper::isValidMessage($message->{'watinglist_confirmation_body' . $fieldSuffix}))
+
+		if ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'watinglist_confirmation_body' . $fieldSuffix}))
 		{
 			$body = $message->{'watinglist_confirmation_body' . $fieldSuffix};
 		}
@@ -653,8 +654,8 @@ class EventbookingHelperMail
 		if (JMailHelper::isEmailAddress($row->email))
 		{
 			static::send($mailer, array($row->email), $subject, $body);
+			$mailer->clearAllRecipients();
 		}
-		$mailer->clearAllRecipients();
 
 		$emails = explode(',', $config->notification_emails);
 
@@ -720,7 +721,7 @@ class EventbookingHelperMail
 		//Notification email send to user
 		if (JMailHelper::isEmailAddress($row->email))
 		{
-			if (strlen($message->{'deposit_payment_user_email_subject' . $fieldSuffix}))
+			if ($fieldSuffix && strlen($message->{'deposit_payment_user_email_subject' . $fieldSuffix}))
 			{
 				$subject = $message->{'deposit_payment_user_email_subject' . $fieldSuffix};
 			}
@@ -729,7 +730,7 @@ class EventbookingHelperMail
 				$subject = $message->deposit_payment_user_email_subject;
 			}
 
-			if (EventbookingHelper::isValidMessage($message->{'deposit_payment_user_email_body' . $fieldSuffix}))
+			if ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'deposit_payment_user_email_body' . $fieldSuffix}))
 			{
 				$body = $message->{'deposit_payment_user_email_body' . $fieldSuffix};
 			}
@@ -806,7 +807,7 @@ class EventbookingHelperMail
 
 		//Notification email send to user
 
-		if (strlen($message->{'submit_event_user_email_subject' . $fieldSuffix}))
+		if ($fieldSuffix && strlen($message->{'submit_event_user_email_subject' . $fieldSuffix}))
 		{
 			$subject = $message->{'submit_event_user_email_subject' . $fieldSuffix};
 		}
@@ -815,7 +816,7 @@ class EventbookingHelperMail
 			$subject = $message->submit_event_user_email_subject;
 		}
 
-		if (EventbookingHelper::isValidMessage($message->{'submit_event_user_email_body' . $fieldSuffix}))
+		if ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'submit_event_user_email_body' . $fieldSuffix}))
 		{
 			$body = $message->{'submit_event_user_email_body' . $fieldSuffix};
 		}
@@ -1025,8 +1026,8 @@ class EventbookingHelperMail
 			static::send($mailer, array($row->email), $emailSubject, $emailBody);
 			$mailer->clearAddresses();
 
-			$query->clear();
-			$query->update('#__eb_registrants')
+			$query->clear()
+				->update('#__eb_registrants')
 				->set('is_reminder_sent = 1')
 				->where('id = ' . (int) $row->id);
 			$db->setQuery($query);
@@ -1118,8 +1119,8 @@ class EventbookingHelperMail
 			static::send($mailer, array($row->email), $emailSubject, $emailBody);
 			$mailer->clearAddresses();
 
-			$query->clear();
-			$query->update('#__eb_registrants')
+			$query->clear()
+				->update('#__eb_registrants')
 				->set('is_deposit_payment_reminder_sent = 1')
 				->where('id = ' . (int) $row->id);
 			$db->setQuery($query);
