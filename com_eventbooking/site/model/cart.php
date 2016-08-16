@@ -76,10 +76,12 @@ class EventbookingModelCart extends RADModel
 	public function processCheckout(&$data)
 	{
 		jimport('joomla.user.helper');
-		$db                     = JFactory::getDbo();
-		$query                  = $db->getQuery(true);
-		$user                   = JFactory::getUser();
-		$config                 = EventbookingHelper::getConfig();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+		$user   = JFactory::getUser();
+		$config = EventbookingHelper::getConfig();
+
+		/* @var EventbookingTableRegistrant $row */
 		$row                    = JTable::getInstance('EventBooking', 'Registrant');
 		$data['transaction_id'] = strtoupper(JUserHelper::genRandomPassword());
 		$cart                   = new EventbookingHelperCart();
@@ -121,7 +123,7 @@ class EventbookingModelCart extends RADModel
 		$membersTaxAmount      = $fees['members_tax_amount'];
 		$membersLateFee        = $fees['members_late_fee'];
 
-		$count = 0;
+		$count  = 0;
 		$userIp = EventbookingHelper::getUserIp();
 
 		for ($i = 0, $n = count($items); $i < $n; $i++)
@@ -175,10 +177,10 @@ class EventbookingModelCart extends RADModel
 					$total = $db->loadResult();
 					if (!$total)
 					{
+						$row->registration_code = $registrationCode;
 						break;
 					}
 				}
-				$row->registration_code = $registrationCode;
 			}
 			else
 			{
@@ -199,24 +201,28 @@ class EventbookingModelCart extends RADModel
 
 			if ($config->collect_member_information_in_cart)
 			{
-				for ($j = 0 ; $j < $row->number_registrants; $j++)
+				for ($j = 0; $j < $row->number_registrants; $j++)
 				{
 					$count++;
-					$rowMember                     = JTable::getInstance('EventBooking', 'Registrant');
-					$rowMember->group_id           = $row->id;
-					$rowMember->transaction_id     = $row->transaction_id;
-					$rowMember->event_id           = $row->event_id;
-					$rowMember->payment_method     = $row->payment_method;
-					$rowMember->user_id            = $row->user_id;
-					$rowMember->register_date      = $row->register_date;
+
+					/* @var EventbookingTableRegistrant $rowMember */
+					$rowMember                 = JTable::getInstance('EventBooking', 'Registrant');
+					$rowMember->group_id       = $row->id;
+					$rowMember->transaction_id = $row->transaction_id;
+					$rowMember->event_id       = $row->event_id;
+					$rowMember->payment_method = $row->payment_method;
+					$rowMember->user_id        = $row->user_id;
+					$rowMember->register_date  = $row->register_date;
+					$rowMember->user_ip        = $row->user_ip;
 
 					$rowMember->total_amount       = $membersTotalAmount[$eventId][$j];
 					$rowMember->discount_amount    = $membersDiscountAmount[$eventId][$j];
 					$rowMember->late_fee           = $membersLateFee[$eventId][$j];
 					$rowMember->tax_amount         = $membersTaxAmount[$eventId][$j];
 					$rowMember->amount             = $rowMember->total_amount - $rowMember->discount_amount + $rowMember->tax_amount + $rowMember->late_fee;
-
 					$rowMember->number_registrants = 1;
+
+					/* @var RADForm $memberForm */
 					$memberForm = $membersForm[$eventId][$j];
 					$memberForm->removeFieldSuffix();
 
