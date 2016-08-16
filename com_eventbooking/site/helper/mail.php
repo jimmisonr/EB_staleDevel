@@ -1,152 +1,323 @@
 <?php
 /**
- * @package        Joomla
- * @subpackage     Membership Pro
- * @author         Tuan Pham Ngoc
- * @copyright      Copyright (C) 2012 - 2016 Ossolution Team
- * @license        GNU/GPL, see LICENSE.php
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 
 // no direct access
 defined('_JEXEC') or die;
 
-class OSMembershipHelperMail
+class EventbookingHelperMail
 {
 	/**
-	 * Send email to super administrator and user
+	 * From Name
 	 *
-	 * @param OSMembershipTableSubscriber $row
+	 * @var string
+	 */
+	public static $fromName;
+
+	/**
+	 * From Email
+	 *
+	 * @var string
+	 */
+	public static $fromEmail;
+
+	/**
+	 * Helper function for sending emails to registrants and administrator
+	 *
+	 * @param EventbookingTableRegistrant $row
 	 * @param object                      $config
 	 */
 	public static function sendEmails($row, $config)
 	{
-		$db          = JFactory::getDbo();
-		$query       = $db->getQuery(true);
-		$fieldSuffix = OSMembershipHelper::getFieldSuffix($row->language);
-
-		$query->select('*')
-			->from('#__osmembership_plans')
-			->where('id = ' . $row->plan_id);
-
-		if ($fieldSuffix)
+		if ($config->send_emails == 3)
 		{
-			OSMembershipHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
+			return;
 		}
 
-		$db->setQuery($query);
-		$plan = $db->loadObject();
+		$message     = EventbookingHelper::getMessages();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 
-		if ($plan->notification_emails)
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+
+		$query->select('*')
+			->from('#__eb_events')
+			->where('id=' . $row->event_id);
+		$db->setQuery($query);
+		if ($fieldSuffix)
 		{
-			$config->notification_emails = $plan->notification_emails;
+			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
+		}
+		$event = $db->loadObject();
+		if (strlen(trim($event->notification_emails)) > 0)
+		{
+			$config->notification_emails = $event->notification_emails;
 		}
 
 		$mailer = static::getMailer($config);
 
-		$message = OSMembershipHelper::getMessages();
-
-		if ($row->act == 'upgrade')
+		if ($event->created_by)
 		{
-			static::sendMembershipUpgradeEmails($mailer, $row, $plan, $config, $message, $fieldSuffix);
-
-			return;
+			$eventCreator = JUser::getInstance($event->created_by);
+			if (JMailHelper::isEmailAddress($eventCreator->email) && !$eventCreator->authorise('core.admin'))
+			{
+				$mailer->addReplyTo($eventCreator->email);
+			}
 		}
 
-		if ($row->act == 'renew')
+		if ($config->multiple_booking)
 		{
-			static::sendMembershipRenewalEmails($mailer, $row, $plan, $config, $message, $fieldSuffix);
-
-			return;
+			$rowFields = EventbookingHelper::getFormFields($row->id, 4);
 		}
-
-		$rowFields              = OSMembershipHelper::getProfileFields($row->plan_id);
-		$emailContent           = OSMembershipHelper::getEmailContent($config, $row);
-		$replaces               = OSMembershipHelper::buildTags($row, $config);
-		$replaces['plan_title'] = $plan->title;
-
-		// Get the message from the plan if needed
-		if ($plan->{'user_email_subject' . $fieldSuffix})
+		elseif ($row->is_group_billing)
 		{
-			$message->{'user_email_subject' . $fieldSuffix} = $plan->{'user_email_subject' . $fieldSuffix};
-		}
-
-		if (strlen(strip_tags($plan->{'user_email_body' . $fieldSuffix})))
-		{
-			$message->{'user_email_body' . $fieldSuffix} = $plan->{'user_email_body' . $fieldSuffix};
-		}
-
-		if (strlen(strip_tags($plan->{'user_email_body_offline' . $fieldSuffix})))
-		{
-			$message->{'user_email_body_offline' . $fieldSuffix} = $plan->{'user_email_body_offline' . $fieldSuffix};
-		}
-
-		if (strlen($message->{'user_email_subject' . $fieldSuffix}))
-		{
-			$subject = $message->{'user_email_subject' . $fieldSuffix};
+			$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
 		}
 		else
 		{
-			$subject = $message->user_email_subject;
+			$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
 		}
+		$form = new RADForm($rowFields);
+		$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+		$form->bind($data);
+		$form->buildFieldsDependency();
+		$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
 
-		if ($row->payment_method == 'os_offline' && $row->published == 0)
+		$query->clear()
+			->select('a.*')
+			->from('#__eb_locations AS a')
+			->innerJoin('#__eb_events AS b ON a.id=b.location_id')
+			->where('b.id=' . $row->event_id);
+
+		$db->setQuery($query);
+		$rowLocation = $db->loadObject();
+
+		// Notification email send to user
+		if ($config->send_emails == 0 || $config->send_emails == 2)
 		{
-			if (strlen(strip_tags($message->{'user_email_body_offline' . $fieldSuffix})))
+			if ($fieldSuffix && strlen($message->{'user_email_subject' . $fieldSuffix}))
 			{
-				$body = $message->{'user_email_body_offline' . $fieldSuffix};
+				$subject = $message->{'user_email_subject' . $fieldSuffix};
 			}
 			else
 			{
-				$body = $message->user_email_body_offline;
+				$subject = $message->user_email_subject;
 			}
-		}
-		else
-		{
-			if (strlen(strip_tags($message->{'user_email_body' . $fieldSuffix})))
+
+			if (!$row->published && strpos($row->payment_method, 'os_offline') !== false)
 			{
-				$body = $message->{'user_email_body' . $fieldSuffix};
+				if ($fieldSuffix && EventbookingHelper::isValidMessage($event->{'user_email_body_offline' . $fieldSuffix}))
+				{
+					$body = $event->{'user_email_body_offline' . $fieldSuffix};
+				}
+				elseif ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'user_email_body_offline' . $fieldSuffix}))
+				{
+					$body = $message->{'user_email_body_offline' . $fieldSuffix};
+				}
+				elseif (EventbookingHelper::isValidMessage($event->user_email_body_offline))
+				{
+					$body = $event->user_email_body_offline;
+				}
+				else
+				{
+					$body = $message->user_email_body_offline;
+				}
 			}
 			else
 			{
-				$body = $message->user_email_body;
+				if ($fieldSuffix && EventbookingHelper::isValidMessage($event->{'user_email_body' . $fieldSuffix}))
+				{
+					$body = $event->{'user_email_body' . $fieldSuffix};
+				}
+				elseif ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'user_email_body' . $fieldSuffix}))
+				{
+					$body = $message->{'user_email_body' . $fieldSuffix};
+				}
+				elseif (EventbookingHelper::isValidMessage($event->user_email_body))
+				{
+					$body = $event->user_email_body;
+				}
+				else
+				{
+					$body = $message->user_email_body;
+				}
 			}
-		}
 
-		$subject = str_replace('[PLAN_TITLE]', $plan->title, $subject);
-		$body    = str_replace('[SUBSCRIPTION_DETAIL]', $emailContent, $body);
-		foreach ($replaces as $key => $value)
-		{
-			$key     = strtoupper($key);
-			$subject = str_ireplace("[$key]", $value, $subject);
-			$body    = str_ireplace("[$key]", $value, $body);
-		}
-
-		if ($config->activate_invoice_feature && $config->send_invoice_to_customer && OSMembershipHelper::needToCreateInvoice($row))
-		{
-			if (!$row->invoice_number)
+			foreach ($replaces as $key => $value)
 			{
-				$row->invoice_number = OSMembershipHelper::getInvoiceNumber($row);
-				$row->store();
+				$key     = strtoupper($key);
+				$subject = str_ireplace("[$key]", $value, $subject);
+				$body    = str_ireplace("[$key]", $value, $body);
 			}
-			OSMembershipHelper::generateInvoicePDF($row);
-			$mailer->addAttachment(JPATH_ROOT . '/media/com_osmembership/invoices/' . OSMembershipHelper::formatInvoiceNumber($row, $config) . '.pdf');
-		}
+			$body = EventbookingHelper::convertImgTags($body);
 
-		if (JMailHelper::isEmailAddress($row->email))
-		{
-			static::send($mailer, array($row->email), $subject, $body);
-			$mailer->clearAllRecipients();
-		}
+			if (strpos($body, '[QRCODE]') !== false)
+			{
+				EventbookingHelper::generateQrcode($row->id);
+				$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+				$body   = str_ireplace("[QRCODE]", $imgTag, $body);
+			}
 
-		if (!$config->send_invoice_to_admin)
-		{
+			$invoiceFilePath = '';
+			if ($config->activate_invoice_feature && $config->send_invoice_to_customer && $row->invoice_number)
+			{
+				EventbookingHelper::generateInvoicePDF($row);
+				$invoiceFilePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
+				$mailer->addAttachment($invoiceFilePath);
+			}
+
+			static::addEventAttachments($mailer, $row, $event, $config);
+
+			//Generate and send ics file to registrants
+			if ($config->send_ics_file)
+			{
+				$ics = new EventbookingHelperIcs();
+				$ics->setName($event->title)
+					->setDescription($event->short_description)
+					->setOrganizer(static::$fromEmail, static::$fromName)
+					->setStart($event->event_date)
+					->setEnd($event->event_end_date);
+
+				if ($rowLocation)
+				{
+					$ics->setLocation($rowLocation->name);
+				}
+				$fileName = JApplication::stringURLSafe($event->title) . '.ics';
+				$mailer->addAttachment($ics->save(JPATH_ROOT . '/media/com_eventbooking/icsfiles/', $fileName));
+			}
+
+			if (JMailHelper::isEmailAddress($row->email))
+			{
+				static::send($mailer, array($row->email), $subject, $body);
+				$mailer->clearAllRecipients();
+			}
+
+			if ($config->send_email_to_group_members && $row->is_group_billing)
+			{
+				// Remove invoice from attachment, group members should not receive invoice
+				if ($invoiceFilePath && file_exists($invoiceFilePath))
+				{
+					$mailer->removeAttachment(0);
+				}
+
+				$query->clear()
+					->select('*')
+					->from('#__eb_registrants')
+					->where('group_id = ' . $row->id)
+					->order('id');
+				$db->setQuery($query);
+				$rowMembers = $db->loadObjectList();
+				if (count($rowMembers))
+				{
+					$memberReplaces                      = array();
+					$memberReplaces['event_title']       = $replaces['event_title'];
+					$memberReplaces['event_date']        = $replaces['event_date'];
+					$memberReplaces['transaction_id']    = $replaces['transaction_id'];
+					$memberReplaces['date']              = $replaces['date'];
+					$memberReplaces['short_description'] = $replaces['short_description'];
+					$memberReplaces['description']       = $replaces['short_description'];
+					$memberReplaces['location']          = $replaces['location'];
+					$memberFormFields                    = EventbookingHelper::getFormFields($row->event_id, 2);
+					foreach ($rowMembers as $rowMember)
+					{
+						if (!JMailHelper::isEmailAddress($rowMember->email))
+						{
+							continue;
+						}
+
+						if (strlen($message->{'group_member_email_subject' . $fieldSuffix}))
+						{
+							$subject = $message->{'group_member_email_subject' . $fieldSuffix};
+						}
+						else
+						{
+							$subject = $message->group_member_email_subject;
+						}
+
+						if (EventbookingHelper::isValidMessage($message->{'group_member_email_body' . $fieldSuffix}))
+						{
+							$body = $message->{'group_member_email_body' . $fieldSuffix};
+						}
+						else
+						{
+							$body = $message->group_member_email_body;
+						}
+
+						if (!$subject)
+						{
+							break;
+						}
+
+						if (!$body)
+						{
+							break;
+						}
+
+						//Build the member form
+						$memberForm = new RADForm($memberFormFields);
+						$memberData = EventbookingHelper::getRegistrantData($rowMember, $memberFormFields);
+						$memberForm->bind($memberData);
+						$memberForm->buildFieldsDependency();
+						$fields = $memberForm->getFields();
+						foreach ($fields as $field)
+						{
+							if ($field->hideOnDisplay)
+							{
+								$fieldValue = '';
+							}
+							else
+							{
+								if (is_string($field->value) && is_array(json_decode($field->value)))
+								{
+									$fieldValue = implode(', ', json_decode($field->value));
+								}
+								else
+								{
+									$fieldValue = $field->value;
+								}
+							}
+							$memberReplaces[$field->name] = $fieldValue;
+						}
+						$memberReplaces['member_detail'] = EventbookingHelper::getMemberDetails($config, $rowMember, $event, $rowLocation, true, $memberForm);
+						foreach ($memberReplaces as $key => $value)
+						{
+							$key     = strtoupper($key);
+							$body    = str_ireplace("[$key]", $value, $body);
+							$subject = str_ireplace("[$key]", $value, $subject);
+						}
+						$body = EventbookingHelper::convertImgTags($body);
+
+						static::send($mailer, array($rowMember->email), $subject, $body);
+						$mailer->clearAllRecipients();
+					}
+				}
+			}
+
+			// Clear attachments
 			$mailer->clearAttachments();
+			$mailer->clearReplyTos();
 		}
 
-		if (!$config->disable_notification_to_admin)
+		// Add invoice to admin email if needed
+		if ($config->send_emails == 0 || $config->send_emails == 1)
 		{
-			$emails = explode(',', $config->notification_emails);
+			if ($config->send_invoice_to_admin && !empty($invoiceFilePath) && file_exists($invoiceFilePath))
+			{
+				$mailer->addAttachment($invoiceFilePath);
+			}
 
+			// Send attachment to admin email if needed
+			if ($config->send_attachments_to_admin)
+			{
+				static::addRegistrationFormAttachments($mailer, $rowFields, $replaces);
+			}
+
+			$emails = $emails = explode(',', $config->notification_emails);
 			if (strlen($message->{'admin_email_subject' . $fieldSuffix}))
 			{
 				$subject = $message->{'admin_email_subject' . $fieldSuffix};
@@ -155,9 +326,8 @@ class OSMembershipHelperMail
 			{
 				$subject = $message->admin_email_subject;
 			}
-			$subject = str_replace('[PLAN_TITLE]', $plan->title, $subject);
 
-			if (strlen(strip_tags($message->{'admin_email_body' . $fieldSuffix})))
+			if (EventbookingHelper::isValidMessage($message->{'admin_email_body' . $fieldSuffix}))
 			{
 				$body = $message->{'admin_email_body' . $fieldSuffix};
 			}
@@ -166,9 +336,10 @@ class OSMembershipHelperMail
 				$body = $message->admin_email_body;
 			}
 
-			$emailContent = OSMembershipHelper::getEmailContent($config, $row, true);
-
-			$body = str_replace('[SUBSCRIPTION_DETAIL]', $emailContent, $body);
+			if ($row->payment_method == 'os_offline_creditcard')
+			{
+				$replaces['registration_detail'] = EventbookingHelper::getEmailContent($config, $row, true, $form, true);
+			}
 
 			foreach ($replaces as $key => $value)
 			{
@@ -176,175 +347,18 @@ class OSMembershipHelperMail
 				$subject = str_ireplace("[$key]", $value, $subject);
 				$body    = str_ireplace("[$key]", $value, $body);
 			}
+			$body = EventbookingHelper::convertImgTags($body);
 
-			if ($config->send_attachments_to_admin)
+			if (strpos($body, '[QRCODE]') !== false)
 			{
-				self::addAttachments($mailer, $rowFields, $replaces);
+				EventbookingHelper::generateQrcode($row->id);
+				$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+				$body   = str_ireplace("[QRCODE]", $imgTag, $body);
 			}
 
-			static::send($mailer, $emails, $subject, $body);
-		}
-
-		//After sending email, we can empty the user_password of subscription was activated
-		if ($row->published == 1 && $row->user_password)
-		{
-			$query->clear()
-				->update('#__osmembership_subscribers')
-				->set('user_password = ""')
-				->where('id = ' . $row->id);
-			$db->setQuery($query);
-			$db->execute();
-		}
-	}
-
-	/**
-	 * Send email when subscriber upgrade their membership
-	 *
-	 * @param JMail                       $mailer
-	 * @param OSMembershipTableSubscriber $row
-	 * @param stdClass                    $plan
-	 * @param stdClass                    $config
-	 * @param stdClass                    $message
-	 * @param string                      $fieldSuffix
-	 */
-	public static function sendMembershipRenewalEmails($mailer, $row, $plan, $config, $message, $fieldSuffix)
-	{
-		if ($row->renew_option_id == OSM_DEFAULT_RENEW_OPTION_ID)
-		{
-			$numberDays = $plan->subscription_length;
-		}
-		else
-		{
-			$db    = JFactory::getDbo();
-			$query = $db->getQuery(true);
-			$query->select('number_days')
-				->from('#__osmembership_renewrates')
-				->where('id = ' . $row->renew_option_id);
-			$db->setQuery($query);
-			$numberDays = $db->loadResult();
-		}
-
-		// Get list of fields
-		$rowFields = OSMembershipHelper::getProfileFields($row->plan_id);
-
-		$emailContent            = OSMembershipHelper::getEmailContent($config, $row);
-		$replaces                = OSMembershipHelper::buildTags($row, $config);
-		$replaces['plan_title']  = $plan->title;
-		$replaces['number_days'] = $numberDays;
-
-		// Use plan messages if needed
-		if (strlen($plan->{'user_renew_email_subject' . $fieldSuffix}))
-		{
-			$message->{'user_renew_email_subject' . $fieldSuffix} = $plan->{'user_renew_email_subject' . $fieldSuffix};
-		}
-
-		if (strlen(strip_tags($plan->{'user_renew_email_body' . $fieldSuffix})))
-		{
-			$message->{'user_renew_email_body' . $fieldSuffix} = $plan->{'user_renew_email_body' . $fieldSuffix};
-		}
-
-		if (strlen($message->{'user_renew_email_subject' . $fieldSuffix}))
-		{
-			$subject = $message->{'user_renew_email_subject' . $fieldSuffix};
-		}
-		else
-		{
-			$subject = $message->user_renew_email_subject;
-		}
-
-		$subject = str_replace('[PLAN_TITLE]', $plan->title, $subject);
-
-		if (strlen(strip_tags($message->{'user_renew_email_body' . $fieldSuffix})))
-		{
-			$body = $message->{'user_renew_email_body' . $fieldSuffix};
-		}
-		else
-		{
-			$body = $message->user_renew_email_body;
-		}
-
-		// Use offline payment email message if available
-		if ($row->payment_method == 'os_offline' && $row->published == 0)
-		{
-			if (strlen(strip_tags($message->{'renew_thanks_message_offline' . $fieldSuffix})))
+			if (!empty($eventCreator->email) && !$eventCreator->authorise('core.admin') && JMailHelper::isEmailAddress($eventCreator->email) && !in_array($eventCreator->email, $emails))
 			{
-				$body = $message->{'renew_thanks_message_offline' . $fieldSuffix};
-			}
-			elseif (strlen(strip_tags($message->renew_thanks_message_offline)))
-			{
-				$body = $message->renew_thanks_message_offline;
-			}
-		}
-
-		$body = str_replace('[SUBSCRIPTION_DETAIL]', $emailContent, $body);
-		foreach ($replaces as $key => $value)
-		{
-			$key     = strtoupper($key);
-			$subject = str_ireplace("[$key]", $value, $subject);
-			$body    = str_ireplace("[$key]", $value, $body);
-		}
-
-		if ($config->activate_invoice_feature && $config->send_invoice_to_customer && OSMembershipHelper::needToCreateInvoice($row))
-		{
-			if (!$row->invoice_number)
-			{
-				$row->invoice_number = OSMembershipHelper::getInvoiceNumber($row);
-				$row->store();
-			}
-			OSMembershipHelper::generateInvoicePDF($row);
-			$mailer->addAttachment(JPATH_ROOT . '/media/com_osmembership/invoices/' . OSMembershipHelper::formatInvoiceNumber($row, $config) . '.pdf');
-		}
-
-		if (JMailHelper::isEmailAddress($row->email))
-		{
-			static::send($mailer, array($row->email), $subject, $body);
-			$mailer->clearAllRecipients();
-		}
-
-		if (!$config->send_invoice_to_admin)
-		{
-			$mailer->clearAttachments();
-		}
-
-		if (!$config->disable_notification_to_admin)
-		{
-			$emails = explode(',', $config->notification_emails);
-
-			if (strlen($message->{'admin_renw_email_subject' . $fieldSuffix}))
-			{
-				$subject = $message->{'admin_renw_email_subject' . $fieldSuffix};
-			}
-			else
-			{
-				$subject = $message->admin_renw_email_subject;
-			}
-			$subject = str_replace('[PLAN_TITLE]', $plan->title, $subject);
-
-			if (strlen(strip_tags($message->{'admin_renew_email_body' . $fieldSuffix})))
-			{
-				$body = $message->{'admin_renew_email_body' . $fieldSuffix};
-			}
-			else
-			{
-				$body = $message->admin_renew_email_body;
-			}
-
-			if ($row->payment_method == 'os_creditcard')
-			{
-				$emailContent = OSMembershipHelper::getEmailContent($config, $row, true);
-			}
-			$body = str_replace('[SUBSCRIPTION_DETAIL]', $emailContent, $body);
-			foreach ($replaces as $key => $value)
-			{
-				$key     = strtoupper($key);
-				$subject = str_ireplace("[$key]", $value, $subject);
-				$body    = str_ireplace("[$key]", $value, $body);
-			}
-
-			//We will need to get attachment data here
-			if ($config->send_attachments_to_admin)
-			{
-				static::addAttachments($mailer, $rowFields, $replaces);
+				$emails[] = $eventCreator->email;
 			}
 
 			static::send($mailer, $emails, $subject, $body);
@@ -352,364 +366,142 @@ class OSMembershipHelperMail
 	}
 
 	/**
-	 * Send email when someone upgrade their membership
+	 * Send email to registrant when admin approves his registration
 	 *
-	 * @param JMail                       $mailer
-	 * @param OSMembershipTableSubscriber $row
-	 * @param stdClass                    $plan
-	 * @param stdClass                    $config
-	 * @param stdClass                    $message
-	 * @param string                      $fieldSuffix
+	 * @param EventbookingTableRegistrant $row
+	 * @param RADConfig                   $config
 	 */
-	public static function sendMembershipUpgradeEmails($mailer, $row, $plan, $config, $message, $fieldSuffix)
+	public static function sendRegistrationApprovedEmail($row, $config)
 	{
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 
-		//Get from plan title
-		$query->select('b.title' . $fieldSuffix . ' AS title')
-			->from('#__osmembership_upgraderules AS a')
-			->innerJoin('#__osmembership_plans AS b ON a.from_plan_id = b.id')
-			->where('a.id = ' . $row->upgrade_option_id);
-		$db->setQuery($query);
-		$planTitle = $db->loadResult();
+		EventbookingHelper::loadLanguage();
 
-		$rowFields = OSMembershipHelper::getProfileFields($row->plan_id);
+		$message     = EventbookingHelper::getMessages();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
+		$mailer      = static::getMailer($config);
 
-		$emailContent              = OSMembershipHelper::getEmailContent($config, $row);
-		$replaces                  = OSMembershipHelper::buildTags($row, $config);
-		$replaces['plan_title']    = $planTitle;
-		$replaces['to_plan_title'] = $plan->title;
-
-		if (strlen($message->{'user_upgrade_email_subject' . $fieldSuffix}))
+		if ($config->multiple_booking)
 		{
-			$subject = $message->{'user_upgrade_email_subject' . $fieldSuffix};
+			$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+		}
+		elseif ($row->is_group_billing)
+		{
+			$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
 		}
 		else
 		{
-			$subject = $message->user_upgrade_email_subject;
+			$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
 		}
-		$subject = str_replace('[TO_PLAN_TITLE]', $plan->title, $subject);
-		$subject = str_replace('[PLAN_TITLE]', $planTitle, $subject);
-		if (strlen(strip_tags($message->{'user_upgrade_email_body' . $fieldSuffix})))
-		{
-			$body = $message->{'user_upgrade_email_body' . $fieldSuffix};
-		}
-		else
-		{
-			$body = $message->user_upgrade_email_body;
-		}
-		$body = str_replace('[SUBSCRIPTION_DETAIL]', $emailContent, $body);
-		foreach ($replaces as $key => $value)
-		{
-			$key     = strtoupper($key);
-			$subject = str_ireplace("[$key]", $value, $subject);
-			$body    = str_ireplace("[$key]", $value, $body);
-		}
-		$attachment = null;
-		if ($config->activate_invoice_feature && $config->send_invoice_to_customer && OSMembershipHelper::needToCreateInvoice($row))
-		{
-			if (!$row->invoice_number)
-			{
-				$row->invoice_number = OSMembershipHelper::getInvoiceNumber($row);
-				$row->store();
-			}
-			OSMembershipHelper::generateInvoicePDF($row);
-			$mailer->addAttachment(JPATH_ROOT . '/media/com_osmembership/invoices/' . OSMembershipHelper::formatInvoiceNumber($row, $config) . '.pdf');
-		}
-
-		if (JMailHelper::isEmailAddress($row->email))
-		{
-			static::send($mailer, array($row->email), $subject, $body);
-			$mailer->clearAllRecipients();
-		}
-
-		if (!$config->send_invoice_to_admin)
-		{
-			$mailer->clearAttachments();
-		}
-
-		//Send emails to notification emails
-		if (!$config->disable_notification_to_admin)
-		{
-			$emails = explode(',', $config->notification_emails);
-
-			if (strlen($message->{'admin_upgrade_email_subject' . $fieldSuffix}))
-			{
-				$subject = $message->{'admin_upgrade_email_subject' . $fieldSuffix};
-			}
-			else
-			{
-				$subject = $message->admin_upgrade_email_subject;
-			}
-			$subject = str_replace('[TO_PLAN_TITLE]', $plan->title, $subject);
-			$subject = str_replace('[PLAN_TITLE]', $planTitle, $subject);
-			if (strlen(strip_tags($message->{'admin_upgrade_email_body' . $fieldSuffix})))
-			{
-				$body = $message->{'admin_upgrade_email_body' . $fieldSuffix};
-			}
-			else
-			{
-				$body = $message->admin_upgrade_email_body;
-			}
-			if ($row->payment_method == 'os_creditcard')
-			{
-				$emailContent = OSMembershipHelper::getEmailContent($config, $row, true);
-			}
-			$body = str_replace('[SUBSCRIPTION_DETAIL]', $emailContent, $body);
-			foreach ($replaces as $key => $value)
-			{
-				$key     = strtoupper($key);
-				$subject = str_ireplace("[$key]", $value, $subject);
-				$body    = str_ireplace("[$key]", $value, $body);
-			}
-
-			// Add attachments which subscriber upload to notification emails
-			if ($config->send_attachments_to_admin)
-			{
-				static::addAttachments($mailer, $rowFields, $replaces);
-			}
-
-			static::send($mailer, $emails, $subject, $body);
-		}
-	}
-
-	/**
-	 * Send email to subscriber to inform them that their membership approved (and activated)
-	 *
-	 * @param object $row
-	 */
-	public static function sendMembershipApprovedEmail($row)
-	{
-		// Load frontend language file
-		if ($row->language && $row->language != '*')
-		{
-			$lang = JFactory::getLanguage();
-			$lang->load('com_osmembership', JPATH_ROOT, $row->language);
-		}
-
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-
-		$config = OSMembershipHelper::getConfig();
-
-		$mailer = static::getMailer($config);
-
-		$message     = OSMembershipHelper::getMessages();
-		$fieldSuffix = OSMembershipHelper::getFieldSuffix($row->language);
+		$form = new RADForm($rowFields);
+		$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+		$form->bind($data);
+		$form->buildFieldsDependency();
 
 		$query->select('*')
-			->from('#__osmembership_plans')
-			->where('id = ' . $row->plan_id);
-
+			->from('#__eb_events')
+			->where('id=' . $row->event_id);
+		$db->setQuery($query);
 		if ($fieldSuffix)
 		{
-			OSMembershipHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
+			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
 		}
+		$event = $db->loadObject();
 
-		$db->setQuery($query);
-		$plan = $db->loadObject();
+		$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
 
-		$emailContent           = OSMembershipHelper::getEmailContent($config, $row);
-		$replaces               = OSMembershipHelper::buildTags($row, $config);
-		$replaces['plan_title'] = $plan->title;
-
-		// Override messages from plan settings if needed
-		if (strlen($plan->{'subscription_approved_email_subject' . $fieldSuffix}))
+		if (strlen(trim($event->registration_approved_email_subject)))
 		{
-			$message->{'subscription_approved_email_subject' . $fieldSuffix} = $plan->{'subscription_approved_email_subject' . $fieldSuffix};
+			$subject = $event->registration_approved_email_subject;
 		}
-
-		if (strlen(strip_tags($plan->{'subscription_approved_email_body' . $fieldSuffix})))
+		elseif (strlen($message->{'registration_approved_email_subject' . $fieldSuffix}))
 		{
-			$message->{'subscription_approved_email_body' . $fieldSuffix} = $plan->{'subscription_approved_email_body' . $fieldSuffix};
-		}
-
-		if (strlen($message->{'subscription_approved_email_subject' . $fieldSuffix}))
-		{
-			$subject = $message->{'subscription_approved_email_subject' . $fieldSuffix};
+			$subject = $message->{'registration_approved_email_subject' . $fieldSuffix};
 		}
 		else
 		{
-			$subject = $message->subscription_approved_email_subject;
+			$subject = $message->registration_approved_email_subject;
 		}
 
-		$subject = str_replace('[PLAN_TITLE]', $plan->title, $subject);
-		if (strlen(strip_tags($message->{'subscription_approved_email_body' . $fieldSuffix})))
+		if ($fieldSuffix && EventbookingHelper::isValidMessage($event->{'registration_approved_email_body' . $fieldSuffix}))
 		{
-			$body = $message->{'subscription_approved_email_body' . $fieldSuffix};
+			$body = $event->{'registration_approved_email_body' . $fieldSuffix};
+		}
+		elseif ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'registration_approved_email_body' . $fieldSuffix}))
+		{
+			$body = $message->{'registration_approved_email_body' . $fieldSuffix};
+		}
+		elseif (EventbookingHelper::isValidMessage($event->registration_approved_email_body))
+		{
+			$body = $event->registration_approved_email_body;
 		}
 		else
 		{
-			$body = $message->subscription_approved_email_body;
+			$body = $message->registration_approved_email_body;
 		}
-		$body = str_replace('[SUBSCRIPTION_DETAIL]', $emailContent, $body);
+
 		foreach ($replaces as $key => $value)
 		{
 			$key     = strtoupper($key);
 			$subject = str_ireplace("[$key]", $value, $subject);
 			$body    = str_ireplace("[$key]", $value, $body);
 		}
+		$body = EventbookingHelper::convertImgTags($body);
 
-		if (JMailHelper::isEmailAddress($row->email))
+		if (strpos($body, '[QRCODE]') !== false)
 		{
-			static::send($mailer, array($row->email), $subject, $body);
+			EventbookingHelper::generateQrcode($row->id);
+			$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+			$body   = str_ireplace("[QRCODE]", $imgTag, $body);
 		}
 
-		if ($row->published == 1 && $row->user_password)
+		if ($config->activate_invoice_feature && $row->invoice_number)
 		{
-			$query->clear()
-				->update('#__osmembership_subscribers')
-				->set('user_password = ""')
-				->where('id = ' . $row->id);
-			$db->setQuery($query);
-			$db->execute();
+			EventbookingHelper::generateInvoicePDF($row);
+			$mailer->addAttachment(JPATH_ROOT . '/media/com_eventbooking/invoices/' . EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config) . '.pdf');
 		}
+
+		static::send($mailer, array($row->email), $subject, $body);
 	}
 
+
 	/**
-	 * Send confirmation email to subscriber and notification email to admin when a recurring subscription cancelled
+	 * Send email to registrant when admin change the status to cancelled
 	 *
-	 * @param $row
-	 * @param $config
+	 * @param EventbookingTableRegistrant $row
+	 * @param object                      $config
 	 */
-	public static function sendSubscriptionCancelEmail($row, $config)
+	public static function sendRegistrationCancelledEmail($row, $config)
 	{
-		// Load the frontend language file with subscription record language
-		$lang = JFactory::getLanguage();
-		$tag  = $row->language;
-		if (!$tag)
-		{
-			$tag = 'en-GB';
-		}
-		$lang->load('com_osmembership', JPATH_ROOT, $tag);
-
-		$message     = OSMembershipHelper::getMessages();
-		$fieldSuffix = OSMembershipHelper::getFieldSuffix($row->language);
-
+		$app   = JFactory::getApplication();
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 
-		$query->select('*')
-			->from('#__osmembership_plans')
-			->where('id = ' . $row->plan_id);
-
-		if ($fieldSuffix)
+		if ($app->isSite())
 		{
-			OSMembershipHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
+			if ($row->language && $row->language != '*')
+			{
+				$tag = $row->language;
+			}
+			else
+			{
+				$tag = EventbookingHelper::getDefaultLanguage();
+			}
+
+			JFactory::getLanguage()->load('com_eventbooking', JPATH_ROOT, $tag);
 		}
 
-		$db->setQuery($query);
-		$plan = $db->loadObject();
+		$message     = EventbookingHelper::getMessages();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 
-		if ($plan->notification_emails)
+		if ($fieldSuffix && strlen($message->{'user_registration_cancel_subject' . $fieldSuffix}))
 		{
-			$config->notification_emails = $plan->notification_emails;
-		}
-
-		$mailer = static::getMailer($config);
-
-		$replaces['plan_title'] = $plan->title;
-		$replaces['first_name'] = $row->first_name;
-		$replaces['last_name']  = $row->last_name;
-		$replaces['email']      = $row->email;
-
-		// Get latest subscription end date
-		$query->clear();
-		$query->select('MAX(to_date)')
-			->from('#__osmembership_subscribers')
-			->where('user_id = ' . $row->user_id)
-			->where('plan_id = ' . $row->plan_id);
-		$db->setQuery($query);
-		$subscriptionEndDate = $db->loadResult();
-		if (!$subscriptionEndDate)
-		{
-			$subscriptionEndDate = date($config->date_format);
-		}
-		$replaces['SUBSCRIPTION_END_DATE'] = $subscriptionEndDate;
-
-		// Send confirmation email to subscribers
-		if (strlen($message->{'user_recurring_subscription_cancel_subject' . $fieldSuffix}))
-		{
-			$subject = $message->{'user_recurring_subscription_cancel_subject' . $fieldSuffix};
+			$subject = $message->{'user_registration_cancel_subject' . $fieldSuffix};
 		}
 		else
 		{
-			$subject = $message->user_recurring_subscription_cancel_subject;
-		}
-
-		if (strlen(strip_tags($message->{'user_recurring_subscription_cancel_body' . $fieldSuffix})))
-		{
-			$body = $message->{'user_recurring_subscription_cancel_body' . $fieldSuffix};
-		}
-		else
-		{
-			$body = $message->user_recurring_subscription_cancel_body;
-		}
-
-		$subject = str_replace('[PLAN_TITLE]', $plan->title, $subject);
-		foreach ($replaces as $key => $value)
-		{
-			$key     = strtoupper($key);
-			$subject = str_ireplace("[$key]", $value, $subject);
-			$body    = str_ireplace("[$key]", $value, $body);
-		}
-
-		if (JMailHelper::isEmailAddress($row->email))
-		{
-			static::send($mailer, array($row->email), $subject, $body);
-			$mailer->clearAllRecipients();
-		}
-
-		//Send notification email to administrators
-		$emails = explode(',', $config->notification_emails);
-		if (strlen($message->{'admin_recurring_subscription_cancel_subject' . $fieldSuffix}))
-		{
-			$subject = $message->{'admin_recurring_subscription_cancel_subject' . $fieldSuffix};
-		}
-		else
-		{
-			$subject = $message->admin_recurring_subscription_cancel_subject;
-		}
-		$subject = str_replace('[PLAN_TITLE]', $plan->title, $subject);
-
-		if (strlen(strip_tags($message->{'admin_recurring_subscription_cancel_body' . $fieldSuffix})))
-		{
-			$body = $message->{'admin_recurring_subscription_cancel_body' . $fieldSuffix};
-		}
-		else
-		{
-			$body = $message->admin_recurring_subscription_cancel_body;
-		}
-
-		foreach ($replaces as $key => $value)
-		{
-			$key     = strtoupper($key);
-			$subject = str_ireplace("[$key]", $value, $subject);
-			$body    = str_ireplace("[$key]", $value, $body);
-		}
-
-		static::send($mailer, $emails, $subject, $body);
-	}
-
-	/**
-	 * Send notification email to admin when someone update his profile
-	 *
-	 * @param $row
-	 * @param $config
-	 */
-	public static function sendProfileUpdateEmail($row, $config)
-	{
-		$message     = OSMembershipHelper::getMessages();
-		$fieldSuffix = OSMembershipHelper::getFieldSuffix();
-
-		if (strlen($message->{'profile_update_email_subject' . $fieldSuffix}))
-		{
-			$subject = $message->{'profile_update_email_subject' . $fieldSuffix};
-		}
-		else
-		{
-			$subject = $message->profile_update_email_subject;
+			$subject = $message->user_registration_cancel_subject;
 		}
 
 		if (empty($subject))
@@ -717,53 +509,256 @@ class OSMembershipHelperMail
 			return;
 		}
 
-		if (strlen(strip_tags($message->{'profile_update_email_body' . $fieldSuffix})))
+		if ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'user_registration_cancel_message' . $fieldSuffix}))
 		{
-			$body = $message->{'profile_update_email_body' . $fieldSuffix};
+			$body = $message->{'user_registration_cancel_message' . $fieldSuffix};
 		}
 		else
 		{
-			$body = $message->profile_update_email_body;
+			$body = $message->user_registration_cancel_message;
 		}
 
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('*')
-			->from('#__osmembership_plans')
-			->where('id = ' . $row->plan_id);
-
-		if ($fieldSuffix)
+		if (empty($body))
 		{
-			OSMembershipHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
+			return;
 		}
 
-		$db->setQuery($query);
-		$plan = $db->loadObject();
-
-		if ($plan->notification_emails)
+		if (!JMailHelper::isEmailAddress($row->email))
 		{
-			$config->notification_emails = $plan->notification_emails;
+			return;
 		}
 
 		$mailer = static::getMailer($config);
 
-		$replaces = OSMembershipHelper::buildTags($row, $config);
-
-		// Get latest subscription end date
-		$query->clear();
-		$query->select('MAX(to_date)')
-			->from('#__osmembership_subscribers')
-			->where('user_id = ' . $row->user_id)
-			->where('plan_id = ' . $row->plan_id);
-		$db->setQuery($query);
-		$subscriptionEndDate = $db->loadResult();
-		if (!$subscriptionEndDate)
+		if ($config->multiple_booking)
 		{
-			$subscriptionEndDate = date($config->date_format);
+			$rowFields = EventbookingHelper::getFormFields($row->id, 4);
 		}
-		$replaces['SUBSCRIPTION_END_DATE'] = $subscriptionEndDate;
-		$profileUrl                        = JUri::root() . 'administrator/index.php?option=com_osmembership&task=subscriber.edit&cid[]=' . $row->profile_id;
-		$replaces['profile_link']          = '<a href="' . $profileUrl . '">' . $profileUrl . '</a>';
+		elseif ($row->is_group_billing)
+		{
+			$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+		}
+		else
+		{
+			$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+		}
+
+		$form = new RADForm($rowFields);
+		$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+		$form->bind($data);
+		$form->buildFieldsDependency();
+
+		$query->select('*')
+			->from('#__eb_events')
+			->where('id=' . $row->event_id);
+		$db->setQuery($query);
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
+		}
+		$event    = $db->loadObject();
+		$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
+
+		foreach ($replaces as $key => $value)
+		{
+			$key     = strtoupper($key);
+			$subject = str_ireplace("[$key]", $value, $subject);
+			$body    = str_ireplace("[$key]", $value, $body);
+		}
+		$body = EventbookingHelper::convertImgTags($body);
+
+		static::send($mailer, array($row->email), $subject, $body);
+	}
+
+	/**
+	 * Send email when users fill-in waitinglist
+	 *
+	 * @param  object $row
+	 * @param object  $config
+	 */
+	public static function sendWaitinglistEmail($row, $config)
+	{
+		$message     = EventbookingHelper::getMessages();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
+		$query->select('*')
+			->from('#__eb_events')
+			->where('id=' . $row->event_id);
+		$db->setQuery($query);
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
+		}
+		$event = $db->loadObject();
+
+		if (strlen(trim($event->notification_emails)) > 0)
+		{
+			$config->notification_emails = $event->notification_emails;
+		}
+
+		$mailer = static::getMailer($config);
+		if ($config->multiple_booking)
+		{
+			$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+		}
+		elseif ($row->is_group_billing)
+		{
+			$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+		}
+		else
+		{
+			$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+		}
+		$form = new RADForm($rowFields);
+		$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+		$form->bind($data);
+		$form->buildFieldsDependency();
+		$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
+
+		//Notification email send to user
+		if (strlen($message->{'watinglist_confirmation_subject' . $fieldSuffix}))
+		{
+			$subject = $message->{'watinglist_confirmation_subject' . $fieldSuffix};
+		}
+		else
+		{
+			$subject = $message->watinglist_confirmation_subject;
+		}
+		if (EventbookingHelper::isValidMessage($message->{'watinglist_confirmation_body' . $fieldSuffix}))
+		{
+			$body = $message->{'watinglist_confirmation_body' . $fieldSuffix};
+		}
+		else
+		{
+			$body = $message->watinglist_confirmation_body;
+		}
+		$subject = str_ireplace('[EVENT_TITLE]', $event->title, $subject);
+		foreach ($replaces as $key => $value)
+		{
+			$key  = strtoupper($key);
+			$body = str_ireplace("[$key]", $value, $body);
+		}
+
+		if (JMailHelper::isEmailAddress($row->email))
+		{
+			static::send($mailer, array($row->email), $subject, $body);
+		}
+		$mailer->clearAllRecipients();
+
+		$emails = explode(',', $config->notification_emails);
+
+		if (strlen($message->{'watinglist_notification_subject' . $fieldSuffix}))
+		{
+			$subject = $message->{'watinglist_notification_subject' . $fieldSuffix};
+		}
+		else
+		{
+			$subject = $message->watinglist_notification_subject;
+		}
+
+		if (EventbookingHelper::isValidMessage($message->{'watinglist_notification_body' . $fieldSuffix}))
+		{
+			$body = $message->{'watinglist_notification_body' . $fieldSuffix};
+		}
+		else
+		{
+			$body = $message->watinglist_notification_body;
+		}
+		$subject = str_ireplace('[EVENT_TITLE]', $event->title, $subject);
+		foreach ($replaces as $key => $value)
+		{
+			$key  = strtoupper($key);
+			$body = str_ireplace("[$key]", $value, $body);
+		}
+		$body = EventbookingHelper::convertImgTags($body);
+
+		static::send($mailer, $emails, $subject, $body);
+	}
+
+	/**
+	 * Send email when registrants complete deposit payment
+	 *
+	 * @param EventbookingTableRegistrant $row
+	 * @param RADConfig                   $config
+	 */
+	public static function sendDepositPaymentEmail($row, $config)
+	{
+		$message     = EventbookingHelper::getMessages();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
+
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('*')
+			->from('#__eb_events')
+			->where('id=' . $row->event_id);
+		$db->setQuery($query);
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
+		}
+		$event = $db->loadObject();
+
+		if (strlen(trim($event->notification_emails)) > 0)
+		{
+			$config->notification_emails = $event->notification_emails;
+		}
+
+		$mailer   = static::getMailer($config);
+		$replaces = EventbookingHelper::buildDepositPaymentTags($row, $config);
+
+		//Notification email send to user
+		if (JMailHelper::isEmailAddress($row->email))
+		{
+			if (strlen($message->{'deposit_payment_user_email_subject' . $fieldSuffix}))
+			{
+				$subject = $message->{'deposit_payment_user_email_subject' . $fieldSuffix};
+			}
+			else
+			{
+				$subject = $message->deposit_payment_user_email_subject;
+			}
+
+			if (EventbookingHelper::isValidMessage($message->{'deposit_payment_user_email_body' . $fieldSuffix}))
+			{
+				$body = $message->{'deposit_payment_user_email_body' . $fieldSuffix};
+			}
+			else
+			{
+				$body = $message->deposit_payment_user_email_body;
+			}
+
+			$subject = str_ireplace('[EVENT_TITLE]', $event->title, $subject);
+			foreach ($replaces as $key => $value)
+			{
+				$key  = strtoupper($key);
+				$body = str_ireplace("[$key]", $value, $body);
+			}
+
+			static::send($mailer, array($row->email), $subject, $body);
+			$mailer->clearAllRecipients();
+		}
+
+		$emails = explode(',', $config->notification_emails);
+
+		if (strlen($message->{'deposit_payment_admin_email_subject' . $fieldSuffix}))
+		{
+			$subject = $message->{'deposit_payment_admin_email_subject' . $fieldSuffix};
+		}
+		else
+		{
+			$subject = $message->deposit_payment_admin_email_subject;
+		}
+
+		if (EventbookingHelper::isValidMessage($message->{'deposit_payment_admin_email_body' . $fieldSuffix}))
+		{
+			$body = $message->{'deposit_payment_admin_email_body' . $fieldSuffix};
+		}
+		else
+		{
+			$body = $message->deposit_payment_admin_email_body;
+		}
+
 		foreach ($replaces as $key => $value)
 		{
 			$key     = strtoupper($key);
@@ -771,140 +766,352 @@ class OSMembershipHelperMail
 			$body    = str_ireplace("[$key]", $value, $body);
 		}
 
-		$emails = explode(',', $config->notification_emails);
+		$body = EventbookingHelper::convertImgTags($body);
 
 		static::send($mailer, $emails, $subject, $body);
 	}
 
 	/**
-	 * Method for sending first, second and third reminder emails
+	 * Send new event notification email to admin and users when new event is submitted in the frontend
 	 *
-	 * @param array  $rows
-	 * @param string $bccEmail
-	 * @param int    $time
+	 * @param EventbookingTableEvent $row
+	 * @param RADConfig              $config
 	 */
-	public static function sendReminderEmails($rows, $bccEmail, $time = 1)
+	public static function sendNewEventNotificationEmail($row, $config)
 	{
-		$config = OSMembershipHelper::getConfig();
-		$db     = JFactory::getDbo();
-		$query  = $db->getQuery(true);
+		$user        = JFactory::getUser();
+		$message     = EventbookingHelper::getMessages();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
+
 		$mailer = static::getMailer($config);
 
-		if (JMailHelper::isEmailAddress($bccEmail))
+		$replaces = array(
+			'username'    => $user->username,
+			'name'        => $user->name,
+			'event_id'    => $row->id,
+			'event_title' => $row->title,
+			'event_date'  => JHtml::_('date', $row->event_date, $config->event_date_format, null),
+			'event_link'  => JUri::root() . 'administrator/index.php?option=com_eventbooking&view=event&id=' . $row->id,
+		);
+
+		//Notification email send to user
+
+		if (strlen($message->{'submit_event_user_email_subject' . $fieldSuffix}))
+		{
+			$subject = $message->{'submit_event_user_email_subject' . $fieldSuffix};
+		}
+		else
+		{
+			$subject = $message->submit_event_user_email_subject;
+		}
+
+		if (EventbookingHelper::isValidMessage($message->{'submit_event_user_email_body' . $fieldSuffix}))
+		{
+			$body = $message->{'submit_event_user_email_body' . $fieldSuffix};
+		}
+		else
+		{
+			$body = $message->submit_event_user_email_body;
+		}
+
+		if ($subject)
+		{
+			foreach ($replaces as $key => $value)
+			{
+				$key     = strtoupper($key);
+				$subject = str_ireplace("[$key]", $value, $subject);
+				$body    = str_ireplace("[$key]", $value, $body);
+			}
+
+			$body = EventbookingHelper::convertImgTags($body);
+			if (JMailHelper::isEmailAddress($user->email))
+			{
+				static::send($message, array($user->email), $subject, $body);
+				$mailer->clearAllRecipients();
+			}
+		}
+
+		$emails = explode(',', $config->notification_emails);
+		$emails = array_map('trim', $emails);
+
+		if (strlen($message->{'submit_event_admin_email_subject' . $fieldSuffix}))
+		{
+			$subject = $message->{'submit_event_admin_email_subject' . $fieldSuffix};
+		}
+		else
+		{
+			$subject = $message->submit_event_admin_email_subject;
+		}
+
+		if (!$subject)
+		{
+			return;
+		}
+
+		if (EventbookingHelper::isValidMessage($message->{'submit_event_admin_email_body' . $fieldSuffix}))
+		{
+			$body = $message->{'submit_event_admin_email_body' . $fieldSuffix};
+		}
+		else
+		{
+			$body = $message->submit_event_admin_email_body;
+		}
+
+		foreach ($replaces as $key => $value)
+		{
+			$key     = strtoupper($key);
+			$subject = str_ireplace("[$key]", $value, $subject);
+			$body    = str_ireplace("[$key]", $value, $body);
+		}
+
+		$body = EventbookingHelper::convertImgTags($body);
+
+		static::send($mailer, $emails, $subject, $body);
+	}
+
+	/**
+	 * Send reminder email to registrants
+	 *
+	 * @param int  $numberEmailSendEachTime
+	 * @param null $bccEmail
+	 */
+	public static function sendReminder($numberEmailSendEachTime = 0, $bccEmail = null)
+	{
+		$db      = JFactory::getDbo();
+		$query   = $db->getQuery(true);
+		$config  = EventbookingHelper::getConfig();
+		$message = EventbookingHelper::getMessages();
+		$mailer  = static::getMailer($config);
+
+		$siteUrl = EventbookingHelper::getSiteUrl();
+
+		EventbookingHelper::loadLanguage();
+
+		if ($bccEmail)
 		{
 			$mailer->addBcc($bccEmail);
 		}
 
-		$fieldSuffixes = array();
-
-		switch ($time)
+		if (!$numberEmailSendEachTime)
 		{
-			case 2:
-				$fieldPrefix = 'second_reminder_';
-				break;
-			case 3:
-				$fieldPrefix = 'third_reminder_';
-				break;
-			default:
-				$fieldPrefix = 'first_reminder_';
-				break;
+			$numberEmailSendEachTime = 15;
 		}
 
-		$message  = OSMembershipHelper::getMessages();
-		$timeSent = $db->quote(JFactory::getDate()->toSql());
+		$eventFields = array('b.id as event_id', 'b.event_date', 'b.title');
+
+		if (JLanguageMultilang::isEnabled())
+		{
+			$languages = EventbookingHelper::getLanguages();
+			if (count($languages))
+			{
+				foreach ($languages as $language)
+				{
+					$eventFields[] = 'b.title_' . $language->sef;
+				}
+			}
+		}
+
+		$query->select('a.*, c.name AS location_name')
+			->select(implode(',', $eventFields))
+			->from('#__eb_registrants AS a')
+			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+			->leftJoin('#__eb_locations AS c ON b.location_id = c.id')
+			->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published = 0))')
+			->where('a.is_reminder_sent = 0')
+			->where('b.published = 1')
+			->where('b.enable_auto_reminder = 1')
+			->where('DATEDIFF(b.event_date, NOW()) <= b.remind_before_x_days')
+			->where('DATEDIFF(b.event_date, NOW()) >= 0')
+			->order('b.event_date, a.register_date');
+
+		$db->setQuery($query, 0, $numberEmailSendEachTime);
+
+		try
+		{
+			$rows = $db->loadObjectList();
+		}
+		catch (Exception  $e)
+		{
+			$rows = array();
+		}
+
 		for ($i = 0, $n = count($rows); $i < $n; $i++)
 		{
 			$row = $rows[$i];
 
-			if ($row->number_days < 0)
+			if (!JMailHelper::isEmailAddress($row->email))
 			{
 				continue;
 			}
 
-			$query->clear()
-				->select('COUNT(*)')
-				->from('#__osmembership_subscribers')
-				->where('plan_id = ' . $row->plan_id)
-				->where('published = 1')
-				->where('DATEDIFF(from_date, NOW()) >=0')
-				->where('((user_id > 0 AND user_id = ' . (int) $row->user_id . ') OR email="' . $row->email . '")');
-			$db->setQuery($query);
-			$total = (int) $db->loadResult();
-			if ($total)
+			$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
+			if (strlen($message->{'reminder_email_subject' . $fieldSuffix}))
 			{
-				$query->clear()
-					->update('#__osmembership_subscribers')
-					->set($db->quoteName($fieldPrefix . 'sent') . ' = 1 ')
-					->where('id = ' . $row->id);
-				$db->setQuery($query);
-				$db->execute();
-				continue;
+				$emailSubject = $message->{'reminder_email_subject' . $fieldSuffix};
+			}
+			else
+			{
+				$emailSubject = $message->reminder_email_subject;
 			}
 
-			$fieldSuffix = '';
-			if ($row->language)
-			{
-				if (!isset($fieldSuffixes[$row->language]))
-				{
-					$fieldSuffixes[$row->language] = OSMembershipHelper::getFieldSuffix($row->language);
-				}
+			$eventTitle = $row->{'title' . $fieldSuffix};
 
-				$fieldSuffix = $fieldSuffixes[$row->language];
+			$emailSubject = str_ireplace('[EVENT_TITLE]', $eventTitle, $emailSubject);
+
+			if (strlen($message->{'reminder_email_body' . $fieldSuffix}))
+			{
+				$emailBody = $message->{'reminder_email_body' . $fieldSuffix};
+			}
+			else
+			{
+				$emailBody = $message->reminder_email_body;
 			}
 
-			$query->clear()
-				->select('title' . $fieldSuffix . ' AS title')
-				->from('#__osmembership_plans')
-				->where('id = ' . $row->plan_id);
-
-			$db->setQuery($query);
-			$planTitle = $db->loadResult();
-
-			$query->clear();
 			$replaces                = array();
-			$replaces['plan_title']  = $planTitle;
+			$replaces['event_date']  = JHtml::_('date', $row->event_date, $config->event_date_format, null);
 			$replaces['first_name']  = $row->first_name;
 			$replaces['last_name']   = $row->last_name;
-			$replaces['number_days'] = $row->number_days;
-			$replaces['expire_date'] = JHtml::_('date', $row->to_date, $config->date_format);
+			$replaces['event_title'] = $eventTitle;
+			$replaces['location']    = $row->location_name;
 
-			if (strlen($message->{$fieldPrefix . 'email_subject' . $fieldSuffix}))
+			// On process [REGISTRATION_DETAIL] tag if it is available in the email message
+			if (strpos($emailBody, '[REGISTRATION_DETAIL]') !== false)
 			{
-				$subject = $message->{$fieldPrefix . 'email_subject' . $fieldSuffix};
-			}
-			else
-			{
-				$subject = $message->{$fieldPrefix . 'email_subject'};
+				// Build this tag
+				if ($config->multiple_booking)
+				{
+					$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+				}
+				elseif ($row->is_group_billing)
+				{
+					$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+				}
+				else
+				{
+					$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+				}
+
+				$form = new RADForm($rowFields);
+				$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+				$form->bind($data);
+				$form->buildFieldsDependency();
+
+				$replaces['registration_detail'] = EventbookingHelper::getEmailContent($config, $row, true, $form);
 			}
 
-			if (strlen(strip_tags($message->{$fieldPrefix . 'email_body' . $fieldSuffix})))
+			if (strpos($emailBody, '[QRCODE]') !== false)
 			{
-				$body = $message->{$fieldPrefix . 'email_body' . $fieldSuffix};
-			}
-			else
-			{
-				$body = $message->{$fieldSuffix . 'email_body'};
+				EventbookingHelper::generateQrcode($row->id);
+				$imgTag    = '<img src="' . $siteUrl . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+				$emailBody = str_ireplace("[QRCODE]", $imgTag, $emailBody);
 			}
 
 			foreach ($replaces as $key => $value)
 			{
-				$key     = strtoupper($key);
-				$body    = str_ireplace("[$key]", $value, $body);
-				$subject = str_ireplace("[$key]", $value, $subject);
+				$emailBody = str_ireplace('[' . strtoupper($key) . ']', $value, $emailBody);
 			}
 
-			if (JMailHelper::isEmailAddress($row->email))
+			$emailBody = EventbookingHelper::convertImgTags($emailBody);
+			static::send($mailer, array($row->email), $emailSubject, $emailBody);
+			$mailer->clearAddresses();
+
+			$query->clear();
+			$query->update('#__eb_registrants')
+				->set('is_reminder_sent = 1')
+				->where('id = ' . (int) $row->id);
+			$db->setQuery($query);
+			$db->execute();
+		}
+	}
+
+	/**
+	 * Send deposit payment reminder email to registrants
+	 *
+	 * @param int  $numberDays
+	 * @param int  $numberEmailSendEachTime
+	 * @param null $bccEmail
+	 */
+	public static function sendDepositReminder($numberDays, $numberEmailSendEachTime = 0, $bccEmail = null)
+	{
+		$db      = JFactory::getDbo();
+		$query   = $db->getQuery(true);
+		$config  = EventbookingHelper::getConfig();
+		$message = EventbookingHelper::getMessages();
+		$mailer  = static::getMailer($config);
+		$Itemid  = EventbookingHelper::getItemid();
+		$siteUrl = EventbookingHelper::getSiteUrl();
+
+		if ($bccEmail)
+		{
+			$mailer->addBcc($bccEmail);
+		}
+
+		if (!$numberDays)
+		{
+			$numberDays = 7;
+		}
+
+		if (!$numberEmailSendEachTime)
+		{
+			$numberEmailSendEachTime = 15;
+		}
+
+		$query->select('a.id, a.first_name, a.last_name, a.email, a.amount, a.deposit_amount, b.title, b.event_date, b.currency_symbol')
+			->from('#__eb_registrants AS a')
+			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+			->where('(a.published = 1 OR (a.payment_method LIKE "os_offline%" AND a.published = 0))')
+			->where('a.payment_status = 0')
+			->where('a.group_id = 0')
+			->where('a.is_deposit_payment_reminder_sent = 0')
+			->where('b.published = 1')
+			->where('DATEDIFF(b.event_date, NOW()) <= ' . $numberDays)
+			->where('DATEDIFF(b.event_date, NOW()) >= 0')
+			->order('b.event_date, a.register_date');
+
+		$db->setQuery($query, 0, $numberEmailSendEachTime);
+
+		try
+		{
+			$rows = $db->loadObjectList();
+		}
+		catch (Exception  $e)
+		{
+			$rows = array();
+		}
+
+		foreach ($rows as $row)
+		{
+			if (!JMailHelper::isEmailAddress($row->email))
 			{
-				static::send($mailer, array($row->email), $subject, $body);
-
-				$mailer->clearAddresses();
+				continue;
 			}
 
-			$query->clear()
-				->update('#__osmembership_subscribers')
-				->set($fieldPrefix . 'sent = 1')
-				->set($fieldPrefix . 'sent_at = ' . $timeSent)
-				->where('id = ' . $row->id);
+			$emailSubject = $message->deposit_payment_reminder_email_subject;
+			$emailBody    = $message->deposit_payment_reminder_email_body;
+
+			$replaces                         = array();
+			$replaces['event_date']           = JHtml::_('date', $row->event_date, $config->event_date_format, null);
+			$replaces['first_name']           = $row->first_name;
+			$replaces['last_name']            = $row->last_name;
+			$replaces['event_title']          = $row->title;
+			$replaces['amount']               = EventbookingHelper::formatCurrency($row->amount - $row->deposit_amount, $config, $row->currency_symbol);
+			$replaces['registration_id']      = $row->id;
+			$replaces['deposit_payment_link'] = $siteUrl . 'index.php?option=com_eventbooking&view=payment&amp;registrant_id=' . $row->id . '&Itemid=' . $Itemid;
+
+			foreach ($replaces as $key => $value)
+			{
+				$emailSubject = str_ireplace('[' . strtoupper($key) . ']', $value, $emailSubject);
+				$emailBody    = str_ireplace('[' . strtoupper($key) . ']', $value, $emailBody);
+			}
+
+			$emailBody = EventbookingHelper::convertImgTags($emailBody);
+			static::send($mailer, array($row->email), $emailSubject, $emailBody);
+			$mailer->clearAddresses();
+
+			$query->clear();
+			$query->update('#__eb_registrants')
+				->set('is_deposit_payment_reminder_sent = 1')
+				->where('id = ' . (int) $row->id);
 			$db->setQuery($query);
 			$db->execute();
 		}
@@ -947,37 +1154,91 @@ class OSMembershipHelperMail
 			$config->notification_emails = $fromEmail;
 		}
 
+		static::$fromName  = $fromName;
+		static::$fromEmail = $fromEmail;
+
 		return $mailer;
 	}
 
+
 	/**
-	 * Add file uploads to the mailer object
+	 * Add event's attachments to mailer object for sending emails to registrants
+	 *
+	 * @param JMail                       $mailer
+	 * @param EventbookingTableRegistrant $row
+	 * @param EventbookingTableEvent      $event
+	 * @param RADConfig                   $config
+	 */
+	private static function addEventAttachments($mailer, $row, $event, $config)
+	{
+		if ($config->multiple_booking)
+		{
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('attachment')
+				->from('#__eb_events')
+				->where('id IN (SELECT event_id FROM #__eb_registrants AS a WHERE a.id=' . $row->id . ' OR a.cart_id=' . $row->id . ' ORDER BY a.id)');
+			$db->setQuery($query);
+			$attachmentFiles = $db->loadColumn();
+		}
+		elseif ($event->attachment)
+		{
+			$attachmentFiles = array($event->attachment);
+		}
+		else
+		{
+			$attachmentFiles = array();
+		}
+
+		// Remove empty value from array
+		$attachmentFiles = array_filter($attachmentFiles);
+
+		// Add all valid attachments to email
+		foreach ($attachmentFiles as $attachmentFile)
+		{
+			$files = explode('|', $attachmentFile);
+			foreach ($files as $file)
+			{
+				$filePath = JPATH_ROOT . '/media/com_eventbooking/' . $file;
+				if ($file && file_exists($filePath))
+				{
+					$mailer->addAttachment($filePath);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Add file uploads to the mailer object for sending to administrator
 	 *
 	 * @param JMail $mailer
-	 * @param array $fields
-	 * @param array $data
+	 * @param array $rowFields
+	 * @param array $replaces
 	 */
-	private static function addAttachments($mailer, $fields, $data)
+	private static function addRegistrationFormAttachments($mailer, $rowFields, $replaces)
 	{
-		$attachmentsPath = JPATH_ROOT . '/media/com_osmembership/upload/';
-		for ($i = 0, $n = count($fields); $i < $n; $i++)
+		$attachmentsPath = JPATH_ROOT . '/media/com_eventbooking/files/';
+		for ($i = 0, $n = count($rowFields); $i < $n; $i++)
 		{
-			$field = $fields[$i];
-			if ($field->fieldtype == 'File' && isset($data[$field->name]))
+			$rowField = $rowFields[$i];
+			if ($rowField->fieldtype == 'File')
 			{
-				$fileName = $data[$field->name];
-				if ($fileName && file_exists($attachmentsPath . '/' . $fileName))
+				if (isset($replaces[$rowField->name]))
 				{
-					$pos = strpos($fileName, '_');
-					if ($pos !== false)
+					$fileName = $replaces[$rowField->name];
+					if ($fileName && file_exists($attachmentsPath . '/' . $fileName))
 					{
-						$originalFilename = substr($fileName, $pos + 1);
+						$pos = strpos($fileName, '_');
+						if ($pos !== false)
+						{
+							$originalFilename = substr($fileName, $pos + 1);
+						}
+						else
+						{
+							$originalFilename = $fileName;
+						}
+						$mailer->addAttachment($attachmentsPath . '/' . $fileName, $originalFilename);
 					}
-					else
-					{
-						$originalFilename = $fileName;
-					}
-					$mailer->addAttachment($attachmentsPath . '/' . $fileName, $originalFilename);
 				}
 			}
 		}
