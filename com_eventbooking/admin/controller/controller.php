@@ -39,9 +39,9 @@ class EventbookingController extends RADControllerAdmin
 	{
 		jimport('joomla.filesystem.folder');
 		$db = JFactory::getDbo();
-		//Setup menus
+		// Setup menus
 		$menuSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/menus.eventbooking.sql';
-		$sql     = JFile::read($menuSql);
+		$sql     = file_get_contents($menuSql);
 		$queries = $db->splitSql($sql);
 		if (count($queries))
 		{
@@ -55,6 +55,24 @@ class EventbookingController extends RADControllerAdmin
 				}
 			}
 		}
+
+		// Create tables if not exists
+		$tableSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/createifnotexists.eventbooking.sql';
+		$sql     = file_get_contents($tableSql);
+		$queries = $db->splitSql($sql);
+		if (count($queries))
+		{
+			foreach ($queries as $query)
+			{
+				$query = trim($query);
+				if ($query != '' && $query{0} != '#')
+				{
+					$db->setQuery($query);
+					$db->execute();
+				}
+			}
+		}
+
 		###Setup default configuration data                
 		$sql = 'SELECT COUNT(*) FROM #__eb_configs';
 		$db->setQuery($sql);

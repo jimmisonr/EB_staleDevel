@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS `#__eb_discounts` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `discount_amount` DECIMAL(10,2) DEFAULT NULL,
+  `from_date` DATETIME DEFAULT NULL,
+  `to_date` DATETIME DEFAULT NULL,
+  `times` INT NOT NULL DEFAULT '0',
+  `used` INT NOT NULL DEFAULT '0',
+  `published` TINYINT NOT NULL DEFAULT '1',
+  PRIMARY KEY(`id`)
+) CHARACTER SET `utf8`;
+CREATE TABLE IF NOT EXISTS `#__eb_discount_events` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `discount_id` INT NOT NULL DEFAULT '0',
+  `event_id` INT NOT NULL DEFAULT '0',
+  PRIMARY KEY(`id`)
+)CHARACTER SET `utf8`;
