@@ -134,7 +134,14 @@ JHtml::_('formbehavior.chosen', 'select');
 			<?php echo EventbookingHelper::getUserInput($this->item->user_id, 'user_id', (int) $this->item->id); ?>
 		</div>
 	</div>
-
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_ACCESS'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['access']; ?>
+		</div>
+	</div>
 	<div class="control-group">
 		<label class="control-label">
 			<?php echo JText::_('EB_PUBLISHED'); ?>
