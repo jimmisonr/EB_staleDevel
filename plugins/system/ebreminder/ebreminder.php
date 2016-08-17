@@ -78,7 +78,7 @@ class plgSystemEBReminder extends JPlugin
 			}
 
 			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
-			EventbookingHelper::sendReminder($numberEmailSendEachTime, $bccEmail);
+			EventbookingHelperMail::sendReminder($numberEmailSendEachTime, $bccEmail);
 		}
 
 		return true;

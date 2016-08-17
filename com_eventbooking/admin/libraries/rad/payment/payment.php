@@ -228,7 +228,7 @@ abstract class RADPayment
 			$dispatcher = JEventDispatcher::getInstance();
 			$dispatcher->trigger('onDepositPaymentSuccess', array($row));
 
-			EventbookingHelper::sendDepositPaymentEmail($row, $config);
+			EventbookingHelperMail::sendDepositPaymentEmail($row, $config);
 		}
 		else
 		{
