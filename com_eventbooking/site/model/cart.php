@@ -267,6 +267,16 @@ class EventbookingModelCart extends RADModel
 			$db->execute();
 		}
 
+		if (!empty($fees['bundle_discount_ids']))
+		{
+			$query->clear()
+				->update('#__eb_discounts')
+				->set('used = used + 1')
+				->where('id IN (' . implode(',', $fees['bundle_discount_ids']) . ')');
+			$db->setQuery($query);
+			$db->execute();
+		}
+
 		$session = JFactory::getSession();
 		$session->set('eb_registration_code', $row->registration_code);
 		if ($fees['amount'] > 0)
