@@ -22,8 +22,9 @@ INSERT INTO `#__eb_menus` (`id`, `menu_name`, `menu_parent_id`, `menu_link`, `pu
 (4, 'EB_EVENTS', 2, 'index.php?option=com_eventbooking&view=events', 1, 2, 'calendar'),
 (5, 'EB_CUSTOM_FIELDS', 2, 'index.php?option=com_eventbooking&view=fields', 1, 3, 'list'),
 (6, 'EB_LOCATIONS', 2, 'index.php?option=com_eventbooking&view=locations', 1, 4, 'location'),
-(7, 'EB_COUNTRIES', 2, 'index.php?option=com_eventbooking&view=countries', 1, 5, 'flag'),
-(8, 'EB_STATES', 2, 'index.php?option=com_eventbooking&view=states', 1, 6, 'book'),
+(23,'EB_DISCOUNT_BUNDLES', 2, 'index.php?option=com_eventbooking&view=discounts', 1, 5, 'tags'),
+(7, 'EB_COUNTRIES', 2, 'index.php?option=com_eventbooking&view=countries', 1, 6, 'flag'),
+(8, 'EB_STATES', 2, 'index.php?option=com_eventbooking&view=states', 1, 7, 'book'),
 
 (9, 'EB_REGISTRANTS', 0, 'index.php?option=com_eventbooking&view=registrants', 1, 3, 'user'),
 
