@@ -13,6 +13,18 @@ defined('_JEXEC') or die;
 class EventbookingModelDiscount extends RADModelAdmin
 {
 	/**
+	 * Pre-process data before custom field is being saved to database
+	 *
+	 * @param JTable   $row
+	 * @param RADInput $input
+	 * @param bool     $isNew
+	 */
+	protected function beforeStore($row, $input, $isNew)
+	{
+		$row->event_ids = implode(',', $input->get('event_id', array(), 'array'));
+	}
+
+	/**
 	 * Post - process, Store discount rule mapping with events.
 	 *
 	 * @param EventbookingTableDiscount $row
@@ -25,23 +37,19 @@ class EventbookingModelDiscount extends RADModelAdmin
 		$discountId = $row->id;
 		$db         = $this->getDbo();
 		$query      = $db->getQuery(true);
+
 		if (!$isNew)
 		{
 			$query->delete('#__eb_discount_events')->where('discount_id = ' . $discountId);
-			$config = EventbookingHelper::getConfig();
-			if ($config->hide_past_events_from_events_dropdown)
-			{
-				$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
-				$query->where('event_id IN (SELECT id FROM #__eb_events AS a WHERE a.published = 1 AND (DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.event_end_date) >= ' . $currentDate . '))');
-			}
 			$db->setQuery($query);
 			$db->execute();
 		}
 
 		foreach ($eventIds as $eventId)
 		{
-			$query->clear();
-			$query->insert('#__eb_discount_events')->columns('discount_id, event_id');
+			$query->clear()
+				->insert('#__eb_discount_events')
+				->columns('discount_id, event_id');
 			for ($i = 0, $n = count($eventIds); $i < $n; $i++)
 			{
 				$eventId = (int) $eventId;
