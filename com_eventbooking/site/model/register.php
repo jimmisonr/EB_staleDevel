@@ -425,6 +425,16 @@ class EventBookingModelRegister extends RADModel
 			$row->coupon_id = $coupon->id;
 		}
 
+		if (!empty($fees['bundle_discount_ids']))
+		{
+			$query->clear()
+				->update('#__eb_discounts')
+				->set('used = used + 1')
+				->where('id IN (' . implode(',', $fees['bundle_discount_ids']) . ')');
+			$db->setQuery($query);
+			$db->execute();
+		}
+
 		if ($waitingList)
 		{
 			$row->published      = 3;

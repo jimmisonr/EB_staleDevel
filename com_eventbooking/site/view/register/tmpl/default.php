@@ -361,7 +361,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			</div>
 		<?php
 		}
-		if ($this->enableCoupon || $this->discountAmount > 0 || $this->discountRate > 0 || $this->event->tax_rate > 0 || $this->showPaymentFee)
+		if ($this->enableCoupon || $this->discountAmount > 0 || $this->bundleDiscountAmount > 0 || $this->discountRate > 0 || $this->event->tax_rate > 0 || $this->showPaymentFee)
 		{
 		?>
 		<div class="<?php echo $controlGroupClass;  ?>">

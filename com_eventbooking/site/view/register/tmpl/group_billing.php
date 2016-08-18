@@ -171,7 +171,7 @@ else
 		</div>
 	</div>
 	<?php
-		if ($this->enableCoupon || $this->discountAmount > 0)
+		if ($this->enableCoupon || $this->discountAmount > 0 || $this->bundleDiscountAmount > 0)
 		{
 		?>
 		<div class="<?php echo $controlGroupClass; ?>">
@@ -299,7 +299,7 @@ else
 			</div>
 		<?php
 		}
-		if ($this->enableCoupon || $this->discountAmount > 0 || $this->event->tax_rate > 0 || $this->showPaymentFee)
+		if ($this->enableCoupon || $this->discountAmount > 0 || $this->bundleDiscountAmount > 0 || $this->event->tax_rate > 0 || $this->showPaymentFee)
 		{
 		?>
 		<div class="<?php echo $controlGroupClass; ?>">

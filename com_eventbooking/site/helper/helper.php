@@ -1399,6 +1399,49 @@ class EventbookingHelper
 			}
 		}
 
+		$fees['bundle_discount_amount'] = 0;
+		$fees['bundle_discount_ids']    = array();
+
+		// Calculate bundle discount if setup
+		if ($user->id > 0)
+		{
+			$nullDate    = $db->quote($db->getNullDate());
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$query->clear()
+				->select('id, event_ids, discount_amount')
+				->from('#__eb_discounts')
+				->where('(from_date = ' . $nullDate . ' OR DATE(from_date) <=' . $currentDate . ')')
+				->where('(to_date = ' . $nullDate . ' OR DATE(to_date) >= ' . $currentDate . ')')
+				->where('(times = 0 OR times > used)')
+				->where('id IN (SELECT discount_id FROM #__eb_discount_events WHERE event_id = ' . $event->id . ')');
+			$db->setQuery($query);
+			$discountRules = $db->loadObjectList();
+
+			if (!empty($discountRules))
+			{
+				$query->clear()
+					->select('DISTINCT event_id')
+					->from('#__eb_registrants')
+					->where('user_id = ' . $user->id)
+					->where('(published = 1 OR (payment_method LIKE "os_offline%" AND published IN (0, 1)))');
+				$registeredEventIds = $db->loadColumn();
+				if (count($registeredEventIds))
+				{
+					$registeredEventIds[] = $event->id;
+					foreach ($discountRules as $rule)
+					{
+						$eventIds = explode(',', $rule->event_ids);
+						if (!array_diff($eventIds, $registeredEventIds))
+						{
+							$fees['bundle_discount_amount'] += $rule->discount_amount;
+							$discountAmount += $rule->discount_amount;
+							$fees['bundle_discount_ids'][] = $rule->id;
+						}
+					}
+				}
+			}
+		}
+
 		// Late Fee
 		$lateFee = 0;
 		if (($event->late_fee_date != $nullDate) && $event->late_fee_date_diff >= 0 && $event->late_fee_amount > 0)
