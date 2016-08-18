@@ -406,10 +406,10 @@ class EventBookingModelRegister extends RADModel
 			$total = $db->loadResult();
 			if (!$total)
 			{
+				$row->registration_code = $registrationCode;
 				break;
 			}
 		}
-		$row->registration_code = $registrationCode;
 
 		// Coupon code
 		$couponCode = isset($data['coupon_code']) ? $data['coupon_code'] : null;
