@@ -281,6 +281,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$this->paymentProcessingFee = $fees['payment_processing_fee'];
 		$this->showPaymentFee       = $showPaymentFee;
 		$this->discountRate         = $fees['discount_rate'];
+		$this->bundleDiscountAmount = $fees['bundle_discount_amount'];
 		$this->waitingList          = $waitingList;
 
 		parent::display();

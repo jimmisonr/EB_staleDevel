@@ -1038,14 +1038,14 @@ class EventbookingHelper
 		if ($couponCode)
 		{
 			//Validate the coupon
-			$query->clear();
-			$query->select('*')
+			$query->clear()
+				->select('*')
 				->from('#__eb_coupons')
 				->where('published = 1')
 				->where('`access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
 				->where('code = ' . $db->quote($couponCode))
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
+				->where('(valid_from = "0000-00-00" OR valid_from <= NOW())')
+				->where('(valid_to = "0000-00-00" OR valid_to >= NOW())')
 				->where('(times = 0 OR times > used)')
 				->where('enable_for IN (0, 1)')
 				->where('user_id IN (0, ' . $user->id . ')')
@@ -1074,6 +1074,49 @@ class EventbookingHelper
 		else
 		{
 			$fees['coupon_valid'] = 1;
+		}
+
+		$fees['bundle_discount_amount'] = 0;
+		$fees['bundle_discount_ids']    = array();
+
+		// Calculate bundle discount if setup
+		if ($user->id > 0)
+		{
+			$nullDate    = $db->quote($db->getNullDate());
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$query->clear()
+				->select('id, event_ids, discount_amount')
+				->from('#__eb_discounts')
+				->where('(from_date = ' . $nullDate . ' OR DATE(from_date) <=' . $currentDate . ')')
+				->where('(to_date = ' . $nullDate . ' OR DATE(to_date) >= ' . $currentDate . ')')
+				->where('(times = 0 OR times > used)')
+				->where('id IN (SELECT discount_id FROM #__eb_discount_events WHERE event_id = ' . $event->id . ')');
+			$db->setQuery($query);
+			$discountRules = $db->loadObjectList();
+
+			if (!empty($discountRules))
+			{
+				$query->clear()
+					->select('DISTINCT event_id')
+					->from('#__eb_registrants')
+					->where('user_id = ' . $user->id)
+					->where('(published = 1 OR (payment_method LIKE "os_offline%" AND published IN (0, 1)))');
+				$registeredEventIds = $db->loadColumn();
+				if (count($registeredEventIds))
+				{
+					$registeredEventIds[] = $event->id;
+					foreach ($discountRules as $rule)
+					{
+						$eventIds = explode(',', $rule->event_ids);
+						if (!array_diff($eventIds, $registeredEventIds))
+						{
+							$fees['bundle_discount_amount'] += $rule->discount_amount;
+							$discountAmount += $rule->discount_amount;
+							$fees['bundle_discount_ids'][] = $rule->id;
+						}
+					}
+				}
+			}
 		}
 
 		if ($discountAmount > $totalAmount)
