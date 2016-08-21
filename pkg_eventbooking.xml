@@ -55,4 +55,7 @@
         <file type="library" id="eventbooking">lib_omnipay.zip</file>
         <file type="component" id="eventbooking">com_eventbooking.zip</file>
     </files>
+	<updateservers>	
+		<server type="extension" priority="1" name="Events Booking Extension">http://joomdonation.com/updates/eventsbooking.xml</server>
+	</updateservers>
 </extension>
