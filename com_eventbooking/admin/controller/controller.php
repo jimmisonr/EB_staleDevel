@@ -2606,28 +2606,58 @@ class EventbookingController extends RADControllerAdmin
 	 */
 	public function check_update()
 	{
-		$installedVersion = EventbookingHelper::getInstalledVersion();
-		$result           = array();
+		// Get the caching duration.
+		$component     = JComponentHelper::getComponent('com_installer');
+		$params        = $component->params;
+		$cache_timeout = $params->get('cachetimeout', 6, 'int');
+		$cache_timeout = 3600 * $cache_timeout;
+
+		// Get the minimum stability.
+		$minimum_stability = $params->get('minimum_stability', JUpdater::STABILITY_STABLE, 'int');
+
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_installer/models');
+
+		/** @var InstallerModelUpdate $model */
+		$model = JModelLegacy::getInstance('Update', 'InstallerModel');
+
+		$model->purge();
+
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('extension_id')
+			->from('#__extensions')
+			->where('`type` = "package"')
+			->where('`element` = "pkg_eventbooking"');
+		$db->setQuery($query);
+		$eid = (int) $db->loadResult();
+
 		$result['status'] = 0;
 
-		$http     = JHttpFactory::getHttp();
-		$url      = 'http://joomdonationdemo.com/versions/eventbookingj3.txt';
-		$response = $http->get($url);
-		if ($response->code == 200)
+		if ($eid)
 		{
-			$latestVersion = $response->body;
-			if ($latestVersion)
+			$ret = JUpdater::getInstance()->findUpdates($eid, $cache_timeout, $minimum_stability);
+
+			if ($ret)
 			{
-				if (version_compare($latestVersion, $installedVersion, 'gt'))
+				$model->setState('list.start', 0);
+				$model->setState('list.limit', 0);
+				$model->setState('filter.extension_id', $eid);
+				$updates          = $model->getItems();
+				$result['status'] = 2;
+
+				if (count($updates))
 				{
-					$result['status']  = 2;
-					$result['message'] = JText::sprintf('EB_UPDATE_CHECKING_UPDATEFOUND', $latestVersion);
+					$result['message'] = JText::sprintf('EB_UPDATE_CHECKING_UPDATEFOUND', $updates[0]->version);
 				}
 				else
 				{
-					$result['status']  = 1;
-					$result['message'] = JText::_('EB_UPDATE_CHECKING_UPTODATE');
+					$result['message'] = JText::sprintf('EB_UPDATE_CHECKING_UPDATEFOUND', null);
 				}
+			}
+			else
+			{
+				$result['status']  = 1;
+				$result['message'] = JText::_('EB_UPDATE_CHECKING_UPTODATE');
 			}
 		}
 
