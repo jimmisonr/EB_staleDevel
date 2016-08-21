@@ -28,6 +28,14 @@ JHtml::_('script', 'jui/cms.js', false, true);
 					<legend><?php echo JText::_('EB_GENERAL_SETTINGS'); ?></legend>
 					<div class="control-group">
 						<div class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('download_id', JText::_('EB_DOWNLOAD_ID'), JText::_('EB_DOWNLOAD_ID_EXPLAIN')); ?>
+						</div>
+						<div class="controls">
+							<input type="text" name="download_id" class="input-xlarge" value="<?php echo $config->get('download_id', ''); ?>" size="60" />
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('map_api_key', JText::_('EB_MAP_API_KEY')); ?>
 						</div>
 						<div class="controls">
