@@ -55,7 +55,7 @@ class EventbookingController extends RADControllerAdmin
 				}
 			}
 		}
-		###Setup default configuration data                
+		###Setup default configuration data
 		$sql = 'SELECT COUNT(*) FROM #__eb_configs';
 		$db->setQuery($sql);
 		$total = $db->loadResult();
@@ -1777,7 +1777,7 @@ class EventbookingController extends RADControllerAdmin
 				6 => 'Radio',
 				7 => 'Date',
 				8 => 'Heading',
-				9 => 'Message', );
+				9 => 'Message',);
 
 			foreach ($typeMapping as $key => $value)
 			{
@@ -1858,7 +1858,7 @@ class EventbookingController extends RADControllerAdmin
 					'gs_phone',
 					'gs_fax',
 					'gs_email',
-					'gs_comment', );
+					'gs_comment',);
 				foreach ($keys as $key)
 				{
 					$config->$key = $params->get($key, 0);
@@ -1878,7 +1878,7 @@ class EventbookingController extends RADControllerAdmin
 				'phone'        => $config->s_phone,
 				'fax'          => $config->s_fax,
 				'comment'      => $config->s_comment,
-				'email'        => 1, );
+				'email'        => 1,);
 
 			foreach ($publishStatus as $key => $value)
 			{
@@ -1901,7 +1901,7 @@ class EventbookingController extends RADControllerAdmin
 				'phone'        => $config->r_phone,
 				'fax'          => $config->r_fax,
 				'comment'      => $config->r_comment,
-				'email'        => 1, );
+				'email'        => 1,);
 
 			foreach ($requiredStatus as $key => $value)
 			{
@@ -1922,7 +1922,7 @@ class EventbookingController extends RADControllerAdmin
 				'country'      => $config->gs_country,
 				'phone'        => $config->gs_phone,
 				'fax'          => $config->gs_fax,
-				'comment'      => $config->gs_comment, );
+				'comment'      => $config->gs_comment,);
 			foreach ($groupMemberFields as $fieldName => $showed)
 			{
 				$showed = (int) $showed;
@@ -2067,7 +2067,7 @@ class EventbookingController extends RADControllerAdmin
 				'watinglist_confirmation_subject',
 				'watinglist_confirmation_body',
 				'watinglist_notification_subject',
-				'watinglist_notification_body', );
+				'watinglist_notification_body',);
 			foreach ($keys as $key)
 			{
 				$row->id          = 0;
@@ -2306,30 +2306,6 @@ class EventbookingController extends RADControllerAdmin
 		$db->setQuery($query)
 			->execute();
 
-		// Try to delete the file com_eventbooking.zip from tmp folder
-		$tmpFolder = JFactory::getConfig()->get('tmp_path');
-		if (!JFolder::exists($tmpFolder))
-		{
-			$tmpFolder = JPATH_ROOT . '/tmp';
-		}
-		if (file_exists($tmpFolder . '/com_eventbooking.zip'))
-		{
-			JFile::delete($tmpFolder . '/com_eventbooking.zip');
-		}
-
-		// Try to clean tmp folders
-		$folders = JFolder::folders($tmpFolder);
-		if (count($folders))
-		{
-			foreach ($folders as $installFolder)
-			{
-				if (strpos($installFolder, 'install_') !== false)
-				{
-					JFolder::delete($tmpFolder . '/' . $installFolder);
-				}
-			}
-		}
-
 		// Migrate currency code from plugin param to configuration
 		if (empty($config->currency_code))
 		{
@@ -2384,9 +2360,9 @@ class EventbookingController extends RADControllerAdmin
 		$asset->loadByName('com_eventbooking');
 		if ($asset)
 		{
-			$rules = $asset->rules;
-			$rules = str_replace('eventbooking.registrants_management', 'eventbooking.registrantsmanagement', $rules);
-			$rules = str_replace('eventbooking.view_registrants_list', 'eventbooking.viewregistrantslist', $rules);
+			$rules        = $asset->rules;
+			$rules        = str_replace('eventbooking.registrants_management', 'eventbooking.registrantsmanagement', $rules);
+			$rules        = str_replace('eventbooking.view_registrants_list', 'eventbooking.viewregistrantslist', $rules);
 			$asset->rules = $rules;
 			$asset->store();
 		}
@@ -2416,9 +2392,9 @@ class EventbookingController extends RADControllerAdmin
 			$dependOnOptions = json_encode(explode(',', $dependOnOptions));
 
 			$query->clear()
-					->update('#__eb_fields')
-					->set('depend_on_options = ' . $db->quote($dependOnOptions))
-					->where('id = ' . $rowField->id);
+				->update('#__eb_fields')
+				->set('depend_on_options = ' . $db->quote($dependOnOptions))
+				->where('id = ' . $rowField->id);
 
 			if (!empty($languages))
 			{
@@ -2436,9 +2412,9 @@ class EventbookingController extends RADControllerAdmin
 
 		// Insert deposit payment related messages
 		$query->clear()
-				->select('COUNT(*)')
-				->from('#__eb_messages')
-				->where('message_key = "deposit_payment_form_message"');
+			->select('COUNT(*)')
+			->from('#__eb_messages')
+			->where('message_key = "deposit_payment_form_message"');
 		$db->setQuery($query);
 		$total = $db->loadResult();
 		if (!$total)
@@ -2558,7 +2534,7 @@ class EventbookingController extends RADControllerAdmin
 			JFolder::create(JPATH_ROOT . '/images/com_eventbooking');
 		}
 
-		$db = JFactory::getDbo();
+		$db  = JFactory::getDbo();
 		$sql = 'SELECT thumb FROM #__eb_events WHERE thumb IS NOT NULL';
 		$db->setQuery($sql);
 		$thumbs = $db->loadColumn();
