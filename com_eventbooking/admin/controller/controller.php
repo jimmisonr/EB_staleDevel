@@ -2306,6 +2306,38 @@ class EventbookingController extends RADControllerAdmin
 		$db->setQuery($query)
 			->execute();
 
+		$query->clear()
+			->update('#__extensions')
+			->set('enabled = 1')
+			->where('element = "eventbooking"')
+			->where('folder = "installer"');
+		$db->setQuery($query)
+			->execute();
+
+		// Try to delete the file com_eventbooking.zip from tmp folder
+		$tmpFolder = JFactory::getConfig()->get('tmp_path');
+		if (!JFolder::exists($tmpFolder))
+		{
+			$tmpFolder = JPATH_ROOT . '/tmp';
+		}
+		if (file_exists($tmpFolder . '/com_eventbooking.zip'))
+		{
+			JFile::delete($tmpFolder . '/com_eventbooking.zip');
+		}
+
+		// Try to clean tmp folders
+		$folders = JFolder::folders($tmpFolder);
+		if (count($folders))
+		{
+			foreach ($folders as $installFolder)
+			{
+				if (strpos($installFolder, 'install_') !== false)
+				{
+					JFolder::delete($tmpFolder . '/' . $installFolder);
+				}
+			}
+		}
+
 		// Migrate currency code from plugin param to configuration
 		if (empty($config->currency_code))
 		{
