@@ -262,8 +262,21 @@ class EventbookingModelCart extends RADModel
 
 		if ($couponId > 0)
 		{
-			$sql = 'UPDATE #__eb_coupons SET used = used + 1 WHERE id=' . (int) $couponId;
-			$db->setQuery($sql);
+			$query->clear()
+				->update('#__eb_coupons')
+				->set('used = used + 1')
+				->where('id = ' . $couponId);
+			$db->setQuery($query);
+			$db->execute();
+		}
+
+		if (!empty($fees['bundle_discount_ids']))
+		{
+			$query->clear()
+				->update('#__eb_discounts')
+				->set('used = used + 1')
+				->where('id IN (' . implode(',', $fees['bundle_discount_ids']) . ')');
+			$db->setQuery($query);
 			$db->execute();
 		}
 
