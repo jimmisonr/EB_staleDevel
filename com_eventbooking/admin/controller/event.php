@@ -16,7 +16,6 @@ class EventbookingControllerEvent extends EventbookingController
 	 */
 	public function export()
 	{
-		error_reporting(E_ALL);
 		set_time_limit(0);
 		$model = $this->getModel('events');
 
@@ -127,8 +126,8 @@ class EventbookingControllerEvent extends EventbookingController
 			foreach ($fields as $field)
 			{
 				$cellData = empty($rowEvent->{$field}) ? '' : $rowEvent->{$field};
-				$exporter->getActiveSheet()->setCellValue($column . $row, $cellData);
-				$exporter->getActiveSheet()->getColumnDimension($column)->setAutoSize(true);
+				$sheet->setCellValue($column . $row, $cellData);
+				$sheet->getColumnDimension($column)->setAutoSize(true);
 				$column++;
 			}
 			$row++;
