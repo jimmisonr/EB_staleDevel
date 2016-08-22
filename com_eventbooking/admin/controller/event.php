@@ -12,6 +12,26 @@ defined('_JEXEC') or die;
 class EventbookingControllerEvent extends EventbookingController
 {
 	/**
+	 * Import Events from a csv file
+	 */
+	public function import()
+	{
+		/* @vare  EventbookingModelEvent $model */
+		$model = $this->getModel('Event');
+
+		$numberImportedEvents = $model->import($this->input);
+		if ($numberImportedEvents === false)
+		{
+			$this->setRedirect('index.php?option=com_eventbooking&view=event&layout=import', JText::_('EB_NO_EVENTS_IMPORTED'));
+		}
+		else
+		{
+			$this->setRedirect('index.php?option=com_eventbooking&view=events',
+				JText::sprintf('EB_NUMBER_EVENTS_IMPORTED', $numberImportedEvents));
+		}
+	}
+
+	/**
 	 * Export events into an Excel File
 	 */
 	public function export()
