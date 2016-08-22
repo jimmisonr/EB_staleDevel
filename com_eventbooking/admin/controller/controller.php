@@ -55,7 +55,7 @@ class EventbookingController extends RADControllerAdmin
 				}
 			}
 		}
-		
+
 		// Create tables if not exists
 		$tableSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/createifnotexists.eventbooking.sql';
 		$sql     = file_get_contents($tableSql);
@@ -72,7 +72,7 @@ class EventbookingController extends RADControllerAdmin
 				}
 			}
 		}
-		
+
 		###Setup default configuration data
 		$sql = 'SELECT COUNT(*) FROM #__eb_configs';
 		$db->setQuery($sql);
@@ -1806,7 +1806,7 @@ class EventbookingController extends RADControllerAdmin
 				6 => 'Radio',
 				7 => 'Date',
 				8 => 'Heading',
-				9 => 'Message',);
+				9 => 'Message', );
 
 			foreach ($typeMapping as $key => $value)
 			{
@@ -1887,7 +1887,7 @@ class EventbookingController extends RADControllerAdmin
 					'gs_phone',
 					'gs_fax',
 					'gs_email',
-					'gs_comment',);
+					'gs_comment', );
 				foreach ($keys as $key)
 				{
 					$config->$key = $params->get($key, 0);
@@ -1907,7 +1907,7 @@ class EventbookingController extends RADControllerAdmin
 				'phone'        => $config->s_phone,
 				'fax'          => $config->s_fax,
 				'comment'      => $config->s_comment,
-				'email'        => 1,);
+				'email'        => 1, );
 
 			foreach ($publishStatus as $key => $value)
 			{
@@ -1930,7 +1930,7 @@ class EventbookingController extends RADControllerAdmin
 				'phone'        => $config->r_phone,
 				'fax'          => $config->r_fax,
 				'comment'      => $config->r_comment,
-				'email'        => 1,);
+				'email'        => 1, );
 
 			foreach ($requiredStatus as $key => $value)
 			{
@@ -1951,7 +1951,7 @@ class EventbookingController extends RADControllerAdmin
 				'country'      => $config->gs_country,
 				'phone'        => $config->gs_phone,
 				'fax'          => $config->gs_fax,
-				'comment'      => $config->gs_comment,);
+				'comment'      => $config->gs_comment, );
 			foreach ($groupMemberFields as $fieldName => $showed)
 			{
 				$showed = (int) $showed;
@@ -2096,7 +2096,7 @@ class EventbookingController extends RADControllerAdmin
 				'watinglist_confirmation_subject',
 				'watinglist_confirmation_body',
 				'watinglist_notification_subject',
-				'watinglist_notification_body',);
+				'watinglist_notification_body', );
 			foreach ($keys as $key)
 			{
 				$row->id          = 0;

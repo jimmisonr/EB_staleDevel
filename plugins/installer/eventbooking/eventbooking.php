@@ -37,7 +37,7 @@ class plgInstallerEventbooking extends JPlugin
 			$uri->setVar('domain', $siteUri->getHost());
 
 			$uri->setVar('version', EventbookingHelper::getInstalledVersion());
-			
+
 			$url = $uri->toString();
 		}
 

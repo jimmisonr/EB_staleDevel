@@ -608,7 +608,7 @@ class EventbookingHelperData
 	public static function csvExport($rows, $config, $rowFields, $fieldValues, $eventId = 0)
 	{
 		if (count($rows))
-		{			
+		{
 			$browser   = JFactory::getApplication()->client->browser;
 			$mime_type = ($browser == JApplicationWebClient::IE || $browser == JApplicationWebClient::OPERA) ? 'application/octetstream' : 'application/octet-stream';
 			$filename  = "registrants_list";

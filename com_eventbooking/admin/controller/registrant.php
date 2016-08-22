@@ -144,7 +144,6 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 	/**
 	 * Remove group member from group registration
-	 *
 	 */
 	public function remove_group_member()
 	{
@@ -158,14 +157,14 @@ class EventbookingControllerRegistrant extends EventbookingController
 		$query = $db->getQuery(true);
 		$query->select('COUNT(*)')
 			->from('#__eb_registrants')
-			->where('id = '. $id);
+			->where('id = ' . $id);
 		$db->setQuery($query);
 		$total = $db->loadResult();
 
 		if ($total)
 		{
 			// Redirect back to registrant edit screen
-			$url = JRoute::_('index.php?option=com_eventbooking&view=registrant&id='.$id, false);
+			$url = JRoute::_('index.php?option=com_eventbooking&view=registrant&id=' . $id, false);
 		}
 		else
 		{

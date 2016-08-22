@@ -470,7 +470,6 @@ class EventbookingHelperMail
 		static::send($mailer, array($row->email), $subject, $body);
 	}
 
-
 	/**
 	 * Send email to registrant when admin change the status to cancelled
 	 *
@@ -1170,7 +1169,6 @@ class EventbookingHelperMail
 
 		return $mailer;
 	}
-
 
 	/**
 	 * Add event's attachments to mailer object for sending emails to registrants

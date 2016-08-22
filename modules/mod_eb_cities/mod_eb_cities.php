@@ -11,11 +11,9 @@
 defined('_JEXEC') or die;
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 
-
 $config = EventbookingHelper::getConfig();
 EventbookingHelper::loadLanguage();
 JFactory::getDocument()->addStylesheet(JUri::base(true) . '/media/com_eventbooking/assets/css/style.css', 'text/css', null, null);
-
 
 $db               = JFactory::getDbo();
 $query            = $db->getQuery(true);
@@ -52,4 +50,4 @@ if (!$itemId)
 	$itemId = EventbookingHelper::getItemid();
 }
 
-require(JModuleHelper::getLayoutPath('mod_eb_cities', 'default'));
+require JModuleHelper::getLayoutPath('mod_eb_cities', 'default');
