@@ -213,9 +213,6 @@ class com_eventbookingInstallerScript
 					}
 				}
 			}
-		}
-
-		JFactory::getApplication()->redirect(
-			JRoute::_('index.php?option=com_eventbooking&task=update_db_schema&install_type=' . $this->installType, false));
+		}		
 	}
 }

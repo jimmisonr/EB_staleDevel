@@ -55,7 +55,7 @@ class EventbookingController extends RADControllerAdmin
 				}
 			}
 		}
-
+		
 		// Create tables if not exists
 		$tableSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/createifnotexists.eventbooking.sql';
 		$sql     = file_get_contents($tableSql);
@@ -72,8 +72,8 @@ class EventbookingController extends RADControllerAdmin
 				}
 			}
 		}
-
-		###Setup default configuration data                
+		
+		###Setup default configuration data
 		$sql = 'SELECT COUNT(*) FROM #__eb_configs';
 		$db->setQuery($sql);
 		$total = $db->loadResult();
@@ -1806,7 +1806,7 @@ class EventbookingController extends RADControllerAdmin
 				6 => 'Radio',
 				7 => 'Date',
 				8 => 'Heading',
-				9 => 'Message', );
+				9 => 'Message',);
 
 			foreach ($typeMapping as $key => $value)
 			{
@@ -1887,7 +1887,7 @@ class EventbookingController extends RADControllerAdmin
 					'gs_phone',
 					'gs_fax',
 					'gs_email',
-					'gs_comment', );
+					'gs_comment',);
 				foreach ($keys as $key)
 				{
 					$config->$key = $params->get($key, 0);
@@ -1907,7 +1907,7 @@ class EventbookingController extends RADControllerAdmin
 				'phone'        => $config->s_phone,
 				'fax'          => $config->s_fax,
 				'comment'      => $config->s_comment,
-				'email'        => 1, );
+				'email'        => 1,);
 
 			foreach ($publishStatus as $key => $value)
 			{
@@ -1930,7 +1930,7 @@ class EventbookingController extends RADControllerAdmin
 				'phone'        => $config->r_phone,
 				'fax'          => $config->r_fax,
 				'comment'      => $config->r_comment,
-				'email'        => 1, );
+				'email'        => 1,);
 
 			foreach ($requiredStatus as $key => $value)
 			{
@@ -1951,7 +1951,7 @@ class EventbookingController extends RADControllerAdmin
 				'country'      => $config->gs_country,
 				'phone'        => $config->gs_phone,
 				'fax'          => $config->gs_fax,
-				'comment'      => $config->gs_comment, );
+				'comment'      => $config->gs_comment,);
 			foreach ($groupMemberFields as $fieldName => $showed)
 			{
 				$showed = (int) $showed;
@@ -2096,7 +2096,7 @@ class EventbookingController extends RADControllerAdmin
 				'watinglist_confirmation_subject',
 				'watinglist_confirmation_body',
 				'watinglist_notification_subject',
-				'watinglist_notification_body', );
+				'watinglist_notification_body',);
 			foreach ($keys as $key)
 			{
 				$row->id          = 0;
@@ -2335,6 +2335,14 @@ class EventbookingController extends RADControllerAdmin
 		$db->setQuery($query)
 			->execute();
 
+		$query->clear()
+			->update('#__extensions')
+			->set('enabled = 1')
+			->where('element = "eventbooking"')
+			->where('folder = "installer"');
+		$db->setQuery($query)
+			->execute();
+
 		// Try to delete the file com_eventbooking.zip from tmp folder
 		$tmpFolder = JFactory::getConfig()->get('tmp_path');
 		if (!JFolder::exists($tmpFolder))
@@ -2413,9 +2421,9 @@ class EventbookingController extends RADControllerAdmin
 		$asset->loadByName('com_eventbooking');
 		if ($asset)
 		{
-			$rules = $asset->rules;
-			$rules = str_replace('eventbooking.registrants_management', 'eventbooking.registrantsmanagement', $rules);
-			$rules = str_replace('eventbooking.view_registrants_list', 'eventbooking.viewregistrantslist', $rules);
+			$rules        = $asset->rules;
+			$rules        = str_replace('eventbooking.registrants_management', 'eventbooking.registrantsmanagement', $rules);
+			$rules        = str_replace('eventbooking.view_registrants_list', 'eventbooking.viewregistrantslist', $rules);
 			$asset->rules = $rules;
 			$asset->store();
 		}
@@ -2445,9 +2453,9 @@ class EventbookingController extends RADControllerAdmin
 			$dependOnOptions = json_encode(explode(',', $dependOnOptions));
 
 			$query->clear()
-					->update('#__eb_fields')
-					->set('depend_on_options = ' . $db->quote($dependOnOptions))
-					->where('id = ' . $rowField->id);
+				->update('#__eb_fields')
+				->set('depend_on_options = ' . $db->quote($dependOnOptions))
+				->where('id = ' . $rowField->id);
 
 			if (!empty($languages))
 			{
@@ -2465,9 +2473,9 @@ class EventbookingController extends RADControllerAdmin
 
 		// Insert deposit payment related messages
 		$query->clear()
-				->select('COUNT(*)')
-				->from('#__eb_messages')
-				->where('message_key = "deposit_payment_form_message"');
+			->select('COUNT(*)')
+			->from('#__eb_messages')
+			->where('message_key = "deposit_payment_form_message"');
 		$db->setQuery($query);
 		$total = $db->loadResult();
 		if (!$total)
@@ -2587,7 +2595,7 @@ class EventbookingController extends RADControllerAdmin
 			JFolder::create(JPATH_ROOT . '/images/com_eventbooking');
 		}
 
-		$db = JFactory::getDbo();
+		$db  = JFactory::getDbo();
 		$sql = 'SELECT thumb FROM #__eb_events WHERE thumb IS NOT NULL';
 		$db->setQuery($sql);
 		$thumbs = $db->loadColumn();
@@ -2627,28 +2635,58 @@ class EventbookingController extends RADControllerAdmin
 	 */
 	public function check_update()
 	{
-		$installedVersion = EventbookingHelper::getInstalledVersion();
-		$result           = array();
+		// Get the caching duration.
+		$component     = JComponentHelper::getComponent('com_installer');
+		$params        = $component->params;
+		$cache_timeout = $params->get('cachetimeout', 6, 'int');
+		$cache_timeout = 3600 * $cache_timeout;
+
+		// Get the minimum stability.
+		$minimum_stability = $params->get('minimum_stability', JUpdater::STABILITY_STABLE, 'int');
+
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_installer/models');
+
+		/** @var InstallerModelUpdate $model */
+		$model = JModelLegacy::getInstance('Update', 'InstallerModel');
+
+		$model->purge();
+
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('extension_id')
+			->from('#__extensions')
+			->where('`type` = "package"')
+			->where('`element` = "pkg_eventbooking"');
+		$db->setQuery($query);
+		$eid = (int) $db->loadResult();
+
 		$result['status'] = 0;
 
-		$http     = JHttpFactory::getHttp();
-		$url      = 'http://joomdonationdemo.com/versions/eventbookingj3.txt';
-		$response = $http->get($url);
-		if ($response->code == 200)
+		if ($eid)
 		{
-			$latestVersion = $response->body;
-			if ($latestVersion)
+			$ret = JUpdater::getInstance()->findUpdates($eid, $cache_timeout, $minimum_stability);
+
+			if ($ret)
 			{
-				if (version_compare($latestVersion, $installedVersion, 'gt'))
+				$model->setState('list.start', 0);
+				$model->setState('list.limit', 0);
+				$model->setState('filter.extension_id', $eid);
+				$updates          = $model->getItems();
+				$result['status'] = 2;
+
+				if (count($updates))
 				{
-					$result['status']  = 2;
-					$result['message'] = JText::sprintf('EB_UPDATE_CHECKING_UPDATEFOUND', $latestVersion);
+					$result['message'] = JText::sprintf('EB_UPDATE_CHECKING_UPDATEFOUND', $updates[0]->version);
 				}
 				else
 				{
-					$result['status']  = 1;
-					$result['message'] = JText::_('EB_UPDATE_CHECKING_UPTODATE');
+					$result['message'] = JText::sprintf('EB_UPDATE_CHECKING_UPDATEFOUND', null);
 				}
+			}
+			else
+			{
+				$result['status']  = 1;
+				$result['message'] = JText::_('EB_UPDATE_CHECKING_UPTODATE');
 			}
 		}
 
