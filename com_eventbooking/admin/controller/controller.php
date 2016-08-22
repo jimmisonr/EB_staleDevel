@@ -212,6 +212,17 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('access', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_coupons` ADD  `access` INT(11) NOT NULL DEFAULT '1';";
+			$db->setQuery($sql);
+			$db->execute();
+
+			$sql = 'UPDATE #__eb_coupons SET `access` = 1';
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		$fields = array_keys($db->getTableColumns('#__eb_states'));
 
 		if (!in_array('id', $fields))

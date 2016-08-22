@@ -333,7 +333,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 			if ($isNew && $app->isSite())
 			{
-				EventbookingHelper::sendNewEventNotificationEmail($row, $config);
+				EventbookingHelperMail::sendNewEventNotificationEmail($row, $config);
 			}
 
 			if (!$isNew && $row->parent_id > 0)
@@ -781,7 +781,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 		if ($isNew && $app->isSite())
 		{
-			EventbookingHelper::sendNewEventNotificationEmail($row, $config);
+			EventbookingHelperMail::sendNewEventNotificationEmail($row, $config);
 		}
 
 		EventbookingHelper::updateParentMaxEventDate($row->id);

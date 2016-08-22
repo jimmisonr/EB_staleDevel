@@ -260,7 +260,7 @@ class EventBookingModelRegister extends RADModel
 			}
 			else
 			{
-				EventbookingHelper::sendWaitinglistEmail($row, $config);
+				EventbookingHelperMail::sendWaitinglistEmail($row, $config);
 
 				return 2;
 			}
@@ -541,7 +541,7 @@ class EventBookingModelRegister extends RADModel
 				if ($row->is_group_billing)
 				{
 					EventbookingHelper::updateGroupRegistrationRecord($row->id);
-					EventbookingHelper::sendWaitinglistEmail($row, $config);
+					EventbookingHelperMail::sendWaitinglistEmail($row, $config);
 				}
 
 				return 2;
