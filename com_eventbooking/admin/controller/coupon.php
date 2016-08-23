@@ -52,119 +52,81 @@ class EventbookingControllerCoupon extends EventbookingController
 	 */
 	public function export()
 	{
-		$db        = JFactory::getDbo();
-		$query     = $db->getQuery(true);
-		$nullDate  = $db->getNullDate();
-		$eventId    = $this->input->getInt('filter_event_id');
-		$published = $this->input->get('filter_state', '');
+		set_time_limit(0);
+		$model = $this->getModel('coupons');
 
-		switch ($published)
+		/* @var EventbookingModelCoupons $model */
+
+		$model->setState('limitstart', 0)
+			->setState('limit', 0)
+			->setState('filter_order', 'tbl.id')
+			->setState('filter_order_Dir', 'ASC');
+		$rows = $model->getData();
+
+		if (count($rows) == 0)
 		{
-			case "P":
-				$published = 1;
-				break;
-			case "U":
-				$published = 0;
-				break;
+			$this->setMessage(JText::_('There are no coupons to export'));
+			$this->setRedirect('index.php?option=com_eventbooking&view=coupons');
+
+			return;
 		}
 
-		$query->select('a.*, b.title')
-			->from('#__eb_coupons AS a')
-			->leftJoin('#__eb_events AS b ON a.event_id = b.id');
+		$fields = array(
+			'event',
+			'code',
+			'discount',
+			'coupon_type',
+			'times',
+			'used',
+			'valid_from',
+			'valid_to',
+			'published',
+		);
 
-		if ($eventId > 0)
+		$db       = JFactory::getDbo();
+		$query    = $db->getQuery(true);
+		$nullDate = $db->getNullDate();
+
+		// Prepare data
+		foreach ($rows as $row)
 		{
-			$query->where('a.event_id = ' . $eventId);
-		}
-
-		if ($published != '')
-		{
-			$query->where(' a.published=' . $published);
-		}
-		$db->setQuery($query);
-		$rows = $db->loadObjectList();
-		if (count($rows))
-		{
-
-			$results_arr   = array();
-			$results_arr[] = JText::_('event');
-			$results_arr[] = JText::_('code');
-			$results_arr[] = JText::_('discount');
-			$results_arr[] = JText::_('coupon_type');
-			$results_arr[] = JText::_('times');
-			$results_arr[] = JText::_('used');
-			$results_arr[] = JText::_('valid_from');
-			$results_arr[] = JText::_('valid_to');
-			$results_arr[] = JText::_('published');
-			$csv_output    = "\"" . implode("\",\"", $results_arr) . "\"";
-
-			foreach ($rows as $r)
+			if ($row->event_id == -1)
 			{
-				$results_arr   = array();
-				if ($r->event_id == -1)
-				{
-					$results_arr[] = $r->title;
-				}
-				else
-				{
-					$query->clear();
-					$query->select('a.id')
-						->from('#__eb_events AS a')
-						->leftJoin('#__eb_coupon_events AS b ON a.id=b.event_id')
-						->where('b.coupon_id=' . (int) $r->id);
-					$db->setQuery($query);
-					$results_arr[] = implode(',', $db->loadColumn());
-				}
-				$results_arr[] = $r->code;
-				$results_arr[] = round($r->discount, 2);
-				$results_arr[] = $r->coupon_type;
-				$results_arr[] = $r->times;
-				$results_arr[] = $r->used;
-				if ($r->valid_from != $nullDate && $r->valid_from)
-				{
-					$results_arr[] = JHtml::_('date', $r->valid_from, 'Y-m-d', null);
-				}
-				else
-				{
-					$results_arr[] = '';
-				}
-
-				if ($r->valid_to != $nullDate && $r->valid_to)
-				{
-					$results_arr[] = JHtml::_('date', $r->valid_to, 'Y-m-d', null);
-				}
-				else
-				{
-					$results_arr[] = '';
-				}
-
-				$results_arr[] = $r->published;
-				$csv_output .= "\n\"" . implode("\",\"", $results_arr) . "\"";
-			}
-			$csv_output .= "\n";
-			$browser   = JFactory::getApplication()->client->browser;
-			$mime_type = ($browser == JApplicationWebClient::IE || $browser == JApplicationWebClient::OPERA) ? 'application/octetstream' : 'application/octet-stream';
-
-			$filename  = "coupon_list";
-			@ob_end_clean();
-			ob_start();
-			header('Content-Type: ' . $mime_type);
-			header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-
-			if ($browser == JApplicationWebClient::IE)
-			{
-				header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
-				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-				header('Pragma: public');
+				$row->event = '';
 			}
 			else
 			{
-				header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
-				header('Pragma: no-cache');
+				$query->clear()
+					->select('a.id')
+					->from('#__eb_events AS a')
+					->leftJoin('#__eb_coupon_events AS b ON a.id = b.event_id')
+					->where('b.coupon_id=' . (int) $row->id);
+				$db->setQuery($query);
+				$row->event = implode(',', $db->loadColumn());
 			}
-			print $csv_output;
-			exit();
+
+			$row->discount = round($row->discount, 2);
+
+			if ($row->valid_from != $nullDate && $row->valid_from)
+			{
+				$row->valid_from = JHtml::_('date', $row->valid_from, 'Y-m-d', null);
+			}
+			else
+			{
+				$row->valid_from = '';
+			}
+
+			if ($row->valid_to != $nullDate && $row->valid_to)
+			{
+				$row->valid_to = JHtml::_('date', $row->valid_to, 'Y-m-d', null);
+			}
+			else
+			{
+				$row->valid_to = '';
+			}
 		}
+
+		EventbookingHelperData::excelExport($fields, $rows, 'coupons_list');
 	}
 
 	/**
@@ -172,7 +134,7 @@ class EventbookingControllerCoupon extends EventbookingController
 	 */
 	public function batch()
 	{
-		$model         = $this->getModel('Coupon');
+		$model = $this->getModel('Coupon');
 		$model->batch($this->input);
 		$this->setRedirect('index.php?option=com_eventbooking&view=coupons', JText::_('EB_COUPONS_SUCCESSFULLY_GENERATED'));
 	}
