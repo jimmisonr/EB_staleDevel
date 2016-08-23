@@ -912,8 +912,9 @@ class EventbookingHelperData
 	 * @param $fields
 	 * @param $rows
 	 * @param $filename
+	 * @param $headers
 	 */
-	public static function excelExport($fields, $rows, $filename)
+	public static function excelExport($fields, $rows, $filename, $headers = array())
 	{
 		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/PHPOffice/PHPExcel.php';
 
@@ -969,7 +970,7 @@ class EventbookingHelperData
 		$rowIndex = '1';
 		foreach ($fields as $field)
 		{
-			$sheet->setCellValue($column . $rowIndex, $field);
+			$sheet->setCellValue($column . $rowIndex, $field, empty($headers[$field]) ? $field : $headers[$field]);
 			$sheet->getColumnDimension($column)->setAutoSize(true);
 			$column++;
 		}
