@@ -866,4 +866,43 @@ class EventbookingHelperData
 		}
 		JFactory::getApplication()->close();
 	}
+
+	/**
+	 * Get data from excel file using PHPExcel library
+	 *
+	 * @param $file
+	 *
+	 * @return array
+	 */
+	public static function getDataFromFile($file)
+	{
+		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/PHPOffice/PHPExcel.php';
+
+		$data = array();
+
+		$reader = PHPExcel_IOFactory::load($file);
+		if ($reader instanceof PHPExcel_Reader_CSV)
+		{
+			$config = EventbookingHelper::getConfig();
+			//$reader->setDelimiter($config->get('csv_delimiter', ','));
+		}
+
+		$rows   = $reader->getActiveSheet()->toArray(null, true, true, true);
+
+		if (count($rows) > 1)
+		{
+			for ($i = 2, $n = count($rows); $i <= $n; $i++)
+			{
+				$row = array();
+				foreach ($rows[1] as $key => $fieldName)
+				{
+					$row[$fieldName] = $rows[$i][$key];
+				}
+
+				$data[] = $row;
+			}
+		}
+
+		return $data;
+	}
 }
