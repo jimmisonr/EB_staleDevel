@@ -905,4 +905,99 @@ class EventbookingHelperData
 
 		return $data;
 	}
+
+	/**
+	 * Export the given data to Excel
+	 *
+	 * @param $fields
+	 * @param $rows
+	 * @param $filename
+	 */
+	public static function excelExport($fields, $rows, $filename)
+	{
+		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/PHPOffice/PHPExcel.php';
+
+		$exporter    = new PHPExcel();
+		$user        = JFactory::getUser();
+		$createdDate = JFactory::getDate('now', JFactory::getConfig()->get('offset'))->toSql(true);
+
+
+		//Set properties Excel
+		$exporter->getProperties()
+			->setCreator($user->name)
+			->setLastModifiedBy($user->name)
+			->setTitle('Events List Exported On ' . $createdDate)
+			->setSubject('Events List Exported On ' . $createdDate)
+			->setDescription('Events List Exported On ' . $createdDate);
+
+		//Set some styles and layout for Excel file
+		$borderedCenter = new PHPExcel_Style();
+		$borderedCenter->applyFromArray(
+			array(
+				'alignment' => array(
+					'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+					'vertical'   => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+				),
+				'font'      => array(
+					'name' => 'Times New Roman', 'bold' => false, 'italic' => false, 'size' => 11
+				),
+				'borders'   => array(
+					'bottom' => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+					'right'  => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+					'top'    => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+					'left'   => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+				)
+			)
+		);
+
+		$borderedLeft = new PHPExcel_Style();
+		$borderedLeft->applyFromArray(
+			array(
+				'alignment' => array(
+					'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+				),
+				'font'      => array(
+					'name' => 'Times New Roman', 'bold' => false, 'italic' => false, 'size' => 11
+				),
+				'borders'   => array(
+					'bottom' => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+					'right'  => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+					'top'    => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+					'left'   => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+				)
+			)
+		);
+
+		$sheet  = $exporter->setActiveSheetIndex(0);
+		$column = 'A';
+		$row    = '1';
+		foreach ($fields as $field)
+		{
+			$sheet->setCellValue($column . $row, $field);
+			$sheet->getColumnDimension($column)->setAutoSize(true);
+			$column++;
+		}
+
+		$row = 2;
+		foreach ($rows as $rowData)
+		{
+			$column = 'A';
+			foreach ($fields as $field)
+			{
+				$cellData = empty($rowData->{$field}) ? '' : $rowData->{$field};
+				$sheet->setCellValue($column . $row, $cellData);
+				$sheet->getColumnDimension($column)->setAutoSize(true);
+				$column++;
+			}
+			$row++;
+		}
+
+		header('Content-Type: application/vnd.ms-exporter');
+		header('Content-Disposition: attachment;filename=' . $filename . '_on_' . $createdDate . '.xlsx');
+		header('Cache-Control: max-age=0');
+		$objWriter = PHPExcel_IOFactory::createWriter($exporter, 'Excel2007');
+		$objWriter->save('php://output');
+
+		JFactory::getApplication()->close();
+	}
 }
