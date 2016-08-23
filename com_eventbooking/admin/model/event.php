@@ -30,6 +30,13 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 				->from('#__eb_categories');
 			$db->setQuery($query);
 			$categories = $db->loadObjectList('name');
+
+			$query->clear()
+				->select('id, name')
+				->from('#__eb_locations');
+			$db->setQuery($query);
+			$locations = $db->loadObjectList('name');
+
 			$imported   = 0;
 			foreach ($events as $event)
 			{
@@ -40,7 +47,29 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 
 				/* @var EventbookingTableEvent $row */
 				$row = $this->getTable();
-				$row->bind($event);
+				if (!empty($event['id']))
+				{
+					$row->load($event['id']);
+				}
+				$row->bind($event, array('id'));
+
+				if (is_numeric($event['location']))
+				{
+					$event['location_id'] = $event['location'];
+				}
+				else
+				{
+					$locationName         = trim($event['location']);
+					$event['location_id'] = isset($locations[$locationName]) ? $locations[$locationName]->id : 0;
+				}
+
+				if (!is_numeric($event['location']))
+				{
+					$locationName = trim($event['location']);
+					$event['location'] = isset($locations[$locationName]) ? $locations[$locationName]->id : 0;
+				}
+
+
 				$this->prepareTable($row, 'save');
 				$row->store();
 				$eventId = $row->id;

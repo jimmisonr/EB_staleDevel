@@ -77,6 +77,7 @@ class EventbookingControllerEvent extends EventbookingController
 			'individual_price',
 			'tax_rate',
 			'event_capacity',
+			'location',
 			'short_description',
 			'description',
 			'meta_keywords',

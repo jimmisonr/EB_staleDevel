@@ -37,12 +37,24 @@ class EventbookingModelEvents extends RADModelList
 		{
 			$db    = $this->getDbo();
 			$query = $db->getQuery(true);
-			$query->select('a.name, b.main_category FROM #__eb_categories AS a')
+			$query->clear()
+				->select('id, name')
+				->from('#__eb_locations');
+			$db->setQuery($query);
+			$locations = $db->loadObjectList('id');
+
+			$query->clear()
+				->select('a.name, b.main_category FROM #__eb_categories AS a')
 				->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id')
 				->order('a.ordering');
 
 			foreach ($rows as $row)
 			{
+				if (isset($locations[$row->location_id]))
+				{
+					$row->location = $locations[$row->location_id]->name;
+				}
+
 				$query->where('event_id=' . $row->id);
 				$db->setQuery($query);
 				$categories           = $db->loadObjectList();
