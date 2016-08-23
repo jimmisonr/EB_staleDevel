@@ -884,7 +884,7 @@ class EventbookingHelperData
 		if ($reader instanceof PHPExcel_Reader_CSV)
 		{
 			$config = EventbookingHelper::getConfig();
-			//$reader->setDelimiter($config->get('csv_delimiter', ','));
+			$reader->setDelimiter($config->get('csv_delimiter', ','));
 		}
 
 		$rows   = $reader->getActiveSheet()->toArray(null, true, true, true);
