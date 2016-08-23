@@ -964,28 +964,28 @@ class EventbookingHelperData
 			)
 		);
 
-		$sheet  = $exporter->setActiveSheetIndex(0);
-		$column = 'A';
-		$row    = '1';
+		$sheet    = $exporter->setActiveSheetIndex(0);
+		$column   = 'A';
+		$rowIndex = '1';
 		foreach ($fields as $field)
 		{
-			$sheet->setCellValue($column . $row, $field);
+			$sheet->setCellValue($column . $rowIndex, $field);
 			$sheet->getColumnDimension($column)->setAutoSize(true);
 			$column++;
 		}
 
-		$row = 2;
-		foreach ($rows as $rowData)
+		$rowIndex++;
+		foreach ($rows as $row)
 		{
 			$column = 'A';
 			foreach ($fields as $field)
 			{
-				$cellData = empty($rowData->{$field}) ? '' : $rowData->{$field};
-				$sheet->setCellValue($column . $row, $cellData);
+				$cellData = empty($row->{$field}) ? '' : $row->{$field};
+				$sheet->setCellValue($column . $rowIndex, $cellData);
 				$sheet->getColumnDimension($column)->setAutoSize(true);
 				$column++;
 			}
-			$row++;
+			$rowIndex++;
 		}
 
 		header('Content-Type: application/vnd.ms-exporter');
