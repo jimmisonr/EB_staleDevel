@@ -602,6 +602,14 @@ JHtml::_('script', 'jui/cms.js', false, true);
 					</div>
 					<div class="control-group">
 						<div class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('export_data_format', JText::_('EB_EXPORT_DATA_FORMAT')); ?>
+						</div>
+						<div class="controls">
+							<?php echo $this->lists['export_data_format']; ?>
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('conversion_tracking_code', JText::_('EB_CONVERSION_TRACKING_CODE'), JText::_('EB_CONVERSION_TRACKING_CODE_EXPLAIN')); ?>
 						</div>
 						<div class="controls">

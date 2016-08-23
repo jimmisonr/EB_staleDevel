@@ -990,10 +990,28 @@ class EventbookingHelperData
 			$rowIndex++;
 		}
 
+		$config   = EventbookingHelper::getConfig();
+		$fileType = $config->get('export_data_format', 'xlsx');
+		switch ($fileType)
+		{
+			case 'csv' :
+				$writer = 'CSV';
+				break;
+			case 'xls' :
+				$writer = 'Excel5';
+				break;
+			case 'xlsx' :
+				$writer = 'Excel2007';
+				break;
+			default :
+				$writer = 'Excel2007';
+				break;
+		}
+
 		header('Content-Type: application/vnd.ms-exporter');
-		header('Content-Disposition: attachment;filename=' . $filename . '_on_' . $createdDate . '.xlsx');
+		header('Content-Disposition: attachment;filename=' . $filename . '_on_' . $createdDate . '.' . $fileType);
 		header('Cache-Control: max-age=0');
-		$objWriter = PHPExcel_IOFactory::createWriter($exporter, 'Excel2007');
+		$objWriter = PHPExcel_IOFactory::createWriter($exporter, $writer);
 		$objWriter->save('php://output');
 
 		JFactory::getApplication()->close();
