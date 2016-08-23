@@ -921,14 +921,10 @@ class EventbookingHelperData
 		$user        = JFactory::getUser();
 		$createdDate = JFactory::getDate('now', JFactory::getConfig()->get('offset'))->toSql(true);
 
-
 		//Set properties Excel
 		$exporter->getProperties()
 			->setCreator($user->name)
-			->setLastModifiedBy($user->name)
-			->setTitle('Events List Exported On ' . $createdDate)
-			->setSubject('Events List Exported On ' . $createdDate)
-			->setDescription('Events List Exported On ' . $createdDate);
+			->setLastModifiedBy($user->name);
 
 		//Set some styles and layout for Excel file
 		$borderedCenter = new PHPExcel_Style();
