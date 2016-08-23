@@ -16,18 +16,28 @@ class EventbookingControllerEvent extends EventbookingController
 	 */
 	public function import()
 	{
-		/* @vare  EventbookingModelEvent $model */
-		$model = $this->getModel('Event');
+		$inputFile = $this->input->files->get('input_file');
+		$fileName  = $inputFile ['name'];
+		$fileExt   = strtolower(JFile::getExt($fileName));
 
-		$numberImportedEvents = $model->import($this->input);
-		if ($numberImportedEvents === false)
+		if (!in_array($fileExt, array('csv', 'xls', 'xlsx')))
 		{
-			$this->setRedirect('index.php?option=com_eventbooking&view=event&layout=import', JText::_('EB_NO_EVENTS_IMPORTED'));
+			$this->setRedirect('index.php?option=com_eventbooking&view=event&layout=import', JText::_('Invalid File Type. Only CSV, XLS and XLS file types are supported'));
+
+			return;
 		}
-		else
+
+		/* @var  EventbookingModelEvent $model */
+		$model = $this->getModel('Event');
+		try
 		{
-			$this->setRedirect('index.php?option=com_eventbooking&view=events',
-				JText::sprintf('EB_NUMBER_EVENTS_IMPORTED', $numberImportedEvents));
+			$numberImportedEvents = $model->import($inputFile['tmp_name']);
+			$this->setRedirect('index.php?option=com_eventbooking&view=events', JText::sprintf('EB_NUMBER_EVENTS_IMPORTED', $numberImportedEvents));
+		}
+		catch (Exception $e)
+		{
+			$this->setRedirect('index.php?option=com_eventbooking&view=event&layout=import');
+			$this->setMessage($e->getMessage(), 'error');
 		}
 	}
 

@@ -19,7 +19,7 @@ JToolbarHelper::cancel('event.cancel');
 				<?php echo JText::_('EB_EXCEL_FILE'); ?>
 			</td>
 			<td>
-				<input type="file" name="events_file" id="events_file" size="50" />
+				<input type="file" name="input_file" id="input_file" size="50" />
 			</td>
 			<td>
 				<?php echo JText::_('EB_EXCEL_EVENT_FILE_EXPLAIN'); ?>

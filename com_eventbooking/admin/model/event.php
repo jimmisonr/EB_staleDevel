@@ -12,14 +12,14 @@ defined('_JEXEC') or die;
 class EventbookingModelEvent extends EventbookingModelCommonEvent
 {
 	/**
-	 * @param $input
+	 * @param $file
 	 *
 	 * @return int
 	 * @throws Exception
 	 */
-	public function import($input)
+	public function import($file)
 	{
-		$events   = $this->getEventsFromInput($input);
+		$events   = EventbookingHelperData::getDataFromFile($file);
 		$imported = 0;
 
 		if (count($events))
@@ -44,6 +44,15 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 				$this->prepareTable($row, 'save');
 				$row->store();
 				$eventId = $row->id;
+
+				if (!empty($event['id']))
+				{
+					$query->clear()
+						->delete('#__eb_event_categories')
+						->where('event_id = ' . (int) $event['id']);
+					$db->setQuery($query);
+					$db->execute();
+				}
 
 				// Main category
 				if (is_numeric($event['category']))
@@ -89,44 +98,5 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 		}
 
 		return $imported;
-	}
-
-	/**
-	 * Get events data from excel file
-	 *
-	 * @param RADInput $input
-	 *
-	 * @return array
-	 */
-	private function getEventsFromInput($input)
-	{
-		$events  = array();
-		$csvFile = $input->files->get('events_file');
-		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/PHPOffice/PHPExcel.php';
-		try
-		{
-			$objPHPExcel = PHPExcel_IOFactory::load($csvFile ['tmp_name']);
-		}
-		catch (Exception $e)
-		{
-			die('Error loading file "' . pathinfo($csvFile ['tmp_name'], PATHINFO_BASENAME) . '": ' . $e->getMessage());
-		}
-
-		$data = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
-		if (count($data) > 1)
-		{
-			for ($i = 2, $n = count($data); $i <= $n; $i++)
-			{
-				$event = array();
-				foreach ($data[1] as $key => $fieldName)
-				{
-					$event[$fieldName] = $data[$i][$key];
-				}
-
-				$events[] = $event;
-			}
-		}
-
-		return $events;
 	}
 }

@@ -22,16 +22,28 @@ class EventbookingControllerCoupon extends EventbookingController
 	 */
 	public function import()
 	{
-		$model         = $this->getModel('Coupon');
-		$numberCoupons = $model->import($this->input);
-		if ($numberCoupons === false)
+		$inputFile = $this->input->files->get('input_file');
+		$fileName  = $inputFile ['name'];
+		$fileExt   = strtolower(JFile::getExt($fileName));
+
+		if (!in_array($fileExt, array('csv', 'xls', 'xlsx')))
 		{
-			$this->setRedirect('index.php?option=com_eventbooking&view=coupon&layout=import', JText::_('EB_NO_COUPONS_IMPORTED'));
+			$this->setRedirect('index.php?option=com_eventbooking&view=coupon&layout=import', JText::_('Invalid File Type. Only CSV, XLS and XLS file types are supported'));
+
+			return;
 		}
-		else
+
+		/* @var  EventbookingModelCoupon $model */
+		$model = $this->getModel('Coupon');
+		try
 		{
-			$this->setRedirect('index.php?option=com_eventbooking&view=coupons',
-				JText::sprintf('EB_NUMBER_COUPONS_IMPORTED', $numberCoupons));
+			$numberImportedCoupons = $model->import($inputFile['tmp_name']);
+			$this->setRedirect('index.php?option=com_eventbooking&view=coupons', JText::sprintf('EB_NUMBER_COUPONS_IMPORTED', $numberImportedCoupons));
+		}
+		catch (Exception $e)
+		{
+			$this->setRedirect('index.php?option=com_eventbooking&view=coupon&layout=import');
+			$this->setMessage($e->getMessage(), 'error');
 		}
 	}
 
@@ -130,25 +142,16 @@ class EventbookingControllerCoupon extends EventbookingController
 				$csv_output .= "\n\"" . implode("\",\"", $results_arr) . "\"";
 			}
 			$csv_output .= "\n";
-			if (ereg('Opera(/| )([0-9].[0-9]{1,2})', $_SERVER['HTTP_USER_AGENT']))
-			{
-				$UserBrowser = "Opera";
-			}
-			elseif (ereg('MSIE ([0-9].[0-9]{1,2})', $_SERVER['HTTP_USER_AGENT']))
-			{
-				$UserBrowser = "IE";
-			}
-			else
-			{
-				$UserBrowser = '';
-			}
-			$mime_type = ($UserBrowser == 'IE' || $UserBrowser == 'Opera') ? 'application/octetstream' : 'application/octet-stream';
+			$browser   = JFactory::getApplication()->client->browser;
+			$mime_type = ($browser == JApplicationWebClient::IE || $browser == JApplicationWebClient::OPERA) ? 'application/octetstream' : 'application/octet-stream';
+
 			$filename  = "coupon_list";
 			@ob_end_clean();
 			ob_start();
 			header('Content-Type: ' . $mime_type);
 			header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-			if ($UserBrowser == 'IE')
+
+			if ($browser == JApplicationWebClient::IE)
 			{
 				header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
 				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
