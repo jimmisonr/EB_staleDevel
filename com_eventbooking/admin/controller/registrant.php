@@ -57,10 +57,10 @@ class EventbookingControllerRegistrant extends EventbookingController
 	public function export()
 	{
 		set_time_limit(0);
-		$config    = EventbookingHelper::getConfig();
-		$model = $this->getModel('registrants');
+		$config = EventbookingHelper::getConfig();
+		$model  = $this->getModel('registrants');
 
-		/* @var EventbookingModelRegistrants $model*/
+		/* @var EventbookingModelRegistrants $model */
 		$model->setState('limitstart', 0)
 			->setState('limit', 0)
 			->setState('filter_order', 'tbl.id')
@@ -78,15 +78,17 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		$eventId   = (int) $model->getState('filter_event_id');
 		$rowFields = EventbookingHelper::getAllEventFields($eventId);
-		$fieldIds = array();
-		foreach($rowFields as $rowField)
+		$fieldIds  = array();
+		foreach ($rowFields as $rowField)
 		{
 			$fieldIds[] = $rowField->id;
 		}
 
 		$fieldValues = $model->getFieldsData($fieldIds);
 
-		EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues, $eventId);
+		list($fields, $rows, $headers) = EventbookingHelperData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
+
+		EventbookingHelperData::excelExport($fields, $rows, 'registrants_list', $headers);
 	}
 
 	/**
