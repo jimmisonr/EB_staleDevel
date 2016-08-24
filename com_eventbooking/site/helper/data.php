@@ -921,7 +921,7 @@ class EventbookingHelperData
 
 		$exporter    = new PHPExcel();
 		$user        = JFactory::getUser();
-		$createdDate = JFactory::getDate('now', JFactory::getConfig()->get('offset'))->toSql(true);
+		$createdDate = JFactory::getDate('now', JFactory::getConfig()->get('offset'))->format('Y-m-d');
 
 		//Set properties Excel
 		$exporter->getProperties()
