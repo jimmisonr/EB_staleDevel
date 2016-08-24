@@ -903,7 +903,8 @@ class EventbookingHelperData
 				}
 			}
 		}
-		return array($fields, $rows, $headers);
+
+		return array($fields, $headers);
 	}
 
 	/**
@@ -968,9 +969,15 @@ class EventbookingHelperData
 		$sheet    = $exporter->setActiveSheetIndex(0);
 		$column   = 'A';
 		$rowIndex = '1';
-		foreach ($fields as $field)
+
+		if (empty($headers))
 		{
-			$sheet->setCellValue($column . $rowIndex, $field, empty($headers[$field]) ? $field : $headers[$field]);
+			$headers = $fields;
+		}
+
+		foreach ($headers as $header)
+		{
+			$sheet->setCellValue($column . $rowIndex, $header);
 			$sheet->getColumnDimension($column)->setAutoSize(true);
 			$column++;
 		}
@@ -1010,8 +1017,70 @@ class EventbookingHelperData
 		header('Content-Type: application/vnd.ms-exporter');
 		header('Content-Disposition: attachment;filename=' . $filename . '_on_' . $createdDate . '.' . $fileType);
 		header('Cache-Control: max-age=0');
+
 		$objWriter = PHPExcel_IOFactory::createWriter($exporter, $writer);
+
+		if ($fileType == 'csv')
+		{
+			/* @var PHPExcel_Writer_CSV $objWriter*/
+			$objWriter->setDelimiter($config->get('csv_delimiter', ','));
+		}
 		$objWriter->save('php://output');
+
+		JFactory::getApplication()->close();
+	}
+
+	/**
+	 * Export the given data to CSV, this method will be used as a backup in case we have performance issue with PHPExcel on large dataset
+	 *
+	 * @param $fields
+	 * @param $rows
+	 * @param $filename
+	 * @param $headers
+	 */
+	public static function csvExport($fields, $rows, $filename, $headers = array())
+	{
+		$browser   = JFactory::getApplication()->client->browser;
+		$mime_type = ($browser == JApplicationWebClient::IE || $browser == JApplicationWebClient::OPERA) ? 'application/octetstream' : 'application/octet-stream';
+
+		$createdDate = JFactory::getDate('now', JFactory::getConfig()->get('offset'))->format('Y-m-d');
+		$filename    = $filename . '_on_' . $createdDate;
+
+		header('Content-Encoding: UTF-8');
+		header('Content-Type: ' . $mime_type . ' ;charset=UTF-8');
+		header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+		if ($browser == JApplicationWebClient::IE)
+		{
+			header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
+			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+			header('Pragma: public');
+		}
+		else
+		{
+			header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
+			header('Pragma: no-cache');
+		}
+
+		$fp = fopen('php://output', 'w');
+		fwrite($fp, "\xEF\xBB\xBF");
+
+
+		$config    = EventbookingHelper::getConfig();
+		$delimiter = $config->get('csv_delimiter', ',');
+
+		fputcsv($fp, $headers, $delimiter);
+
+		foreach ($rows as $row)
+		{
+			$values = array();
+			foreach ($fields as $field)
+			{
+				$values[] = isset($row->{$field}) ? $row->{$field} : '';
+			}
+			fputcsv($fp, $values, $delimiter);
+		}
+
+		fclose($fp);
 
 		JFactory::getApplication()->close();
 	}
