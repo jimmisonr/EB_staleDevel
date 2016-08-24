@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS `#__eb_discounts` (
   PRIMARY KEY (`id`)
 ) CHARACTER SET `utf8`;
 CREATE TABLE IF NOT EXISTS `#__eb_discount_events` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `discount_id` INT NOT NULL DEFAULT '0',
-  `event_id` INT NOT NULL DEFAULT '0',
-  PRIMARY KEY(`id`)
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `discount_id` int(11) NOT NULL DEFAULT '0',
+  `event_id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
 )CHARACTER SET `utf8`;
