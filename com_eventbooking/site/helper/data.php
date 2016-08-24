@@ -982,7 +982,7 @@ class EventbookingHelperData
 			$column = 'A';
 			foreach ($fields as $field)
 			{
-				$cellData = empty($row->{$field}) ? '' : $row->{$field};
+				$cellData = isset($row->{$field}) ? $row->{$field} : '';
 				$sheet->setCellValue($column . $rowIndex, $cellData);
 				$sheet->getColumnDimension($column)->setAutoSize(true);
 				$column++;
