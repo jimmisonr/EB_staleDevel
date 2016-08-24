@@ -899,12 +899,11 @@ class EventbookingHelperData
 				}
 				else
 				{
-					$row->$row->invoice_number = '';
+					$row->invoice_number = '';
 				}
 			}
-
-			return array($fields, $rows, $headers);
 		}
+		return array($fields, $rows, $headers);
 	}
 
 	/**
