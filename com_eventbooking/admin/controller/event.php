@@ -52,9 +52,7 @@ class EventbookingControllerEvent extends EventbookingController
 		/* @var EventbookingModelEvents $model */
 
 		$model->setState('limitstart', 0)
-			->setState('limit', 0)
-			->setState('filter_order', 'tbl.id')
-			->setState('filter_order_Dir', 'ASC');
+			->setState('limit', 0);
 
 		$rowEvents = $model->getData();
 
@@ -69,22 +67,38 @@ class EventbookingControllerEvent extends EventbookingController
 		$fields = array(
 			'id',
 			'title',
+			'alias',
 			'category',
 			'additional_categories',
 			'thumb',
+			'location',
 			'event_date',
 			'event_end_date',
 			'individual_price',
 			'tax_rate',
 			'event_capacity',
-			'location',
+			'registration_type',
+			'registration_handle_url',
+			'cut_off_date',
+			'registration_start_date',
 			'short_description',
 			'description',
 			'meta_keywords',
 			'meta_description',
 			'access',
 			'registration_access',
-			'published'
+			'featured',
+			'published',
+			'discount_groups',
+			'discount',
+			'discount_type',
+			'early_bird_discount_amount',
+			'early_bird_discount_type',
+			'early_bird_discount_date',
+			'enable_cancel_registration',
+			'cancel_before_date',
+			'enable_auto_reminder',
+			'remind_before_x_days',
 		);
 
 		EventbookingHelperData::excelExport($fields, $rowEvents, 'events_list');
