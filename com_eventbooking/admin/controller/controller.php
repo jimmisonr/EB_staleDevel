@@ -2501,7 +2501,6 @@ class EventbookingController extends RADControllerAdmin
 		$deleteFiles = array(
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller/daylightsaving.php',
-			JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller/event.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller.php',
 			JPATH_ROOT . '/components/com_eventbooking/controller.php',
 			JPATH_ROOT . '/components/com_eventbooking/helper/os_cart.php',
