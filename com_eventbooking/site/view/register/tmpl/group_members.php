@@ -28,21 +28,23 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 	$headerText = JText::_('EB_MEMBER_REGISTRATION') ;
 	$headerText = str_replace('[ATTENDER_NUMBER]', $i, $headerText) ;
 ?>
-	<h3 class="eb-heading clearfix">
-		<?php echo $headerText ?>
-		<?php
-			if ($i > 1)
+<div class="<?php echo $controlGroupClass; ?> clearfix">	
+	<h3 class="eb-heading">
+		<?php echo $headerText ?>		
+	</h3>	
+	<?php
+		if ($i > 1)
+		{
+			$options = array();
+			$options[] = JHtml::_('select.option', 0, JText::_('EB_POPULATE_DATA_FROM'));
+			for ($j = 1 ; $j < $i ; $j++)
 			{
-				$options = array();
-				$options[] = JHtml::_('select.option', 0, JText::_('EB_POPULATE_DATA_FROM'));
-				for ($j = 1 ; $j < $i ; $j++)
-				{
-					$options[] = JHtml::_('select.option', $j, JText::sprintf('EB_MEMBER_NUMBER', $j));
-				}
-				echo JHtml::_('select.genericlist', $options, 'member_number_' . $i, 'id="member_number_' . $i . '" class="input-large eb-member-number-select" onchange="populateMemberFormData(' . $i . ', this.value)"', 'value', 'text', 0);
+				$options[] = JHtml::_('select.option', $j, JText::sprintf('EB_MEMBER_NUMBER', $j));
 			}
-		?>
-	</h3>
+			echo JHtml::_('select.genericlist', $options, 'member_number_' . $i, 'id="member_number_' . $i . '" class="input-large eb-member-number-select" onchange="populateMemberFormData(' . $i . ', this.value)"', 'value', 'text', 0);
+		}
+	?>
+</div>	
 <?php
 	$form = new RADForm($this->rowFields);
 	$form->setFieldSuffix($i);

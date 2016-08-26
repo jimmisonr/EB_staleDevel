@@ -1195,3 +1195,8 @@ p.eb-ticket-type-description
 {
 
 }
+h3.eb-heading
+{
+	display: inline-block;	
+	margin-right: 20px;
+}
