@@ -171,7 +171,8 @@ class EventbookingModelCalendar extends RADModel
 			$rows =  $db->loadObjectList();
 		}
 
-		if (empty($rows) && !$this->state->mini_calendar)
+		$app = JFactory::getApplication();
+		if (empty($rows) && $app->input->getMethod() == 'GET' && !$this->state->mini_calendar)
 		{
 			$query->clear()
 				->select('MONTH(event_date) AS next_event_month')
@@ -208,7 +209,7 @@ class EventbookingModelCalendar extends RADModel
 				if (empty($rows))
 				{
 					// Warning users that there is no upcoming events
-					JFactory::getApplication()->enqueueMessage(JText::_('EB_NO_UPCOMING_EVENTS'));
+					$app->enqueueMessage(JText::_('EB_NO_UPCOMING_EVENTS'));
 				}
 			}
 		}
