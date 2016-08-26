@@ -37,7 +37,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 			$db->setQuery($query);
 			$locations = $db->loadObjectList('name');
 
-			$imported   = 0;
+			$imported = 0;
 			foreach ($events as $event)
 			{
 				if (empty($event['title']) || empty($event['category']) || empty($event['event_date']))
@@ -65,7 +65,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 
 				if (!is_numeric($event['location']))
 				{
-					$locationName = trim($event['location']);
+					$locationName      = trim($event['location']);
 					$event['location'] = isset($locations[$locationName]) ? $locations[$locationName]->id : 0;
 				}
 
@@ -104,7 +104,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 					$db->execute();
 				}
 
-				$eventCategories = isset($data['additional_categories']) ? $data['additional_categories'] : array();
+				$eventCategories = isset($event['additional_categories']) ? $event['additional_categories'] : '';
 				$eventCategories = explode(' | ', $eventCategories);
 
 				for ($i = 0, $n = count($eventCategories); $i < $n; $i++)
