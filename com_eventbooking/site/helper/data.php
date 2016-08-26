@@ -485,7 +485,14 @@ class EventbookingHelperData
 		// Get categories data for each events
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('a.id, a.name, a.alias')
+
+		$query->select('*')
+			->from('#__eb_locations');
+		$db->setQuery($query);
+		$locations = $db->loadObjectList('id');
+
+		$query->clear()
+			->select('a.id, a.name, a.alias')
 			->from('#__eb_categories AS a')
 			->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id')
 			->order('b.id');
@@ -503,6 +510,12 @@ class EventbookingHelperData
 			$row->category_id    = $row->categories[0]->id;
 			$row->category_name  = $row->categories[0]->name;
 			$row->category_alias = $row->categories[0]->alias;
+
+			// Location data
+			if ($row->location_id)
+			{
+				$row->location = $locations[$row->location_id];
+			}
 
 			$query->clear('where');
 		}
@@ -593,277 +606,495 @@ class EventbookingHelperData
 			$item->paramData = $paramData;
 		}
 	}
+	
+	/**
+	 * Get data from excel file using PHPExcel library
+	 *
+	 * @param $file
+	 *
+	 * @return array
+	 */
+	public static function getDataFromFile($file)
+	{
+		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/PHPOffice/PHPExcel.php';
+
+		$data = array();
+
+		$reader = PHPExcel_IOFactory::load($file);
+		if ($reader instanceof PHPExcel_Reader_CSV)
+		{
+			$config = EventbookingHelper::getConfig();
+			$reader->setDelimiter($config->get('csv_delimiter', ','));
+		}
+
+		$rows = $reader->getActiveSheet()->toArray(null, true, true, true);
+
+		if (count($rows) > 1)
+		{
+			for ($i = 2, $n = count($rows); $i <= $n; $i++)
+			{
+				$row = array();
+				foreach ($rows[1] as $key => $fieldName)
+				{
+					$row[$fieldName] = $rows[$i][$key];
+				}
+
+				$data[] = $row;
+			}
+		}
+
+		return $data;
+	}
 
 	/**
-	 * Export registration records into csv file
+	 * Prepare registrants data before exporting to excel
 	 *
-	 * @param $rows
-	 * @param $config
-	 * @param $rowFields
-	 * @param $fieldValues
-	 * @param $eventId
+	 * @param array     $rows
+	 * @param RADConfig $config
+	 * @param array     $rowFields
+	 * @param array     $fieldValues
+	 * @param int       $eventId
 	 *
-	 * @throws Exception
+	 * @return array
 	 */
-	public static function csvExport($rows, $config, $rowFields, $fieldValues, $eventId = 0)
+	public static function prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId = 0)
 	{
-		if (count($rows))
-		{			
-			$browser   = JFactory::getApplication()->client->browser;
-			$mime_type = ($browser == JApplicationWebClient::IE || $browser == JApplicationWebClient::OPERA) ? 'application/octetstream' : 'application/octet-stream';
-			$filename  = "registrants_list";
-			header('Content-Encoding: UTF-8');
-			header('Content-Type: ' . $mime_type . ' ;charset=UTF-8');
-			header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-			if ($browser == JApplicationWebClient::IE)
+		$showGroup = false;
+		foreach ($rows as $row)
+		{
+			if ($row->is_group_billing || $row->group_id > 0)
 			{
-				header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
-				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-				header('Pragma: public');
+				$showGroup = true;
+				break;
 			}
-			else
-			{
-				header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
-				header('Pragma: no-cache');
-			}
-			$fp = fopen('php://output', 'w');
-			fwrite($fp, "\xEF\xBB\xBF");
-			$delimiter = $config->csv_delimiter ? $config->csv_delimiter : ',';
+		}
 
-			$showGroup = false;
-			foreach ($rows as $row)
+		// Determine whether we need to show payment method column
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('name, title')
+			->from('#__eb_payment_plugins')
+			->where('published=1');
+		$db->setQuery($query);
+		$plugins = $db->loadObjectList('name');
+
+		$showPaymentMethodColumn = false;
+		if (count($plugins) > 1)
+		{
+			$showPaymentMethodColumn = true;
+		}
+
+		if ($eventId)
+		{
+			$event = EventbookingHelperDatabase::getEvent($eventId);
+			if ($event->has_multiple_ticket_types)
 			{
-				if ($row->is_group_billing || $row->group_id > 0)
+				$ticketTypes = EventbookingHelperData::getTicketTypes($eventId);
+
+				$ticketTypeIds = array();
+				foreach ($ticketTypes as $ticketType)
 				{
-					$showGroup = true;
-					break;
+					$ticketTypeIds[] = $ticketType->id;
+				}
+
+				$db    = JFactory::getDbo();
+				$query = $db->getQuery(true);
+				$query->select('registrant_id, ticket_type_id, quantity')
+					->from('#__eb_registrant_tickets')
+					->where('ticket_type_id IN (' . implode(',', $ticketTypeIds) . ')');
+				$db->setQuery($query);
+
+				$registrantTickets = $db->loadObjectList();
+
+				$tickets = array();
+				foreach ($registrantTickets as $registrantTicket)
+				{
+					$tickets[$registrantTicket->registrant_id][$registrantTicket->ticket_type_id] = $registrantTicket->quantity;
 				}
 			}
+		}
 
-			// Determine whether we need to show payment method column
-			$db    = JFactory::getDbo();
-			$query = $db->getQuery(true);
-			$query->select('name, title')
-				->from('#__eb_payment_plugins')
-				->where('published=1');
-			$db->setQuery($query);
-			$plugins = $db->loadObjectList('name');
+		$headers = array(JText::_('EB_EVENT'));
+		$fields  = array('title');
 
-			$showPaymentMethodColumn = false;
-			if (count($plugins) > 1)
+		if ($config->show_event_date)
+		{
+			$headers[] = JText::_('EB_EVENT_DATE');
+			$fields[]  = 'event_date';
+		}
+
+		if ($showGroup)
+		{
+			$headers[] = JText::_('EB_GROUP');
+			$fields[]  = 'registration_group_name';
+		}
+		if (count($rowFields))
+		{
+			foreach ($rowFields as $rowField)
 			{
-				$showPaymentMethodColumn = true;
+				$headers[] = $rowField->title;
+				$fields[]  = $rowField->name;
 			}
+		}
 
-			if ($eventId)
+		if (!empty($ticketTypes))
+		{
+			foreach ($ticketTypes as $ticketType)
 			{
-				$event = EventbookingHelperDatabase::getEvent($eventId);
-				if ($event->has_multiple_ticket_types)
-				{
-					$ticketTypes = EventbookingHelperData::getTicketTypes($eventId);
-
-					$ticketTypeIds = array();
-					foreach ($ticketTypes as $ticketType)
-					{
-						$ticketTypeIds[] = $ticketType->id;
-					}
-
-					$db    = JFactory::getDbo();
-					$query = $db->getQuery(true);
-					$query->select('registrant_id, ticket_type_id, quantity')
-						->from('#__eb_registrant_tickets')
-						->where('ticket_type_id IN (' . implode(',', $ticketTypeIds) . ')');
-					$db->setQuery($query);
-
-					$registrantTickets = $db->loadObjectList();
-
-					$tickets = array();
-					foreach ($registrantTickets as $registrantTicket)
-					{
-						$tickets[$registrantTicket->registrant_id][$registrantTicket->ticket_type_id] = $registrantTicket->quantity;
-					}
-				}
+				$headers[] = $ticketType->title;
+				$fields[]  = 'event_ticket_type_' . $ticketType->id;
 			}
+		}
 
-			$fields   = array();
-			$fields[] = JText::_('EB_EVENT');
+		$headers[] = JText::_('EB_NUMBER_REGISTRANTS');
+		$headers[] = JText::_('EB_AMOUNT');
+		$headers[] = JText::_('EB_DISCOUNT_AMOUNT');
+		$headers[] = JText::_('EB_LATE_FEE');
+		$headers[] = JText::_('EB_TAX');
+		$headers[] = JText::_('EB_GROSS_AMOUNT');
+
+		$fields[] = 'number_registrants';
+		$fields[] = 'total_amount';
+		$fields[] = 'discount_amount';
+		$fields[] = 'late_fee';
+		$fields[] = 'tax_amount';
+		$fields[] = 'amount';
+
+		if ($config->activate_deposit_feature)
+		{
+			$headers[] = JText::_('EB_DEPOSIT_AMOUNT');
+			$headers[] = JText::_('EB_DUE_AMOUNT');
+
+			$fields[] = 'deposit_amount';
+			$fields[] = 'due_amount';
+		}
+
+		if ($config->show_coupon_code_in_registrant_list)
+		{
+			$headers[] = JText::_('EB_COUPON');
+			$fields[]  = 'coupon_code';
+		}
+
+		$headers[] = JText::_('EB_REGISTRATION_DATE');
+		$fields[]  = 'register_date';
+
+		if ($showPaymentMethodColumn)
+		{
+			$headers[] = JText::_('EB_PAYMENT_METHOD');
+			$fields[]  = 'payment_method';
+		}
+
+		$headers[] = JText::_('EB_TRANSACTION_ID');
+		$headers[] = JText::_('EB_PAYMENT_STATUS');
+		$fields[]  = 'transaction_id';
+		$fields[]  = 'payment_status';
+
+		if ($config->activate_invoice_feature)
+		{
+			$headers[] = JText::_('EB_INVOICE_NUMBER');
+			$fields[]  = 'invoice_number';
+		}
+
+		$headers[] = JText::_('EB_ID');
+		$fields[]  = 'id';
+
+		foreach ($rows as $row)
+		{
 			if ($config->show_event_date)
 			{
-				$fields[] = JText::_('EB_EVENT_DATE');
+				$row->event_date = JHtml::_('date', $row->event_date, $config->date_format, null);
 			}
+
 			if ($showGroup)
 			{
-				$fields[] = JText::_('EB_GROUP');
-			}
-			if (count($rowFields))
-			{
-				foreach ($rowFields as $rowField)
+				if ($row->is_group_billing)
 				{
-					$fields[] = $rowField->title;
+					$row->registration_group_name = $row->first_name . ' ' . $row->last_name;
+				}
+				elseif ($row->group_id > 0)
+				{
+					$row->registration_group_name = $row->group_name;
+				}
+				else
+				{
+					$row->registration_group_name = '';
 				}
 			}
+
+			foreach ($rowFields as $rowField)
+			{
+				if (!$rowField->is_core)
+				{
+					$fieldValue = @$fieldValues[$row->id][$rowField->id];
+					if (is_string($fieldValue) && is_array(json_decode($fieldValue)))
+					{
+						$fieldValue = implode(', ', json_decode($fieldValue));
+					}
+					$row->{$rowField->name} = $fieldValue;
+				}
+			}
+
 
 			if (!empty($ticketTypes))
 			{
 				foreach ($ticketTypes as $ticketType)
 				{
-					$fields[] = $ticketType->title;
+					if (!empty($tickets[$row->id][$ticketType->id]))
+					{
+						$row->{'event_ticket_type_' . $ticketType->id} = $tickets[$row->id][$ticketType->id];
+					}
+					else
+					{
+						$row->{'event_ticket_type_' . $ticketType->id} = 0;
+					}
 				}
 			}
-			$fields[] = JText::_('EB_NUMBER_REGISTRANTS');
-			$fields[] = JText::_('EB_AMOUNT');
-			$fields[] = JText::_('EB_DISCOUNT_AMOUNT');
-			$fields[] = JText::_('EB_LATE_FEE');
-			$fields[] = JText::_('EB_TAX');
-			$fields[] = JText::_('EB_GROSS_AMOUNT');
+
+
+			$row->total_amount    = EventbookingHelper::formatAmount($row->total_amount, $config);
+			$row->discount_amount = EventbookingHelper::formatAmount($row->discount_amount, $config);
+			$row->late_fee        = EventbookingHelper::formatAmount($row->late_fee, $config);
+			$row->tax_amount      = EventbookingHelper::formatAmount($row->tax_amount, $config);
+			$row->amount          = EventbookingHelper::formatAmount($row->amount, $config);
+
 			if ($config->activate_deposit_feature)
 			{
-				$fields[] = JText::_('EB_DEPOSIT_AMOUNT');
-				$fields[] = JText::_('EB_DUE_AMOUNT');
+				if ($row->deposit_amount > 0)
+				{
+					$row->deposit_amount = EventbookingHelper::formatAmount($row->deposit_amount, $config);
+					$row->due_amount     = EventbookingHelper::formatAmount($row->amount - $row->deposit_amount, $config);
+				}
+				else
+				{
+					$row->deposit_amount = '';
+					$row->due_amount     = '';
+				}
 			}
-			if ($config->show_coupon_code_in_registrant_list)
-			{
-				$fields[] = JText::_('EB_COUPON');
-			}
-			$fields[] = JText::_('EB_REGISTRATION_DATE');
+
+			$row->register_date = JHtml::_('date', $row->register_date, $config->date_format);
+
 			if ($showPaymentMethodColumn)
 			{
-				$fields[] = JText::_('EB_PAYMENT_METHOD');
+				if ($row->payment_method && isset($plugins[$row->payment_method]))
+				{
+					$row->payment_method = JText::_($plugins[$row->payment_method]->title);
+				}
+				else
+				{
+					$row->payment_method = '';
+				}
 			}
-			$fields[] = JText::_('EB_TRANSACTION_ID');
-			$fields[] = JText::_('EB_PAYMENT_STATUS');
+
+			switch ($row->published)
+			{
+				case 0:
+					$row->payment_status = JText::_('EB_PENDING');
+					break;
+				case 1:
+					$row->payment_status = JText::_('EB_PAID');
+					break;
+				case 2:
+					$row->payment_status = JText::_('EB_CANCELLED');
+					break;
+				case 3:
+					$row->payment_status = JText::_('EB_WAITING_LIST');
+					break;
+				default:
+					break;
+			}
+
 			if ($config->activate_invoice_feature)
 			{
-				$fields[] = JText::_('EB_INVOICE_NUMBER');
+
+				if ($row->invoice_number)
+				{
+					$row->invoice_number = EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config);
+				}
+				else
+				{
+					$row->invoice_number = '';
+				}
 			}
-			$fields[] = JText::_('EB_ID');
-			fputcsv($fp, $fields, $delimiter);
-			foreach ($rows as $r)
-			{
-
-				$fields   = array();
-				$fields[] = $r->title;
-				if ($config->show_event_date)
-				{
-					$fields[] = JHtml::_('date', $r->event_date, $config->date_format, null);
-				}
-				if ($showGroup)
-				{
-					if ($r->is_group_billing)
-					{
-						$fields[] = $r->first_name . ' ' . $r->last_name;
-					}
-					elseif ($r->group_id > 0)
-					{
-						$fields[] = $r->group_name;
-					}
-					else
-					{
-						$fields[] = '';
-					}
-				}
-
-				foreach ($rowFields as $rowField)
-				{
-					if ($rowField->is_core)
-					{
-						$fields[] = @$r->{$rowField->name};
-					}
-					else
-					{
-						$fieldValue = @$fieldValues[$r->id][$rowField->id];
-						if (is_string($fieldValue) && is_array(json_decode($fieldValue)))
-						{
-							$fieldValue = implode(', ', json_decode($fieldValue));
-						}
-						$fields[] = $fieldValue;
-					}
-				}
-
-				if (!empty($ticketTypes))
-				{
-					foreach ($ticketTypes as $ticketType)
-					{
-						if (!empty($tickets[$r->id][$ticketType->id]))
-						{
-							$fields[] = $tickets[$r->id][$ticketType->id];
-						}
-						else
-						{
-							$fields[] = 0;
-						}
-					}
-				}
-
-				$fields[] = $r->number_registrants;
-				$fields[] = EventbookingHelper::formatAmount($r->total_amount, $config);
-				$fields[] = EventbookingHelper::formatAmount($r->discount_amount, $config);
-				$fields[] = EventbookingHelper::formatAmount($r->late_fee, $config);
-				$fields[] = EventbookingHelper::formatAmount($r->tax_amount, $config);
-				$fields[] = EventbookingHelper::formatAmount($r->amount, $config);
-				if ($config->activate_deposit_feature)
-				{
-					if ($r->deposit_amount > 0)
-					{
-						$fields[] = EventbookingHelper::formatAmount($r->deposit_amount, $config);
-						$fields[] = EventbookingHelper::formatAmount($r->amount - $r->deposit_amount, $config);
-					}
-					else
-					{
-						$fields[] = '';
-						$fields[] = '';
-					}
-				}
-
-				if ($config->show_coupon_code_in_registrant_list)
-				{
-					$fields[] = $r->coupon_code;
-				}
-
-				$fields[] = JHtml::_('date', $r->register_date, $config->date_format);
-				if ($showPaymentMethodColumn)
-				{
-					if ($r->payment_method && isset($plugins[$r->payment_method]))
-					{
-						$fields[] = JText::_($plugins[$r->payment_method]->title);
-					}
-					else
-					{
-						$fields[] = '';
-					}
-				}
-				$fields[] = $r->transaction_id;
-				switch ($r->published)
-				{
-					case 0:
-						$fields[] = JText::_('EB_PENDING');
-						break;
-					case 1:
-						$fields[] = JText::_('EB_PAID');
-						break;
-					case 2:
-						$fields[] = JText::_('EB_CANCELLED');
-						break;
-					case 3:
-						$fields[] = JText::_('EB_WAITING_LIST');
-						break;
-				}
-				if ($config->activate_invoice_feature)
-				{
-					if ($r->invoice_number)
-					{
-						$fields[] = EventbookingHelper::formatInvoiceNumber($r->invoice_number, $config);
-					}
-					else
-					{
-						$fields[] = '';
-					}
-				}
-				$fields[] = $r->id;
-				fputcsv($fp, $fields, $delimiter);
-			}
-			fclose($fp);
 		}
+
+		return array($fields, $headers);
+	}
+
+	/**
+	 * Export the given data to Excel
+	 *
+	 * @param $fields
+	 * @param $rows
+	 * @param $filename
+	 * @param $headers
+	 */
+	public static function excelExport($fields, $rows, $filename, $headers = array())
+	{
+		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/PHPOffice/PHPExcel.php';
+
+		$exporter    = new PHPExcel();
+		$user        = JFactory::getUser();
+		$createdDate = JFactory::getDate('now', JFactory::getConfig()->get('offset'))->format('Y-m-d');
+
+		//Set properties Excel
+		$exporter->getProperties()
+			->setCreator($user->name)
+			->setLastModifiedBy($user->name);
+
+		//Set some styles and layout for Excel file
+		$borderedCenter = new PHPExcel_Style();
+		$borderedCenter->applyFromArray(
+			array(
+				'alignment' => array(
+					'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+					'vertical'   => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+				),
+				'font'      => array(
+					'name' => 'Times New Roman', 'bold' => false, 'italic' => false, 'size' => 11
+				),
+				'borders'   => array(
+					'bottom' => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+					'right'  => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+					'top'    => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+					'left'   => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+				)
+			)
+		);
+
+		$borderedLeft = new PHPExcel_Style();
+		$borderedLeft->applyFromArray(
+			array(
+				'alignment' => array(
+					'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+				),
+				'font'      => array(
+					'name' => 'Times New Roman', 'bold' => false, 'italic' => false, 'size' => 11
+				),
+				'borders'   => array(
+					'bottom' => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+					'right'  => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+					'top'    => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+					'left'   => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+				)
+			)
+		);
+
+		$sheet    = $exporter->setActiveSheetIndex(0);
+		$column   = 'A';
+		$rowIndex = '1';
+
+		if (empty($headers))
+		{
+			$headers = $fields;
+		}
+
+		foreach ($headers as $header)
+		{
+			$sheet->setCellValue($column . $rowIndex, $header);
+			$sheet->getColumnDimension($column)->setAutoSize(true);
+			$column++;
+		}
+
+		$rowIndex++;
+		foreach ($rows as $row)
+		{
+			$column = 'A';
+			foreach ($fields as $field)
+			{
+				$cellData = isset($row->{$field}) ? $row->{$field} : '';
+				$sheet->setCellValue($column . $rowIndex, $cellData);
+				$sheet->getColumnDimension($column)->setAutoSize(true);
+				$column++;
+			}
+			$rowIndex++;
+		}
+
+		$config   = EventbookingHelper::getConfig();
+		$fileType = $config->get('export_data_format', 'xlsx');
+		switch ($fileType)
+		{
+			case 'csv' :
+				$writer = 'CSV';
+				break;
+			case 'xls' :
+				$writer = 'Excel5';
+				break;
+			case 'xlsx' :
+				$writer = 'Excel2007';
+				break;
+			default :
+				$writer = 'Excel2007';
+				break;
+		}
+
+		header('Content-Type: application/vnd.ms-exporter');
+		header('Content-Disposition: attachment;filename=' . $filename . '_on_' . $createdDate . '.' . $fileType);
+		header('Cache-Control: max-age=0');
+
+		$objWriter = PHPExcel_IOFactory::createWriter($exporter, $writer);
+
+		if ($fileType == 'csv')
+		{
+			/* @var PHPExcel_Writer_CSV $objWriter*/
+			$objWriter->setDelimiter($config->get('csv_delimiter', ','));
+		}
+		$objWriter->save('php://output');
+
+		JFactory::getApplication()->close();
+	}
+
+	/**
+	 * Export the given data to CSV, this method will be used as a backup in case we have performance issue with PHPExcel on large dataset
+	 *
+	 * @param $fields
+	 * @param $rows
+	 * @param $filename
+	 * @param $headers
+	 */
+	public static function csvExport($fields, $rows, $filename, $headers = array())
+	{
+		$browser   = JFactory::getApplication()->client->browser;
+		$mime_type = ($browser == JApplicationWebClient::IE || $browser == JApplicationWebClient::OPERA) ? 'application/octetstream' : 'application/octet-stream';
+
+		$createdDate = JFactory::getDate('now', JFactory::getConfig()->get('offset'))->format('Y-m-d');
+		$filename    = $filename . '_on_' . $createdDate;
+
+		header('Content-Encoding: UTF-8');
+		header('Content-Type: ' . $mime_type . ' ;charset=UTF-8');
+		header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+		if ($browser == JApplicationWebClient::IE)
+		{
+			header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
+			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+			header('Pragma: public');
+		}
+		else
+		{
+			header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
+			header('Pragma: no-cache');
+		}
+
+		$fp = fopen('php://output', 'w');
+		fwrite($fp, "\xEF\xBB\xBF");
+
+
+		$config    = EventbookingHelper::getConfig();
+		$delimiter = $config->get('csv_delimiter', ',');
+
+		fputcsv($fp, $headers, $delimiter);
+
+		foreach ($rows as $row)
+		{
+			$values = array();
+			foreach ($fields as $field)
+			{
+				$values[] = isset($row->{$field}) ? $row->{$field} : '';
+			}
+			fputcsv($fp, $values, $delimiter);
+		}
+
+		fclose($fp);
+
 		JFactory::getApplication()->close();
 	}
 }

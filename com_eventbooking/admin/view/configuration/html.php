@@ -55,6 +55,12 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options[]              = JHtml::_('select.option', ';', JText::_('EB_SEMICOLON'));
 		$lists['csv_delimiter'] = JHtml::_('select.genericlist', $options, 'csv_delimiter', '', 'value', 'text', $config->csv_delimiter);
 
+		$options                     = array();
+		$options[]                   = JHtml::_('select.option', 'csv', JText::_('EB_FILE_CSV'));
+		$options[]                   = JHtml::_('select.option', 'xls', JText::_('EB_FILE_EXCEL_2003'));
+		$options[]                   = JHtml::_('select.option', 'xlsx', JText::_('EB_FILE_EXCEL_2007'));
+		$lists['export_data_format'] = JHtml::_('select.genericlist', $options, 'export_data_format', '', 'value', 'text', $config->get('export_data_format', 'xlsx'));
+
 		$options                           = array();
 		$options[]                         = JHtml::_('select.option', '', JText::_('EB_DEFAULT'));
 		$options[]                         = JHtml::_('select.option', 'simple', JText::_('EB_SIMPLE_FORM'));

@@ -79,7 +79,7 @@ class plgSystemEBDepositReminder extends JPlugin
 			}
 
 			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
-			EventbookingHelper::sendDepositReminder($numberDays, $numberEmailSendEachTime, $bccEmail);
+			EventbookingHelperMail::sendDepositReminder($numberDays, $numberEmailSendEachTime, $bccEmail);
 		}
 
 		return true;

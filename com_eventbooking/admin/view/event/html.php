@@ -15,6 +15,11 @@ class EventbookingViewEventHtml extends RADViewItem
 	{
 		parent::prepareView();
 
+		if ($this->getLayout() == 'import')
+		{
+			return;
+		}
+
 		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
 		$item   = $this->item;
@@ -214,5 +219,17 @@ class EventbookingViewEventHtml extends RADViewItem
 		$this->nullDate = $nullDate;
 		$this->config   = $config;
 		$this->plugins  = $results;
+	}
+
+	/**
+	 * Override addToolbar function to allow generating custom buttons for import & batch coupon feature
+	 */
+	protected function addToolbar()
+	{
+		$layout = $this->getLayout();
+		if ($layout == 'default')
+		{
+			parent::addToolbar();
+		}
 	}
 }

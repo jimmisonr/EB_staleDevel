@@ -57,10 +57,10 @@ class EventbookingControllerRegistrant extends EventbookingController
 	public function export()
 	{
 		set_time_limit(0);
-		$config    = EventbookingHelper::getConfig();
-		$model = $this->getModel('registrants');
+		$config = EventbookingHelper::getConfig();
+		$model  = $this->getModel('registrants');
 
-		/* @var EventbookingModelRegistrants $model*/
+		/* @var EventbookingModelRegistrants $model */
 		$model->setState('limitstart', 0)
 			->setState('limit', 0)
 			->setState('filter_order', 'tbl.id')
@@ -78,15 +78,17 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		$eventId   = (int) $model->getState('filter_event_id');
 		$rowFields = EventbookingHelper::getAllEventFields($eventId);
-		$fieldIds = array();
-		foreach($rowFields as $rowField)
+		$fieldIds  = array();
+		foreach ($rowFields as $rowField)
 		{
 			$fieldIds[] = $rowField->id;
 		}
 
 		$fieldValues = $model->getFieldsData($fieldIds);
 
-		EventbookingHelperData::csvExport($rows, $config, $rowFields, $fieldValues, $eventId);
+		list($fields, $headers) = EventbookingHelperData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
+
+		EventbookingHelperData::excelExport($fields, $rows, 'registrants_list', $headers);
 	}
 
 	/**
@@ -144,7 +146,6 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 	/**
 	 * Remove group member from group registration
-	 *
 	 */
 	public function remove_group_member()
 	{
@@ -158,14 +159,14 @@ class EventbookingControllerRegistrant extends EventbookingController
 		$query = $db->getQuery(true);
 		$query->select('COUNT(*)')
 			->from('#__eb_registrants')
-			->where('id = '. $id);
+			->where('id = ' . $id);
 		$db->setQuery($query);
 		$total = $db->loadResult();
 
 		if ($total)
 		{
 			// Redirect back to registrant edit screen
-			$url = JRoute::_('index.php?option=com_eventbooking&view=registrant&id='.$id, false);
+			$url = JRoute::_('index.php?option=com_eventbooking&view=registrant&id=' . $id, false);
 		}
 		else
 		{

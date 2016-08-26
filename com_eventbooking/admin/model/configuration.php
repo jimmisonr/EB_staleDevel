@@ -37,7 +37,7 @@ class EventbookingModelConfiguration extends RADModel
 
 		if (isset($data['custom_css']))
 		{
-			JFile::write(JPATH_ROOT.'/media/com_eventbooking/assets/css/custom.css', trim($data['custom_css']));
+			JFile::write(JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css', trim($data['custom_css']));
 		}
 
 		return true;

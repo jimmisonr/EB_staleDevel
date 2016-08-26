@@ -71,11 +71,10 @@ class EventBookingModelRegister extends RADModel
 			$total = $db->loadResult();
 			if (!$total)
 			{
+				$row->registration_code = $registrationCode;
 				break;
 			}
 		}
-
-		$row->registration_code = $registrationCode;
 
 		// Calculate the payment amount
 		$eventId = (int) $data['event_id'];
@@ -152,13 +151,23 @@ class EventBookingModelRegister extends RADModel
 		if ($couponCode && $fees['coupon_valid'])
 		{
 			$coupon = $fees['coupon'];
-			$query->clear();
-			$query->update('#__eb_coupons')
+			$query->clear()
+				->update('#__eb_coupons')
 				->set('used = used + 1')
 				->where('id = ' . (int) $coupon->id);
 			$db->setQuery($query);
 			$db->execute();
 			$row->coupon_id = $coupon->id;
+		}
+
+		if (!empty($fees['bundle_discount_ids']))
+		{
+			$query->clear()
+				->update('#__eb_discounts')
+				->set('used = used + 1')
+				->where('id IN (' . implode(',', $fees['bundle_discount_ids']) . ')');
+			$db->setQuery($query);
+			$db->execute();
 		}
 
 		if ($waitingList)
@@ -260,7 +269,7 @@ class EventBookingModelRegister extends RADModel
 			}
 			else
 			{
-				EventbookingHelper::sendWaitinglistEmail($row, $config);
+				EventbookingHelperMail::sendWaitinglistEmail($row, $config);
 
 				return 2;
 			}
@@ -397,10 +406,10 @@ class EventBookingModelRegister extends RADModel
 			$total = $db->loadResult();
 			if (!$total)
 			{
+				$row->registration_code = $registrationCode;
 				break;
 			}
 		}
-		$row->registration_code = $registrationCode;
 
 		// Coupon code
 		$couponCode = isset($data['coupon_code']) ? $data['coupon_code'] : null;
@@ -414,6 +423,16 @@ class EventBookingModelRegister extends RADModel
 			$db->setQuery($query);
 			$db->execute();
 			$row->coupon_id = $coupon->id;
+		}
+
+		if (!empty($fees['bundle_discount_ids']))
+		{
+			$query->clear()
+				->update('#__eb_discounts')
+				->set('used = used + 1')
+				->where('id IN (' . implode(',', $fees['bundle_discount_ids']) . ')');
+			$db->setQuery($query);
+			$db->execute();
 		}
 
 		if ($waitingList)
@@ -541,7 +560,7 @@ class EventBookingModelRegister extends RADModel
 				if ($row->is_group_billing)
 				{
 					EventbookingHelper::updateGroupRegistrationRecord($row->id);
-					EventbookingHelper::sendWaitinglistEmail($row, $config);
+					EventbookingHelperMail::sendWaitinglistEmail($row, $config);
 				}
 
 				return 2;

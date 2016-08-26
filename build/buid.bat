@@ -93,6 +93,8 @@ cd E:\www\eventbooking\plugins\system\ebdepositreminder\
 7z a -tzip E:\www\eventbooking\build/packages/plug_system_ebdepositreminder.zip *
 cd E:\www\eventbooking\plugins\community\eb_registrationhistory
 7z a -tzip E:\www\eventbooking\build/packages/plug_js_regisrationhisory.zip *
+cd E:\www\eventbooking\plugins\installer\eventbooking
+7z a -tzip E:\www\eventbooking\build/packages/plug_installer_eventbooking.zip *
 REM package
 cd E:\www\eventbooking\build\
 copy E:\www\eventbooking\pkg_eventbooking.xml

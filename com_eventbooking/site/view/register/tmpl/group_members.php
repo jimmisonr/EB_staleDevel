@@ -12,6 +12,13 @@ $controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
 $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
 $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 $btnClass          = $bootstrapHelper->getClassMapping('btn');
+
+$memberFields = array();
+foreach ($this->rowFields as $rowField)
+{
+	$memberFields[] = $rowField->name;
+}
+$memberFields = json_encode($memberFields);
 ?>
 <form name="eb-form-group-members" id="eb-form-group-members" action="<?php echo JRoute::_('index.php?option=com_eventbooking&Itemid='.$this->Itemid); ?>" autocomplete="off" class="form form-horizontal" method="post">
 <?php
@@ -21,8 +28,20 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 	$headerText = JText::_('EB_MEMBER_REGISTRATION') ;
 	$headerText = str_replace('[ATTENDER_NUMBER]', $i, $headerText) ;
 ?>
-	<h3 class="eb-heading">
-		<?php echo $headerText; ?>
+	<h3 class="eb-heading clearfix">
+		<?php echo $headerText ?>
+		<?php
+			if ($i > 1)
+			{
+				$options = array();
+				$options[] = JHtml::_('select.option', 0, JText::_('EB_POPULATE_DATA_FROM'));
+				for ($j = 1 ; $j < $i ; $j++)
+				{
+					$options[] = JHtml::_('select.option', $j, JText::sprintf('EB_MEMBER_NUMBER', $j));
+				}
+				echo JHtml::_('select.genericlist', $options, 'member_number_' . $i, 'id="member_number_' . $i . '" class="input-large eb-member-number-select" onchange="populateMemberFormData(' . $i . ', this.value)"', 'value', 'text', 0);
+			}
+		?>
 	</h3>
 <?php
 	$form = new RADForm($this->rowFields);
@@ -98,7 +117,36 @@ if ($this->showCaptcha)
 	<input type="hidden" name="task" value="register.store_group_members_data" />
 	<input type="hidden" name="event_id" value="<?php echo $this->eventId; ?>" />
 	<script type="text/javascript">
+			var memberFields = <?php echo $memberFields ?>;
 			Eb.jQuery(document).ready(function($){
+				populateMemberFormData = (function (currentMemberNumber, fromMemberNumber) {
+					if (fromMemberNumber != 0)
+					{
+						var arrayLength = memberFields.length;
+						var selecteds = [];
+						var value = '';
+						for (var i = 0; i < arrayLength; i++)
+						{
+							if ($('input[name="' + memberFields[i] + '_' + currentMemberNumber + '[]"]').length)
+							{
+								//This is a checkbox or multiple select
+								selecteds = $('input[name="' + memberFields[i] + '_' + fromMemberNumber + '[]"]:checked').map(function(){return $(this).val();}).get();
+								$('input[name="' + memberFields[i] + '_' + currentMemberNumber + '[]"]').val(selecteds);
+							}
+							else if ($('input[type="radio"][name="' + memberFields[i] + '_' + currentMemberNumber + '"]').length)
+							{
+								value = $('input[name="' + memberFields[i] + '_' + fromMemberNumber + '"]:checked').val();
+								$('input[name="' + memberFields[i] + '_' + currentMemberNumber + '"][value="' + value + '"]').attr('checked', 'checked');
+							}
+							else
+							{
+								value = $('#' + memberFields[i] + '_' + fromMemberNumber).val();
+								$('#' + memberFields[i] + '_' + currentMemberNumber).val(value);
+							}
+						}
+					}
+				})
+
 				<?php
 					if (count($dateFields))
 					{

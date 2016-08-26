@@ -232,12 +232,12 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				//Change from pending to paid, trigger event, send emails
 				JPluginHelper::importPlugin('eventbooking');
 				JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));
-				EventbookingHelper::sendRegistrationApprovedEmail($row, $config);
+				EventbookingHelperMail::sendRegistrationApprovedEmail($row, $config);
 			}
 			elseif ($row->published == 2 && $published != 2)
 			{
 				// Send registration cancelled email to registrant
-				EventbookingHelper::sendRegistrationCancelledEmail($row, $config);
+				EventbookingHelperMail::sendRegistrationCancelledEmail($row, $config);
 
 				//Registration is cancelled, send notification emails to waiting list
 				if ($config->activate_waitinglist_feature)

@@ -369,6 +369,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$this->amount               = $fees['amount'];
 		$this->depositAmount        = $fees['deposit_amount'];
 		$this->paymentProcessingFee = $fees['payment_processing_fee'];
+		$this->bundleDiscountAmount = $fees['bundle_discount_amount'];
 		$this->showPaymentFee       = $showPaymentFee;
 		$this->waitingList          = $waitingList;
 

@@ -338,7 +338,7 @@ if (!$this->userId && $this->config->user_registration)
 			</div>
 		</div>			
 		<?php	
-		if ($this->enableCoupon || $this->discountAmount > 0)
+		if ($this->enableCoupon || $this->discountAmount > 0 || $this->bunldeDiscount > 0)
 		{
 		?>
 		<div class="<?php echo $controlGroupClass;  ?>">
@@ -468,7 +468,7 @@ if (!$this->userId && $this->config->user_registration)
 		<?php
 		}
 
-		if ($this->enableCoupon || $this->discountAmount > 0 || $this->taxAmount > 0 || $this->showPaymentFee)
+		if ($this->enableCoupon || $this->discountAmount > 0 || $this->bunldeDiscount > 0 || $this->taxAmount > 0 || $this->showPaymentFee)
 		{
 		?>
 		<div class="<?php echo $controlGroupClass;  ?>">

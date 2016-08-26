@@ -74,7 +74,7 @@ JToolBarHelper::title(JText::_('EB_DASHBOARD'), 'generic.png');
                 else if (msg.status == 2)
                 {
                     jQuery('#update-check').find('img').attr('src', updateFoundImg).attr('title', msg.message);
-                    jQuery('#update-check').find('a').attr('href', 'http://joomdonation.com/my-downloads.html');
+                    jQuery('#update-check').find('a').attr('href', 'index.php?option=com_installer&view=update');
                     jQuery('#update-check').find('span').text(msg.message);
                 }
                 else

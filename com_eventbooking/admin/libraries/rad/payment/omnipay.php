@@ -137,7 +137,7 @@ class RADPaymentOmnipay extends OmnipayPayment
 			$dispatcher = JEventDispatcher::getInstance();
 			$dispatcher->trigger('onDepositPaymentSuccess', array($row));
 
-			EventbookingHelper::sendDepositPaymentEmail($row, $config);
+			EventbookingHelperMail::sendDepositPaymentEmail($row, $config);
 		}
 		else
 		{

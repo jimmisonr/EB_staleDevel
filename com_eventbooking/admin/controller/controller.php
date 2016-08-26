@@ -39,9 +39,9 @@ class EventbookingController extends RADControllerAdmin
 	{
 		jimport('joomla.filesystem.folder');
 		$db = JFactory::getDbo();
-		//Setup menus
+		// Setup menus
 		$menuSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/menus.eventbooking.sql';
-		$sql     = JFile::read($menuSql);
+		$sql     = file_get_contents($menuSql);
 		$queries = $db->splitSql($sql);
 		if (count($queries))
 		{
@@ -55,7 +55,25 @@ class EventbookingController extends RADControllerAdmin
 				}
 			}
 		}
-		###Setup default configuration data                
+
+		// Create tables if not exists
+		$tableSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/createifnotexists.eventbooking.sql';
+		$sql     = file_get_contents($tableSql);
+		$queries = $db->splitSql($sql);
+		if (count($queries))
+		{
+			foreach ($queries as $query)
+			{
+				$query = trim($query);
+				if ($query != '' && $query{0} != '#')
+				{
+					$db->setQuery($query);
+					$db->execute();
+				}
+			}
+		}
+
+		###Setup default configuration data
 		$sql = 'SELECT COUNT(*) FROM #__eb_configs';
 		$db->setQuery($sql);
 		$total = $db->loadResult();
@@ -208,6 +226,17 @@ class EventbookingController extends RADControllerAdmin
 		if (!in_array('enable_for', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_coupons` ADD  `enable_for` INT(11) NOT NULL DEFAULT '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('access', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_coupons` ADD  `access` INT(11) NOT NULL DEFAULT '1';";
+			$db->setQuery($sql);
+			$db->execute();
+
+			$sql = 'UPDATE #__eb_coupons SET `access` = 1';
 			$db->setQuery($sql);
 			$db->execute();
 		}
@@ -2306,6 +2335,14 @@ class EventbookingController extends RADControllerAdmin
 		$db->setQuery($query)
 			->execute();
 
+		$query->clear()
+			->update('#__extensions')
+			->set('enabled = 1')
+			->where('element = "eventbooking"')
+			->where('folder = "installer"');
+		$db->setQuery($query)
+			->execute();
+
 		// Try to delete the file com_eventbooking.zip from tmp folder
 		$tmpFolder = JFactory::getConfig()->get('tmp_path');
 		if (!JFolder::exists($tmpFolder))
@@ -2384,9 +2421,9 @@ class EventbookingController extends RADControllerAdmin
 		$asset->loadByName('com_eventbooking');
 		if ($asset)
 		{
-			$rules = $asset->rules;
-			$rules = str_replace('eventbooking.registrants_management', 'eventbooking.registrantsmanagement', $rules);
-			$rules = str_replace('eventbooking.view_registrants_list', 'eventbooking.viewregistrantslist', $rules);
+			$rules        = $asset->rules;
+			$rules        = str_replace('eventbooking.registrants_management', 'eventbooking.registrantsmanagement', $rules);
+			$rules        = str_replace('eventbooking.view_registrants_list', 'eventbooking.viewregistrantslist', $rules);
 			$asset->rules = $rules;
 			$asset->store();
 		}
@@ -2416,9 +2453,9 @@ class EventbookingController extends RADControllerAdmin
 			$dependOnOptions = json_encode(explode(',', $dependOnOptions));
 
 			$query->clear()
-					->update('#__eb_fields')
-					->set('depend_on_options = ' . $db->quote($dependOnOptions))
-					->where('id = ' . $rowField->id);
+				->update('#__eb_fields')
+				->set('depend_on_options = ' . $db->quote($dependOnOptions))
+				->where('id = ' . $rowField->id);
 
 			if (!empty($languages))
 			{
@@ -2436,9 +2473,9 @@ class EventbookingController extends RADControllerAdmin
 
 		// Insert deposit payment related messages
 		$query->clear()
-				->select('COUNT(*)')
-				->from('#__eb_messages')
-				->where('message_key = "deposit_payment_form_message"');
+			->select('COUNT(*)')
+			->from('#__eb_messages')
+			->where('message_key = "deposit_payment_form_message"');
 		$db->setQuery($query);
 		$total = $db->loadResult();
 		if (!$total)
@@ -2464,7 +2501,6 @@ class EventbookingController extends RADControllerAdmin
 		$deleteFiles = array(
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller/daylightsaving.php',
-			JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller/event.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/controller.php',
 			JPATH_ROOT . '/components/com_eventbooking/controller.php',
 			JPATH_ROOT . '/components/com_eventbooking/helper/os_cart.php',
@@ -2558,7 +2594,7 @@ class EventbookingController extends RADControllerAdmin
 			JFolder::create(JPATH_ROOT . '/images/com_eventbooking');
 		}
 
-		$db = JFactory::getDbo();
+		$db  = JFactory::getDbo();
 		$sql = 'SELECT thumb FROM #__eb_events WHERE thumb IS NOT NULL';
 		$db->setQuery($sql);
 		$thumbs = $db->loadColumn();
@@ -2598,28 +2634,58 @@ class EventbookingController extends RADControllerAdmin
 	 */
 	public function check_update()
 	{
-		$installedVersion = EventbookingHelper::getInstalledVersion();
-		$result           = array();
+		// Get the caching duration.
+		$component     = JComponentHelper::getComponent('com_installer');
+		$params        = $component->params;
+		$cache_timeout = $params->get('cachetimeout', 6, 'int');
+		$cache_timeout = 3600 * $cache_timeout;
+
+		// Get the minimum stability.
+		$minimum_stability = $params->get('minimum_stability', JUpdater::STABILITY_STABLE, 'int');
+
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_installer/models');
+
+		/** @var InstallerModelUpdate $model */
+		$model = JModelLegacy::getInstance('Update', 'InstallerModel');
+
+		$model->purge();
+
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('extension_id')
+			->from('#__extensions')
+			->where('`type` = "package"')
+			->where('`element` = "pkg_eventbooking"');
+		$db->setQuery($query);
+		$eid = (int) $db->loadResult();
+
 		$result['status'] = 0;
 
-		$http     = JHttpFactory::getHttp();
-		$url      = 'http://joomdonationdemo.com/versions/eventbookingj3.txt';
-		$response = $http->get($url);
-		if ($response->code == 200)
+		if ($eid)
 		{
-			$latestVersion = $response->body;
-			if ($latestVersion)
+			$ret = JUpdater::getInstance()->findUpdates($eid, $cache_timeout, $minimum_stability);
+
+			if ($ret)
 			{
-				if (version_compare($latestVersion, $installedVersion, 'gt'))
+				$model->setState('list.start', 0);
+				$model->setState('list.limit', 0);
+				$model->setState('filter.extension_id', $eid);
+				$updates          = $model->getItems();
+				$result['status'] = 2;
+
+				if (count($updates))
 				{
-					$result['status']  = 2;
-					$result['message'] = JText::sprintf('EB_UPDATE_CHECKING_UPDATEFOUND', $latestVersion);
+					$result['message'] = JText::sprintf('EB_UPDATE_CHECKING_UPDATEFOUND', $updates[0]->version);
 				}
 				else
 				{
-					$result['status']  = 1;
-					$result['message'] = JText::_('EB_UPDATE_CHECKING_UPTODATE');
+					$result['message'] = JText::sprintf('EB_UPDATE_CHECKING_UPDATEFOUND', null);
 				}
+			}
+			else
+			{
+				$result['status']  = 1;
+				$result['message'] = JText::_('EB_UPDATE_CHECKING_UPTODATE');
 			}
 		}
 

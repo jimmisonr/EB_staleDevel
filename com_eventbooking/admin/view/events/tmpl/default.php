@@ -9,9 +9,13 @@
 
 // no direct access
 defined( '_JEXEC' ) or die ;
+JToolbarHelper::custom('export', 'download', 'download', 'Export Events', false);
+
 JHtml::_('bootstrap.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('formbehavior.chosen', 'select');
+
+
 $user	= JFactory::getUser();
 $userId	= $user->get('id');
 $listOrder	= $this->state->filter_order;

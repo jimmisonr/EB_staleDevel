@@ -235,7 +235,7 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 						EventbookingHelper::generateInvoicePDF($row);
 					}
 
-					EventbookingHelper::sendRegistrationApprovedEmail($row, $config);
+					EventbookingHelperMail::sendRegistrationApprovedEmail($row, $config);
 
 					// Trigger event
 					JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));

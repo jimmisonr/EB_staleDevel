@@ -91,16 +91,16 @@ class EventbookingModelCoupon extends RADModelAdmin
 	}
 
 	/**
-	 * @param $input
+	 * @param $file
 	 *
 	 * @return int
 	 * @throws Exception
 	 */
-	public function import($input)
+	public function import($file)
 	{
 		$db      = JFactory::getDbo();
 		$query   = $db->getQuery(true);
-		$coupons = $this->getCouponCSV($input);
+		$coupons = EventbookingHelperData::getDataFromFile($file);
 
 		$imported = 0;
 		if (count($coupons))
@@ -108,6 +108,11 @@ class EventbookingModelCoupon extends RADModelAdmin
 			$imported = 0;
 			foreach ($coupons as $coupon)
 			{
+				if (empty($coupon['code']) || empty($coupon['discount']))
+				{
+					continue;
+				}
+
 				/* @var EventbookingTableCoupon $row */
 				$row = $this->getTable();
 
@@ -267,54 +272,6 @@ class EventbookingModelCoupon extends RADModelAdmin
 		}
 
 		return array();
-	}
-
-	/**
-	 * Get subscribers data from csv file
-	 *
-	 * @param $input
-	 *
-	 * @return array
-	 */
-	private function getCouponCSV($input)
-	{
-		$keys        = array();
-		$coupons     = array();
-		$coupon      = array();
-		$allowedExts = array('csv');
-		$csvFile     = $input->files->get('csv_coupons');
-		$csvFileName = $csvFile ['tmp_name'];
-		$fileName    = $csvFile ['name'];
-		$fileExt     = strtolower(JFile::getExt($fileName));
-		if (in_array($fileExt, $allowedExts))
-		{
-			$line = 0;
-			$fp   = fopen($csvFileName, 'r');
-			while (($cells = fgetcsv($fp)) !== false)
-			{
-				if ($line == 0)
-				{
-					foreach ($cells as $key)
-					{
-						$keys [] = $key;
-					}
-					$line++;
-				}
-				else
-				{
-					$i = 0;
-					foreach ($cells as $cell)
-					{
-						$coupon [$keys [$i]] = $cell;
-						$i++;
-					}
-					$coupons [] = $coupon;
-				}
-			}
-			fclose($fp);
-		}
-
-		return $coupons;
 	}
 
 	/**

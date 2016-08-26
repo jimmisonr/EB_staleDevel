@@ -11,11 +11,9 @@
 defined('_JEXEC') or die;
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 
-
 $config = EventbookingHelper::getConfig();
 EventbookingHelper::loadLanguage();
 JFactory::getDocument()->addStylesheet(JUri::base(true) . '/media/com_eventbooking/assets/css/style.css', 'text/css', null, null);
-
 
 $db               = JFactory::getDbo();
 $query            = $db->getQuery(true);
@@ -27,8 +25,9 @@ $query->select('a.city, COUNT(b.id) AS total_events')
 	->innerJoin('#__eb_events AS b ON a.id = b.location_id')
 	->where('a.published = 1')
 	->where('b.published = 1')
-	->where('b.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
-	->group('a.id')
+	->where('b.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')	
+	->where('a.city != ""')
+	->group('a.city')
 	->order('a.city');
 
 if ($config->hide_past_events)
@@ -52,4 +51,4 @@ if (!$itemId)
 	$itemId = EventbookingHelper::getItemid();
 }
 
-require(JModuleHelper::getLayoutPath('mod_eb_cities', 'default'));
+require JModuleHelper::getLayoutPath('mod_eb_cities', 'default');
