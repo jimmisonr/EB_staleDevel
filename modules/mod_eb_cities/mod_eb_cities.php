@@ -25,8 +25,9 @@ $query->select('a.city, COUNT(b.id) AS total_events')
 	->innerJoin('#__eb_events AS b ON a.id = b.location_id')
 	->where('a.published = 1')
 	->where('b.published = 1')
-	->where('b.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
-	->group('a.id')
+	->where('b.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')	
+	->where('a.city != ""')
+	->group('a.city')
 	->order('a.city');
 
 if ($config->hide_past_events)
