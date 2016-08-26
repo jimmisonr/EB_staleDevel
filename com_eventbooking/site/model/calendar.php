@@ -65,7 +65,6 @@ class EventbookingModelCalendar extends RADModel
 		$currentDateData = self::getCurrentDateData();
 
 		// Exclude categories
-		$params = JFactory::getApplication()->getParams();
 		$excludeCategoryIds = JFactory::getApplication()->getParams()->get('exclude_category_ids');
 		JArrayHelper::toInteger($excludeCategoryIds);
 		$excludeCategoryIds = array_filter($excludeCategoryIds);
@@ -164,13 +163,42 @@ class EventbookingModelCalendar extends RADModel
 				}
 			}
 
-			return $rowEvents;
+			$rows =  $rowEvents;
 		}
 		else
 		{
-			return $db->loadObjectList();
+			$rows =  $db->loadObjectList();
 		}
 
+		if (empty($rows) && !$this->state->mini_calendar)
+		{
+			$query->clear()
+				->select('MONTH(event_date) AS next_event_month')
+				->select('YEAR(event_date) AS next_event_year')
+				->from('#__eb_events')
+				->where('MONTH(event_date) > '. $month)
+				->where('YEAR(event_date) >= '. $year)
+				->order('event_date');
+
+			$db->setQuery($query, 0, 1);
+			$rowNextEvent = $db->loadObject();
+
+			if ($rowNextEvent)
+			{
+				$this->state->set('month', $rowNextEvent->next_event_month)
+					->set('year', $rowNextEvent->next_event_year);
+
+				$rows = $this->getData();
+
+				if (empty($rows))
+				{
+					// Warning users that there is no upcoming events
+					JFactory::getApplication()->enqueueMessage(JText::_('EB_NO_UPCOMING_EVENTS'));
+				}
+			}
+		}
+
+		return $rows;
 	}
 
 	/**
