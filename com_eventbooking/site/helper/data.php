@@ -485,7 +485,14 @@ class EventbookingHelperData
 		// Get categories data for each events
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('a.id, a.name, a.alias')
+
+		$query->select('*')
+			->from('#__eb_locations');
+		$db->setQuery($query);
+		$locations = $db->loadObjectList('id');
+
+		$query->clear()
+			->select('a.id, a.name, a.alias')
 			->from('#__eb_categories AS a')
 			->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id')
 			->order('b.id');
@@ -503,6 +510,12 @@ class EventbookingHelperData
 			$row->category_id    = $row->categories[0]->id;
 			$row->category_name  = $row->categories[0]->name;
 			$row->category_alias = $row->categories[0]->alias;
+
+			// Location data
+			if ($row->location_id)
+			{
+				$row->location = $locations[$row->location_id];
+			}
 
 			$query->clear('where');
 		}
