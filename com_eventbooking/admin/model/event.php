@@ -24,6 +24,16 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 
 		if (count($events))
 		{
+			$config = EventbookingHelper::getConfig();
+			if (!$config->thumb_width)
+			{
+				$config->thumb_width = 120;
+			}
+			if (!$config->thumb_height)
+			{
+				$config->thumb_height = 120;
+			}
+
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('id, name')
@@ -51,7 +61,6 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 				{
 					$row->load($event['id']);
 				}
-				$row->bind($event, array('id'));
 
 				if (is_numeric($event['location']))
 				{
@@ -63,12 +72,33 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 					$event['location_id'] = isset($locations[$locationName]) ? $locations[$locationName]->id : 0;
 				}
 
-				if (!is_numeric($event['location']))
+				if (!empty($event['image']) && JFile::exists(JPATH_ROOT . '/' . $event['image']))
 				{
-					$locationName      = trim($event['location']);
-					$event['location'] = isset($locations[$locationName]) ? $locations[$locationName]->id : 0;
-				}
+					$fileName = JFile::makeSafe(basename($event['image']));
 
+					if (!JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $fileName))
+					{
+						$imagePath = JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName;
+						$thumbPath = JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $fileName;
+
+						JFile::copy(JPATH_ROOT . '/' . $event['image'], $imagePath);
+
+						$image = new JImage($imagePath);
+						$image->resize($config->thumb_width, $config->thumb_height, false)
+							->toFile($thumbPath);
+
+						$event['thumb'] = $fileName;
+					}
+					else
+					{
+						if (!$row->thumb)
+						{
+							$event['thumb'] = $fileName;
+						}
+					}
+				}
+				
+				$row->bind($event, array('id'));
 
 				$this->prepareTable($row, 'save');
 				$row->store();
