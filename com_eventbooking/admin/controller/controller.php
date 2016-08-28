@@ -2527,6 +2527,7 @@ class EventbookingController extends RADControllerAdmin
 		);
 
 		$deleteFolders = array(
+			JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/PHPOffice',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/assets/chosen',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/models',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/views',

@@ -930,7 +930,7 @@ class EventbookingHelperData
 	 */
 	public static function excelExport($fields, $rows, $filename, $headers = array())
 	{
-		require_once JPATH_ADMINISTRATOR . '/libraries/osphpexcel/PHPExcel.php';
+		require_once JPATH_ROOT . '/libraries/osphpexcel/PHPExcel.php';
 
 		$exporter    = new PHPExcel();
 		$user        = JFactory::getUser();
