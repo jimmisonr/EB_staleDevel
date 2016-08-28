@@ -54,6 +54,7 @@
         <file type="plugin" id="eventbooking" group="editors-xtd">plug_editors_xtd_ebregister.zip</file>
 		<file type="plugin" id="eventbooking" group="installer">plug_installer_eventbooking.zip</file>
         <file type="library" id="eventbooking">lib_omnipay.zip</file>
+		<file type="library" id="eventbooking">lib_osphpexcel.zip</file>
         <file type="component" id="eventbooking">com_eventbooking.zip</file>
     </files>
 	<updateservers>	
