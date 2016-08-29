@@ -236,6 +236,18 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			}
 			elseif ($row->published == 2 && $published != 2)
 			{
+				// Update status of group members record to cancelled as well
+				if ($row->is_group_billing)
+				{
+					// We will need to set group members records to be cancelled
+					$query->clear()
+						->update('#__eb_registrants')
+						->set('published = 2')
+						->where('group_id = ' . (int) $row->id);
+					$db->setQuery($query);
+					$db->execute();
+				}
+
 				// Send registration cancelled email to registrant
 				EventbookingHelperMail::sendRegistrationCancelledEmail($row, $config);
 
