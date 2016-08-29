@@ -2343,6 +2343,41 @@ class EventbookingController extends RADControllerAdmin
 		$db->setQuery($query)
 			->execute();
 
+		if (JFile::exists(JPATH_ADMINISTRATOR . '/manifests/packages/pkg_eventbooking.xml'))
+		{
+			// Insert update site
+			$tmpInstaller = new JInstaller;
+			$tmpInstaller->setPath('source', JPATH_ADMINISTRATOR . '/manifests/packages');
+			$file     = JPATH_ADMINISTRATOR . '/manifests/packages/pkg_eventbooking.xml';
+			$manifest = $tmpInstaller->isManifest($file);
+
+			if (!is_null($manifest))
+			{
+				$query = $db->getQuery(true)
+					->select($db->quoteName('extension_id'))
+					->from($db->quoteName('#__extensions'))
+					->where($db->quoteName('name') . ' = ' . $db->quote($manifest->name))
+					->where($db->quoteName('type') . ' = ' . $db->quote($manifest['type']))
+					->where($db->quoteName('state') . ' != -1');
+				$db->setQuery($query);
+
+				$eid = (int) $db->loadResult();
+
+				if ($eid && $manifest->updateservers)
+				{
+					// Set the manifest object and path
+					$tmpInstaller->manifest = $manifest;
+					$tmpInstaller->setPath('manifest', $file);
+
+					// Load the extension plugin (if not loaded yet).
+					JPluginHelper::importPlugin('extension', 'joomla');
+
+					// Fire the onExtensionAfterUpdate
+					JEventDispatcher::getInstance()->trigger('onExtensionAfterUpdate', array('installer' => $tmpInstaller, 'eid' => $eid));
+				}
+			}
+		}
+
 		// Try to delete the file com_eventbooking.zip from tmp folder
 		$tmpFolder = JFactory::getConfig()->get('tmp_path');
 		if (!JFolder::exists($tmpFolder))
