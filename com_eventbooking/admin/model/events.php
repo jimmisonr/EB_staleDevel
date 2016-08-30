@@ -23,6 +23,7 @@ class EventbookingModelEvents extends RADModelList
 		$this->state->insert('filter_category_id', 'int', 0)
 			->insert('filter_location_id', 'int', 0)
 			->insert('filter_past_events', 'int', 0)
+			->insert('cid', 'array', array())
 			->setDefault('filter_order', 'tbl.event_date');
 	}
 
@@ -108,14 +109,22 @@ class EventbookingModelEvents extends RADModelList
 	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
 		$app = JFactory::getApplication();
+
+		if (!empty($this->state->cid))
+		{
+			$query->where('tbl.id IN (' . implode(',', $this->state->cid) . ')');
+		}
+
 		if ($this->state->filter_category_id)
 		{
 			$query->where('tbl.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id=' . $this->state->filter_category_id . ')');
 		}
+
 		if ($this->state->filter_location_id)
 		{
 			$query->where('tbl.location_id=' . $this->state->filter_location_id);
 		}
+
 		if ($this->state->filter_past_events == 0 && $app->isAdmin())
 		{
 			$query->where('(DATE(tbl.event_date) >= CURDATE() OR DATE(tbl.event_end_date) >= CURDATE())');
