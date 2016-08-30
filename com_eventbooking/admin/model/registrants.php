@@ -12,6 +12,13 @@ defined('_JEXEC') or die;
 class EventbookingModelRegistrants extends RADModelList
 {
 	/**
+	 * The selected registrants to export
+	 *
+	 * @var array
+	 */
+	protected $registrantIds = array();
+
+	/**
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
@@ -32,7 +39,6 @@ class EventbookingModelRegistrants extends RADModelList
 		$this->state->insert('filter_event_id', 'int', 0)
 			->insert('filter_published', 'int', -1)
 			->insert('filter_checked_in', 'int', -1)
-			->insert('cid', 'array', array())
 			->setDefault('filter_order_Dir', 'DESC');
 	}
 
@@ -61,8 +67,8 @@ class EventbookingModelRegistrants extends RADModelList
 				$query = $db->getQuery(true);
 
 				$query->select('id, first_name, last_name')
-						->from('#__eb_registrants')
-						->where('id IN (' . implode(',', $billingIds) . ')');
+					->from('#__eb_registrants')
+					->where('id IN (' . implode(',', $billingIds) . ')');
 				$db->setQuery($query);
 				$billingRecords = $db->loadObjectList('id');
 				foreach ($rows as $row)
@@ -117,10 +123,10 @@ class EventbookingModelRegistrants extends RADModelList
 
 			// Get data from core fields
 			$query->clear()
-					->select('id, name')
-					->from('#__eb_fields')
-					->where('id IN (' . implode(',', $fields) . ')')
-					->where('is_core = 1');
+				->select('id, name')
+				->from('#__eb_fields')
+				->where('id IN (' . implode(',', $fields) . ')')
+				->where('is_core = 1');
 			$db->setQuery($query);
 			$coreFields = $db->loadObjectList();
 			if (count($coreFields))
@@ -174,9 +180,9 @@ class EventbookingModelRegistrants extends RADModelList
 		// Prevent empty registration records (spams) from being showed
 		$query->where(' (tbl.first_name != "" OR tbl.group_id > 0)');
 
-		if (!empty($this->state->cid))
+		if (!empty($this->registrantIds))
 		{
-			$query->where('tbl.id IN (' . implode(',', $this->state->cid) . ')');
+			$query->where('tbl.id IN (' . implode(',', $this->registrantIds) . ')');
 		}
 
 		if ($this->state->filter_published != -1)
@@ -213,15 +219,25 @@ class EventbookingModelRegistrants extends RADModelList
 
 		$modelName = strtolower($this->getName());
 		if ($app->isSite()
-				&& $modelName == 'registrants'
-				&& !$user->authorise('core.admin', 'com_eventbooking')
-				&& $config->only_show_registrants_of_event_owner
+			&& $modelName == 'registrants'
+			&& !$user->authorise('core.admin', 'com_eventbooking')
+			&& $config->only_show_registrants_of_event_owner
 		)
 		{
 			$query->where('tbl.event_id IN (SELECT id FROM #__eb_events WHERE created_by =' . $user->id . ')');
 		}
 
 		return parent::buildQueryWhere($query);
+	}
+
+	/**
+	 * Setter method to set selected registrantIds for exporting
+	 *
+	 * @param array $registrantIds
+	 */
+	public function setRegistrantIds($registrantIds)
+	{
+		$this->registrantIds = $registrantIds;
 	}
 
 	/**

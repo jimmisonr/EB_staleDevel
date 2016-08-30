@@ -12,6 +12,13 @@ defined('_JEXEC') or die;
 class EventbookingModelEvents extends RADModelList
 {
 	/**
+	 * Selected event ids which will be exported
+	 *
+	 * @var array
+	 */
+	protected $eventIds = array();
+
+	/**
 	 * Instantiate the model.
 	 *
 	 * @param array $config configuration data for the model
@@ -23,7 +30,6 @@ class EventbookingModelEvents extends RADModelList
 		$this->state->insert('filter_category_id', 'int', 0)
 			->insert('filter_location_id', 'int', 0)
 			->insert('filter_past_events', 'int', 0)
-			->insert('cid', 'array', array())
 			->setDefault('filter_order', 'tbl.event_date');
 	}
 
@@ -110,9 +116,9 @@ class EventbookingModelEvents extends RADModelList
 	{
 		$app = JFactory::getApplication();
 
-		if (!empty($this->state->cid))
+		if (!empty($this->eventIds))
 		{
-			$query->where('tbl.id IN (' . implode(',', $this->state->cid) . ')');
+			$query->where('tbl.id IN (' . implode(',', $this->eventIds) . ')');
 		}
 
 		if ($this->state->filter_category_id)
@@ -143,5 +149,15 @@ class EventbookingModelEvents extends RADModelList
 		$query->group('tbl.id');
 
 		return $this;
+	}
+
+	/**
+	 * Setter method to set selected event ids which will be exported
+	 *
+	 * @param array $eventIds
+	 */
+	public function setEventIds($eventIds = array())
+	{
+		$this->eventIds = $eventIds;
 	}
 }

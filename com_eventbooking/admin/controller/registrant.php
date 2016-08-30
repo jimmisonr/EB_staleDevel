@@ -66,6 +66,9 @@ class EventbookingControllerRegistrant extends EventbookingController
 			->setState('filter_order', 'tbl.id')
 			->setState('filter_order_Dir', 'ASC');
 
+		$cid = $this->input->get('cid', array(), 'array');
+		$model->setRegistrantIds($cid);
+
 		$rows = $model->getData();
 
 		if (count($rows) == 0)

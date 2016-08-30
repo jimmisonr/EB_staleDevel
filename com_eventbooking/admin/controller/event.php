@@ -54,6 +54,9 @@ class EventbookingControllerEvent extends EventbookingController
 		$model->setState('limitstart', 0)
 			->setState('limit', 0);
 
+		$cid = $this->input->get('cid', array(), 'array');
+		$model->setEventIds($cid);
+
 		$rowEvents = $model->getData();
 
 		if (count($rowEvents) == 0)
