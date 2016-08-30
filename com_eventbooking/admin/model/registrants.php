@@ -32,6 +32,7 @@ class EventbookingModelRegistrants extends RADModelList
 		$this->state->insert('filter_event_id', 'int', 0)
 			->insert('filter_published', 'int', -1)
 			->insert('filter_checked_in', 'int', -1)
+			->insert('cid', 'array', array())
 			->setDefault('filter_order_Dir', 'DESC');
 	}
 
@@ -172,6 +173,11 @@ class EventbookingModelRegistrants extends RADModelList
 
 		// Prevent empty registration records (spams) from being showed
 		$query->where(' (tbl.first_name != "" OR tbl.group_id > 0)');
+
+		if (!empty($this->state->cid))
+		{
+			$query->where('tbl.id IN (' . implode(',', $this->state->cid) . ')');
+		}
 
 		if ($this->state->filter_published != -1)
 		{
