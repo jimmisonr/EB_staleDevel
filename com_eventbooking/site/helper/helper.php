@@ -3743,7 +3743,15 @@ class EventbookingHelper
 
 		$replaces                   = self::buildTags($row, $form, $rowEvent, $config);
 		$replaces['invoice_number'] = self::formatInvoiceNumber($row->invoice_number, $config);
-		$replaces['invoice_date']   = JHtml::_('date', $row->register_date, $config->date_format);
+
+		if (empty($row->payment_date) || ($row->payment_date == $db->getNullDate()))
+		{
+			$replaces['invoice_date'] = JHtml::_('date', $row->register_date, $config->date_format);
+		}
+		else
+		{
+			$replaces['invoice_date'] = JHtml::_('date', $row->payment_date, $config->date_format);
+		}
 
 		if ($row->published == 0)
 		{

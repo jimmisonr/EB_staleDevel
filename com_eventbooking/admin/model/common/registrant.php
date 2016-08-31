@@ -229,6 +229,12 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 
 			if ($row->published == 1 && $published == 0)
 			{
+				if (empty($row->payment_date) || ($row->payment_date == $db->getNullDate()))
+				{
+					$row->payment_date = JFactory::getDate()->toSql();
+					$row->store();
+				}
+
 				//Change from pending to paid, trigger event, send emails
 				JPluginHelper::importPlugin('eventbooking');
 				JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));
