@@ -229,6 +229,12 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 				$row->load($registrantId);
 				if (!$row->published)
 				{
+					if (empty($row->payment_date) || ($row->payment_date == $db->getNullDate()))
+					{
+						$row->payment_date = JFactory::getDate()->toSql();
+						$row->store();
+					}
+					
 					// Re-generate invoice with Paid status
 					if ($config->activate_invoice_feature && $row->invoice_number)
 					{
