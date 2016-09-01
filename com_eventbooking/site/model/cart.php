@@ -260,16 +260,6 @@ class EventbookingModelCart extends RADModel
 			$data['card_type'] = EventbookingHelperCreditcard::getCardType($data['x_card_num']);
 		}
 
-		if ($couponId > 0)
-		{
-			$query->clear()
-				->update('#__eb_coupons')
-				->set('used = used + 1')
-				->where('id = ' . $couponId);
-			$db->setQuery($query);
-			$db->execute();
-		}
-
 		if (!empty($fees['bundle_discount_ids']))
 		{
 			$query->clear()
