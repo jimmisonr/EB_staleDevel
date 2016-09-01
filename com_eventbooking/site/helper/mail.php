@@ -214,7 +214,12 @@ class EventbookingHelperMail
 				$rowMembers = $db->loadObjectList();
 				if (count($rowMembers))
 				{
-					$memberReplaces                      = array();
+					$memberReplaces = array();
+
+					$memberReplaces['group_billing_first_name'] = $row->first_name;
+					$memberReplaces['group_billing_last_name']  = $row->last_name;
+					$memberReplaces['group_billing_email']      = $row->email;
+
 					$memberReplaces['event_title']       = $replaces['event_title'];
 					$memberReplaces['event_date']        = $replaces['event_date'];
 					$memberReplaces['transaction_id']    = $replaces['transaction_id'];
