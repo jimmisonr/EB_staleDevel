@@ -26,8 +26,8 @@ class plgEventBookingField extends JPlugin
 	/**
 	 * Store setting into database
 	 *
-	 * @param JTable  $row
-	 * @param Boolean $isNew true if create new plan, false if edit
+	 * @param EventbookingTableEvent $row
+	 * @param bool                   $isNew true if create new plan, false if edit
 	 */
 	public function onAfterSaveEvent($row, $data, $isNew)
 	{
@@ -75,7 +75,11 @@ class plgEventBookingField extends JPlugin
 			$fieldValues[$i] = $fieldValues[$i] . ' - ' . $feeValues[$i];
 		}
 
-		$feeValues = array_map('floatval', $feeValues);
+		$inputFilter = JFilterInput::getInstance();
+		for ($i = 0, $n = count($feeValues); $i < $n; $i++)
+		{
+			$feeValues[$i] = $inputFilter->clean($feeValues[$i], 'FLOAT');
+		}
 
 		for ($i = 0, $n = count($feeValues); $i < $n; $i++)
 		{
