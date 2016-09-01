@@ -103,11 +103,13 @@ class plgEventbookingSystem extends JPlugin
 	 */
 	private function updateCouponUsage($row)
 	{
+		$row->coupon_usage_calculated = 1;
+		$row->store();
+
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->update('#__eb_coupons')
 			->set('used = used + 1')
-			->set('coupon_usage_calculated = 1')
 			->where('id = ' . (int) $row->coupon_id);
 		$db->setQuery($query);
 		$db->execute();
