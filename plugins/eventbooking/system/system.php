@@ -28,10 +28,17 @@ class plgEventbookingSystem extends JPlugin
 				$this->processInvoiceNumber($row);
 			}
 
+			// Update coupon usage
+			if ($row->coupon_id)
+			{
+				$this->updateCouponUsage($row);
+			}
+
 			if ($config->unpublish_event_when_full)
 			{
 				$this->processUnpublishEvent($row->event_id);
 			}
+
 		}
 	}
 
@@ -47,6 +54,12 @@ class plgEventbookingSystem extends JPlugin
 		if ($config->activate_invoice_feature && !$row->invoice_number)
 		{
 			$this->processInvoiceNumber($row);
+		}
+
+		// Update coupon usage, increase by 1
+		if ($row->coupon_id && !$row->coupon_usage_calculated)
+		{
+			$this->updateCouponUsage($row);
 		}
 
 		if ($config->multiple_booking)
@@ -81,6 +94,23 @@ class plgEventbookingSystem extends JPlugin
 			$db->setQuery($query);
 			$db->execute();
 		}
+	}
+
+	/**
+	 * Update coupon usage, increase number usage by 1
+	 *
+	 * @param EventbookingTableRegistrant $row
+	 */
+	private function updateCouponUsage($row)
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->update('#__eb_coupons')
+			->set('used = used + 1')
+			->set('coupon_usage_calculated = 1')
+			->where('id = ' . (int) $row->coupon_id);
+		$db->setQuery($query);
+		$db->execute();
 	}
 
 	/**

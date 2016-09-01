@@ -151,12 +151,6 @@ class EventBookingModelRegister extends RADModel
 		if ($couponCode && $fees['coupon_valid'])
 		{
 			$coupon = $fees['coupon'];
-			$query->clear()
-				->update('#__eb_coupons')
-				->set('used = used + 1')
-				->where('id = ' . (int) $coupon->id);
-			$db->setQuery($query);
-			$db->execute();
 			$row->coupon_id = $coupon->id;
 		}
 
@@ -416,12 +410,6 @@ class EventBookingModelRegister extends RADModel
 		if ($couponCode && $fees['coupon_valid'])
 		{
 			$coupon = $fees['coupon'];
-			$query->clear();
-			$query->update('#__eb_coupons')
-				->set('used = used + 1')
-				->where('id = ' . (int) $coupon->id);
-			$db->setQuery($query);
-			$db->execute();
 			$row->coupon_id = $coupon->id;
 		}
 
