@@ -216,6 +216,7 @@ class EventbookingHelperMail
 				{
 					$memberReplaces = array();
 
+					$memberReplaces['registration_detail']      = $replaces['registration_detail'];
 					$memberReplaces['group_billing_first_name'] = $row->first_name;
 					$memberReplaces['group_billing_last_name']  = $row->last_name;
 					$memberReplaces['group_billing_email']      = $row->email;
