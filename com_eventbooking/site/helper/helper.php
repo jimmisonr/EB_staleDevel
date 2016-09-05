@@ -706,13 +706,16 @@ class EventbookingHelper
 			$eventTitle = $event->title;
 		}
 
-		$replaces['date']              = date($config->date_format);
-		$replaces['event_title']       = $eventTitle;
-		$replaces['event_date']        = JHtml::_('date', $event->event_date, $config->event_date_format, null);
-		$replaces['event_end_date']    = JHtml::_('date', $event->event_end_date, $config->event_date_format, null);
-		$replaces['short_description'] = $event->short_description;
-		$replaces['description']       = $event->description;
-		$replaces['event_link']        = self::getSiteUrl() . 'index.php?option=com_eventbooking&view=event&id=' . $event->id . '&Itemid=' . $Itemid;
+		$timeFormat                      = $config->event_time_format ? $config->event_time_format : 'g:i a';
+		$replaces['date']                = date($config->date_format);
+		$replaces['event_title']         = $eventTitle;
+		$replaces['event_date']          = JHtml::_('date', $event->event_date, $config->event_date_format, null);
+		$replaces['event_date_time']     = JHtml::_('date', $event->event_date, $timeFormat, null);
+		$replaces['event_end_date']      = JHtml::_('date', $event->event_end_date, $config->event_date_format, null);
+		$replaces['event_end_date_time'] = JHtml::_('date', $event->event_end_date, $timeFormat, null);
+		$replaces['short_description']   = $event->short_description;
+		$replaces['description']         = $event->description;
+		$replaces['event_link']          = self::getSiteUrl() . 'index.php?option=com_eventbooking&view=event&id=' . $event->id . '&Itemid=' . $Itemid;
 
 		// Add support for group members name tags
 		if ($row->is_group_billing)
