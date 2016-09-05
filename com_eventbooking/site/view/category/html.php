@@ -210,6 +210,11 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 			->setState('year', $year)
 			->setState('id', $categoryId);
 		$rows        = $model->getData();
+
+		$state = $model->getState();
+		$year  = $state->year;
+		$month = $state->month;
+
 		$this->data  = EventbookingHelperData::getCalendarData($rows, $year, $month);
 		$this->month = $month;
 		$this->year  = $year;
