@@ -343,6 +343,14 @@ JHtml::_('script', 'jui/cms.js', false, true);
 					</div>
 					<div class="control-group">
 						<div class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('allow_populate_group_member_data', JText::_('EB_ALLOW_POPULATE_GROUP_MEMBER_DATA'), JText::_('EB_ALLOW_POPULATE_GROUP_MEMBER_DATA_EXPLAIN')); ?>
+						</div>
+						<div class="controls">
+							<?php echo EventbookingHelperHtml::getBooleanInput('allow_populate_group_member_data', $config->get('allow_populate_group_member_data', 0)); ?>
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="control-label">
 							<?php echo EventbookingHelperHtml::getFieldLabel('multiple_booking', JText::_('EB_MULTIPLE_BOOKING'), JText::_('EB_MULTIPLE_BOOKING_EXPLAIN')); ?>
 						</div>
 						<div class="controls">

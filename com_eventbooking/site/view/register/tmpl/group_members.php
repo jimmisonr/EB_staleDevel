@@ -26,26 +26,37 @@ $dateFields = array();
 for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 {
 	$headerText = JText::_('EB_MEMBER_REGISTRATION') ;
-	$headerText = str_replace('[ATTENDER_NUMBER]', $i, $headerText) ;
-?>
-<div class="<?php echo $controlGroupClass; ?> clearfix">	
-	<h3 class="eb-heading">
-		<?php echo $headerText ?>		
-	</h3>	
-	<?php
-		if ($i > 1)
-		{
-			$options = array();
-			$options[] = JHtml::_('select.option', 0, JText::_('EB_POPULATE_DATA_FROM'));
-			for ($j = 1 ; $j < $i ; $j++)
-			{
-				$options[] = JHtml::_('select.option', $j, JText::sprintf('EB_MEMBER_NUMBER', $j));
-			}
-			echo JHtml::_('select.genericlist', $options, 'member_number_' . $i, 'id="member_number_' . $i . '" class="input-large eb-member-number-select" onchange="populateMemberFormData(' . $i . ', this.value)"', 'value', 'text', 0);
-		}
+	$headerText = str_replace('[ATTENDER_NUMBER]', $i, $headerText);
+	if ($this->config->allow_populate_group_member_data)
+	{
 	?>
-</div>	
-<?php
+		<div class="<?php echo $controlGroupClass; ?> clearfix">
+			<h3 class="eb-heading">
+				<?php echo $headerText ?>
+			</h3>
+			<?php
+			if ($i > 1)
+			{
+				$options = array();
+				$options[] = JHtml::_('select.option', 0, JText::_('EB_POPULATE_DATA_FROM'));
+				for ($j = 1 ; $j < $i ; $j++)
+				{
+					$options[] = JHtml::_('select.option', $j, JText::sprintf('EB_MEMBER_NUMBER', $j));
+				}
+				echo JHtml::_('select.genericlist', $options, 'member_number_' . $i, 'id="member_number_' . $i . '" class="input-large eb-member-number-select" onchange="populateMemberFormData(' . $i . ', this.value)"', 'value', 'text', 0);
+			}
+			?>
+		</div>
+	<?php
+	}
+	else
+	{
+	?>
+		<h3 class="eb-heading">
+			<?php echo $headerText ?>
+		</h3>
+	<?php
+	}
 	$form = new RADForm($this->rowFields);
 	$form->setFieldSuffix($i);
 	//Bill form data
@@ -121,35 +132,40 @@ if ($this->showCaptcha)
 	<script type="text/javascript">
 			var memberFields = <?php echo $memberFields ?>;
 			Eb.jQuery(document).ready(function($){
-				populateMemberFormData = (function (currentMemberNumber, fromMemberNumber) {
-					if (fromMemberNumber != 0)
-					{
-						var arrayLength = memberFields.length;
-						var selecteds = [];
-						var value = '';
-						for (var i = 0; i < arrayLength; i++)
-						{
-							if ($('input[name="' + memberFields[i] + '_' + currentMemberNumber + '[]"]').length)
-							{
-								//This is a checkbox or multiple select
-								selecteds = $('input[name="' + memberFields[i] + '_' + fromMemberNumber + '[]"]:checked').map(function(){return $(this).val();}).get();
-								$('input[name="' + memberFields[i] + '_' + currentMemberNumber + '[]"]').val(selecteds);
-							}
-							else if ($('input[type="radio"][name="' + memberFields[i] + '_' + currentMemberNumber + '"]').length)
-							{
-								value = $('input[name="' + memberFields[i] + '_' + fromMemberNumber + '"]:checked').val();
-								$('input[name="' + memberFields[i] + '_' + currentMemberNumber + '"][value="' + value + '"]').attr('checked', 'checked');
-							}
-							else
-							{
-								value = $('#' + memberFields[i] + '_' + fromMemberNumber).val();
-								$('#' + memberFields[i] + '_' + currentMemberNumber).val(value);
-							}
-						}
-					}
-				})
 
 				<?php
+					if ($this->config->allow_populate_group_member_data)
+					{
+					?>
+						populateMemberFormData = (function (currentMemberNumber, fromMemberNumber) {
+							if (fromMemberNumber != 0)
+							{
+								var arrayLength = memberFields.length;
+								var selecteds = [];
+								var value = '';
+								for (var i = 0; i < arrayLength; i++)
+								{
+									if ($('input[name="' + memberFields[i] + '_' + currentMemberNumber + '[]"]').length)
+									{
+										//This is a checkbox or multiple select
+										selecteds = $('input[name="' + memberFields[i] + '_' + fromMemberNumber + '[]"]:checked').map(function(){return $(this).val();}).get();
+										$('input[name="' + memberFields[i] + '_' + currentMemberNumber + '[]"]').val(selecteds);
+									}
+									else if ($('input[type="radio"][name="' + memberFields[i] + '_' + currentMemberNumber + '"]').length)
+									{
+										value = $('input[name="' + memberFields[i] + '_' + fromMemberNumber + '"]:checked').val();
+										$('input[name="' + memberFields[i] + '_' + currentMemberNumber + '"][value="' + value + '"]').attr('checked', 'checked');
+									}
+									else
+									{
+										value = $('#' + memberFields[i] + '_' + fromMemberNumber).val();
+										$('#' + memberFields[i] + '_' + currentMemberNumber).val(value);
+									}
+								}
+							}
+						})
+					<?php
+					}
 					if (count($dateFields))
 					{
 						echo EventbookingHelperHtml::getCalendarSetupJs($dateFields);
