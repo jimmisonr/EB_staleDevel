@@ -114,7 +114,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 				$isMultipleDate = true;
 			}
 		?>
-			<tr class="eb-category-<?php echo $item->category_id; ?>">
+			<tr class="eb-category-<?php echo $item->category_id; ?><?php if ($item->featured) echo ' eb-featured-event'; ?>">
 				<?php
 					if ($config->show_image_in_table_layout)
 					{

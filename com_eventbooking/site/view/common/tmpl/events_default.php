@@ -49,7 +49,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 				$isMultipleDate = true;
 			}
 		?>
-			<div class="eb-category-<?php echo $event->category_id; ?> eb-event clearfix" itemscope itemtype="http://schema.org/Event">
+			<div class="eb-category-<?php echo $event->category_id; ?> eb-event<?php if ($event->featured) echo ' eb-featured-event'; ?> clearfix" itemscope itemtype="http://schema.org/Event">
 				<div class="eb-box-heading clearfix">
 					<h2 class="eb-event-title pull-left">
 						<?php

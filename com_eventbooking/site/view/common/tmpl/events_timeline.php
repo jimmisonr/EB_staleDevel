@@ -53,7 +53,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 				$isMultipleDate = true;
 			}
 		?>
-		<div class="eb-category-<?php echo $event->category_id; ?> eb-event-container" itemscope itemtype="http://schema.org/Event">
+		<div class="eb-category-<?php echo $event->category_id; ?> eb-event-container<?php if ($event->featured) echo ' eb-featured-event'; ?>" itemscope itemtype="http://schema.org/Event">
 			<div class="eb-event-date-container">
 				<div class="eb-event-date <?php echo $btnInverseClass; ?>">
 					<?php
