@@ -666,20 +666,8 @@ if (!$this->userId && $this->config->user_registration)
 			</div>	
 		</div>
 		<?php		
-	}						
-	if ($this->showCaptcha)
-	{
-	?>
-	<div class="<?php echo $controlGroupClass;  ?>">
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<?php echo $this->captcha; ?>	
-		</div>
-	</div>
-	<?php
 	}
+
 	if ($this->config->accept_term ==1)
 	{
 		$articleId  = $this->config->article_id ;
@@ -708,17 +696,31 @@ if (!$this->userId && $this->config->user_registration)
 		EventbookingHelperJquery::colorbox('eb-colorbox-term');
 		$termLink = ContentHelperRoute::getArticleRoute($article->id, $article->catid) . '&tmpl=component&format=html';
 		?>
-		<div class="<?php echo $controlGroupClass;  ?>">			
+		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="checkbox">
 				<input type="checkbox" name="accept_term" value="1" class="validate[required]" data-errormessage="<?php echo JText::_('EB_ACCEPT_TERMS');?>" />
 				<?php echo JText::_('EB_ACCEPT'); ?>&nbsp;
 				<?php
-					echo "<a class=\"eb-colorbox-term\" title=\"".JText::_('EB_TERM_AND_CONDITION')."\" href=\"".JRoute::_($termLink)."\" rel=\"{handler: 'iframe', size: {x: 700, y: 500}}\">"."<strong>".JText::_('EB_TERM_AND_CONDITION')."</strong>"."</a>\n";
+				echo "<a class=\"eb-colorbox-term\" title=\"".JText::_('EB_TERM_AND_CONDITION')."\" href=\"".JRoute::_($termLink)."\" rel=\"{handler: 'iframe', size: {x: 700, y: 500}}\">"."<strong>".JText::_('EB_TERM_AND_CONDITION')."</strong>"."</a>\n";
 				?>
 			</label>
 		</div>
+		<?php
+	}
+
+	if ($this->showCaptcha)
+	{
+	?>
+	<div class="<?php echo $controlGroupClass;  ?>">
+		<label class="<?php echo $controlLabelClass; ?>">
+			<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
+		</label>
+		<div class="<?php echo $controlsClass; ?>">
+			<?php echo $this->captcha; ?>	
+		</div>
+	</div>
 	<?php
-	}            
+	}
 	?>								
 	<div class="form-actions">
 		<input type="button" class="btn btn-primary" name="btnBack" value="<?php echo  JText::_('EB_BACK') ;?>" onclick="window.history.go(-1);">

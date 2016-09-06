@@ -102,19 +102,6 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 		}
 	}
 }
-if ($this->showCaptcha)
-{
-?>
-	<div class="<?php echo $controlGroupClass; ?>">
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<?php echo $this->captcha; ?>
-		</div>
-	</div>
-<?php
-}
 
 $articleId  = $this->event->article_id ? $this->event->article_id : $this->config->article_id ;
 if (!$this->showBillingStep && $this->config->accept_term ==1 && $articleId)
@@ -154,6 +141,20 @@ if (!$this->showBillingStep && $this->config->accept_term ==1 && $articleId)
 		</label>
 	</div>
 	<?php
+}
+
+if ($this->showCaptcha)
+{
+?>
+	<div class="<?php echo $controlGroupClass; ?>">
+		<label class="<?php echo $controlLabelClass; ?>">
+			<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
+		</label>
+		<div class="<?php echo $controlsClass; ?>">
+			<?php echo $this->captcha; ?>
+		</div>
+	</div>
+<?php
 }
 ?>
 	<div class="form-actions">

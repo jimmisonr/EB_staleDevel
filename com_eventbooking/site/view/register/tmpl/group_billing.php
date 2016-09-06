@@ -516,19 +516,7 @@ else
 		<?php
 		}
 	}
-	if ($this->showCaptcha)
-	{
-	?>
-		<div class="<?php echo $controlGroupClass; ?>">
-			<label class="<?php echo $controlLabelClass; ?>">
-				<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
-			</label>
-			<div class="<?php echo $controlsClass; ?>">
-				<?php echo $this->captcha; ?>
-			</div>
-		</div>
-	<?php
-	}
+
 	$articleId  = $this->event->article_id ? $this->event->article_id : $this->config->article_id ;
 	if ($this->config->accept_term ==1 && $articleId)
 	{
@@ -562,9 +550,23 @@ else
 				<input type="checkbox" name="accept_term" value="1" class="validate[required]" data-errormessage="<?php echo JText::_('EB_ACCEPT_TERMS');?>" />
 				<?php echo JText::_('EB_ACCEPT'); ?>&nbsp;
 				<?php
-					echo "<a class=\"eb-colorbox-term\" href=\"".JRoute::_($termLink)."\">"."<strong>".JText::_('EB_TERM_AND_CONDITION')."</strong>"."</a>\n";
+				echo "<a class=\"eb-colorbox-term\" href=\"".JRoute::_($termLink)."\">"."<strong>".JText::_('EB_TERM_AND_CONDITION')."</strong>"."</a>\n";
 				?>
 			</label>
+		</div>
+		<?php
+	}
+
+	if ($this->showCaptcha)
+	{
+	?>
+		<div class="<?php echo $controlGroupClass; ?>">
+			<label class="<?php echo $controlLabelClass; ?>">
+				<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
+			</label>
+			<div class="<?php echo $controlsClass; ?>">
+				<?php echo $this->captcha; ?>
+			</div>
 		</div>
 	<?php
 	}
