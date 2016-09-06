@@ -16,7 +16,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '2.10.0';
+		return '2.10.1';
 	}
 
 	/**
@@ -3436,7 +3436,8 @@ class EventbookingHelper
 			$query->select('a.id, a.name' . $fieldSuffix . ' AS name, a.color_code')
 				->from('#__eb_categories AS a')
 				->where('published = 1')
-				->where('id IN (SELECT category_id FROM #__eb_event_categories WHERE event_id IN (' . implode(',', $eventIds) . ') AND main_category = 1)');
+				->where('id IN (SELECT category_id FROM #__eb_event_categories WHERE event_id IN (' . implode(',', $eventIds) . ') AND main_category = 1)')
+				->order('a.ordering');
 			$db->setQuery($query);
 
 			return $db->loadObjectList();

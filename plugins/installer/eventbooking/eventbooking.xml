@@ -7,7 +7,7 @@
     <copyright>Copyright (C) 2010 - 2016 Ossolution Team</copyright>
     <license>GNU General Public License version 3, or later</license>
     <creationDate>August 2016</creationDate>
-    <version>2.10.0</version>
+    <version>2.10.1</version>
     <description>Allows the installation of Events Booking updates. This plugin MUST be installed for the Events Booking updates to be installed under your Joomla site. Otherwise you will see the updates but you will not be able to install them.</description>
     <files>
         <filename plugin="eventbooking">eventbooking.php</filename>        

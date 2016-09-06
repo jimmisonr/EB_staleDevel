@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>contact@joomdonation.com</authorEmail>
 	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>2.10.0</version>
+	<version>2.10.1</version>
 	<description>This plugin is used to create a CB account for user when they register for an Event in Events Booking</description>
 	<files>
 		<filename plugin="cb">cb.php</filename>
