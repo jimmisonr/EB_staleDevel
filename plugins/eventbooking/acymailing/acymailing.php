@@ -71,7 +71,37 @@ class plgEventBookingAcymailing extends JPlugin
 		{
 			return;
 		}
-		$event =  JTable::getInstance('EventBooking', 'Event');
+		
+		// Only add subscribers to newsletter if they agree.
+		if ($subscribeNewsletterField = $this->params->get('subscribe_newsletter_field'))
+		{
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('name, fieldtype')
+				->from('#__eb_fields')
+				->where('id = ' . $db->quote((int) $subscribeNewsletterField));
+			$db->setQuery($query);
+			$field     = $db->loadObject();
+			$fieldType = $field->fieldtype;
+			$fieldName = $field->name;
+			if ($fieldType == 'Checkboxes')
+			{
+				if (!isset($_POST[$fieldName]))
+				{
+					return;
+				}
+			}
+			else
+			{
+				$fieldValue = strtolower(JFactory::getApplication()->input->getString($fieldName));
+				if (empty($fieldValue) || $fieldValue == 'no' || $fieldValue == '0')
+				{
+					return;
+				}
+			}
+		}
+
+		$event = JTable::getInstance('EventBooking', 'Event');
 		$event->load($row->event_id);
 		$params  = new JRegistry($event->params);
 		$listIds = $params->get('acymailing_list_ids', '');
@@ -128,6 +158,6 @@ class plgEventBookingAcymailing extends JPlugin
 				</td>
 			</tr>
 		</table>
-	<?php
+		<?php
 	}
 }
