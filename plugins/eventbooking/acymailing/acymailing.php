@@ -63,7 +63,7 @@ class plgEventBookingAcymailing extends JPlugin
 	/**
 	 * Run when a membership activated
 	 *
-	 * @param PlanOsMembership $row
+	 * @param EventbookingTableRegistrant $row
 	 */
 	public function onAfterStoreRegistrant($row)
 	{
@@ -71,12 +71,13 @@ class plgEventBookingAcymailing extends JPlugin
 		{
 			return;
 		}
-		
+
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+
 		// Only add subscribers to newsletter if they agree.
 		if ($subscribeNewsletterField = $this->params->get('subscribe_newsletter_field'))
 		{
-			$db    = JFactory::getDbo();
-			$query = $db->getQuery(true);
 			$query->select('name, fieldtype')
 				->from('#__eb_fields')
 				->where('id = ' . $db->quote((int) $subscribeNewsletterField));
@@ -108,28 +109,60 @@ class plgEventBookingAcymailing extends JPlugin
 		if ($listIds != '')
 		{
 			require_once JPATH_ADMINISTRATOR . '/components/com_acymailing/helpers/helper.php';
-			$userClass = acymailing_get('class.subscriber');
-			$subId     = $userClass->subid($row->email);
-			if (!$subId)
-			{
-				$myUser         = new stdClass();
-				$myUser->email  = $row->email;
-				$myUser->name   = $row->first_name . ' ' . $row->last_name;
-				$myUser->userid = $row->user_id;
-				$eventClass     = acymailing_get('class.subscriber');
-				$subId          = $eventClass->save($myUser); //this
-			}
-			$listIds  = explode(',', $listIds);
-			$newEvent = array();
-			foreach ($listIds as $listId)
-			{
-				$newList           = array();
-				$newList['status'] = 1;
-				$newEvent[$listId] = $newList;
-			}
+			$listIds = explode(',', $listIds);
 
-			$userClass->saveSubscription($subId, $newEvent);
+			$this->subscribeToAcyMailingLists($row, $listIds);
+
+			if ($row->is_group_billing && $this->params->get('add_group_members_to_newsletter'))
+			{
+				$query->clear()
+					->select('user_id, first_name, last_name, email')
+					->from('#__eb_registrants')
+					->where('group_id = ' . (int) $row->id);
+				$db->setQuery($query);
+				$groupMembers = $db->loadObjectList();
+
+				foreach ($groupMembers as $groupMember)
+				{
+					$this->subscribeToAcyMailingLists($groupMember, $listIds);
+				}
+			}
 		}
+	}
+
+	/**
+	 * @param EventbookingTableRegistrant $row
+	 * @param array                       $listIds
+	 */
+	private function subscribeToAcyMailingLists($row, $listIds)
+	{
+		if (!JMailHelper::isEmailAddress($row->email))
+		{
+			return;
+		}
+
+		$userClass = acymailing_get('class.subscriber');
+		$subId     = $userClass->subid($row->email);
+
+		if (!$subId)
+		{
+			$myUser         = new stdClass();
+			$myUser->email  = $row->email;
+			$myUser->name   = trim($row->first_name . ' ' . $row->last_name);
+			$myUser->userid = $row->user_id;
+			$eventClass     = acymailing_get('class.subscriber');
+			$subId          = $eventClass->save($myUser); //this
+		}
+
+		$newEvent = array();
+		foreach ($listIds as $listId)
+		{
+			$newList           = array();
+			$newList['status'] = 1;
+			$newEvent[$listId] = $newList;
+		}
+
+		$userClass->saveSubscription($subId, $newEvent);
 	}
 
 	/**
