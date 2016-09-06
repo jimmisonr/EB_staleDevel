@@ -596,11 +596,10 @@ class EventbookingHelperData
 			{
 				$paramData[$name]['title'] = $label;
 				$paramData[$name]['value'] = $params->get($name);
-			}
-
-			if (!property_exists($item, $name))
-			{
-				$item->{$name} = $params->get($name);
+				if (!property_exists($item, $name))
+				{
+					$item->{$name} = $params->get($name);
+				}
 			}
 
 			$item->paramData = $paramData;
