@@ -44,10 +44,9 @@ abstract class EventbookingHelperHtml
 	 */
 	public static function buildCategoryDropdown($selected, $name = "parent", $attr = null)
 	{
-		$db          = JFactory::getDbo();
-		$query       = $db->getQuery(true);
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$query->select('id, parent AS parent_id, name' . $fieldSuffix . ' AS title')
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('id, parent AS parent_id, name AS title')
 			->from('#__eb_categories')
 			->where('published=1');
 		$db->setQuery($query);
@@ -78,7 +77,7 @@ abstract class EventbookingHelperHtml
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => 'class="inputbox" ' . $attr,
-				'list.select'        => $selected, ));
+				'list.select'        => $selected,));
 	}
 
 	/**

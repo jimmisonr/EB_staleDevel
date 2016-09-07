@@ -18,7 +18,7 @@ class EventbookingModelCategory extends RADModelAdmin
 	 *
 	 * @return void
 	 */
-	protected function prepareTable($row, $task, $sourceId)
+	protected function prepareTable($row, $task, $sourceId = 0)
 	{
 		if ($row->parent > 0)
 		{

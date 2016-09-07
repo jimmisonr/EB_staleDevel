@@ -149,9 +149,7 @@ class EventbookingModelRegistrants extends RADModelList
 	 */
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-
-		$query->select('tbl.*, ev.title' . $fieldSuffix . ' AS title, ev.event_date, ev.event_end_date, cp.code AS coupon_code, cp.id AS coupon_id');
+		$query->select('tbl.*, ev.title, ev.event_date, ev.event_end_date, cp.code AS coupon_code, cp.id AS coupon_id');
 
 		return $this;
 	}
