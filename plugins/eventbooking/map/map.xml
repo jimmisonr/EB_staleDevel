@@ -18,6 +18,16 @@
             <fieldset name="basic">
                 <field name="map_width" type="text" default="700" description="" label="Map width"></field>
                 <field name="map_height" type="text" default="500" description="" label="Map height"></field>
+                <field
+					name="disable_zoom"
+					type="radio"
+					default="1"
+					class="btn-group btn-group-yesno"
+					label="Disable scrollwheel"
+					description="Set to Yes to disable mouse scroll-wheel scaling with Google Maps API">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
             </fieldset>
 
         </fields>

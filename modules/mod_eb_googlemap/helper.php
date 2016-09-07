@@ -107,7 +107,7 @@ class modEventBookingGoogleMapHelper
 
 		$rootUri = JUri::root();
 		$zoomLevel = $this->params->get('zoom_level', 10);
-
+		$disableZoom    = $this->params->get('disable_zoom', 1) == 1 ? 'false' : 'true';
 		JFactory::getDocument()->addScript('https://maps.googleapis.com/maps/api/js?key=' . $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4'));
 		?>
 		<script type="text/javascript">
@@ -130,6 +130,7 @@ class modEventBookingGoogleMapHelper
 				var mapOptions = {
 					zoom: <?php echo $zoomLevel; ?>,
 					streetViewControl: true,
+					scrollwheel: <?php echo $disableZoom; ?>,
 					mapTypeControl: true,
 					panControl: true,
 					mapTypeId: google.maps.MapTypeId.ROADMAP,

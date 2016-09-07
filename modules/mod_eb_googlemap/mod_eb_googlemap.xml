@@ -61,6 +61,16 @@
 					<option value="1">JYES</option>
 					<option value="0">JNO</option>
 				</field>
+				<field
+					name="disable_zoom"
+					type="radio"
+					default="1"
+					class="btn-group btn-group-yesno"
+					label="Disable scrollwheel"
+					description="Set to Yes to disable mouse scroll-wheel scaling with Google Maps API">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
 			</fieldset>
 		</fields>
 	</config>
