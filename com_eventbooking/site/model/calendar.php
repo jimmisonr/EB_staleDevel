@@ -17,15 +17,15 @@ class EventbookingModelCalendar extends RADModel
 	 * @var array
 	 */
 	protected static $fields = array(
-			'a.id',
-			'a.parent_id',
-			'a.event_capacity',
-			'a.title',
-			'a.event_date',
-			'a.event_end_date',
-			'a.thumb',
-			'a.alias',
-			'a.featured',
+		'a.id',
+		'a.parent_id',
+		'a.event_capacity',
+		'a.title',
+		'a.event_date',
+		'a.event_end_date',
+		'a.thumb',
+		'a.alias',
+		'a.featured',
 	);
 
 	/**
@@ -55,6 +55,7 @@ class EventbookingModelCalendar extends RADModel
 	 */
 	public function getData()
 	{
+		$app             = JFactory::getApplication();
 		$db              = $this->getDbo();
 		$query           = $db->getQuery(true);
 		$config          = EventbookingHelper::getConfig();
@@ -131,6 +132,11 @@ class EventbookingModelCalendar extends RADModel
 			$query->where('a.id NOT IN (SELECT event_id FROM #__eb_event_categories WHERE category_id IN (' . implode(',', $excludeCategoryIds) . '))');
 		}
 
+		if ($app->getLanguageFilter())
+		{
+			$query->where('tbl.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
+		}
+
 		$db->setQuery($query);
 		if ($config->show_multiple_days_event_in_calendar && !$this->state->mini_calendar)
 		{
@@ -164,14 +170,13 @@ class EventbookingModelCalendar extends RADModel
 				}
 			}
 
-			$rows =  $rowEvents;
+			$rows = $rowEvents;
 		}
 		else
 		{
-			$rows =  $db->loadObjectList();
+			$rows = $db->loadObjectList();
 		}
 
-		$app = JFactory::getApplication();
 		if (empty($rows) && $app->input->getMethod() == 'GET' && !$this->state->mini_calendar)
 		{
 			$query->clear()
@@ -205,12 +210,10 @@ class EventbookingModelCalendar extends RADModel
 					->set('year', $rowNextEvent->next_event_year);
 
 				$rows = $this->getData();
-
-				if (empty($rows))
-				{
-					// Warning users that there is no upcoming events
-					$app->enqueueMessage(JText::_('EB_NO_UPCOMING_EVENTS'));
-				}
+			}
+			else
+			{
+				$app->enqueueMessage(JText::_('EB_NO_UPCOMING_EVENTS'));
 			}
 		}
 

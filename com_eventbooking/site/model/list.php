@@ -125,7 +125,7 @@ class EventbookingModelList extends RADModelList
 			return;
 		}
 
-		EventbookingHelperData::preProcessEventData($rows,  'list');
+		EventbookingHelperData::preProcessEventData($rows, 'list');
 	}
 
 	/**
@@ -253,10 +253,12 @@ class EventbookingModelList extends RADModelList
 
 		if ($state->search)
 		{
-			$search = $db->Quote('%' . $db->escape($state->search, true) . '%', false);
+			$search = $db->quote('%' . $db->escape($state->search, true) . '%', false);
 			$query->where("(LOWER(tbl.title) LIKE $search OR LOWER(tbl.short_description) LIKE $search OR LOWER(tbl.description) LIKE $search)");
 		}
+
 		$name = strtolower($this->getName());
+
 		if ($name == 'archive')
 		{
 			$query->where('DATE(tbl.event_date) < CURDATE()');
@@ -273,6 +275,11 @@ class EventbookingModelList extends RADModelList
 			{
 				$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.cut_off_date) >= ' . $currentDate . ')');
 			}
+		}
+
+		if (JFactory::getApplication()->getLanguageFilter())
+		{
+			$query->where('tbl.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
 		}
 
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
