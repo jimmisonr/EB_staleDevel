@@ -103,6 +103,11 @@ class plgEventbookingSystem extends JPlugin
 	 */
 	private function updateCouponUsage($row)
 	{
+		if ($row->cart_id > 0)
+		{
+			return;
+		}
+
 		$row->coupon_usage_calculated = 1;
 		$row->store();
 
