@@ -30,6 +30,11 @@ if ($fieldSuffix)
 		->where($db->quoteName('a.name' . $fieldSuffix) . ' IS NOT NULL ');
 }
 
+if (JFactory::getApplication()->getLanguageFilter())
+{
+	$query->where('a.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
+}
+
 if ($numberCategories)
 {
 	$db->setQuery($query, 0, $numberCategories);
