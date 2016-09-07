@@ -261,6 +261,21 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 							<?php echo EventbookingHelperHtml::getBooleanInput('featured', $this->item->featured); ?>
 						</div>
 					</div>
+					<?php
+					if (JLanguageMultilang::isEnabled())
+					{
+					?>
+						<div class="control-group">
+							<label class="control-label">
+								<?php echo JText::_('EB_LANGUAGE'); ?>
+							</label>
+							<div class="controls">
+								<?php echo $this->lists['language']; ?>
+							</div>
+						</div>
+					<?php
+					}
+					?>
 					<div class="control-group">
 						<label class="control-label">
 							<?php echo JText::_('EB_PUBLISHED'); ?>

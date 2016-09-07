@@ -21,11 +21,9 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 <script type="text/javascript">
 	Joomla.submitbutton = function(pressbutton)
 	{
-		var form = document.adminForm;
 		if (pressbutton == 'cancel')
 		{
 			Joomla.submitform( pressbutton );
-			return;
 		}
 		else
 		{
@@ -90,6 +88,21 @@ if ($translatable)
 			<?php echo EventbookingHelperHtml::getBooleanInput('show_on_submit_event_form', $this->item->show_on_submit_event_form); ?>
 		</div>
 	</div>
+	<?php
+	if (JLanguageMultilang::isEnabled())
+	{
+	?>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_LANGUAGE'); ?>
+			</label>
+			<div class="controls">
+				<?php echo $this->lists['language'] ; ?>
+			</div>
+		</div>
+	<?php
+	}
+	?>
 	<div class="control-group">
 		<label class="control-label">
 			<?php echo JText::_('EB_PUBLISHED'); ?>
