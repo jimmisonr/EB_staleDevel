@@ -219,8 +219,9 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$lists['location_id'] = JHtml::_('select.genericlist', $options, 'location_id', '', 'id', 'name', $item->location_id);
 
 		// Categories dropdown
-		$query->clear();
-		$query->select("id, parent AS parent_id, show_on_submit_event_form, name" . $fieldSuffix . " AS title")
+		$query->clear()
+			->select('id, parent AS parent_id, show_on_submit_event_form')
+			->select($db->quoteName("name" . $fieldSuffix, 'title'))
 			->from('#__eb_categories')
 			->where('published = 1')
 			->order('name' . $fieldSuffix);
@@ -281,14 +282,14 @@ class EventbookingViewEventHtml extends RADViewHtml
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => '',
-				'list.select'        => $mainCategoryId, ));
+				'list.select'        => $mainCategoryId,));
 		$lists['category_id']                = JHtml::_('select.genericlist', $options, 'category_id[]',
 			array(
 				'option.text.toHtml' => false,
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => 'class="inputbox"  size="5" multiple="multiple"',
-				'list.select'        => $additionalCategories, ));
+				'list.select'        => $additionalCategories,));
 		$options                             = array();
 		$options[]                           = JHtml::_('select.option', 1, JText::_('%'));
 		$options[]                           = JHtml::_('select.option', 2, $config->currency_symbol);

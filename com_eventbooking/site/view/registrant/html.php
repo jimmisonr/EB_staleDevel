@@ -33,7 +33,8 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 
 		if ($item->id)
 		{
-			$query->select('*, title' . $fieldSuffix . ' AS title')
+			$query->select('*')
+				->select($db->quoteName('title' . $fieldSuffix, 'title'))
 				->from('#__eb_events')
 				->where('id=' . $item->event_id);
 			$db->setQuery($query);
@@ -53,9 +54,9 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 
 			$query->clear();
 			$query->select('*')
-					->from('#__eb_registrants')
-					->where('group_id=' . $item->id)
-					->order('id');
+				->from('#__eb_registrants')
+				->where('group_id=' . $item->id)
+				->order('id');
 			$db->setQuery($query, 0, $item->number_registrants);
 			$rowMembers = $db->loadObjectList();
 
@@ -63,10 +64,10 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		}
 		else
 		{
-			$rowFields  = EventbookingHelper::getFormFields($item->event_id, 0);
+			$rowFields = EventbookingHelper::getFormFields($item->event_id, 0);
 
 			$useDefault = true;
-			$data = array();
+			$data       = array();
 			$rowMembers = array();
 		}
 
@@ -102,7 +103,8 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			//Build list of event dropdown
 			$options = array();
 			$query->clear();
-			$query->select('id, title' . $fieldSuffix . ' AS title, event_date')
+			$query->select('id, event_date')
+				->select($db->quoteName('title' . $fieldSuffix, 'title'))
 				->from('#__eb_events')
 				->where('published=1')
 				->order('title');

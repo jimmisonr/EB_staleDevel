@@ -34,14 +34,15 @@ class EventbookingViewRegistrantsHtml extends RADViewHtml
 		$state       = $model->getState();
 
 		//Get list of events
-		$query->select('id, title' . $fieldSuffix . ' AS title, event_date')
+		$query->select('id, event_date')
+			->select($db->quoteName('title' . $fieldSuffix, 'title'))
 			->from('#__eb_events')
 			->where('published = 1')
 			->order($config->sort_events_dropdown);
 
 		if ($config->hide_past_events_from_events_dropdown)
 		{
-			$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
 			$query->where('(DATE(event_date) >= ' . $currentDate . ' OR DATE(event_end_date) >= ' . $currentDate . ')');
 		}
 
@@ -66,12 +67,12 @@ class EventbookingViewRegistrantsHtml extends RADViewHtml
 		{
 			$options = array_merge($options, $db->loadObjectList());
 		}
-		$lists['filter_event_id']  = JHtml::_('select.genericlist', $options, 'filter_event_id', ' class="inputbox" onchange="submit();"', 'id', 'title',
+		$lists['filter_event_id'] = JHtml::_('select.genericlist', $options, 'filter_event_id', ' class="inputbox" onchange="submit();"', 'id', 'title',
 			$state->filter_event_id);
-		$options                   = array();
-		$options[]                 = JHtml::_('select.option', -1, JText::_('EB_REGISTRATION_STATUS'));
-		$options[]                 = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
-		$options[]                 = JHtml::_('select.option', 1, JText::_('EB_PAID'));
+		$options                  = array();
+		$options[]                = JHtml::_('select.option', -1, JText::_('EB_REGISTRATION_STATUS'));
+		$options[]                = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
+		$options[]                = JHtml::_('select.option', 1, JText::_('EB_PAID'));
 		if ($config->activate_waitinglist_feature)
 		{
 			$options[] = JHtml::_('select.option', 3, JText::_('EB_WAITING_LIST'));

@@ -297,10 +297,10 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	private function displayGroupForm($event, $input)
 	{
-		$config   = EventbookingHelper::getConfig();
-		$user     = JFactory::getUser();
-		$db       = JFactory::getDbo();
-		$query    = $db->getQuery(true);
+		$config = EventbookingHelper::getConfig();
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
 
 		// Check to see whether we need to load ajax file upload script
 		$query->select('COUNT(*)')
@@ -373,14 +373,14 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	private function displayCart()
 	{
-		$app      = JFactory::getApplication();
-		$input    = $this->input;
-		$db       = JFactory::getDbo();
-		$config   = EventbookingHelper::getConfig();
-		$user     = JFactory::getUser();
-		$userId   = $user->get('id');
-		$cart     = new EventbookingHelperCart();
-		$items    = $cart->getItems();
+		$app    = JFactory::getApplication();
+		$input  = $this->input;
+		$db     = JFactory::getDbo();
+		$config = EventbookingHelper::getConfig();
+		$user   = JFactory::getUser();
+		$userId = $user->get('id');
+		$cart   = new EventbookingHelperCart();
+		$items  = $cart->getItems();
 		if (!count($items))
 		{
 			$url = JRoute::_('index.php?option=com_eventbooking&Itemid=' . $input->getInt('Itemid', 0));
@@ -509,8 +509,8 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
-		$query->clear();
-		$query->select('title' . $fieldSuffix . ' AS title')
+		$query->clear()
+			->select($db->quoteName('title' . $fieldSuffix, 'title'))
 			->from('#__eb_events')
 			->where('id IN (' . implode(',', $items) . ')')
 			->order('FIND_IN_SET(id, "' . implode(',', $items) . '")');
@@ -592,14 +592,15 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 
 	/**
 	 * Load captcha for registration form
+	 *
 	 * @param bool $initOnly
 	 *
 	 * @throws Exception
 	 */
 	private function loadCaptcha($initOnly = false)
 	{
-		$config = EventbookingHelper::getConfig();
-		$user   = JFactory::getUser();
+		$config      = EventbookingHelper::getConfig();
+		$user        = JFactory::getUser();
 		$showCaptcha = 0;
 
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
@@ -613,7 +614,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
 			if ($plugin)
 			{
-				$showCaptcha   = 1;
+				$showCaptcha = 1;
 				if ($initOnly)
 				{
 					JCaptcha::getInstance($captchaPlugin)->initialise('dynamic_recaptcha_1');

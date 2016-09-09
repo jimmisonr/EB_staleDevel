@@ -22,7 +22,7 @@ class EventbookingViewCancelHtml extends RADViewHtml
 		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
-		$query->select('b.title' . $fieldSuffix . ' AS event_title')
+		$query->select($db->quoteName('b.title' . $fieldSuffix, 'event_title'))
 			->from('#__eb_registrants AS a')
 			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
 			->where('a.id=' . $id);

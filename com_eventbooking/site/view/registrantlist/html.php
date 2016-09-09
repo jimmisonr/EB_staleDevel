@@ -27,9 +27,9 @@ class EventbookingViewRegistrantlistHtml extends RADViewHtml
 		{
 			$rows = $this->model->getData();
 
-			$config  = EventbookingHelper::getConfig();
-			$db      = JFactory::getDbo();
-			$query   = $db->getQuery(true);
+			$config = EventbookingHelper::getConfig();
+			$db     = JFactory::getDbo();
+			$query  = $db->getQuery(true);
 
 			// Check to see whether we need to display custom fields data for this event
 			$query->select('custom_field_ids')
@@ -48,7 +48,8 @@ class EventbookingViewRegistrantlistHtml extends RADViewHtml
 				$fieldTitles = array();
 				$fieldSuffix = EventbookingHelper::getFieldSuffix();
 				$query->clear();
-				$query->select('id, name,title' . $fieldSuffix . ' AS title, is_core')
+				$query->select('id, name, is_core')
+					->select($db->quoteName('title' . $fieldSuffix, 'title'))
 					->from('#__eb_fields')
 					->where('id IN (' . $customFieldIds . ')');
 				$rowFields = $db->loadObjectList();
