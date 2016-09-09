@@ -109,7 +109,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 		}
 		else
 		{
-			$query->select('a.id, a.title AS title, b.id AS registrant_id, b.user_id, cancel_before_date, DATEDIFF(cancel_before_date, NOW()) AS number_days')
+			$query->select('a.id, a.title, b.id AS registrant_id, b.user_id, cancel_before_date, DATEDIFF(cancel_before_date, NOW()) AS number_days')
 				->from('#__eb_events AS a')
 				->innerJoin('#__eb_registrants AS b ON a.id = b.event_id')
 				->where('b.registration_code = ' . $db->quote($registrationCode));
