@@ -120,7 +120,8 @@ class EventbookingHelperRoute
 			$db          = JFactory::getDbo();
 			$query       = $db->getQuery(true);
 			$fieldSuffix = EventbookingHelper::getFieldSuffix();
-			$query->select('id, event_type, parent_id,  alias' . $fieldSuffix . ' AS alias')
+			$query->select('id, event_type, parent_id')
+				->select($db->quoteName('alias' . $fieldSuffix, 'alias'))
 				->from('#__eb_events')
 				->where('id=' . $id);
 			$db->setQuery($query);
@@ -150,7 +151,9 @@ class EventbookingHelperRoute
 		{
 			$fieldSuffix = EventbookingHelper::getFieldSuffix();
 			$query       = $db->getQuery(true);
-			$query->select('id, alias' . $fieldSuffix . ' AS alias, parent')->from('#__eb_categories');
+			$query->select('id, parent')
+				->select($db->quoteName('alias' . $fieldSuffix, 'alias'))
+				->from('#__eb_categories');
 			$db->setQuery($query);
 			$categories = $db->loadObjectList('id');
 		}

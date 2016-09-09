@@ -691,8 +691,8 @@ class EventbookingHelper
 			$eventIds = $db->loadColumn();
 
 			$fieldSuffix = EventbookingHelper::getFieldSuffix();
-			$query->clear();
-			$query->select('title' . $fieldSuffix . ' AS title')
+			$query->clear()
+				->select($db->quoteName('title' . $fieldSuffix) . ' AS title')
 				->from('#__eb_events')
 				->where('id IN (' . implode(',', $eventIds) . ')')
 				->order('FIND_IN_SET(id, "' . implode(',', $eventIds) . '")');
@@ -2386,7 +2386,7 @@ class EventbookingHelper
 			"validate[minSize[6]]",
 			"validate[maxSize[12]]",
 			"validate[custom[integer],min[-5]]",
-			"validate[custom[integer],max[50]]", );
+			"validate[custom[integer],max[50]]",);
 
 		return json_encode($validClass);
 	}
@@ -2653,7 +2653,7 @@ class EventbookingHelper
 			$data['Itemid'] = $Itemid;
 
 			$query->select('a.*, b.event_date, b.event_end_date')
-				->select('b.title' . $fieldSuffix . ' AS title')
+				->select($db->quoteName('b.title' . $fieldSuffix, 'title'))
 				->from('#__eb_registrants AS a')
 				->innerJoin('#__eb_events AS b ON a.event_id = b.id')
 				->where("(a.id = $row->id OR a.cart_id = $row->id)")
@@ -2708,7 +2708,8 @@ class EventbookingHelper
 		}
 		else
 		{
-			$query->select('*, title' . $fieldSuffix . ' AS title')
+			$query->select('*')
+				->select($db->quoteName('title' . $fieldSuffix, 'title'))
 				->from('#__eb_events')
 				->where('id=' . $row->event_id);
 			$db->setQuery($query);
@@ -2787,7 +2788,7 @@ class EventbookingHelper
 	{
 		$db          = JFactory::getDbo();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$sql         = "SELECT id, parent AS parent_id, name" . $fieldSuffix . " AS title FROM #__eb_categories";
+		$sql         = 'SELECT id, parent AS parent_id, ' . $db->quoteName('name' . $fieldSuffix) . ' AS title FROM #__eb_categories';
 		$db->setQuery($sql);
 		$rows     = $db->loadObjectList();
 		$children = array();
@@ -2817,7 +2818,7 @@ class EventbookingHelper
 					'option.text'        => 'text',
 					'option.value'       => 'value',
 					'list.attr'          => 'class="inputbox" onchange="submit();"',
-					'list.select'        => $selected, ));
+					'list.select'        => $selected,));
 		else
 			return JHtml::_('select.genericlist', $options, $name,
 				array(
@@ -2825,7 +2826,7 @@ class EventbookingHelper
 					'option.text'        => 'text',
 					'option.value'       => 'value',
 					'list.attr'          => 'class="inputbox" ',
-					'list.select'        => $selected, ));
+					'list.select'        => $selected,));
 	}
 
 	/**
@@ -2842,7 +2843,7 @@ class EventbookingHelper
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
 		$query->select('id, parent AS parent_id')
-			->select('name' . $fieldSuffix . ' AS title')
+			->select($db->quoteName('name' . $fieldSuffix, 'title'))
 			->from('#__eb_categories');
 		if ($row->id)
 		{
@@ -2883,7 +2884,7 @@ class EventbookingHelper
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => ' class="inputbox" ',
-				'list.select'        => $row->parent, ));
+				'list.select'        => $row->parent,));
 	}
 
 	/**
@@ -3299,8 +3300,10 @@ class EventbookingHelper
 			{
 				$replaces['event_link'] = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')) . '/' . EventbookingHelperRoute::getEventRoute($row->event_id, 0, EventbookingHelper::getItemid());
 			}
-			$query->clear();
-			$query->select('*, title' . $fieldSuffix . ' AS title')
+
+			$query->clear()
+				->select('*')
+				->select($db->quoteName('title' . $fieldSuffix, 'title'))
 				->from('#__eb_events')
 				->where('id = ' . (int) $row->event_id);
 			$db->setQuery($query);
@@ -3433,7 +3436,8 @@ class EventbookingHelper
 			$db          = JFactory::getDbo();
 			$query       = $db->getQuery(true);
 			$fieldSuffix = EventbookingHelper::getFieldSuffix();
-			$query->select('a.id, a.name' . $fieldSuffix . ' AS name, a.color_code')
+			$query->select('a.id, a.color_code')
+				->select($db->quoteName('a.name' . $fieldSuffix, 'name'))
 				->from('#__eb_categories AS a')
 				->where('published = 1')
 				->where('id IN (SELECT category_id FROM #__eb_event_categories WHERE event_id IN (' . implode(',', $eventIds) . ') AND main_category = 1)')
@@ -3668,7 +3672,8 @@ class EventbookingHelper
 		$config      = self::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 		$sitename    = JFactory::getConfig()->get("sitename");
-		$query->select('*, title' . $fieldSuffix . ' AS title')
+		$query->select('*')
+			->select($db->quoteName('title' . $fieldSuffix, 'title'))
 			->from('#__eb_events')
 			->where('id = ' . (int) $row->event_id);
 		$db->setQuery($query);
@@ -3775,7 +3780,7 @@ class EventbookingHelper
 		unset($replaces['tax_amount']);
 		if ($config->multiple_booking)
 		{
-			$sql = 'SELECT a.title' . $fieldSuffix . ' AS title, a.event_date, b.* FROM #__eb_events AS a INNER JOIN #__eb_registrants AS b ' . ' ON a.id = b.event_id ' .
+			$sql = 'SELECT ' . $db->quoteName('a.title' . $fieldSuffix) . ' AS title, a.event_date, b.* FROM #__eb_events AS a INNER JOIN #__eb_registrants AS b ' . ' ON a.id = b.event_id ' .
 				' WHERE b.id=' . $row->id . ' OR b.cart_id=' . $row->id;
 			$db->setQuery($sql);
 			$rowEvents                          = $db->loadObjectList();
@@ -3792,7 +3797,7 @@ class EventbookingHelper
 					'taxAmount'      => $taxAmount,
 					'discountAmount' => $discountAmount,
 					'total'          => $total,
-					'config'         => $config, ));
+					'config'         => $config,));
 			$replaces['SUB_TOTAL']              = EventbookingHelper::formatCurrency($subTotal, $config);
 			$replaces['DISCOUNT_AMOUNT']        = EventbookingHelper::formatCurrency($discountAmount, $config);
 			$replaces['TAX_AMOUNT']             = EventbookingHelper::formatCurrency($taxAmount, $config);

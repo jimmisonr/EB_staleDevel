@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package            Joomla
  * @subpackage         Event Booking
@@ -450,7 +451,9 @@ class EventbookingHelperData
 		$db          = JFactory::getDbo();
 		$query       = $db->getQuery(true);
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$query->select('id, name' . $fieldSuffix . ' AS name, parent')->from('#__eb_categories')->where('published=1');
+		$query->select('id, ' . $db->quoteName('name' . $fieldSuffix) . ' AS name, parent')
+			->from('#__eb_categories')
+			->where('published=1');
 		$db->setQuery($query);
 		$categories = $db->loadObjectList('id');
 		$paths      = array();
@@ -604,7 +607,7 @@ class EventbookingHelperData
 			$item->paramData = $paramData;
 		}
 	}
-	
+
 	/**
 	 * Get data from excel file using PHPExcel library
 	 *
@@ -1033,7 +1036,7 @@ class EventbookingHelperData
 
 		if ($fileType == 'csv')
 		{
-			/* @var PHPExcel_Writer_CSV $objWriter*/
+			/* @var PHPExcel_Writer_CSV $objWriter */
 			$objWriter->setDelimiter($config->get('csv_delimiter', ','));
 		}
 		$objWriter->save('php://output');
