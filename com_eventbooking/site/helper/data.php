@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package            Joomla
  * @subpackage         Event Booking

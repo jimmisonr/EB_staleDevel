@@ -234,7 +234,10 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 						$row->payment_date = JFactory::getDate()->toSql();
 						$row->store();
 					}
-					
+
+					// Trigger event
+					JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));
+
 					// Re-generate invoice with Paid status
 					if ($config->activate_invoice_feature && $row->invoice_number)
 					{
@@ -242,9 +245,6 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 					}
 
 					EventbookingHelperMail::sendRegistrationApprovedEmail($row, $config);
-
-					// Trigger event
-					JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));
 				}
 			}
 		}

@@ -134,7 +134,7 @@ class EventbookingModelCalendar extends RADModel
 
 		if ($app->getLanguageFilter())
 		{
-			$query->where('tbl.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
+			$query->where('a.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
 		}
 
 		$db->setQuery($query);
