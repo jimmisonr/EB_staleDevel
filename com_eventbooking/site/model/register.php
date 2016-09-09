@@ -150,7 +150,7 @@ class EventBookingModelRegister extends RADModel
 		$couponCode = isset($data['coupon_code']) ? $data['coupon_code'] : null;
 		if ($couponCode && $fees['coupon_valid'])
 		{
-			$coupon = $fees['coupon'];
+			$coupon         = $fees['coupon'];
 			$row->coupon_id = $coupon->id;
 		}
 
@@ -409,7 +409,7 @@ class EventBookingModelRegister extends RADModel
 		$couponCode = isset($data['coupon_code']) ? $data['coupon_code'] : null;
 		if ($couponCode && $fees['coupon_valid'])
 		{
-			$coupon = $fees['coupon'];
+			$coupon         = $fees['coupon'];
 			$row->coupon_id = $coupon->id;
 		}
 
@@ -663,8 +663,8 @@ class EventBookingModelRegister extends RADModel
 		// Need to over-ridde some config options
 		$emailContent = EventbookingHelper::getEmailContent($config, $row, true, $form);
 		$fieldSuffix  = EventbookingHelper::getFieldSuffix();
-		$query->clear();
-		$query->select('title' . $fieldSuffix . ' AS title')
+		$query->clear()
+			->select($db->quoteName('title' . $fieldSuffix, 'title'))
 			->from('#__eb_events')
 			->where('id=' . $row->event_id);
 		$db->setQuery($query);

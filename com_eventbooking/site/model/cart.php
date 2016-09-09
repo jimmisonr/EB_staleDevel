@@ -237,8 +237,8 @@ class EventbookingModelCart extends RADModel
 			$dispatcher->trigger('onAfterStoreRegistrant', array($row));
 		}
 
-		$query->clear();
-		$query->select('title' . $fieldSuffix . ' AS title')
+		$query->clear()
+			->select($db->quoteName('title' . $fieldSuffix, 'title'))
 			->from('#__eb_events')
 			->where('id IN (' . implode(',', $items) . ')')
 			->order('FIND_IN_SET(id, "' . implode(',', $items) . '")');
