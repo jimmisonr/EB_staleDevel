@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package            Joomla
  * @subpackage         Event Booking
@@ -594,17 +595,24 @@ class EventbookingHelperData
 			foreach ($customFields as $name => $label)
 			{
 				$paramData[$name]['title'] = $label;
-				$paramData[$name]['value'] = $params->get($name);
+				$fieldValue                = $params->get($name);
+
+				if (is_array($fieldValue))
+				{
+					$fieldValue = implode(', ', $fieldValue);
+				}
+				$paramData[$name]['value'] = $fieldValue;
+				
 				if (!property_exists($item, $name))
 				{
-					$item->{$name} = $params->get($name);
+					$item->{$name} = $fieldValue;
 				}
 			}
 
 			$item->paramData = $paramData;
 		}
 	}
-	
+
 	/**
 	 * Get data from excel file using PHPExcel library
 	 *
@@ -1033,7 +1041,7 @@ class EventbookingHelperData
 
 		if ($fileType == 'csv')
 		{
-			/* @var PHPExcel_Writer_CSV $objWriter*/
+			/* @var PHPExcel_Writer_CSV $objWriter */
 			$objWriter->setDelimiter($config->get('csv_delimiter', ','));
 		}
 		$objWriter->save('php://output');
