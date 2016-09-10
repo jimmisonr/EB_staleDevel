@@ -57,7 +57,7 @@ if ($params->get('only_show_featured_events', 0))
 
 if ($fieldSuffix)
 {
-	$query->select('a.title' . $fieldSuffix . ' AS title');
+	$query->select($db->quoteName('a.title' . $fieldSuffix, 'title'));
 	$query->where($db->quoteName('a.title' . $fieldSuffix) . ' != ""')
 		->where($db->quoteName('a.title' . $fieldSuffix) . ' IS NOT NULL');
 }
@@ -75,8 +75,9 @@ if (JFactory::getApplication()->getLanguageFilter())
 $db->setQuery($query, 0, $numberEvents);
 $rows = $db->loadObjectList();
 
-$query->clear();
-$query->select('a.id, a.name' . $fieldSuffix . ' AS name')
+$query->clear()
+	->select('a.id')
+	->select($db->quoteName('a.name' . $fieldSuffix, 'name'))
 	->from('#__eb_categories AS a')
 	->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id');
 

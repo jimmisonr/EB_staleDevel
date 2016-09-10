@@ -43,7 +43,7 @@ if ($showCategory)
 	$query       = $db->getQuery(true);
 	$fieldSuffix = EventbookingHelper::getFieldSuffix();
 	$query->select('id, parent AS parent_id')
-		->select("name" . $fieldSuffix . " AS title")
+		->select($db->quoteName('name' . $fieldSuffix, 'title'))
 		->from('#__eb_categories')
 		->where('published = 1')
 		->where('`access` IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
@@ -64,10 +64,10 @@ if ($showCategory)
 	}
 	$list      = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
 	$options   = array();
-	$options[] = JHTML::_('select.option', 0, JText::_('EB_SELECT_CATEGORY'));
+	$options[] = JHtml::_('select.option', 0, JText::_('EB_SELECT_CATEGORY'));
 	foreach ($list as $listItem)
 	{
-		$options[] = JHTML::_('select.option', $listItem->id, '&nbsp;&nbsp;&nbsp;' . $listItem->treename);
+		$options[] = JHtml::_('select.option', $listItem->id, '&nbsp;&nbsp;&nbsp;' . $listItem->treename);
 	}
 	$lists['category_id'] = JHtml::_('select.genericlist', $options, 'category_id', array(
 		'option.text.toHtml' => false,
@@ -81,7 +81,7 @@ if ($showCategory)
 //Build location dropdown
 if ($showLocation)
 {
-	$options   			  = array();
+	$options              = array();
 	$options[]            = JHtml::_('select.option', 0, JText::_('EB_SELECT_LOCATION'), 'id', 'name');
 	$options              = array_merge($options, EventbookingHelperDatabase::getAllLocations());
 	$lists['location_id'] = JHtml::_('select.genericlist', $options, 'location_id', ' class="inputbox location_box" ', 'id', 'name', $locationId);

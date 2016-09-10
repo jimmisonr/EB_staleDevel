@@ -17,7 +17,8 @@ $db               = JFactory::getDbo();
 $query            = $db->getQuery(true);
 $numberCategories = (int) $params->get('number_categories', 0);
 
-$query->select('a.id, a.name' . $fieldSuffix . ' AS name')
+$query->select('a.id')
+	->select($db->quoteName('a.name' . $fieldSuffix, 'name'))
 	->from('#__eb_categories AS a')
 	->where('a.parent = 0')
 	->where('a.published = 1')
