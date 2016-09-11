@@ -29,10 +29,7 @@ class EventbookingModelCart extends RADModel
 			$eventIds = array($data['id']);
 		}
 
-		for ($i = 0, $n = count($eventIds); $i < $n; $i++)
-		{
-			$eventIds[$i] = (int) $eventIds[$i];
-		}
+		JArrayHelper::toInteger($eventIds);
 
 		$cart = new EventbookingHelperCart();
 		$cart->addEvents($eventIds);
@@ -50,11 +47,9 @@ class EventbookingModelCart extends RADModel
 	 */
 	public function processUpdateCart($eventIds, $quantities)
 	{
-		for ($i = 0, $n = count($eventIds); $i < $n; $i++)
-		{
-			$eventIds[$i] = (int) $eventIds[$i];
-		}
-		
+		JArrayHelper::toInteger($eventIds);
+		JArrayHelper::toInteger($quantities);
+
 		$cart = new EventbookingHelperCart();
 		$cart->updateCart($eventIds, $quantities);
 
@@ -127,12 +122,14 @@ class EventbookingModelCart extends RADModel
 		JPluginHelper::importPlugin('eventbooking');
 
 		// Store list of registrants
-
-		$membersForm           = $fees['members_form'];
-		$membersTotalAmount    = $fees['members_total_amount'];
-		$membersDiscountAmount = $fees['members_discount_amount'];
-		$membersTaxAmount      = $fees['members_tax_amount'];
-		$membersLateFee        = $fees['members_late_fee'];
+		if ($config->collect_member_information_in_cart)
+		{
+			$membersForm           = $fees['members_form'];
+			$membersTotalAmount    = $fees['members_total_amount'];
+			$membersDiscountAmount = $fees['members_discount_amount'];
+			$membersTaxAmount      = $fees['members_tax_amount'];
+			$membersLateFee        = $fees['members_late_fee'];
+		}
 
 		$count  = 0;
 		$userIp = EventbookingHelper::getUserIp();
