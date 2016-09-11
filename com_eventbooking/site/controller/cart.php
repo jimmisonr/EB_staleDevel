@@ -19,6 +19,7 @@ class EventbookingControllerCart extends EventbookingController
 	public function add_cart()
 	{
 		$data = $this->input->getData();
+
 		if (is_numeric($data['id']))
 		{
 			// Check if this is event is password protected
@@ -34,6 +35,8 @@ class EventbookingControllerCart extends EventbookingController
 				else
 				{
 					// Add event to cart, then redirect to cart page
+
+					/* @var EventbookingModelCart $model */
 					$model = $this->getModel('cart');
 					$model->processAddToCart($data);
 					$Itemid = $this->input->getInt('Itemid', 0);
@@ -41,6 +44,8 @@ class EventbookingControllerCart extends EventbookingController
 				}
 			}
 		}
+
+		/* @var EventbookingModelCart $model */
 		$model = $this->getModel('cart');
 		$model->processAddToCart($data);
 
@@ -64,13 +69,18 @@ class EventbookingControllerCart extends EventbookingController
 		$redirect   = $this->input->getInt('redirect', 1);
 		$eventIds   = $this->input->get('event_id', '', 'none');
 		$quantities = $this->input->get('quantity', '', 'none');
+
+		/* @var EventbookingModelCart $model */
 		$model      = $this->getModel('cart');
+
 		if (!$redirect)
 		{
 			$eventIds   = explode(',', $eventIds);
 			$quantities = explode(',', $quantities);
 		}
+
 		$model->processUpdateCart($eventIds, $quantities);
+
 		if ($redirect)
 		{
 			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('cart', $Itemid), false));
@@ -93,8 +103,11 @@ class EventbookingControllerCart extends EventbookingController
 		$redirect = $this->input->getInt('redirect', 1);
 		$Itemid   = $this->input->getInt('Itemid', 0);
 		$id       = $this->input->getInt('id', 0);
+
+		/* @var EventbookingModelCart $model */
 		$model    = $this->getModel('cart');
 		$model->removeEvent($id);
+
 		if ($redirect)
 		{
 			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('cart', $Itemid), false));
@@ -156,11 +169,13 @@ class EventbookingControllerCart extends EventbookingController
 
 		$cart  = new EventbookingHelperCart();
 		$items = $cart->getItems();
+
 		if (!count($items))
 		{
 			$this->app->redirect('index.php', JText::_('Sorry, your session was expired. Please try again!'));
 		}
 
+		/* @var EventbookingModelCart $model */
 		$model  = $this->getModel('cart');
 		$return = $model->processCheckout($data);
 

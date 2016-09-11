@@ -19,8 +19,11 @@ class EventbookingControllerRegister extends EventbookingController
 		$password = $this->input->get('password', '', 'none');
 		$eventId  = $this->input->getInt('event_id', 0);
 		$return   = $this->input->get('return', '', 'none');
+
+		/* @var EventBookingModelRegister $model*/
 		$model    = $this->getModel('Register');
 		$success  = $model->checkPassword($eventId, $password);
+
 		if ($success)
 		{
 			JFactory::getSession()->set('eb_passowrd_' . $eventId, 1);
@@ -48,15 +51,20 @@ class EventbookingControllerRegister extends EventbookingController
 		$db      = JFactory::getDbo();
 		$query   = $db->getQuery(true);
 		$eventId = $this->input->getInt('event_id');
+
 		if (!$eventId)
 		{
 			return;
 		}
+
 		$event = EventbookingHelperDatabase::getEvent($eventId);
+
 		if (!$event)
 		{
 			return;
 		}
+
+
 		if ($event->event_password)
 		{
 			$passwordPassed = JFactory::getSession()->get('eb_passowrd_' . $event->id, 0);
@@ -142,6 +150,7 @@ class EventbookingControllerRegister extends EventbookingController
 		$eventId = $input->getInt('event_id', 0);
 
 		$event = EventbookingHelperDatabase::getEvent($eventId);
+
 		if (!$event)
 		{
 			return;
@@ -157,6 +166,7 @@ class EventbookingControllerRegister extends EventbookingController
 
 		// Validate email
 		$result = $this->validateRegistrantEmail($eventId, $input->get('email', '', 'none'));
+
 		if (!$result['success'])
 		{
 			$errors[] = $result['message'];
@@ -188,6 +198,7 @@ class EventbookingControllerRegister extends EventbookingController
 			}
 
 			$fromArticle = $input->post->getInt('from_article', 0);
+
 			if ($fromArticle)
 			{
 				$session->set('eb_form_data', serialize($data));
@@ -208,8 +219,8 @@ class EventbookingControllerRegister extends EventbookingController
 		if ($event->has_multiple_ticket_types)
 		{
 			$ticketTypes = EventbookingHelperData::getTicketTypes($event->id);
-
 			$ticketTypesValues = explode(',', $data['ticket_type_values']);
+
 			foreach ($ticketTypesValues as $ticketValue)
 			{
 				$ticketInfo           = explode(':', $ticketValue);
@@ -219,6 +230,7 @@ class EventbookingControllerRegister extends EventbookingController
 
 			// Validate ticket quantity before submitting
 			$quantityValid = true;
+
 			foreach ($ticketTypes as $ticketType)
 			{
 				if (!empty($data['ticket_type_' . $ticketType->id]))
@@ -247,8 +259,11 @@ class EventbookingControllerRegister extends EventbookingController
 		}
 
 		$session->clear('eb_catpcha_invalid');
+
+		/* @var EventBookingModelRegister $model*/
 		$model  = $this->getModel('Register');
 		$return = $model->processIndividualRegistration($data);
+
 		if ($return === 1)
 		{
 			// Redirect registrants to registration complete page
@@ -269,6 +284,7 @@ class EventbookingControllerRegister extends EventbookingController
 		$config  = EventbookingHelper::getConfig();
 		$session = JFactory::getSession();
 		$session->set('eb_number_registrants', $this->input->getInt('number_registrants'));
+
 		if ($config->collect_member_information)
 		{
 			$this->input->set('view', 'register');
@@ -279,6 +295,7 @@ class EventbookingControllerRegister extends EventbookingController
 			$this->input->set('view', 'register');
 			$this->input->set('layout', 'group_billing');
 		}
+
 		$this->display();
 	}
 
@@ -292,6 +309,7 @@ class EventbookingControllerRegister extends EventbookingController
 		$session->set('eb_group_members_data', serialize($membersData));
 		$eventId         = $this->input->getInt('event_id', 0);
 		$showBillingStep = EventbookingHelper::showBillingStep($eventId);
+
 		if (!$showBillingStep)
 		{
 			$this->process_group_registration();
@@ -322,6 +340,7 @@ class EventbookingControllerRegister extends EventbookingController
 		}
 
 		$errors = array();
+
 		if (!$this->validateCaptcha())
 		{
 			$errors[] = JText::_('EB_INVALID_CAPTCHA_ENTERED');
@@ -375,8 +394,10 @@ class EventbookingControllerRegister extends EventbookingController
 			return;
 		}
 
+		/* @var EventBookingModelRegister $model*/
 		$model  = $this->getModel('Register');
 		$return = $model->processGroupRegistration($data);
+
 		if ($return === 1)
 		{
 			// Redirect registrants to registration complete page
