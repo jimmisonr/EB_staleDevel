@@ -2543,6 +2543,43 @@ class EventbookingController extends RADControllerAdmin
 			}
 		}
 
+		# Add index to improve the speed
+		$sql = 'SHOW INDEX FROM #__eb_registrants';
+		$db->setQuery($sql);
+		$rows   = $db->loadObjectList();
+		$fields = array();
+
+		for ($i = 0, $n = count($rows); $i < $n; $i++)
+		{
+			$row      = $rows[$i];
+			$fields[] = $row->Column_name;
+		}
+
+		if (!in_array('event_id', $fields))
+		{
+			$sql = 'ALTER TABLE `#__eb_registrants` ADD INDEX ( `event_id` )';
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		$sql = 'SHOW INDEX FROM #__eb_events';
+		$db->setQuery($sql);
+		$rows   = $db->loadObjectList();
+		$fields = array();
+
+		for ($i = 0, $n = count($rows); $i < $n; $i++)
+		{
+			$row      = $rows[$i];
+			$fields[] = $row->Column_name;
+		}
+
+		if (!in_array('location_id', $fields))
+		{
+			$sql = 'ALTER TABLE `#__eb_events` ADD INDEX ( `location_id` )';
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		// Files, Folders clean up
 		$deleteFiles = array(
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php',
