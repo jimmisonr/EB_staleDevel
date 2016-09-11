@@ -28,6 +28,12 @@ class EventbookingModelCart extends RADModel
 		{
 			$eventIds = array($data['id']);
 		}
+
+		for ($i = 0, $n = count($eventIds); $i < $n; $i++)
+		{
+			$eventIds[$i] = (int) $eventIds[$i];
+		}
+
 		$cart = new EventbookingHelperCart();
 		$cart->addEvents($eventIds);
 
@@ -44,6 +50,11 @@ class EventbookingModelCart extends RADModel
 	 */
 	public function processUpdateCart($eventIds, $quantities)
 	{
+		for ($i = 0, $n = count($eventIds); $i < $n; $i++)
+		{
+			$eventIds[$i] = (int) $eventIds[$i];
+		}
+		
 		$cart = new EventbookingHelperCart();
 		$cart->updateCart($eventIds, $quantities);
 
