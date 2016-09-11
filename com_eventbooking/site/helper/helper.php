@@ -1951,11 +1951,14 @@ class EventbookingHelper
 			$fees['records_data'] = $recordsData;
 		}
 
-		$fees['members_form']            = $membersForm;
-		$fees['members_total_amount']    = $membersTotalAmount;
-		$fees['members_discount_amount'] = $membersDiscountAmount;
-		$fees['members_tax_amount']      = $membersTaxAmount;
-		$fees['members_late_fee']        = $membersLateFee;
+		if ($config->collect_member_information_in_cart)
+		{
+			$fees['members_form']            = $membersForm;
+			$fees['members_total_amount']    = $membersTotalAmount;
+			$fees['members_discount_amount'] = $membersDiscountAmount;
+			$fees['members_tax_amount']      = $membersTaxAmount;
+			$fees['members_late_fee']        = $membersLateFee;
+		}
 
 		return $fees;
 	}
