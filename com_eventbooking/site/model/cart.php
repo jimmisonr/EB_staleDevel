@@ -105,6 +105,7 @@ class EventbookingModelCart extends RADModel
 		$form->bind($data);
 		$data['collect_records_data'] = true;
 		$fees                         = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+
 		// Save the active language
 		if (JFactory::getApplication()->getLanguageFilter())
 		{
@@ -114,9 +115,9 @@ class EventbookingModelCart extends RADModel
 		{
 			$language = '*';
 		}
+
 		$recordsData = $fees['records_data'];
 		$cartId      = 0;
-		$couponId    = 0;
 
 		$dispatcher = JEventDispatcher::getInstance();
 		JPluginHelper::importPlugin('eventbooking');
@@ -149,6 +150,7 @@ class EventbookingModelCart extends RADModel
 			$row->payment_processing_fee = $recordData['payment_processing_fee'];
 			$row->amount                 = $recordData['amount'];
 			$row->deposit_amount         = $recordData['deposit_amount'];
+
 			if ($row->deposit_amount > 0)
 			{
 				$row->payment_status = 0;
@@ -157,6 +159,12 @@ class EventbookingModelCart extends RADModel
 			{
 				$row->payment_status = 1;
 			}
+
+			if ($config->collect_member_information_in_cart)
+			{
+				$row->is_group_billing = 1;
+			}
+
 			$row->group_id      = 0;
 			$row->published     = 0;
 			$row->register_date = gmdate('Y-m-d H:i:s');
@@ -198,14 +206,12 @@ class EventbookingModelCart extends RADModel
 			$row->language = $language;
 			$row->store();
 			$form->storeData($row->id, $data);
+
 			if ($i == 0)
 			{
 				$cartId = $row->id;
 			}
-			if ($row->coupon_id > 0)
-			{
-				$couponId = $row->coupon_id;
-			}
+
 
 			if ($config->collect_member_information_in_cart)
 			{
