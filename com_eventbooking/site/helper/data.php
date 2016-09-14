@@ -602,7 +602,7 @@ class EventbookingHelperData
 					$fieldValue = implode(', ', $fieldValue);
 				}
 				$paramData[$name]['value'] = $fieldValue;
-				
+
 				if (!property_exists($item, $name))
 				{
 					$item->{$name} = $fieldValue;
@@ -936,6 +936,16 @@ class EventbookingHelperData
 	 */
 	public static function excelExport($fields, $rows, $filename, $headers = array())
 	{
+		$config   = EventbookingHelper::getConfig();
+		$fileType = $config->get('export_data_format', 'xlsx');
+
+		if ($fileType == 'csv')
+		{
+			static::csvExport($fields, $rows, $filename, $headers);
+
+			return;
+		}
+
 		require_once JPATH_ROOT . '/libraries/osphpexcel/PHPExcel.php';
 
 		$exporter    = new PHPExcel();
@@ -1002,6 +1012,7 @@ class EventbookingHelperData
 		}
 
 		$rowIndex++;
+
 		foreach ($rows as $row)
 		{
 			$column = 'A';
@@ -1015,8 +1026,6 @@ class EventbookingHelperData
 			$rowIndex++;
 		}
 
-		$config   = EventbookingHelper::getConfig();
-		$fileType = $config->get('export_data_format', 'xlsx');
 		switch ($fileType)
 		{
 			case 'csv' :
@@ -1044,6 +1053,7 @@ class EventbookingHelperData
 			/* @var PHPExcel_Writer_CSV $objWriter */
 			$objWriter->setDelimiter($config->get('csv_delimiter', ','));
 		}
+
 		$objWriter->save('php://output');
 
 		JFactory::getApplication()->close();
