@@ -23,9 +23,11 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 	 */
 	public function store($input, $ignore = array())
 	{
-		$db    = $this->getDbo();
-		$query = $db->getQuery(true);
-		$app   = JFactory::getApplication();
+		$app    = JFactory::getApplication();
+		$config = EventbookingHelper::getConfig();
+		$db     = $this->getDbo();
+		$query  = $db->getQuery(true);
+
 		if ($app->isAdmin())
 		{
 			$data = $input->getData(RAD_INPUT_ALLOWRAW);
@@ -33,6 +35,11 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		else
 		{
 			$data = $input->getData();
+		}
+
+		if (!empty($data['currency_code']) && empty($data['currency_symbol']) && $data['currency_code'] != $config->currency_code)
+		{
+			$data['currency_symbol'] = $data['currency_code'];
 		}
 
 		$languages = EventbookingHelper::getLanguages();
@@ -70,8 +77,8 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			}
 		}
 
-		$config     = EventbookingHelper::getConfig();
 		$thumbImage = $input->files->get('thumb_image');
+
 		if ($thumbImage['name'])
 		{
 			$fileExt        = JString::strtoupper(JFile::getExt($thumbImage['name']));
@@ -616,7 +623,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					'currency_symbol',
 					'custom_field_ids',
 					'custom_fields',
-					'published', );
+					'published',);
 				$rowChildEvent  = $this->getTable();
 				foreach ($children as $childId)
 				{

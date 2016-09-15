@@ -511,6 +511,11 @@ class EventbookingHelperData
 			$row->category_name  = $row->categories[0]->name;
 			$row->category_alias = $row->categories[0]->alias;
 
+			if ($row->currency_code && !$row->currency_symbol)
+			{
+				$row->currency_symbol = $row->currency_code;
+			}
+
 			// Location data
 			if ($row->location_id)
 			{
