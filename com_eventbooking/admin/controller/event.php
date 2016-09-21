@@ -84,6 +84,7 @@ class EventbookingControllerEvent extends EventbookingController
 			'event_capacity',
 			'registration_type',
 			'registration_handle_url',
+			'attachment',
 			'short_description',
 			'description',
 			'event_password',
