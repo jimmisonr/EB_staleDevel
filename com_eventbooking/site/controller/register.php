@@ -423,7 +423,15 @@ class EventbookingControllerRegister extends EventbookingController
 		$rowFields     = EventbookingHelper::getFormFields($eventId, 0);
 		$form          = new RADForm($rowFields);
 		$form->bind($data);
-		$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+
+		if (is_callable('EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees'))
+		{
+			$fees = EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		}
+		else
+		{
+			$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		}
 
 		$response                           = array();
 		$response['total_amount']           = EventbookingHelper::formatAmount($fees['total_amount'], $config);

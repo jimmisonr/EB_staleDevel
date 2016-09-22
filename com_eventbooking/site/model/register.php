@@ -91,13 +91,28 @@ class EventBookingModelRegister extends RADModel
 		$rowFields     = EventbookingHelper::getFormFields($eventId, 0);
 		$form          = new RADForm($rowFields);
 		$form->bind($data);
+
 		if ($waitingList == true)
 		{
-			$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, '');
+			if (is_callable('EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees'))
+			{
+				$fees = EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, '');
+			}
+			else
+			{
+				$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, '');
+			}
 		}
 		else
 		{
-			$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			if (is_callable('EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees'))
+			{
+				$fees = EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			}
+			else
+			{
+				$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			}
 		}
 
 		$paymentType = isset($data['payment_type']) ? (int) $data['payment_type'] : 0;
@@ -150,7 +165,7 @@ class EventBookingModelRegister extends RADModel
 		$couponCode = isset($data['coupon_code']) ? $data['coupon_code'] : null;
 		if ($couponCode && $fees['coupon_valid'])
 		{
-			$coupon = $fees['coupon'];
+			$coupon         = $fees['coupon'];
 			$row->coupon_id = $coupon->id;
 		}
 
@@ -409,7 +424,7 @@ class EventBookingModelRegister extends RADModel
 		$couponCode = isset($data['coupon_code']) ? $data['coupon_code'] : null;
 		if ($couponCode && $fees['coupon_valid'])
 		{
-			$coupon = $fees['coupon'];
+			$coupon         = $fees['coupon'];
 			$row->coupon_id = $coupon->id;
 		}
 
