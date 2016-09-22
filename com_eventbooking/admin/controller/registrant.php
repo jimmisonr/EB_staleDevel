@@ -22,7 +22,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 			$model->batchMail($this->input);
 			$this->setMessage(JText::_('EB_BATCH_MAIL_SUCCESS'));
 		}
-		catch(Exception $e)
+		catch (Exception $e)
 		{
 			$this->setMessage($e->getMessage(), 'error');
 		}
@@ -89,16 +89,16 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		$fieldValues = $model->getFieldsData($fieldIds);
 
-		list($fields, $headers) = EventbookingHelperData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
-
-		if (is_callable('EventbookingHelperOverrideData::excelExport'))
+		if (is_callable('EventbookingHelperOverrideData::prepareRegistrantsExportData'))
 		{
-			EventbookingHelperOverrideData::excelExport($fields, $rows, 'registrants_list', $headers);
+			list($fields, $headers) = EventbookingHelperOverrideData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
 		}
 		else
 		{
-			EventbookingHelperData::excelExport($fields, $rows, 'registrants_list', $headers);
+			list($fields, $headers) = EventbookingHelperData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
 		}
+
+		EventbookingHelperData::excelExport($fields, $rows, 'registrants_list', $headers);
 	}
 
 	/**
@@ -117,14 +117,14 @@ class EventbookingControllerRegistrant extends EventbookingController
 	{
 		$cid = $this->input->get('cid', array(), 'array');
 
-		$model  = $this->getModel();
+		$model = $this->getModel();
 
 		try
 		{
 			$model->checkin($cid[0], true);
 			$this->setMessage(JText::_('EB_CHECKIN_SUCCESSFULLY'));
 		}
-		catch(Exception $e)
+		catch (Exception $e)
 		{
 			$this->setMessage($e->getMessage(), 'error');
 		}
@@ -139,14 +139,14 @@ class EventbookingControllerRegistrant extends EventbookingController
 	{
 		$cid = $this->input->get('cid', array(), 'array');
 
-		$model  = $this->getModel();
+		$model = $this->getModel();
 
 		try
 		{
 			$model->resetCheckin($cid[0]);
 			$this->setMessage(JText::_('EB_RESET_CHECKIN_SUCCESSFULLY'));
 		}
-		catch(Exception $e)
+		catch (Exception $e)
 		{
 			$this->setMessage($e->getMessage(), 'error');
 		}
@@ -159,13 +159,13 @@ class EventbookingControllerRegistrant extends EventbookingController
 	 */
 	public function remove_group_member()
 	{
-		$id = $this->input->getInt('id');
+		$id            = $this->input->getInt('id');
 		$groupMemberId = $this->input->getInt('group_member_id');
-		/* @var $model EventbookingModelRegistrant*/
+		/* @var $model EventbookingModelRegistrant */
 		$model = $this->getModel();
 		$model->delete(array($groupMemberId));
 
-		$db = JFactory::getDbo();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('COUNT(*)')
 			->from('#__eb_registrants')
