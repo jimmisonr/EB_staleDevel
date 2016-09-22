@@ -34,6 +34,13 @@ class EventbookingHelperMail
 	 */
 	public static function sendEmails($row, $config)
 	{
+		if (is_callable('EventbookingHelperOverrideMail::sendEmails'))
+		{
+			EventbookingHelperOverrideMail::sendEmails($row, $config);
+
+			return;
+		}
+
 		if ($config->send_emails == 3)
 		{
 			return;
@@ -400,6 +407,13 @@ class EventbookingHelperMail
 			return;
 		}
 
+		if (is_callable('EventbookingHelperOverrideMail::sendRegistrationApprovedEmail'))
+		{
+			EventbookingHelperOverrideMail::sendRegistrationApprovedEmail($row, $config);
+
+			return;
+		}
+
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 
@@ -520,6 +534,13 @@ class EventbookingHelperMail
 			return;
 		}
 
+		if (is_callable('EventbookingHelperOverrideMail::sendRegistrationCancelledEmail'))
+		{
+			EventbookingHelperOverrideMail::sendRegistrationCancelledEmail($row, $config);
+
+			return;
+		}
+
 		$app   = JFactory::getApplication();
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
@@ -632,6 +653,13 @@ class EventbookingHelperMail
 	 */
 	public static function sendWaitinglistEmail($row, $config)
 	{
+		if (is_callable('EventbookingHelperOverrideMail::sendWaitinglistEmail'))
+		{
+			EventbookingHelperOverrideMail::sendWaitinglistEmail($row, $config);
+
+			return;
+		}
+
 		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 		$db          = JFactory::getDbo();
@@ -747,6 +775,13 @@ class EventbookingHelperMail
 	 */
 	public static function sendDepositPaymentEmail($row, $config)
 	{
+		if (is_callable('EventbookingHelperOverrideMail::sendDepositPaymentEmail'))
+		{
+			EventbookingHelperOverrideMail::sendDepositPaymentEmail($row, $config);
+
+			return;
+		}
+
 		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 
@@ -842,6 +877,13 @@ class EventbookingHelperMail
 	 */
 	public static function sendNewEventNotificationEmail($row, $config)
 	{
+		if (is_callable('EventbookingHelperOverrideMail::sendNewEventNotificationEmail'))
+		{
+			EventbookingHelperOverrideMail::sendNewEventNotificationEmail($row, $config);
+
+			return;
+		}
+
 		$user        = JFactory::getUser();
 		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
@@ -940,6 +982,13 @@ class EventbookingHelperMail
 	 */
 	public static function sendReminder($numberEmailSendEachTime = 0, $bccEmail = null)
 	{
+		if (is_callable('EventbookingHelperOverrideMail::sendReminder'))
+		{
+			EventbookingHelperOverrideMail::sendReminder($numberEmailSendEachTime, $bccEmail);
+
+			return;
+		}
+
 		$db      = JFactory::getDbo();
 		$query   = $db->getQuery(true);
 		$config  = EventbookingHelper::getConfig();
@@ -1096,6 +1145,13 @@ class EventbookingHelperMail
 	 */
 	public static function sendDepositReminder($numberDays, $numberEmailSendEachTime = 0, $bccEmail = null)
 	{
+		if (is_callable('EventbookingHelperOverrideMail::sendDepositReminder'))
+		{
+			EventbookingHelperOverrideMail::sendDepositReminder($numberDays, $numberEmailSendEachTime, $bccEmail);
+
+			return;
+		}
+
 		$db      = JFactory::getDbo();
 		$query   = $db->getQuery(true);
 		$config  = EventbookingHelper::getConfig();
@@ -1187,7 +1243,7 @@ class EventbookingHelperMail
 	 *
 	 * @return JMail
 	 */
-	private static function getMailer($config)
+	public static function getMailer($config)
 	{
 		$mailer = JFactory::getMailer();
 
@@ -1231,7 +1287,7 @@ class EventbookingHelperMail
 	 * @param EventbookingTableEvent      $event
 	 * @param RADConfig                   $config
 	 */
-	private static function addEventAttachments($mailer, $row, $event, $config)
+	public static function addEventAttachments($mailer, $row, $event, $config)
 	{
 		if ($config->multiple_booking)
 		{
@@ -1277,7 +1333,7 @@ class EventbookingHelperMail
 	 * @param array $rowFields
 	 * @param array $replaces
 	 */
-	private static function addRegistrationFormAttachments($mailer, $rowFields, $replaces)
+	public static function addRegistrationFormAttachments($mailer, $rowFields, $replaces)
 	{
 		$attachmentsPath = JPATH_ROOT . '/media/com_eventbooking/files/';
 		for ($i = 0, $n = count($rowFields); $i < $n; $i++)
@@ -1314,7 +1370,7 @@ class EventbookingHelperMail
 	 * @param string $subject
 	 * @param string $body
 	 */
-	private static function send($mailer, $emails, $subject, $body)
+	public static function send($mailer, $emails, $subject, $body)
 	{
 		if (empty($subject))
 		{
