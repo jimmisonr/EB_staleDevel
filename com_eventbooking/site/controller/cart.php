@@ -71,7 +71,7 @@ class EventbookingControllerCart extends EventbookingController
 		$quantities = $this->input->get('quantity', '', 'none');
 
 		/* @var EventbookingModelCart $model */
-		$model      = $this->getModel('cart');
+		$model = $this->getModel('cart');
 
 		if (!$redirect)
 		{
@@ -105,7 +105,7 @@ class EventbookingControllerCart extends EventbookingController
 		$id       = $this->input->getInt('id', 0);
 
 		/* @var EventbookingModelCart $model */
-		$model    = $this->getModel('cart');
+		$model = $this->getModel('cart');
 		$model->removeEvent($id);
 
 		if ($redirect)
@@ -202,7 +202,15 @@ class EventbookingControllerCart extends EventbookingController
 		$form                = new RADForm($rowFields);
 		$form->bind($data);
 
-		$fees                               = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+		if (is_callable('EventbookingHelperOverrideHelper::calculateCartRegistrationFee'))
+		{
+			$fees = EventbookingHelperOverrideHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+		}
+		else
+		{
+			$fees = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+		}
+
 		$response['total_amount']           = EventbookingHelper::formatAmount($fees['total_amount'], $config);
 		$response['discount_amount']        = EventbookingHelper::formatAmount($fees['discount_amount'], $config);
 		$response['tax_amount']             = EventbookingHelper::formatAmount($fees['tax_amount'], $config);

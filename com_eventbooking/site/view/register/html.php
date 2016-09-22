@@ -482,15 +482,24 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$currentYear         = date('Y');
 		$lists['exp_year']   = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
 		$data['coupon_code'] = $input->post->getString('coupon_code', '');
-		$fees                = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
-		$events              = $cart->getEvents();
-		$methods             = os_payments::getPaymentMethods();
-		$options             = array();
-		$options[]           = JHtml::_('select.option', 'Visa', 'Visa');
-		$options[]           = JHtml::_('select.option', 'MasterCard', 'MasterCard');
-		$options[]           = JHtml::_('select.option', 'Discover', 'Discover');
-		$options[]           = JHtml::_('select.option', 'Amex', 'American Express');
-		$lists['card_type']  = JHtml::_('select.genericlist', $options, 'card_type', ' class="inputbox" ', 'value', 'text');
+
+		if (is_callable('EventbookingHelperOverrideHelper::calculateCartRegistrationFee'))
+		{
+			$fees = EventbookingHelperOverrideHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+		}
+		else
+		{
+			$fees = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+		}
+		
+		$events             = $cart->getEvents();
+		$methods            = os_payments::getPaymentMethods();
+		$options            = array();
+		$options[]          = JHtml::_('select.option', 'Visa', 'Visa');
+		$options[]          = JHtml::_('select.option', 'MasterCard', 'MasterCard');
+		$options[]          = JHtml::_('select.option', 'Discover', 'Discover');
+		$options[]          = JHtml::_('select.option', 'Amex', 'American Express');
+		$lists['card_type'] = JHtml::_('select.genericlist', $options, 'card_type', ' class="inputbox" ', 'value', 'text');
 		//Coupon will be enabled if there is atleast one event has coupon
 		$query->clear();
 		$query->select('enable_coupon')
