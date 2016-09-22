@@ -91,7 +91,14 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		list($fields, $headers) = EventbookingHelperData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
 
-		EventbookingHelperData::excelExport($fields, $rows, 'registrants_list', $headers);
+		if (is_callable('EventbookingHelperOverrideData::excelExport'))
+		{
+			EventbookingHelperOverrideData::excelExport($fields, $rows, 'registrants_list', $headers);
+		}
+		else
+		{
+			EventbookingHelperData::excelExport($fields, $rows, 'registrants_list', $headers);
+		}
 	}
 
 	/**
