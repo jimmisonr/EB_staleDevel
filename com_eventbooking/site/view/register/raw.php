@@ -260,14 +260,30 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$form->bind($data, $useDefault);
 		$form->prepareFormFields('calculateGroupRegistrationFee();');
 		$paymentMethod = $input->post->getString('payment_method', os_payments::getDefautPaymentMethod(trim($event->payment_methods)));
+
 		if ($waitingList)
 		{
-			$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, null);
+			if (is_callable('EventbookingHelperOverrideHelper::calculateGroupRegistrationFees'))
+			{
+				$fees = EventbookingHelperOverrideHelper::calculateGroupRegistrationFees($event, $form, $data, $config, null);
+			}
+			else
+			{
+				$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, null);
+			}
 		}
 		else
 		{
-			$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			if (is_callable('EventbookingHelperOverrideHelper::calculateGroupRegistrationFees'))
+			{
+				$fees = EventbookingHelperOverrideHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			}
+			else
+			{
+				$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			}
 		}
+
 		$expMonth           = $input->post->getInt('exp_month', date('m'));
 		$expYear            = $input->post->getInt('exp_year', date('Y'));
 		$lists['exp_month'] = JHtml::_('select.integerlist', 1, 12, 1, 'exp_month', ' class="input-small" ', $expMonth, '%02d');

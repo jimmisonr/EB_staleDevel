@@ -337,11 +337,25 @@ class EventBookingModelRegister extends RADModel
 		$paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : '';
 		if ($waitingList)
 		{
-			$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, null);
+			if (is_callable('EventbookingHelperOverrideHelper::calculateGroupRegistrationFees'))
+			{
+				$fees = EventbookingHelperOverrideHelper::calculateGroupRegistrationFees($event, $form, $data, $config, null);
+			}
+			else
+			{
+				$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, null);
+			}
 		}
 		else
 		{
-			$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			if (is_callable('EventbookingHelperOverrideHelper::calculateGroupRegistrationFees'))
+			{
+				$fees = EventbookingHelperOverrideHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			}
+			else
+			{
+				$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			}
 		}
 		//Calculate members fee
 		$membersForm           = $fees['members_form'];

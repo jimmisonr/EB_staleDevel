@@ -20,9 +20,9 @@ class EventbookingControllerRegister extends EventbookingController
 		$eventId  = $this->input->getInt('event_id', 0);
 		$return   = $this->input->get('return', '', 'none');
 
-		/* @var EventBookingModelRegister $model*/
-		$model    = $this->getModel('Register');
-		$success  = $model->checkPassword($eventId, $password);
+		/* @var EventBookingModelRegister $model */
+		$model   = $this->getModel('Register');
+		$success = $model->checkPassword($eventId, $password);
 
 		if ($success)
 		{
@@ -218,7 +218,7 @@ class EventbookingControllerRegister extends EventbookingController
 
 		if ($event->has_multiple_ticket_types)
 		{
-			$ticketTypes = EventbookingHelperData::getTicketTypes($event->id);
+			$ticketTypes       = EventbookingHelperData::getTicketTypes($event->id);
 			$ticketTypesValues = explode(',', $data['ticket_type_values']);
 
 			foreach ($ticketTypesValues as $ticketValue)
@@ -260,7 +260,7 @@ class EventbookingControllerRegister extends EventbookingController
 
 		$session->clear('eb_catpcha_invalid');
 
-		/* @var EventBookingModelRegister $model*/
+		/* @var EventBookingModelRegister $model */
 		$model  = $this->getModel('Register');
 		$return = $model->processIndividualRegistration($data);
 
@@ -394,7 +394,7 @@ class EventbookingControllerRegister extends EventbookingController
 			return;
 		}
 
-		/* @var EventBookingModelRegister $model*/
+		/* @var EventBookingModelRegister $model */
 		$model  = $this->getModel('Register');
 		$return = $model->processGroupRegistration($data);
 
@@ -462,7 +462,14 @@ class EventbookingControllerRegister extends EventbookingController
 		$form      = new RADForm($rowFields);
 		$form->bind($data);
 
-		$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		if (is_callable('EventbookingHelperOverrideHelper::calculateGroupRegistrationFees'))
+		{
+			$fees = EventbookingHelperOverrideHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		}
+		else
+		{
+			$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		}
 
 		$response                           = array();
 		$response['total_amount']           = EventbookingHelper::formatAmount($fees['total_amount'], $config);
