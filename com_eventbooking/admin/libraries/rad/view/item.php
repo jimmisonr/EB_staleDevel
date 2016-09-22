@@ -47,6 +47,7 @@ class RADViewItem extends RADViewHtml
 	public function display()
 	{
 		$this->prepareView();
+
 		parent::display();
 	}
 
@@ -57,10 +58,12 @@ class RADViewItem extends RADViewHtml
 	{
 		$this->state = $this->model->getState();
 		$this->item  = $this->model->getData();
+
 		if (property_exists($this->item, 'published'))
 		{
 			$this->lists['published'] = EventbookingHelperHtml::getBooleanInput('published', $this->item->published);
 		}
+
 		if (property_exists($this->item, 'access'))
 		{
 			$this->lists['access'] = JHtml::_('access.level', 'access', $this->item->access, ' ', false);
@@ -85,6 +88,7 @@ class RADViewItem extends RADViewHtml
 	protected function addToolbar()
 	{
 		$helperClass = $this->viewConfig['class_prefix'] . 'Helper';
+
 		if (is_callable($helperClass . '::getActions'))
 		{
 			$canDo = call_user_func(array($helperClass, 'getActions'), $this->name, $this->state);
@@ -93,6 +97,7 @@ class RADViewItem extends RADViewHtml
 		{
 			$canDo = call_user_func(array('RADHelper', 'getActions'), $this->option, $this->name, $this->state);
 		}
+
 		if ($this->item->id)
 		{
 			$toolbarTitle = $this->viewConfig['language_prefix'] . '_' . $this->name . '_EDIT';
@@ -101,17 +106,18 @@ class RADViewItem extends RADViewHtml
 		{
 			$toolbarTitle = $this->viewConfig['language_prefix'] . '_' . $this->name . '_NEW';
 		}
-		JToolBarHelper::title(JText::_(strtoupper($toolbarTitle)));
+
+		JToolbarHelper::title(JText::_(strtoupper($toolbarTitle)));
 
 		if (($canDo->get('core.edit') || ($canDo->get('core.create'))) && !in_array('save', $this->hideButtons))
 		{
-			JToolBarHelper::apply('apply', 'JTOOLBAR_APPLY');
-			JToolBarHelper::save('save', 'JTOOLBAR_SAVE');
+			JToolbarHelper::apply('apply', 'JTOOLBAR_APPLY');
+			JToolbarHelper::save('save', 'JTOOLBAR_SAVE');
 		}
 
 		if ($canDo->get('core.create') && !in_array('save2new', $this->hideButtons))
 		{
-			JToolBarHelper::custom('save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
+			JToolbarHelper::custom('save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
 		}
 
 		if ($this->item->id && $canDo->get('core.create') && !in_array('save2copy', $this->hideButtons))
@@ -121,11 +127,11 @@ class RADViewItem extends RADViewHtml
 
 		if ($this->item->id)
 		{
-			JToolBarHelper::cancel('cancel', 'JTOOLBAR_CLOSE');
+			JToolbarHelper::cancel('cancel', 'JTOOLBAR_CLOSE');
 		}
 		else
 		{
-			JToolBarHelper::cancel('cancel', 'JTOOLBAR_CANCEL');
+			JToolbarHelper::cancel('cancel', 'JTOOLBAR_CANCEL');
 		}
 	}
 }

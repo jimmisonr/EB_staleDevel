@@ -102,9 +102,11 @@ class RADModelAdmin extends RADModel
 		$this->context = $this->option . '.' . $this->name;
 		//Insert the default model states for admin
 		$this->state->insert('id', 'int', 0)->insert('cid', 'array', array());
+
 		if ($this->triggerEvents)
 		{
 			$name = ucfirst($this->name);
+
 			if (isset($config['plugin_group']))
 			{
 				$this->pluginGroup = $config['plugin_group'];
@@ -114,6 +116,7 @@ class RADModelAdmin extends RADModel
 				//Plugin group should default to component name
 				$this->pluginGroup = substr($this->option, 4);
 			}
+
 			//Initialize the events
 			if (isset($config['event_after_delete']))
 			{
@@ -185,6 +188,7 @@ class RADModelAdmin extends RADModel
 			{
 				$this->state->id = (int) $this->state->cid[0];
 			}
+
 			if ($this->state->id)
 			{
 				$this->loadData();
@@ -214,9 +218,11 @@ class RADModelAdmin extends RADModel
 			$dispatcher = JEventDispatcher::getInstance();
 			JPluginHelper::importPlugin($this->pluginGroup);
 		}
+
 		$row   = $this->getTable();
 		$isNew = true;
 		$id    = $input->getInt('id');
+
 		if ($id)
 		{
 			$isNew = false;
@@ -227,22 +233,27 @@ class RADModelAdmin extends RADModel
 		$data = $input->getData();
 		$row->bind($data, $ignore);
 		$this->prepareTable($row, $input->get('task'), $input->getInt('source_id'));
+
 		if (!$row->check())
 		{
 			throw new Exception($row->getError());
 		}
+
 		if ($this->triggerEvents)
 		{
 			$result = $dispatcher->trigger($this->eventBeforeSave, array($row, $data, $isNew));
+
 			if (in_array(false, $result, true))
 			{
 				throw new Exception($row->getError());
 			}
 		}
+
 		if (!$row->store())
 		{
 			throw new Exception($row->getError());
 		}
+
 		if ($this->triggerEvents)
 		{
 			$dispatcher->trigger($this->eventAfterSave, array($row, $data, $isNew));
@@ -272,9 +283,9 @@ class RADModelAdmin extends RADModel
 			}
 
 			$this->beforeDelete($cid);
-			// Before delete
 
 			$row = $this->getTable();
+
 			foreach ($cid as $id)
 			{
 				if ($row->load($id))
@@ -282,15 +293,18 @@ class RADModelAdmin extends RADModel
 					if ($this->triggerEvents)
 					{
 						$result = $dispatcher->trigger($this->eventBeforeDelete, array($this->context, $row));
+
 						if (in_array(false, $result, true))
 						{
 							throw new Exception($row->getError());
 						}
 					}
+
 					if (!$row->delete())
 					{
 						throw new Exception($row->getError());
 					}
+
 					if ($this->triggerEvents)
 					{
 						$dispatcher->trigger($this->eventAfterDelete, array($this->context, $row));
@@ -354,11 +368,13 @@ class RADModelAdmin extends RADModel
 	{
 		$row = $this->getTable();
 		$pks = (array) $pks;
+
 		foreach ($pks as $pk)
 		{
 			if ($row->load($pk))
 			{
 				$where = $this->getReorderConditions($row);
+
 				if (!$row->move($delta, $where))
 				{
 					throw new Exception($row->getError());
@@ -389,13 +405,16 @@ class RADModelAdmin extends RADModel
 	{
 		$row        = $this->getTable();
 		$conditions = array();
+
 		// Update ordering values
 		foreach ($pks as $i => $pk)
 		{
 			$row->load((int) $pk);
+
 			if ($row->ordering != $order[$i])
 			{
 				$row->ordering = $order[$i];
+
 				if (!$row->store())
 				{
 					throw new Exception($row->getError());
@@ -403,6 +422,7 @@ class RADModelAdmin extends RADModel
 				// Remember to reorder within position and client_id
 				$condition = $this->getReorderConditions($row);
 				$found     = false;
+
 				foreach ($conditions as $cond)
 				{
 					if ($cond[1] == $condition)
@@ -411,6 +431,7 @@ class RADModelAdmin extends RADModel
 						break;
 					}
 				}
+
 				if (!$found)
 				{
 					$conditions[] = array($row->id, $condition);
@@ -475,15 +496,19 @@ class RADModelAdmin extends RADModel
 		$query = $db->getQuery(true);
 		$query->select('COUNT(*)')->from($this->table);
 		$conditions = $this->getReorderConditions($row);
+
 		while (true)
 		{
 			$query->where('alias=' . $db->quote($alias));
+
 			if (count($conditions))
 			{
 				$query->where($conditions);
 			}
+
 			$db->setQuery($query);
 			$found = (int) $db->loadResult();
+
 			if ($found)
 			{
 				$title = JString::increment($title);
@@ -509,6 +534,7 @@ class RADModelAdmin extends RADModel
 	protected function getReorderConditions($row)
 	{
 		$conditions = array();
+
 		if (property_exists($row, 'catid'))
 		{
 			$conditions[] = 'catid = ' . (int) $row->catid;
@@ -528,9 +554,9 @@ class RADModelAdmin extends RADModel
 	 */
 	protected function prepareTable($row, $task, $sourceId = 0)
 	{
-		$user = JFactory::getUser();
-
+		$user       = JFactory::getUser();
 		$titleField = '';
+
 		if (property_exists($row, 'title'))
 		{
 			$titleField = 'title';
@@ -587,6 +613,7 @@ class RADModelAdmin extends RADModel
 			{
 				// Build alias alias for other languages
 				$languages = EventbookingHelper::getLanguages();
+
 				if (count($languages))
 				{
 					foreach ($languages as $language)
@@ -615,10 +642,12 @@ class RADModelAdmin extends RADModel
 					->select('MAX(ordering)')
 					->from($db->quoteName($this->table));
 				$conditions = $this->getReorderConditions($row);
+
 				if (count($conditions))
 				{
 					$query->where($conditions);
 				}
+
 				$db->setQuery($query);
 				$max           = $db->loadResult();
 				$row->ordering = $max + 1;
@@ -639,6 +668,7 @@ class RADModelAdmin extends RADModel
 		{
 			$row->modified_date = JFactory::getDate()->toSql();
 		}
+
 		if (property_exists($row, 'modified_by') && !$row->modified_by)
 		{
 			$row->modified_by = $user->get('id');

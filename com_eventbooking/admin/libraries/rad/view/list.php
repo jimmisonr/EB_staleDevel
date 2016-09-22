@@ -41,7 +41,7 @@ class RADViewList extends RADViewHtml
 	/**
 	 * The array which keeps list of "list" options which will used to display as the filter on the list
 	 *
-	 * @var Array
+	 * @var array
 	 */
 	protected $lists = array();
 
@@ -76,6 +76,7 @@ class RADViewList extends RADViewHtml
 		$this->state      = $this->model->getState();
 		$this->items      = $this->model->getData();
 		$this->pagination = $this->model->getPagination();
+
 		if ($this->isAdminView)
 		{
 			$this->lists['filter_state']    = str_replace('class="inputbox"', 'class="input-medium"', JHtml::_('grid.state', $this->state->filter_state));
@@ -96,6 +97,7 @@ class RADViewList extends RADViewHtml
 	protected function addToolbar()
 	{
 		$helperClass = $this->viewConfig['class_prefix'] . 'Helper';
+
 		if (is_callable($helperClass . '::getActions'))
 		{
 			$canDo = call_user_func(array($helperClass, 'getActions'), $this->name, $this->state);
@@ -106,19 +108,21 @@ class RADViewList extends RADViewHtml
 		}
 
 		$languagePrefix = $this->viewConfig['language_prefix'];
-		JToolBarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')), 'link ' . $this->name);
+		JToolbarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')), 'link ' . $this->name);
 
 		if ($canDo->get('core.create') && !in_array('add', $this->hideButtons))
 		{
-			JToolBarHelper::addNew('add', 'JTOOLBAR_NEW');
+			JToolbarHelper::addNew('add', 'JTOOLBAR_NEW');
 		}
+
 		if ($canDo->get('core.edit') && isset($this->items[0]) && !in_array('edit', $this->hideButtons))
 		{
-			JToolBarHelper::editList('edit', 'JTOOLBAR_EDIT');
+			JToolbarHelper::editList('edit', 'JTOOLBAR_EDIT');
 		}
+
 		if ($canDo->get('core.delete') && isset($this->items[0]) && !in_array('delete', $this->hideButtons))
 		{
-			JToolBarHelper::deleteList(JText::_($languagePrefix . '_DELETE_CONFIRM'), 'delete');
+			JToolbarHelper::deleteList(JText::_($languagePrefix . '_DELETE_CONFIRM'), 'delete');
 		}
 
 		if ($canDo->get('core.edit.state') && !in_array('publish', $this->hideButtons))
@@ -132,7 +136,7 @@ class RADViewList extends RADViewHtml
 
 		if ($canDo->get('core.admin'))
 		{
-			JToolBarHelper::preferences($this->option);
+			JToolbarHelper::preferences($this->option);
 		}
 	}
 }

@@ -84,8 +84,15 @@ class RADModel
 	 */
 	public static function getInstance($name, $prefix, $config = array())
 	{
-		$name  = preg_replace('/[^A-Z0-9_\.-]/i', '', $name);
-		$class = ucfirst($prefix) . ucfirst($name);
+		$name          = preg_replace('/[^A-Z0-9_\.-]/i', '', $name);
+		$class         = ucfirst($prefix) . ucfirst($name);
+		$overrideClass = ucfirst($prefix) . 'Override' . ucfirst($name);
+
+		if (class_exists($overrideClass))
+		{
+			$class = $overrideClass;
+		}
+
 		if (!class_exists($class))
 		{
 			if (isset($config['default_model_class']))
@@ -119,6 +126,7 @@ class RADModel
 		{
 			$className = get_class($this);
 			$pos       = strpos($className, 'Model');
+
 			if ($pos !== false)
 			{
 				$this->option = 'com_' . strtolower(substr($className, 0, $pos));
@@ -138,6 +146,7 @@ class RADModel
 		{
 			$className = get_class($this);
 			$pos       = strpos($className, 'Model');
+
 			if ($pos !== false)
 			{
 				$this->name = substr($className, $pos + 5);
@@ -225,12 +234,14 @@ class RADModel
 		if ($this->rememberStates)
 		{
 			$properties = $this->state->getProperties();
+
 			if (count($properties))
 			{
 				$context = $this->option . '.' . $input->get('view', $this->config['default_view']) . '.';
 				foreach ($properties as $property)
 				{
 					$newState = $this->getUserStateFromRequest($input, $context . $property, $property);
+
 					if ($newState != null)
 					{
 						$data[$property] = $newState;
@@ -438,16 +449,16 @@ class RADModel
 		$conf    = JFactory::getConfig();
 		$options = array(
 			'defaultgroup' => ($group) ? $group : $this->option,
-			'cachebase'    => ($client_id) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache'), );
+			'cachebase'    => ($client_id) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache'),);
 
 		$cache = JCache::getInstance('callback', $options);
 		$cache->clean();
+
 		// Trigger the onContentCleanCache event.
 		if (!empty($this->eventCleanCache))
 		{
 			$dispatcher = JEventDispatcher::getInstance();
-			$dispatcher->trigger($this->event_clean_cache, $options);
+			$dispatcher->trigger($this->eventCleanCache, $options);
 		}
 	}
-
 }

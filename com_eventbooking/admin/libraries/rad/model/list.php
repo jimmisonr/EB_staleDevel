@@ -86,6 +86,7 @@ class RADModelList extends RADModel
 		{
 			$defaultOrdering = 'tbl.id';
 		}
+
 		if (in_array('published', $fields))
 		{
 			$this->stateField = 'tbl.published';
@@ -120,10 +121,12 @@ class RADModelList extends RADModel
 			{
 				$this->searchFields[] = 'tbl.name';
 			}
+
 			if (in_array('title', $fields))
 			{
 				$this->searchFields[] = 'tbl.title';
 			}
+
 			if (in_array('alias', $fields))
 			{
 				$this->searchFields[] = 'tbl.alias';
@@ -313,6 +316,7 @@ class RADModelList extends RADModel
 		$user  = JFactory::getUser();
 		$db    = $this->getDbo();
 		$state = $this->state;
+
 		if ($state->filter_state == 'P')
 		{
 			$query->where($this->stateField . ' = 1');
@@ -321,6 +325,7 @@ class RADModelList extends RADModel
 		{
 			$query->where($this->stateField . ' = 0');
 		}
+
 		if ($state->filter_access)
 		{
 			$query->where('tbl.access = ' . (int) $state->filter_access);
@@ -329,10 +334,12 @@ class RADModelList extends RADModel
 				$query->where('tbl.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
 			}
 		}
+
 		if ($state->filter_search)
 		{
 			//Remove blank space from searching
 			$state->filter_search = trim($state->filter_search);
+
 			if (stripos($state->filter_search, 'id:') === 0)
 			{
 				$query->where('tbl.id = ' . (int) substr($state->filter_search, 3));
@@ -340,15 +347,18 @@ class RADModelList extends RADModel
 			else
 			{
 				$search = $db->quote('%' . $db->escape($state->filter_search, true) . '%', false);
+
 				if (is_array($this->searchFields))
 				{
 					$whereOr = array();
+
 					foreach ($this->searchFields as $searchField)
 					{
 						$whereOr[] = " LOWER($searchField) LIKE " . $search;
 					}
 					$query->where('(' . implode(' OR ', $whereOr) . ') ');
 				}
+
 			}
 		}
 
@@ -395,6 +405,7 @@ class RADModelList extends RADModel
 	{
 		$sort      = $this->state->filter_order;
 		$direction = strtoupper($this->state->filter_order_Dir);
+
 		if ($sort)
 		{
 			$query->order($sort . ' ' . $direction);

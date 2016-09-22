@@ -83,6 +83,7 @@ class RADViewHtml extends RADView
 		{
 			$this->layout = $config['layout'];
 		}
+
 		if (isset($config['paths']))
 		{
 			$this->paths = $config['paths'];
@@ -206,11 +207,13 @@ class RADViewHtml extends RADView
 	{
 		// Get the layout path.
 		$path = $this->getPath($this->getLayout());
+
 		// Check if the layout path was found.
 		if (!$path)
 		{
 			throw new RuntimeException('Layout Path Not Found');
 		}
+
 		// Start an output buffer.
 		ob_start();
 
@@ -236,11 +239,13 @@ class RADViewHtml extends RADView
 	{
 		// Get the layout path.
 		$path = $this->getPath($this->getLayout() . '_' . $template);
+
 		// Check if the layout path was found.
 		if (!$path)
 		{
 			throw new RuntimeException('Layout Path Not Found');
 		}
+
 		extract($data);
 		// Start an output buffer.
 		ob_start();
