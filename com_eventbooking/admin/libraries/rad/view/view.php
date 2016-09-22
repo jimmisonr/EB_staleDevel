@@ -65,7 +65,14 @@ abstract class RADView
 	 */
 	public static function getInstance($name, $type, $prefix, array $config = array())
 	{
-		$class = ucfirst($prefix) . ucfirst($name) . ucfirst($type);
+		$class             = ucfirst($prefix) . ucfirst($name) . ucfirst($type);
+		$overrideViewClass = ucfirst($prefix) . 'Override' . ucfirst($name) . ucfirst($type);
+
+		if (class_exists($overrideViewClass))
+		{
+			$class = $overrideViewClass;
+		}
+
 		if (!class_exists($class))
 		{
 			if (isset($config['default_view_class']))
@@ -99,6 +106,7 @@ abstract class RADView
 		{
 			$className = get_class($this);
 			$pos       = strpos('View', $className);
+
 			if ($pos !== false)
 			{
 				$this->option = 'com_' . strtolower(substr($className, 0, $pos));
@@ -118,6 +126,7 @@ abstract class RADView
 		{
 			$className = get_class($this);
 			$viewPos   = strpos('View', $className);
+
 			if ($viewPos !== false)
 			{
 				$this->name = substr($className, $viewPos + 4);

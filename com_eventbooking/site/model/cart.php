@@ -104,7 +104,15 @@ class EventbookingModelCart extends RADModel
 		$form      = new RADForm($rowFields);
 		$form->bind($data);
 		$data['collect_records_data'] = true;
-		$fees                         = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+
+		if (is_callable('EventbookingHelperOverrideHelper::calculateCartRegistrationFee'))
+		{
+			$fees = EventbookingHelperOverrideHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+		}
+		else
+		{
+			$fees = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+		}
 
 		// Save the active language
 		if (JFactory::getApplication()->getLanguageFilter())

@@ -54,6 +54,7 @@ class RADModelState
 	public function get($name, $default = null)
 	{
 		$result = $default;
+
 		if (isset($this->data[$name]))
 		{
 			$result = $this->data[$name]->value;
@@ -158,6 +159,7 @@ class RADModelState
 					{
 						$value = null;
 					}
+
 					$this->data[$key]->value = $value;
 				}
 			}

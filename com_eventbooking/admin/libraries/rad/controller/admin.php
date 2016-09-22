@@ -95,10 +95,12 @@ class RADControllerAdmin extends RADController
 	public function edit()
 	{
 		$cid = $this->input->get('cid', array(), 'array');
+
 		if (count($cid))
 		{
 			$this->input->set('id', 0);
 		}
+
 		if ($this->allowEdit(array('id' => $this->input->getInt('id'))))
 		{
 			$this->input->set('view', $this->viewItem);
@@ -122,19 +124,23 @@ class RADControllerAdmin extends RADController
 		$this->csrfProtection();
 		$input = $this->input;
 		$task  = $this->getTask();
+
 		if ($task == 'save2copy')
 		{
 			$input->set('source_id', $input->getInt('id', 0));
 			$input->set('id', 0);
 			$task = 'apply';
 		}
+
 		$id = $input->getInt('id', 0);
+
 		if ($this->allowSave(array('id' => $id)))
 		{
 			try
 			{
 				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin'));
 				$model->store($this->input);
+
 				if ($this->app->isSite() && $id == 0)
 				{
 					$langSuffix = '_SUBMIT_SAVE_SUCCESS';
@@ -143,8 +149,10 @@ class RADControllerAdmin extends RADController
 				{
 					$langSuffix = '_SAVE_SUCCESS';
 				}
+
 				$languagePrefix = $this->config['language_prefix'];
 				$msg            = JText::_((JFactory::getLanguage()->hasKey($languagePrefix . $langSuffix) ? $languagePrefix : 'JLIB_APPLICATION') . $langSuffix);
+
 				switch ($task)
 				{
 					case 'apply':
@@ -157,6 +165,7 @@ class RADControllerAdmin extends RADController
 						$url = JRoute::_($this->getViewListUrl(), false);
 						break;
 				}
+
 				$this->setRedirect($url, $msg);
 			}
 			catch (Exception $e)
@@ -193,6 +202,7 @@ class RADControllerAdmin extends RADController
 		$cid   = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($order);
 		JArrayHelper::toInteger($cid);
+
 		for ($i = 0, $n = count($cid); $i < $n; $i++)
 		{
 			if (!$this->allowEditState($cid[$i]))
@@ -200,6 +210,7 @@ class RADControllerAdmin extends RADController
 				unset($cid[$i]);
 			}
 		}
+
 		if (count($cid))
 		{
 			try
@@ -233,6 +244,7 @@ class RADControllerAdmin extends RADController
 		$this->csrfProtection();
 		$cid = $this->input->post->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid);
+
 		if (count($cid) && $this->allowEditState($cid[0]))
 		{
 			try
@@ -253,6 +265,7 @@ class RADControllerAdmin extends RADController
 			$languagePrefix = $this->config['language_prefix'];
 			$this->setMessage($languagePrefix . '_NO_ITEM_SELECTED', 'warning');
 		}
+
 		$this->setRedirect(JRoute::_($this->getViewListUrl(), false));
 	}
 
@@ -268,6 +281,7 @@ class RADControllerAdmin extends RADController
 		// Get items to remove from the request.
 		$cid = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid);
+
 		for ($i = 0, $n = count($cid); $i < $n; $i++)
 		{
 			if (!$this->allowDelete($cid[$i]))
@@ -277,6 +291,7 @@ class RADControllerAdmin extends RADController
 		}
 
 		$languagePrefix = $this->config['language_prefix'];
+
 		if (count($cid))
 		{
 			try
@@ -314,6 +329,7 @@ class RADControllerAdmin extends RADController
 		$published = JArrayHelper::getValue($data, $task, 0, 'int');
 
 		JArrayHelper::toInteger($cid);
+
 		for ($i = 0, $n = count($cid); $i < $n; $i++)
 		{
 			if (!$this->allowEditState($cid[$i]))
@@ -330,6 +346,7 @@ class RADControllerAdmin extends RADController
 			{
 				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin', 'ignore_request' => true));
 				$model->publish($cid, $published);
+
 				switch ($published)
 				{
 					case 0:
@@ -355,6 +372,7 @@ class RADControllerAdmin extends RADController
 		{
 			$this->setMessage($languagePrefix . '_NO_ITEM_SELECTED', 'warning');
 		}
+
 		$this->setRedirect(JRoute::_($this->getViewListUrl(), false));
 	}
 
@@ -368,7 +386,7 @@ class RADControllerAdmin extends RADController
 	public function save_order_ajax()
 	{
 		// Get the input
-		$pks = $this->input->post->get('cid', array(), 'array');
+		$pks   = $this->input->post->get('cid', array(), 'array');
 		$order = $this->input->post->get('order', array(), 'array');
 
 		// Sanitize the input
@@ -389,6 +407,7 @@ class RADControllerAdmin extends RADController
 		// Close the application
 		$this->app->close();
 	}
+
 	/**
 	 * Method to check if you can add a new record.
 	 *
@@ -438,10 +457,8 @@ class RADControllerAdmin extends RADController
 		{
 			return $this->allowEdit($data, $key);
 		}
-		else
-		{
-			return $this->allowAdd($data);
-		}
+
+		return $this->allowAdd($data);
 	}
 
 	/**
@@ -481,8 +498,7 @@ class RADControllerAdmin extends RADController
 	/**
 	 * Get url of the page which allow adding/editing a record
 	 *
-	 * @param int    $recordId
-	 * @param string $urlVar
+	 * @param int $recordId
 	 *
 	 * @return string
 	 */

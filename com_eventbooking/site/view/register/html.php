@@ -181,14 +181,30 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$form->bind($data, $useDefault);
 		$form->prepareFormFields('calculateIndividualRegistrationFee();');
 		$paymentMethod = $input->post->getString('payment_method', os_payments::getDefautPaymentMethod(trim($event->payment_methods)));
+
 		if ($waitingList)
 		{
-			$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, null);
+			if (is_callable('EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees'))
+			{
+				$fees = EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, null);
+			}
+			else
+			{
+				$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, null);
+			}
 		}
 		else
 		{
-			$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			if (is_callable('EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees'))
+			{
+				$fees = EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			}
+			else
+			{
+				$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			}
 		}
+
 		$expMonth            = $input->post->getInt('exp_month', date('m'));
 		$expYear             = $input->post->getInt('exp_year', date('Y'));
 		$lists['exp_month']  = JHtml::_('select.integerlist', 1, 12, 1, 'exp_month', ' class="input-small" ', $expMonth, '%02d');
@@ -297,10 +313,10 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	private function displayGroupForm($event, $input)
 	{
-		$config   = EventbookingHelper::getConfig();
-		$user     = JFactory::getUser();
-		$db       = JFactory::getDbo();
-		$query    = $db->getQuery(true);
+		$config = EventbookingHelper::getConfig();
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
 
 		// Check to see whether we need to load ajax file upload script
 		$query->select('COUNT(*)')
@@ -373,14 +389,14 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 */
 	private function displayCart()
 	{
-		$app      = JFactory::getApplication();
-		$input    = $this->input;
-		$db       = JFactory::getDbo();
-		$config   = EventbookingHelper::getConfig();
-		$user     = JFactory::getUser();
-		$userId   = $user->get('id');
-		$cart     = new EventbookingHelperCart();
-		$items    = $cart->getItems();
+		$app    = JFactory::getApplication();
+		$input  = $this->input;
+		$db     = JFactory::getDbo();
+		$config = EventbookingHelper::getConfig();
+		$user   = JFactory::getUser();
+		$userId = $user->get('id');
+		$cart   = new EventbookingHelperCart();
+		$items  = $cart->getItems();
 		if (!count($items))
 		{
 			$url = JRoute::_('index.php?option=com_eventbooking&Itemid=' . $input->getInt('Itemid', 0));
@@ -466,15 +482,24 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$currentYear         = date('Y');
 		$lists['exp_year']   = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
 		$data['coupon_code'] = $input->post->getString('coupon_code', '');
-		$fees                = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
-		$events              = $cart->getEvents();
-		$methods             = os_payments::getPaymentMethods();
-		$options             = array();
-		$options[]           = JHtml::_('select.option', 'Visa', 'Visa');
-		$options[]           = JHtml::_('select.option', 'MasterCard', 'MasterCard');
-		$options[]           = JHtml::_('select.option', 'Discover', 'Discover');
-		$options[]           = JHtml::_('select.option', 'Amex', 'American Express');
-		$lists['card_type']  = JHtml::_('select.genericlist', $options, 'card_type', ' class="inputbox" ', 'value', 'text');
+
+		if (is_callable('EventbookingHelperOverrideHelper::calculateCartRegistrationFee'))
+		{
+			$fees = EventbookingHelperOverrideHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+		}
+		else
+		{
+			$fees = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+		}
+		
+		$events             = $cart->getEvents();
+		$methods            = os_payments::getPaymentMethods();
+		$options            = array();
+		$options[]          = JHtml::_('select.option', 'Visa', 'Visa');
+		$options[]          = JHtml::_('select.option', 'MasterCard', 'MasterCard');
+		$options[]          = JHtml::_('select.option', 'Discover', 'Discover');
+		$options[]          = JHtml::_('select.option', 'Amex', 'American Express');
+		$lists['card_type'] = JHtml::_('select.genericlist', $options, 'card_type', ' class="inputbox" ', 'value', 'text');
 		//Coupon will be enabled if there is atleast one event has coupon
 		$query->clear();
 		$query->select('enable_coupon')
@@ -592,14 +617,15 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 
 	/**
 	 * Load captcha for registration form
+	 *
 	 * @param bool $initOnly
 	 *
 	 * @throws Exception
 	 */
 	private function loadCaptcha($initOnly = false)
 	{
-		$config = EventbookingHelper::getConfig();
-		$user   = JFactory::getUser();
+		$config      = EventbookingHelper::getConfig();
+		$user        = JFactory::getUser();
 		$showCaptcha = 0;
 
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
@@ -613,7 +639,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
 			if ($plugin)
 			{
-				$showCaptcha   = 1;
+				$showCaptcha = 1;
 				if ($initOnly)
 				{
 					JCaptcha::getInstance($captchaPlugin)->initialise('dynamic_recaptcha_1');

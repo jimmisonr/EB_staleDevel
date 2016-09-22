@@ -125,6 +125,7 @@ class RADController
 		// Determine controller name
 		$task = $input->get('task', '');
 		$pos  = strpos($task, '.');
+
 		if ($pos !== false)
 		{
 			//In case task has dot in it, task need to have the format controllername.task
@@ -147,6 +148,7 @@ class RADController
 
 		// Create the controller if it doesn't exist
 		$component = substr($option, 4);
+
 		if (!isset(self::$instances[$component . $name]))
 		{
 			if (empty($config['class_prefix']))
@@ -154,7 +156,13 @@ class RADController
 				$config['class_prefix'] = ucfirst($component);
 			}
 
-			$class = ucfirst($config['class_prefix']) . 'Controller' . ucfirst($name);
+			$class         = ucfirst($config['class_prefix']) . 'Controller' . ucfirst($name);
+			$overrideClass = ucfirst($config['class_prefix']) . 'ControllerOverride' . ucfirst($name);
+
+			if (class_exists($overrideClass))
+			{
+				$class = $overrideClass;
+			}
 
 			if (!class_exists($class))
 			{
@@ -213,6 +221,7 @@ class RADController
 		$xMethods = get_class_methods('RADController');
 		$r        = new ReflectionClass($this);
 		$rMethods = $r->getMethods(ReflectionMethod::IS_PUBLIC);
+
 		foreach ($rMethods as $rMethod)
 		{
 			$mName = $rMethod->getName();
@@ -222,6 +231,7 @@ class RADController
 				$this->methods[]                   = strtolower($mName);
 			}
 		}
+
 		$this->task = $input->get('task', 'display');
 
 		// Register controller default task
@@ -244,6 +254,7 @@ class RADController
 	public function execute()
 	{
 		$task = strtolower($this->task);
+
 		if (isset($this->taskMap[$task]))
 		{
 			$doTask = $this->taskMap[$task];
@@ -256,6 +267,7 @@ class RADController
 		{
 			throw new Exception(JText::sprintf('JLIB_APPLICATION_ERROR_TASK_NOT_FOUND', $task), 404);
 		}
+
 		$this->$doTask();
 
 		return $this;
@@ -340,6 +352,7 @@ class RADController
 
 		//Create model and auto populate model states if required
 		$model = RADModel::getInstance($name, ucfirst($config['class_prefix']) . 'Model', $config);
+
 		if (!$model->ignoreRequest)
 		{
 			$model->populateState($this->input);
@@ -437,6 +450,7 @@ class RADController
 	public function setRedirect($url, $msg = null, $type = null)
 	{
 		$this->redirect = $url;
+
 		if ($msg !== null)
 		{
 			// Controller may have set this directly

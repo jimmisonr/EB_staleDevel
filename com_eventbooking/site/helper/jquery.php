@@ -133,12 +133,19 @@ abstract class EventbookingHelperJquery
 	 */
 	public static function validateForm()
 	{
+		if (is_callable('EventbookingHelperOverrideJquery::validateForm'))
+		{
+			EventbookingHelperOverrideJquery::validateForm();
+
+			return;
+		}
+
 		static $loaded = false;
 		if (!$loaded)
 		{
 			JHtml::_('stylesheet', EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/assets/js/validate/css/validationEngine.jquery.css', false, false);
 
-			$config      = EventbookingHelper::getConfig();
+			$config = EventbookingHelper::getConfig();
 			if ($config->multiple_booking)
 			{
 				$eventId = 0;
