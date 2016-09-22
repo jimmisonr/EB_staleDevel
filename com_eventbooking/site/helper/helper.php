@@ -3872,8 +3872,18 @@ class EventbookingHelper
 				$row->invoice_number = self::getInvoiceNumber();
 				$row->store();
 			}
+
 			$invoiceNumber = self::formatInvoiceNumber($row->invoice_number, $config);
-			self::generateInvoicePDF($row);
+
+			if (is_callable('EventbookingHelperOverrideHelper::generateInvoicePDF'))
+			{
+				EventbookingHelperOverrideHelper::generateInvoicePDF($row);
+			}
+			else
+			{
+				self::generateInvoicePDF($row);
+			}
+
 			$invoicePath = $invoiceStorePath . $invoiceNumber . '.pdf';
 			$fileName    = $invoiceNumber . '.pdf';
 			while (@ob_end_clean()) ;

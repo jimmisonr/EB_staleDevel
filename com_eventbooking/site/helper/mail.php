@@ -174,7 +174,15 @@ class EventbookingHelperMail
 			$invoiceFilePath = '';
 			if ($config->activate_invoice_feature && $config->send_invoice_to_customer && $row->invoice_number)
 			{
-				EventbookingHelper::generateInvoicePDF($row);
+				if (is_callable('EventbookingHelperOverrideHelper::generateInvoicePDF'))
+				{
+					EventbookingHelperOverrideHelper::generateInvoicePDF($row);
+				}
+				else
+				{
+					EventbookingHelper::generateInvoicePDF($row);
+				}
+
 				$invoiceFilePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
 				$mailer->addAttachment($invoiceFilePath);
 			}
@@ -484,7 +492,15 @@ class EventbookingHelperMail
 
 		if ($config->activate_invoice_feature && $row->invoice_number)
 		{
-			EventbookingHelper::generateInvoicePDF($row);
+			if (is_callable('EventbookingHelperOverrideHelper::generateInvoicePDF'))
+			{
+				EventbookingHelperOverrideHelper::generateInvoicePDF($row);
+			}
+			else
+			{
+				EventbookingHelper::generateInvoicePDF($row);
+			}
+
 			$mailer->addAttachment(JPATH_ROOT . '/media/com_eventbooking/invoices/' . EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config) . '.pdf');
 		}
 
@@ -661,7 +677,7 @@ class EventbookingHelperMail
 		{
 			$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
 		}
-		
+
 		//Notification email send to user
 		if ($fieldSuffix && strlen($message->{'watinglist_confirmation_subject' . $fieldSuffix}))
 		{
