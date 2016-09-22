@@ -9,6 +9,7 @@ define('EB_TBC_DATE', '2099-12-31 00:00:00');
 JLoader::registerPrefix('RAD', dirname(__FILE__));
 $app = JFactory::getApplication();
 JLoader::registerPrefix('Eventbooking', JPATH_BASE . '/components/com_eventbooking');
+
 if ($app->isAdmin())
 {
 	JLoader::register('EventbookingHelper', JPATH_ROOT . '/components/com_eventbooking/helper/helper.php');
@@ -20,15 +21,30 @@ if ($app->isAdmin())
 	JLoader::register('EventbookingHelperData', JPATH_ROOT . '/components/com_eventbooking/helper/data.php');
 	JLoader::register('EventbookingHelperDatabase', JPATH_ROOT . '/components/com_eventbooking/helper/database.php');
 	JLoader::register('EventbookingHelperMail', JPATH_ROOT . '/components/com_eventbooking/helper/mail.php');
+
+	// Register override classes
+	$possibleOverrides = array(
+		'EventbookingHelperOverrideHelper' => 'helper.php',
+		'EventbookingHelperOverrideMail'   => 'mail.php',
+		'EventbookingHelperOverrideJquery' => 'jquery.php',
+		'EventbookingHelperOverrideData'   => 'data.php',
+	);
+
+	foreach ($possibleOverrides as $className => $filename)
+	{
+		JLoader::register($className, JPATH_ROOT . '/components/com_eventbooking/helper/override/' . $filename);
+	}
 }
 else
 {
 	JLoader::register('EventbookingModelRegistrants', JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/registrants.php');
 	JLoader::register('EventbookingModelEvents', JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/events.php');
 }
+
 JLoader::register('os_payments', JPATH_ROOT . '/components/com_eventbooking/payments/os_payments.php');
 JLoader::register('os_payment', JPATH_ROOT . '/components/com_eventbooking/payments/os_payment.php');
 JLoader::register('JFile', JPATH_LIBRARIES . '/joomla/filesystem/file.php');
+
 $config = EventbookingHelper::getConfig();
 
 if ($config->debug)
