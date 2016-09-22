@@ -22,11 +22,11 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 	{
 		//Hardcoded the layout, it happens with some clients. Maybe it is a bug of Joomla core code, will find out it later
 		$this->setLayout('default');
-		$db               = JFactory::getDbo();
-		$query            = $db->getQuery(true);
-		$config           = EventbookingHelper::getConfig();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+		$config = EventbookingHelper::getConfig();
 
-		$session = JFactory::getSession();
+		$session          = JFactory::getSession();
 		$registrationCode = $session->get('eb_registration_code', '');
 
 		$id = 0;
@@ -55,9 +55,9 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 			EventbookingHelperDatabase::getMultilingualFields($query, array('a.title'), $fieldSuffix);
 		}
 		$db->setQuery($query);
-		$rowEvent    = $db->loadObject();
+		$rowEvent = $db->loadObject();
 
-		$message     = EventbookingHelper::getMessages();
+		$message = EventbookingHelper::getMessages();
 		if (strpos($rowEvent->payment_method, 'os_offline') !== false)
 		{
 			if ($fieldSuffix && EventbookingHelper::isValidMessage($rowEvent->{'thanks_message_offline' . $fieldSuffix}))
@@ -128,7 +128,16 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		$data = EventbookingHelper::getRegistrantData($rowRegistrant, $rowFields);
 		$form->bind($data);
 		$form->buildFieldsDependency();
-		$replaces = EventbookingHelper::buildTags($rowRegistrant, $form, $rowEvent, $config, false);
+
+		if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
+		{
+			$replaces = EventbookingHelperOverrideHelper::buildTags($rowRegistrant, $form, $rowEvent, $config, false);
+		}
+		else
+		{
+			$replaces = EventbookingHelper::buildTags($rowRegistrant, $form, $rowEvent, $config, false);
+		}
+
 		foreach ($replaces as $key => $value)
 		{
 			$key          = strtoupper($key);
@@ -138,7 +147,7 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		if (strpos($thankMessage, '[QRCODE]') !== false)
 		{
 			EventbookingHelper::generateQrcode($rowRegistrant->id);
-			$imgTag = '<img src="media/com_eventbooking/qrcodes/' . $rowRegistrant->id . '.png" border="0" />';
+			$imgTag       = '<img src="media/com_eventbooking/qrcodes/' . $rowRegistrant->id . '.png" border="0" />';
 			$thankMessage = str_ireplace("[QRCODE]", $imgTag, $thankMessage);
 		}
 
@@ -152,9 +161,9 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 			}
 		}
 
-		$this->message          = $thankMessage;
-		$this->registrationCode = $registrationCode;
-		$this->tmpl             = $this->input->getString('tmpl');
+		$this->message                = $thankMessage;
+		$this->registrationCode       = $registrationCode;
+		$this->tmpl                   = $this->input->getString('tmpl');
 		$this->conversionTrackingCode = $trackingCode;
 
 		// Reset cart

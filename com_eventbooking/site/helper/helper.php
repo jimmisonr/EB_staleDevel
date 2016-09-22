@@ -2389,7 +2389,7 @@ class EventbookingHelper
 			"validate[minSize[6]]",
 			"validate[maxSize[12]]",
 			"validate[custom[integer],min[-5]]",
-			"validate[custom[integer],max[50]]", );
+			"validate[custom[integer],max[50]]",);
 
 		return json_encode($validClass);
 	}
@@ -2820,7 +2820,7 @@ class EventbookingHelper
 					'option.text'        => 'text',
 					'option.value'       => 'value',
 					'list.attr'          => 'class="inputbox" onchange="submit();"',
-					'list.select'        => $selected, ));
+					'list.select'        => $selected,));
 		else
 			return JHtml::_('select.genericlist', $options, $name,
 				array(
@@ -2828,7 +2828,7 @@ class EventbookingHelper
 					'option.text'        => 'text',
 					'option.value'       => 'value',
 					'list.attr'          => 'class="inputbox" ',
-					'list.select'        => $selected, ));
+					'list.select'        => $selected,));
 	}
 
 	/**
@@ -2886,7 +2886,7 @@ class EventbookingHelper
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => ' class="inputbox" ',
-				'list.select'        => $row->parent, ));
+				'list.select'        => $row->parent,));
 	}
 
 	/**
@@ -3748,7 +3748,15 @@ class EventbookingHelper
 		$form->bind($data);
 		$form->buildFieldsDependency();
 
-		$replaces                   = self::buildTags($row, $form, $rowEvent, $config);
+		if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
+		{
+			$replaces = EventbookingHelperOverrideHelper::buildTags($row, $form, $rowEvent, $config);
+		}
+		else
+		{
+			$replaces = self::buildTags($row, $form, $rowEvent, $config);
+		}
+
 		$replaces['invoice_number'] = self::formatInvoiceNumber($row->invoice_number, $config);
 
 		if (empty($row->payment_date) || ($row->payment_date == $db->getNullDate()))
@@ -3795,7 +3803,7 @@ class EventbookingHelper
 					'taxAmount'      => $taxAmount,
 					'discountAmount' => $discountAmount,
 					'total'          => $total,
-					'config'         => $config, ));
+					'config'         => $config,));
 			$replaces['SUB_TOTAL']              = EventbookingHelper::formatCurrency($subTotal, $config);
 			$replaces['DISCOUNT_AMOUNT']        = EventbookingHelper::formatCurrency($discountAmount, $config);
 			$replaces['TAX_AMOUNT']             = EventbookingHelper::formatCurrency($taxAmount, $config);

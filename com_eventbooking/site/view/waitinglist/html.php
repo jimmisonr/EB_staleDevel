@@ -59,7 +59,16 @@ class EventbookingViewWaitinglistHtml extends RADViewHtml
 		$data = EventbookingHelper::getRegistrantData($rowRegistrant, $rowFields);
 		$form->bind($data);
 		$form->buildFieldsDependency();
-		$replaces = EventbookingHelper::buildTags($rowRegistrant, $form, $rowEvent, $config);
+
+		if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
+		{
+			$replaces = EventbookingHelperOverrideHelper::buildTags($rowRegistrant, $form, $rowEvent, $config);
+		}
+		else
+		{
+			$replaces = EventbookingHelper::buildTags($rowRegistrant, $form, $rowEvent, $config);
+		}
+
 		foreach ($replaces as $key => $value)
 		{
 			$key = strtoupper($key);

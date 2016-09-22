@@ -86,7 +86,15 @@ class EventbookingHelperMail
 		$data = EventbookingHelper::getRegistrantData($row, $rowFields);
 		$form->bind($data);
 		$form->buildFieldsDependency();
-		$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
+
+		if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
+		{
+			$replaces = EventbookingHelperOverrideHelper::buildTags($row, $form, $event, $config);
+		}
+		else
+		{
+			$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
+		}
 
 		$query->clear()
 			->select('a.*')
@@ -420,7 +428,14 @@ class EventbookingHelperMail
 		}
 		$event = $db->loadObject();
 
-		$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
+		if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
+		{
+			$replaces = EventbookingHelperOverrideHelper::buildTags($row, $form, $event, $config);
+		}
+		else
+		{
+			$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
+		}
 
 		if (strlen(trim($event->registration_approved_email_subject)))
 		{
@@ -571,8 +586,16 @@ class EventbookingHelperMail
 		{
 			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
 		}
-		$event    = $db->loadObject();
-		$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
+		$event = $db->loadObject();
+
+		if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
+		{
+			$replaces = EventbookingHelperOverrideHelper::buildTags($row, $form, $event, $config);
+		}
+		else
+		{
+			$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
+		}
 
 		foreach ($replaces as $key => $value)
 		{
@@ -629,8 +652,16 @@ class EventbookingHelperMail
 		$data = EventbookingHelper::getRegistrantData($row, $rowFields);
 		$form->bind($data);
 		$form->buildFieldsDependency();
-		$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
 
+		if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
+		{
+			$replaces = EventbookingHelperOverrideHelper::buildTags($row, $form, $event, $config);
+		}
+		else
+		{
+			$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
+		}
+		
 		//Notification email send to user
 		if ($fieldSuffix && strlen($message->{'watinglist_confirmation_subject' . $fieldSuffix}))
 		{
