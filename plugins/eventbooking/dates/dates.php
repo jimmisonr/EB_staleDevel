@@ -161,15 +161,20 @@ class plgEventBookingDates extends JPlugin
 		$query = $db->getQuery(true);
 		$nullDate = $db->getNullDate();
 		$format = 'Y-m-d';
-
-		$query->select('id, event_date, event_end_date, cut_off_date, registration_start_date, location_id')
-				->from('#__eb_events')
-				->where('parent_id = ' . (int) $row->id)
-				->where('is_additional_date = 1')
-				->order('id');
-		$db->setQuery($query);
-		$rowEvents = $db->loadObjectList();
-
+		
+		$rowEvents = array();
+		
+		if ($row->id > 0)
+		{		
+			$query->select('id, event_date, event_end_date, cut_off_date, registration_start_date, location_id')
+					->from('#__eb_events')
+					->where('parent_id = ' . (int) $row->id)
+					->where('is_additional_date = 1')
+					->order('id');
+			$db->setQuery($query);
+			$rowEvents = $db->loadObjectList();
+		}
+		
 		$maxNumberDates = max($this->params->get('max_number_dates', 3), count($rowEvents));
 
 		$options                    = array();
