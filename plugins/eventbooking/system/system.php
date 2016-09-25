@@ -109,12 +109,21 @@ class plgEventbookingSystem extends JPlugin
 		}
 
 		$row->coupon_usage_calculated = 1;
-		$row->store();
+		$row->store();		
+		
+		if ($row->coupon_used_count > 0)
+		{
+			$used = $row->coupon_used_count;
+		}
+		else
+		{
+			$used = 1;
+		}
 
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->update('#__eb_coupons')
-			->set('used = used + 1')
+			->set('used = used + ' . $used)
 			->where('id = ' . (int) $row->coupon_id);
 		$db->setQuery($query);
 		$db->execute();
