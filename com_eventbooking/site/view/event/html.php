@@ -145,7 +145,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 			$this->items = EventbookingModelEvent::getAllChildrenEvents($item->id);
 		}
 
-		if (isset($item->params))
+		if (isset($item->paramData))
 		{
 			$this->paramData = $item->paramData;
 		}
