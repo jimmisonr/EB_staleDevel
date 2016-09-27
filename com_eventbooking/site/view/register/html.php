@@ -102,7 +102,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 *
 	 * @throws Exception
 	 */
-	private function displayIndividualRegistrationForm($event, $input)
+	protected function displayIndividualRegistrationForm($event, $input)
 	{
 		$config    = EventbookingHelper::getConfig();
 		$user      = JFactory::getUser();
@@ -319,7 +319,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 *
 	 * @throws Exception
 	 */
-	private function displayGroupForm($event, $input)
+	protected function displayGroupForm($event, $input)
 	{
 		$config = EventbookingHelper::getConfig();
 		$user   = JFactory::getUser();
@@ -395,7 +395,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 *
 	 * @throws Exception
 	 */
-	private function displayCart()
+	protected function displayCart()
 	{
 		$app    = JFactory::getApplication();
 		$input  = $this->input;
@@ -601,7 +601,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 * @param JTable $event
 	 * @param string $layout
 	 */
-	private function generateBreadcrumb($event, $layout)
+	protected function generateBreadcrumb($event, $layout)
 	{
 		$app      = JFactory::getApplication();
 		$active   = $app->getMenu()->getActive();
@@ -630,7 +630,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 *
 	 * @throws Exception
 	 */
-	private function loadCaptcha($initOnly = false)
+	protected function loadCaptcha($initOnly = false)
 	{
 		$config      = EventbookingHelper::getConfig();
 		$user        = JFactory::getUser();
