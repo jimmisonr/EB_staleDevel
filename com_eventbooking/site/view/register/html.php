@@ -50,7 +50,15 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 
 		if (!EventbookingHelper::acceptRegistration($event))
 		{
-			$waitingList = EventbookingHelper::getConfigValue('activate_waitinglist_feature');
+			if ($event->activate_waiting_list == 2)
+			{
+				$waitingList = $config->activate_waitinglist_feature;
+			}
+			else
+			{
+				$waitingList = $event->activate_waiting_list;
+			}
+
 			if (!$waitingList || !$event->number_event_dates)
 			{
 				JFactory::getApplication()->redirect('index.php', JText::_('EB_ERROR_REGISTRATION'));
@@ -94,7 +102,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 *
 	 * @throws Exception
 	 */
-	private function displayIndividualRegistrationForm($event, $input)
+	protected function displayIndividualRegistrationForm($event, $input)
 	{
 		$config    = EventbookingHelper::getConfig();
 		$user      = JFactory::getUser();
@@ -311,7 +319,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 *
 	 * @throws Exception
 	 */
-	private function displayGroupForm($event, $input)
+	protected function displayGroupForm($event, $input)
 	{
 		$config = EventbookingHelper::getConfig();
 		$user   = JFactory::getUser();
@@ -387,7 +395,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 *
 	 * @throws Exception
 	 */
-	private function displayCart()
+	protected function displayCart()
 	{
 		$app    = JFactory::getApplication();
 		$input  = $this->input;
@@ -593,7 +601,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 * @param JTable $event
 	 * @param string $layout
 	 */
-	private function generateBreadcrumb($event, $layout)
+	protected function generateBreadcrumb($event, $layout)
 	{
 		$app      = JFactory::getApplication();
 		$active   = $app->getMenu()->getActive();
@@ -622,7 +630,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 	 *
 	 * @throws Exception
 	 */
-	private function loadCaptcha($initOnly = false)
+	protected function loadCaptcha($initOnly = false)
 	{
 		$config      = EventbookingHelper::getConfig();
 		$user        = JFactory::getUser();

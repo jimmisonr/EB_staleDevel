@@ -56,6 +56,7 @@ else
 							array(
 									'Itemid' => $this->Itemid,
 									'config' => $this->config,
+									'month' => $this->month,
 									'previousMonth' => $previousMonth,
 									'nextMonth' => $nextMonth,
 									'previousMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$previousMonth.'&year='.$previousYear.'&Itemid='.$this->Itemid),

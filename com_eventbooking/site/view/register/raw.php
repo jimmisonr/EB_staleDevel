@@ -42,7 +42,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 	 * @param Object   $event
 	 * @param RADInput $input
 	 */
-	private function displayNumberMembersForm($event, $input)
+	protected function displayNumberMembersForm($event, $input)
 	{
 		$session           = JFactory::getSession();
 		$numberRegistrants = $session->get('eb_number_registrants', '');

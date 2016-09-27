@@ -73,7 +73,7 @@ class EventbookingViewCartRaw extends RADViewHtml
 	/**
 	 * Display content of cart module, using for ajax request
 	 */
-	private function displayModule()
+	protected function displayModule()
 	{
 		jimport('joomla.application.module.helper');
 		$module = JModuleHelper::getModule('mod_eb_cart');

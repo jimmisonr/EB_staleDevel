@@ -51,9 +51,12 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 
 			$params->set('page_title', $pageTitle);
 		}
-
-		EventbookingHelperHtml::prepareDocument($params, $category);
-
+		
+		if (!$this->input->getInt('hmvc_call', 0))
+		{
+			EventbookingHelperHtml::prepareDocument($params, $category);
+		}	
+		
 		if ($config->multiple_booking)
 		{
 			if ($this->deviceType == 'mobile')

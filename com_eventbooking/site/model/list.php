@@ -28,6 +28,7 @@ class EventbookingModelList extends RADModelList
 		'tbl.access',
 		'tbl.registration_access',
 		'tbl.individual_price',
+		'tbl.price_text',
 		'tbl.event_capacity',
 		'tbl.created_by',
 		'tbl.cut_off_date',
@@ -60,6 +61,7 @@ class EventbookingModelList extends RADModelList
 		'tbl.tax_rate',
 		'tbl.featured',
 		'tbl.has_multiple_ticket_types',
+		'tbl.activate_waiting_list',
 	);
 
 	/**

@@ -81,7 +81,7 @@ class EventbookingViewInviteHtml extends RADViewHtml
 	/**
 	 * Display invitation complete message
 	 */
-	private function displayInviteComplete()
+	protected function displayInviteComplete()
 	{
 		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();

@@ -108,7 +108,7 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 	/**
 	 * Display weekly events
 	 */
-	private function displayWeeklyView()
+	protected function displayWeeklyView()
 	{
 		$config					 = EventbookingHelper::getConfig();
 		$model                   = $this->getModel();
@@ -129,7 +129,7 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 	/**
 	 * Display daily events
 	 */
-	private function displayDailyView()
+	protected function displayDailyView()
 	{
 		EventbookingHelperJquery::colorbox('eb-colorbox-addlocation');
 		$config 	  = EventbookingHelper::getConfig();

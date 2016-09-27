@@ -25,10 +25,19 @@ $return = base64_encode(JUri::getInstance()->toString());
 ?>
 <div id="eb-events" class="eb-events-timeline">
 	<?php
-		$activateWaitingList = $config->activate_waitinglist_feature ;
 		for ($i = 0 , $n = count($events) ;  $i < $n ; $i++)
 		{
-			$event = $events[$i] ;
+			$event = $events[$i];
+
+			if ($event->activate_waiting_list == 2)
+			{
+				$activateWaitingList = $config->activate_waitinglist_feature;
+			}
+			else
+			{
+				$activateWaitingList = $event->activate_waiting_list;
+			}
+
 			$canRegister = EventbookingHelper::acceptRegistration($event);
 			$detailUrl = JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, @$category->id, $Itemid));
 
@@ -42,12 +51,23 @@ $return = base64_encode(JUri::getInstance()->toString());
 			}
 
 			$waitingList = false ;
+
+			if ($item->activate_waiting_list == 2)
+			{
+				$activateWaitingList = $config->activate_waitinglist_feature;
+			}
+			else
+			{
+				$activateWaitingList = $item->activate_waiting_list;
+			}
+
 			if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants) && $activateWaitingList && !@$event->user_registered && $registrationOpen)
 			{
 				$waitingList = true ;
 			}
 
 			$isMultipleDate = false;
+
 			if ($config->show_children_events_under_parent_event && $event->event_type == 1)
 			{
 				$isMultipleDate = true;
@@ -195,7 +215,14 @@ $return = base64_encode(JUri::getInstance()->toString());
 							{
 								$price = $event->individual_price;
 							}
-							if ($price > 0)
+
+							if ($event->price_text)
+							{
+							?>
+								<span class="eb-individual-price"><?php echo $event->price_text; ?></span>
+							<?php
+							}
+							elseif ($price > 0)
 							{
 								$symbol        = $event->currency_symbol ? $event->currency_symbol : $config->currency_symbol;
 							?>

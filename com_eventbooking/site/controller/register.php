@@ -180,7 +180,16 @@ class EventbookingControllerRegister extends EventbookingController
 		}
 
 		// Validate number slots left
-		if ($event->event_capacity && !$config->activate_waitinglist_feature)
+		if ($event->activate_waiting_list == 2)
+		{
+			$waitingListEnabled = $config->activate_waitinglist_feature;
+		}
+		else
+		{
+			$waitingListEnabled = $event->activate_waiting_list;
+		}
+
+		if ($event->event_capacity && !$waitingListEnabled)
 		{
 			$numberRegistrantsAvailable = $event->event_capacity - $event->total_registrants;
 
@@ -368,7 +377,16 @@ class EventbookingControllerRegister extends EventbookingController
 		}
 
 		// Validate number slots left
-		if ($event->event_capacity && !$config->activate_waitinglist_feature)
+		if ($event->activate_waiting_list == 2)
+		{
+			$waitingListEnabled = $config->activate_waitinglist_feature;
+		}
+		else
+		{
+			$waitingListEnabled = $event->activate_waiting_list;
+		}
+
+		if ($event->event_capacity && !$waitingListEnabled)
 		{
 			$numberRegistrantsAvailable = $event->event_capacity - $event->total_registrants;
 

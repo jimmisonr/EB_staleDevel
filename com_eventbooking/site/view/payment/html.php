@@ -159,7 +159,7 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 	/**
 	 * Display payment complete page
 	 */
-	private function displayPaymentComplete()
+	protected function displayPaymentComplete()
 	{
 		$config      = EventbookingHelper::getConfig();
 		$message     = EventbookingHelper::getMessages();
@@ -211,7 +211,7 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 	 *
 	 * @throws Exception
 	 */
-	private function loadCaptcha($initOnly = false)
+	protected function loadCaptcha($initOnly = false)
 	{
 		$config      = EventbookingHelper::getConfig();
 		$user        = JFactory::getUser();

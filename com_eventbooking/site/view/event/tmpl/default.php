@@ -356,7 +356,11 @@ $offset = JFactory::getConfig()->get('offset');
 									</td>
 									<td class="eb_price">
 										<?php
-										if ($item->individual_price > 0)
+										if ($item->price_text)
+										{
+											echo $item->price_text;
+										}
+										elseif ($item->individual_price > 0)
 										{
 											echo EventbookingHelper::formatCurrency($item->individual_price, $this->config, $item->currency_symbol) ;
 										}
@@ -519,7 +523,15 @@ $offset = JFactory::getConfig()->get('offset');
 						</tbody>
 					</table>
 					<?php
-					$activateWaitingList = $this->config->activate_waitinglist_feature ;
+					if ($item->activate_waiting_list == 2)
+					{
+						$activateWaitingList = $this->config->activate_waitinglist_feature;
+					}
+					else
+					{
+						$activateWaitingList = $item->activate_waiting_list;
+					}
+
 					if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !@$item->user_registered && $registrationOpen)
 					{
 						$waitingList = true ;
