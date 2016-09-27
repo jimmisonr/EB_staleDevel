@@ -1085,9 +1085,13 @@ class EventbookingController extends RADControllerAdmin
 			}
 		}
 
-		if (!in_array('price_text', $fields))
+		if (!in_array('activate_waiting_list', $fields))
 		{
-			$sql = "ALTER TABLE  `#__eb_events` ADD  `price_text` VARCHAR( 255 ) NULL;";
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `activate_waiting_list` TINYINT NOT NULL DEFAULT  '2' ;";
+			$db->setQuery($sql);
+			$db->execute();
+
+			$sql = 'UPDATE #__eb_events SET activate_waiting_list = 2';
 			$db->setQuery($sql);
 			$db->execute();
 		}

@@ -8,7 +8,7 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
-$activateWaitingList = $config->activate_waitinglist_feature;
+
 $hiddenPhoneClass    = $bootstrapHelper->getClassMapping('hidden-phone');
 $btnClass            = $bootstrapHelper->getClassMapping('btn');
 ?>
@@ -90,7 +90,17 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 	<?php
 		for ($i = 0 , $n = count($items) ; $i < $n; $i++)
 		{
-			$item = $items[$i] ;
+			$item = $items[$i];
+
+			if ($item->activate_waiting_list == 2)
+			{
+				$activateWaitingList = $config->activate_waitinglist_feature;
+			}
+			else
+			{
+				$activateWaitingList = $item->activate_waiting_list;
+			}
+
 			$canRegister = EventbookingHelper::acceptRegistration($item);
 
 			if ($item->cut_off_date != $nullDate)
@@ -103,6 +113,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 			}
 
 			$waitingList = false ;
+
 			if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !$item->user_registered && $registrationOpen)
 			{
 				$waitingList = true ;

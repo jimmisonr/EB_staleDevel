@@ -12,10 +12,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 ?>
 <div id="eb-events">
 	<?php
-		$activateWaitingList = $config->activate_waitinglist_feature;
-
 		/* @var EventbookingHelperBootstrap $bootstrapHelper */
-
 		$rowFluidClass       = $bootstrapHelper->getClassMapping('row-fluid');
 		$span7Class          = $bootstrapHelper->getClassMapping('span7');
 		$span5Class          = $bootstrapHelper->getClassMapping('span5');
@@ -28,6 +25,16 @@ $return = base64_encode(JUri::getInstance()->toString());
 		for ($i = 0 , $n = count($events) ;  $i < $n ; $i++)
 		{
 			$event = $events[$i] ;
+
+			if ($event->activate_waiting_list == 2)
+			{
+				$activateWaitingList = $config->activate_waitinglist_feature;
+			}
+			else
+			{
+				$activateWaitingList = $event->activate_waiting_list;
+			}
+
 			$canRegister = EventbookingHelper::acceptRegistration($event);
 
 			if ($event->cut_off_date != $nullDate)

@@ -50,7 +50,15 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 
 		if (!EventbookingHelper::acceptRegistration($event))
 		{
-			$waitingList = EventbookingHelper::getConfigValue('activate_waitinglist_feature');
+			if ($event->activate_waiting_list == 2)
+			{
+				$waitingList = $config->activate_waitinglist_feature;
+			}
+			else
+			{
+				$waitingList = $event->activate_waiting_list;
+			}
+
 			if (!$waitingList || !$event->number_event_dates)
 			{
 				JFactory::getApplication()->redirect('index.php', JText::_('EB_ERROR_REGISTRATION'));

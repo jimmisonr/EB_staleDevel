@@ -322,6 +322,14 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 							<?php echo $this->lists['enable_coupon']; ?>
 						</div>
 					</div>
+					<div class="control-group">
+						<label class="control-label">
+							<?php echo JText::_('EB_ENABLE_WAITING_LIST'); ?>
+						</label>
+						<div class="controls">
+							<?php echo $this->lists['activate_waiting_list']; ?>
+						</div>
+					</div>
 					<?php
 					if ($this->config->activate_deposit_feature)
 					{

@@ -120,6 +120,12 @@ class EventbookingViewEventHtml extends RADViewItem
 		$options[]                    = JHtml::_('select.option', 3, JText::_('EB_INDIVIDUAL_GROUP'));
 		$this->lists['enable_coupon'] = JHtml::_('select.genericlist', $options, 'enable_coupon', ' class="inputbox" ', 'value', 'text', $item->enable_coupon);
 
+		$options                      = array();
+		$options[]                    = JHtml::_('select.option', 0, JText::_('No'));
+		$options[]                    = JHtml::_('select.option', 1, JText::_('Yes'));
+		$options[]                    = JHtml::_('select.option', 2, JText::_('EB_USE_GLOBAL_CONFIGURATION'));
+		$this->lists['activate_waiting_list'] = JHtml::_('select.genericlist', $options, 'activate_waiting_list', ' class="inputbox" ', 'value', 'text', $item->activate_waiting_list);
+
 		$this->lists['access']                     = JHtml::_('access.level', 'access', $item->access, 'class="inputbox"', false);
 		$this->lists['registration_access']        = JHtml::_('access.level', 'registration_access', $item->registration_access, 'class="inputbox"', false);
 		if ($item->event_date != $db->getNullDate())

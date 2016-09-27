@@ -25,10 +25,19 @@ $return = base64_encode(JUri::getInstance()->toString());
 ?>
 <div id="eb-events" class="eb-events-timeline">
 	<?php
-		$activateWaitingList = $config->activate_waitinglist_feature ;
 		for ($i = 0 , $n = count($events) ;  $i < $n ; $i++)
 		{
-			$event = $events[$i] ;
+			$event = $events[$i];
+
+			if ($event->activate_waiting_list == 2)
+			{
+				$activateWaitingList = $config->activate_waitinglist_feature;
+			}
+			else
+			{
+				$activateWaitingList = $event->activate_waiting_list;
+			}
+
 			$canRegister = EventbookingHelper::acceptRegistration($event);
 			$detailUrl = JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, @$category->id, $Itemid));
 
@@ -42,6 +51,16 @@ $return = base64_encode(JUri::getInstance()->toString());
 			}
 
 			$waitingList = false ;
+
+			if ($item->activate_waiting_list == 2)
+			{
+				$activateWaitingList = $config->activate_waitinglist_feature;
+			}
+			else
+			{
+				$activateWaitingList = $item->activate_waiting_list;
+			}
+
 			if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants) && $activateWaitingList && !@$event->user_registered && $registrationOpen)
 			{
 				$waitingList = true ;
