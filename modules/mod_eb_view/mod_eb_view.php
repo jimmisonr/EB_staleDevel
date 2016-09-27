@@ -16,7 +16,7 @@ if (file_exists(JPATH_ROOT . '/components/com_eventbooking/eventbooking.php'))
 	$view = $params->get('view', 'categories');
 	$queryString = $params->get('query_string', '');
 	EventbookingHelper::loadLanguage();
-	$request = array('option' => 'com_eventbooking', 'view' => $view);
+	$request = array('option' => 'com_eventbooking', 'view' => $view, 'hmvc_call' => 1);
 	if ($queryString)
 	{
 		parse_str($queryString, $vars);
