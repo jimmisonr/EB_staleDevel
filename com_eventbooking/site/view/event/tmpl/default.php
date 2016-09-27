@@ -356,7 +356,11 @@ $offset = JFactory::getConfig()->get('offset');
 									</td>
 									<td class="eb_price">
 										<?php
-										if ($item->individual_price > 0)
+										if ($item->price_text)
+										{
+											echo $item->price_text;
+										}
+										elseif ($item->individual_price > 0)
 										{
 											echo EventbookingHelper::formatCurrency($item->individual_price, $this->config, $item->currency_symbol) ;
 										}

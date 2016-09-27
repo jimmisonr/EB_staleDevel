@@ -114,6 +114,14 @@ JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text
 					</div>
 					<div class="control-group">
 						<label class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('price_text', JText::_('EB_PRICE_TEXT'), JText::_('EB_PRICE_TEXT_EXPLAIN')); ?>
+						</label>
+						<div class="controls">
+							<input type="text" name="price_text" id="price_text" class="input-xlarge" value="<?php echo $this->item->price_text; ?>" />
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label">
 							<?php echo JText::_('EB_TAX_RATE'); ?>
 						</label>
 						<div class="controls">

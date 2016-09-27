@@ -1085,6 +1085,13 @@ class EventbookingController extends RADControllerAdmin
 			}
 		}
 
+		if (!in_array('price_text', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `price_text` VARCHAR( 255 ) NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		//The Categories table
 		$fields = array_keys($db->getTableColumns('#__eb_categories'));
 		if (!in_array('access', $fields))

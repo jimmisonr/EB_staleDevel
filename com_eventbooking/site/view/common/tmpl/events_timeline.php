@@ -48,6 +48,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 			}
 
 			$isMultipleDate = false;
+
 			if ($config->show_children_events_under_parent_event && $event->event_type == 1)
 			{
 				$isMultipleDate = true;
@@ -195,7 +196,14 @@ $return = base64_encode(JUri::getInstance()->toString());
 							{
 								$price = $event->individual_price;
 							}
-							if ($price > 0)
+
+							if ($event->price_text)
+							{
+							?>
+								<span class="eb-individual-price"><?php echo $event->price_text; ?></span>
+							<?php
+							}
+							elseif ($price > 0)
 							{
 								$symbol        = $event->currency_symbol ? $event->currency_symbol : $config->currency_symbol;
 							?>

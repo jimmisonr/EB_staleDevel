@@ -13,6 +13,9 @@ $return = base64_encode(JUri::getInstance()->toString());
 <div id="eb-events">
 	<?php
 		$activateWaitingList = $config->activate_waitinglist_feature;
+
+		/* @var EventbookingHelperBootstrap $bootstrapHelper */
+
 		$rowFluidClass       = $bootstrapHelper->getClassMapping('row-fluid');
 		$span7Class          = $bootstrapHelper->getClassMapping('span7');
 		$span5Class          = $bootstrapHelper->getClassMapping('span5');
@@ -21,6 +24,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 		$iconOkClass    = $bootstrapHelper->getClassMapping('icon-ok');
 		$iconRemoveClass  = $bootstrapHelper->getClassMapping('icon-remove');
 		$iconDownloadClass     = $bootstrapHelper->getClassMapping('icon-download');
+
 		for ($i = 0 , $n = count($events) ;  $i < $n ; $i++)
 		{
 			$event = $events[$i] ;
@@ -44,6 +48,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 			}
 
 			$isMultipleDate = false;
+
 			if ($config->show_children_events_under_parent_event && $event->event_type == 1)
 			{
 				$isMultipleDate = true;
@@ -100,7 +105,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 											}
 											else
 											{
-												?>
+											?>
 												<meta itemprop="startDate" content="<?php echo JFactory::getDate($event->event_date)->format("Y-m-d\TH:i"); ?>">
 												<?php
 												if (strpos($event->event_date, '00:00:00') !== false)
@@ -240,7 +245,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 									}
 								}
 
-								if (($event->individual_price > 0) || ($config->show_price_for_free_event))
+								if (($event->individual_price > 0) || $event->price_text !== '' || ($config->show_price_for_free_event))
 								{
 									$showPrice = true ;
 								}
@@ -305,7 +310,11 @@ $return = base64_encode(JUri::getInstance()->toString());
 											</td>
 											<td class="eb-event-property-value">
 												<?php
-												if ($event->individual_price > 0)
+												if ($event->price_text)
+												{
+													echo $event->price_text;
+												}
+												elseif ($event->individual_price > 0)
 												{
 													echo EventbookingHelper::formatCurrency($event->individual_price, $config, $event->currency_symbol);
 												}
@@ -319,9 +328,10 @@ $return = base64_encode(JUri::getInstance()->toString());
 										<?php
 									}
 								}
+
 								if ($event->fixed_group_price > 0)
 								{
-									?>
+								?>
 									<tr>
 										<td>
 											<strong><?php echo JText::_('EB_FIXED_GROUP_PRICE'); ?></strong>
@@ -332,13 +342,12 @@ $return = base64_encode(JUri::getInstance()->toString());
 											?>
 										</td>
 									</tr>
-									<?php
+								<?php
 								}
-
 
 								if ($event->late_fee > 0)
 								{
-									?>
+								?>
 									<tr class="eb-event-property">
 										<td class="eb-event-property-label">
 											<?php echo JText::_('EB_LATE_FEE'); ?>
@@ -350,12 +359,12 @@ $return = base64_encode(JUri::getInstance()->toString());
 											?>
 										</td>
 									</tr>
-									<?php
+								<?php
 								}
 
 								if ($config->show_event_creator)
 								{
-									?>
+								?>
 									<tr class="eb-event-property">
 										<td class="eb-event-property-label">
 											<?php echo JText::_('EB_CREATED_BY'); ?>
@@ -364,7 +373,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 											<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=search&created_by=' . $event->created_by . '&Itemid=' . $Itemid); ?>"><?php echo $event->creator_name; ?></a>
 										</td>
 									</tr>
-									<?php
+								<?php
 								}
 
 								if (isset($event->paramData))

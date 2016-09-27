@@ -28,6 +28,7 @@ class EventbookingModelList extends RADModelList
 		'tbl.access',
 		'tbl.registration_access',
 		'tbl.individual_price',
+		'tbl.price_text',
 		'tbl.event_capacity',
 		'tbl.created_by',
 		'tbl.cut_off_date',

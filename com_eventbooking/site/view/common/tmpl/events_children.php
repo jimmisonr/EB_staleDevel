@@ -27,6 +27,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 				</th>
 			<?php
 			}
+
 			if ($config->show_location_in_category_view)
 			{
 			?>
@@ -35,11 +36,16 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 				</th>
 			<?php
 			}
+
+			if ($config->show_price_in_table_layout)
+			{
 			?>
 				<th class="table_price_col <?php echo $hiddenPhoneClass; ?>">
 					<?php echo JText::_('EB_INDIVIDUAL_PRICE'); ?>
 				</th>
 			<?php
+			}
+
 			if ($config->show_capacity)
 			{
 			?>
@@ -48,6 +54,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 				</th>
 			<?php
 			}
+
 			if ($config->show_registered)
 			{
 			?>
@@ -56,6 +63,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 				</th>
 			<?php
 			}
+
 			if ($config->show_available_place)
 			{
 			?>
@@ -172,19 +180,28 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 					</td>
 					<?php
 					}
-					if ($config->show_discounted_price)
+
+					if ($config->show_price_in_table_layout)
 					{
-						$price = $item->discounted_price ;
+						if ($item->price_text)
+						{
+							$price = $item->price_text;
+						}
+						elseif ($config->show_discounted_price)
+						{
+							$price = $item->discounted_price ;
+						}
+						else
+						{
+							$price = $item->individual_price ;
+						}
+						?>
+							<td class="<?php echo $hiddenPhoneClass; ?>">
+								<?php echo EventbookingHelper::formatCurrency($price, $config, $item->currency_symbol); ?>
+							</td>
+						<?php
 					}
-					else
-					{
-						$price = $item->individual_price ;
-					}
-					?>
-						<td class="<?php echo $hiddenPhoneClass; ?>">
-							<?php echo EventbookingHelper::formatCurrency($price, $config, $item->currency_symbol); ?>
-						</td>
-					<?php
+
 					if ($config->show_capacity)
 					{
 					?>

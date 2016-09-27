@@ -109,6 +109,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 			}
 
 			$isMultipleDate = false;
+
 			if ($config->show_children_events_under_parent_event && $item->event_type == 1)
 			{
 				$isMultipleDate = true;
@@ -228,7 +229,11 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 					}
 					if ($config->show_price_in_table_layout)
 					{
-						if ($config->show_discounted_price)
+						if ($item->price_text)
+						{
+							$price = $item->price_text;
+						}
+						elseif ($config->show_discounted_price)
 						{
 							$price = $item->discounted_price ;
 						}
