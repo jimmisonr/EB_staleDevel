@@ -82,7 +82,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		if ($thumbImage['name'])
 		{
 			$fileExt        = JString::strtoupper(JFile::getExt($thumbImage['name']));
-			$supportedTypes = array('JPG', 'PNG', 'GIF');
+			$supportedTypes = array('JPG', 'PNG', 'GIF', 'JPEG');
 			if (in_array($fileExt, $supportedTypes))
 			{
 				if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . JString::strtolower($thumbImage['name'])))

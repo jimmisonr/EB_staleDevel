@@ -252,7 +252,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 									}
 								}
 
-								if (($event->individual_price > 0) || $event->price_text !== '' || ($config->show_price_for_free_event))
+								if ($event->individual_price > 0 || $event->price_text || $config->show_price_for_free_event)
 								{
 									$showPrice = true ;
 								}
