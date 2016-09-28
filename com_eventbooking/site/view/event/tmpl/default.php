@@ -119,14 +119,6 @@ $offset = JFactory::getConfig()->get('offset');
 			<?php
 			if (!empty($this->items))
 			{
-				if ($this->config->use_https)
-				{
-					$ssl = 1 ;
-				}
-				else
-				{
-					$ssl = 0 ;
-				}
 				echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/events_children.php', array('items' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate, 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'categoryId' => $this->item->category_id, 'bootstrapHelper' => $this->bootstrapHelper));
 			}
 			else
