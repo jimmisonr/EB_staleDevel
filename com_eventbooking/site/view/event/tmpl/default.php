@@ -6,6 +6,7 @@
  * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
+
 // no direct access
 defined('_JEXEC') or die;
 
@@ -51,53 +52,13 @@ $offset = JFactory::getConfig()->get('offset');
 	</div>
 	<div id="eb-event-details" class="eb-description">
 		<?php
+			// Facebook, twitter, Gplus share buttons
 			if ($this->config->show_fb_like_button)
 			{
-				$document = JFactory::getDocument();
-				$document->addCustomTag('<meta property="og:title" content="'.$item->title.'"/>');
-				if ($item->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$item->thumb))
-				{
-					$document->addCustomTag('<meta property="og:image" content="'.JUri::base().'media/com_eventbooking/images/thumbs/'.$item->thumb.'"/>');
-				}
-				$document->addCustomTag('<meta property="og:url" content="'.JUri::getInstance()->toString().'"/>');
-				$document->addCustomTag('<meta property="og:description" content="'.$item->title.'"/>');
-				$document->addCustomTag('<meta property="og:site_name" content="'.JFactory::getConfig()->get('sitename').'"/>');
-			?>
-				<div class="sharing clearfix" >
-					<!-- FB -->
-					<div style="float:left;" id="rsep_fb_like">
-						<div id="fb-root"></div>
-						<script src="https://connect.facebook.net/en_US/all.js" type="text/javascript"></script>
-						<script type="text/javascript">
-							FB.init({appId: '340486642645761', status: true, cookie: true, xfbml: true});
-						</script>
-						<fb:like href="<?php echo $socialUrl; ?>" send="true" layout="button_count" width="150" show_faces="false"></fb:like>
-					</div>
-
-					<!-- Twitter -->
-					<div style="float:left;" id="rsep_twitter">
-						<a href="https://twitter.com/share" class="twitter-share-button" data-text="<?php echo $this->item->title." ".$socialUrl; ?>">Tweet</a>
-						<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-					</div>
-
-					<!-- GPlus -->
-					<div style="float:left;" id="rsep_gplus">
-						<!-- Place this tag where you want the +1 button to render -->
-						<g:plusone size="medium"></g:plusone>
-
-						<!-- Place this render call where appropriate -->
-						<script type="text/javascript">
-							(function() {
-								var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-								po.src = 'https://apis.google.com/js/plusone.js';
-								var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-							})();
-						</script>
-					</div>
-				</div>
-			<?php
+				echo $this->loadTemplate('share');
 			}
 		?>
+
 		<div class="eb-description-details clearfix" itemprop="description">
 			<?php
 				if ($this->config->get('show_image_in_event_detail', 1) && $this->config->display_large_image && $item->image && file_exists(JPATH_ROOT . '/' . $item->image))
@@ -112,9 +73,11 @@ $offset = JFactory::getConfig()->get('offset');
 					<a href="<?php echo JUri::base(true).'/media/com_eventbooking/images/'.$item->thumb; ?>" class="eb-modal"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$item->thumb; ?>" class="eb-thumb-left"/></a>
 				<?php
 				}
-				echo $item->description ;
+
+				echo $item->description;
 			?>
 		</div>
+
 		<div id="eb-event-info" class="clearfix <?php echo $bootstrapHelper->getClassMapping('row-fluid'); ?>">
 			<?php
 			if (!empty($this->items))
@@ -147,7 +110,7 @@ $offset = JFactory::getConfig()->get('offset');
 								}
 								else
 								{
-									?>
+								?>
 									<meta itemprop="startDate" content="<?php echo JFactory::getDate($item->event_date)->format("Y-m-d\TH:i"); ?>">
 									<?php
 									if (strpos($item->event_date, '00:00:00') !== false)
@@ -158,12 +121,14 @@ $offset = JFactory::getConfig()->get('offset');
 									{
 										$dateFormat = $this->config->event_date_format;
 									}
+
 									echo JHtml::_('date', $item->event_date, $dateFormat, null) ;
 								}
 								?>
 							</td>
 						</tr>
 						<?php
+
 						if ($item->event_end_date != $this->nullDate)
 						{
 							if (strpos($item->event_end_date, '00:00:00') !== false)
