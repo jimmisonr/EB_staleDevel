@@ -157,7 +157,9 @@ $offset = JFactory::getConfig()->get('offset');
 		<div class="clearfix"></div>
 	<?php
 	}
+
 	$ticketsLeft = $item->event_capacity - $item->total_registrants ;
+
 	if ($item->individual_price > 0 || $ticketsLeft > 0)
 	{
 	?>
@@ -181,170 +183,26 @@ $offset = JFactory::getConfig()->get('offset');
 		</div>
 	<?php
 	}
+
 	if ($this->showTaskBar)
 	{
-	?>
-		<div class="eb-taskbar clearfix">
-			<ul>
-				<?php
-					if (empty($this->items))
-					{
-						if ($canRegister)
-						{
-							$registrationUrl = trim($item->registration_handle_url);
-							if ($registrationUrl)
-							{
-							?>
-								<li>
-									<a class="<?php echo $btnClass; ?>" href="<?php echo $registrationUrl; ?>" target="_blank"><?php echo JText::_('EB_REGISTER');; ?></a>
-								</li>
-							<?php
-							}
-							else
-							{
-								if ($item->registration_type == 0 || $item->registration_type == 1)
-								{
-									if ($this->config->multiple_booking && !$item->has_multiple_ticket_types)
-									{
-										$url        = 'index.php?option=com_eventbooking&task=cart.add_cart&id=' . (int) $item->id . '&Itemid=' . (int) $this->Itemid;
-										if ($item->event_password)
-										{
-											$extraClass = '';
-										}
-										else
-										{
-											$extraClass = 'eb-colorbox-addcart';
-										}
-										$text       = JText::_('EB_REGISTER');
-									}
-									else
-									{
-										$url        = JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id=' . $item->id . '&Itemid=' . $this->Itemid, false, $ssl);
-										if ($item->has_multiple_ticket_types)
-										{
-											$text       = JText::_('EB_REGISTER');
-										}
-										else
-										{
-											$text       = JText::_('EB_REGISTER_INDIVIDUAL');
-										}
+		$layoutData = array(
+			'item'                => $this->item,
+			'config'              => $this->config,
+			'showRegisterButtons' => empty($this->items),
+			'canRegister'         => $canRegister,
+			'Itemid'              => $this->Itemid,
+			'ssl'                 => $ssl,
+			'btnClass'            => $btnClass,
+			'iconOkClass'         => $iconOkClass,
+			'iconRemoveClass'     => $iconRemoveClass,
+			'iconDownloadClass'   => $iconDownloadClass,
+			'registrationOpen'    => $registrationOpen,
+			'return'              => $return,
+			'iconPencilClass'     => $iconPencilClass,
+		);
 
-										$extraClass = '';
-									}
-									?>
-									<li>
-										<a class="<?php echo $btnClass.' '.$extraClass;?>"
-										   href="<?php echo $url; ?>"><?php echo $text; ?></a>
-									</li>
-									<?php
-								}
-
-								if (($item->registration_type == 0 || $item->registration_type == 2) && !$this->config->multiple_booking && !$item->has_multiple_ticket_types)
-								{
-								?>
-									<li>
-										<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
-									</li>
-								<?php
-								}
-							}
-						}
-						elseif ($waitingList)
-						{
-							if ($item->registration_type == 0 || $item->registration_type == 1)
-							{
-								?>
-								<li>
-									<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
-								</li>
-								<?php
-							}
-							if (($item->registration_type == 0 || $item->registration_type == 2) && !$this->config->multiple_booking)
-							{
-								?>
-								<li>
-									<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id='.$item->id.'&Itemid='.$this->Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
-								</li>
-								<?php
-							}
-						}
-					}
-					if ($this->config->show_save_to_personal_calendar)
-					{
-					?>
-						<li>
-							<?php echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/save_calendar.php', array('item' => $item, 'Itemid' => $this->Itemid)); ?>
-						</li>
-					<?php
-					}
-					if ($this->config->show_invite_friend && $registrationOpen)
-					{
-					?>
-						<li>
-							<a class="<?php echo $btnClass; ?> eb-colorbox-invite" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=invite&tmpl=component&id='.$item->id.'&Itemid='.$this->Itemid, false) ; ?>"><?php echo JText::_('EB_INVITE_FRIEND'); ?></a>
-						</li>
-					<?php
-					}
-
-					$registrantId = EventbookingHelper::canCancelRegistration($item->id) ;
-					if ($registrantId !== false)
-					{
-					?>
-						<li>
-							<a class="<?php echo $btnClass; ?>" href="javascript:cancelRegistration(<?php echo $registrantId; ?>)"><?php echo JText::_('EB_CANCEL_REGISTRATION'); ?></a>
-						</li>
-					<?php
-					}
-
-					if (EventbookingHelper::checkEditEvent($item->id))
-					{
-					?>
-						<li>
-							<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id='.$item->id.'&Itemid='.$this->Itemid.'&return='.$return); ?>">
-								<i class="<?php echo $iconPencilClass; ?>"></i>
-								<?php echo JText::_('EB_EDIT'); ?>
-							</a>
-						</li>
-					<?php
-					}
-					if (EventbookingHelper::canChangeEventStatus($item->id))
-					{
-						if ($item->published == 1)
-						{
-							$link = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id='.$item->id.'&Itemid='.$this->Itemid.'&return='.$return);
-							$text = JText::_('EB_UNPUBLISH');
-							$class = $iconRemoveClass;
-						}
-						else
-						{
-							$link = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id='.$item->id.'&Itemid='.$this->Itemid.'&return='.$return);
-							$text = JText::_('EB_PUBLISH');
-							$class = $iconOkClass;
-						}
-					?>
-						<li>
-							<a class="<?php echo $btnClass; ?>" href="<?php echo $link; ?>">
-								<i class="<?php echo $class; ?>"></i>
-								<?php echo $text; ?>
-							</a>
-						</li>
-					<?php
-					}
-					if ($item->total_registrants && EventbookingHelper::canExportRegistrants($item->id))
-					{
-					?>
-					   <li>
-							<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.export&event_id='.$item->id.'&Itemid='.$this->Itemid); ?>">
-								 <i class="<?php echo $iconDownloadClass; ?>"></i>
-								<?php echo JText::_('EB_EXPORT_REGISTRANTS'); ?>
-							</a>
-					   </li>
-					<?php
-					}
-					?>
-			</ul>
-		</div>
-	<?php
+		echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/buttons.php', $layoutData);
 	}
 
 	if (count($this->plugins))
