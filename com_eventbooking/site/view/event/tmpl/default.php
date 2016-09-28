@@ -186,23 +186,31 @@ $offset = JFactory::getConfig()->get('offset');
 
 	if ($this->showTaskBar)
 	{
-		$layoutData = array(
-			'item'                => $this->item,
-			'config'              => $this->config,
-			'showRegisterButtons' => empty($this->items),
-			'canRegister'         => $canRegister,
-			'Itemid'              => $this->Itemid,
-			'ssl'                 => $ssl,
-			'btnClass'            => $btnClass,
-			'iconOkClass'         => $iconOkClass,
-			'iconRemoveClass'     => $iconRemoveClass,
-			'iconDownloadClass'   => $iconDownloadClass,
-			'registrationOpen'    => $registrationOpen,
-			'return'              => $return,
-			'iconPencilClass'     => $iconPencilClass,
-		);
+	?>
+		<div class="eb-taskbar clearfix">
+			<ul>
+				<?php
+					$layoutData = array(
+						'item'                => $this->item,
+						'config'              => $this->config,
+						'showRegisterButtons' => empty($this->items),
+						'canRegister'         => $canRegister,
+						'Itemid'              => $this->Itemid,
+						'ssl'                 => $ssl,
+						'btnClass'            => $btnClass,
+						'iconOkClass'         => $iconOkClass,
+						'iconRemoveClass'     => $iconRemoveClass,
+						'iconDownloadClass'   => $iconDownloadClass,
+						'registrationOpen'    => $registrationOpen,
+						'return'              => $return,
+						'iconPencilClass'     => $iconPencilClass,
+					);
 
-		echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/buttons.php', $layoutData);
+					echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/buttons.php', $layoutData);
+				?>
+			</ul>
+		</div>
+	<?php
 	}
 
 	if (count($this->plugins))
