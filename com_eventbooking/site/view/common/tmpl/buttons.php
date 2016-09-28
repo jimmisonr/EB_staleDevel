@@ -113,11 +113,11 @@ defined('_JEXEC') or die;
 
 		if ($config->show_invite_friend && $registrationOpen)
 		{
-			?>
+		?>
 			<li>
 				<a class="<?php echo $btnClass; ?> eb-colorbox-invite" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=invite&tmpl=component&id=' . $item->id . '&Itemid=' . $Itemid, false); ?>"><?php echo JText::_('EB_INVITE_FRIEND'); ?></a>
 			</li>
-			<?php
+		<?php
 		}
 
 		$registrantId = EventbookingHelper::canCancelRegistration($item->id);
