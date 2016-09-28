@@ -107,7 +107,7 @@ if ($config->show_save_to_personal_calendar)
 <?php
 }
 
-if ($config->show_invite_friend && $registrationOpen)
+if ($showInviteFriend && $config->show_invite_friend && $registrationOpen)
 {
 ?>
 	<li>

@@ -204,6 +204,7 @@ $offset = JFactory::getConfig()->get('offset');
 						'registrationOpen'    => $registrationOpen,
 						'return'              => $return,
 						'iconPencilClass'     => $iconPencilClass,
+						'showInviteFriend'    => true,
 					);
 
 					echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/buttons.php', $layoutData);
