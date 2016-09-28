@@ -258,6 +258,61 @@ class RADViewHtml extends RADView
 	}
 
 	/**
+	 * Load common template for the view
+	 *
+	 * @param string $layout
+	 *
+	 * @throws RuntimeException
+	 *
+	 * @return string The output of common layout
+	 */
+	public function loadCommonLayout($layout, $data = array())
+	{
+		$app       = JFactory::getApplication();
+		$template  = $app->getTemplate();
+		$themeFile = str_replace('/tmpl', '', $layout);
+
+		$deviceType = EventbookingHelper::getDeviceType();
+
+		$paths = array($layout);
+
+		if ($deviceType != 'desktop')
+		{
+			$paths[] = JPATH_THEMES . '/' . $template . '/html/com_eventbooking/' . str_replace('.php', '.' . $deviceType . '.php', $themeFile);
+			$paths[] = JPATH_ROOT . '/components/com_eventbooking/view/' . str_replace('.php', '.' . $deviceType . '.php', $layout);
+		}
+
+		$paths[] = JPATH_THEMES . '/' . $template . '/html/com_eventbooking/' . $themeFile;
+		$paths[] = JPATH_ROOT . '/components/com_eventbooking/view/' . $layout;
+
+		$path = '';
+
+		foreach ($paths as $possiblePath)
+		{
+			if (JFile::exists($possiblePath))
+			{
+				$path = $possiblePath;
+				break;
+			}
+		}
+
+		if (empty($path))
+		{
+			throw new RuntimeException(JText::sprintf('The given common layout %s does not exist', $layout));
+		}
+
+		// Start an output buffer.
+		ob_start();
+		extract($data);
+
+		// Load the layout.
+		include $path;
+
+		// Get the layout contents.
+		return ob_get_clean();
+	}
+
+	/**
 	 * Method to set the view layout.
 	 *
 	 * @param string $layout The layout name.
