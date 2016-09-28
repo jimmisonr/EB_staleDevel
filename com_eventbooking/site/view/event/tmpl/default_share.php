@@ -12,15 +12,15 @@ defined('_JEXEC') or die;
 
 /* @var JDocumentHtml $document */
 $document = JFactory::getDocument();
-$document->addCustomTag('<meta property="og:title" content="' . $item->title . '"/>');
+$document->addCustomTag('<meta property="og:title" content="' . $this->item->title . '"/>');
 
-if ($item->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $item->thumb))
+if ($this->item->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $this->item->thumb))
 {
-	$document->addCustomTag('<meta property="og:image" content="' . JUri::base() . 'media/com_eventbooking/images/thumbs/' . $item->thumb . '"/>');
+	$document->addCustomTag('<meta property="og:image" content="' . JUri::base() . 'media/com_eventbooking/images/thumbs/' . $this->item->thumb . '"/>');
 }
 
 $document->addCustomTag('<meta property="og:url" content="' . JUri::getInstance()->toString() . '"/>');
-$document->addCustomTag('<meta property="og:description" content="' . $item->title . '"/>');
+$document->addCustomTag('<meta property="og:description" content="' . $this->item->title . '"/>');
 $document->addCustomTag('<meta property="og:site_name" content="' . JFactory::getConfig()->get('sitename') . '"/>');
 ?>
 <div class="sharing clearfix">
