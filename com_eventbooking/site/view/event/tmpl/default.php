@@ -16,6 +16,7 @@ $item = $this->item ;
 $url = JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, 0, $this->Itemid), false);
 $canRegister = EventbookingHelper::acceptRegistration($item) ;
 $socialUrl = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')).JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, 0, $this->Itemid));
+
 if ($this->config->use_https)
 {
 	$ssl = 1 ;
@@ -25,6 +26,7 @@ else
 	$ssl = 0 ;
 }
 
+/* @var EventbookingHelperBootstrap $bootstrapHelper*/
 $bootstrapHelper   = $this->bootstrapHelper;
 $iconPencilClass   = $bootstrapHelper->getClassMapping('icon-pencil');
 $iconOkClass       = $bootstrapHelper->getClassMapping('icon-ok');
@@ -517,55 +519,11 @@ $offset = JFactory::getConfig()->get('offset');
 					}
 					?>
 				</div>
+
 				<?php
 				if (count($this->rowGroupRates))
 				{
-				?>
-				<div id="eb-event-info-right" class="<?php echo $bootstrapHelper->getClassMapping('span4'); ?>">
-					<h3 id="eb-event-group-rates-heading">
-						<?php echo JText::_('EB_GROUP_RATE'); ?>
-					</h3>
-					<table class="table table-bordered table-striped">
-						<thead>
-						<tr>
-							<th class="eb_number_registrant_column">
-								<?php echo JText::_('EB_NUMBER_REGISTRANTS'); ?>
-							</th>
-							<th class="sectiontableheader eb_rate_column">
-								<?php echo JText::_('EB_RATE_PERSON'); ?>(<?php echo $this->item->currency_symbol ? $this->item->currency_symbol : $this->config->currency_symbol; ?>)
-							</th>
-						</tr>
-						</thead>
-						<tbody>
-						<?php
-						$i = 0 ;
-						if ($this->config->show_price_including_tax)
-						{
-							$taxRate = $this->item->tax_rate;
-						}
-						else
-						{
-							$taxRate = 0;
-						}
-						foreach ($this->rowGroupRates as $rowRate)
-						{
-							$groupRate = round($rowRate->price * (1 + $taxRate / 100), 2);
-						?>
-							<tr>
-								<td class="eb_number_registrant_column">
-									<?php echo $rowRate->registrant_number ; ?>
-								</td>
-								<td class="eb_rate_column">
-									<?php echo EventbookingHelper::formatAmount($groupRate, $this->config); ?>
-								</td>
-							</tr>
-						<?php
-						}
-						?>
-						</tbody>
-					</table>
-				</div>
-				<?php
+					echo $this->loadTemplate('group_rates');
 				}
 			}
 			?>
