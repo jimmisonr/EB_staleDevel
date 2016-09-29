@@ -403,6 +403,7 @@ defined('_JEXEC') or die;
 			<?php
 			$attachments = explode('|', $item->attachment);
 
+			$baseUri =  JUri::base();
 			for ($i = 0, $n = count($attachments); $i < $n; $i++)
 			{
 				$attachment = $attachments[$i];
@@ -412,7 +413,7 @@ defined('_JEXEC') or die;
 					echo '<br />';
 				}
 				?>
-				<a href="<?php echo JUri::base() . '/media/com_eventbooking/' . $attachment; ?>"
+				<a href="<?php echo $baseUri . 'media/com_eventbooking/' . $attachment; ?>"
 				   target="_blank"><?php echo $attachment; ?></a>
 				<?php
 			}
