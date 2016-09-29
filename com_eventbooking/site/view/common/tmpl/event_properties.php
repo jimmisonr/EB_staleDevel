@@ -12,72 +12,76 @@ defined('_JEXEC') or die;
 ?>
 <table class="table table-bordered table-striped">
 	<tbody>
-	<tr>
-		<td style="width: 30%;">
-			<strong><?php echo JText::_('EB_EVENT_DATE') ?></strong>
-		</td>
-		<td>
-			<?php
-			if ($item->event_date == EB_TBC_DATE)
-			{
-				echo JText::_('EB_TBC');
-			}
-			else
-			{
-			?>
-				<meta itemprop="startDate" content="<?php echo JFactory::getDate($item->event_date)->format("Y-m-d\TH:i"); ?>">
+	<?php
+	if (!$isMultipleDate)
+	{
+	?>
+		<tr>
+			<td style="width: 30%;">
+				<strong><?php echo JText::_('EB_EVENT_DATE') ?></strong>
+			</td>
+			<td>
 				<?php
-				if (strpos($item->event_date, '00:00:00') !== false)
+				if ($item->event_date == EB_TBC_DATE)
 				{
-					$dateFormat = $config->date_format;
+					echo JText::_('EB_TBC');
 				}
 				else
 				{
-					$dateFormat = $config->event_date_format;
+				?>
+					<meta itemprop="startDate" content="<?php echo JFactory::getDate($item->event_date)->format("Y-m-d\TH:i"); ?>">
+					<?php
+					if (strpos($item->event_date, '00:00:00') !== false)
+					{
+						$dateFormat = $config->date_format;
+					}
+					else
+					{
+						$dateFormat = $config->event_date_format;
+					}
+
+					echo JHtml::_('date', $item->event_date, $dateFormat, null);
 				}
-
-				echo JHtml::_('date', $item->event_date, $dateFormat, null);
-			}
-			?>
-		</td>
-	</tr>
-
-	<?php
-	if ($item->event_end_date != $nullDate)
-	{
-		if (strpos($item->event_end_date, '00:00:00') !== false)
-		{
-			$dateFormat = $config->date_format;
-		}
-		else
-		{
-			$dateFormat = $config->event_date_format;
-		}
-		?>
-		<tr>
-			<td>
-				<strong><?php echo JText::_('EB_EVENT_END_DATE'); ?></strong>
-			</td>
-			<td>
-				<meta itemprop="endDate"
-				      content="<?php echo JFactory::getDate($item->event_end_date)->format("Y-m-d\TH:i"); ?>">
-				<?php echo JHtml::_('date', $item->event_end_date, $dateFormat, null); ?>
+				?>
 			</td>
 		</tr>
-		<?php
-	}
 
-	if ($item->registration_start_date != $nullDate)
-	{
-		if (strpos($item->registration_start_date, '00:00:00') !== false)
+		<?php
+		if ($item->event_end_date != $nullDate)
 		{
-			$dateFormat = $config->date_format;
+			if (strpos($item->event_end_date, '00:00:00') !== false)
+			{
+				$dateFormat = $config->date_format;
+			}
+			else
+			{
+				$dateFormat = $config->event_date_format;
+			}
+			?>
+			<tr>
+				<td>
+					<strong><?php echo JText::_('EB_EVENT_END_DATE'); ?></strong>
+				</td>
+				<td>
+					<meta itemprop="endDate"
+					      content="<?php echo JFactory::getDate($item->event_end_date)->format("Y-m-d\TH:i"); ?>">
+					<?php echo JHtml::_('date', $item->event_end_date, $dateFormat, null); ?>
+				</td>
+			</tr>
+			<?php
 		}
-		else
+
+		if ($item->registration_start_date != $nullDate)
 		{
-			$dateFormat = $config->event_date_format;
-		}
-		?>
+			if (strpos($item->registration_start_date, '00:00:00') !== false)
+			{
+				$dateFormat = $config->date_format;
+			}
+			else
+			{
+				$dateFormat = $config->event_date_format;
+			}
+			?>
 			<tr>
 				<td>
 					<strong><?php echo JText::_('EB_REGISTRATION_START_DATE'); ?></strong>
@@ -86,90 +90,91 @@ defined('_JEXEC') or die;
 					<?php echo JHtml::_('date', $item->registration_start_date, $dateFormat, null); ?>
 				</td>
 			</tr>
-		<?php
-	}
-
-	if ($config->show_capacity == 1 || ($config->show_capacity == 2 && $item->event_capacity))
-	{
-	?>
-		<tr>
-			<td>
-				<strong><?php echo JText::_('EB_CAPACITY'); ?></strong>
-			</td>
-			<td>
-				<?php
-				if ($item->event_capacity)
-				{
-					echo $item->event_capacity;
-				}
-				else
-				{
-					echo JText::_('EB_UNLIMITED');
-				}
-				?>
-			</td>
-		</tr>
-	<?php
-	}
-
-	if ($config->show_registered && $item->registration_type != 3)
-	{
-	?>
-		<tr>
-			<td>
-				<strong><?php echo JText::_('EB_REGISTERED'); ?></strong>
-			</td>
-			<td>
-				<?php
-				echo $item->total_registrants . ' ';
-				if ($config->show_list_of_registrants && ($item->total_registrants > 0) && EventbookingHelper::canViewRegistrantList())
-				{
-				?>
-					<a href="index.php?option=com_eventbooking&view=registrantlist&id=<?php echo $item->id ?>&tmpl=component"
-					   class="eb-colorbox-register-lists"><span
-							class="view_list"><?php echo JText::_("EB_VIEW_LIST"); ?></span></a>
-				<?php
-				}
-				?>
-			</td>
-		</tr>
-	<?php
-	}
-
-	if ($config->show_available_place && $item->event_capacity)
-	{
-	?>
-		<tr>
-			<td>
-				<strong><?php echo JText::_('EB_AVAILABLE_PLACE'); ?></strong>
-			</td>
-			<td>
-				<?php echo $item->event_capacity - $item->total_registrants; ?>
-			</td>
-		</tr>
-	<?php
-	}
-
-	if ($nullDate != $item->cut_off_date)
-	{
-		if (strpos($item->cut_off_date, '00:00:00') !== false)
-		{
-			$dateFormat = $config->date_format;
+			<?php
 		}
-		else
+
+		if ($config->show_capacity == 1 || ($config->show_capacity == 2 && $item->event_capacity))
 		{
-			$dateFormat = $config->event_date_format;
-		}
 		?>
-		<tr>
-			<td>
-				<strong><?php echo JText::_('EB_CUT_OFF_DATE'); ?></strong>
-			</td>
-			<td>
-				<?php echo JHtml::_('date', $item->cut_off_date, $dateFormat, null); ?>
-			</td>
-		</tr>
-	<?php
+			<tr>
+				<td>
+					<strong><?php echo JText::_('EB_CAPACITY'); ?></strong>
+				</td>
+				<td>
+					<?php
+					if ($item->event_capacity)
+					{
+						echo $item->event_capacity;
+					}
+					else
+					{
+						echo JText::_('EB_UNLIMITED');
+					}
+					?>
+				</td>
+			</tr>
+		<?php
+		}
+
+		if ($config->show_registered && $item->registration_type != 3)
+		{
+		?>
+			<tr>
+				<td>
+					<strong><?php echo JText::_('EB_REGISTERED'); ?></strong>
+				</td>
+				<td>
+					<?php
+					echo $item->total_registrants . ' ';
+					if ($config->show_list_of_registrants && ($item->total_registrants > 0) && EventbookingHelper::canViewRegistrantList())
+					{
+						?>
+						<a href="index.php?option=com_eventbooking&view=registrantlist&id=<?php echo $item->id ?>&tmpl=component"
+						   class="eb-colorbox-register-lists"><span
+								class="view_list"><?php echo JText::_("EB_VIEW_LIST"); ?></span></a>
+						<?php
+					}
+					?>
+				</td>
+			</tr>
+		<?php
+		}
+
+		if ($config->show_available_place && $item->event_capacity)
+		{
+		?>
+			<tr>
+				<td>
+					<strong><?php echo JText::_('EB_AVAILABLE_PLACE'); ?></strong>
+				</td>
+				<td>
+					<?php echo $item->event_capacity - $item->total_registrants; ?>
+				</td>
+			</tr>
+		<?php
+		}
+
+		if ($nullDate != $item->cut_off_date)
+		{
+			if (strpos($item->cut_off_date, '00:00:00') !== false)
+			{
+				$dateFormat = $config->date_format;
+			}
+			else
+			{
+				$dateFormat = $config->event_date_format;
+			}
+			?>
+			<tr>
+				<td>
+					<strong><?php echo JText::_('EB_CUT_OFF_DATE'); ?></strong>
+				</td>
+				<td>
+					<?php echo JHtml::_('date', $item->cut_off_date, $dateFormat, null); ?>
+				</td>
+			</tr>
+			<?php
+		}
 	}
 
 	if ($item->individual_price > 0 || ($config->show_price_for_free_event))
