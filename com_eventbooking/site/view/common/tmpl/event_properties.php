@@ -304,7 +304,7 @@ defined('_JEXEC') or die;
 				<?php echo JText::_('EB_CREATED_BY'); ?>
 			</td>
 			<td class="eb-event-property-value">
-				<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=search&created_by=' . $item->created_by . '&Itemid=' . $this->Itemid); ?>"><?php echo $item->creator_name; ?></a>
+				<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=search&created_by=' . $item->created_by . '&Itemid=' . $Itemid); ?>"><?php echo $item->creator_name; ?></a>
 			</td>
 		</tr>
 	<?php
@@ -352,24 +352,24 @@ defined('_JEXEC') or die;
 			</td>
 			<td>
 				<?php
-				if ($this->location->address)
+				if ($location->address)
 				{
 					if (!empty($renderSemanticData))
 					{
 					?>
 						<div style="display:none" itemprop="location" itemscope itemtype="http://schema.org/Place">
-							<div itemprop="name"><?php echo $this->location->name; ?></div>
+							<div itemprop="name"><?php echo $location->name; ?></div>
 							<div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-								<span itemprop="streetAddress"><?php echo $this->location->address; ?></span>
+								<span itemprop="streetAddress"><?php echo $location->address; ?></span>
 								<?php
-								if ($this->location->city && $this->location->state && $this->location->zip)
+								if ($location->city && $location->state && $location->zip)
 								{
-									?>
-									<span itemprop="addressLocality"><?php echo $this->location->city; ?></span>,
-									<span itemprop="addressRegion"><?php echo $this->location->state; ?></span>
-									<span itemprop="postalCode"><?php echo $this->location->zip; ?></span>
-									<span itemprop="addressCountry"><?php echo $this->location->country; ?></span>
-									<?php
+								?>
+									<span itemprop="addressLocality"><?php echo $location->city; ?></span>,
+									<span itemprop="addressRegion"><?php echo $location->state; ?></span>
+									<span itemprop="postalCode"><?php echo $location->zip; ?></span>
+									<span itemprop="addressCountry"><?php echo $location->country; ?></span>
+								<?php
 								}
 								?>
 							</div>
@@ -379,12 +379,12 @@ defined('_JEXEC') or die;
 					?>
 					<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id=' . $item->location_id . '&tmpl=component&format=html'); ?>"
 					   class="eb-colorbox-map"
-					   title="<?php echo $this->location->name; ?>"><?php echo $this->location->name; ?></a>
+					   title="<?php echo $location->name; ?>"><?php echo $location->name; ?></a>
 					<?php
 				}
 				else
 				{
-					echo $this->location->name;
+					echo $location->name;
 				}
 				?>
 			</td>
