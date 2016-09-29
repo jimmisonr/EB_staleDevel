@@ -520,19 +520,10 @@ $return = base64_encode(JUri::getInstance()->toString());
 					<div class="eb-taskbar clearfix">
 						<ul>
 							<?php
-							if (!$config->show_children_events_under_parent_event || $event->event_type != 1)
-							{
-								$showRegisterButtons = true;
-							}
-							else
-							{
-								$showRegisterButtons = false;
-							}
-
 							$layoutData = array(
 								'item'                => $event,
 								'config'              => $config,
-								'showRegisterButtons' => $showRegisterButtons,
+								'showRegisterButtons' => !$isMultipleDate,
 								'canRegister'         => $canRegister,
 								'Itemid'              => $Itemid,
 								'ssl'                 => $ssl,
