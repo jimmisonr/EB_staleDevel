@@ -99,7 +99,17 @@ $offset = JFactory::getConfig()->get('offset');
 						<?php echo JText::_('EB_EVENT_PROPERTIES'); ?>
 					</h3>
 					<?php
-					echo $this->loadTemplate('event_properties');
+					$layoutData = array(
+						'item'           => $this->item,
+						'config'         => $this->config,
+						'location'       => isset($this->location) ? $this->location : null,
+						'showLocation'   => true,
+						'isMultipleDate' => false,
+						'nullDate'       => $this->nullDate,
+						'Itemid'         => $this->Itemid,
+					);
+
+					echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/event_properties.php', $layoutData);
 
 					if ($item->activate_waiting_list == 2)
 					{
@@ -112,11 +122,11 @@ $offset = JFactory::getConfig()->get('offset');
 
 					if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !@$item->user_registered && $registrationOpen)
 					{
-						$waitingList = true ;
+						$waitingList = true;
 					}
 					else
 					{
-						$waitingList = false ;
+						$waitingList = false;
 					}
 
 					if (!$canRegister && $item->registration_type != 3 && $this->config->display_message_for_full_event && !$waitingList && $item->registration_start_minutes >= 0)
@@ -127,14 +137,14 @@ $offset = JFactory::getConfig()->get('offset');
 						}
 						elseif (!in_array($item->registration_access, $this->viewLevels))
 						{
-							$msg = JText::_('EB_LOGIN_TO_REGISTER') ;
+							$msg = JText::_('EB_LOGIN_TO_REGISTER');
 						}
 						else
 						{
-							$msg = JText::_('EB_NO_LONGER_ACCEPT_REGISTRATION') ;
+							$msg = JText::_('EB_NO_LONGER_ACCEPT_REGISTRATION');
 						}
 						?>
-							<div class="text-info eb-notice-message"><?php echo $msg ; ?></div>
+							<div class="text-info eb-notice-message"><?php echo $msg; ?></div>
 						<?php
 					}
 					?>

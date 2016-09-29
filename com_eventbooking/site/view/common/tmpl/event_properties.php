@@ -220,7 +220,7 @@ defined('_JEXEC') or die;
 
 						if ($item->early_bird_discount_amount > 0 && $item->early_bird_discount_date != $nullDate)
 						{
-							echo ' <em> ' . JText::sprintf('EB_UNTIl_DATE', JHtml::_('date', $item->early_bird_discount_date, $config->date_format, null)) . '</em>';
+							echo '<em>' . JText::sprintf('EB_UNTIl_DATE', JHtml::_('date', $item->early_bird_discount_date, $config->date_format, null)) . '</em>';
 						}
 					}
 					else
