@@ -2528,6 +2528,11 @@ class EventbookingHelper
 	 */
 	public static function formatCurrency($amount, $config, $currencySymbol = null)
 	{
+		if (is_callable('EventbookingHelperOverrideHelper::formatCurrency'))
+		{
+			return EventbookingHelperOverrideHelper::formatCurrency($amount, $config, $currencySymbol);
+		}
+
 		$decimals      = isset($config->decimals) ? $config->decimals : 2;
 		$dec_point     = isset($config->dec_point) ? $config->dec_point : '.';
 		$thousands_sep = isset($config->thousands_sep) ? $config->thousands_sep : ',';
