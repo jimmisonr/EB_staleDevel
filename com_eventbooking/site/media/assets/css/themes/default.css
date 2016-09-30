@@ -152,13 +152,13 @@
 }
 
 #extcalendar .previousday a, #extcalendar .previousmonth a, #extcalendar .previousweek a {
-    background: url(../images/mini_arrowL.gif) no-repeat left center;
+    background: url(../../images/mini_arrowL.gif) no-repeat left center;
     color: #FFFFFF;
     padding-left: 8px;
 }
 
 #extcalendar .nextday a, #extcalendar .nextmonth a, #extcalendar .nextweek a {
-    background: url(../images/mini_arrowR.gif) no-repeat right center;
+    background: url(../../images/mini_arrowR.gif) no-repeat right center;
     color: #FFFFFF;
     padding-right: 8px;
 }
@@ -210,21 +210,21 @@
 
 /* mini calendar */
 div.moduleS2 {
-    background: url(../images/topright_2.png) no-repeat 100% 0;
+    background: url(../../images/topright_2.png) no-repeat 100% 0;
     height: 1%;
     margin-bottom: 10px;
 }
 
 div.moduleS2 div {
-    background: url(../images/topleft_2.png) no-repeat 0 0;
+    background: url(../../images/topleft_2.png) no-repeat 0 0;
 }
 
 div.moduleS2 div div {
-    background: url(../images/botright_2.png) no-repeat 100% 100%;
+    background: url(../../images/botright_2.png) no-repeat 100% 100%;
 }
 
 div.moduleS2 div div div {
-    background: url(../images/botleft_2.png) no-repeat 0 100%;
+    background: url(../../images/botleft_2.png) no-repeat 0 100%;
     padding: 12px 15px 15px;
 }
 
@@ -264,7 +264,7 @@ div.moduleS2 h3, div.moduletableS2 h3 {
 
 
 #eb-categories .eb-box-heading, #eb-events .eb-box-heading, #eb-event-page .eb-box-heading {
-    background: #f2f2f2 url(../../images/background.png) repeat-x 0 0;
+    background: #f2f2f2 url(../../../images/background.png) repeat-x 0 0;
     border: 1px solid #DBDEE1;
 }
 #eb-categories .eb-description, #eb-events .eb-description, #eb-event-page .eb-description {
@@ -316,5 +316,5 @@ span.event-date span.day {
 }
 
 #extcalendar .eventdesc .location-name {
-	background: url(../../images/location.png) no-repeat left center;
+	background: url(../../../images/location.png) no-repeat left center;
 }
