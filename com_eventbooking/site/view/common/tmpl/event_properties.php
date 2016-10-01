@@ -9,6 +9,18 @@
 
 // no direct access
 defined('_JEXEC') or die;
+
+/**
+ * Layout variables
+ * -----------------
+ * @var   EventbookingTableEvent $item
+ * @var   RADConfig              $config
+ * @var   boolean                $showLocation
+ * @var   stdClass               $location
+ * @var   boolean                $isMultipleDate
+ * @var   string                 $nullDate
+ * @var   int                    $Itemid
+ */
 ?>
 <table class="table table-bordered table-striped">
 	<tbody>
