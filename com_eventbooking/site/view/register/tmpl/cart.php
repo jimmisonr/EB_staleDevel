@@ -463,7 +463,7 @@ $layoutData = array(
 				<?php
 				if ($this->config->currency_position == 0)
 				{
-					?>
+				?>
 					<div class="<?php echo $inputPrependClass; ?> inline-display">
 						<span class="<?php echo $addOnClass; ?>"><?php echo $this->config->currency_symbol;?></span>
 						<input id="deposit_amount" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->depositAmount, $this->config); ?>" />
@@ -472,7 +472,7 @@ $layoutData = array(
 				}
 				else
 				{
-					?>
+				?>
 					<div class="<?php echo $inputAppendClass; ?> inline-display">
 						<input id="deposit_amount" type="text" readonly="readonly" class="input-small" value="<?php echo EventbookingHelper::formatAmount($this->depositAmount, $this->config); ?>" />
 						<span class="<?php echo $addOnClass; ?>"><?php echo $this->config->currency_symbol;?></span>
@@ -496,44 +496,10 @@ $layoutData = array(
 		echo $this->loadCommonLayout('register/tmpl/register_payment_methods.php', $layoutData);
 	}
 
-	if ($this->config->accept_term ==1)
+	if ($this->config->accept_term ==1 && $this->config->article_id)
 	{
-		$articleId  = $this->config->article_id ;
-		if (JLanguageMultilang::isEnabled())
-		{
-			$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $articleId);
-			$langCode     = JFactory::getLanguage()->getTag();
-			if (isset($associations[$langCode]))
-			{
-				$article = $associations[$langCode];
-			}
-		}
-
-		if (!isset($article))
-		{
-			$db    = JFactory::getDbo();
-			$query = $db->getQuery(true);
-			$query->select('id, catid')
-				->from('#__content')
-				->where('id = ' . (int) $articleId);
-			$db->setQuery($query);
-			$article = $db->loadObject();
-		}
-
-		require_once JPATH_ROOT . '/components/com_content/helpers/route.php';
-		EventbookingHelperJquery::colorbox('eb-colorbox-term');
-		$termLink = ContentHelperRoute::getArticleRoute($article->id, $article->catid) . '&tmpl=component&format=html';
-		?>
-		<div class="<?php echo $controlGroupClass;  ?>">
-			<label class="checkbox">
-				<input type="checkbox" name="accept_term" value="1" class="validate[required]" data-errormessage="<?php echo JText::_('EB_ACCEPT_TERMS');?>" />
-				<?php echo JText::_('EB_ACCEPT'); ?>&nbsp;
-				<?php
-				echo "<a class=\"eb-colorbox-term\" title=\"".JText::_('EB_TERM_AND_CONDITION')."\" href=\"".JRoute::_($termLink)."\" rel=\"{handler: 'iframe', size: {x: 700, y: 500}}\">"."<strong>".JText::_('EB_TERM_AND_CONDITION')."</strong>"."</a>\n";
-				?>
-			</label>
-		</div>
-		<?php
+		$layoutData['articleId'] = $this->config->article_id;
+		echo $this->loadCommonLayout('register/tmpl/register_terms_and_conditions.php', $layoutData);
 	}
 
 	if ($this->showCaptcha)
