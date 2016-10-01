@@ -32,45 +32,14 @@ $btnClass          = $bootstrapHelper->getClassMapping('btn');
 if (!$this->userId && $this->config->user_registration)
 {
 	$validateLoginForm = true;
-?>
-<h3 class="eb-heading"><?php echo JText::_('EB_EXISTING_USER_LOGIN'); ?></h3>
-<form method="post" action="index.php" name="eb-form-login" id="eb-form-login" autocomplete="off" class="form form-horizontal">
-	<div class="<?php echo $controlGroupClass; ?>">
-		<label class="<?php echo $controlLabelClass; ?>" for="username">
-			<?php echo  JText::_('EB_USERNAME') ?><span class="required">*</span>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<input type="text" name="username" id="username" class="input-large validate[required]" value=""/>
-		</div>
-	</div>
-	<div class="<?php echo $controlGroupClass; ?>">
-		<label class="<?php echo $controlLabelClass; ?>" for="password">
-			<?php echo  JText::_('EB_PASSWORD') ?><span class="required">*</span>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<input type="password" id="password" name="password" class="input-large validate[required]" value="" />
-		</div>
-	</div>
-	<div class="<?php echo $controlGroupClass; ?>">
-		<div class="<?php echo $controlsClass; ?>">
-			<input type="submit" value="<?php echo JText::_('EB_LOGIN'); ?>" class="button btn btn-primary" name="btn-login" id="btn-login" />
-		</div>
-	</div>
-	<?php
-		if (JPluginHelper::isEnabled('system', 'remember'))
-		{
-		?>
-			<input type="hidden" name="remember" value="1" />
-		<?php
-		}
-	?>
-	<input type="hidden" name="option" value="com_users" />
-	<input type="hidden" name="task" value="user.login" />
-	<input type="hidden" name="return" id="return_url" value="" />
-	<?php echo JHtml::_( 'form.token' ); ?>
-</form>
-<h3 class="eb-heading"><?php echo JText::_('EB_NEW_USER_REGISTER'); ?></h3>
-<?php
+
+	$layoutData = array(
+		'controlGroupClass' => $controlGroupClass,
+		'controlLabelClass' => $controlLabelClass,
+		'controlsClass' => $controlsClass,
+	);
+
+	echo $this->loadCommonLayout('register/tmpl/register_login.php', $layoutData);
 }
 else
 {

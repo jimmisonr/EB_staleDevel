@@ -9,6 +9,9 @@
 // no direct access
 defined( '_JEXEC' ) or die ;
 EventbookingHelperJquery::validateForm();
+
+/* @var  $this EventbookingViewRegisterHtml */
+
 if ($this->waitingList)
 {
 	$headerText = JText::_('EB_JOIN_WAITINGLIST');
@@ -95,45 +98,13 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	if (!$this->userId && $this->config->user_registration)
 	{
 		$validateLoginForm = true;
-	?>
-	<form method="post" action="index.php" name="eb-login-form" id="eb-login-form" autocomplete="off" class="form form-horizontal">
-		<h3 class="eb-heading"><?php echo JText::_('EB_EXISTING_USER_LOGIN'); ?></h3>
-		<div class="<?php echo $controlGroupClass;  ?>">
-			<label class="<?php echo $controlLabelClass; ?>" for="username">
-				<?php echo  JText::_('EB_USERNAME') ?><span class="required">*</span>
-			</label>
-			<div class="<?php echo $controlsClass; ?>">
-				<input type="text" name="username" id="username" class="input-large validate[required]" value=""/>
-			</div>
-		</div>
-		<div class="<?php echo $controlGroupClass;  ?>">
-			<label class="<?php echo $controlLabelClass; ?>" for="password">
-				<?php echo  JText::_('EB_PASSWORD') ?><span class="required">*</span>
-			</label>
-			<div class="<?php echo $controlsClass; ?>">
-				<input type="password" id="password" name="password" class="input-large validate[required]" value="" />
-			</div>
-		</div>
-		<div class="<?php echo $controlGroupClass;  ?>">
-			<div class="<?php echo $controlsClass; ?>">
-				<input type="submit" value="<?php echo JText::_('EB_LOGIN'); ?>" class="button btn btn-primary" />
-			</div>
-		</div>
-		<h3 class="eb-heading"><?php echo JText::_('EB_NEW_USER_REGISTER'); ?></h3>
-		<?php
-			if (JPluginHelper::isEnabled('system', 'remember'))
-			{
-			?>
-				<input type="hidden" name="remember" value="1" />
-			<?php
-			}
-		?>
-		<input type="hidden" name="option" value="com_users" />
-		<input type="hidden" name="task" value="user.login" />
-		<input type="hidden" name="return" value="<?php echo base64_encode(JUri::getInstance()->toString()); ?>" />
-		<?php echo JHtml::_( 'form.token' ); ?>
-	</form>
-	<?php
+		$layoutData = array(
+			'controlGroupClass' => $controlGroupClass,
+			'controlLabelClass' => $controlLabelClass,
+			'controlsClass' => $controlsClass,
+		);
+
+		echo $this->loadCommonLayout('register/tmpl/register_login.php', $layoutData);
 	}
 	else
 	{
