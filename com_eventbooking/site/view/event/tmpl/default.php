@@ -129,6 +129,13 @@ $offset = JFactory::getConfig()->get('offset');
 						$waitingList = false;
 					}
 
+					$isMultipleDate = false;
+
+					if ($this->config->show_children_events_under_parent_event && $item->event_type == 1)
+					{
+						$isMultipleDate = true;
+					}
+
 					if (!$canRegister && $item->registration_type != 3 && $this->config->display_message_for_full_event && !$waitingList && $item->registration_start_minutes >= 0)
 					{
 						if (@$item->user_registered)
@@ -201,20 +208,20 @@ $offset = JFactory::getConfig()->get('offset');
 			<ul>
 				<?php
 					$layoutData = array(
-						'item'                => $this->item,
-						'config'              => $this->config,
-						'showRegisterButtons' => empty($this->items),
-						'canRegister'         => $canRegister,
-						'Itemid'              => $this->Itemid,
-						'ssl'                 => $ssl,
-						'btnClass'            => $btnClass,
-						'iconOkClass'         => $iconOkClass,
-						'iconRemoveClass'     => $iconRemoveClass,
-						'iconDownloadClass'   => $iconDownloadClass,
-						'registrationOpen'    => $registrationOpen,
-						'return'              => $return,
-						'iconPencilClass'     => $iconPencilClass,
-						'showInviteFriend'    => true,
+						'item'              => $this->item,
+						'config'            => $this->config,
+						'isMultipleDate'    => $isMultipleDate,
+						'canRegister'       => $canRegister,
+						'Itemid'            => $this->Itemid,
+						'ssl'               => $ssl,
+						'btnClass'          => $btnClass,
+						'iconOkClass'       => $iconOkClass,
+						'iconRemoveClass'   => $iconRemoveClass,
+						'iconDownloadClass' => $iconDownloadClass,
+						'registrationOpen'  => $registrationOpen,
+						'return'            => $return,
+						'iconPencilClass'   => $iconPencilClass,
+						'showInviteFriend'  => true,
 					);
 
 					echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/buttons.php', $layoutData);

@@ -29,7 +29,7 @@ defined('_JEXEC') or die;
  */
 
 
-if ($showRegisterButtons)
+if (!$isMultipleDate)
 {
 	if ($canRegister)
 	{
