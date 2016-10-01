@@ -44,6 +44,13 @@ else
 	$registrationOpen = ($item->number_event_dates > 0);
 }
 
+$isMultipleDate = false;
+
+if ($this->config->show_children_events_under_parent_event && $item->event_type == 1)
+{
+	$isMultipleDate = true;
+}
+
 $offset = JFactory::getConfig()->get('offset');
 ?>
 <div id="eb-event-page" class="eb-container eb-category-<?php echo $item->category_id; ?>eb-event<?php if ($item->featured) echo ' eb-featured-event'; ?>" itemscope itemtype="http://schema.org/Event">
@@ -127,13 +134,6 @@ $offset = JFactory::getConfig()->get('offset');
 					else
 					{
 						$waitingList = false;
-					}
-
-					$isMultipleDate = false;
-
-					if ($this->config->show_children_events_under_parent_event && $item->event_type == 1)
-					{
-						$isMultipleDate = true;
 					}
 
 					if (!$canRegister && $item->registration_type != 3 && $this->config->display_message_for_full_event && !$waitingList && $item->registration_start_minutes >= 0)
