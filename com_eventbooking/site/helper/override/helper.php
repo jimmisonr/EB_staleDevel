@@ -195,6 +195,7 @@ class EventbookingHelperOverrideHelper extends EventbookingHelper
 					if ($event->discount_type == 1)
 					{
 						$registrantDiscount = $registrantTotalAmount * $discountRate / 100;
+
 						if ($config->collect_member_information_in_cart)
 						{
 							for ($j = 0; $j < $quantity; $j++)
@@ -247,15 +248,33 @@ class EventbookingHelperOverrideHelper extends EventbookingHelper
 			// Coupon discount
 			if (!empty($coupon) && ($coupon->times == 0 || $couponTimesAvailable > 0) && ($coupon->event_id == -1 || in_array($eventId, $couponDiscountedEventIds)))
 			{
-				$couponUsedCount++;
 				if ($couponTimesAvailable > 0)
 				{
-					$couponTimesAvailable--;
+					$couponUsageForThisEvent = min($quantity, $couponTimesAvailable);
+				}
+				else
+				{
+					$couponUsageForThisEvent = $quantity;
+				}
+
+				$couponUsedCount += $couponUsageForThisEvent;
+
+				if ($couponTimesAvailable > 0)
+				{
+					$couponTimesAvailable -= $couponUsageForThisEvent;
 				}
 
 				if ($coupon->coupon_type == 0)
 				{
-					$registrantDiscount = $registrantDiscount + $registrantTotalAmount * $coupon->discount / 100;
+					if ($couponUsageForThisEvent < $quantity)
+					{
+						$registrantDiscount = $registrantDiscount + $rate * $couponUsageForThisEvent * $coupon->discount / 100;
+					}
+					else
+					{
+						$registrantDiscount = $registrantDiscount + $registrantTotalAmount * $coupon->discount / 100;
+					}
+
 					if ($config->collect_member_information_in_cart)
 					{
 						for ($j = 0; $j < $quantity; $j++)
@@ -266,7 +285,7 @@ class EventbookingHelperOverrideHelper extends EventbookingHelper
 				}
 				else
 				{
-					$registrantDiscount = $registrantDiscount + $coupon->discount;
+					$registrantDiscount = $registrantDiscount + $coupon->discount*$couponUsageForThisEvent;
 					if ($config->collect_member_information_in_cart)
 					{
 						$membersDiscountAmount[$eventId][0] += $coupon->discount;
