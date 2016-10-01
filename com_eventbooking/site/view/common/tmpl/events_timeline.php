@@ -288,20 +288,20 @@ $return = base64_encode(JUri::getInstance()->toString());
 				<ul>
 					<?php
 					$layoutData = array(
-						'item'                => $event,
-						'config'              => $config,
-						'showRegisterButtons' => !$isMultipleDate,
-						'canRegister'         => $canRegister,
-						'Itemid'              => $Itemid,
-						'ssl'                 => $ssl,
-						'btnClass'            => $btnClass,
-						'iconOkClass'         => $iconOkClass,
-						'iconRemoveClass'     => $iconRemoveClass,
-						'iconDownloadClass'   => $iconDownloadClass,
-						'registrationOpen'    => $registrationOpen,
-						'return'              => $return,
-						'iconPencilClass'     => $iconPencilClass,
-						'showInviteFriend'    => false,
+						'item'              => $event,
+						'config'            => $config,
+						'isMultipleDate'    => $isMultipleDate,
+						'canRegister'       => $canRegister,
+						'Itemid'            => $Itemid,
+						'ssl'               => $ssl,
+						'btnClass'          => $btnClass,
+						'iconOkClass'       => $iconOkClass,
+						'iconRemoveClass'   => $iconRemoveClass,
+						'iconDownloadClass' => $iconDownloadClass,
+						'registrationOpen'  => $registrationOpen,
+						'return'            => $return,
+						'iconPencilClass'   => $iconPencilClass,
+						'showInviteFriend'  => false,
 					);
 
 					echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/buttons.php', $layoutData);
