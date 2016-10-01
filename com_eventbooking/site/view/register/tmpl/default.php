@@ -49,6 +49,7 @@ else
 }
 
 $replaces = EventbookingHelper::buildEventTags($this->event, $this->config);
+
 foreach ($replaces as $key => $value)
 {
 	foreach ($replaces as $key => $value)
@@ -61,15 +62,16 @@ foreach ($replaces as $key => $value)
 
 if ($this->config->use_https)
 {
-	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_individual_registration&Itemid='.$this->Itemid, false, 1);
+	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_individual_registration&Itemid=' . $this->Itemid, false, 1);
 }
 else
 {
-	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_individual_registration&Itemid='.$this->Itemid, false);
+	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_individual_registration&Itemid=' . $this->Itemid, false);
 }
+
 $selectedState = '';
 
-// Bootstrap classes
+/* @var EventbookingHelperBootstrap $bootstrapHelper*/
 $bootstrapHelper   = $this->bootstrapHelper;
 $controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
 $inputPrependClass = $bootstrapHelper->getClassMapping('input-prepend');
@@ -81,10 +83,8 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 $layoutData = array(
 	'controlGroupClass' => $controlGroupClass,
 	'controlLabelClass' => $controlLabelClass,
-	'controlsClass' => $controlsClass,
+	'controlsClass'     => $controlsClass,
 );
-
-/* @var EventbookingViewRegisterHtml $this */
 ?>
 <div id="eb-individual-registration-page" class="eb-container">
 	<h1 class="eb-page-heading"><?php echo $headerText; ?></h1>
@@ -92,7 +92,7 @@ $layoutData = array(
 	if (strlen($msg))
 	{
 	?>
-	<div class="eb-message"><?php echo $msg ; ?></div>
+		<div class="eb-message"><?php echo $msg ; ?></div>
 	<?php
 	}
 
@@ -104,6 +104,7 @@ $layoutData = array(
 	if (!$this->userId && $this->config->user_registration)
 	{
 		$validateLoginForm = true;
+
 		echo $this->loadCommonLayout('register/tmpl/register_login.php', $layoutData);
 	}
 	else
@@ -164,16 +165,17 @@ $layoutData = array(
 	if ($this->showCaptcha)
 	{
 	?>
-	<div class="<?php echo $controlGroupClass;  ?>">
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<?php echo $this->captcha; ?>
+		<div class="<?php echo $controlGroupClass;  ?>">
+			<label class="<?php echo $controlLabelClass; ?>">
+				<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
+			</label>
+			<div class="<?php echo $controlsClass; ?>">
+				<?php echo $this->captcha; ?>
+			</div>
 		</div>
-	</div>
 	<?php
 	}
+
 	if ($this->waitingList)
 	{
 		$buttonText = JText::_('EB_PROCESS');
@@ -183,18 +185,18 @@ $layoutData = array(
 		$buttonText = JText::_('EB_PROCESS_REGISTRATION');
 	}
 	?>
-	<div class="form-actions">
-		<input type="button" class="btn btn-primary" name="btnBack" value="<?php echo  JText::_('EB_BACK') ;?>" onclick="window.history.go(-1);">
-		<input type="submit" class="btn btn-primary" name="btn-submit" id="btn-submit" value="<?php echo $buttonText;?>">
-		<img id="ajax-loading-animation" src="<?php echo JUri::base(true);?>/media/com_eventbooking/ajax-loadding-animation.gif" style="display: none;"/>
-	</div>
+		<div class="form-actions">
+			<input type="button" class="btn btn-primary" name="btnBack" value="<?php echo  JText::_('EB_BACK') ;?>" onclick="window.history.go(-1);">
+			<input type="submit" class="btn btn-primary" name="btn-submit" id="btn-submit" value="<?php echo $buttonText;?>">
+			<img id="ajax-loading-animation" src="<?php echo JUri::base(true);?>/media/com_eventbooking/ajax-loadding-animation.gif" style="display: none;"/>
+		</div>
 	<?php
-		if (count($this->methods) == 1)
-		{
-		?>
-			<input type="hidden" name="payment_method" value="<?php echo $this->methods[0]->getName(); ?>" />
-		<?php
-		}
+	if (count($this->methods) == 1)
+	{
+	?>
+		<input type="hidden" name="payment_method" value="<?php echo $this->methods[0]->getName(); ?>" />
+	<?php
+	}
 	?>
 	<input type="hidden" id="ticket_type_values" name="ticket_type_values" value="" />
 	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />

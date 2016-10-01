@@ -13,11 +13,11 @@ defined( '_JEXEC' ) or die;
 
 if ($this->config->use_https)
 {
-	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_group_registration&Itemid='.$this->Itemid, false, 1);
+	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_group_registration&Itemid=' . $this->Itemid, false, 1);
 }
 else
 {
-	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_group_registration&Itemid='.$this->Itemid, false);
+	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_group_registration&Itemid=' . $this->Itemid, false);
 }
 $selectedState = '';
 
@@ -33,7 +33,7 @@ $btnClass          = $bootstrapHelper->getClassMapping('btn');
 $layoutData = array(
 	'controlGroupClass' => $controlGroupClass,
 	'controlLabelClass' => $controlLabelClass,
-	'controlsClass' => $controlsClass,
+	'controlsClass'     => $controlsClass,
 );
 
 if (!$this->userId && $this->config->user_registration)
@@ -75,7 +75,7 @@ else
 	if (($this->totalAmount > 0) || $this->form->containFeeFields())
 	{
 	?>
-	<h3 class="eb-heading"><?php echo JText::_('EB_PAYMENT_INFORMATION'); ?></h3>
+		<h3 class="eb-heading"><?php echo JText::_('EB_PAYMENT_INFORMATION'); ?></h3>
 	<?php
 		$layoutData['currencySymbol']     = $this->event->currency_symbol ?: $this->config->currency_symbol;
 		$layoutData['onCouponChange']     = 'calculateGroupRegistrationFee();';
@@ -94,10 +94,12 @@ else
 		}
 	}
 
-	$articleId  = $this->event->article_id ? $this->event->article_id : $this->config->article_id ;
-	if ($this->config->accept_term ==1 && $articleId)
+	$articleId = $this->event->article_id ? $this->event->article_id : $this->config->article_id;
+
+	if ($this->config->accept_term == 1 && $articleId)
 	{
 		$layoutData['articleId'] = $articleId;
+
 		echo $this->loadCommonLayout('register/tmpl/register_terms_and_conditions.php', $layoutData);
 	}
 

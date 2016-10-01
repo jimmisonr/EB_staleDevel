@@ -7,20 +7,27 @@
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
-defined( '_JEXEC' ) or die ;			
+defined( '_JEXEC' ) or die ;
+
 EventbookingHelperJquery::validateForm();
 JHtml::_('behavior.modal', 'a.eb-modal');
+
+/* @var EventbookingViewRegisterHtml $this */
+
 $popup = 'class="eb-modal" rel="{handler: \'iframe\', size: {x: 800, y: 500}}"';
-if ($this->config->use_https) 
+
+if ($this->config->use_https)
 {
-	$formUrl = JRoute::_('index.php?option=com_eventbooking&Itemid='.$this->Itemid, false, 1);
-} 
-else 
-{
-    $formUrl = JRoute::_('index.php?option=com_eventbooking&Itemid='.$this->Itemid, 0);
+	$formUrl = JRoute::_('index.php?option=com_eventbooking&Itemid=' . $this->Itemid, false, 1);
 }
+else
+{
+	$formUrl = JRoute::_('index.php?option=com_eventbooking&Itemid=' . $this->Itemid, 0);
+}
+
 $selectedState = '';
 
+/* @var EventbookingHelperBootstrap $bootstrapHelper */
 $bootstrapHelper   = $this->bootstrapHelper;
 $controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
 $inputPrependClass = $bootstrapHelper->getClassMapping('input-prepend');
@@ -34,8 +41,6 @@ $layoutData = array(
 	'controlLabelClass' => $controlLabelClass,
 	'controlsClass'     => $controlsClass,
 );
-
-/* @var EventbookingViewRegisterHtml $this */
 ?>
 <div id="eb-cart-registration-page" class="eb-container row-fluid">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_CHECKOUT'); ?></h1>
@@ -65,6 +70,7 @@ $layoutData = array(
 	if (!$this->userId && $this->config->user_registration)
 	{
 		$validateLoginForm = true;
+
 		echo $this->loadCommonLayout('register/tmpl/register_login.php', $layoutData);
 	}
 	else
@@ -150,7 +156,7 @@ $layoutData = array(
 		{
             $showPaymentInformation = true;
 		?>
-		<h3 class="eb-heading"><?php echo JText::_('EB_PAYMENT_INFORMATION'); ?></h3>
+			<h3 class="eb-heading"><?php echo JText::_('EB_PAYMENT_INFORMATION'); ?></h3>
 		<?php
 		$layoutData['currencySymbol']     = $this->config->currency_symbol;
 		$layoutData['onCouponChange']     = 'calculateCartRegistrationFee();';
@@ -175,14 +181,14 @@ $layoutData = array(
 	if ($this->showCaptcha)
 	{
 	?>
-	<div class="<?php echo $controlGroupClass;  ?>">
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
-		</label>
-		<div class="<?php echo $controlsClass; ?>">
-			<?php echo $this->captcha; ?>	
+		<div class="<?php echo $controlGroupClass;  ?>">
+			<label class="<?php echo $controlLabelClass; ?>">
+				<?php echo JText::_('EB_CAPTCHA'); ?><span class="required">*</span>
+			</label>
+			<div class="<?php echo $controlsClass; ?>">
+				<?php echo $this->captcha; ?>
+			</div>
 		</div>
-	</div>
 	<?php
 	}
 	?>								
@@ -190,12 +196,12 @@ $layoutData = array(
 		<input type="button" class="btn btn-primary" name="btnBack" value="<?php echo  JText::_('EB_BACK') ;?>" onclick="window.history.go(-1);">
 		<input type="submit" class="btn btn-primary" name="btn-submit" id="btn-submit" value="<?php echo JText::_('EB_PROCESS_REGISTRATION');?>">
 		<img id="ajax-loading-animation" src="<?php echo JUri::base(true);?>/media/com_eventbooking/ajax-loadding-animation.gif" style="display: none;"/>
-	</div>																					
+	</div>
 	<?php
 		if (count($this->methods) == 1) 
 		{
 		?>
-		<input type="hidden" name="payment_method" value="<?php echo $this->methods[0]->getName(); ?>" />
+			<input type="hidden" name="payment_method" value="<?php echo $this->methods[0]->getName(); ?>" />
 		<?php	
 		}		
 	?>
