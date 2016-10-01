@@ -28,7 +28,7 @@ $minimumLength = $params->get('minimum_length', 4);
 		<?php echo  JText::_('EB_USERNAME') ?><span class="required">*</span>
 	</label>
 	<div class="<?php echo $controlsClass; ?>">
-		<input type="text" name="username" id="username1" class="input-large validate[required,minSize[2],ajax[ajaxUserCall]]" value="<?php echo $this->escape($username); ?>" />
+		<input type="text" name="username" id="username1" class="input-large validate[required,minSize[2],ajax[ajaxUserCall]]" value="<?php echo $this->escape($this->input->getUsername('username')); ?>" />
 	</div>
 </div>
 <div class="<?php echo $controlGroupClass;  ?>">

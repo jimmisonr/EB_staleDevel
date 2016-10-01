@@ -13,9 +13,9 @@ defined('_JEXEC') or die;
 /**
  * Layout variables
  * -----------------
- * @var   string                 $controlGroupClass
- * @var   string                 $controlLabelClass
- * @var   string                 $controlsClass
+ * @var   string $controlGroupClass
+ * @var   string $controlLabelClass
+ * @var   string $controlsClass
  */
 ?>
 <h3 class="eb-heading"><?php echo JText::_('EB_EXISTING_USER_LOGIN'); ?></h3>

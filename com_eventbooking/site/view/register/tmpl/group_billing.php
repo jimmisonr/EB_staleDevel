@@ -29,16 +29,16 @@ $addOnClass        = $bootstrapHelper->getClassMapping('add-on');
 $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
 $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 $btnClass          = $bootstrapHelper->getClassMapping('btn');
+
+$layoutData = array(
+	'controlGroupClass' => $controlGroupClass,
+	'controlLabelClass' => $controlLabelClass,
+	'controlsClass' => $controlsClass,
+);
+
 if (!$this->userId && $this->config->user_registration)
 {
 	$validateLoginForm = true;
-
-	$layoutData = array(
-		'controlGroupClass' => $controlGroupClass,
-		'controlLabelClass' => $controlLabelClass,
-		'controlsClass' => $controlsClass,
-	);
-
 	echo $this->loadCommonLayout('register/tmpl/register_login.php', $layoutData);
 }
 else
@@ -50,13 +50,6 @@ else
 <?php
 	if (!$this->userId && $this->config->user_registration)
 	{
-		$layoutData = array(
-			'username'          => $this->input->getUsername('username'),
-			'controlGroupClass' => $controlGroupClass,
-			'controlLabelClass' => $controlLabelClass,
-			'controlsClass'     => $controlsClass,
-		);
-
 		echo $this->loadCommonLayout('register/tmpl/register_user_registration.php', $layoutData);
 	}
 
@@ -331,141 +324,10 @@ else
 			</div>
 			<?php
 		}
+
 		if (!$this->waitingList)
 		{
-			if (count($this->methods) > 1)
-			{
-				?>
-				<div class="<?php echo $controlGroupClass; ?> payment_information" id="payment_method_container">
-					<label class="<?php echo $controlLabelClass; ?>" for="payment_method">
-						<?php echo JText::_('EB_PAYMENT_OPTION'); ?>
-						<span class="required">*</span>
-					</label>
-
-					<div class="<?php echo $controlsClass; ?>">
-						<?php
-						$method = null;
-						for ($i = 0, $n = count($this->methods); $i < $n; $i++)
-						{
-							$paymentMethod = $this->methods[$i];
-							if ($paymentMethod->getName() == $this->paymentMethod)
-							{
-								$checked = ' checked="checked" ';
-								$method  = $paymentMethod;
-							}
-							else
-							{
-								$checked = '';
-							}
-							?>
-							<label class="radio">
-								<input onclick="changePaymentMethod('group');" class="validate[required] radio"
-									   type="radio" name="payment_method"
-									   value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
-							</label>
-						<?php
-						}
-						?>
-					</div>
-				</div>
-			<?php
-			}
-			else
-			{
-				$method = $this->methods[0];
-				?>
-				<div class="<?php echo $controlGroupClass; ?> payment_information" id="payment_method_container">
-					<label class="<?php echo $controlLabelClass; ?>">
-						<?php echo JText::_('EB_PAYMENT_OPTION'); ?>
-					</label>
-
-					<div class="<?php echo $controlsClass; ?>">
-						<?php echo JText::_($method->getTitle()); ?>
-					</div>
-				</div>
-			<?php
-			}
-			if ($method->getCreditCard())
-			{
-				$style = '';
-			}
-			else
-			{
-				$style = 'style = "display:none"';
-			}
-			?>
-			<div class="<?php echo $controlGroupClass; ?> payment_information" id="tr_card_number" <?php echo $style; ?>>
-				<label class="<?php echo $controlLabelClass; ?>" for="x_card_num">
-					<?php echo JText::_('AUTH_CARD_NUMBER'); ?><span class="required">*</span>
-				</label>
-
-				<div class="<?php echo $controlsClass; ?>">
-					<input type="text" id="x_card_num" name="x_card_num"
-						   class="input-large validate[required,creditCard]"
-						   value="<?php echo $this->escape($this->input->getAlnum('x_card_num')); ?>" onchange="removeSpace(this);"/>
-				</div>
-			</div>
-			<div class="<?php echo $controlGroupClass; ?> payment_information" id="tr_exp_date" <?php echo $style; ?>>
-				<label class="<?php echo $controlLabelClass; ?>">
-					<?php echo JText::_('AUTH_CARD_EXPIRY_DATE'); ?><span class="required">*</span>
-				</label>
-
-				<div class="<?php echo $controlsClass; ?>">
-					<?php echo $this->lists['exp_month'] . '  /  ' . $this->lists['exp_year']; ?>
-				</div>
-			</div>
-			<div class="<?php echo $controlGroupClass; ?> payment_information" id="tr_cvv_code" <?php echo $style; ?>>
-				<label class="<?php echo $controlLabelClass; ?>" for="x_card_code">
-					<?php echo JText::_('AUTH_CVV_CODE'); ?><span class="required">*</span>
-				</label>
-
-				<div class="<?php echo $controlsClass; ?>">
-					<input type="text" id="x_card_code" name="x_card_code"
-						   class="input-large validate[required,custom[number]]"
-						   value="<?php echo $this->escape($this->input->getAlnum('x_card_code'));; ?>"/>
-				</div>
-			</div>
-			<?php
-			if ($method->getCardType())
-			{
-				$style = '';
-			}
-			else
-			{
-				$style = ' style = "display:none;" ';
-			}
-			?>
-			<div class="<?php echo $controlGroupClass; ?> payment_information" id="tr_card_type" <?php echo $style; ?>>
-				<label class="<?php echo $controlLabelClass; ?>" for="card_type">
-					<?php echo JText::_('EB_CARD_TYPE'); ?><span class="required">*</span>
-				</label>
-
-				<div class="<?php echo $controlsClass; ?>">
-					<?php echo $this->lists['card_type']; ?>
-				</div>
-			</div>
-			<?php
-			if ($method->getCardHolderName())
-			{
-				$style = '';
-			}
-			else
-			{
-				$style = ' style = "display:none;" ';
-			}
-			?>
-			<div class="<?php echo $controlGroupClass; ?> payment_information" id="tr_card_holder_name" <?php echo $style; ?>>
-				<label class="<?php echo $controlLabelClass; ?>" for="card_holder_name">
-					<?php echo JText::_('EB_CARD_HOLDER_NAME'); ?><span class="required">*</span>
-				</label>
-
-				<div class="<?php echo $controlsClass; ?>">
-					<input type="text" id="card_holder_name" name="card_holder_name"
-						   class="input-large validate[required]"
-						   value="<?php echo $this->escape($this->input->getString('card_holder_name')); ?>"/>
-				</div>
-			</div>
-		<?php
+			echo $this->loadCommonLayout('register/tmpl/register_payment_methods.php', $layoutData);
 		}
 	}
 
