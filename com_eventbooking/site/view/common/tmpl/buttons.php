@@ -9,6 +9,26 @@
 
 // no direct access
 defined('_JEXEC') or die;
+
+/**
+ * Layout variables
+ * -----------------
+ * @var   EventbookingTableEvent $item
+ * @var   RADConfig              $config
+ * @var   boolean                $showInviteFriend
+ * @var   boolean                $canRegister
+ * @var   boolean                $registrationOpen
+ * @var   int                    $ssl
+ * @var   int                    $Itemid
+ * @var   string                 $return
+ * @var   string                 $btnClass
+ * @var   string                 $iconOkClass
+ * @var   string                 $iconRemoveClass
+ * @var   string                 $iconDownloadClass
+ * @var   string                 $iconPencilClass
+ */
+
+
 if ($showRegisterButtons)
 {
 	if ($canRegister)
