@@ -241,7 +241,7 @@ class EventbookingModelCalendar extends RADModel
 		{
 			$startWeekDate = '';
 		}
-
+		
 		if ($startWeekDate)
 		{
 			$date = JFactory::getDate($startWeekDate, JFactory::getConfig()->get('offset'));

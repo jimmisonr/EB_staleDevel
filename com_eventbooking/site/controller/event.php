@@ -27,14 +27,14 @@ class EventbookingControllerEvent extends EventbookingController
 		$model = $this->getModel('event');
 		try
 		{
-			$model->store($this->input);
-			$msg = JText::_('Successfully saving event');
+			$model->store($this->input);			
+			$msg = JText::_('EB_EVENT_SAVED');
 		}
 		catch (Exception $e)
 		{
-			$msg = JText::_('Error while saving event:' . $e->getMessage());
+			$msg = JText::_('EB_EVENT_SAVING_ERROR').$e->getMessage();
 		}
-
+		
 		$return = base64_decode($this->input->getString('return'));
 		if ($return)
 		{

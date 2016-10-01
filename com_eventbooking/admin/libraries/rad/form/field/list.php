@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Form Field class for the Joomla RAD.
  * Supports a generic list of options.
@@ -14,11 +15,12 @@ class RADFormFieldList extends RADFormField
 	 * @var    string
 	 */
 	protected $type = 'List';
+
 	/**
 	 * Method to instantiate the form field object.
 	 *
-	 * @param   JTable  $row  the table object store form field definitions
-	 * @param	mixed	$value the initial value of the form field
+	 * @param   JTable $row   the table object store form field definitions
+	 * @param    mixed $value the initial value of the form field
 	 */
 	public function __construct($row, $value)
 	{
@@ -38,7 +40,7 @@ class RADFormFieldList extends RADFormField
 	protected function getInput($bootstrapHelper = null)
 	{
 		// Get the field options.
-		$options = (array) $this->getOptions();
+		$options    = (array) $this->getOptions();
 		$attributes = $this->buildAttributes();
 		if ($this->row->multiple)
 		{
@@ -75,7 +77,9 @@ class RADFormFieldList extends RADFormField
 	 */
 	protected function getOptions()
 	{
-		$options = array();
+		$user = JFactory::getUser();
+
+		$options   = array();
 		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT'));
 		if (is_array($this->row->values))
 		{
@@ -89,9 +93,10 @@ class RADFormFieldList extends RADFormField
 		{
 			$values = explode(",", $this->row->values);
 		}
+
 		$quantityValues = explode("\r\n", $this->row->quantity_values);
 
-		if ($this->row->quantity_field && count($values) && count($quantityValues) && $this->eventId)
+		if ($this->row->quantity_field && count($values) && count($quantityValues) && $this->eventId && !$user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
 			$multilingualValues = array();
 			if (JLanguageMultilang::isEnabled())

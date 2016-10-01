@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Form Field class for the Joomla RAD.
  * Supports a checkbox list custom field.
@@ -73,8 +74,8 @@ class RADFormFieldCheckboxes extends RADFormField
 			$checked     = in_array($optionValue, $selectedOptions) ? 'checked' : '';
 			$html[]      = '<li class="' . $spanClass . '">';
 			$html[]      = '<label for="' . $this->name . $i . '" ><input type="checkbox" id="' . $this->name . $i . '" name="' . $this->name . '[]" value="' .
-					htmlspecialchars($optionValue, ENT_COMPAT, 'UTF-8') . '"' . $checked . $attributes . $this->row->extra_attributes . '/> ' . $option .
-					'</label>';
+				htmlspecialchars($optionValue, ENT_COMPAT, 'UTF-8') . '"' . $checked . $attributes . $this->row->extra_attributes . '/> ' . $option .
+				'</label>';
 			$html[]      = '</li>';
 			if ($i % $size == 0 && $i < $numberOptions)
 			{
@@ -92,6 +93,8 @@ class RADFormFieldCheckboxes extends RADFormField
 
 	protected function getOptions()
 	{
+		$user = JFactory::getUser();
+
 		if (is_array($this->row->values))
 		{
 			$values = $this->row->values;
@@ -107,7 +110,7 @@ class RADFormFieldCheckboxes extends RADFormField
 
 		$quantityValues = explode("\r\n", $this->row->quantity_values);
 
-		if ($this->row->quantity_field && count($values) && count($quantityValues) && $this->eventId)
+		if ($this->row->quantity_field && count($values) && count($quantityValues) && $this->eventId && !$user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
 			$values = EventbookingHelperHtml::getAvailableQuantityOptions($values, $quantityValues, $this->eventId, $this->row->id, true);
 		}
