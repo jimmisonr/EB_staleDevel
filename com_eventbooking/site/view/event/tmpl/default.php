@@ -212,16 +212,16 @@ $offset = JFactory::getConfig()->get('offset');
 						'config'            => $this->config,
 						'isMultipleDate'    => $isMultipleDate,
 						'canRegister'       => $canRegister,
-						'Itemid'            => $this->Itemid,
+						'registrationOpen'  => $registrationOpen,
+						'return'            => $return,
+						'showInviteFriend'  => true,
 						'ssl'               => $ssl,
+						'Itemid'            => $this->Itemid,
 						'btnClass'          => $btnClass,
 						'iconOkClass'       => $iconOkClass,
 						'iconRemoveClass'   => $iconRemoveClass,
 						'iconDownloadClass' => $iconDownloadClass,
-						'registrationOpen'  => $registrationOpen,
-						'return'            => $return,
 						'iconPencilClass'   => $iconPencilClass,
-						'showInviteFriend'  => true,
 					);
 
 					echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/buttons.php', $layoutData);

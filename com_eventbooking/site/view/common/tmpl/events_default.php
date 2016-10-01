@@ -179,16 +179,16 @@ $return = base64_encode(JUri::getInstance()->toString());
 								'config'            => $config,
 								'isMultipleDate'    => $isMultipleDate,
 								'canRegister'       => $canRegister,
-								'Itemid'            => $Itemid,
+								'registrationOpen'  => $registrationOpen,
+								'return'            => $return,
+								'showInviteFriend'  => false,
 								'ssl'               => $ssl,
+								'Itemid'            => $Itemid,
 								'btnClass'          => $btnClass,
 								'iconOkClass'       => $iconOkClass,
 								'iconRemoveClass'   => $iconRemoveClass,
 								'iconDownloadClass' => $iconDownloadClass,
-								'registrationOpen'  => $registrationOpen,
-								'return'            => $return,
 								'iconPencilClass'   => $iconPencilClass,
-								'showInviteFriend'  => false,
 							);
 
 							echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/buttons.php', $layoutData);
