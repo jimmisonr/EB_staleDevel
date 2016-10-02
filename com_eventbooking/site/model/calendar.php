@@ -138,34 +138,41 @@ class EventbookingModelCalendar extends RADModel
 		}
 
 		$db->setQuery($query);
+
 		if ($config->show_multiple_days_event_in_calendar && !$this->state->mini_calendar)
 		{
 			$rows      = $db->loadObjectList();
 			$rowEvents = array();
+
 			for ($i = 0, $n = count($rows); $i < $n; $i++)
 			{
 				$row      = $rows[$i];
 				$arrDates = explode('-', $row->event_date);
+
 				if ($arrDates[0] == $year && $arrDates[1] == $month)
 				{
 					$rowEvents[] = $row;
 				}
+
 				$startDateParts = explode(' ', $row->event_date);
 				$startTime      = strtotime($startDateParts[0]);
 				$startDateTime  = strtotime($row->event_date);
 				$endDateParts   = explode(' ', $row->event_end_date);
 				$endTime        = strtotime($endDateParts[0]);
 				$count          = 0;
+
 				while ($startTime < $endTime)
 				{
 					$count++;
 					$rowNew             = clone $row;
 					$rowNew->event_date = date('Y-m-d H:i:s', $startDateTime + $count * 24 * 3600);
 					$arrDates           = explode('-', $rowNew->event_date);
+
 					if ($arrDates[0] == $year && $arrDates[1] == $month)
 					{
 						$rowEvents[] = $rowNew;
 					}
+
 					$startTime += 24 * 3600;
 				}
 			}
@@ -241,7 +248,7 @@ class EventbookingModelCalendar extends RADModel
 		{
 			$startWeekDate = '';
 		}
-		
+
 		if ($startWeekDate)
 		{
 			$date = JFactory::getDate($startWeekDate, JFactory::getConfig()->get('offset'));
@@ -251,6 +258,7 @@ class EventbookingModelCalendar extends RADModel
 			$date = JFactory::getDate($currentDateData['start_week_date'], JFactory::getConfig()->get('offset'));
 			$this->state->set('date', $date->format('Y-m-d', true));
 		}
+
 		$date->setTime(0, 0, 0);
 		$startDate = $db->quote($date->toSql(true));
 		$date->modify('+6 day');
@@ -281,6 +289,7 @@ class EventbookingModelCalendar extends RADModel
 		$db->setQuery($query);
 		$events   = $db->loadObjectList();
 		$eventArr = array();
+
 		foreach ($events as $event)
 		{
 			$weekDay              = (date('w', strtotime($event->event_date)) - $startDay + 7) % 7;
@@ -314,6 +323,7 @@ class EventbookingModelCalendar extends RADModel
 			$day             = $currentDateData['current_date'];
 			$this->state->set('day', $day);
 		}
+
 		$startDate = $db->quote($day . " 00:00:00");
 		$endDate   = $db->quote($day . " 23:59:59");
 		$query->select(static::$fields)
@@ -335,6 +345,7 @@ class EventbookingModelCalendar extends RADModel
 			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
 			$query->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')');
 		}
+
 		$query->order('a.event_date ASC, a.ordering ASC');
 
 		$db->setQuery($query);
@@ -350,6 +361,7 @@ class EventbookingModelCalendar extends RADModel
 	public static function getCurrentDateData($currentDate = 'now')
 	{
 		static $data;
+
 		if (empty($data))
 		{
 			$config               = EventbookingHelper::getConfig();
@@ -359,6 +371,7 @@ class EventbookingModelCalendar extends RADModel
 			$data['year']         = $date->format('Y');
 			$data['month']        = $date->format('m');
 			$data['current_date'] = $date->format('Y-m-d');
+
 			if ($startDay == 0)
 			{
 				$date->modify('Sunday last week');
@@ -367,6 +380,7 @@ class EventbookingModelCalendar extends RADModel
 			{
 				$date->modify(('Sunday' == $date->format('l')) ? 'Monday last week' : 'Monday this week');
 			}
+
 			$data['start_week_date'] = $date->format('Y-m-d');
 			$data['end_week_date']   = $date->modify('+6 day')->format('Y-m-d');
 		}
