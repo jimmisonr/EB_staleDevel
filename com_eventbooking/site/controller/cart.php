@@ -182,7 +182,14 @@ class EventbookingControllerCart extends EventbookingController
 		if ($return == 1)
 		{
 			// Redirect to registration complete page
-			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->input->getInt('Itemid'), false, false));
+			if (JPluginHelper::isEnabled('system', 'cache'))
+			{
+				$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->input->getInt('Itemid') . '&pt=' . time(), false, false));
+			}
+			else
+			{
+				$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->input->getInt('Itemid'), false, false));
+			}
 		}
 	}
 
