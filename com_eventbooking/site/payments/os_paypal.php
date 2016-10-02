@@ -65,7 +65,14 @@ class os_paypal extends RADPayment
 
 		if ($row->process_deposit_payment)
 		{
-			$this->setParameter('return', $siteUrl . 'index.php?option=com_eventbooking&view=payment&layout=complete&Itemid=' . $Itemid);
+			if (JPluginHelper::isEnabled('system', 'cache'))
+			{
+				$this->setParameter('return', $siteUrl . 'index.php?option=com_eventbooking&view=payment&layout=complete&Itemid=' . $Itemid . '&pt=' . time());
+			}
+			else
+			{
+				$this->setParameter('return', $siteUrl . 'index.php?option=com_eventbooking&view=payment&layout=complete&Itemid=' . $Itemid);
+			}
 		}
 		else
 		{

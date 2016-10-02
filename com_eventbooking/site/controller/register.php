@@ -276,7 +276,14 @@ class EventbookingControllerRegister extends EventbookingController
 		if ($return === 1)
 		{
 			// Redirect registrants to registration complete page
-			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->input->getInt('Itemid'), false, false));
+			if (JPluginHelper::isEnabled('system', 'cache'))
+			{
+				$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->input->getInt('Itemid') . '&pt=' . time(), false, false));
+			}
+			else
+			{
+				$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->input->getInt('Itemid'), false, false));
+			}
 		}
 		elseif ($return === 2)
 		{
@@ -419,7 +426,14 @@ class EventbookingControllerRegister extends EventbookingController
 		if ($return === 1)
 		{
 			// Redirect registrants to registration complete page
-			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->input->getInt('Itemid'), false, false));
+			if (JPluginHelper::isEnabled('system', 'cache'))
+			{
+				$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->input->getInt('Itemid') . '&pt=' . time(), false, false));
+			}
+			else
+			{
+				$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->input->getInt('Itemid'), false, false));
+			}
 		}
 		elseif ($return === 2)
 		{

@@ -30,12 +30,23 @@ class os_offline extends RADPayment
 		$app    = JFactory::getApplication();
 		$Itemid = $app->input->getInt('Itemid', 0);
 		$config = EventbookingHelper::getConfig();
+
 		if ($row->is_group_billing)
 		{
 			EventbookingHelper::updateGroupRegistrationRecord($row->id);
 		}
+
 		EventbookingHelper::sendEmails($row, $config);
-		$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false, false);
+
+		if (JPluginHelper::isEnabled('system', 'cache'))
+		{
+			$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid . '&pt=' . time(), false, false);
+		}
+		else
+		{
+			$url = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false, false);
+		}
+
 		$app->redirect($url);
 	}
 }

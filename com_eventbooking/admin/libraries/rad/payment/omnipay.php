@@ -78,7 +78,14 @@ class RADPaymentOmnipay extends OmnipayPayment
 		}
 		else
 		{
-			$this->paymentSuccessUrl = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false, false);
+			if (JPluginHelper::isEnabled('system', 'cache'))
+			{
+				$this->paymentSuccessUrl = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid . '&pt=' . time(), false, false);
+			}
+			else
+			{
+				$this->paymentSuccessUrl = JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid, false, false);
+			}
 		}
 	}
 
