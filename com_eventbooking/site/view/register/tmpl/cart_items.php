@@ -9,6 +9,7 @@
 
 // no direct access
 defined('_JEXEC') or die;
+$popup = 'class="eb-modal" rel="{handler: \'iframe\', size: {x: 800, y: 500}}"';
 ?>
 <div class="eb-cart-content">
 	<table class="table table-striped table-bordered table-condensed">

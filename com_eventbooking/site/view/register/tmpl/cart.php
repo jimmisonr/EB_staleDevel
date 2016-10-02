@@ -14,8 +14,6 @@ JHtml::_('behavior.modal', 'a.eb-modal');
 
 /* @var EventbookingViewRegisterHtml $this */
 
-$popup = 'class="eb-modal" rel="{handler: \'iframe\', size: {x: 800, y: 500}}"';
-
 if ($this->config->use_https)
 {
 	$formUrl = JRoute::_('index.php?option=com_eventbooking&Itemid=' . $this->Itemid, false, 1);
