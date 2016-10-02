@@ -27,6 +27,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$config                = EventbookingHelper::getConfig();
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 		$layout                = $this->getLayout();
+
 		if ($layout == 'cart')
 		{
 			$this->displayCart();
@@ -39,6 +40,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$event   = EventbookingHelperDatabase::getEvent($eventId);
 
 		$accessLevels = JFactory::getUser()->getAuthorisedViewLevels();
+
 		if (empty($event)
 			|| !$event->published
 			|| !in_array($event->access, $accessLevels)
@@ -68,6 +70,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		if ($event->event_password)
 		{
 			$passwordPassed = JFactory::getSession()->get('eb_passowrd_' . $event->id, 0);
+
 			if (!$passwordPassed)
 			{
 				$return = base64_encode(JUri::getInstance()->toString());
@@ -127,7 +130,9 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			$waitingList = false;
 		}
+
 		$captchaInvalid = $input->getInt('captcha_invalid', 0);
+
 		if ($captchaInvalid)
 		{
 			$data = $input->post->getData();
@@ -142,10 +147,12 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 				$data = $input->getData();
 			}
 		}
+
 		if ($userId && !isset($data['first_name']))
 		{
 			//Load the name from Joomla default name
 			$name = $user->name;
+
 			if ($name)
 			{
 				$pos = strpos($name, ' ');
@@ -161,6 +168,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 				}
 			}
 		}
+
 		if ($userId && !isset($data['email']))
 		{
 			$data['email'] = $user->email;
@@ -178,6 +186,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 
 		//Get data
 		$form = new RADForm($rowFields);
+
 		if ($captchaInvalid)
 		{
 			$useDefault = false;
@@ -186,6 +195,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			$useDefault = true;
 		}
+
 		$form->bind($data, $useDefault);
 		$form->prepareFormFields('calculateIndividualRegistrationFee();');
 		$paymentMethod = $input->post->getString('payment_method', os_payments::getDefautPaymentMethod(trim($event->payment_methods)));
@@ -227,6 +237,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$options[]          = JHtml::_('select.option', 'Discover', 'Discover');
 		$options[]          = JHtml::_('select.option', 'Amex', 'American Express');
 		$lists['card_type'] = JHtml::_('select.genericlist', $options, 'card_type', ' class="inputbox" ', 'value', 'text');
+
 		if (($event->enable_coupon == 0 && $config->enable_coupon) || $event->enable_coupon == 1 || $event->enable_coupon == 3)
 		{
 			$enableCoupon = 1;
@@ -238,6 +249,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 
 		// Check to see if there is payment processing fee or not
 		$showPaymentFee = false;
+
 		foreach ($methods as $method)
 		{
 			if ($method->paymentFee)
@@ -249,6 +261,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 
 		// Add support for deposit payment
 		$paymentType = $input->post->getInt('payment_type', 0);
+
 		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
 		{
 			$options               = array();
@@ -350,8 +363,10 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $event->id . '))');
 		}
+
 		$db->setQuery($query);
 		$totalFileFields = $db->loadResult();
+
 		if ($totalFileFields)
 		{
 			JFactory::getDocument()->addScript(JUri::root(true) . '/media/com_eventbooking/assets/js/ajaxupload.js');
@@ -374,6 +389,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		}
 
 		$this->bypassNumberMembersStep = false;
+
 		if ($event->max_group_number > 0 && ($event->max_group_number == $event->min_group_number))
 		{
 			$session = JFactory::getSession();
@@ -405,11 +421,13 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$userId = $user->get('id');
 		$cart   = new EventbookingHelperCart();
 		$items  = $cart->getItems();
+
 		if (!count($items))
 		{
 			$url = JRoute::_('index.php?option=com_eventbooking&Itemid=' . $input->getInt('Itemid', 0));
 			$app->redirect($url, JText::_('EB_NO_EVENTS_FOR_CHECKOUT'));
 		}
+
 		$eventId   = (int) $items[0];
 		$query     = $db->getQuery(true);
 		$rowFields = EventbookingHelper::getFormFields(0, 4);
@@ -425,6 +443,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		}
 
 		$captchaInvalid = $input->getInt('captcha_invalid', 0);
+
 		if ($captchaInvalid)
 		{
 			$data = $input->post->getData();
@@ -432,19 +451,23 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		else
 		{
 			$data = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);
+
 			// IN case there is no data, get it from URL (get for example)
 			if (empty($data))
 			{
 				$data = $input->getData();
 			}
 		}
+
 		if ($userId && !isset($data['first_name']))
 		{
 			//Load the name from Joomla default name
 			$name = $user->name;
+
 			if ($name)
 			{
 				$pos = strpos($name, ' ');
+
 				if ($pos !== false)
 				{
 					$data['first_name'] = substr($name, 0, $pos);
@@ -457,6 +480,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 				}
 			}
 		}
+
 		if ($userId && !isset($data['email']))
 		{
 			$data['email'] = $user->email;
@@ -471,8 +495,10 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			$data['country'] = $config->default_country;
 		}
+
 		//Get data
 		$form = new RADForm($rowFields);
+
 		if ($captchaInvalid)
 		{
 			$useDefault = false;
@@ -481,6 +507,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			$useDefault = true;
 		}
+
 		$form->bind($data, $useDefault);
 		$form->prepareFormFields('calculateCartRegistrationFee();');
 		$paymentMethod       = $input->post->getString('payment_method', os_payments::getDefautPaymentMethod());
@@ -499,7 +526,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			$fees = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
 		}
-		
+
 		$events             = $cart->getEvents();
 		$methods            = os_payments::getPaymentMethods();
 		$options            = array();
@@ -508,6 +535,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$options[]          = JHtml::_('select.option', 'Discover', 'Discover');
 		$options[]          = JHtml::_('select.option', 'Amex', 'American Express');
 		$lists['card_type'] = JHtml::_('select.genericlist', $options, 'card_type', ' class="inputbox" ', 'value', 'text');
+
 		//Coupon will be enabled if there is atleast one event has coupon
 		$query->clear();
 		$query->select('enable_coupon')
@@ -516,6 +544,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$db->setQuery($query);
 		$enableCoupons = $db->loadColumn();
 		$enableCoupon  = 0;
+
 		for ($i = 0, $n = count($enableCoupons); $i < $n; $i++)
 		{
 			if ($enableCoupons[$i] > 0 || ($enableCoupons[$i] == 0 && $config->enable_coupon))
@@ -524,8 +553,10 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 				break;
 			}
 		}
+
 		##Add support for deposit payment
 		$paymentType = $input->post->getInt('payment_type', 0);
+
 		if ($config->activate_deposit_feature)
 		{
 			$options               = array();
@@ -539,6 +570,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		{
 			$depositPayment = 0;
 		}
+
 		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
@@ -639,15 +671,19 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 		{
 			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+
 			if (!$captchaPlugin)
 			{
 				// Hardcode to recaptcha, reduce support request
 				$captchaPlugin = 'recaptcha';
 			}
+
 			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+
 			if ($plugin)
 			{
 				$showCaptcha = 1;
+
 				if ($initOnly)
 				{
 					JCaptcha::getInstance($captchaPlugin)->initialise('dynamic_recaptcha_1');

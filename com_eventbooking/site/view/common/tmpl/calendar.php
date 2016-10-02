@@ -41,9 +41,11 @@ EventbookingHelperJquery::equalHeights();
 		$eventIds = array();
 		$dataCount = count($data["dates"]);
 		$dn=0;
+
 		for ($w=0; $w<6 && $dn < $dataCount; $w++)
 		{
 			$rowClass = 'eb-calendar-row-'.$w;
+
 			for ($d=0; $d<7 && $dn < $dataCount; $d++)
 			{
 				$currentDay = $data["dates"][$dn];
@@ -64,6 +66,7 @@ EventbookingHelperJquery::equalHeights();
 						{
 							$color =   EventbookingHelper::getColorCodeOfEvent($event->id);
 							$eventIds[] = $event->id;
+
 							if ($config->show_thumb_in_calendar && $event->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $event->thumb))
 							{
 								$thumbSource = JUri::root(true) . '/media/com_eventbooking/images/thumbs/' . $event->thumb;
@@ -74,6 +77,7 @@ EventbookingHelperJquery::equalHeights();
 							}
 
 							$eventId = $event->id;
+
 							if ($config->show_children_events_under_parent_event && $event->parent_id > 0)
 							{
 								$eventId = $event->parent_id;

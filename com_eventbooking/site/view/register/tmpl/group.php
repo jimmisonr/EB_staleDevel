@@ -18,6 +18,7 @@ if ($this->config->accept_term ==1 && !$this->config->fix_term_and_condition_pop
 if ($this->waitingList)
 {
 	$headerText = JText::_('EB_JOIN_WAITINGLIST');
+
 	if (strlen(strip_tags($this->message->{'waitinglist_form_message' . $this->fieldSuffix})))
 	{
 		$msg = $this->message->{'waitinglist_form_message' . $this->fieldSuffix};
@@ -30,6 +31,7 @@ if ($this->waitingList)
 else
 {
 	$headerText = JText::_('EB_GROUP_REGISTRATION');
+
 	if ($this->fieldSuffix && strlen(strip_tags($this->event->{'registration_form_message_group' . $this->fieldSuffix})))
 	{
 		$msg = $this->event->{'registration_form_message_group' . $this->fieldSuffix};
@@ -49,6 +51,7 @@ else
 }
 
 $replaces = EventbookingHelper::buildEventTags($this->event, $this->config);
+
 foreach ($replaces as $key => $value)
 {
 	foreach ($replaces as $key => $value)
@@ -82,6 +85,7 @@ foreach ($replaces as $key => $value)
 		</div>
 	<?php
 	}
+
 	if ($this->config->collect_member_information)
 	{
 	?>
@@ -93,9 +97,10 @@ foreach ($replaces as $key => $value)
 		</div>
 	<?php
 	}
+
 	if($this->showBillingStep)
 	{
-		?>
+	?>
 		<div id="eb-group-billing">
 			<div class="eb-form-heading">
 				<?php echo JText::_('EB_BILLING_INFORMATION'); ?>

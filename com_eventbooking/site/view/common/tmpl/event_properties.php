@@ -76,7 +76,7 @@ defined('_JEXEC') or die;
 				</td>
 				<td>
 					<meta itemprop="endDate"
-					      content="<?php echo JFactory::getDate($item->event_end_date)->format("Y-m-d\TH:i"); ?>">
+						  content="<?php echo JFactory::getDate($item->event_end_date)->format("Y-m-d\TH:i"); ?>">
 					<?php echo JHtml::_('date', $item->event_end_date, $dateFormat, null); ?>
 				</td>
 			</tr>
@@ -138,13 +138,14 @@ defined('_JEXEC') or die;
 				<td>
 					<?php
 					echo $item->total_registrants . ' ';
+
 					if ($config->show_list_of_registrants && ($item->total_registrants > 0) && EventbookingHelper::canViewRegistrantList())
 					{
-						?>
+					?>
 						<a href="index.php?option=com_eventbooking&view=registrantlist&id=<?php echo $item->id ?>&tmpl=component"
 						   class="eb-colorbox-register-lists"><span
 								class="view_list"><?php echo JText::_("EB_VIEW_LIST"); ?></span></a>
-						<?php
+					<?php
 					}
 					?>
 				</td>
@@ -300,8 +301,8 @@ defined('_JEXEC') or die;
 			</td>
 			<td class="eb-event-property-value">
 				<?php
-				echo EventbookingHelper::formatCurrency($item->late_fee, $config, $item->currency_symbol);
-				echo '<em>' . JText::sprintf('EB_FROM_DATE', JHtml::_('date', $item->late_fee_date, $config->date_format, null)) . '</em>';
+					echo EventbookingHelper::formatCurrency($item->late_fee, $config, $item->currency_symbol);
+					echo '<em>' . JText::sprintf('EB_FROM_DATE', JHtml::_('date', $item->late_fee_date, $config->date_format, null)) . '</em>';
 				?>
 			</td>
 		</tr>
@@ -389,9 +390,9 @@ defined('_JEXEC') or die;
 					<?php
 					}
 					?>
-					<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id=' . $item->location_id . '&tmpl=component&format=html'); ?>"
-					   class="eb-colorbox-map"
-					   title="<?php echo $location->name; ?>"><?php echo $location->name; ?></a>
+
+				<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id=' . $item->location_id . '&tmpl=component&format=html'); ?>"
+				   class="eb-colorbox-map" title="<?php echo $location->name; ?>"><?php echo $location->name; ?></a>
 					<?php
 				}
 				else
@@ -414,8 +415,8 @@ defined('_JEXEC') or die;
 		<td>
 			<?php
 			$attachments = explode('|', $item->attachment);
-
 			$baseUri =  JUri::base(true);
+
 			for ($i = 0, $n = count($attachments); $i < $n; $i++)
 			{
 				$attachment = $attachments[$i];
@@ -425,8 +426,7 @@ defined('_JEXEC') or die;
 					echo '<br />';
 				}
 				?>
-				<a href="<?php echo $baseUri . '/media/com_eventbooking/' . $attachment; ?>"
-				   target="_blank"><?php echo $attachment; ?></a>
+					<a href="<?php echo $baseUri . '/media/com_eventbooking/' . $attachment; ?>" target="_blank"><?php echo $attachment; ?></a>
 				<?php
 			}
 			?>

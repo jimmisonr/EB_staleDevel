@@ -27,13 +27,14 @@ if (count($this->methods) > 1)
 			<?php echo JText::_('EB_PAYMENT_OPTION'); ?>
 			<span class="required">*</span>
 		</label>
-
 		<div class="<?php echo $controlsClass; ?>">
 			<?php
 			$method = null;
+
 			for ($i = 0, $n = count($this->methods); $i < $n; $i++)
 			{
 				$paymentMethod = $this->methods[$i];
+
 				if ($paymentMethod->getName() == $this->paymentMethod)
 				{
 					$checked = ' checked="checked" ';
@@ -44,11 +45,11 @@ if (count($this->methods) > 1)
 					$checked = '';
 				}
 				?>
-				<label class="radio">
-					<input onclick="changePaymentMethod('individual');" class="validate[required] radio"
-					       type="radio" name="payment_method"
-					       value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
-				</label>
+					<label class="radio">
+						<input onclick="changePaymentMethod('individual');" class="validate[required] radio"
+							   type="radio" name="payment_method"
+							   value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
+					</label>
 				<?php
 			}
 			?>
@@ -59,7 +60,7 @@ if (count($this->methods) > 1)
 else
 {
 	$method = $this->methods[0];
-	?>
+?>
 	<div class="<?php echo $controlGroupClass;  ?> payment_information" id="payment_method_container">
 		<label class="<?php echo $controlLabelClass; ?>">
 			<?php echo JText::_('EB_PAYMENT_OPTION'); ?>
@@ -69,8 +70,9 @@ else
 			<?php echo JText::_($method->getTitle()); ?>
 		</div>
 	</div>
-	<?php
+<?php
 }
+
 if ($method->getCreditCard())
 {
 	$style = '';
@@ -80,37 +82,37 @@ else
 	$style = 'style = "display:none"';
 }
 ?>
-	<div class="<?php echo $controlGroupClass;  ?> payment_information" id="tr_card_number" <?php echo $style; ?>>
-		<label class="<?php echo $controlLabelClass; ?>" for="x_card_num">
-			<?php echo JText::_('AUTH_CARD_NUMBER'); ?><span class="required">*</span>
-		</label>
+<div class="<?php echo $controlGroupClass;  ?> payment_information" id="tr_card_number" <?php echo $style; ?>>
+	<label class="<?php echo $controlLabelClass; ?>" for="x_card_num">
+		<?php echo JText::_('AUTH_CARD_NUMBER'); ?><span class="required">*</span>
+	</label>
 
-		<div class="<?php echo $controlsClass; ?>">
-			<input type="text" id="x_card_num" name="x_card_num"
-			       class="input-large validate[required,creditCard]"
-			       value="<?php echo $this->escape($this->input->getAlnum('x_card_num')); ?>" onchange="removeSpace(this);"/>
-		</div>
+	<div class="<?php echo $controlsClass; ?>">
+		<input type="text" id="x_card_num" name="x_card_num"
+			   class="input-large validate[required,creditCard]"
+			   value="<?php echo $this->escape($this->input->getAlnum('x_card_num')); ?>" onchange="removeSpace(this);"/>
 	</div>
-	<div class="<?php echo $controlGroupClass;  ?> payment_information" id="tr_exp_date" <?php echo $style; ?>>
-		<label class="<?php echo $controlLabelClass; ?>">
-			<?php echo JText::_('AUTH_CARD_EXPIRY_DATE'); ?><span class="required">*</span>
-		</label>
+</div>
+<div class="<?php echo $controlGroupClass;  ?> payment_information" id="tr_exp_date" <?php echo $style; ?>>
+	<label class="<?php echo $controlLabelClass; ?>">
+		<?php echo JText::_('AUTH_CARD_EXPIRY_DATE'); ?><span class="required">*</span>
+	</label>
 
-		<div class="<?php echo $controlsClass; ?>">
-			<?php echo $this->lists['exp_month'] . '  /  ' . $this->lists['exp_year']; ?>
-		</div>
+	<div class="<?php echo $controlsClass; ?>">
+		<?php echo $this->lists['exp_month'] . '  /  ' . $this->lists['exp_year']; ?>
 	</div>
-	<div class="<?php echo $controlGroupClass;  ?> payment_information" id="tr_cvv_code" <?php echo $style; ?>>
-		<label class="<?php echo $controlLabelClass; ?>" for="x_card_code">
-			<?php echo JText::_('AUTH_CVV_CODE'); ?><span class="required">*</span>
-		</label>
+</div>
+<div class="<?php echo $controlGroupClass;  ?> payment_information" id="tr_cvv_code" <?php echo $style; ?>>
+	<label class="<?php echo $controlLabelClass; ?>" for="x_card_code">
+		<?php echo JText::_('AUTH_CVV_CODE'); ?><span class="required">*</span>
+	</label>
 
-		<div class="<?php echo $controlsClass; ?>">
-			<input type="text" id="x_card_code" name="x_card_code"
-			       class="input-large validate[required,custom[number]]"
-			       value="<?php echo $this->escape($this->input->getString('x_card_code')); ?>"/>
-		</div>
+	<div class="<?php echo $controlsClass; ?>">
+		<input type="text" id="x_card_code" name="x_card_code"
+			   class="input-large validate[required,custom[number]]"
+			   value="<?php echo $this->escape($this->input->getString('x_card_code')); ?>"/>
 	</div>
+</div>
 <?php
 if ($method->getCardType())
 {
@@ -121,15 +123,15 @@ else
 	$style = ' style = "display:none;" ';
 }
 ?>
-	<div class="<?php echo $controlGroupClass;  ?> payment_information" id="tr_card_type" <?php echo $style; ?>>
-		<label class="<?php echo $controlLabelClass; ?>" for="card_type">
-			<?php echo JText::_('EB_CARD_TYPE'); ?><span class="required">*</span>
-		</label>
+<div class="<?php echo $controlGroupClass;  ?> payment_information" id="tr_card_type" <?php echo $style; ?>>
+	<label class="<?php echo $controlLabelClass; ?>" for="card_type">
+		<?php echo JText::_('EB_CARD_TYPE'); ?><span class="required">*</span>
+	</label>
 
-		<div class="<?php echo $controlsClass; ?>">
-			<?php echo $this->lists['card_type']; ?>
-		</div>
+	<div class="<?php echo $controlsClass; ?>">
+		<?php echo $this->lists['card_type']; ?>
 	</div>
+</div>
 <?php
 if ($method->getCardHolderName())
 {
@@ -147,7 +149,7 @@ else
 
 	<div class="<?php echo $controlsClass; ?>">
 		<input type="text" id="card_holder_name" name="card_holder_name"
-		       class="input-large validate[required]"
-		       value="<?php echo $this->escape($this->input->getString('card_holder_name')); ?>"/>
+			   class="input-large validate[required]"
+			   value="<?php echo $this->escape($this->input->getString('card_holder_name')); ?>"/>
 	</div>
 </div>

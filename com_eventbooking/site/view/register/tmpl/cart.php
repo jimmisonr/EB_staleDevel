@@ -44,28 +44,28 @@ $layoutData = array(
 ?>
 <div id="eb-cart-registration-page" class="eb-container row-fluid">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_CHECKOUT'); ?></h1>
-<?php	 
+<?php
 	if (strlen(strip_tags($this->message->{'registration_form_message'.$this->fieldSuffix})))
 	{
 		$msg = $this->message->{'registration_form_message'.$this->fieldSuffix};
 	}
-	else 
+	else
 	{
 		$msg = $this->message->registration_form_message;
-	}			
+	}
 
 	if (strlen($msg))
 	{
 		$msg = str_replace('[EVENT_TITLE]', $this->eventTitle, $msg) ;
 		$msg = str_replace('[AMOUNT]', EventbookingHelper::formatCurrency($this->amount, $this->config), $msg) ;
-	?>								
-		<div class="eb-message"><?php echo $msg ; ?></div>							 															
-	<?php	
+	?>
+		<div class="eb-message"><?php echo $msg ; ?></div>
+	<?php
 	}
 
 	echo $this->loadTemplate('items');
 ?>
-<div class="clearfix"></div>	
+<div class="clearfix"></div>
 <?php
 	if (!$this->userId && $this->config->user_registration)
 	{
@@ -79,8 +79,8 @@ $layoutData = array(
 	}
 ?>
 	<form method="post" name="adminForm" id="adminForm" action="<?php echo $formUrl; ?>" autocomplete="off" class="form form-horizontal" enctype="multipart/form-data">
-	<?php	 									
-		if (!$this->userId && $this->config->user_registration) 
+	<?php
+		if (!$this->userId && $this->config->user_registration)
 		{
 			echo $this->loadCommonLayout('register/tmpl/register_user_registration.php', $layoutData);
 		}
@@ -89,6 +89,7 @@ $layoutData = array(
 		if ($this->config->collect_member_information_in_cart)
 		{
 			$count = 0;
+
 			foreach($this->items as $item)
 			{
 			?>
@@ -154,7 +155,7 @@ $layoutData = array(
 
 		if ($this->totalAmount > 0 || $this->form->containFeeFields())
 		{
-            $showPaymentInformation = true;
+			$showPaymentInformation = true;
 		?>
 			<h3 class="eb-heading"><?php echo JText::_('EB_PAYMENT_INFORMATION'); ?></h3>
 		<?php
@@ -191,89 +192,89 @@ $layoutData = array(
 		</div>
 	<?php
 	}
-	?>								
+	?>
 	<div class="form-actions">
 		<input type="button" class="btn btn-primary" name="btnBack" value="<?php echo  JText::_('EB_BACK') ;?>" onclick="window.history.go(-1);">
 		<input type="submit" class="btn btn-primary" name="btn-submit" id="btn-submit" value="<?php echo JText::_('EB_PROCESS_REGISTRATION');?>">
 		<img id="ajax-loading-animation" src="<?php echo JUri::base(true);?>/media/com_eventbooking/ajax-loadding-animation.gif" style="display: none;"/>
 	</div>
 	<?php
-		if (count($this->methods) == 1) 
+		if (count($this->methods) == 1)
 		{
 		?>
 			<input type="hidden" name="payment_method" value="<?php echo $this->methods[0]->getName(); ?>" />
-		<?php	
-		}		
+		<?php
+		}
 	?>
-	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />	
-	<input type="hidden" name="option" value="com_eventbooking" />	
+	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
+	<input type="hidden" name="option" value="com_eventbooking" />
 	<input type="hidden" name="task" value="cart.process_checkout" />
 	<input type="hidden" name="show_payment_fee" value="<?php echo (int)$this->showPaymentFee ; ?>" />
-		<script type="text/javascript">		
+		<script type="text/javascript">
 			var eb_current_page = 'cart';
 			Eb.jQuery(function($){
 				$(document).ready(function(){
-					$("#adminForm").validationEngine('attach', { 
-					    onValidationComplete: function(form, status){
-					        if (status == true) {						        
-					            form.on('submit', function(e) {
-					                e.preventDefault();
-					            });
+					$("#adminForm").validationEngine('attach', {
+						onValidationComplete: function(form, status){
+							if (status == true) {
+								form.on('submit', function(e) {
+									e.preventDefault();
+								});
 
-						        if (typeof stripePublicKey !== 'undefined' && $('#x_card_num').is(":visible"))
-						        {
-							        if($('input:radio[name^=payment_method]').length)
-							        {
-								        var paymentMethod = $('input:radio[name^=payment_method]:checked').val();
-							        }
-							        else
-							        {
-								        var paymentMethod = $('input[name^=payment_method]').val();
-							        }
+								if (typeof stripePublicKey !== 'undefined' && $('#x_card_num').is(":visible"))
+								{
+									if($('input:radio[name^=payment_method]').length)
+									{
+										var paymentMethod = $('input:radio[name^=payment_method]:checked').val();
+									}
+									else
+									{
+										var paymentMethod = $('input[name^=payment_method]').val();
+									}
 
-							        if (paymentMethod.indexOf('os_stripe') == 0)
-							        {
-								        Stripe.card.createToken({
-									        number: $('#x_card_num').val(),
-									        cvc: $('#x_card_code').val(),
-									        exp_month: $('select[name^=exp_month]').val(),
-									        exp_year: $('select[name^=exp_year]').val()
-								        }, stripeResponseHandler);
+									if (paymentMethod.indexOf('os_stripe') == 0)
+									{
+										Stripe.card.createToken({
+											number: $('#x_card_num').val(),
+											cvc: $('#x_card_code').val(),
+											exp_month: $('select[name^=exp_month]').val(),
+											exp_year: $('select[name^=exp_year]').val()
+										}, stripeResponseHandler);
 
-								        return false;
-							        }
-						        }
+										return false;
+									}
+								}
 
-					            return true;
-					        }
-					        return false;
-					    }
+								return true;
+							}
+							return false;
+						}
 					});
 					buildStateField('state', 'country', '<?php echo $selectedState; ?>');
 					if ($('#email').val())
 					{
-						$('#email').validationEngine('validate'); 
+						$('#email').validationEngine('validate');
 					}
-                    <?php
-                    if ($this->amount == 0 && !empty($showPaymentInformation))
-                    {
-                    //The event is free because of discount, so we need to hide payment information
-                    ?>
-                    $('.payment_information').css('display', 'none');
-                    <?php
-                    }
-                    ?>
+					<?php
+					if ($this->amount == 0 && !empty($showPaymentInformation))
+					{
+					//The event is free because of discount, so we need to hide payment information
+					?>
+					$('.payment_information').css('display', 'none');
+					<?php
+					}
+					?>
 				})
 			});
-			
+
 			<?php
-				echo os_payments::writeJavascriptObjects();					 		 
-			?>				
+				echo os_payments::writeJavascriptObjects();
+			?>
 
 			function updateCart(){
 				location.href = '<?php echo JRoute::_(EventbookingHelperRoute::getViewRoute('cart', $this->Itemid)); ?>' ;
-			}																
-		</script>	
+			}
+		</script>
 		<?php echo JHtml::_( 'form.token' ); ?>
-	</form>					
+	</form>
 </div>

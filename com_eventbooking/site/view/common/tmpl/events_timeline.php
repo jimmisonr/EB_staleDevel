@@ -112,24 +112,25 @@ $return = base64_encode(JUri::getInstance()->toString());
 					}
 				?>
 			</h2>
-			<div class="eb-event-information <?php echo $rowFluidClass; ?>">				
+			<div class="eb-event-information <?php echo $rowFluidClass; ?>">
 				<div class="<?php echo $span8Class; ?>">
 					<div class="clearfix">
 						<span class="eb-event-date-info">
-                            <?php
-                                if ($event->event_date != EB_TBC_DATE)
-                                {
-                                ?>
-                                    <meta itemprop="startDate" content="<?php echo JFactory::getDate($event->event_date)->format("Y-m-d\TH:i"); ?>">
-                                <?php
-                                }
-                                if ($event->event_end_date != $nullDate)
-                                {
-                                ?>
-                                    <meta itemprop="endDate" content="<?php echo JFactory::getDate($event->event_end_date)->format("Y-m-d\TH:i"); ?>">
-                                <?php
-                                }				
-                            ?>
+							<?php
+								if ($event->event_date != EB_TBC_DATE)
+								{
+								?>
+									<meta itemprop="startDate" content="<?php echo JFactory::getDate($event->event_date)->format("Y-m-d\TH:i"); ?>">
+								<?php
+								}
+
+								if ($event->event_end_date != $nullDate)
+								{
+								?>
+									<meta itemprop="endDate" content="<?php echo JFactory::getDate($event->event_end_date)->format("Y-m-d\TH:i"); ?>">
+								<?php
+								}
+							?>
 							<i class="<?php echo $iconCalendarClass; ?>"></i>
 							<?php
 								if ($event->event_date != EB_TBC_DATE)
@@ -140,12 +141,14 @@ $return = base64_encode(JUri::getInstance()->toString());
 								{
 									echo JText::_('EB_TBC');
 								}
+
 								if (strpos($event->event_date, '00:00:00') === false)
 								{
 								?>
 									<span class="eb-time"><?php echo JHtml::_('date', $event->event_date, $timeFormat, null) ?></span>
 								<?php
 								}
+
 								if ($event->event_end_date != $nullDate)
 								{
 									if (strpos($event->event_end_date, '00:00:00') === false)
@@ -156,8 +159,10 @@ $return = base64_encode(JUri::getInstance()->toString());
 									{
 										$showTime = false;
 									}
+
 									$startDate =  JHtml::_('date', $event->event_date, 'Y-m-d', null);
 									$endDate   = JHtml::_('date', $event->event_end_date, 'Y-m-d', null);
+
 									if ($startDate == $endDate)
 									{
 										if ($showTime)
@@ -186,19 +191,19 @@ $return = base64_encode(JUri::getInstance()->toString());
 						{
 						?>
 						<div class="clearfix">
-								<i class="<?php echo $iconMapMakerClass; ?>"></i>
-								<?php
-									if ($event->location_address)
-									{
-									?>
-										<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$event->location_id.'&tmpl=component'); ?>" class="eb-colorbox-map"><span><?php echo $event->location_name ; ?></span></a>
-									<?php
-									}
-									else
-									{
-										echo $event->location_name;
-									}
+							<i class="<?php echo $iconMapMakerClass; ?>"></i>
+							<?php
+								if ($event->location_address)
+								{
 								?>
+									<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$event->location_id.'&tmpl=component'); ?>" class="eb-colorbox-map"><span><?php echo $event->location_name ; ?></span></a>
+								<?php
+								}
+								else
+								{
+									echo $event->location_name;
+								}
+							?>
 						</div>
 						<?php
 						}
@@ -248,11 +253,13 @@ $return = base64_encode(JUri::getInstance()->toString());
 						<a href="<?php echo JUri::base(true).'/media/com_eventbooking/images/'.$event->thumb; ?>" class="eb-modal"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$event->thumb; ?>" class="eb-thumb-left"/></a>
 					<?php
 					}
+
 					echo $event->short_description;
 				?>
 			</div>
-            <?php
-                $ticketsLeft = $event->event_capacity - $event->total_registrants ;
+			<?php
+				$ticketsLeft = $event->event_capacity - $event->total_registrants ;
+
 				if ($event->individual_price > 0 || $ticketsLeft > 0)
 				{
 				?>
@@ -276,14 +283,14 @@ $return = base64_encode(JUri::getInstance()->toString());
 				<?php
 				}
 
-	            if (!empty($event->ticketTypes))
-	            {
-		            echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/tickettypes.php', array('ticketTypes' => $event->ticketTypes, 'config' => $config));
-		        ?>
-		            <div class="clearfix"></div>
-		        <?php
-	            }
-            ?>
+				if (!empty($event->ticketTypes))
+				{
+					echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/tickettypes.php', array('ticketTypes' => $event->ticketTypes, 'config' => $config));
+				?>
+					<div class="clearfix"></div>
+				<?php
+				}
+			?>
 			<div class="eb-taskbar clearfix">
 				<ul>
 					<?php

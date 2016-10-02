@@ -22,6 +22,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$eventId               = $input->getInt('event_id', 0);
 		$event                 = EventbookingHelperDatabase::getEvent($eventId);
 		$layout                = $this->getLayout();
+
 		switch ($layout)
 		{
 			case 'number_members':
@@ -46,6 +47,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 	{
 		$session           = JFactory::getSession();
 		$numberRegistrants = $session->get('eb_number_registrants', '');
+
 		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
 		{
 			$waitingList = true;
@@ -54,6 +56,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		{
 			$waitingList = false;
 		}
+
 		if ($waitingList)
 		{
 			if ($event->max_group_number)
@@ -105,6 +108,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 
 		//Get Group members form data
 		$membersData = $session->get('eb_group_members_data', null);
+
 		if ($membersData)
 		{
 			$membersData = unserialize($membersData);
@@ -117,19 +121,24 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$this->showBillingStep = EventbookingHelper::showBillingStep($event->id);
 
 		$showCaptcha = 0;
+
 		if (!$this->showBillingStep)
 		{
 			$user = JFactory::getUser();
+
 			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 			{
 				$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+
 				if (!$captchaPlugin)
 				{
 					// Hardcode to recaptcha, reduce support request
 					$captchaPlugin = 'recaptcha';
 				}
+
 				// Check to make sure Captcha is enabled
 				$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+
 				if ($plugin)
 				{
 					$showCaptcha         = 1;
@@ -150,6 +159,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		}
 
 		$this->bypassNumberMembersStep = false;
+
 		if ($event->max_group_number > 0 && ($event->max_group_number == $event->min_group_number))
 		{
 			$this->bypassNumberMembersStep = true;
@@ -186,6 +196,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$eventId          = $event->id;
 		$rowFields        = EventbookingHelper::getFormFields($eventId, 1);
 		$groupBillingData = $session->get('eb_group_billing_data', null);
+
 		if ($groupBillingData)
 		{
 			$data           = unserialize($groupBillingData);
@@ -202,13 +213,16 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 				$data = $input->getData();
 			}
 		}
+
 		if ($userId && !isset($data['first_name']))
 		{
 			//Load the name from Joomla default name
 			$name = $user->name;
+
 			if ($name)
 			{
 				$pos = strpos($name, ' ');
+
 				if ($pos !== false)
 				{
 					$data['first_name'] = substr($name, 0, $pos);
@@ -221,6 +235,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 				}
 			}
 		}
+
 		if ($userId && !isset($data['email']))
 		{
 			$data['email'] = $user->email;
@@ -247,8 +262,9 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 			$waitingList = false;
 		}
 
-		//Get data				
+		//Get data
 		$form = new RADForm($rowFields);
+
 		if ($captchaInvalid)
 		{
 			$useDefault = false;
@@ -257,6 +273,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		{
 			$useDefault = true;
 		}
+
 		$form->bind($data, $useDefault);
 		$form->prepareFormFields('calculateGroupRegistrationFee();');
 		$paymentMethod = $input->post->getString('payment_method', os_payments::getDefautPaymentMethod(trim($event->payment_methods)));
@@ -296,6 +313,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$options[]          = JHtml::_('select.option', 'Discover', 'Discover');
 		$options[]          = JHtml::_('select.option', 'Amex', 'American Express');
 		$lists['card_type'] = JHtml::_('select.genericlist', $options, 'card_type', ' class="inputbox" ', 'value', 'text');
+
 		if (($event->enable_coupon == 0 && $config->enable_coupon) || $event->enable_coupon == 2 || $event->enable_coupon == 3)
 		{
 			$enableCoupon = 1;
@@ -307,6 +325,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 
 		// Add support for deposit payment
 		$paymentType = $input->post->getInt('payment_type', 0);
+
 		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
 		{
 			$options               = array();
@@ -322,6 +341,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		}
 
 		$showCaptcha = 0;
+
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 		{
 			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
@@ -342,6 +362,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 
 		// Check to see if there is payment processing fee or not
 		$showPaymentFee = false;
+
 		foreach ($methods as $method)
 		{
 			if ($method->paymentFee)
@@ -392,5 +413,3 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		parent::display();
 	}
 }
-
-?>

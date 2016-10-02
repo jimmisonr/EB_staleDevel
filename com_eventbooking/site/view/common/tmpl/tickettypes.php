@@ -9,9 +9,9 @@
 // no direct access
 defined('_JEXEC') or die;
 ?>
-	<h3 class="eb-event-tickets-heading"><?php echo JText::_('EB_TICKET_INFORMATION'); ?></h3>
-	<table class="table table-striped table-bordered table-condensed eb-ticket-information">
-		<thead>
+<h3 class="eb-event-tickets-heading"><?php echo JText::_('EB_TICKET_INFORMATION'); ?></h3>
+<table class="table table-striped table-bordered table-condensed eb-ticket-information">
+	<thead>
 		<tr>
 			<th>
 				<?php echo JText::_('EB_TICKET_TYPE'); ?>
@@ -30,42 +30,41 @@ defined('_JEXEC') or die;
 			}
 			?>
 		</tr>
-		</thead>
-		<tbody>
-		<?php
-		foreach ($ticketTypes as $ticketType)
-		{
-		?>
-			<tr>
-				<td class="eb-ticket-type-title">
-					<?php echo $ticketType->title; ?>
-					<?php 
-						if ($ticketType->description)
-						{
-						?>
-							<p class="eb-ticket-type-description"><?php echo $ticketType->description; ?></p>
-						<?php
-						}
-					?>
-				</td>
-				<td class="eb-text-right">
-					<?php echo EventbookingHelper::formatCurrency($ticketType->price, $config); ?>
-				</td>
-				<?php
-				if ($config->show_available_place)
+	</thead>
+	<tbody>
+	<?php
+	foreach ($ticketTypes as $ticketType)
+	{
+	?>
+	<tr>
+		<td class="eb-ticket-type-title">
+			<?php
+				echo $ticketType->title;
+				if ($ticketType->description)
 				{
-					$available = $ticketType->capacity - $ticketType->registered;
 				?>
-					<td class="center">
-						<?php echo $available; ?>
-					</td>
+					<p class="eb-ticket-type-description"><?php echo $ticketType->description; ?></p>
 				<?php
 				}
-				?>
-			</tr>
+			?>
+		</td>
+		<td class="eb-text-right">
+			<?php echo EventbookingHelper::formatCurrency($ticketType->price, $config); ?>
+		</td>
+		<?php
+		if ($config->show_available_place)
+		{
+			$available = $ticketType->capacity - $ticketType->registered;
+		?>
+			<td class="center">
+				<?php echo $available; ?>
+			</td>
 		<?php
 		}
 		?>
-		</tbody>
-	</table>
-<?php
+	</tr>
+	<?php
+	}
+	?>
+	</tbody>
+</table>

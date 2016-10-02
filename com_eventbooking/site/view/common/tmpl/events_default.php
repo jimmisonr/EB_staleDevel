@@ -49,6 +49,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 			$detailUrl = JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, @$category->id, $Itemid));
 
 			$waitingList = false;
+
 			if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants) && $activateWaitingList && !@$event->user_registered && $registrationOpen)
 			{
 				$waitingList = true;
@@ -86,7 +87,8 @@ $return = base64_encode(JUri::getInstance()->toString());
 					<div class="<?php echo $rowFluidClass; ?>">
 					<div class="eb-description-details <?php echo $span7Class; ?>" itemprop="description">
 						<?php
-							if ($event->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$event->thumb)) {
+							if ($event->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$event->thumb))
+							{
 							?>
 								<a href="<?php echo JUri::base(true).'/media/com_eventbooking/images/'.$event->thumb; ?>" class="eb-modal"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$event->thumb; ?>" class="eb-thumb-left"/></a>
 							<?php
@@ -108,7 +110,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 									'isMultipleDate' => $isMultipleDate,
 									'nullDate' => $nullDate,
 									'Itemid'    => $Itemid,
- 								);
+								);
 
 								echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/event_properties.php', $layoutData);
 							?>
@@ -124,6 +126,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 				}
 
 				$ticketsLeft = $event->event_capacity - $event->total_registrants ;
+
 				if ($event->individual_price > 0 || $ticketsLeft > 0)
 				{
 				?>
@@ -163,11 +166,11 @@ $return = base64_encode(JUri::getInstance()->toString());
 						{
 							$msg = JText::_('EB_NO_LONGER_ACCEPT_REGISTRATION') ;
 						}
-						?>
+					?>
 						<div class="clearfix">
 							<p class="text-info eb-notice-message"><?php echo $msg; ?></p>
 						</div>
-						<?php
+					<?php
 					}
 				}
 				?>
@@ -195,13 +198,13 @@ $return = base64_encode(JUri::getInstance()->toString());
 
 							if ($config->hide_detail_button !== '1' || $isMultipleDate)
 							{
-								?>
+							?>
 								<li>
 									<a class="<?php echo $btnClass; ?> btn-primary" href="<?php echo $detailUrl; ?>">
 										<?php echo $isMultipleDate ? JText::_('EB_CHOOSE_DATE_LOCATION') : JText::_('EB_DETAILS');?>
 									</a>
 								</li>
-								<?php
+							<?php
 							}
 							?>
 						</ul>

@@ -13,34 +13,35 @@ defined('_JEXEC') or die;
 <div class="eb-cart-content">
 	<table class="table table-striped table-bordered table-condensed">
 		<thead>
-		<tr>
-			<th class="col_event">
-				<?php echo JText::_('EB_EVENT'); ?>
-			</th>
-			<?php
-			if ($this->config->show_event_date)
-			{
-			?>
-				<th class="col_event_date">
-					<?php echo JText::_('EB_EVENT_DATE'); ?>
+			<tr>
+				<th class="col_event">
+					<?php echo JText::_('EB_EVENT'); ?>
 				</th>
-			<?php
-			}
-			?>
-			<th class="col_price">
-				<?php echo JText::_('EB_PRICE'); ?>
-			</th>
-			<th class="col_quantity">
-				<?php echo JText::_('EB_QUANTITY'); ?>
-			</th>
-			<th class="col_subtotal">
-				<?php echo JText::_('EB_SUB_TOTAL'); ?>
-			</th>
-		</tr>
+				<?php
+				if ($this->config->show_event_date)
+				{
+				?>
+					<th class="col_event_date">
+						<?php echo JText::_('EB_EVENT_DATE'); ?>
+					</th>
+				<?php
+				}
+				?>
+				<th class="col_price">
+					<?php echo JText::_('EB_PRICE'); ?>
+				</th>
+				<th class="col_quantity">
+					<?php echo JText::_('EB_QUANTITY'); ?>
+				</th>
+				<th class="col_subtotal">
+					<?php echo JText::_('EB_SUB_TOTAL'); ?>
+				</th>
+			</tr>
 		</thead>
 		<tbody>
 		<?php
 		$total = 0 ;
+
 		for ($i = 0 , $n = count($this->items) ; $i < $n; $i++)
 		{
 			$item = $this->items[$i] ;

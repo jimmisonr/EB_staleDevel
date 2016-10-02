@@ -15,6 +15,7 @@ EventbookingHelperJquery::validateForm();
 if ($this->waitingList)
 {
 	$headerText = JText::_('EB_JOIN_WAITINGLIST');
+
 	if (strlen(strip_tags($this->message->{'waitinglist_form_message' . $this->fieldSuffix})))
 	{
 		$msg = $this->message->{'waitinglist_form_message' . $this->fieldSuffix};
@@ -159,6 +160,7 @@ $layoutData = array(
 	if ($this->config->accept_term ==1 && $articleId)
 	{
 		$layoutData['articleId'] = $articleId;
+
 		echo $this->loadCommonLayout('register/tmpl/register_terms_and_conditions.php', $layoutData);
 	}
 

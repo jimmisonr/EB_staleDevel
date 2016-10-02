@@ -19,6 +19,7 @@ else
 {
 	$url = JRoute::_('index.php?option=com_eventbooking&task=register.process_group_registration&Itemid=' . $this->Itemid, false);
 }
+
 $selectedState = '';
 
 $bootstrapHelper   = $this->bootstrapHelper;

@@ -16,6 +16,7 @@ else
 {
 	$msg = $this->message->number_members_form_message;
 }
+
 $msg        = str_replace("[MIN_NUMBER_REGISTRANTS]", $this->minNumberRegistrants, $msg);
 $msg        = str_replace("[MAX_NUMBER_REGISTRANTS]", $this->maxRegistrants, $msg);
 $bootstrapHelper   = $this->bootstrapHelper;
@@ -23,6 +24,7 @@ $controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
 $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
 $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 $btnClass          = $bootstrapHelper->getClassMapping('btn');
+
 if (strlen($msg))
 {
 ?>

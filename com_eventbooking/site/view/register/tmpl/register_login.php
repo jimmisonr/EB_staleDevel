@@ -44,9 +44,9 @@ defined('_JEXEC') or die;
 	<?php
 	if (JPluginHelper::isEnabled('system', 'remember'))
 	{
-		?>
+	?>
 		<input type="hidden" name="remember" value="1" />
-		<?php
+	<?php
 	}
 	?>
 	<input type="hidden" name="option" value="com_users" />

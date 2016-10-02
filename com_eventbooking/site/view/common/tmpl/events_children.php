@@ -130,7 +130,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 					{
 					?>
 						<td>
-							<?php 
+							<?php
 								if ($item->event_end_date == EB_TBC_DATE)
 								{
 									echo JText::_('EB_TBC');
@@ -152,6 +152,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 						</td>
 					<?php
 					}
+
 					if ($config->show_location_in_category_view)
 					{
 					?>
@@ -172,9 +173,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 							}
 							else
 							{
-							?>
-								&nbsp;
-							<?php
+								echo '';
 							}
 						?>
 					</td>
@@ -219,6 +218,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 						</td>
 					<?php
 					}
+
 					if ($config->show_registered)
 					{
 					?>
@@ -237,6 +237,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 						</td>
 					<?php
 					}
+
 					if ($config->show_available_place)
 					{
 					?>
@@ -262,6 +263,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 									<ul>
 										<?php
 											$registrationUrl = trim($item->registration_handle_url);
+
 											if ($registrationUrl)
 											{
 											?>
@@ -277,6 +279,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 													if ($config->multiple_booking)
 													{
 														$url        = 'index.php?option=com_eventbooking&task=cart.add_cart&id=' . (int) $item->id . '&Itemid=' . (int) $Itemid;
+
 														if ($item->event_password)
 														{
 															$extraClass = '';
@@ -293,13 +296,14 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 														$text       = JText::_('EB_REGISTER_INDIVIDUAL');
 														$extraClass = '';
 													}
-													?>
+												?>
 													<li>
 														<a class="<?php echo $btnClass . ' ' . $extraClass;?>"
 														   href="<?php echo $url; ?>"><?php echo $text; ?></a>
 													</li>
 												<?php
 												}
+
 												if (($item->registration_type == 0 || $item->registration_type == 2) && !$config->multiple_booking)
 												{
 												?>
@@ -322,15 +326,16 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 										<?php
 										if ($item->registration_type == 0 || $item->registration_type == 1)
 										{
-											?>
+										?>
 											<li>
 												<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.individual_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl);?>"><?php echo JText::_('EB_REGISTER_INDIVIDUAL_WAITING_LIST'); ; ?></a>
 											</li>
 										<?php
 										}
+
 										if (($item->registration_type == 0 || $item->registration_type == 2) && !$config->multiple_booking)
 										{
-											?>
+										?>
 											<li>
 												<a class="<?php echo $btnClass; ?>" href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id='.$item->id.'&Itemid='.$Itemid, false, $ssl) ; ?>"><?php echo JText::_('EB_REGISTER_GROUP_WAITING_LIST'); ; ?></a>
 											</li>

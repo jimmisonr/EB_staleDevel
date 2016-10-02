@@ -10,6 +10,7 @@
 defined( '_JEXEC' ) or die ;
 $menuLayout = 'layout';
 $activeMenu = JFactory::getApplication()->getMenu()->getActive();
+
 if ($activeMenu && !empty($activeMenu->query['layout']))
 {
 	$menuLayout = $activeMenu->query['layout'];
@@ -19,8 +20,8 @@ if ($activeMenu && !empty($activeMenu->query['layout']))
 	<ul class="eb-menu-calendar nav nav-pills">
 		<li>
 			<?php
-			$month = $currentDateData['month'];
-			$year = $currentDateData['year'];
+				$month = $currentDateData['month'];
+				$year = $currentDateData['year'];
 			?>
 			<a class="calendar_link<?php if ($layout == 'default') echo ' active'; ?>"
 			   href="<?php echo JRoute::_("index.php?option=com_eventbooking&view=calendar" . ($menuLayout == 'default' ? '' : '&layout=default') . "&month=$month&year=$year&Itemid=$Itemid"); ?>"
@@ -40,6 +41,7 @@ if ($activeMenu && !empty($activeMenu->query['layout']))
 			</li>
 		<?php
 		}
+
 		if ($config->activate_daily_calendar_view)
 		{
 		?>

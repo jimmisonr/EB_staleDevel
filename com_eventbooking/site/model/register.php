@@ -29,6 +29,7 @@ class EventBookingModelRegister extends RADModel
 			->where('event_password = ' . $db->quote($password));
 		$db->setQuery($query);
 		$total = $db->loadResult();
+
 		if ($total)
 		{
 			return true;
@@ -48,12 +49,14 @@ class EventBookingModelRegister extends RADModel
 	public function processIndividualRegistration($data)
 	{
 		jimport('joomla.user.helper');
+
 		$db                     = JFactory::getDbo();
 		$query                  = $db->getQuery(true);
 		$user                   = JFactory::getUser();
 		$config                 = EventbookingHelper::getConfig();
 		$row                    = JTable::getInstance('EventBooking', 'Registrant');
 		$data['transaction_id'] = strtoupper(JUserHelper::genRandomPassword());
+
 		if (!$user->id && $config->user_registration)
 		{
 			$userId          = EventbookingHelper::saveRegistration($data);
@@ -69,6 +72,7 @@ class EventBookingModelRegister extends RADModel
 				->where('registration_code=' . $db->quote($registrationCode));
 			$db->setQuery($query);
 			$total = $db->loadResult();
+
 			if (!$total)
 			{
 				$row->registration_code = $registrationCode;
@@ -79,6 +83,7 @@ class EventBookingModelRegister extends RADModel
 		// Calculate the payment amount
 		$eventId = (int) $data['event_id'];
 		$event   = EventbookingHelperDatabase::getEvent($eventId);
+
 		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
 		{
 			$waitingList = true;
@@ -87,6 +92,7 @@ class EventBookingModelRegister extends RADModel
 		{
 			$waitingList = false;
 		}
+
 		$paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : '';
 		$rowFields     = EventbookingHelper::getFormFields($eventId, 0);
 		$form          = new RADForm($rowFields);
@@ -116,10 +122,12 @@ class EventBookingModelRegister extends RADModel
 		}
 
 		$paymentType = isset($data['payment_type']) ? (int) $data['payment_type'] : 0;
+
 		if ($paymentType == 0)
 		{
 			$fees['deposit_amount'] = 0;
 		}
+
 		$data['total_amount']           = round($fees['total_amount'], 2);
 		$data['discount_amount']        = round($fees['discount_amount'], 2);
 		$data['late_fee']               = round($fees['late_fee'], 2);
@@ -133,6 +141,7 @@ class EventBookingModelRegister extends RADModel
 		$row->published          = 0;
 		$row->register_date      = gmdate('Y-m-d H:i:s');
 		$row->number_registrants = 1;
+
 		if (isset($data['user_id']))
 		{
 			$row->user_id = $data['user_id'];
@@ -141,6 +150,7 @@ class EventBookingModelRegister extends RADModel
 		{
 			$row->user_id = $user->get('id');
 		}
+
 		if ($row->deposit_amount > 0)
 		{
 			$row->payment_status = 0;
@@ -163,6 +173,7 @@ class EventBookingModelRegister extends RADModel
 		}
 
 		$couponCode = isset($data['coupon_code']) ? $data['coupon_code'] : null;
+
 		if ($couponCode && $fees['coupon_valid'])
 		{
 			$coupon         = $fees['coupon'];
@@ -192,6 +203,7 @@ class EventBookingModelRegister extends RADModel
 		if ($event->has_multiple_ticket_types && !$waitingList)
 		{
 			$ticketTypes = EventbookingHelperData::getTicketTypes($eventId);
+
 			foreach ($ticketTypes as $ticketType)
 			{
 				if (!empty($data['ticket_type_' . $ticketType->id]))
@@ -208,9 +220,11 @@ class EventBookingModelRegister extends RADModel
 		}
 
 		$data['event_title'] = $event->title;
+
 		JPluginHelper::importPlugin('eventbooking');
 		$dispatcher = JEventDispatcher::getInstance();
 		$dispatcher->trigger('onAfterStoreRegistrant', array($row));
+
 		if ($row->deposit_amount > 0)
 		{
 			$data['amount'] = $row->deposit_amount;
@@ -248,15 +262,18 @@ class EventBookingModelRegister extends RADModel
 
 			// Convert payment amount to USD if the currency is not supported by payment gateway
 			$currency = $event->currency_code ? $event->currency_code : $config->currency_code;
+
 			if (method_exists($paymentClass, 'getSupportedCurrencies'))
 			{
 				$currencies = $paymentClass->getSupportedCurrencies();
+
 				if (!in_array($currency, $currencies))
 				{
 					$data['amount'] = EventbookingHelper::convertAmountToUSD($data['amount'], $currency);
 					$currency       = 'USD';
 				}
 			}
+
 			$data['currency'] = $currency;
 
 			$country         = empty($data['country']) ? $config->default_country : $data['country'];
@@ -296,6 +313,7 @@ class EventBookingModelRegister extends RADModel
 	public function processGroupRegistration($data)
 	{
 		jimport('joomla.user.helper');
+
 		$session           = JFactory::getSession();
 		$user              = JFactory::getUser();
 		$db                = JFactory::getDbo();
@@ -304,6 +322,7 @@ class EventBookingModelRegister extends RADModel
 		$row               = JTable::getInstance('EventBooking', 'Registrant');
 		$numberRegistrants = (int) $session->get('eb_number_registrants', '');
 		$membersData       = $session->get('eb_group_members_data', null);
+
 		if ($membersData)
 		{
 			$membersData = unserialize($membersData);
@@ -312,15 +331,19 @@ class EventBookingModelRegister extends RADModel
 		{
 			$membersData = array();
 		}
+
 		$data['number_registrants'] = $numberRegistrants;
 		$data['transaction_id']     = strtoupper(JUserHelper::genRandomPassword());
+
 		if (!$user->id && $config->user_registration)
 		{
 			$userId          = EventbookingHelper::saveRegistration($data);
 			$data['user_id'] = $userId;
 		}
+
 		$eventId = (int) $data['event_id'];
 		$event   = EventbookingHelperDatabase::getEvent($eventId);
+
 		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
 		{
 			$waitingList = true;
@@ -329,12 +352,14 @@ class EventBookingModelRegister extends RADModel
 		{
 			$waitingList = false;
 		}
+
 		$rowFields        = EventbookingHelper::getFormFields($eventId, 1);
 		$memberFormFields = EventbookingHelper::getFormFields($eventId, 2);
 		$form             = new RADForm($rowFields);
 		$form->bind($data);
 
 		$paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : '';
+
 		if ($waitingList)
 		{
 			if (is_callable('EventbookingHelperOverrideHelper::calculateGroupRegistrationFees'))
@@ -357,6 +382,7 @@ class EventBookingModelRegister extends RADModel
 				$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
 			}
 		}
+
 		//Calculate members fee
 		$membersForm           = $fees['members_form'];
 		$membersTotalAmount    = $fees['members_total_amount'];
@@ -364,11 +390,13 @@ class EventBookingModelRegister extends RADModel
 		$membersTaxAmount      = $fees['members_tax_amount'];
 		$membersLateFee        = $fees['members_late_fee'];
 		$paymentType           = (int) @$data['payment_type'];
+
 		if ($paymentType == 0)
 		{
 			$fees['deposit_amount'] = 0;
 		}
-		//The data for group billing record		
+
+		//The data for group billing record
 		$data['total_amount']           = $fees['total_amount'];
 		$data['discount_amount']        = $fees['discount_amount'];
 		$data['late_fee']               = $fees['late_fee'];
@@ -376,6 +404,7 @@ class EventBookingModelRegister extends RADModel
 		$data['deposit_amount']         = $fees['deposit_amount'];
 		$data['payment_processing_fee'] = $fees['payment_processing_fee'];
 		$data['amount']                 = $fees['amount'];
+
 		if (!isset($data['first_name']))
 		{
 			//Get data from first member
@@ -385,6 +414,7 @@ class EventBookingModelRegister extends RADModel
 			$firstMemberForm->removeFieldSuffix();
 			$data = array_merge($data, $firstMemberForm->getFormData());
 		}
+
 		$row->bind($data);
 		$row->group_id         = 0;
 		$row->published        = 0;
@@ -398,6 +428,7 @@ class EventBookingModelRegister extends RADModel
 		{
 			$row->user_id = $user->get('id');
 		}
+
 		if ($row->deposit_amount > 0)
 		{
 			$row->payment_status = 0;
@@ -427,6 +458,7 @@ class EventBookingModelRegister extends RADModel
 				->where('registration_code=' . $db->quote($registrationCode));
 			$db->setQuery($query);
 			$total = $db->loadResult();
+
 			if (!$total)
 			{
 				$row->registration_code = $registrationCode;
@@ -436,6 +468,7 @@ class EventBookingModelRegister extends RADModel
 
 		// Coupon code
 		$couponCode = isset($data['coupon_code']) ? $data['coupon_code'] : null;
+
 		if ($couponCode && $fees['coupon_valid'])
 		{
 			$coupon         = $fees['coupon'];
@@ -463,6 +496,7 @@ class EventBookingModelRegister extends RADModel
 		//Clear the coupon session
 		$row->store();
 		$form->storeData($row->id, $data);
+
 		//Store group members data
 		if ($config->collect_member_information)
 		{
@@ -487,10 +521,12 @@ class EventBookingModelRegister extends RADModel
 				$memberData = $membersForm[$i]->getFormData();
 				$rowMember->bind($memberData);
 				$rowMember->store();
+
 				//Store members data custom field
 				$membersForm[$i]->storeData($rowMember->id, $memberData);
 			}
 		}
+
 		$data['event_title'] = $event->title;
 
 		// Trigger onAfterStoreRegistrant event
@@ -540,15 +576,18 @@ class EventBookingModelRegister extends RADModel
 
 			// Convert payment amount to USD if the currency is not supported by payment gateway
 			$currency = $event->currency_code ? $event->currency_code : $config->currency_code;
+
 			if (method_exists($paymentClass, 'getSupportedCurrencies'))
 			{
 				$currencies = $paymentClass->getSupportedCurrencies();
+
 				if (!in_array($currency, $currencies))
 				{
 					$data['amount'] = EventbookingHelper::convertAmountToUSD($data['amount'], $currency);
 					$currency       = 'USD';
 				}
 			}
+
 			$data['currency'] = $currency;
 
 			$country         = empty($data['country']) ? $config->default_country : $data['country'];
@@ -563,10 +602,12 @@ class EventBookingModelRegister extends RADModel
 				$row->payment_date = gmdate('Y-m-d H:i:s');
 				$row->published    = 1;
 				$row->store();
+
 				if ($row->is_group_billing)
 				{
 					EventbookingHelper::updateGroupRegistrationRecord($row->id);
 				}
+
 				$dispatcher->trigger('onAfterPaymentSuccess', array($row));
 				EventbookingHelper::sendEmails($row, $config);
 
@@ -593,6 +634,7 @@ class EventBookingModelRegister extends RADModel
 	public function paymentConfirm($paymentMethod)
 	{
 		$method = os_payments::getPaymentMethod($paymentMethod);
+
 		if ($method)
 		{
 			$method->verifyPayment();
@@ -608,11 +650,13 @@ class EventBookingModelRegister extends RADModel
 		{
 			return false;
 		}
+
 		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
 		$config = EventbookingHelper::getConfig();
 		$row    = JTable::getInstance('EventBooking', 'Registrant');
 		$row->load($id);
+
 		if (!$row->id)
 		{
 			return false;
@@ -622,6 +666,7 @@ class EventBookingModelRegister extends RADModel
 		{
 			return false;
 		}
+
 		//Trigger the cancellation
 		JPluginHelper::importPlugin('eventbooking');
 		$dispatcher = JEventDispatcher::getInstance();
@@ -649,6 +694,7 @@ class EventBookingModelRegister extends RADModel
 			$db->execute();
 			$query->clear();
 		}
+
 		$query->clear();
 		$query->select('*')
 			->from('#__eb_events')
@@ -665,6 +711,7 @@ class EventBookingModelRegister extends RADModel
 		{
 			$fromName = JFactory::getConfig()->get('fromname');
 		}
+
 		if ($config->from_email)
 		{
 			$fromEmail = $config->from_email;
@@ -673,6 +720,7 @@ class EventBookingModelRegister extends RADModel
 		{
 			$fromEmail = JFactory::getConfig()->get('mailfrom');
 		}
+
 		if ($config->multiple_booking)
 		{
 			$rowFields = EventbookingHelper::getFormFields($row->id, 4);
@@ -685,6 +733,7 @@ class EventBookingModelRegister extends RADModel
 		{
 			$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
 		}
+
 		$form = new RADForm($rowFields);
 		$data = EventbookingHelper::getRegistrantData($row, $rowFields);
 		$form->bind($data);
@@ -702,6 +751,7 @@ class EventBookingModelRegister extends RADModel
 		$replaces['event_title'] = $db->loadResult();
 		//Replace the custom fields
 		$fields = $form->getFields();
+
 		foreach ($fields as $field)
 		{
 			if (is_string($field->value) && is_array(json_decode($field->value)))
@@ -712,11 +762,14 @@ class EventBookingModelRegister extends RADModel
 			{
 				$fieldValue = $field->value;
 			}
+
 			$replaces[$field->name] = $fieldValue;
 		}
+
 		$replaces['amount'] = EventbookingHelper::formatAmount($row->amount, $config);
 		//Notification email send to user
 		$message = EventbookingHelper::getMessages();
+
 		if (strlen(trim($message->{'registration_cancel_email_subject' . $fieldSuffix})))
 		{
 			$subject = $message->{'registration_cancel_email_subject' . $fieldSuffix};
@@ -725,6 +778,7 @@ class EventBookingModelRegister extends RADModel
 		{
 			$subject = $message->registration_cancel_email_subject;
 		}
+
 		if (strlen(trim(strip_tags($message->{'registration_cancel_email_body' . $fieldSuffix}))))
 		{
 			$body = $message->{'registration_cancel_email_body' . $fieldSuffix};
@@ -733,14 +787,17 @@ class EventBookingModelRegister extends RADModel
 		{
 			$body = $message->registration_cancel_email_body;
 		}
+
 		$subject = str_replace('[EVENT_TITLE]', $eventTitle, $subject);
 		$body    = str_replace('[REGISTRATION_DETAIL]', $emailContent, $body);
+
 		foreach ($replaces as $key => $value)
 		{
 			$key     = strtoupper($key);
 			$subject = str_replace("[$key]", $value, $subject);
 			$body    = str_replace("[$key]", $value, $body);
 		}
+
 		//Send emails to notification emails
 		if (strlen(trim($event->notification_emails)) > 0)
 		{
@@ -755,9 +812,11 @@ class EventBookingModelRegister extends RADModel
 		{
 			$notificationEmails = $config->notification_emails;
 		}
+
 		$notificationEmails = str_replace(' ', '', $notificationEmails);
 		$emails             = explode(',', $notificationEmails);
 		$mailer             = JFactory::getMailer();
+
 		for ($i = 0, $n = count($emails); $i < $n; $i++)
 		{
 			$email = $emails[$i];
