@@ -97,7 +97,7 @@ $layoutData = array(
 				{
 					$count++;
 					$rowFields = EventbookingHelper::getFormFields($item->id, 2);
-					$form = new RADForm($rowFields);
+					$form      = new RADForm($rowFields);
 					$form->setFieldSuffix($count);
 					$form->bind($this->formData, $this->useDefault);
 					$form->prepareFormFields('calculateCartRegistrationFee();');
@@ -108,24 +108,23 @@ $layoutData = array(
 					if (isset($fields['email']))
 					{
 						$emailField = $fields['email'];
-						$cssClass = $emailField->getAttribute('class');
-						$cssClass = str_replace(',ajax[ajaxEmailCall]', '', $cssClass);
+						$cssClass   = $emailField->getAttribute('class');
+						$cssClass   = str_replace(',ajax[ajaxEmailCall]', '', $cssClass);
 						$emailField->setAttribute('class', $cssClass);
 					}
 				?>
 					<h4 class="eb-heading"><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1); ?></h4>
 				<?php
-					$j = 0;
+
+					/* @var RADFormField $field */
 					foreach ($fields as $field)
 					{
-						$j++;
-
-						if ($j > 1 && $field->row->only_show_for_first_member)
+						if ($count > 1 && $field->row->only_show_for_first_member)
 						{
 							continue;
 						}
 
-						if ($j > 1 && $field->row->only_require_for_first_member)
+						if ($count > 1 && $field->row->only_require_for_first_member)
 						{
 							$field->makeFieldOptional();
 						}
