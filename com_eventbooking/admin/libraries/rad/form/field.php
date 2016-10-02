@@ -462,13 +462,8 @@ abstract class RADFormField
 	 */
 	public function makeFieldOptional()
 	{
-		// This only need to be processed if the field is required
-		if (!$this->row->required)
-		{
-			return;
-		}
-
 		$cssClass = $this->getAttribute('class');
+
 		if (strpos($cssClass, 'validate[required,') !== false)
 		{
 			$cssClass = str_replace('validate[required,', 'validate[', $cssClass);

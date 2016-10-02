@@ -89,6 +89,7 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 	//We don't need to use ajax validation for email field for group members
 	if (isset($fields['email']))
 	{
+		/* @var RADFormField $emailField */
 		$emailField = $fields['email'];
 		$cssClass = $emailField->getAttribute('class');
 		$cssClass = str_replace(',ajax[ajaxEmailCall]', '', $cssClass);
@@ -97,6 +98,7 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 
 	foreach ($fields as $field)
 	{
+		/* @var RADFormField $field */
 		if ($i > 1 && $field->row->only_show_for_first_member)
 		{
 			continue;
