@@ -144,7 +144,8 @@ $offset = JFactory::getConfig()->get('offset');
 						}
 						elseif (!in_array($item->registration_access, $this->viewLevels))
 						{
-							$msg = JText::_('EB_LOGIN_TO_REGISTER');
+							$loginLink = 'index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString());
+							$msg       = str_replace('[LOGIN_LINK]', $loginLink, JText::_('EB_LOGIN_TO_REGISTER'));
 						}
 						else
 						{

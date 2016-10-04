@@ -94,7 +94,10 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 	</thead>
 	<tbody>
 	<?php
-		for ($i = 0 , $n = count($items) ; $i < $n; $i++)
+		$loginLink          = 'index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString());
+		$loginToRegisterMsg = str_replace('[LOGIN_LINK]', $loginLink, JText::_('EB_LOGIN_TO_REGISTER'));
+
+		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
 			$item = $items[$i];
 
@@ -427,11 +430,11 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 								}
 								elseif (!in_array($item->registration_access, $viewLevels))
 								{
-									$msg = JText::_('EB_LOGIN_TO_REGISTER') ;
+									$msg = $loginToRegisterMsg;
 								}
 								else
 								{
-									$msg = JText::_('EB_NO_LONGER_ACCEPT_REGISTRATION') ;
+									$msg = JText::_('EB_NO_LONGER_ACCEPT_REGISTRATION');
 								}
 							?>
 								<div class="eb-notice-message">

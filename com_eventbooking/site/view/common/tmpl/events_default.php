@@ -13,14 +13,17 @@ $return = base64_encode(JUri::getInstance()->toString());
 <div id="eb-events">
 	<?php
 		/* @var EventbookingHelperBootstrap $bootstrapHelper */
-		$rowFluidClass       = $bootstrapHelper->getClassMapping('row-fluid');
-		$span7Class          = $bootstrapHelper->getClassMapping('span7');
-		$span5Class          = $bootstrapHelper->getClassMapping('span5');
-		$btnClass            = $bootstrapHelper->getClassMapping('btn');
-		$iconPencilClass     = $bootstrapHelper->getClassMapping('icon-pencil');
-		$iconOkClass    = $bootstrapHelper->getClassMapping('icon-ok');
-		$iconRemoveClass  = $bootstrapHelper->getClassMapping('icon-remove');
-		$iconDownloadClass     = $bootstrapHelper->getClassMapping('icon-download');
+		$rowFluidClass     = $bootstrapHelper->getClassMapping('row-fluid');
+		$span7Class        = $bootstrapHelper->getClassMapping('span7');
+		$span5Class        = $bootstrapHelper->getClassMapping('span5');
+		$btnClass          = $bootstrapHelper->getClassMapping('btn');
+		$iconPencilClass   = $bootstrapHelper->getClassMapping('icon-pencil');
+		$iconOkClass       = $bootstrapHelper->getClassMapping('icon-ok');
+		$iconRemoveClass   = $bootstrapHelper->getClassMapping('icon-remove');
+		$iconDownloadClass = $bootstrapHelper->getClassMapping('icon-download');
+
+		$loginLink          = 'index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString());
+		$loginToRegisterMsg = str_replace('[LOGIN_LINK]', $loginLink, JText::_('EB_LOGIN_TO_REGISTER'));
 
 		for ($i = 0 , $n = count($events) ;  $i < $n ; $i++)
 		{
@@ -160,11 +163,11 @@ $return = base64_encode(JUri::getInstance()->toString());
 						}
 						elseif (!in_array($event->registration_access, $viewLevels))
 						{
-							$msg = JText::_('EB_LOGIN_TO_REGISTER') ;
+							$msg  = $loginToRegisterMsg;
 						}
 						else
 						{
-							$msg = JText::_('EB_NO_LONGER_ACCEPT_REGISTRATION') ;
+							$msg = JText::_('EB_NO_LONGER_ACCEPT_REGISTRATION');
 						}
 					?>
 						<div class="clearfix">
