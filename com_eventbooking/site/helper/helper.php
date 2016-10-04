@@ -999,11 +999,29 @@ class EventbookingHelper
 		$query      = $db->getQuery(true);
 		$couponCode = isset($data['coupon_code']) ? $data['coupon_code'] : '';
 
-		$totalAmount = $event->individual_price + $form->calculateFee(array('NUMBER_REGISTRANTS' => 1, 'INDIVIDUAL_PRICE' => $event->individual_price));
+		$feeCalculationTags = array(
+			'NUMBER_REGISTRANTS' => 1,
+			'INDIVIDUAL_PRICE'   => $event->individual_price
+		);
+
+		if ($config->event_custom_field && file_exists(JPATH_ROOT . '/components/com_eventbooking/fields.xml'))
+		{
+			EventbookingHelperData::prepareCustomFieldsData(array($event));
+
+			$filterInput = JFilterInput::getInstance();
+
+			foreach ($event->paramData as $customFieldName => $param)
+			{
+				$feeCalculationTags[strtoupper($customFieldName)] = $filterInput->clean($param['value'], 'float');
+			}
+		}
+
+		$totalAmount = $event->individual_price + $form->calculateFee($feeCalculationTags);
 
 		if ($event->has_multiple_ticket_types)
 		{
 			$ticketTypes = EventbookingHelperData::getTicketTypes($event->id);
+
 			foreach ($ticketTypes as $ticketType)
 			{
 				if (!empty($data['ticket_type_' . $ticketType->id]))
@@ -1240,7 +1258,24 @@ class EventbookingHelper
 		$memberFormFields = EventbookingHelper::getFormFields($eventId, 2);
 		$rate             = EventbookingHelper::getRegistrationRate($eventId, $numberRegistrants);
 
-		$extraFee = $form->calculateFee(array('NUMBER_REGISTRANTS' => $numberRegistrants, 'INDIVIDUAL_PRICE' => $rate));
+		$feeCalculationTags = array(
+			'NUMBER_REGISTRANTS' => $numberRegistrants,
+			'INDIVIDUAL_PRICE'   => $rate,
+		);
+
+		if ($config->event_custom_field && file_exists(JPATH_ROOT . '/components/com_eventbooking/fields.xml'))
+		{
+			EventbookingHelperData::prepareCustomFieldsData(array($event));
+
+			$filterInput = JFilterInput::getInstance();
+
+			foreach ($event->paramData as $customFieldName => $param)
+			{
+				$feeCalculationTags[strtoupper($customFieldName)] = $filterInput->clean($param['value'], 'float');
+			}
+		}
+
+		$extraFee = $form->calculateFee($feeCalculationTags);
 
 		$nullDate              = $db->getNullDate();
 		$membersForm           = array();
@@ -1269,7 +1304,7 @@ class EventbookingHelper
 				$memberForm = new RADForm($memberFormFields);
 				$memberForm->setFieldSuffix($i + 1);
 				$memberForm->bind($membersData);
-				$memberExtraFee = $memberForm->calculateFee();
+				$memberExtraFee = $memberForm->calculateFee($feeCalculationTags);
 				$extraFee += $memberExtraFee;
 				$membersTotalAmount[$i]    = $rate + $memberExtraFee;
 				$membersDiscountAmount[$i] = 0;
@@ -1596,7 +1631,6 @@ class EventbookingHelper
 		$user                 = JFactory::getUser();
 		$db                   = JFactory::getDbo();
 		$query                = $db->getQuery(true);
-		$nullDate             = $db->getNullDate();
 		$fees                 = array();
 		$recordsData          = array();
 		$totalAmount          = 0;
