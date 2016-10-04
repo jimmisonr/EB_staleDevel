@@ -157,7 +157,11 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		{
 			$data['discount_groups'] = implode(',', $data['discount_groups']);
 		}
-
+		else
+		{
+			$data['discount_groups'] = '';
+		}
+		
 		//Process attachment
 		if (JFactory::getApplication()->isSite())
 		{
