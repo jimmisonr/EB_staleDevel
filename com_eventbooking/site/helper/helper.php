@@ -1016,6 +1016,7 @@ class EventbookingHelper
 			}
 		}
 
+
 		$totalAmount = $event->individual_price + $form->calculateFee($feeCalculationTags);
 
 		if ($event->has_multiple_ticket_types)
@@ -1034,12 +1035,15 @@ class EventbookingHelper
 		$discountAmount        = 0;
 		$fees['discount_rate'] = 0;
 		$nullDate              = $db->getNullDate();
+
 		if ($user->id)
 		{
 			$discountRate = self::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
+
 			if ($discountRate > 0)
 			{
 				$fees['discount_rate'] = $discountRate;
+
 				if ($event->discount_type == 1)
 				{
 					$discountAmount = $totalAmount * $discountRate / 100;
@@ -1084,10 +1088,12 @@ class EventbookingHelper
 				->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
+
 			if ($coupon)
 			{
 				$fees['coupon_valid'] = 1;
 				$fees['coupon']       = $coupon;
+
 				if ($coupon->coupon_type == 0)
 				{
 					$discountAmount = $discountAmount + $totalAmount * $coupon->discount / 100;
@@ -1133,12 +1139,15 @@ class EventbookingHelper
 					->where('user_id = ' . $user->id)
 					->where('(published = 1 OR (payment_method LIKE "os_offline%" AND published IN (0, 1)))');
 				$registeredEventIds = $db->loadColumn();
+
 				if (count($registeredEventIds))
 				{
 					$registeredEventIds[] = $event->id;
+
 					foreach ($discountRules as $rule)
 					{
 						$eventIds = explode(',', $rule->event_ids);
+
 						if (!array_diff($eventIds, $registeredEventIds))
 						{
 							$fees['bundle_discount_amount'] += $rule->discount_amount;
@@ -1184,6 +1193,7 @@ class EventbookingHelper
 		// Payment processing fee
 		$paymentFeeAmount  = 0;
 		$paymentFeePercent = 0;
+
 		if ($paymentMethod)
 		{
 			$method            = os_payments::loadPaymentMethod($paymentMethod);
@@ -1191,6 +1201,7 @@ class EventbookingHelper
 			$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
 			$paymentFeePercent = (float) $params->get('payment_fee_percent');
 		}
+
 		if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $amount > 0)
 		{
 			$fees['payment_processing_fee'] = round($paymentFeeAmount + $amount * $paymentFeePercent / 100, 2);
@@ -1283,10 +1294,12 @@ class EventbookingHelper
 		$membersDiscountAmount = array();
 		$membersLateFee        = array();
 		$membersTaxAmount      = array();
+
 		// Members data
 		if ($config->collect_member_information)
 		{
 			$membersData = $session->get('eb_group_members_data', null);
+
 			if ($membersData)
 			{
 				$membersData = unserialize($membersData);
@@ -1299,6 +1312,7 @@ class EventbookingHelper
 			{
 				$membersData = array();
 			}
+
 			for ($i = 0; $i < $numberRegistrants; $i++)
 			{
 				$memberForm = new RADForm($memberFormFields);
@@ -1324,14 +1338,17 @@ class EventbookingHelper
 
 		// Calculate discount amount
 		$discountAmount = 0;
+
 		if ($user->id)
 		{
 			$discountRate = self::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
+
 			if ($discountRate > 0)
 			{
 				if ($event->discount_type == 1)
 				{
 					$discountAmount = $totalAmount * $discountRate / 100;
+
 					if ($config->collect_member_information)
 					{
 						for ($i = 0; $i < $numberRegistrants; $i++)
@@ -1343,6 +1360,7 @@ class EventbookingHelper
 				else
 				{
 					$discountAmount = $numberRegistrants * $discountRate;
+
 					if ($config->collect_member_information)
 					{
 						for ($i = 0; $i < $numberRegistrants; $i++)
@@ -1371,10 +1389,12 @@ class EventbookingHelper
 				->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
+
 			if ($coupon)
 			{
 				$fees['coupon_valid'] = 1;
 				$fees['coupon']       = $coupon;
+
 				if ($coupon->coupon_type == 0)
 				{
 					$discountAmount = $discountAmount + $totalAmount * $coupon->discount / 100;
@@ -1425,6 +1445,7 @@ class EventbookingHelper
 				if ($event->early_bird_discount_type == 1)
 				{
 					$discountAmount = $discountAmount + $totalAmount * $event->early_bird_discount_amount / 100;
+
 					if ($config->collect_member_information)
 					{
 						for ($i = 0; $i < $numberRegistrants; $i++)
@@ -1436,6 +1457,7 @@ class EventbookingHelper
 				else
 				{
 					$discountAmount = $discountAmount + $numberRegistrants * $event->early_bird_discount_amount;
+
 					if ($config->collect_member_information)
 					{
 						for ($i = 0; $i < $numberRegistrants; $i++)
@@ -1473,12 +1495,15 @@ class EventbookingHelper
 					->where('user_id = ' . $user->id)
 					->where('(published = 1 OR (payment_method LIKE "os_offline%" AND published IN (0, 1)))');
 				$registeredEventIds = $db->loadColumn();
+
 				if (count($registeredEventIds))
 				{
 					$registeredEventIds[] = $event->id;
+
 					foreach ($discountRules as $rule)
 					{
 						$eventIds = explode(',', $rule->event_ids);
+
 						if (!array_diff($eventIds, $registeredEventIds))
 						{
 							$fees['bundle_discount_amount'] += $rule->discount_amount;
@@ -1492,11 +1517,13 @@ class EventbookingHelper
 
 		// Late Fee
 		$lateFee = 0;
+
 		if (($event->late_fee_date != $nullDate) && $event->late_fee_date_diff >= 0 && $event->late_fee_amount > 0)
 		{
 			if ($event->late_fee_type == 1)
 			{
 				$lateFee = $totalAmount * $event->late_fee_amount / 100;
+
 				if ($config->collect_member_information)
 				{
 					for ($i = 0; $i < $numberRegistrants; $i++)
@@ -1509,6 +1536,7 @@ class EventbookingHelper
 			{
 
 				$lateFee = $numberRegistrants * $event->late_fee_amount;
+
 				if ($config->collect_member_information)
 				{
 					for ($i = 0; $i < $numberRegistrants; $i++)
@@ -1540,6 +1568,7 @@ class EventbookingHelper
 		if ($event->tax_rate && ($totalAmount - $discountAmount + $lateFee > 0))
 		{
 			$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $event->tax_rate / 100, 2);
+
 			if ($config->collect_member_information)
 			{
 				for ($i = 0; $i < $numberRegistrants; $i++)
@@ -1551,6 +1580,7 @@ class EventbookingHelper
 		else
 		{
 			$taxAmount = 0;
+
 			if ($config->collect_member_information)
 			{
 				for ($i = 0; $i < $numberRegistrants; $i++)
@@ -1566,6 +1596,7 @@ class EventbookingHelper
 		// Payment processing fee
 		$paymentFeeAmount  = 0;
 		$paymentFeePercent = 0;
+
 		if ($paymentMethod)
 		{
 			$method            = os_payments::loadPaymentMethod($paymentMethod);
@@ -1573,6 +1604,7 @@ class EventbookingHelper
 			$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
 			$paymentFeePercent = (float) $params->get('payment_fee_percent');
 		}
+
 		if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $amount > 0)
 		{
 			$fees['payment_processing_fee'] = round($paymentFeeAmount + $amount * $paymentFeePercent / 100, 2);
@@ -1648,6 +1680,7 @@ class EventbookingHelper
 		$collectRecordsData   = isset($data['collect_records_data']) ? $data['collect_records_data'] : false;
 		$paymentFeeAmount     = 0;
 		$paymentFeePercent    = 0;
+
 		if ($paymentMethod)
 		{
 			$method            = os_payments::loadPaymentMethod($paymentMethod);
@@ -1657,6 +1690,7 @@ class EventbookingHelper
 		}
 
 		$couponDiscountedEventIds = array();
+
 		if ($couponCode)
 		{
 			$query->clear()
@@ -1673,9 +1707,11 @@ class EventbookingHelper
 				->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
+
 			if ($coupon)
 			{
 				$fees['coupon_valid'] = 1;
+
 				if ($coupon->event_id != -1)
 				{
 					// Get list of events which will receive discount
@@ -1721,9 +1757,11 @@ class EventbookingHelper
 			->where('id IN (SELECT discount_id FROM #__eb_discount_events WHERE event_id IN (' . implode(',', $items) . '))');
 		$db->setQuery($query);
 		$discountRules = $db->loadObjectList();
+
 		if (!empty($discountRules))
 		{
 			$registeredEventIds = $items;
+
 			if ($user->id)
 			{
 				$query->clear()
@@ -1746,6 +1784,7 @@ class EventbookingHelper
 		}
 
 		$count = 0;
+
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
 			$eventId               = (int) $items[$i];
@@ -1753,6 +1792,7 @@ class EventbookingHelper
 			$recordsData[$eventId] = array();
 			$event                 = EventbookingHelperDatabase::getEvent($eventId);
 			$rate                  = self::getRegistrationRate($eventId, $quantity);
+
 			if ($i == 0)
 			{
 				$registrantTotalAmount = $rate * $quantity + $feeAmount;
@@ -1766,6 +1806,7 @@ class EventbookingHelper
 			if ($config->collect_member_information_in_cart)
 			{
 				$memberFormFields = EventbookingHelper::getFormFields($eventId, 2);
+
 				for ($j = 0; $j < $quantity; $j++)
 				{
 					$count++;
@@ -1794,11 +1835,13 @@ class EventbookingHelper
 			if ($user->id)
 			{
 				$discountRate = EventbookingHelper::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
+
 				if ($discountRate > 0)
 				{
 					if ($event->discount_type == 1)
 					{
 						$registrantDiscount = $registrantTotalAmount * $discountRate / 100;
+
 						if ($config->collect_member_information_in_cart)
 						{
 							for ($j = 0; $j < $quantity; $j++)
@@ -1810,6 +1853,7 @@ class EventbookingHelper
 					else
 					{
 						$registrantDiscount = $quantity * $discountRate;
+
 						if ($config->collect_member_information_in_cart)
 						{
 							for ($j = 0; $j < $quantity; $j++)
@@ -1838,6 +1882,7 @@ class EventbookingHelper
 				else
 				{
 					$registrantDiscount += $quantity * $event->early_bird_discount_amount;
+
 					if ($config->collect_member_information_in_cart)
 					{
 						for ($j = 0; $j < $quantity; $j++)
@@ -1854,6 +1899,7 @@ class EventbookingHelper
 				if ($coupon->coupon_type == 0)
 				{
 					$registrantDiscount = $registrantDiscount + $registrantTotalAmount * $coupon->discount / 100;
+
 					if ($config->collect_member_information_in_cart)
 					{
 						for ($j = 0; $j < $quantity; $j++)
@@ -1865,6 +1911,7 @@ class EventbookingHelper
 				else
 				{
 					$registrantDiscount = $registrantDiscount + $coupon->discount;
+
 					if ($config->collect_member_information_in_cart)
 					{
 						$membersDiscountAmount[$eventId][0] += $coupon->discount;
@@ -1963,6 +2010,7 @@ class EventbookingHelper
 			{
 				$registrantDepositAmount = 0;
 			}
+
 			$totalAmount += $registrantTotalAmount;
 			$discountAmount += $registrantDiscount;
 			$lateFee += $registrantLateFee;
@@ -1990,6 +2038,7 @@ class EventbookingHelper
 		$fees['amount']                 = $amount;
 		$fees['deposit_amount']         = $depositAmount;
 		$fees['payment_processing_fee'] = $paymentProcessingFee;
+
 		if ($collectRecordsData)
 		{
 			$fees['records_data'] = $recordsData;
