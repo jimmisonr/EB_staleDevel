@@ -246,6 +246,7 @@ class EventbookingHelperMail
 
 					$memberReplaces['event_title']       = $replaces['event_title'];
 					$memberReplaces['event_date']        = $replaces['event_date'];
+					$memberReplaces['event_end_date']    = $replaces['event_end_date'];
 					$memberReplaces['transaction_id']    = $replaces['transaction_id'];
 					$memberReplaces['date']              = $replaces['date'];
 					$memberReplaces['short_description'] = $replaces['short_description'];
