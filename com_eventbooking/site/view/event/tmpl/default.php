@@ -214,6 +214,7 @@ $offset = JFactory::getConfig()->get('offset');
 						'isMultipleDate'    => $isMultipleDate,
 						'canRegister'       => $canRegister,
 						'registrationOpen'  => $registrationOpen,
+						'waitingList'       => $waitingList,
 						'return'            => $return,
 						'showInviteFriend'  => true,
 						'ssl'               => $ssl,

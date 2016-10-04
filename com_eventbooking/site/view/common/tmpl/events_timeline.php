@@ -300,6 +300,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 						'isMultipleDate'    => $isMultipleDate,
 						'canRegister'       => $canRegister,
 						'Itemid'            => $Itemid,
+						'waitingList'       => $waitingList,
 						'ssl'               => $ssl,
 						'btnClass'          => $btnClass,
 						'iconOkClass'       => $iconOkClass,

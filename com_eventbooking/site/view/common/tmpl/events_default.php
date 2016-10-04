@@ -52,7 +52,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 			$detailUrl = JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, @$category->id, $Itemid));
 
 			$waitingList = false;
-
+			
 			if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants) && $activateWaitingList && !@$event->user_registered && $registrationOpen)
 			{
 				$waitingList = true;
@@ -188,6 +188,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 								'registrationOpen'  => $registrationOpen,
 								'return'            => $return,
 								'showInviteFriend'  => false,
+								'waitingList'       => $waitingList,
 								'ssl'               => $ssl,
 								'Itemid'            => $Itemid,
 								'btnClass'          => $btnClass,
