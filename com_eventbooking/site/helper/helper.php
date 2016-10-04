@@ -654,6 +654,16 @@ class EventbookingHelper
 			$replaces['location_name'] = '';
 		}
 
+		if ($config->event_custom_field && file_exists(JPATH_ROOT . '/components/com_eventbooking/fields.xml'))
+		{
+			EventbookingHelperData::prepareCustomFieldsData(array($event));
+
+			foreach ($event->paramData as $customFieldName => $param)
+			{
+				$replaces[strtoupper($customFieldName)] = $param['value'];
+			}
+		}
+
 		return $replaces;
 	}
 
