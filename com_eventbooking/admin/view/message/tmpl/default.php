@@ -15,6 +15,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 $editor = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 $fields = EventbookingHelperHtml::getAvailableMessagesTags();
+JHtml::_('behavior.tabstate');
 ?>
 <form action="index.php?option=com_eventbooking&view=message" method="post" name="adminForm" id="adminForm" class="form-horizontal eb-configuration">
 	<?php echo JHtml::_('bootstrap.startTabSet', 'message', array('active' => 'registration-form-messages-page')); ?>

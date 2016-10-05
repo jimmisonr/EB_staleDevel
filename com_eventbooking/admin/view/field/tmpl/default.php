@@ -15,6 +15,11 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 JHtml::_('formbehavior.chosen', 'select#event_id,select#category_id');
+
+if ($translatable)
+{
+	JHtml::_('behavior.tabstate');
+}
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function(pressbutton) {

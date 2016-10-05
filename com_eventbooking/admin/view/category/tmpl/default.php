@@ -17,6 +17,11 @@ JHtml::_('formbehavior.chosen', 'select');
 
 $editor = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
+
+if ($translatable)
+{
+	JHtml::_('behavior.tabstate');
+}
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function(pressbutton)

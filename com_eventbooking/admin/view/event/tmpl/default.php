@@ -15,6 +15,7 @@ $format = 'Y-m-d';
 
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text_multiple' => JText::_('EB_SELECT_CATEGORIES')));
+JHtml::_('behavior.tabstate');
 ?>
 <style>
 	.calendar {

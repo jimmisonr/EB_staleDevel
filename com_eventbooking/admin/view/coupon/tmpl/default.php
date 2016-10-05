@@ -9,6 +9,11 @@
 // no direct access
 defined('_JEXEC') or die;
 JHtml::_('formbehavior.chosen', 'select');
+
+if (!empty($this->registrants))
+{
+	JHtml::_('behavior.tabstate');
+}
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function (pressbutton)

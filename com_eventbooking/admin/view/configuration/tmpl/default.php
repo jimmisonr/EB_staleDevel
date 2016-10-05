@@ -15,7 +15,7 @@ $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 $editor = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 $config = $this->config;
 JHtml::_('formbehavior.chosen', 'select');
-
+JHtml::_('behavior.tabstate');
 JHtml::_('jquery.framework');
 JHtml::_('script', 'jui/cms.js', false, true);
 ?>
