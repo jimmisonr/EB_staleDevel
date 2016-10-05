@@ -20,6 +20,29 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Check if a method is overrided in a child class
+	 *
+	 * @param $class
+	 * @param $method
+	 *
+	 * @return bool
+	 */
+	public static function isMethodOverridden($class, $method)
+	{
+		if (method_exists($class, $method))
+		{
+			$reflectionMethod = new ReflectionMethod($class, $method);
+
+			if ($reflectionMethod->getDeclaringClass()->getName() == $class)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Get configuration data and store in config object
 	 *
 	 * @return RADConfig
@@ -2621,7 +2644,7 @@ class EventbookingHelper
 	 */
 	public static function formatCurrency($amount, $config, $currencySymbol = null)
 	{
-		if (is_callable('EventbookingHelperOverrideHelper::formatCurrency'))
+		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideHelper', 'formatCurrency'))
 		{
 			return EventbookingHelperOverrideHelper::formatCurrency($amount, $config, $currencySymbol);
 		}
@@ -3032,6 +3055,7 @@ class EventbookingHelper
 		$cats      = array();
 		$arrCats[] = $categoryId;
 		$cats[]    = $categoryId;
+
 		if ($includeChildren)
 		{
 			while (count($arrCats))
@@ -3039,8 +3063,8 @@ class EventbookingHelper
 				$catId = array_pop($arrCats);
 
 				//Get list of children category
-				$query->clear();
-				$query->select('id')
+				$query->clear()
+					->select('id')
 					->from('#__eb_categories')
 					->where('parent = ' . $catId)
 					->where('published = 1');
@@ -3051,17 +3075,28 @@ class EventbookingHelper
 			}
 		}
 
-		$query->clear();
-		$query->select('COUNT(a.id)')
+		$query->clear()
+			->select('COUNT(a.id)')
 			->from('#__eb_events AS a')
 			->innerJoin('#__eb_event_categories AS b ON a.id = b.event_id')
 			->where('b.category_id IN (' . implode(',', $cats) . ')')
 			->where('published = 1')
 			->where('`access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
+
 		if ($config->hide_past_events)
 		{
-			$query->where('event_date >= ' . $db->quote(JHtml::_('date', 'Now', 'Y-m-d')));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+
+			if ($config->show_children_events_under_parent_event)
+			{
+				$query->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ' OR DATE(a.max_end_date) >= ' . $currentDate . ')');
+			}
+			else
+			{
+				$query->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')');
+			}
 		}
+
 		$db->setQuery($query);
 
 		return (int) $db->loadResult();

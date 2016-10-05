@@ -34,7 +34,7 @@ class EventbookingHelperMail
 	 */
 	public static function sendEmails($row, $config)
 	{
-		if (is_callable('EventbookingHelperOverrideMail::sendEmails'))
+		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideMail', 'sendEmails'))
 		{
 			EventbookingHelperOverrideMail::sendEmails($row, $config);
 
@@ -408,7 +408,7 @@ class EventbookingHelperMail
 			return;
 		}
 
-		if (is_callable('EventbookingHelperOverrideMail::sendRegistrationApprovedEmail'))
+		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideMail', 'sendRegistrationApprovedEmail'))
 		{
 			EventbookingHelperOverrideMail::sendRegistrationApprovedEmail($row, $config);
 
@@ -535,7 +535,7 @@ class EventbookingHelperMail
 			return;
 		}
 
-		if (is_callable('EventbookingHelperOverrideMail::sendRegistrationCancelledEmail'))
+		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideMail', 'sendRegistrationCancelledEmail'))
 		{
 			EventbookingHelperOverrideMail::sendRegistrationCancelledEmail($row, $config);
 
@@ -654,7 +654,7 @@ class EventbookingHelperMail
 	 */
 	public static function sendWaitinglistEmail($row, $config)
 	{
-		if (is_callable('EventbookingHelperOverrideMail::sendWaitinglistEmail'))
+		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideMail', 'sendWaitinglistEmail'))
 		{
 			EventbookingHelperOverrideMail::sendWaitinglistEmail($row, $config);
 
@@ -776,7 +776,7 @@ class EventbookingHelperMail
 	 */
 	public static function sendDepositPaymentEmail($row, $config)
 	{
-		if (is_callable('EventbookingHelperOverrideMail::sendDepositPaymentEmail'))
+		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideMail', 'sendDepositPaymentEmail'))
 		{
 			EventbookingHelperOverrideMail::sendDepositPaymentEmail($row, $config);
 
@@ -878,7 +878,7 @@ class EventbookingHelperMail
 	 */
 	public static function sendNewEventNotificationEmail($row, $config)
 	{
-		if (is_callable('EventbookingHelperOverrideMail::sendNewEventNotificationEmail'))
+		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideMail', 'sendNewEventNotificationEmail'))
 		{
 			EventbookingHelperOverrideMail::sendNewEventNotificationEmail($row, $config);
 
@@ -983,7 +983,7 @@ class EventbookingHelperMail
 	 */
 	public static function sendReminder($numberEmailSendEachTime = 0, $bccEmail = null)
 	{
-		if (is_callable('EventbookingHelperOverrideMail::sendReminder'))
+		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideMail', 'sendReminder'))
 		{
 			EventbookingHelperOverrideMail::sendReminder($numberEmailSendEachTime, $bccEmail);
 
@@ -1146,7 +1146,7 @@ class EventbookingHelperMail
 	 */
 	public static function sendDepositReminder($numberDays, $numberEmailSendEachTime = 0, $bccEmail = null)
 	{
-		if (is_callable('EventbookingHelperOverrideMail::sendDepositReminder'))
+		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideMail', 'sendDepositReminder'))
 		{
 			EventbookingHelperOverrideMail::sendDepositReminder($numberDays, $numberEmailSendEachTime, $bccEmail);
 
