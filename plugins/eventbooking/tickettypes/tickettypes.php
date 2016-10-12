@@ -117,6 +117,8 @@ class plgEventBookingTicketTypes extends JPlugin
 			->where('id = ' . $row->id);
 		$db->setQuery($query);
 		$db->execute();
+		
+		$row->has_multiple_ticket_types = $hasMultipleTicketTypes;
 
 		if (count($ticketTypeIds))
 		{

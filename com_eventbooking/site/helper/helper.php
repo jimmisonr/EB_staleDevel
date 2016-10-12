@@ -29,7 +29,7 @@ class EventbookingHelper
 	 */
 	public static function isMethodOverridden($class, $method)
 	{
-		if (method_exists($class, $method))
+		if (class_exists($class) && method_exists($class, $method))
 		{
 			$reflectionMethod = new ReflectionMethod($class, $method);
 
