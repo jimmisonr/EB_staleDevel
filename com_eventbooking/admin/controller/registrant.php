@@ -55,8 +55,10 @@ class EventbookingControllerRegistrant extends EventbookingController
 	 * Export registrants into a CSV file
 	 */
 	public function export()
-	{
+	{	
+		ini_set('memory_limit', '-1');
 		set_time_limit(0);
+		
 		$config = EventbookingHelper::getConfig();
 		$model  = $this->getModel('registrants');
 
