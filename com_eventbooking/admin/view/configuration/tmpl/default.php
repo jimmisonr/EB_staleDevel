@@ -42,6 +42,10 @@ JHtml::_('script', 'jui/cms.js', false, true);
 		echo $this->loadTemplate('invoice', array('config' => $config, 'editor' => $editor));
 		echo JHtml::_('bootstrap.endTab');
 
+		echo JHtml::_('bootstrap.addTab', 'configuration', 'certificate-page', JText::_('EB_CERTIFICATE_SETTINGS', true));
+		echo $this->loadTemplate('certificate', array('config' => $config, 'editor' => $editor));
+		echo JHtml::_('bootstrap.endTab');
+
 		if ($translatable)
 		{
 			echo $this->loadTemplate('translation', array('config' => $config, 'editor' => $editor));
