@@ -16,10 +16,11 @@ $fieldSuffix      = EventbookingHelper::getFieldSuffix();
 $db               = JFactory::getDbo();
 $query            = $db->getQuery(true);
 $numberCategories = (int) $params->get('number_categories', 0);
+$parentId = (int) $params->get('parent_id', 0);
 
 $query->select('a.id, a.name' . $fieldSuffix . ' AS name')
 	->from('#__eb_categories AS a')
-	->where('a.parent = 0')
+	->where('a.parent = ' . $parentId)
 	->where('a.published = 1')
 	->where('a.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
 	->order('a.ordering');

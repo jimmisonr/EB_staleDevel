@@ -31,7 +31,7 @@ $document->addCustomTag('<meta property="og:site_name" content="' . JFactory::ge
 		<script type="text/javascript">
 			FB.init({appId: '340486642645761', status: true, cookie: true, xfbml: true});
 		</script>
-		<fb:like href="<?php echo $socialUrl; ?>" send="true" layout="button_count" width="150"
+		<fb:like href="<?php echo JUri::getInstance()->toString(); ?>" send="true" layout="button_count" width="150"
 		         show_faces="false"></fb:like>
 	</div>
 

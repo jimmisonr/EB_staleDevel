@@ -328,7 +328,7 @@ class EventbookingControllerRegister extends EventbookingController
 
 		if (!$showBillingStep)
 		{
-			$this->process_group_registration();
+			$this->process_group_registration(true);
 		}
 		else
 		{
@@ -341,7 +341,7 @@ class EventbookingControllerRegister extends EventbookingController
 	/**
 	 * Process group registration
 	 */
-	public function process_group_registration()
+	public function process_group_registration($bypassBilling = false)
 	{
 		$app     = JFactory::getApplication();
 		$session = JFactory::getSession();
@@ -362,6 +362,33 @@ class EventbookingControllerRegister extends EventbookingController
 			$errors[] = JText::_('EB_INVALID_CAPTCHA_ENTERED');
 		}
 
+		$data = $input->post->getData();
+
+		if ($bypassBilling)
+		{
+			$membersData       = $session->get('eb_group_members_data', null);
+
+			if ($membersData)
+			{
+				$membersData = unserialize($membersData);
+			}
+			else
+			{
+				$membersData = array();
+			}
+
+			$memberFormFields = EventbookingHelper::getFormFields($eventId, 2);
+
+			//Get data from first member
+			$firstMemberForm = new RADForm($memberFormFields);
+			$firstMemberForm->setFieldSuffix(1);
+			$firstMemberForm->bind($membersData);
+			$firstMemberForm->removeFieldSuffix();
+			$data = array_merge($data, $firstMemberForm->getFormData());
+
+			$input->set('email', $data['email']);
+		}
+
 		$result = $this->validateRegistrantEmail($eventId, $input->get('email', '', 'none'));
 
 		if (!$result['success'])
@@ -369,7 +396,6 @@ class EventbookingControllerRegister extends EventbookingController
 			$errors[] = $result['message'];
 		}
 
-		$data = $input->post->getData();
 
 		if ($formErrors = $this->validateFormData($eventId, 1, $data))
 		{
