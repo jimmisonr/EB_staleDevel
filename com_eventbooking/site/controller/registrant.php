@@ -218,6 +218,81 @@ class EventbookingControllerRegistrant extends EventbookingController
 	}
 
 	/**
+	 * Download certificate associated to the registration record
+	 *
+	 * @throws Exception
+	 */
+	public function download_certificate()
+	{
+		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/table/registrant.php';
+
+		$row    = JTable::getInstance('registrant', 'EventbookingTable');
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+		$config = EventbookingHelper::getConfig();
+
+		$downloadCode = $this->input->getString('download_code');
+
+		if (!$user->id && empty($downloadCode))
+		{
+			throw new Exception(JText::_('You do not have permission to download the certificate'), 403);
+		}
+
+		if (!empty($downloadCode))
+		{
+
+			$query->select('id')
+				->from('#__eb_registrants')
+				->where('registration_code = ' . $db->quote($downloadCode));
+			$db->setQuery($query);
+
+			$id = (int) $db->loadResult();
+		}
+		else
+		{
+			$id = $this->input->getInt('id', 0);
+		}
+
+		if (!$row->load($id))
+		{
+			throw new Exception(JText::_('Invalid Registration Record'), 404);
+		}
+
+		if (empty($downloadCode) && $row->user_id != $user->id && $row->email != $user->get('email'))
+		{
+			throw new Exception(JText::_('You do not have permission to download the certificate'), 403);
+		}
+
+		if ($row->published == 0)
+		{
+			throw new Exception(JText::_('Certificate is only allowed for confirmed/page registrants'), 403);
+		}
+
+		// Compare current date with event end date
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$query->clear()
+			->select('*')
+			->select("TIMESTAMPDIFF(MINUTE, event_end_date, '$currentDate') AS event_end_date_minutes")
+			->from('#__eb_events')
+			->where('id = ' . $row->event_id);
+		$db->setQuery($query);
+		$rowEvent = $db->loadObject();
+
+		if ($rowEvent->activate_certificate_feature == 0 || ($rowEvent->activate_certificate_feature == 2 && !$config->activate_certificate_feature))
+		{
+			throw new Exception(printf('Certificate is not enabled for event %s', $rowEvent->title), 403);
+		}
+
+		if ($rowEvent->event_end_date_minutes < 0)
+		{
+			throw new Exception(JText::_('Certificate can only be downloaded after event end date'), 403);
+		}
+
+		EventbookingHelper::downloadCertificate($row, $config);
+	}
+
+	/**
 	 * Export registrants data into a csv file
 	 */
 	public function export()

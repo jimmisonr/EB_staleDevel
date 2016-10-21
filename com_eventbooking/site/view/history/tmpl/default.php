@@ -206,7 +206,7 @@ JHtml::_('formbehavior.chosen', 'select');
 							if ($row->published == 1 && ($row->activate_certificate_feature == 1 || ($row->activate_certificate_feature == 2 && $this->config->activate_certificate_feature == 1)))
 							{
 							?>
-								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_certificate&id='.$row->id); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo JText::_('EB_DOWNLOAD');?></a>
+								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_certificate&id='.$row->id); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo EventbookingHelper::formatCertificateNumber($row->id, $this->config);?></a>
 							<?php
 							}
 							?>
