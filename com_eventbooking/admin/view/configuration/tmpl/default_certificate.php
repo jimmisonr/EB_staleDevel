@@ -19,6 +19,22 @@ defined( '_JEXEC' ) or die ;
 </div>
 <div class="control-group">
 	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('certificate_prefix', JText::_('EB_CERTIFICATE_PREFIX'), JText::_('EB_CERTIFICATE_PREFIX_EXPLAIN')); ?>
+	</div>
+	<div class="controls">
+		<input type="text" name="certificate_prefix" class="inputbox" value="<?php echo $config->get('certificate_prefix', 'CT'); ?>" size="10" />
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('certificate_number_length', JText::_('EB_CERTIFICATE_NUMBER_LENGTH'), JText::_('EB_CERTIFICATE_NUMBER_LENGTH_EXPLAIN')); ?>
+	</div>
+	<div class="controls">
+		<input type="text" name="certificate_number_length" class="inputbox" value="<?php echo $config->get('certificate_number_length', 5); ?>" size="10" />
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
 		<?php echo EventbookingHelperHtml::getFieldLabel('certificate_layout', JText::_('EB_DEFAULT_CERTIFICATE_LAYOUT'), JText::_('EB_DEFAULT_CERTIFICATE_LAYOUT_EXPLAIN')); ?>
 	</div>
 	<div class="controls">
