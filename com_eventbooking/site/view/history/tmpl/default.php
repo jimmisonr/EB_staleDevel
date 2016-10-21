@@ -79,9 +79,19 @@ JHtml::_('formbehavior.chosen', 'select');
 					{
 						$cols++;
 					?>
-						<td class="center">
+						<th class="center">
 							<?php echo JHtml::_('grid.sort',  JText::_('EB_INVOICE_NUMBER'), 'tbl.invoice_number', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-						</td>
+						</th>
+					<?php
+					}
+
+					if ($this->showDownloadCertificate)
+					{
+						$cols++;
+					?>
+						<th class="center">
+							<?php echo JText::_('EB_CERTIFICATE'); ?>
+						</th>
 					<?php
 					}
 				?>
@@ -181,6 +191,22 @@ JHtml::_('formbehavior.chosen', 'select');
 							{
 							?>
 								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_invoice&id='.($row->cart_id ? $row->cart_id : ($row->group_id ? $row->group_id : $row->id))); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo EventbookingHelper::formatInvoiceNumber($row->invoice_number, $this->config) ; ?></a>
+							<?php
+							}
+							?>
+						</td>
+					<?php
+					}
+
+					if ($this->showDownloadCertificate)
+					{
+					?>
+						<td class="center">
+							<?php
+							if ($row->published == 1 && ($row->activate_certificate_feature == 1 || ($row->activate_certificate_feature == 2 && $this->config->activate_certificate_feature == 1)))
+							{
+							?>
+								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_certificate&id='.$row->id); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo JText::_('EB_DOWNLOAD');?></a>
 							<?php
 							}
 							?>

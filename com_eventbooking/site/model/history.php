@@ -24,6 +24,19 @@ class EventbookingModelHistory extends EventbookingModelRegistrants
 	}
 
 	/**
+	 * Builds SELECT columns list for the query
+	 */
+	protected function buildQueryColumns(JDatabaseQuery $query)
+	{
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+
+		$query->select('ev.activate_certificate_feature')
+			->select("TIMESTAMPDIFF(MINUTE, ev.event_end_date, '$currentDate') AS event_end_date_minutes");
+
+		return parent::buildQueryColumns($query);
+	}
+
+	/**
 	 * Builds a WHERE clause for the query
 	 *
 	 * @param JDatabaseQuery $query
@@ -32,8 +45,8 @@ class EventbookingModelHistory extends EventbookingModelRegistrants
 	 */
 	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
-		$user   = JFactory::getUser();
-		$db     = $this->getDbo();
+		$user = JFactory::getUser();
+		$db   = $this->getDbo();
 
 		$query->where('(tbl.user_id =' . $user->get('id') . ' OR tbl.email=' . $db->quote($user->get('email')) . ')');
 

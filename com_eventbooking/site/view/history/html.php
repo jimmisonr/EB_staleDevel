@@ -51,6 +51,7 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 		$showDueAmountColumn = false;
 
 		$numberPaymentMethods = EventbookingHelper::getNumberNoneOfflinePaymentMethods();
+
 		if ($numberPaymentMethods > 0)
 		{
 			foreach ($items as $item)
@@ -63,11 +64,24 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 			}
 		}
 
-		$this->lists               = $lists;
-		$this->items               = $items;
-		$this->pagination          = $model->getPagination();
-		$this->config              = $config;
-		$this->showDueAmountColumn = $showDueAmountColumn;
+		// Check to see whether we should show download certificate feature
+		$showDownloadCertificate = false;
+
+		foreach ($items as $item)
+		{
+			if ($item->published == 1 && ($item->activate_certificate_feature == 1 || ($item->activate_certificate_feature == 2 && $config->activate_certificate_feature == 1)))
+			{
+				$showDownloadCertificate = true;
+				break;
+			}
+		}
+
+		$this->lists                   = $lists;
+		$this->items                   = $items;
+		$this->pagination              = $model->getPagination();
+		$this->config                  = $config;
+		$this->showDueAmountColumn     = $showDueAmountColumn;
+		$this->showDownloadCertificate = $showDownloadCertificate;
 
 		parent::display();
 	}
