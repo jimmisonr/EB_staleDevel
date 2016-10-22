@@ -24,6 +24,7 @@
 	<folder>images</folder>	
 	<folder>flags</folder>
 	<folder>invoices</folder>
+	<folder>certificates</folder>
     <folder>icsfiles</folder>
 	<folder>assets</folder>
 	<folder>qrcodes</folder>
