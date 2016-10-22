@@ -39,7 +39,7 @@ if (!$itemId)
 }
 
 $fieldSuffix  = EventbookingHelper::getFieldSuffix();
-$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d H:i:s'));
 $numberEvents = $params->get('number_events', 6);
 $categoryIds  = trim($params->get('category_ids', ''));
 $showCategory = $params->get('show_category', 1);
@@ -51,7 +51,7 @@ $query->select('a.*, c.name AS location_name')
 	->leftJoin('#__eb_locations AS c ON a.location_id = c.id')
 	->where('a.published = 1')
 	->where('a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
-	->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')')
+	->where('(a.event_date >= ' . $currentDate . ' OR a.cut_off_date >= ' . $currentDate . ')')
 	->order('a.featured DESC, a.event_date');
 
 if ($params->get('only_show_featured_events', 0))
