@@ -252,7 +252,10 @@ class EventbookingHelperMail
 					$memberReplaces['short_description'] = $replaces['short_description'];
 					$memberReplaces['description']       = $replaces['short_description'];
 					$memberReplaces['location']          = $replaces['location'];
-					$memberFormFields                    = EventbookingHelper::getFormFields($row->event_id, 2);
+
+					$memberReplaces['download_certificate_link'] = $replaces['download_certificate_link'];
+
+					$memberFormFields = EventbookingHelper::getFormFields($row->event_id, 2);
 					foreach ($rowMembers as $rowMember)
 					{
 						if (!JMailHelper::isEmailAddress($rowMember->email))
