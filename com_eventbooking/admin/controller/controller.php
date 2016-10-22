@@ -13,7 +13,7 @@ class EventbookingController extends RADControllerAdmin
 {
 	public function display($cachable = false, array $urlparams = array())
 	{
-		JFactory::getDocument()->addStyleSheet(JURI::base(true) . '/components/com_eventbooking/assets/css/style.css');
+		JFactory::getDocument()->addStyleSheet(JUri::base(true) . '/components/com_eventbooking/assets/css/style.css');
 
 		parent::display($cachable, $urlparams);
 
@@ -678,6 +678,7 @@ class EventbookingController extends RADControllerAdmin
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `attachment` VARCHAR( 255 ) NULL;";
 			$db->setQuery($sql);
 			$db->execute();
+
 			//Need to create com_eventbooking folder under media folder
 			if (!JFolder::exists(JPATH_ROOT . '/media/com_eventbooking'))
 			{
@@ -1103,6 +1104,163 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('activate_certificate_feature', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `activate_certificate_feature` TINYINT NOT NULL DEFAULT  '2' ;";
+			$db->setQuery($sql);
+			$db->execute();
+
+			$sql = 'UPDATE #__eb_events SET activate_certificate_feature = 2';
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('certificate_layout', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `certificate_layout` TEXT NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+
+			$query = $db->getQuery(true);
+			$query->insert('#__eb_configs')
+				->columns('config_key, config_value')
+				->values('"activate_certificate_feature", 0')
+				->values('"certificate_prefix", "CT"')
+				->values('"certificate_number_length", 5');
+			$db->setQuery($query);
+			$db->execute();
+		}
+
+		if (empty($config->certificate_layout))
+		{
+			//Need to insert default data into the system
+			$invoiceFormat = '<table border="0" width="100%" cellspacing="0" cellpadding="2">
+			<tbody>
+			<tr>
+			<td align="left" width="100%">
+			<table border="0" width="100%" cellspacing="0" cellpadding="2">
+			<tbody>
+			<tr>
+			<td width="100%">
+			<table style="width: 100%;" border="0" cellspacing="0" cellpadding="2">
+			<tbody>
+			<tr>
+			<td align="left" valign="top" width="50%">
+			<table style="width: 100%;" border="0" cellspacing="0" cellpadding="2">
+			<tbody>
+			<tr>
+			<td align="left" width="50%">Company Name:</td>
+			<td align="left">Ossolution Team</td>
+			</tr>
+			<tr>
+			<td align="left" width="50%">URL:</td>
+			<td align="left">http://www.joomdonation.com</td>
+			</tr>
+			<tr>
+			<td align="left" width="50%">Phone:</td>
+			<td align="left">84-972409994</td>
+			</tr>
+			<tr>
+			<td align="left" width="50%">E-mail:</td>
+			<td align="left">contact@joomdonation.com</td>
+			</tr>
+			<tr>
+			<td align="left" width="50%">Address:</td>
+			<td align="left">Lang Ha - Ba Dinh - Ha Noi</td>
+			</tr>
+			</tbody>
+			</table>
+			</td>
+			<td align="right" valign="middle" width="50%"><img style="border: 0;" src="media/com_eventbooking/invoice_logo.png" alt="" /></td>
+			</tr>
+			<tr>
+			<td colspan="2" align="left" width="100%">
+			<table style="width: 100%;" border="0" cellspacing="0" cellpadding="2">
+			<tbody>
+			<tr>
+			<td align="left" valign="top" width="50%">
+			<table style="width: 100%;" border="0" cellspacing="0" cellpadding="2">
+			<tbody>
+			<tr>
+			<td style="background-color: #d6d6d6;" colspan="2" align="left">
+			<h4 style="margin: 0px;">Registrant Information</h4>
+			</td>
+			</tr>
+			<tr>
+			<td align="left" width="50%">Name:</td>
+			<td align="left">[NAME]</td>
+			</tr>
+			<tr>
+			<td align="left" width="50%">Company:</td>
+			<td align="left">[ORGANIZATION]</td>
+			</tr>
+			<tr>
+			<td align="left" width="50%">Phone:</td>
+			<td align="left">[PHONE]</td>
+			</tr>
+			<tr>
+			<td align="left" width="50%">Email:</td>
+			<td align="left">[EMAIL]</td>
+			</tr>
+			<tr>
+			<td align="left" width="50%">Address:</td>
+			<td align="left">[ADDRESS], [CITY], [STATE], [COUNTRY]</td>
+			</tr>
+			</tbody>
+			</table>
+			</td>
+			<td align="left" valign="top" width="50%">
+			<table style="width: 100%;" border="0" cellspacing="0" cellpadding="2">
+			<tbody>
+			<tr>
+			<td style="background-color: #d6d6d6;" colspan="2" align="left">
+			<h4 style="margin: 0px;">Event Information</h4>
+			</td>
+			</tr>
+			<tr>
+			<td align="left" width="50%">Event Title:</td>
+			<td align="left">[EVENT_TITLE]</td>
+			</tr>
+			<tr>
+			<td align="left" width="50%">Event Date:</td>
+			<td align="left">[EVENT_DATE]</td>
+			</tr>
+			<tr>
+			<td align="left" width="50%">Event End Date:</td>
+			<td align="left">[EVENT_END_DATE]</td>
+			</tr>
+			</tbody>
+			</table>
+			</td>
+			</tr>
+			</tbody>
+			</table>
+			</td>
+			</tr>
+			</tbody>
+			</table>
+			</td>
+			</tr>
+			</tbody>
+			</table>
+			</td>
+			</tr>
+			</tbody>
+			</table>';
+
+			if (property_exists($config, 'certificate_layout'))
+			{
+				$sql = 'UPDATE #__eb_configs SET config_value = ' . $db->quote($invoiceFormat) . ' WHERE config_key="certificate_layout"';
+			}
+			else
+			{
+				$sql = 'INSERT INTO #__eb_configs(config_key, config_value) VALUES ("certificate_layout", ' . $db->quote($invoiceFormat) . ')';
+			}
+
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		//The Categories table
 		$fields = array_keys($db->getTableColumns('#__eb_categories'));
 		if (!in_array('access', $fields))
@@ -1432,9 +1590,11 @@ class EventbookingController extends RADControllerAdmin
 			$sql = 'SELECT id FROM #__eb_registrants WHERE group_id=0 AND (published=1 OR payment_method LIKE "%os_offline%") ORDER BY id';
 			$db->setQuery($sql);
 			$rows = $db->loadObjectList();
+
 			if (count($rows))
 			{
 				$start = 1;
+
 				foreach ($rows as $row)
 				{
 					$sql = 'UPDATE #__eb_registrants SET invoice_number=' . $start . ' WHERE id=' . $row->id;
@@ -1443,6 +1603,21 @@ class EventbookingController extends RADControllerAdmin
 					$start++;
 				}
 			}
+
+			$query = $db->getQuery(true);
+			$query->insert('#__eb_configs')
+				->columns('config_key, config_value')
+				->values('"activate_invoice_feature", 0')
+				->values('"send_invoice_to_customer", 0')
+				->values('"invoice_start_number", 1')
+				->values('"invoice_prefix", "IV"')
+				->values('"invoice_number_length", 5');
+			$db->setQuery($query);
+			$db->execute();
+		}
+
+		if (empty($config->invoice_format))
+		{
 			//Need to insert default data into the system
 			$invoiceFormat = '<table border="0" width="100%" cellspacing="0" cellpadding="2">
 			<tbody>
@@ -1598,10 +1773,22 @@ class EventbookingController extends RADControllerAdmin
 			</tr>
 			</tbody>
 			</table>';
-			$sql           = 'INSERT INTO #__eb_configs(config_key, config_value) VALUES ("invoice_format", ' . $db->quote($invoiceFormat) . ')';
+
+			if (property_exists($config, 'invoice_format'))
+			{
+				$sql = 'UPDATE #__eb_configs SET config_value = ' . $db->quote($invoiceFormat) . ' WHERE config_key="invoice_format"';
+			}
+			else
+			{
+				$sql = 'INSERT INTO #__eb_configs(config_key, config_value) VALUES ("invoice_format", ' . $db->quote($invoiceFormat) . ')';
+			}
+
 			$db->setQuery($sql);
 			$db->execute();
+		}
 
+		if (empty($config->invoice_format_cart))
+		{
 			$invoiceFormat = '<table border="0" width="100%" cellspacing="0" cellpadding="2">
 			<tbody>
 			<tr>
@@ -1723,19 +1910,17 @@ class EventbookingController extends RADControllerAdmin
 			</tr>
 			</tbody>
 			</table>';
-			$sql           = 'INSERT INTO #__eb_configs(config_key, config_value) VALUES ("invoice_format_cart", ' . $db->quote($invoiceFormat) . ')';
-			$db->setQuery($sql);
-			$db->execute();
 
-			$query = $db->getQuery(true);
-			$query->insert('#__eb_configs')
-				->columns('config_key, config_value')
-				->values('"activate_invoice_feature", 0')
-				->values('"send_invoice_to_customer", 0')
-				->values('"invoice_start_number", 1')
-				->values('"invoice_prefix", "IV"')
-				->values('"invoice_number_length", 5');
-			$db->setQuery($query);
+			if (property_exists($config, 'invoice_format_cart'))
+			{
+				$sql = 'UPDATE #__eb_configs SET config_value = ' . $db->quote($invoiceFormat) . ' WHERE config_key="invoice_format_cart"';
+			}
+			else
+			{
+				$sql = 'INSERT INTO #__eb_configs(config_key, config_value) VALUES ("invoice_format_cart", ' . $db->quote($invoiceFormat) . ')';
+			}
+
+			$db->setQuery($sql);
 			$db->execute();
 		}
 

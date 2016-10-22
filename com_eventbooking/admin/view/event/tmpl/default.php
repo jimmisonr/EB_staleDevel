@@ -159,12 +159,13 @@ JHtml::_('behavior.tabstate');
 							<input type="file" name="attachment"/>
 							<?php
 							echo $this->lists['available_attachment'];
+
 							if ($this->item->attachment)
 							{
-								?>
+							?>
 								<?php echo JText::_('EB_CURRENT_ATTACHMENT'); ?>&nbsp;<a href="<?php echo JURI::root().'media/com_eventbooking/'.$this->item->attachment; ?>" target="_blank"><?php echo $this->item->attachment; ?></a>
 								<input type="checkbox" name="del_attachment" value="1" /><?php echo JText::_('EB_DELETE_CURRENT_ATTACHMENT'); ?>
-								<?php
+							<?php
 							}
 							?>
 						</div>
@@ -332,6 +333,20 @@ JHtml::_('behavior.tabstate');
 						</div>
 					</div>
 					<?php
+					if ($this->config->activate_certificate_feature)
+					{
+					?>
+						<div class="control-group">
+							<label class="control-label">
+								<?php echo JText::_('EB_ACTIVATE_CERTIFICATE_FEATURE'); ?>
+							</label>
+							<div class="controls">
+								<?php echo $this->lists['activate_certificate_feature']; ?>
+							</div>
+						</div>
+					<?php
+					}
+
 					if ($this->config->activate_deposit_feature)
 					{
 						?>
@@ -678,6 +693,21 @@ JHtml::_('behavior.tabstate');
 				<input type="text" name="notification_emails" class="inputbox" size="70" value="<?php echo $this->item->notification_emails ; ?>" />
 			</div>
 		</div>
+		<?php
+			if ($this->config->activate_certificate_feature)
+			{
+			?>
+				<div class="control-group">
+					<label class="control-label">
+						<?php echo EventbookingHelperHtml::getFieldLabel('certificate_layout', JText::_('EB_CERTIFICATE_LAYOUT')); ?>
+					</label>
+					<div class="controls">
+						<?php echo $editor->display( 'certificate_layout',  $this->item->certificate_layout , '100%', '250', '90', '10' ) ; ?>
+					</div>
+				</div>
+			<?php
+			}
+		?>
 		<div class="control-group">
 			<label class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('registration_form_message', JText::_('EB_REGISTRATION_FORM_MESSAGE'), JText::_('EB_AVAILABLE_TAGS').': [EVENT_TITLE]'); ?>
