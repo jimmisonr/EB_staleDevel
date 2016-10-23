@@ -1200,3 +1200,51 @@ h3.eb-heading
 	display: inline-block;	
 	margin-right: 20px;
 }
+
+.eb-event-box
+{
+    margin: 15px;
+}
+
+.eb-event-box .eb-event-date-time {
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 130%;
+}
+
+.eb-event-box .eb-event-location-price {
+    padding-bottom:10px;
+    padding-top: 10px;
+}
+
+.eb-event-box .eb-event-location
+{
+    font-weight: bold;
+}
+
+.eb-event-box .eb-event-price
+{
+    padding: 5px;
+    font-weight: bold;
+}
+
+.eb-event-box  .eb-taskbar .btn {
+    font-size: 14px;
+    padding: 4px 14px;
+    border-radius: 4px;
+    border-color: #cccccc;
+    color: #333333;
+    background: #ffffff;
+}
+
+.eb-event-box img.eb-event-thumb
+{
+    width: 100%;
+}
+
+@media screen and (max-width: 640px) {
+    .eb-taskbar li {
+        float: none !important;
+    }
+}
+
