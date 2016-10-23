@@ -208,6 +208,27 @@ class EventbookingControllerRegistrant extends EventbookingController
 	}
 
 	/**
+	 * Download Certificates for selected registrants
+	 */
+	public function download_certificates()
+	{
+		$cid = $this->input->get('cid', array(), 'array');
+
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('*')
+			->from('#__eb_registrants')
+			->where('id IN ('.implode(',', $cid).')')
+			->order('id');
+		$db->setQuery($query);
+		$rows = $db->loadObjectList();
+
+		$config = EventbookingHelper::getConfig();
+
+		EventbookingHelper::generateCertificatePDF($rows, $config, true);
+	}
+
+	/**
 	 * Reset check in for a registrant
 	 */
 	public function reset_check_in()

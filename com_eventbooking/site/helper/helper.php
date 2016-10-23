@@ -3992,23 +3992,20 @@ class EventbookingHelper
 	 *
 	 * @param object $row
 	 */
-	public static function generateCertificatePDF($row, $config)
+	public static function generateCertificatePDF($row, $config, $download = false)
 	{
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/tcpdf.php";
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/config/lang/eng.php";
 
 		self::loadLanguage();
+		
+		$rows = (array) $row;
+		$events = array();
 
 		$sitename    = JFactory::getConfig()->get("sitename");
-		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
+
 		$db          = JFactory::getDbo();
 		$query       = $db->getQuery(true);
-
-		$query->select('*, title' . $fieldSuffix . ' AS title')
-			->from('#__eb_events')
-			->where('id = ' . (int) $row->event_id);
-		$db->setQuery($query);
-		$rowEvent = $db->loadObject();
 
 		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 		$pdf->SetCreator(PDF_CREATOR);
@@ -4031,104 +4028,138 @@ class EventbookingHelper
 		$font = empty($config->pdf_font) ? 'times' : $config->pdf_font;
 		$pdf->SetFont($font, '', 8);
 
-		if (self::isValidMessage($rowEvent->certificate_layout))
+		foreach($rows as $row)
 		{
-			$invoiceOutput = $rowEvent->certificate_layout;
-		}
-		else
-		{
-			$invoiceOutput = $config->certificate_layout;
-		}
+			if (!isset($events[$row->event_id]))
+			{
+				$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 
-		if ($row->is_group_billing && $config->collect_member_information)
-		{
-			$query->clear()
-				->select('*')
-				->from('#__eb_registrants')
-				->where('group_id = ' . $row->id);
-			$db->setQuery($query);
-			$rowMembers = $db->loadObjectList();
+				$query->clear()
+					->select('*, title' . $fieldSuffix . ' AS title')
+					->from('#__eb_events')
+					->where('id = ' . (int) $row->event_id);
+				$db->setQuery($query);
+				$events[$row->event_id] = $db->loadObject();
+			}
 
-			foreach ($rowMembers as $rowMember)
+			$rowEvent = $events[$row->event_id];
+
+			if (self::isValidMessage($rowEvent->certificate_layout))
+			{
+				$invoiceOutput = $rowEvent->certificate_layout;
+			}
+			else
+			{
+				$invoiceOutput = $config->certificate_layout;
+			}
+
+			if ($row->is_group_billing && $config->collect_member_information)
+			{
+				$query->clear()
+					->select('*')
+					->from('#__eb_registrants')
+					->where('group_id = ' . $row->id);
+				$db->setQuery($query);
+				$rowMembers = $db->loadObjectList();
+
+				foreach ($rowMembers as $rowMember)
+				{
+					$pdf->AddPage();
+
+					$rowFields = self::getFormFields($row->event_id, 0);
+
+					$form = new RADForm($rowFields);
+					$data = self::getRegistrantData($rowMember, $rowFields);
+					$form->bind($data);
+					$form->buildFieldsDependency();
+
+					if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
+					{
+						$replaces = EventbookingHelperOverrideHelper::buildTags($rowMember, $form, $rowEvent, $config);
+					}
+					else
+					{
+						$replaces = self::buildTags($rowMember, $form, $rowEvent, $config);
+					}
+
+					$replaces['certificate_number'] = self::formatCertificateNumber($rowMember->id, $config);
+					$replaces['registration_date']  = JHtml::_('date', $row->register_date, $config->date_format);
+
+					$output = $invoiceOutput;
+
+					foreach ($replaces as $key => $value)
+					{
+						$key    = strtoupper($key);
+						$output = str_ireplace("[$key]", $value, $output);
+					}
+
+					$v = $pdf->writeHTML($output, true, false, false, false, '');
+				}
+			}
+			else
 			{
 				$pdf->AddPage();
 
-				$rowFields = self::getFormFields($row->event_id, 0);
+				if ($config->multiple_booking)
+				{
+					$rowFields = self::getFormFields($row->id, 4);
+				}
+				elseif ($row->is_group_billing)
+				{
+					$rowFields = self::getFormFields($row->event_id, 1);
+				}
+				else
+				{
+					$rowFields = self::getFormFields($row->event_id, 0);
+				}
 
 				$form = new RADForm($rowFields);
-				$data = self::getRegistrantData($rowMember, $rowFields);
+				$data = self::getRegistrantData($row, $rowFields);
 				$form->bind($data);
 				$form->buildFieldsDependency();
 
 				if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
 				{
-					$replaces = EventbookingHelperOverrideHelper::buildTags($rowMember, $form, $rowEvent, $config);
+					$replaces = EventbookingHelperOverrideHelper::buildTags($row, $form, $rowEvent, $config);
 				}
 				else
 				{
-					$replaces = self::buildTags($rowMember, $form, $rowEvent, $config);
+					$replaces = self::buildTags($row, $form, $rowEvent, $config);
 				}
 
-				$replaces['certificate_number'] = self::formatCertificateNumber($rowMember->id, $config);
+				$replaces['certificate_number'] = self::formatCertificateNumber($row->id, $config);
 				$replaces['registration_date']  = JHtml::_('date', $row->register_date, $config->date_format);
-
-				$output = $invoiceOutput;
 
 				foreach ($replaces as $key => $value)
 				{
-					$key    = strtoupper($key);
-					$output = str_ireplace("[$key]", $value, $output);
+					$key           = strtoupper($key);
+					$invoiceOutput = str_ireplace("[$key]", $value, $invoiceOutput);
 				}
 
-				$v = $pdf->writeHTML($output, true, false, false, false, '');
+				$v = $pdf->writeHTML($invoiceOutput, true, false, false, false, '');
 			}
+		}
+
+		if (count($rows) > 1)
+		{
+			//Filename
+			$filePath = JPATH_ROOT . '/media/com_eventbooking/certificates/certificates_' . date('Y-m-d') . '.pdf';
+			$fileName = 'certificates_' . date('Y-m-d') . '.pdf';
 		}
 		else
 		{
-			$pdf->AddPage();
-
-			if ($config->multiple_booking)
-			{
-				$rowFields = self::getFormFields($row->id, 4);
-			}
-			elseif ($row->is_group_billing)
-			{
-				$rowFields = self::getFormFields($row->event_id, 1);
-			}
-			else
-			{
-				$rowFields = self::getFormFields($row->event_id, 0);
-			}
-
-			$form = new RADForm($rowFields);
-			$data = self::getRegistrantData($row, $rowFields);
-			$form->bind($data);
-			$form->buildFieldsDependency();
-
-			if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
-			{
-				$replaces = EventbookingHelperOverrideHelper::buildTags($row, $form, $rowEvent, $config);
-			}
-			else
-			{
-				$replaces = self::buildTags($row, $form, $rowEvent, $config);
-			}
-
-			$replaces['certificate_number'] = self::formatCertificateNumber($row->id, $config);
-			$replaces['registration_date']  = JHtml::_('date', $row->register_date, $config->date_format);
-
-			foreach ($replaces as $key => $value)
-			{
-				$key           = strtoupper($key);
-				$invoiceOutput = str_ireplace("[$key]", $value, $invoiceOutput);
-			}
-
-			$v = $pdf->writeHTML($invoiceOutput, true, false, false, false, '');
+			$fileName = self::formatCertificateNumber($row->id, $config);
+			//Filename
+			$filePath = JPATH_ROOT . '/media/com_eventbooking/certificates/' . $fileName . '.pdf';
 		}
 
-		//Filename
-		$filePath = JPATH_ROOT . '/media/com_eventbooking/certificates/' . self::formatCertificateNumber($row->id, $config) . '.pdf';
 		$pdf->Output($filePath, 'F');
+
+		if ($download)
+		{
+			while (@ob_end_clean()) ;
+			self::processDownload($filePath, $fileName);
+		}
 	}
 
 	/**
