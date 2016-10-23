@@ -28,12 +28,12 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 
 			if (!$config->thumb_width)
 			{
-				$config->thumb_width = 150;
+				$config->thumb_width = 200;
 			}
 
 			if (!$config->thumb_height)
 			{
-				$config->thumb_height = 150;
+				$config->thumb_height = 200;
 			}
 
 			$db    = JFactory::getDbo();
