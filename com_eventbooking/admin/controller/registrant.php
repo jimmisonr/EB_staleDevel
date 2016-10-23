@@ -55,10 +55,10 @@ class EventbookingControllerRegistrant extends EventbookingController
 	 * Export registrants into a CSV file
 	 */
 	public function export()
-	{	
+	{
 		ini_set('memory_limit', '-1');
 		set_time_limit(0);
-		
+
 		$config = EventbookingHelper::getConfig();
 		$model  = $this->getModel('registrants');
 
@@ -101,6 +101,79 @@ class EventbookingControllerRegistrant extends EventbookingController
 		}
 
 		EventbookingHelperData::excelExport($fields, $rows, 'registrants_list', $headers);
+	}
+
+	/**
+	 * Export registrants into a template file which can be used for modifying, then import back to system
+	 */
+	public function import_template()
+	{
+		ini_set('memory_limit', '-1');
+		set_time_limit(0);
+
+		$config = EventbookingHelper::getConfig();
+		$model  = $this->getModel('registrants');
+
+		/* @var EventbookingModelRegistrants $model */
+		$model->setState('limitstart', 0)
+			->setState('limit', 0)
+			->setState('filter_order', 'tbl.id')
+			->setState('filter_order_Dir', 'ASC');
+
+		$cid = $this->input->get('cid', array(), 'array');
+		$model->setRegistrantIds($cid);
+
+		$rows = $model->getData();
+
+		if (count($rows) == 0)
+		{
+			$this->setMessage(JText::_('There are no registrants to export'));
+			$this->setRedirect('index.php?option=com_eventbooking&view=dashboard');
+
+			return;
+		}
+
+		$eventId   = (int) $model->getState('filter_event_id');
+		$rowFields = EventbookingHelper::getAllEventFields($eventId);
+		$fieldIds  = array();
+
+		foreach ($rowFields as $rowField)
+		{
+			$fieldIds[] = $rowField->id;
+		}
+
+		$fieldValues = $model->getFieldsData($fieldIds);
+
+		if (is_callable('EventbookingHelperOverrideData::prepareRegistrantsExportData'))
+		{
+			list($fields, $headers) = EventbookingHelperOverrideData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
+		}
+		else
+		{
+			list($fields, $headers) = EventbookingHelperData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
+		}
+
+		$fields[0] = 'event_id';
+
+		for ($i = 0, $n = count($fields); $i < $n; $i++)
+		{
+			if ($fields[$i] == 'registration_group_name' || $fields[$i] == 'id')
+			{
+				unset($fields[$i]);
+
+				continue;
+			}
+
+			if ($fields[$i] == 'payment_status')
+			{
+				$fields[$i] = 'published';
+			}
+		}
+
+		array_unshift($fields, 'id');
+		reset($fields);
+
+		EventbookingHelperData::excelExport($fields, $rows, 'registrants_list');
 	}
 
 	/**
@@ -187,5 +260,37 @@ class EventbookingControllerRegistrant extends EventbookingController
 		}
 
 		$this->setRedirect($url, JText::_('EB_GROUP_MEMBER_REMOVED'));
+	}
+
+	/**
+	 * Method to import registrants from a csv file
+	 */
+	public function import()
+	{
+		$inputFile = $this->input->files->get('input_file');
+		$fileName  = $inputFile ['name'];
+		$fileExt   = strtolower(JFile::getExt($fileName));
+
+		if (!in_array($fileExt, array('csv', 'xls', 'xlsx')))
+		{
+			$this->setRedirect('index.php?option=com_eventbooking&view=registrant&layout=import', JText::_('Invalid File Type. Only CSV, XLS and XLS file types are supported'));
+
+			return;
+		}
+
+		/* @var  EventbookingModelRegistrant $model */
+		$model = $this->getModel('Registrant');
+
+		try
+		{
+			$numberImportedRegistrants = $model->import($inputFile['tmp_name']);
+
+			$this->setRedirect('index.php?option=com_eventbooking&view=registrants', JText::sprintf('EB_NUMBER_REGISTRANTS_IMPORTED', $numberImportedRegistrants));
+		}
+		catch (Exception $e)
+		{
+			$this->setRedirect('index.php?option=com_eventbooking&view=registrant&layout=import');
+			$this->setMessage($e->getMessage(), 'error');
+		}
 	}
 }

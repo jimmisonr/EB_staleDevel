@@ -258,4 +258,151 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 		$db->setQuery($query);
 		$db->execute();
 	}
+
+	/**
+	 * @param $file
+	 *
+	 * @return int
+	 * @throws Exception
+	 */
+	public function import($file)
+	{
+		$config      = EventbookingHelper::getConfig();
+		$registrants = EventbookingHelperData::getDataFromFile($file);
+
+		$imported = 0;
+
+		if (count($registrants))
+		{
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('name, title')
+				->from('#__eb_payment_plugins');
+			$db->setQuery($query);
+			$plugins = $db->loadObjectList('title');
+
+			foreach ($registrants as $registrant)
+			{
+				if (empty($registrant['event_id']))
+				{
+					continue;
+				}
+
+				/* @var EventbookingTableRegistrant $row */
+				$row = $this->getTable();
+
+				if ($registrant['register_date'])
+				{
+					try
+					{
+						$registerDate                = DateTime::createFromFormat($config->date_format, $registrant['register_date']);
+						$registrant['register_date'] = $registerDate->format('Y=m-d');
+					}
+					catch (Exception $e)
+					{
+
+					}
+				}
+				else
+				{
+					$registrant ['register_date'] = '';
+				}
+
+				if ($registrant['payment_method'] && isset($plugins[$registrant['payment_method']]))
+				{
+					$registrant['payment_method'] = $plugins[$registrant['payment_method']]->name;
+				}
+
+				$row->bind($registrant);
+
+				if ($row->number_registrants > 1)
+				{
+					$row->is_group_billing = 1;
+				}
+
+				$row->store();
+
+				$registrantId = $row->id;
+
+				$fields = self::getEventFields($row->event_id, $config);
+
+				if (count($fields))
+				{
+					$query->clear()
+						->delete('#__eb_field_values')
+						->where('registrant_id = '. $registrantId);
+					$db->setQuery($query);
+					$db->execute();
+
+					foreach($fields as $fieldName => $field)
+					{
+						$fieldValue = isset($registrant[$fieldName]) ? $registrant[$fieldName] : '';
+						$fieldId = $field->id;
+
+						if ($field->fieldtype == 'Checkboxes' || $field->multiple)
+						{
+							$fieldValue = json_encode(explode(', ', $fieldValue));
+						}
+
+						$query->clear()
+							->insert('#__eb_field_values')
+							->columns('registrant_id, field_id, field_value')
+							->values("$registrantId, $fieldId, ". $db->quote($fieldValue));
+						$db->setQuery($query);
+						$db->execute();
+					}
+				}
+
+				$imported++;
+			}
+		}
+
+		return $imported;
+	}
+
+	/**
+	 * Get all custom fields of the given event
+	 *
+	 * @param int $eventId
+	 *
+	 * @pram RADConfig $config
+	 *
+	 * @return array
+	 */
+	public static function getEventFields($eventId, $config)
+	{
+		static $fields;
+
+		if (!isset($fields[$eventId]))
+		{
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('id, name, fieldtype')
+				->from('#__eb_fields')
+				->where('is_core = 0')
+				->where('published = 1');
+
+			if ($config->custom_field_by_category)
+			{
+				//Get main category of the event
+				$subQuery = $db->getQuery(true);
+				$subQuery->select('category_id')
+					->from('#__eb_event_categories')
+					->where('event_id = ' . $eventId)
+					->where('main_category = 1');
+				$db->setQuery($subQuery);
+				$categoryId = (int) $db->loadResult();
+				$query->where('(category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
+			}
+			else
+			{
+				$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . '))');
+			}
+
+			$db->setQuery($query);
+			$fields[$eventId] = $db->loadObjectList('name');
+		}
+
+		return $fields[$eventId];
+	}
 }

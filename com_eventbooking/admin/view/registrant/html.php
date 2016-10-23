@@ -15,6 +15,13 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 	{
 		parent::prepareView();
 
+		$layout = $this->getLayout();
+
+		if ($layout == 'import')
+		{
+			return;
+		}
+
 		// Add necessary javascript library
 		$document = JFactory::getDocument();
 		$rootUri  = JUri::root(true);
@@ -161,5 +168,18 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		$this->event      = $event;
 		$this->rowMembers = $rowMembers;
 		$this->form       = $form;
+	}
+
+	/**
+	 * Override addToolbar function to allow generating custom buttons for import Registrants feature
+	 */
+	protected function addToolbar()
+	{
+		$layout = $this->getLayout();
+
+		if ($layout == 'default')
+		{
+			parent::addToolbar();
+		}
 	}
 }

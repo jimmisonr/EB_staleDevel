@@ -100,15 +100,16 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 				if (!$config->thumb_width)
 				{
-					$config->thumb_width = 120;
+					$config->thumb_width = 200;
 				}
+
 				if (!$config->thumb_height)
 				{
-					$config->thumb_height = 120;
+					$config->thumb_height = 200;
 				}
 
 				$image = new JImage($imagePath);
-				$image->resize($config->thumb_width, $config->thumb_height, false)
+				$image->cropResize($config->thumb_width, $config->thumb_height, false)
 					->toFile($thumbPath);
 
 				$data['thumb'] = $fileName;
@@ -132,15 +133,15 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				{
 					if (!$config->thumb_width)
 					{
-						$config->thumb_width = 120;
+						$config->thumb_width = 200;
 					}
 					if (!$config->thumb_height)
 					{
-						$config->thumb_height = 120;
+						$config->thumb_height = 200;
 					}
 
 					$image = new JImage(JPATH_ROOT . '/' . $data['image']);
-					$image->resize($config->thumb_width, $config->thumb_height, false)
+					$image->cropResize($config->thumb_width, $config->thumb_height, false)
 						->toFile($thumbPath);
 				}
 
