@@ -8,12 +8,15 @@
  */
 // no direct access
 defined('_JEXEC') or die;
+
 EventbookingHelperJquery::validateForm();
 
 $bootstrapHelper   = $this->bootstrapHelper;
 $controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
 $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
 $controlsClass     = $bootstrapHelper->getClassMapping('controls');
+
+/* @var EventbookingViewInviteHtml $this*/
 ?>
 <div id="eb-invite-friend-page" class="eb-container">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_REGISTRATION_INVITE'); ?></h1>
@@ -27,7 +30,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			<?php echo JText::_('EB_NAME'); ?>
 		</label>
 		<div class="<?php echo $controlsClass; ?>">
-			<input type="text" name="name" value="<?php echo $this->name; ?>" class="validate[required] inputbox" size="50" />
+			<input type="text" name="name" value="<?php echo $this->escape($this->name); ?>" class="validate[required] inputbox" size="50" />
 		</div>
 	</div>
 	<div class="<?php echo $controlGroupClass; ?>">
