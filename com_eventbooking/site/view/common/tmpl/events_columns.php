@@ -14,9 +14,6 @@ $dateFormat        = $config->date_format;
 
 /* @var EventbookingHelperBootstrap $bootstrapHelper */
 $rowFluidClass     = $bootstrapHelper->getClassMapping('row-fluid');
-$imgClass = $bootstrapHelper->getClassMapping('img-polaroid');
-$span8Class        = $bootstrapHelper->getClassMapping('span8');
-$span4Class        = $bootstrapHelper->getClassMapping('span4');
 $btnClass          = $bootstrapHelper->getClassMapping('btn');
 $btnInverseClass   = $bootstrapHelper->getClassMapping('btn-inverse');
 $iconOkClass       = $bootstrapHelper->getClassMapping('icon-ok');
@@ -33,6 +30,7 @@ if (!$numberColumns)
 	$numberColumns = 2;
 }
 
+$baseUri = JUri::base(true);
 $span = 'span'.intval(12 / $numberColumns);
 ?>
 <div id="eb-events" class="<?php echo $rowFluidClass; ?> clearfix">
@@ -80,7 +78,7 @@ $span = 'span'.intval(12 / $numberColumns);
 				$isMultipleDate = true;
 			}
 		?>
-			<div class="<?php echo $span; ?> eb-category-<?php echo $event->category_id; ?> eb-event<?php if ($event->featured) echo ' eb-featured-event'; ?> eb-event-box clearfix" itemscope itemtype="http://schema.org/Event">
+			<div class="<?php echo $span; ?> eb-category-<?php echo $event->category_id; ?><?php if ($event->featured) echo ' eb-featured-event'; ?> eb-event-box clearfix" itemscope itemtype="http://schema.org/Event">
 				<h2 class="eb-event-title-container">
 					<?php
 					if ($config->hide_detail_button !== '1')
@@ -101,7 +99,7 @@ $span = 'span'.intval(12 / $numberColumns);
 				{
 				?>
 					<div class="clearfix">
-						<a href="<?php echo JUri::base(true).'/media/com_eventbooking/images/'.$event->thumb; ?>" class="eb-modal"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$event->thumb; ?>" class="eb-event-thumb <?php echo $imgClass; ?>" /></a>
+						<a href="<?php echo $baseUri . '/media/com_eventbooking/images/' . $event->thumb; ?>" class="eb-modal"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $event->thumb; ?>" class="eb-event-thumb" /></a>
 					</div>
 				<?php
 				}
@@ -177,12 +175,12 @@ $span = 'span'.intval(12 / $numberColumns);
 					}
 					?>
 				</div>
-				<div class="eb-event-location-price clearfix">
+				<div class="eb-event-location-price <?php echo $rowFluidClass; ?> clearfix">
 					<?php
 					if ($event->location_id)
 					{
 					?>
-						<div class="eb-event-location pull-left">
+						<div class="eb-event-location <?php echo $bootstrapHelper->getClassMapping('span9'); ?>">
 							<i class="icon-location <?php echo $iconMapMakerClass; ?>"></i>
 							<?php
 							if ($event->location_address)
@@ -200,7 +198,7 @@ $span = 'span'.intval(12 / $numberColumns);
 						<?php
 					}
 					?>
-					<div class="eb-event-price btn-primary pull-right">
+					<div class="eb-event-price btn-primary <?php echo $bootstrapHelper->getClassMapping('span3'); ?> pull-right">
 						<?php
 						if ($config->show_discounted_price)
 						{
