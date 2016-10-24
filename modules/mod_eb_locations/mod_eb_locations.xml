@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>contact@joomdonation.com</authorEmail>
 	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>2.10.3</version>  
+	<version>2.11.0</version>  
 	<description>This module is used to display locations in Event Booking Extension so that users can browse events by location</description>
 	<files>		
 		<filename module="mod_eb_locations">mod_eb_locations.php</filename>		

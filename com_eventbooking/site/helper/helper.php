@@ -16,7 +16,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '2.10.3';
+		return '2.11.0';
 	}
 
 	/**
