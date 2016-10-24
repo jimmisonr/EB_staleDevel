@@ -3988,21 +3988,21 @@ class EventbookingHelper
 
 
 	/**
-	 * Generate invoice PDF
+	 * Download PDF Certificates
 	 *
-	 * @param object $row
+	 * @param array $rows
+	 * @param RADConfig $config
 	 */
-	public static function generateCertificatePDF($row, $config, $download = false)
+	public static function downloadCertificates($rows, $config)
 	{
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/tcpdf.php";
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/config/lang/eng.php";
 
 		self::loadLanguage();
-		
-		$rows = (array) $row;
-		$events = array();
 
 		$sitename    = JFactory::getConfig()->get("sitename");
+
+		$events = array();
 
 		$db          = JFactory::getDbo();
 		$query       = $db->getQuery(true);
@@ -4148,18 +4148,18 @@ class EventbookingHelper
 		}
 		else
 		{
-			$fileName = self::formatCertificateNumber($row->id, $config);
+			$row = $rows[0];
+
 			//Filename
-			$filePath = JPATH_ROOT . '/media/com_eventbooking/certificates/' . $fileName . '.pdf';
+			$fileName = self::formatCertificateNumber($row->id, $config).'.pdf';
+			$filePath = JPATH_ROOT . '/media/com_eventbooking/certificates/' . $fileName ;
 		}
 
 		$pdf->Output($filePath, 'F');
 
-		if ($download)
-		{
-			while (@ob_end_clean()) ;
-			self::processDownload($filePath, $fileName);
-		}
+		// Process download
+		while (@ob_end_clean()) ;
+		self::processDownload($filePath, $fileName);
 	}
 
 	/**
@@ -4170,6 +4170,7 @@ class EventbookingHelper
 	public static function generateQrcode($registrantId)
 	{
 		$filename = $registrantId . '.png';
+
 		if (!file_exists(JPATH_ROOT . '/media/com_eventbooking/qrcodes/' . $filename))
 		{
 			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/phpqrcode/qrlib.php';
@@ -4215,32 +4216,6 @@ class EventbookingHelper
 			while (@ob_end_clean()) ;
 			self::processDownload($invoicePath, $fileName);
 		}
-	}
-
-
-	/**
-	 * Generate and download invoice of given registration record
-	 *
-	 * @param EventbookingTableRegistrant $row
-	 * @param RADConfig                   $config
-	 */
-	public static function downloadCertificate($row, $config)
-	{
-		$certificateNumber = self::formatCertificateNumber($row->id, $config);
-
-		if (is_callable('EventbookingHelperOverrideHelper::generateCertificatePDF'))
-		{
-			EventbookingHelperOverrideHelper::generateCertificatePDF($row, $config);
-		}
-		else
-		{
-			self::generateCertificatePDF($row, $config);
-		}
-
-		$fileName    = $certificateNumber . '.pdf';
-		$invoicePath = JPATH_ROOT . '/media/com_eventbooking/certificates/' . $fileName;
-		while (@ob_end_clean()) ;
-		self::processDownload($invoicePath, $fileName);
 	}
 
 	/**

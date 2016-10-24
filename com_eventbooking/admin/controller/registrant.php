@@ -225,7 +225,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		$config = EventbookingHelper::getConfig();
 
-		EventbookingHelper::generateCertificatePDF($rows, $config, true);
+		EventbookingHelper::downloadCertificates($rows, $config);
 	}
 
 	/**

@@ -289,7 +289,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 			throw new Exception(JText::_('Certificate can only be downloaded after event end date'), 403);
 		}
 
-		EventbookingHelper::downloadCertificate($row, $config);
+		EventbookingHelper::downloadCertificates(array($row), $config);
 	}
 
 	/**
