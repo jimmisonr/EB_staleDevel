@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	<layout title="Category Columns Layout">
+		<message>
+			Displays a list of events from a category using column layout
+		</message>
+	</layout>
+	<state>
+		<name>Category Columns Layout</name>
+		<description>Displays a list of events from a category using columns layout</description>		
+		<fields name="request">			
+			<fieldset name="request"
+				addfieldpath="/administrator/components/com_eventbooking/elements">
+				<field name="id" type="ebcategory" size="3" default="0" label="Select Category" description="Choose the category which you want to display events" />
+			</fieldset>
+			<fields name="params">
+				<fieldset name="basic">
+					<field name="number_columns" type="text" default="2" label="Number Columns" />
+				</fieldset>
+			</fields>
+		</fields>			
+	</state>
+</metadata>

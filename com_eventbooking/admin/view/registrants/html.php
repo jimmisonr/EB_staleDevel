@@ -22,6 +22,7 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 		$rows      = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
 		$options   = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_SELECT_EVENT'), 'id', 'title');
+
 		if ($config->show_event_date)
 		{
 			for ($i = 0, $n = count($rows); $i < $n; $i++)
@@ -86,5 +87,13 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 
 		JToolbarHelper::custom('resend_email', 'envelope', 'envelope', 'Resend Email', true);
 		JToolbarHelper::custom('export', 'download', 'download', 'Export Registration', false);
+
+
+		$config = EventbookingHelper::getConfig();
+
+		if ($config->activate_certificate_feature)
+		{
+			JToolbarHelper::custom('download_certificates', 'download', 'download', 'Download Certificates', true);
+		}
 	}
 }

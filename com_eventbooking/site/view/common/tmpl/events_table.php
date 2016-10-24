@@ -11,6 +11,7 @@ defined( '_JEXEC' ) or die ;
 
 $hiddenPhoneClass    = $bootstrapHelper->getClassMapping('hidden-phone');
 $btnClass            = $bootstrapHelper->getClassMapping('btn');
+$baseUri             = JUri::base(true);
 ?>
 <table class="table table-striped table-bordered table-condensed">
 	<thead>
@@ -145,7 +146,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 							if ($item->thumb)
 							{
 							?>
-								<a href="<?php echo JUri::base(true).'/media/com_eventbooking/images/'.$item->thumb; ?>" class="eb-modal"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$item->thumb; ?>" class="eb_thumb-left"/></a>
+								<a href="<?php echo $baseUri . '/media/com_eventbooking/images/' . $item->thumb; ?>" class="eb-modal"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $item->thumb; ?>" class="eb_thumb-left"/></a>
 							<?php
 							}
 							else

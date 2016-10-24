@@ -25,13 +25,15 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 		if (count($events))
 		{
 			$config = EventbookingHelper::getConfig();
+
 			if (!$config->thumb_width)
 			{
-				$config->thumb_width = 120;
+				$config->thumb_width = 200;
 			}
+
 			if (!$config->thumb_height)
 			{
-				$config->thumb_height = 120;
+				$config->thumb_height = 200;
 			}
 
 			$db    = JFactory::getDbo();
@@ -84,7 +86,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 						JFile::copy(JPATH_ROOT . '/' . $event['image'], $imagePath);
 
 						$image = new JImage($imagePath);
-						$image->resize($config->thumb_width, $config->thumb_height, false)
+						$image->cropResize($config->thumb_width, $config->thumb_height, false)
 							->toFile($thumbPath);
 
 						$event['thumb'] = $fileName;

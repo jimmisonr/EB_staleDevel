@@ -9,6 +9,7 @@
 // no direct access
 defined( '_JEXEC' ) or die ;
 $return = base64_encode(JUri::getInstance()->toString());
+$baseUri = JUri::base(true);
 ?>
 <div id="eb-events">
 	<?php
@@ -93,7 +94,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 							if ($event->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$event->thumb))
 							{
 							?>
-								<a href="<?php echo JUri::base(true).'/media/com_eventbooking/images/'.$event->thumb; ?>" class="eb-modal"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$event->thumb; ?>" class="eb-thumb-left"/></a>
+								<a href="<?php echo $baseUri . '/media/com_eventbooking/images/' . $event->thumb; ?>" class="eb-modal"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $event->thumb; ?>" class="eb-thumb-left"/></a>
 							<?php
 							}
 

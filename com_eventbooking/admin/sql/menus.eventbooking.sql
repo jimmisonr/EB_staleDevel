@@ -30,7 +30,11 @@ INSERT INTO `#__eb_menus` (`id`, `menu_name`, `menu_parent_id`, `menu_link`, `pu
 (26, 'EB_IMPORT', 24, 'index.php?option=com_eventbooking&view=event&layout=import', 1, 2, 'upload'),
 (27, 'EB_EXPORT', 24, 'index.php?option=com_eventbooking&task=event.export', 1, 3, 'download'),
 
-(9, 'EB_REGISTRANTS', 0, 'index.php?option=com_eventbooking&view=registrants', 1, 4, 'user'),
+(9, 'EB_REGISTRANTS', 0, NULL, 1, 4, 'user'),
+(28, 'EB_REGISTRANTS', 9, 'index.php?option=com_eventbooking&view=registrants', 1, 1, 'user'),
+(29, 'EB_IMPORT_TEMPLATE', 9, 'index.php?option=com_eventbooking&task=registrant.import_template', 1, 2, 'list'),
+(30, 'EB_IMPORT', 9, 'index.php?option=com_eventbooking&view=registrant&layout=import', 1, 3, 'upload'),
+(31, 'EB_EXPORT', 9, 'index.php?option=com_eventbooking&task=registrant.export', 1, 4, 'download'),
 
 (10, 'EB_COUPONS', 0, NULL, 1, 5, 'tags'),
 (11, 'EB_COUPONS', 10, 'index.php?option=com_eventbooking&view=coupons', 1, 1, 'tags'),
