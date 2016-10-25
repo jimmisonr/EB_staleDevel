@@ -17,6 +17,7 @@ class EventbookingViewLocationHtml extends RADViewHtml
 	public function display()
 	{
 		$layout = $this->getLayout();
+
 		if ($layout == 'form' || $layout == 'popup')
 		{
 			$this->displayForm();
@@ -35,6 +36,7 @@ class EventbookingViewLocationHtml extends RADViewHtml
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
 		}
+
 		if ($config->multiple_booking)
 		{
 			if ($this->deviceType == 'mobile')
@@ -51,6 +53,7 @@ class EventbookingViewLocationHtml extends RADViewHtml
 		{
 			$width  = (int) $config->get('map_width', 800);
 			$height = (int) $config->get('map_height', 600);
+
 			if ($this->deviceType == 'mobile')
 			{
 				EventbookingHelperJquery::colorbox('eb-colorbox-map', '100%', $height . 'px', 'true', 'false');
@@ -63,6 +66,7 @@ class EventbookingViewLocationHtml extends RADViewHtml
 
 		// Process page meta data
 		$params = EventbookingHelper::getViewParams($active, array('location'));
+
 		if (!$params->get('page_title'))
 		{
 			if (!empty($location->name))
@@ -70,10 +74,16 @@ class EventbookingViewLocationHtml extends RADViewHtml
 				$params->set('page_title', $location->name);
 			}
 		}
+
 		EventbookingHelperHtml::prepareDocument($params, $location);
+
+		// Handle breadcrumb
+		$pathway = $app->getPathway();
+		$pathway->addItem($location->name);
 
 		// Set the layout to display events from this location
 		$layout = $this->getLayout();
+
 		if ($layout == '' || $layout == 'default')
 		{
 			if (!empty($location->layout))
@@ -112,13 +122,13 @@ class EventbookingViewLocationHtml extends RADViewHtml
 
 		$document = JFactory::getDocument();
 		$document->addScriptDeclaration(
-				'var siteUrl = "' . EventbookingHelper::getSiteUrl() . '";'
+			'var siteUrl = "' . EventbookingHelper::getSiteUrl() . '";'
 		);
-		$config             = EventbookingHelper::getConfig();
-		$item               = $this->model->getLocationData();
+		$config = EventbookingHelper::getConfig();
+		$item   = $this->model->getLocationData();
 
-		$options            = array();
-		$options[]          = JHtml::_('select.option', '', JText::_('EB_SELECT_COUNTRY'), 'id', 'name');
+		$options   = array();
+		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_COUNTRY'), 'id', 'name');
 		$countries = EventbookingHelperDatabase::getAllCountries();
 		foreach ($countries as $country)
 		{
@@ -128,9 +138,9 @@ class EventbookingViewLocationHtml extends RADViewHtml
 		$lists['country']   = JHtml::_('select.genericlist', $options, 'country', '', 'value', 'text', $item->country);
 		$lists['published'] = JHtml::_('select.booleanlist', 'published', '', $item->published);
 
-		$this->item         = $item;
-		$this->lists        = $lists;
-		$this->config       = $config;
+		$this->item   = $item;
+		$this->lists  = $lists;
+		$this->config = $config;
 
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 
