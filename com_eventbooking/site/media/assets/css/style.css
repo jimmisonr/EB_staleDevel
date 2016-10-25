@@ -1201,11 +1201,6 @@ h3.eb-heading
 	margin-right: 20px;
 }
 
-.eb-event-box
-{
-    margin: 15px;
-}
-
 .eb-event-box .eb-event-date-time {
     margin-top: 15px;
     font-weight: bold;
@@ -1226,15 +1221,6 @@ h3.eb-heading
 {
     padding: 5px;
     font-weight: bold;
-}
-
-.eb-event-box  .eb-taskbar .btn {
-    font-size: 14px;
-    padding: 4px 14px;
-    border-radius: 4px;
-    border-color: #cccccc;
-    color: #333333;
-    background: #ffffff;
 }
 
 .eb-event-box img.eb-event-thumb

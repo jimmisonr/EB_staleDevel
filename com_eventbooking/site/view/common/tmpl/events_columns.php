@@ -32,6 +32,8 @@ if (!$numberColumns)
 
 $baseUri = JUri::base(true);
 $span = 'span'.intval(12 / $numberColumns);
+$numberEvents = count($events);
+$count = 0;
 ?>
 <div id="eb-events" class="<?php echo $rowFluidClass; ?> clearfix">
 	<?php
@@ -40,6 +42,7 @@ $span = 'span'.intval(12 / $numberColumns);
 
 		for ($i = 0 , $n = count($events) ;  $i < $n ; $i++)
 		{
+			$count++;
 			$event = $events[$i] ;
 
 			if ($event->activate_waiting_list == 2)
@@ -365,6 +368,13 @@ $span = 'span'.intval(12 / $numberColumns);
 				</div>
 			</div>
 		<?php
+			if ($count % $numberColumns == 0 && $count < $numberEvents)
+			{
+			?>
+				</div>
+				<div class="clearfix <?php echo $rowFluidClass; ?>">
+			<?php
+			}
 		}
 	?>
 </div>
