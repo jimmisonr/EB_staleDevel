@@ -278,7 +278,7 @@ class EventbookingControllerCart extends EventbookingController
 			$query->select('COUNT(id)')
 				->from('#__eb_registrants')
 				->where('event_id=' . $eventId)
-				->where('email = ' . $db->quote($email));
+				->where('email = ' . $db->quote($email))
 				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 			$db->setQuery($query);
 			$total = $db->loadResult();
