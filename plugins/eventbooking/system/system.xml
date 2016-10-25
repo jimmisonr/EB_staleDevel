@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>contact@joomdonation.com</authorEmail>
 	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>2.11.0</version>  
+	<version>2.11.1</version>  
 	<description>This plugin is used to perform various tasks (generate invoice numbers, update registration records in cart mode...). It is needed for Events Booking to work properly, so please DO NOT UNPUBLISH</description>
 	<files>
 		<filename plugin="system">system.php</filename>
