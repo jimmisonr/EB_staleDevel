@@ -19,6 +19,7 @@ class EventbookingHelperData
 	public static function getDayName($dayNumber)
 	{
 		static $days;
+
 		if ($days == null)
 		{
 			$days = array(
@@ -31,6 +32,7 @@ class EventbookingHelperData
 				JText::_('EB_SATURDAY'),
 			);
 		}
+
 		$i = $dayNumber % 7;
 
 		return $days[$i];
@@ -46,6 +48,7 @@ class EventbookingHelperData
 	public static function getDayNameMini($dayNumber)
 	{
 		static $daysMini = null;
+
 		if ($daysMini === null)
 		{
 			$daysMini    = array();
@@ -57,7 +60,9 @@ class EventbookingHelperData
 			$daysMini[5] = JText::_('EB_MINICAL_FRIDAY');
 			$daysMini[6] = JText::_('EB_MINICAL_SATURDAY');
 		}
+
 		$i = $dayNumber % 7; //
+
 		return $daysMini[$i];
 	}
 
@@ -72,6 +77,7 @@ class EventbookingHelperData
 	public static function getDayNameHtml($dayNumber, $colored = false)
 	{
 		$i = $dayNumber % 7; // modulo 7
+
 		if ($i == '0' && $colored === true)
 		{
 			$dayName = '<span class="sunday">' . self::getDayName($i) . '</span>';
@@ -99,6 +105,7 @@ class EventbookingHelperData
 	public static function getDayNameHtmlMini($dayNumber, $colored = false)
 	{
 		$i = $dayNumber % 7; // modulo 7
+
 		if ($i == '0' && $colored === true)
 		{
 			$dayName = '<span class="sunday">' . self::getDayNameMini($i) . '</span>';
@@ -134,6 +141,7 @@ class EventbookingHelperData
 		$data["daynames"] = array();
 		$data["dates"]    = array();
 		$month            = intval($month);
+
 		if ($month <= '9')
 		{
 			$month = '0' . $month;
@@ -169,6 +177,7 @@ class EventbookingHelperData
 		$priorYear  = $preMonth->format('Y');
 
 		$dayCount = 0;
+
 		for ($a = $start; $a > 0; $a--)
 		{
 			$data["dates"][$dayCount]                 = array();
@@ -178,10 +187,12 @@ class EventbookingHelperData
 			$data["dates"][$dayCount]['countDisplay'] = 0;
 			$dayCount++;
 		}
+
 		sort($data["dates"]);
 
 		// Current month
 		$end = $date->format('t');
+
 		for ($d = 1; $d <= $end; $d++)
 		{
 			$data["dates"][$dayCount]                 = array();
@@ -189,6 +200,7 @@ class EventbookingHelperData
 			$data["dates"][$dayCount]["monthType"]    = "current";
 			$data["dates"][$dayCount]["month"]        = $month;
 			$data["dates"][$dayCount]["year"]         = $year;
+
 			if ($month == $todayMonth && $year == $todayYear && $d == $todayDay)
 			{
 				$data["dates"][$dayCount]["today"] = true;
@@ -197,14 +209,17 @@ class EventbookingHelperData
 			{
 				$data["dates"][$dayCount]["today"] = false;
 			}
+
 			$data["dates"][$dayCount]['d']      = $d;
 			$data["dates"][$dayCount]['events'] = array();
+
 			if ($rowCount > 0)
 			{
 				foreach ($rows as $row)
 				{
 					$date_of_event = explode('-', $row->event_date);
 					$date_of_event = (int) $date_of_event[2];
+
 					if ($d == $date_of_event)
 					{
 						$i                                      = count($data["dates"][$dayCount]['events']);
@@ -223,6 +238,7 @@ class EventbookingHelperData
 		$followYear  = $date->format('Y');
 
 		$data["followingMonth"] = array();
+
 		for ($d = 1; $d <= $days; $d++)
 		{
 			$data["dates"][$dayCount]                 = array();
@@ -249,6 +265,7 @@ class EventbookingHelperData
 		$config   = EventbookingHelper::getConfig();
 		$nullDate = $db->getNullDate();
 		$userId   = $user->get('id');
+
 		for ($i = 0, $n = count($rows); $i < $n; $i++)
 		{
 			$row = $rows[$i];
@@ -269,6 +286,7 @@ class EventbookingHelperData
 			if ($config->show_discounted_price)
 			{
 				$discount = 0;
+
 				if (($row->early_bird_discount_date != $nullDate) && ($row->date_diff >= 0))
 				{
 					if ($row->early_bird_discount_type == 1)
@@ -280,9 +298,11 @@ class EventbookingHelperData
 						$discount += $row->early_bird_discount_amount;
 					}
 				}
+
 				if ($userId > 0)
 				{
 					$discountRate = EventbookingHelper::calculateMemberDiscount($row->discount_amounts, $row->discount_groups);
+
 					if ($discountRate > 0)
 					{
 						if ($row->discount_type == 1)
@@ -300,6 +320,7 @@ class EventbookingHelperData
 			}
 
 			$lateFee = 0;
+
 			if (($row->late_fee_date != $nullDate) && $row->late_fee_date_diff >= 0 && $row->late_fee_amount > 0)
 			{
 				if ($row->late_fee_type == 1)
@@ -345,6 +366,7 @@ class EventbookingHelperData
 			$db->setQuery($query);
 			$db->setQuery($query);
 			$children = $db->loadColumn();
+
 			if (count($children))
 			{
 				$queue       = array_merge($queue, $children);
@@ -367,11 +389,13 @@ class EventbookingHelperData
 		$db          = JFactory::getDbo();
 		$parents     = array();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+
 		while (true)
 		{
 			$sql = "SELECT id, name'.$fieldSuffix.' AS name, parent FROM #__eb_categories WHERE id = " . $categoryId . " AND published=1";
 			$db->setQuery($sql);
 			$row = $db->loadObject();
+
 			if ($row)
 			{
 				$parents[]  = $row;
@@ -455,6 +479,7 @@ class EventbookingHelperData
 		$db->setQuery($query);
 		$categories = $db->loadObjectList('id');
 		$paths      = array();
+
 		while ($id != $parentId)
 		{
 			if (isset($categories[$id]))
@@ -554,6 +579,7 @@ class EventbookingHelperData
 				$taxRate                = $row->tax_rate;
 				$row->individual_price  = round($row->individual_price * (1 + $taxRate / 100), 2);
 				$row->fixed_group_price = round($row->fixed_group_price * (1 + $taxRate / 100), 2);
+
 				if ($config->show_discounted_price)
 				{
 					$row->discounted_price = round($row->discounted_price * (1 + $taxRate / 100), 2);
@@ -584,6 +610,7 @@ class EventbookingHelperData
 		$xml          = JFactory::getXML(JPATH_ROOT . '/components/com_eventbooking/fields.xml');
 		$fields       = $xml->fields->fieldset->children();
 		$customFields = array();
+
 		foreach ($fields as $field)
 		{
 			$name                  = $field->attributes()->name;
@@ -597,6 +624,7 @@ class EventbookingHelperData
 			$params = new JRegistry();
 			$params->loadString($item->custom_fields, 'JSON');
 			$paramData = array();
+
 			foreach ($customFields as $name => $label)
 			{
 				$paramData[$name]['title'] = $label;
@@ -606,6 +634,7 @@ class EventbookingHelperData
 				{
 					$fieldValue = implode(', ', $fieldValue);
 				}
+
 				$paramData[$name]['value'] = $fieldValue;
 
 				if (!property_exists($item, $name))
@@ -632,6 +661,7 @@ class EventbookingHelperData
 		$data = array();
 
 		$reader = PHPExcel_IOFactory::load($file);
+
 		if ($reader instanceof PHPExcel_Reader_CSV)
 		{
 			$config = EventbookingHelper::getConfig();
@@ -645,6 +675,7 @@ class EventbookingHelperData
 			for ($i = 2, $n = count($rows); $i <= $n; $i++)
 			{
 				$row = array();
+
 				foreach ($rows[1] as $key => $fieldName)
 				{
 					$row[$fieldName] = $rows[$i][$key];
@@ -671,6 +702,7 @@ class EventbookingHelperData
 	public static function prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId = 0)
 	{
 		$showGroup = false;
+
 		foreach ($rows as $row)
 		{
 			if ($row->is_group_billing || $row->group_id > 0)
@@ -690,6 +722,7 @@ class EventbookingHelperData
 		$plugins = $db->loadObjectList('name');
 
 		$showPaymentMethodColumn = false;
+
 		if (count($plugins) > 1)
 		{
 			$showPaymentMethodColumn = true;
@@ -698,11 +731,13 @@ class EventbookingHelperData
 		if ($eventId)
 		{
 			$event = EventbookingHelperDatabase::getEvent($eventId);
+
 			if ($event->has_multiple_ticket_types)
 			{
 				$ticketTypes = EventbookingHelperData::getTicketTypes($eventId);
 
 				$ticketTypeIds = array();
+
 				foreach ($ticketTypes as $ticketType)
 				{
 					$ticketTypeIds[] = $ticketType->id;
@@ -718,6 +753,7 @@ class EventbookingHelperData
 				$registrantTickets = $db->loadObjectList();
 
 				$tickets = array();
+
 				foreach ($registrantTickets as $registrantTicket)
 				{
 					$tickets[$registrantTicket->registrant_id][$registrantTicket->ticket_type_id] = $registrantTicket->quantity;
@@ -837,10 +873,12 @@ class EventbookingHelperData
 				if (!$rowField->is_core)
 				{
 					$fieldValue = @$fieldValues[$row->id][$rowField->id];
+
 					if (is_string($fieldValue) && is_array(json_decode($fieldValue)))
 					{
 						$fieldValue = implode(', ', json_decode($fieldValue));
 					}
+
 					$row->{$rowField->name} = $fieldValue;
 				}
 			}
@@ -860,7 +898,6 @@ class EventbookingHelperData
 					}
 				}
 			}
-
 
 			$row->total_amount    = EventbookingHelper::formatAmount($row->total_amount, $config);
 			$row->discount_amount = EventbookingHelper::formatAmount($row->discount_amount, $config);
@@ -947,6 +984,13 @@ class EventbookingHelperData
 		if ($fileType == 'csv')
 		{
 			static::csvExport($fields, $rows, $filename, $headers);
+
+			return;
+		}
+
+		if ($fileType == 'xlsx')
+		{
+			static::xlsxExport($fields, $rows, $filename, $headers);
 
 			return;
 		}
@@ -1083,6 +1127,7 @@ class EventbookingHelperData
 		header('Content-Encoding: UTF-8');
 		header('Content-Type: ' . $mime_type . ' ;charset=UTF-8');
 		header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+
 		if ($browser == JApplicationWebClient::IE)
 		{
 			header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
@@ -1117,5 +1162,57 @@ class EventbookingHelperData
 		fclose($fp);
 
 		JFactory::getApplication()->close();
+	}
+
+	/**
+	 * Export registrants data into XLSX format
+	 *
+	 * @param       $fields
+	 * @param       $rows
+	 * @param       $filename
+	 * @param array $headers
+	 */
+	public static function xlsxExport($fields, $rows, $filename, $headers = array())
+	{
+		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/xlsxwriter/xlsxwriter.class.php';
+
+		$user        = JFactory::getUser();
+		$createdDate = JFactory::getDate('now', JFactory::getConfig()->get('offset'))->format('Y-m-d');
+
+		header('Content-disposition: attachment; filename="' . ($filename . '_on_' . $createdDate . '.xlsx') . '"');
+		header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		header('Content-Transfer-Encoding: binary');
+		header('Cache-Control: must-revalidate');
+		header('Pragma: public');
+
+		$writer = new XLSXWriter();
+		$writer->setAuthor($user->name);
+
+		$data = array();
+
+		if (empty($headers))
+		{
+			$data[] = $fields;
+		}
+		else
+		{
+			$data[] = $fields;
+		}
+
+		foreach ($rows as $row)
+		{
+			$values = array();
+
+			foreach ($fields as $field)
+			{
+				$values[] = isset($row->{$field}) ? $row->{$field} : '';
+			}
+
+			$data[] = $values;
+		}
+
+		$writer->writeSheet($data, 'Sheet1');
+
+		$writer->writeToStdOut();
 	}
 }
