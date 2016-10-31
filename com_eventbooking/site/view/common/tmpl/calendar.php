@@ -84,8 +84,8 @@ EventbookingHelperJquery::equalHeights();
 							}
 							?>
 							<div class="date day_cell">
-								<a class="eb_event_link" href="<?php echo JRoute::_(EventbookingHelperRoute::getEventRoute($eventId, isset($categoryId) ? $categoryId : 0, $Itemid)); ?>" title="<?php echo $event->title; ?>" <?php if ($color) echo 'style="background-color:#'.$color.'";' ; ?>>
-									<img border="0" align="top" title="<?php echo $event->title; ?>" src="<?php echo $thumbSource; ?>">
+								<a class="eb_event_link" href="<?php echo JRoute::_(EventbookingHelperRoute::getEventRoute($eventId, isset($categoryId) ? $categoryId : 0, $Itemid)); ?>" title="<?php echo $event->title; ?>" <?php if ($color) echo 'style="background-color:#'.$color.';"' ; ?>>
+									<img border="0" align="top" title="<?php echo $event->title; ?>" src="<?php echo $thumbSource; ?>" />
 									<?php
 										if ($config->show_event_time && strpos($event->event_date, '00:00:00') === false)
 										{
