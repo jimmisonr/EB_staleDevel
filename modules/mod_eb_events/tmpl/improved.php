@@ -64,10 +64,21 @@ if (count($rows))
                 <li class="vevent clearfix row-fluid">
                     <div class="span3">
                         <span class="event-date">
-                            <span title="">
-                                <span class="month"><?php echo $monthNames[$month];?></span>
-                                <span class="day"><?php echo $date; ?></span>
-                            </span>
+	                        <?php
+	                            if ($row->event_date == '2099-12-31 00:00:00')
+	                            {
+	                            	echo JText::_('EB_TBC');
+	                            }
+	                            else
+	                            {
+	                            ?>
+		                            <span title="">
+		                                <span class="month"><?php echo $monthNames[$month];?></span>
+		                                <span class="day"><?php echo $date; ?></span>
+		                            </span>
+		                        <?php
+	                            }
+	                        ?>
                         </span>
                     </div>
                     <div class="span9">
