@@ -19,6 +19,7 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
+
 		$this->state->insert('filter_event_id', 'int', 0);
 	}
 
@@ -30,6 +31,7 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 	public function initData()
 	{
 		parent::initData();
+
 		$this->data->event_id = $this->state->filter_event_id;
 	}
 
@@ -44,6 +46,7 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 	{
 		$row = $this->getTable();
 		$row->load($id);
+
 		if ($row->group_id > 0)
 		{
 			// We don't send email to group members, return false
@@ -53,10 +56,12 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 		// Load the default frontend language
 		$lang = JFactory::getLanguage();
 		$tag  = $row->language;
+
 		if (!$tag || $tag == '*')
 		{
 			$tag = JComponentHelper::getParams('com_languages')->get('site', 'en-GB');
 		}
+
 		$lang->load('com_eventbooking', JPATH_ROOT, $tag);
 
 		$config = EventbookingHelper::getConfig();
@@ -141,15 +146,20 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 			$subject = $emailSubject;
 			$message = $emailMessage;
 			$email   = $row->email;
+
 			if (!in_array($email, $emails))
 			{
-				$replaces                      = array();
-				$replaces['event_title']       = $row->title;
-				$replaces['event_date']        = JHtml::_('date', $row->event_date, $config->event_date_format, null);
-				$replaces['event_end_date']    = JHtml::_('date', $row->event_end_date, $config->event_date_format, null);
-				$replaces['short_description'] = $row->short_description;
-				$replaces['description']       = $row->description;
-				$replaces['first_name']        = $row->first_name;
+				$downloadCertificateLink = $siteUrl . 'index.php?option=com_eventbooking&task=registrant.download_certificate&download_code=' . $row->registration_code;
+
+				$replaces = array();
+
+				$replaces['event_title']               = $row->title;
+				$replaces['event_date']                = JHtml::_('date', $row->event_date, $config->event_date_format, null);
+				$replaces['event_end_date']            = JHtml::_('date', $row->event_end_date, $config->event_date_format, null);
+				$replaces['short_description']         = $row->short_description;
+				$replaces['description']               = $row->description;
+				$replaces['first_name']                = $row->first_name;
+				$replaces['DOWNLOAD_CERTIFICATE_LINK'] = $downloadCertificateLink;
 
 				foreach ($replaces as $key => $value)
 				{
@@ -219,14 +229,17 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 	public function publish($cid, $state = 1)
 	{
 		$db = $this->getDbo();
+
 		if (($state == 1) && count($cid))
 		{
 			JPluginHelper::importPlugin('eventbooking');
 			$config = EventbookingHelper::getConfig();
 			$row    = new RADTable('#__eb_registrants', 'id', $db);
+
 			foreach ($cid as $registrantId)
 			{
 				$row->load($registrantId);
+
 				if (!$row->published)
 				{
 					if (empty($row->payment_date) || ($row->payment_date == $db->getNullDate()))
@@ -330,14 +343,14 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 				{
 					$query->clear()
 						->delete('#__eb_field_values')
-						->where('registrant_id = '. $registrantId);
+						->where('registrant_id = ' . $registrantId);
 					$db->setQuery($query);
 					$db->execute();
 
-					foreach($fields as $fieldName => $field)
+					foreach ($fields as $fieldName => $field)
 					{
 						$fieldValue = isset($registrant[$fieldName]) ? $registrant[$fieldName] : '';
-						$fieldId = $field->id;
+						$fieldId    = $field->id;
 
 						if ($field->fieldtype == 'Checkboxes' || $field->multiple)
 						{
@@ -347,7 +360,7 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 						$query->clear()
 							->insert('#__eb_field_values')
 							->columns('registrant_id, field_id, field_value')
-							->values("$registrantId, $fieldId, ". $db->quote($fieldValue));
+							->values("$registrantId, $fieldId, " . $db->quote($fieldValue));
 						$db->setQuery($query);
 						$db->execute();
 					}

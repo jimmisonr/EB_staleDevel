@@ -63,6 +63,7 @@ class EventbookingModelMassmail extends RADModel
 				$replaces['event_location'] = '';
 			}
 
+
 			$query->clear()
 				->select('*')
 				->from('#__eb_registrants')
@@ -87,8 +88,11 @@ class EventbookingModelMassmail extends RADModel
 				$email   = $row->email;
 				if (!in_array($email, $emails))
 				{
+					$downloadCertificateLink = $siteUrl . 'index.php?option=com_eventbooking&task=registrant.download_certificate&download_code=' . $row->registration_code;
+
 					$message = str_replace("[FIRST_NAME]", $row->first_name, $message);
 					$message = str_replace("[LAST_NAME]", $row->last_name, $message);
+					$message = str_replace("[DOWNLOAD_CERTIFICATE_LINK]", $downloadCertificateLink, $message);
 
 					// Process [REGISTRATION_DETAIL] tag if it is used in the message
 					if (strpos($message, '[REGISTRATION_DETAIL]') !== false)
