@@ -329,13 +329,20 @@ defined('_JEXEC') or die;
 		{
 			if ($param['value'])
 			{
+				$paramValue = $param['value'];
+
+				// Make the link click-able
+				if (filter_var($paramValue, FILTER_VALIDATE_URL))
+				{
+					$paramValue = '<a href="' . $paramValue . '" target="_blank">' . $paramValue . '<a/>';
+				}
 			?>
 				<tr>
 					<td>
 						<strong><?php echo $param['title']; ?></strong>
 					</td>
 					<td>
-						<?php echo $param['value']; ?>
+						<?php echo $paramValue; ?>
 					</td>
 				</tr>
 			<?php
