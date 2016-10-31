@@ -1196,7 +1196,7 @@ class EventbookingHelperData
 		}
 		else
 		{
-			$data[] = $fields;
+			$data[] = $headers;
 		}
 
 		foreach ($rows as $row)
@@ -1214,5 +1214,7 @@ class EventbookingHelperData
 		$writer->writeSheet($data, 'Sheet1');
 
 		$writer->writeToStdOut();
+
+		JFactory::getApplication()->close();
 	}
 }
