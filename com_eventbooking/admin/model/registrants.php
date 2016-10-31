@@ -71,6 +71,7 @@ class EventbookingModelRegistrants extends RADModelList
 					->where('id IN (' . implode(',', $billingIds) . ')');
 				$db->setQuery($query);
 				$billingRecords = $db->loadObjectList('id');
+
 				foreach ($rows as $row)
 				{
 					if ($row->group_id > 0)
@@ -94,30 +95,56 @@ class EventbookingModelRegistrants extends RADModelList
 	{
 		$fieldsData = array();
 		$rows       = $this->data;
+
 		if (count($rows) && count($fields))
 		{
 			$db    = $this->getDbo();
 			$query = $db->getQuery(true);
 
+			$query->select('id, fieldtype')
+				->from('#__eb_fields')
+				->where('id IN (' . implode(',', $fields) . ')');
+			$db->setQuery($query);
+			$rowFields = $db->loadObjectList('id');
+
 			$registrantIds = array();
+
 			foreach ($rows as $row)
 			{
 				$registrantIds[] = $row->id;
 			}
 
-			$query->select('registrant_id, field_id, field_value')
+			$query->clear()
+				->select('registrant_id, field_id, field_value')
 				->from('#__eb_field_values')
 				->where('registrant_id IN (' . implode(',', $registrantIds) . ')')
 				->where('field_id IN (' . implode(',', $fields) . ')');
 			$db->setQuery($query);
 			$rowFieldValues = $db->loadObjectList();
+
+			$config = EventbookingHelper::getConfig();
+
 			foreach ($rowFieldValues as $rowFieldValue)
 			{
 				$fieldValue = $rowFieldValue->field_value;
-				if (is_string($fieldValue) && is_array(json_decode($fieldValue)))
+
+				if ($rowFields[$rowFieldValue->field_id]->fieldtype == 'Date')
+				{
+					try
+					{
+						$dateTime   = new DateTime($fieldValue);
+						$fieldValue = $dateTime->format($config->date_format);
+					}
+					catch (Exception $e)
+					{
+						$fieldValue = $rowFieldValue->field_value;
+					}
+				}
+				elseif (is_string($fieldValue) && is_array(json_decode($fieldValue)))
 				{
 					$fieldValue = implode(', ', json_decode($fieldValue));
 				}
+
 				$fieldsData[$rowFieldValue->registrant_id][$rowFieldValue->field_id] = $fieldValue;
 			}
 
@@ -129,6 +156,7 @@ class EventbookingModelRegistrants extends RADModelList
 				->where('is_core = 1');
 			$db->setQuery($query);
 			$coreFields = $db->loadObjectList();
+
 			if (count($coreFields))
 			{
 				foreach ($rows as $row)
