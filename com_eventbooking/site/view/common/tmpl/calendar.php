@@ -6,22 +6,26 @@
  * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
+
 // no direct access
-defined( '_JEXEC' ) or die ;
-$timeFormat = $config->event_time_format ? $config->event_time_format : 'g:i a';
+defined( '_JEXEC' ) or die;
+
 EventbookingHelperJquery::equalHeights();
+
+$timeFormat = $config->event_time_format ? $config->event_time_format : 'g:i a';
+$rootUri    = JUri::root(true);
 ?>
 <div class="eb-calendar">
 	<ul class="eb-month-browser regpro-calendarMonthHeader clearfix">
 		<li class="eb-calendar-nav">
-			<a href="<?php echo $previousMonthLink; ?>" rel="nofollow"><img src="<?php echo JUri::root()?>media/com_eventbooking/assets/images/calendar_previous.png" alt="<?php echo $listMonth[$previousMonth - 1] ;?>"></a>
+			<a href="<?php echo $previousMonthLink; ?>" rel="nofollow"><img src="<?php echo $rootUri;?>/media/com_eventbooking/assets/images/calendar_previous.png" alt="<?php echo $listMonth[$previousMonth - 1] ;?>" /></a>
 		</li>
 		<li id="eb-current-month">
 			<?php echo $searchMonth; ?>
 			<?php echo $searchYear; ?>
 		</li>
 		<li class="eb-calendar-nav">
-			<a href="<?php echo $nextMonthLink ; ?>" rel="nofollow"><img src="<?php echo JUri::root()?>media/com_eventbooking/assets/images/calendar_next.png" alt="<?php echo $listMonth[$nextMonth - 1];?>"></a>
+			<a href="<?php echo $nextMonthLink ; ?>" rel="nofollow"><img src="<?php echo $rootUri?>/media/com_eventbooking/assets/images/calendar_next.png" alt="<?php echo $listMonth[$nextMonth - 1];?>" /></a>
 		</li>
 	</ul>
 	<ul class="eb-weekdays">
@@ -69,11 +73,11 @@ EventbookingHelperJquery::equalHeights();
 
 							if ($config->show_thumb_in_calendar && $event->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $event->thumb))
 							{
-								$thumbSource = JUri::root(true) . '/media/com_eventbooking/images/thumbs/' . $event->thumb;
+								$thumbSource = $rootUri . '/media/com_eventbooking/images/thumbs/' . $event->thumb;
 							}
 							else
 							{
-								$thumbSource = JUri::root(true) . '/media/com_eventbooking/assets/images/calendar_event.png';
+								$thumbSource = $rootUri . '/media/com_eventbooking/assets/images/calendar_event.png';
 							}
 
 							$eventId = $event->id;
