@@ -26,6 +26,7 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 		if ($state->id)
 		{
 			$category = EventbookingHelperDatabase::getCategory($state->id);
+
 			if (empty($category) || !in_array($category->access, JFactory::getUser()->getAuthorisedViewLevels()))
 			{
 				$app->redirect('index.php', JText::_('EB_INVALID_CATEGORY_OR_NOT_AUTHORIZED'));
@@ -41,6 +42,7 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 		}
 
 		$params = EventbookingHelper::getViewParams($active, array('upcomingevents'));
+
 		if (!$params->get('page_title'))
 		{
 			$pageTitle = JText::_('EB_UPCOMING_EVENTS_PAGE_TITLE');
@@ -51,12 +53,12 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 
 			$params->set('page_title', $pageTitle);
 		}
-		
+
 		if (!$this->input->getInt('hmvc_call', 0))
 		{
 			EventbookingHelperHtml::prepareDocument($params, $category);
-		}	
-		
+		}
+
 		if ($config->multiple_booking)
 		{
 			if ($this->deviceType == 'mobile')
@@ -68,10 +70,12 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', 'false', 'false', 'false', 'false');
 			}
 		}
+
 		if ($config->show_list_of_registrants)
 		{
 			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
 		}
+
 		if ($config->show_location_in_category_view || ($this->getLayout() == 'timeline'))
 		{
 			$width  = (int) $config->get('map_width', 800);
@@ -97,6 +101,18 @@ class EventbookingViewUpcomingeventsHtml extends RADViewHtml
 		else
 		{
 			$introText = $message->intro_text;
+		}
+
+		// Show Feed link
+		if ($config->get('show_feed_link', 1))
+		{
+			/* @var JDocumentHtml $document */
+			$document = JFactory::getDocument();
+			$link     = '&format=feed&limitstart=';
+			$attribs  = array('type' => 'application/rss+xml', 'title' => 'RSS 2.0');
+			$document->addHeadLink(JRoute::_($link . '&type=rss'), 'alternate', 'rel', $attribs);
+			$attribs = array('type' => 'application/atom+xml', 'title' => 'Atom 1.0');
+			$document->addHeadLink(JRoute::_($link . '&type=atom'), 'alternate', 'rel', $attribs);
 		}
 
 		$this->viewLevels      = $user->getAuthorisedViewLevels();

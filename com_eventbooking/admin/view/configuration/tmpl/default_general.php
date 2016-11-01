@@ -240,6 +240,14 @@ defined( '_JEXEC' ) or die ;
 				<?php echo $this->lists['country_list']; ?>
 			</div>
 		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('show_feed_link', JText::_('EB_SHOW_FEED_LINK'), JText::_('EB_SHOW_FEED_LINK_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<?php echo EventbookingHelperHtml::getBooleanInput('show_feed_link', $config->get('show_feed_link', 1)); ?>
+			</div>
+		</div>
 	</fieldset>
 	<fieldset class="form-horizontal" style="margin-top:103px;">
 		<legend><?php echo JText::_('EB_MAIL_SETTINGS'); ?></legend>

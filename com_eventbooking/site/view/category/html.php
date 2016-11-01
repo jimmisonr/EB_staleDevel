@@ -161,6 +161,19 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 			$introText = $message->intro_text;
 		}
 
+
+		// Show Feed link
+		if ($config->get('show_feed_link', 1))
+		{
+			/* @var JDocumentHtml $document */
+			$document = JFactory::getDocument();
+			$link     = '&format=feed&limitstart=';
+			$attribs  = array('type' => 'application/rss+xml', 'title' => 'RSS 2.0');
+			$document->addHeadLink(JRoute::_($link . '&type=rss'), 'alternate', 'rel', $attribs);
+			$attribs = array('type' => 'application/atom+xml', 'title' => 'Atom 1.0');
+			$document->addHeadLink(JRoute::_($link . '&type=atom'), 'alternate', 'rel', $attribs);
+		}
+
 		$this->viewLevels      = $user->getAuthorisedViewLevels();
 		$this->userId          = $user->id;
 		$this->items           = $items;
@@ -209,7 +222,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 		$model->setState('month', $month)
 			->setState('year', $year)
 			->setState('id', $categoryId);
-		$rows        = $model->getData();
+		$rows = $model->getData();
 
 		$state = $model->getState();
 		$year  = $state->year;
@@ -230,7 +243,7 @@ class EventbookingViewCategoryHtml extends RADViewHtml
 			JText::_('EB_SEP'),
 			JText::_('EB_OCT'),
 			JText::_('EB_NOV'),
-			JText::_('EB_DEC'), );
+			JText::_('EB_DEC'),);
 		$options     = array();
 		foreach ($listMonth as $key => $monthName)
 		{
