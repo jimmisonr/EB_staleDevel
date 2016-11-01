@@ -2130,7 +2130,7 @@ class EventbookingHelper
 	{
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('id, name, title, is_core')
+		$query->select('id, name, title, is_core, hide_on_export')
 			->from('#__eb_fields')
 			->where('published = 1')
 			->order('ordering');
