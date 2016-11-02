@@ -59,6 +59,11 @@ if ($params->get('only_show_featured_events', 0))
 	$query->where('a.featured = 1');
 }
 
+if ($locationId = $params->get('location_id', 0))
+{
+	$query->where('a.location_id = ' . $locationId);
+}
+
 if ($fieldSuffix)
 {
 	$query->select('a.title' . $fieldSuffix . ' AS title');
