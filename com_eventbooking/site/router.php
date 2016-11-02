@@ -349,6 +349,8 @@ class EventbookingRouter extends JComponentRouterBase
 				'category_id',
 				'registration_code',
 				'search',
+				'filter_city',
+				'filter_state',
 				'start',
 				'limitstart',
 				'limit',
