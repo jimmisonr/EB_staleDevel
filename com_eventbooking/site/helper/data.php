@@ -779,8 +779,11 @@ class EventbookingHelperData
 		{
 			foreach ($rowFields as $rowField)
 			{
-				$headers[] = $rowField->title;
-				$fields[]  = $rowField->name;
+				if (!$rowField->hide_on_export)
+				{
+					$headers[] = $rowField->title;
+					$fields[]  = $rowField->name;
+				}
 			}
 		}
 
