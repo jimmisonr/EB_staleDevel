@@ -178,7 +178,7 @@ $baseUri             = JUri::base(true);
 						{
 							echo JText::_('EB_TBC');
 						}
-						else
+						elseif($item->event_date != $nullDate)
 						{
 							if (strpos($item->event_date, '00:00:00') !== false)
 							{

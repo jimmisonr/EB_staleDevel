@@ -3995,6 +3995,13 @@ class EventbookingHelper
 	 */
 	public static function downloadCertificates($rows, $config)
 	{
+		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideHelper', 'downloadCertificates'))
+		{
+			EventbookingHelperOverrideHelper::downloadCertificates($rows, $config);
+			
+			return;
+		}
+		
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/tcpdf.php";
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/config/lang/eng.php";
 
