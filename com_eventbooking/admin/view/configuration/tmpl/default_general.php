@@ -285,6 +285,14 @@ defined( '_JEXEC' ) or die ;
 		</div>
 		<div class="control-group">
 			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('send_email_to_event_creator', JText::_('EB_SEND_EMAIL_TO_EVENT_CREATOR'), JText::_('EB_SEND_EMAIL_TO_EVENT_CREATOR_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<?php echo EventbookingHelperHtml::getBooleanInput('send_email_to_event_creator', $config->get('send_email_to_event_creator', 1)); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('send_email_to_group_members', JText::_('EB_SEND_CONFIRMATION_EMAIL_TO_GROUP_MEMBERS'), JText::_('EB_SEND_CONFIRMATION_EMAIL_TO_GROUP_MEMBERS_EXPLAIN')); ?>
 			</div>
 			<div class="controls">

@@ -68,9 +68,10 @@ class EventbookingHelperMail
 
 		$mailer = static::getMailer($config);
 
-		if ($event->created_by)
+		if ($event->created_by && $config->send_email_to_event_creator)
 		{
 			$eventCreator = JUser::getInstance($event->created_by);
+
 			if (JMailHelper::isEmailAddress($eventCreator->email) && !$eventCreator->authorise('core.admin'))
 			{
 				$mailer->addReplyTo($eventCreator->email);
@@ -351,6 +352,7 @@ class EventbookingHelperMail
 			}
 
 			$emails = $emails = explode(',', $config->notification_emails);
+
 			if ($fieldSuffix && strlen($message->{'admin_email_subject' . $fieldSuffix}))
 			{
 				$subject = $message->{'admin_email_subject' . $fieldSuffix};
@@ -389,7 +391,12 @@ class EventbookingHelperMail
 				$body   = str_ireplace("[QRCODE]", $imgTag, $body);
 			}
 
-			if (!empty($eventCreator->email) && !$eventCreator->authorise('core.admin') && JMailHelper::isEmailAddress($eventCreator->email) && !in_array($eventCreator->email, $emails))
+			if ($config->send_email_to_event_creator
+				&& !empty($eventCreator->email)
+				&& !$eventCreator->authorise('core.admin')
+				&& JMailHelper::isEmailAddress($eventCreator->email)
+				&& !in_array($eventCreator->email, $emails)
+			)
 			{
 				$emails[] = $eventCreator->email;
 			}
