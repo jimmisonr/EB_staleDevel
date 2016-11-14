@@ -588,6 +588,14 @@ defined( '_JEXEC' ) or die ;
 		</div>
 		<div class="control-group">
 			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('resize_image_method', JText::_('EB_RESIZE_IMAGE_METHOD')); ?>
+			</div>
+			<div class="controls">
+				<?php echo $this->lists['resize_image_method'];?>
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('thumb_width', JText::_('EB_THUMB_WIDTH'), JText::_('EB_THUMB_WIDTH_EXPLAIN')); ?>
 			</div>
 			<div class="controls">

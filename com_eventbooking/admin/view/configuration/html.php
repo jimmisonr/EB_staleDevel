@@ -131,6 +131,11 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options[]                  = JHtml::_('select.option', '%d.%m.%Y', 'd.m.Y');
 		$lists['date_field_format'] = JHtml::_('select.genericlist', $options, 'date_field_format', '', 'value', 'text', isset($config->date_field_format) ? $config->date_field_format : 'Y-m-d');
 
+		$options                      = array();
+		$options[]                    = JHtml::_('select.option', 'resize', JText::_('EB_RESIZE'));
+		$options[]                    = JHtml::_('select.option', 'crop_resize', JText::_('EB_CROPRESIZE'));
+		$lists['resize_image_method'] = JHtml::_('select.genericlist', $options, 'resize_image_method', '', 'value', 'text', $config->get('resize_image_method', 'resize'));
+
 		$currencies = require_once JPATH_ROOT . '/components/com_eventbooking/helper/currencies.php';
 		$options    = array();
 		$options[]  = JHtml::_('select.option', '', JText::_('EB_SELECT_CURRENCY'));

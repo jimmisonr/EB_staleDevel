@@ -83,6 +83,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		{
 			$fileExt        = JString::strtoupper(JFile::getExt($thumbImage['name']));
 			$supportedTypes = array('JPG', 'PNG', 'GIF', 'JPEG');
+
 			if (in_array($fileExt, $supportedTypes))
 			{
 				if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . JString::strtolower($thumbImage['name'])))
@@ -93,6 +94,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				{
 					$fileName = JString::strtolower($thumbImage['name']);
 				}
+
 				$imagePath = JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName;
 				$thumbPath = JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $fileName;
 				JFile::upload($_FILES['thumb_image']['tmp_name'], $imagePath);
@@ -109,8 +111,17 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				}
 
 				$image = new JImage($imagePath);
-				$image->cropResize($config->thumb_width, $config->thumb_height, false)
-					->toFile($thumbPath);
+
+				if ($config->get('resize_image_method') == 'crop_resize')
+				{
+					$image->cropResize($config->thumb_width, $config->thumb_height, false)
+						->toFile($thumbPath);
+				}
+				else
+				{
+					$image->resize($config->thumb_width, $config->thumb_height, false)
+						->toFile($thumbPath);
+				}
 
 				$data['thumb'] = $fileName;
 			}
@@ -141,8 +152,17 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					}
 
 					$image = new JImage(JPATH_ROOT . '/' . $data['image']);
-					$image->cropResize($config->thumb_width, $config->thumb_height, false)
-						->toFile($thumbPath);
+
+					if ($config->get('resize_image_method') == 'crop_resize')
+					{
+						$image->cropResize($config->thumb_width, $config->thumb_height, false)
+							->toFile($thumbPath);
+					}
+					else
+					{
+						$image->resize($config->thumb_width, $config->thumb_height, false)
+							->toFile($thumbPath);
+					}
 				}
 
 				$data['thumb'] = $fileName;
@@ -162,7 +182,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		{
 			$data['discount_groups'] = '';
 		}
-		
+
 		//Process attachment
 		if (JFactory::getApplication()->isSite())
 		{

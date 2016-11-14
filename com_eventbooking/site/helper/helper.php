@@ -3815,7 +3815,11 @@ class EventbookingHelper
 	 */
 	public static function generateInvoicePDF($row)
 	{
+		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/tcpdf.php";
+		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/config/lang/eng.php";
+
 		self::loadLanguage();
+
 		$db          = JFactory::getDbo();
 		$query       = $db->getQuery(true);
 		$config      = self::getConfig();
@@ -3826,9 +3830,7 @@ class EventbookingHelper
 			->where('id = ' . (int) $row->event_id);
 		$db->setQuery($query);
 		$rowEvent = $db->loadObject();
-		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/tcpdf.php";
-		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/config/lang/eng.php";
-		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+		$pdf      = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 		$pdf->SetCreator(PDF_CREATOR);
 		$pdf->SetAuthor($sitename);
 		$pdf->SetTitle('Invoice');
@@ -3930,10 +3932,12 @@ class EventbookingHelper
 		{
 			$invoiceStatus = JText::_('EB_INVOICE_STATUS_UNKNOWN');
 		}
+
 		$replaces['INVOICE_STATUS'] = $invoiceStatus;
 		unset($replaces['total_amount']);
 		unset($replaces['discount_amount']);
 		unset($replaces['tax_amount']);
+
 		if ($config->multiple_booking)
 		{
 			$sql = 'SELECT a.title' . $fieldSuffix . ' AS title, a.event_date, b.* FROM #__eb_events AS a INNER JOIN #__eb_registrants AS b ' . ' ON a.id = b.event_id ' .
@@ -3963,12 +3967,12 @@ class EventbookingHelper
 		else
 		{
 			$replaces['ITEM_QUANTITY']          = 1;
-			$replaces['ITEM_AMOUNT']            = $replaces['ITEM_SUB_TOTAL'] = self::formatCurrency($row->total_amount, $config);
+			$replaces['ITEM_AMOUNT']            = $replaces['ITEM_SUB_TOTAL'] = self::formatCurrency($row->total_amount, $config, $rowEvent->currency_symbol);
 			$replaces['DISCOUNT_AMOUNT']        = self::formatCurrency($row->discount_amount, $config);
-			$replaces['SUB_TOTAL']              = self::formatCurrency($row->total_amount - $row->discount_amount, $config);
-			$replaces['TAX_AMOUNT']             = self::formatCurrency($row->tax_amount, $config);
-			$replaces['PAYMENT_PROCESSING_FEE'] = self::formatCurrency($row->payment_processing_fee, $config);
-			$replaces['TOTAL_AMOUNT']           = self::formatCurrency($row->total_amount - $row->discount_amount + $row->payment_processing_fee + $row->tax_amount, $config);
+			$replaces['SUB_TOTAL']              = self::formatCurrency($row->total_amount - $row->discount_amount, $config, $rowEvent->currency_symbol);
+			$replaces['TAX_AMOUNT']             = self::formatCurrency($row->tax_amount, $config, $rowEvent->currency_symbol);
+			$replaces['PAYMENT_PROCESSING_FEE'] = self::formatCurrency($row->payment_processing_fee, $config, $rowEvent->currency_symbol);
+			$replaces['TOTAL_AMOUNT']           = self::formatCurrency($row->total_amount - $row->discount_amount + $row->payment_processing_fee + $row->tax_amount, $config, $rowEvent->currency_symbol);
 			$itemName                           = JText::_('EB_EVENT_REGISTRATION');
 			$itemName                           = str_ireplace('[EVENT_TITLE]', $rowEvent->title, $itemName);
 			$replaces['ITEM_NAME']              = $itemName;
@@ -3985,7 +3989,6 @@ class EventbookingHelper
 		$filePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . $replaces['invoice_number'] . '.pdf';
 		$pdf->Output($filePath, 'F');
 	}
-
 
 	/**
 	 * Download PDF Certificates

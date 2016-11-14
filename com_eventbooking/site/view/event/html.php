@@ -213,6 +213,11 @@ class EventbookingViewEventHtml extends RADViewHtml
 			->from('#__eb_locations')
 			->where('published = 1')
 			->order('name');
+		
+		if (!$user->authorise('core.admin') && !$config->show_all_locations_in_event_submission_form)
+		{
+			$query->where('user_id = '. (int) $user->id);
+		}	
 		$db->setQuery($query);
 		$options[]            = JHtml::_('select.option', '', JText::_('EB_SELECT_LOCATION'), 'id', 'name');
 		$options              = array_merge($options, $db->loadObjectList());
