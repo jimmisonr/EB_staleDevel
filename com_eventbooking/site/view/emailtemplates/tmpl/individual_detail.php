@@ -44,7 +44,7 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 				?>
 					<tr>
 						<td>
-							<?php echo $ticketType->title; ?>
+							<?php echo JText::_($ticketType->title); ?>
 						</td>
 						<td class="eb-text-right">
 							<?php echo EventbookingHelper::formatCurrency($ticketType->price, $config); ?>

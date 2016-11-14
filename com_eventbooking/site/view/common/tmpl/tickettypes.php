@@ -39,11 +39,12 @@ defined('_JEXEC') or die;
 	<tr>
 		<td class="eb-ticket-type-title">
 			<?php
-				echo $ticketType->title;
+				echo JText::_($ticketType->title);
+
 				if ($ticketType->description)
 				{
 				?>
-					<p class="eb-ticket-type-description"><?php echo $ticketType->description; ?></p>
+					<p class="eb-ticket-type-description"><?php echo JText::_($ticketType->description); ?></p>
 				<?php
 				}
 			?>
