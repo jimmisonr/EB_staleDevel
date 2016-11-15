@@ -167,6 +167,7 @@ $layoutData = array(
 
 		echo $this->loadCommonLayout('register/tmpl/register_payment_amount.php', $layoutData);
 
+		$layoutData['registrationType'] = 'cart';
 		echo $this->loadCommonLayout('register/tmpl/register_payment_methods.php', $layoutData);
 	}
 

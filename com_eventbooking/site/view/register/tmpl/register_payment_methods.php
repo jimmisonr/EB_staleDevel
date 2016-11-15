@@ -46,7 +46,7 @@ if (count($this->methods) > 1)
 				}
 				?>
 					<label class="radio">
-						<input onclick="changePaymentMethod('individual');" class="validate[required] radio"
+						<input onclick="changePaymentMethod('<?php echo $registrationType; ?>');" class="validate[required] radio"
 							   type="radio" name="payment_method"
 							   value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
 					</label>

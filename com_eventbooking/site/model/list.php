@@ -56,6 +56,7 @@ class EventbookingModelList extends RADModelList
 		'tbl.currency_code',
 		'tbl.currency_symbol',
 		'tbl.thumb',
+		'tbl.image',
 		'tbl.language',
 		'tbl.alias',
 		'tbl.tax_rate',

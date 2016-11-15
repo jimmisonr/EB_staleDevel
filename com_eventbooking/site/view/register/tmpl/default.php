@@ -151,6 +151,7 @@ $layoutData = array(
 
 		if (!$this->waitingList)
 		{
+			$layoutData['registrationType'] = 'individual';
 			echo $this->loadCommonLayout('register/tmpl/register_payment_methods.php', $layoutData);
 		}
 	}

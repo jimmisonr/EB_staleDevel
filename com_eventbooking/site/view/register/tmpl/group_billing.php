@@ -91,6 +91,7 @@ else
 
 		if (!$this->waitingList)
 		{
+			$layoutData['registrationType'] = 'group';
 			echo $this->loadCommonLayout('register/tmpl/register_payment_methods.php', $layoutData);
 		}
 	}
