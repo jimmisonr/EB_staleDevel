@@ -1,10 +1,10 @@
 <?php
 /**
- * @package        	Joomla
- * @subpackage		Event Booking
- * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2016 Ossolution Team
- * @license        	GNU/GPL, see LICENSE.php
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
@@ -24,14 +24,15 @@ class os_payments
 	{
 		if (!self::$methods)
 		{
-			$path = JPATH_ROOT . '/components/com_eventbooking/payments/';
-			$db = JFactory::getDbo();
+			$path  = JPATH_ROOT . '/components/com_eventbooking/payments/';
+			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('*')
 				->from('#__eb_payment_plugins')
 				->where('published=1')
 				->where('`access` IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
 				->order('ordering');
+
 			if ($methodIds)
 			{
 				$query->where('id IN (' . $methodIds . ')');
@@ -44,18 +45,44 @@ class os_payments
 
 			$db->setQuery($query);
 			$rows = $db->loadObjectList();
+
+			$baseUri = JUri::base(true);
+
 			foreach ($rows as $row)
 			{
 				if (file_exists($path . $row->name . '.php'))
 				{
 					require_once $path . $row->name . '.php';
-					$params        = new JRegistry($row->params);
+
+					$params = new JRegistry($row->params);
 					$method = new $row->name($params);
 					$method->setTItle($row->title);
+
 					if ($params->get('payment_fee_amount') > 0 || $params->get('payment_fee_percent'))
 					{
 						$method->paymentFee = true;
 					}
+					else
+					{
+						$method->paymentFee = false;
+					}
+
+					$iconUri = '';
+
+					if ($icon = $params->get('icon'))
+					{
+						if (file_exists(JPATH_ROOT . '/media/com_eventbooking/assets/images/paymentmethods/' . $icon))
+						{
+							$iconUri = $baseUri . '/media/com_eventbooking/assets/images/paymentmethods/' . $icon;
+						}
+						elseif (file_exists(JPATH_ROOT . '/' . $icon))
+						{
+							$iconUri = $baseUri . '/' . $icon;
+						}
+					}
+
+					$method->iconUri = $iconUri;
+
 					self::$methods[] = $method;
 				}
 			}
@@ -71,8 +98,9 @@ class os_payments
 	 */
 	public static function writeJavascriptObjects()
 	{
-		$methods = self::getPaymentMethods();
+		$methods  = self::getPaymentMethods();
 		$jsString = " methods = new PaymentMethods();\n";
+
 		if (count($methods))
 		{
 			foreach ($methods as $method)
@@ -81,6 +109,7 @@ class os_payments
 				$jsString .= " methods.Add(method);\n";
 			}
 		}
+
 		echo $jsString;
 	}
 
@@ -93,7 +122,7 @@ class os_payments
 	 */
 	public static function loadPaymentMethod($name)
 	{
-		$db = JFactory::getDbo();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('*')
 			->from('#__eb_payment_plugins')
@@ -112,17 +141,19 @@ class os_payments
 	 */
 	public static function getDefautPaymentMethod($methodIds = null)
 	{
-		$db = JFactory::getDbo();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('name')
 			->from('#__eb_payment_plugins')
 			->where('published=1')
 			->where('`access` IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
 			->order('ordering');
+
 		if ($methodIds)
 		{
 			$query->where('id IN (' . $methodIds . ')');
 		}
+
 		$db->setQuery($query, 0, 1);
 
 		return $db->loadResult();
@@ -132,11 +163,13 @@ class os_payments
 	 * Get the payment method object based on it's name
 	 *
 	 * @param string $name
+	 *
 	 * @return object
 	 */
 	public static function getPaymentMethod($name)
 	{
 		$methods = self::getPaymentMethods();
+
 		foreach ($methods as $method)
 		{
 			if ($method->getName() == $name)
@@ -148,4 +181,3 @@ class os_payments
 		return;
 	}
 }
-?>

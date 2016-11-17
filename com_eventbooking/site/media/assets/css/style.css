@@ -1233,4 +1233,7 @@ h3.eb-heading
         float: none !important;
     }
 }
-
+img.eb-payment-method-icon
+{
+    margin-bottom: 8px;
+}

@@ -27,7 +27,7 @@
 	<folder>certificates</folder>
     <folder>icsfiles</folder>
 	<folder>assets</folder>
-	<folder>qrcodes</folder>
+	<folder>qrcodes</folder>	
 	<filename>ajax-loadding-animation.gif</filename>
 	<filename>invoice_logo.png</filename>		
   </media>

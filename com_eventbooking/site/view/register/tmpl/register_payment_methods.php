@@ -30,7 +30,6 @@ if (count($this->methods) > 1)
 		<div class="<?php echo $controlsClass; ?>">
 			<?php
 			$method = null;
-
 			for ($i = 0, $n = count($this->methods); $i < $n; $i++)
 			{
 				$paymentMethod = $this->methods[$i];
@@ -48,7 +47,20 @@ if (count($this->methods) > 1)
 					<label class="radio">
 						<input onclick="changePaymentMethod('<?php echo $registrationType; ?>');" class="validate[required] radio"
 							   type="radio" name="payment_method"
-							   value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> /><?php echo JText::_($paymentMethod->getTitle()); ?>
+							   value="<?php echo $paymentMethod->getName(); ?>" <?php echo $checked; ?> />
+						<?php
+						if ($paymentMethod->iconUri)
+						{
+						?>
+							<img class="eb-payment-method-icon clearfix" src="<?php echo $paymentMethod->iconUri; ?>"
+							     title="<?php echo JText::_($paymentMethod->getTitle()); ?>" />
+						<?php
+						}
+						else
+						{
+							echo JText::_($paymentMethod->getTitle());
+						}
+						?>
 					</label>
 				<?php
 			}

@@ -22,6 +22,7 @@
                        description="Enter Your Authorize.net API Login" default=""></field>
                 <field name="x_tran_key" type="text" label="Transaction Key"
                        description="Enter Transaction Key"></field>
+                <field name="icon" type="text" size="40" label="Icon" description="If you want to show icon instead of payment method title on registration form, upload it to media/com_eventbooking/assets/images/paymentmethods folder and enter the name of the file here. For example os_authnet.gif" default=""></field>
                 <field name="payment_fee_amount" type="text" label="Payment Processing Fee ($)" description=""></field>
                 <field name="payment_fee_percent" type="text" label="Payment Processing Fee (%)" description=""></field>
             </fieldset>
