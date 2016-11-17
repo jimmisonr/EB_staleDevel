@@ -2790,6 +2790,11 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		// Fix possible issue with categories data
+		$sql = 'UPDATE #__eb_categories SET `parent` = 0 WHERE `parent` = `id`';
+		$db->setQuery($sql);
+		$db->execute();
+
 		// Files, Folders clean up
 		$deleteFiles = array(
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/daylightsaving.php',
