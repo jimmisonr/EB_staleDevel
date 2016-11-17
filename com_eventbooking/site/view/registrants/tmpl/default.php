@@ -25,56 +25,52 @@ else
 $rootUri = JUri::root(true);
 ?>
 <script type="text/javascript">
-	function checkData(pressbutton)
+	Joomla.submitbutton = function(pressbutton)
 	{
 		var form = document.adminForm;
-		if (form.filter_event_id.value == 0)
-		{
-			alert("<?php echo JText::_('EB_SELECT_EVENT_TO_ADD_REGISTRANT'); ?>");
-			form.filter_event_id.focus();
-			return false;
-		}		
-		Joomla.submitform( pressbutton );
-	}
 
-	function deleteConfirm(registrantId)
-	{
-		var msg = "<?php echo JText::_('EB_DELETE_CONFIRM'); ?>";
-		if (confirm(msg))
+		if (pressbutton == 'add')
 		{
-			var form = document.adminForm;
-			form.registrant_id.value = registrantId;
-			form.task.value = 'registrant.delete';
-			form.submit();
+			if (form.filter_event_id.value == 0)
+			{
+				alert("<?php echo JText::_("EB_SELECT_EVENT_TO_ADD_REGISTRANT"); ?>");
+				form.filter_event_id.focus();
+				return;
+			}
 		}
+
+		Joomla.submitform( pressbutton );
 	}
 </script>
 <h1 class="eb-page-heading"><?php echo JText::_('EB_REGISTRANT_LIST'); ?></h1>
 <div id="eb-registrants-management-page" class="eb-container">
 <form action="<?php JRoute::_('index.php?option=com_eventbooking&view=registrants&Itemid='.$this->Itemid );?>" method="post" name="adminForm" id="adminForm">
-	<table width="100%" style="margin-bottom: 5px;">
-		<tr>
-			<td align="left">
-				<?php echo JText::_( 'EB_FILTER' ); ?>:
-				<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->lists['search'];?>" class="input-medium text_area search-query" onchange="document.adminForm.submit();" />
-				<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'EB_GO' ); ?></button>
-			</td >
-			<td style="float: right;">
-				<?php echo $this->lists['filter_published'] ; ?>
-				<?php echo $this->lists['filter_event_id'] ; ?>
-				<button type="button" class="btn btn-small btn-primary" onclick="checkData('add_registrant');"><i class="icon-new icon-white"></i><?php echo JText::_('EB_NEW_REGISTRANTS'); ?></button>
-			</td>
-		</tr>
-	</table>
+	<div class="btn-toolbar" id="btn-toolbar">
+		<?php echo JToolbar::getInstance('toolbar')->render('toolbar'); ?>
+	</div>
+	<fieldset class="filters btn-toolbar clearfix">
+		<div class="filter-search btn-group pull-left">
+			<label for="filter_search" class="element-invisible"><?php echo JText::_('EB_FILTER_SEARCH_REGISTRANTS_DESC');?></label>
+			<input type="text" name="filter_search" id="filter_search" placeholder="<?php echo JText::_('JSEARCH_FILTER'); ?>" value="<?php echo $this->escape($this->lists['search']); ?>" class="hasTooltip" title="<?php echo JHtml::tooltipText('EB_SEARCH_REGISTRANTS_DESC'); ?>" />
+		</div>
+		<div class="btn-group pull-left">
+			<button type="submit" class="btn hasTooltip" title="<?php echo JHtml::tooltipText('JSEARCH_FILTER_SUBMIT'); ?>"><span class="icon-search"></span></button>
+			<button type="button" class="btn hasTooltip" title="<?php echo JHtml::tooltipText('JSEARCH_FILTER_CLEAR'); ?>" onclick="document.getElementById('filter_search').value='';this.form.submit();"><span class="icon-remove"></span></button>
+		</div>
+		<div class="btn-group pull-left hidden-phone">
+			<?php echo $this->lists['filter_event_id'] ; ?>
+			<?php echo $this->lists['filter_published'] ; ?>
+		</div>
+	</fieldset>
 <?php
 	if (count($this->items))
 	{
 	?>
-		<table class="table table-striped table-bordered table-condensed">
+		<table class="table table-striped table-bordered table-hover">
 		<thead>
 			<tr>
-				<th width="5">
-					<?php echo JText::_( 'NUM' ); ?>
+				<th width="20">
+					<input type="checkbox" name="toggle" value="" onclick="Joomla.checkAll(this);" />
 				</th>
 				<th class="list_first_name">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_FIRST_NAME'), 'tbl.first_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
@@ -169,33 +165,21 @@ $rootUri = JUri::root(true);
 			$row      = $this->items[$i];
 			$link     = JRoute::_('index.php?option=com_eventbooking&task=edit_registrant&id=' . $row->id . '&Itemid=' . $this->Itemid . '&return=' . $return);
 			$isMember = $row->group_id > 0 ? true : false;
-			if ($isMember)
-			{
-				$groupLink = JRoute::_('index.php?option=com_eventbooking&task=edit_registrant&cid[]=' . $row->group_id . '&Itemid=' . $this->Itemid);
-			}
-
 			$img    = $row->checked_in ? 'tick.png' : 'publish_x.png';
 			$alt    = $row->checked_in ? JText::_('EB_CHECKED_IN') : JText::_('EB_NOT_CHECKED_IN');
 			$action = $row->checked_in ? JText::_('EB_UN_CHECKIN') : JText::_('EB_CHECKIN');
 			$task   = $row->checked_in ? 'registrant.reset_check_in' : 'registrant.check_in_webapp';
+			$checked 	= JHtml::_('grid.id',   $i, $row->id );
 			?>
 			<tr>
 				<td>
-					<?php echo $this->pagination->getRowOffset( $i ); ?>
+					<?php echo $checked; ?>
 				</td>
 				<td>
 					<a href="<?php echo $link; ?>">
 						<?php echo $row->first_name ?>
 					</a>
 					<?php
-					if ($this->config->get('enable_delete_registrants', 1))
-					{
-					?>
-						<span class="pull-right">
-							<a class="btn" href="javascript:deleteConfirm(<?php echo $row->id; ?>);"><i class="icon-trash"></i><?php echo JText::_('EB_DELETE'); ?></a>
-						</span>
-					<?php
-					}
 					if ($row->is_group_billing)
 					{
 						echo '<br />' ;
@@ -203,6 +187,7 @@ $rootUri = JUri::root(true);
 					}
 					if ($isMember)
 					{
+						$groupLink = JRoute::_('index.php?option=com_eventbooking&task=edit_registrant&cid[]=' . $row->group_id . '&Itemid=' . $this->Itemid);
 					?>
 						<br />
 						<?php echo JText::_('EB_GROUP'); ?><a href="<?php echo $groupLink; ?>"><?php echo $row->group_name ;  ?></a>
@@ -320,9 +305,10 @@ $rootUri = JUri::root(true);
 	}
 ?>
 	<input type="hidden" name="task" value="" />
-	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
-	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
-	<input type="hidden" name="registrant_id" value="0" />
+	<input type="hidden" name="boxchecked" value="0" />
+	<input type="hidden" name="filter_order" value="<?php echo $this->state->filter_order; ?>" />
+	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->state->filter_order_Dir; ?>" />
+	<input type="hidden" name="return" value="<?php echo $return; ?>" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 </form>
 </div>
