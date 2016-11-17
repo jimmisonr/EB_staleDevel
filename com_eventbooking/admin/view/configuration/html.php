@@ -28,19 +28,25 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['calendar_start_date'] = JHtml::_('select.genericlist', $options, 'calendar_start_date', ' class="inputbox" ', 'value', 'text',
 			$config->calendar_start_date);
 
-		$options                  = array();
-		$options[]                = JHtml::_('select.option', 1, JText::_('EB_ORDERING'));
-		$options[]                = JHtml::_('select.option', 2, JText::_('EB_EVENT_DATE'));
-		$lists['order_events']    = JHtml::_('select.genericlist', $options, 'order_events', '  class="inputbox" ', 'value', 'text',
+		$options               = array();
+		$options[]             = JHtml::_('select.option', 1, JText::_('EB_ORDERING'));
+		$options[]             = JHtml::_('select.option', 2, JText::_('EB_EVENT_DATE'));
+		$lists['order_events'] = JHtml::_('select.genericlist', $options, 'order_events', '  class="inputbox" ', 'value', 'text',
 			$config->order_events);
+
 		$options                  = array();
-		$options[]                = JHTML::_('select.option', 'asc', JText::_('EB_ASC'));
-		$options[]                = JHTML::_('select.option', 'desc', JText::_('EB_DESC'));
-		$lists['order_direction'] = JHTML::_('select.genericlist', $options, 'order_direction', '', 'value', 'text', $config->order_direction);
+		$options[]                = JHtml::_('select.option', 'asc', JText::_('EB_ASC'));
+		$options[]                = JHtml::_('select.option', 'desc', JText::_('EB_DESC'));
+		$lists['order_direction'] = JHtml::_('select.genericlist', $options, 'order_direction', '', 'value', 'text', $config->order_direction);
+
+		$options                       = array();
+		$options[]                     = JHtml::_('select.option', '0', JText::_('EB_FULL_PAYMENT'));
+		$options[]                     = JHtml::_('select.option', '1', JText::_('EB_DEPOSIT_PAYMENT'));
+		$lists['default_payment_type'] = JHtml::_('select.genericlist', $options, 'default_payment_type', '', 'value', 'text', $config->get('default_payment_type', 0));
 
 		//Get list of country
-		$query->clear();
-		$query->select('name AS value, name AS text')
+		$query->clear()
+			->select('name AS value, name AS text')
 			->from('#__eb_countries')
 			->order('name');
 		$db->setQuery($query);

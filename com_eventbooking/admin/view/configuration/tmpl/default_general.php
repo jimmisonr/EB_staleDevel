@@ -399,6 +399,14 @@ defined( '_JEXEC' ) or die ;
 				<?php echo EventbookingHelperHtml::getBooleanInput('activate_deposit_feature', $config->activate_deposit_feature); ?>
 			</div>
 		</div>
+		<div class="control-group" data-showon='[{"field":"activate_deposit_feature","values":["1"],"op":""}]'>
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('default_payment_type', JText::_('EB_DEFAULT_PAYMENT_TYPE')); ?>
+			</div>
+			<div class="controls">
+				<?php echo $this->lists['default_payment_type']; ?>
+			</div>
+		</div>
 		<div class="control-group">
 			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('activate_waitinglist_feature', JText::_('EB_ACTIVATE_WAITINGLIST_FEATURE'), JText::_('EB_ACTIVATE_WAITINGLIST_FEATURE_EXPLAIN')); ?>
