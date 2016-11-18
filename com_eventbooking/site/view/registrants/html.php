@@ -71,27 +71,21 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 			$options = array_merge($options, $rows);
 		}
 
-		$lists['filter_event_id'] = JHtml::_('select.genericlist', $options, 'filter_event_id', ' class="inputbox" onchange="submit();"', 'id', 'title',
+		$this->lists['filter_event_id'] = JHtml::_('select.genericlist', $options, 'filter_event_id', ' class="inputbox" onchange="submit();"', 'id', 'title',
 			$this->state->filter_event_id);
-		$options                  = array();
-		$options[]                = JHtml::_('select.option', -1, JText::_('EB_REGISTRATION_STATUS'));
-		$options[]                = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
-		$options[]                = JHtml::_('select.option', 1, JText::_('EB_PAID'));
+		$options                        = array();
+		$options[]                      = JHtml::_('select.option', -1, JText::_('EB_REGISTRATION_STATUS'));
+		$options[]                      = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
+		$options[]                      = JHtml::_('select.option', 1, JText::_('EB_PAID'));
 
 		if ($config->activate_waitinglist_feature)
 		{
 			$options[] = JHtml::_('select.option', 3, JText::_('EB_WAITING_LIST'));
 		}
 
-		$options[]                 = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
-		$lists['filter_published'] = JHtml::_('select.genericlist', $options, 'filter_published', ' class="input-medium" onchange="submit()" ', 'value', 'text',
+		$options[]                       = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
+		$this->lists['filter_published'] = JHtml::_('select.genericlist', $options, 'filter_published', ' class="input-medium" onchange="submit()" ', 'value', 'text',
 			$this->state->filter_published);
-
-		// This need to be kept for B/C with template override of old version
-		$lists['search']    = $this->state->filter_search;
-		$lists['order_Dir'] = $this->state->filter_order_Dir;
-		$lists['order']     = $this->state->filter_order;
-		$this->lists        = $lists;
 
 		$this->config     = $config;
 		$this->coreFields = EventbookingHelper::getPublishedCoreFields();
@@ -106,6 +100,11 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 	protected function addToolbar()
 	{
 		require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
+
+		if (!EventbookingHelper::canDeleteRegistrant())
+		{
+			$this->hideButtons[] = 'delete';
+		}
 
 		parent::addToolbar();
 

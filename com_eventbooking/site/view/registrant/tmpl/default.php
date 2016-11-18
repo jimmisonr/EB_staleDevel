@@ -13,8 +13,11 @@ EventbookingHelperJquery::validateForm();;
 $selectedState = '';
 ?>
 <h1 class="eb_title"><?php echo JText::_('EB_EDIT_REGISTRANT'); ?></h1>
-<form action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=registrant&Itemid=' . $this->Itemid); ?>" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
+<form action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=registrants&Itemid=' . $this->Itemid); ?>" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
 	<div class="row-fluid">
+		<div class="btn-toolbar" id="btn-toolbar">
+			<?php echo JToolbar::getInstance('toolbar')->render('toolbar'); ?>
+		</div>
 		<div class="control-group">
 			<div class="control-label">
 				<?php echo JText::_('EB_EVENT'); ?>
@@ -480,18 +483,6 @@ $selectedState = '';
 			}
 	}
 	?>
-		<div class="form-actions">
-			<input type="button" class="btn btn-primary" name="btnCancel" onclick="registrantList();" value="<?php echo JText::_('EB_BACK');?> "/>
-			<input type="submit" class="btn btn-primary" name="btnSave" value="<?php echo JText::_('EB_SAVE'); ?>"/>
-			<?php
-			if (EventbookingHelper::canCancelRegistration($this->item->event_id) && $this->item->published != 2)
-			{
-			?>
-				<input type="button" class="btn btn-primary" name="btnCancelRegistration" onclick="cancelRegistration();" value="<?php echo JText::_('EB_CANCEL_REGISTRATION'); ?>"/>
-			<?php
-			}
-			?>
-		</div>
 	</div>
 	<!-- End members information -->
 	<input type="hidden" name="option" value="com_eventbooking"/>
@@ -513,18 +504,20 @@ $selectedState = '';
 			});
 		})(jQuery);
 
-		function registrantList()
+		Joomla.submitbutton = function(pressbutton)
 		{
-			var form = document.adminForm;
-			form.task.value = 'cancel_edit';
-			form.submit();
-		}
-		function cancelRegistration() {
-			var form = document.adminForm;
-			if (confirm("<?php echo JText::_('EB_CANCEL_REGISTRATION_CONFIRM'); ?>")) {
-				form.task.value = 'registrant.cancel';
-				form.submit();
+			if (pressbutton == 'registrant.cancel')
+			{
+				if (confirm("<?php echo JText::_('EB_CANCEL_REGISTRATION_CONFIRM'); ?>"))
+				{
+					Joomla.submitform( pressbutton );
+				}
+			}
+			else
+			{
+				Joomla.submitform( pressbutton );
 			}
 		}
+
 	</script>
 </form>

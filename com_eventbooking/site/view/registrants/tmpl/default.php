@@ -163,7 +163,7 @@ $rootUri = JUri::root(true);
 		for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 		{
 			$row      = $this->items[$i];
-			$link     = JRoute::_('index.php?option=com_eventbooking&task=edit_registrant&id=' . $row->id . '&Itemid=' . $this->Itemid . '&return=' . $return);
+			$link     = JRoute::_('index.php?option=com_eventbooking&view=registrant&id=' . $row->id . '&Itemid=' . $this->Itemid . '&return=' . $return);
 			$isMember = $row->group_id > 0 ? true : false;
 			$img    = $row->checked_in ? 'tick.png' : 'publish_x.png';
 			$alt    = $row->checked_in ? JText::_('EB_CHECKED_IN') : JText::_('EB_NOT_CHECKED_IN');
@@ -187,7 +187,7 @@ $rootUri = JUri::root(true);
 					}
 					if ($isMember)
 					{
-						$groupLink = JRoute::_('index.php?option=com_eventbooking&task=edit_registrant&cid[]=' . $row->group_id . '&Itemid=' . $this->Itemid);
+						$groupLink = JRoute::_('index.php?option=com_eventbooking&view=registrant&id=' . $row->group_id . '&Itemid=' . $this->Itemid);
 					?>
 						<br />
 						<?php echo JText::_('EB_GROUP'); ?><a href="<?php echo $groupLink; ?>"><?php echo $row->group_name ;  ?></a>
@@ -225,7 +225,7 @@ $rootUri = JUri::root(true);
 					<?php echo $row->number_registrants; ?>
 				</td>
 				<td align="right">
-					<?php echo EventBookingHelper::formatAmount($row->amount, $this->config); ?>
+					<?php echo EventbookingHelper::formatAmount($row->amount, $this->config); ?>
 				</td>
 				<?php
 				if ($this->config->activate_deposit_feature) {

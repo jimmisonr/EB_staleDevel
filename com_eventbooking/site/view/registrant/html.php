@@ -16,6 +16,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		$document = JFactory::getDocument();
 		$rootUri  = JUri::root(true);
 		EventbookingHelper::addLangLinkForAjax();
+
 		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
 		$document->addScript($rootUri . '/media/com_eventbooking/assets/js/paymentmethods.js');
 		$document->addScript($rootUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
@@ -53,9 +54,9 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 
 			$query->clear();
 			$query->select('*')
-					->from('#__eb_registrants')
-					->where('group_id=' . $item->id)
-					->order('id');
+				->from('#__eb_registrants')
+				->where('group_id=' . $item->id)
+				->order('id');
 			$db->setQuery($query, 0, $item->number_registrants);
 			$rowMembers = $db->loadObjectList();
 
@@ -63,10 +64,10 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		}
 		else
 		{
-			$rowFields  = EventbookingHelper::getFormFields($item->event_id, 0);
+			$rowFields = EventbookingHelper::getFormFields($item->event_id, 0);
 
 			$useDefault = true;
-			$data = array();
+			$data       = array();
 			$rowMembers = array();
 		}
 
@@ -194,6 +195,25 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		$this->return             = $this->input->get('return', '', 'string');
 		$this->canChangeFeeFields = $canChangeFeeFields;
 
+		$this->addToolbar();
+
 		parent::display();
+	}
+
+	protected function addToolbar()
+	{
+		require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
+
+		JToolbarHelper::save('registrant.save', 'JTOOLBAR_SAVE');
+
+		if ($this->item->id &&
+			$this->item->published != 2 &&
+			EventbookingHelper::canCancelRegistration($this->item->event_id)
+		)
+		{
+			JToolbarHelper::custom('registrant.cancel', 'delete', 'delete', JText::_('EB_CANCEL_REGISTRATION'), false);
+		}
+
+		JToolbarHelper::cancel('registrant.cancel_edit', 'JTOOLBAR_CLOSE');
 	}
 }
