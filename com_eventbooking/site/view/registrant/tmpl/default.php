@@ -12,9 +12,11 @@ $format = 'Y-m-d';
 EventbookingHelperJquery::validateForm();;
 $selectedState = '';
 ?>
-<h1 class="eb_title"><?php echo JText::_('EB_EDIT_REGISTRANT'); ?></h1>
-<form action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=registrants&Itemid=' . $this->Itemid); ?>" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
-	<div class="row-fluid">
+<div class="row-fluid eb-container">
+	<div class="page-header">
+		<h1 class="eb_title"><?php echo JText::_('EB_EDIT_REGISTRANT'); ?></h1>
+	</div>
+	<form action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=registrants&Itemid=' . $this->Itemid); ?>" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
 		<div class="btn-toolbar" id="btn-toolbar">
 			<?php echo JToolbar::getInstance('toolbar')->render('toolbar'); ?>
 		</div>
@@ -24,13 +26,13 @@ $selectedState = '';
 			</div>
 			<div class="controls">
 				<?php
-				if (!$this->item->id)
+				if ($this->item->id)
 				{
-					echo $this->lists['event_id'];
+					echo $this->event->title;
 				}
 				else
 				{
-					echo $this->event->title;
+					echo $this->lists['event_id'];
 				}
 				?>
 			</div>
@@ -66,6 +68,7 @@ $selectedState = '';
 			{
 				$available = $ticketType->capacity - $ticketType->registered;
 				$quantity  = 0;
+
 				if (!empty($this->registrantTickets[$ticketType->id]))
 				{
 					$quantity = $this->registrantTickets[$ticketType->id]->quantity;
@@ -80,6 +83,7 @@ $selectedState = '';
 						if ($available > 0 || $quantity > 0)
 						{
 							$fieldName = 'ticket_type_' . $ticketType->id;
+
 							if ($available < $quantity)
 							{
 								$available = $quantity;
@@ -123,6 +127,7 @@ $selectedState = '';
 		foreach ($fields as $field)
 		{
 			$fieldType = strtolower($field->type);
+
 			switch ($fieldType)
 			{
 				case 'message':
@@ -130,11 +135,14 @@ $selectedState = '';
 					break;
 				default:
 					$controlGroupAttributes = 'id="field_' . $field->name . '" ';
+
 					if ($field->hideOnDisplay)
 					{
 						$controlGroupAttributes .= ' style="display:none;" ';
 					}
+
 					$class = "";
+
 					if ($field->isMasterField)
 					{
 						if ($field->suffix)
@@ -171,6 +179,7 @@ $selectedState = '';
 								{
 									$fieldValue = $field->value;
 								}
+
 								echo $fieldValue;
 							}
 							else
@@ -292,7 +301,7 @@ $selectedState = '';
 
 			if ($this->item->tax_amount > 0 || empty($this->item->id))
 			{
-				?>
+			?>
 				<div class="control-group">
 					<div class="control-label">
 						<?php echo JText::_('EB_TAX'); ?>
@@ -339,9 +348,10 @@ $selectedState = '';
 			</div>
 		<?php
 		}
+
 		if ($this->item->deposit_amount > 0)
 		{
-			?>
+		?>
 			<div class="control-group">
 				<div class="control-label">
 					<?php echo JText::_('EB_DEPOSIT_AMOUNT'); ?>
@@ -401,89 +411,88 @@ $selectedState = '';
 	?>
 		<h3 class="eb-heading"><?php echo JText::_('EB_MEMBERS_INFORMATION') ; ?></h3>
 	<?php
-			for ($i = 0, $n = count($this->rowMembers); $i < $n; $i++)
+		for ($i = 0, $n = count($this->rowMembers); $i < $n; $i++)
+		{
+			$rowMember  = $this->rowMembers[$i];
+			$memberId   = $rowMember->id;
+			$rowMember  = $this->rowMembers[$i];
+			$memberId   = $rowMember->id;
+			$form       = new RADForm($this->memberFormFields);
+			$memberData = EventbookingHelper::getRegistrantData($rowMember, $this->memberFormFields);
+			$form->setEventId($this->item->event_id);
+			$form->bind($memberData);
+			$form->setFieldSuffix($i + 1);
+			if ($this->canChangeStatus)
 			{
-				$rowMember  = $this->rowMembers[$i];
-				$memberId   = $rowMember->id;
-				$rowMember  = $this->rowMembers[$i];
-				$memberId   = $rowMember->id;
-				$form       = new RADForm($this->memberFormFields);
-				$memberData = EventbookingHelper::getRegistrantData($rowMember, $this->memberFormFields);
-				$form->setEventId($this->item->event_id);
-				$form->bind($memberData);
-				$form->setFieldSuffix($i + 1);
-				if ($this->canChangeStatus)
+				$form->prepareFormFields('setRecalculateFee();');
+			}
+			$form->buildFieldsDependency();
+			if ($i % 2 == 0)
+			{
+				echo "<div class=\"row-fluid\">\n" ;
+			}
+			?>
+			<div class="span6">
+				<h4><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1); ?></h4>
+				<?php
+				$fields = $form->getFields();
+				foreach ($fields as $field)
 				{
-					$form->prepareFormFields('setRecalculateFee();');
-				}
-				$form->buildFieldsDependency();
-				if ($i % 2 == 0)
-				{
-					echo "<div class=\"row-fluid\">\n" ;
+					if ($i > 0 && $field->row->only_show_for_first_member)
+					{
+						continue;
+					}
+					$fieldType = strtolower($field->type);
+					switch ($fieldType)
+					{
+						case 'heading':
+						case 'message':
+							break;
+						default:
+							$controlGroupAttributes = 'id="field_' . $field->name . '" ';
+							if ($field->hideOnDisplay)
+							{
+								$controlGroupAttributes .= ' style="display:none;" ';
+							}
+							$class = '';
+							if ($field->isMasterField)
+							{
+								if ($field->suffix)
+								{
+									$class = ' master-field-' . $field->suffix;
+								}
+								else
+								{
+									$class = ' master-field';
+								}
+							}
+							?>
+							<div class="control-group<?php echo $class; ?>" <?php echo $controlGroupAttributes; ?>>
+								<label class="control-label">
+									<?php echo $field->title; ?>
+								</label>
+								<div class="controls">
+									<?php echo $field->input; ?>
+								</div>
+							</div>
+							<?php
+					}
 				}
 				?>
-				<div class="span6">
-					<h4><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1); ?></h4>
-					<?php
-					$fields = $form->getFields();
-					foreach ($fields as $field)
-					{
-						if ($i > 0 && $field->row->only_show_for_first_member)
-						{
-							continue;
-						}
-						$fieldType = strtolower($field->type);
-						switch ($fieldType)
-						{
-							case 'heading':
-							case 'message':
-								break;
-							default:
-								$controlGroupAttributes = 'id="field_' . $field->name . '" ';
-								if ($field->hideOnDisplay)
-								{
-									$controlGroupAttributes .= ' style="display:none;" ';
-								}
-								$class = '';
-								if ($field->isMasterField)
-								{
-									if ($field->suffix)
-									{
-										$class = ' master-field-' . $field->suffix;
-									}
-									else
-									{
-										$class = ' master-field';
-									}
-								}
-								?>
-								<div class="control-group<?php echo $class; ?>" <?php echo $controlGroupAttributes; ?>>
-									<label class="control-label">
-										<?php echo $field->title; ?>
-									</label>
-									<div class="controls">
-										<?php echo $field->input; ?>
-									</div>
-								</div>
-								<?php
-						}
-					}
-					?>
-					<input type="hidden" name="ids[]" value="<?php echo $memberId; ?>" />
-				</div>
-				<?php
-				if (($i + 1) % 2 == 0)
-				{
-					echo "</div>\n" ;
-				}
-			}
-			if ($i % 2 != 0)
+				<input type="hidden" name="ids[]" value="<?php echo $memberId; ?>" />
+			</div>
+			<?php
+			if (($i + 1) % 2 == 0)
 			{
 				echo "</div>\n" ;
 			}
+		}
+		if ($i % 2 != 0)
+		{
+			echo "</div>\n" ;
+		}
 	}
 	?>
-	</div>
 	<!-- End members information -->
 	<input type="hidden" name="option" value="com_eventbooking"/>
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>"/>
@@ -518,6 +527,6 @@ $selectedState = '';
 				Joomla.submitform( pressbutton );
 			}
 		}
-
 	</script>
-</form>
+	</form>
+</div>

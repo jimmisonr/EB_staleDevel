@@ -3993,7 +3993,7 @@ class EventbookingHelper
 	/**
 	 * Download PDF Certificates
 	 *
-	 * @param array $rows
+	 * @param array     $rows
 	 * @param RADConfig $config
 	 */
 	public static function downloadCertificates($rows, $config)
@@ -4001,21 +4001,21 @@ class EventbookingHelper
 		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideHelper', 'downloadCertificates'))
 		{
 			EventbookingHelperOverrideHelper::downloadCertificates($rows, $config);
-			
+
 			return;
 		}
-		
+
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/tcpdf.php";
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/config/lang/eng.php";
 
 		self::loadLanguage();
 
-		$sitename    = JFactory::getConfig()->get("sitename");
+		$sitename = JFactory::getConfig()->get("sitename");
 
 		$events = array();
 
-		$db          = JFactory::getDbo();
-		$query       = $db->getQuery(true);
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
 
 		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 		$pdf->SetCreator(PDF_CREATOR);
@@ -4038,7 +4038,7 @@ class EventbookingHelper
 		$font = empty($config->pdf_font) ? 'times' : $config->pdf_font;
 		$pdf->SetFont($font, '', 8);
 
-		foreach($rows as $row)
+		foreach ($rows as $row)
 		{
 			if (!isset($events[$row->event_id]))
 			{
@@ -4161,8 +4161,8 @@ class EventbookingHelper
 			$row = $rows[0];
 
 			//Filename
-			$fileName = self::formatCertificateNumber($row->id, $config).'.pdf';
-			$filePath = JPATH_ROOT . '/media/com_eventbooking/certificates/' . $fileName ;
+			$fileName = self::formatCertificateNumber($row->id, $config) . '.pdf';
+			$filePath = JPATH_ROOT . '/media/com_eventbooking/certificates/' . $fileName;
 		}
 
 		$pdf->Output($filePath, 'F');
@@ -5120,5 +5120,53 @@ class EventbookingHelper
 	public static function getUserIp()
 	{
 		return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+	}
+
+	/**
+	 * Check to see whether the current user can delete the given registrant
+	 *
+	 * @param int $id
+	 *
+	 * @return bool
+	 */
+	public static function canDeleteRegistrant($id = 0)
+	{
+		$user   = JFactory::getUser();
+		$config = EventbookingHelper::getConfig();
+
+		if (!$user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
+		{
+			return false;
+		}
+
+		if ($user->authorise('core.delete', 'com_eventbooking'))
+		{
+			return true;
+		}
+
+		if ($config->get('only_show_registrants_of_event_owner') && $config->get('enable_delete_registrants', 1))
+		{
+			if ($id = 0)
+			{
+				return true;
+			}
+			
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+
+			$query->select('b.created_by')
+				->from('#__eb_registrants AS a')
+				->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+				->where('a.id = ' . $id);
+			$db->setQuery($query);
+			$eventCreatorID = $db->loadObject();
+
+			if ($eventCreatorID == $user->id)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
