@@ -22,8 +22,9 @@ JHtml::_('script', 'jui/cms.js', false, true);
 /* @var EventbookingViewConfigurationHtml $this */
 ?>
 <div class="row-fluid">
-	<form action="index.php?option=com_eventbooking&view=configuration" method="post" name="adminForm" id="adminForm" class="form-horizontal eb-configuration">
-	<?php
+	<form action="index.php?option=com_eventbooking&view=configuration" method="post" name="adminForm" id="adminForm"
+	      class="form-horizontal eb-configuration">
+		<?php
 		echo JHtml::_('bootstrap.startTabSet', 'configuration', array('active' => 'general-page'));
 
 		echo JHtml::_('bootstrap.addTab', 'configuration', 'general-page', JText::_('EB_GENERAL', true));
@@ -42,6 +43,10 @@ JHtml::_('script', 'jui/cms.js', false, true);
 		echo $this->loadTemplate('invoice', array('config' => $config, 'editor' => $editor));
 		echo JHtml::_('bootstrap.endTab');
 
+		echo JHtml::_('bootstrap.addTab', 'configuration', 'tickets-page', JText::_('EB_TICKETS_SETTINGS', true));
+		echo $this->loadTemplate('tickets', array('config' => $config, 'editor' => $editor));
+		echo JHtml::_('bootstrap.endTab');
+
 		echo JHtml::_('bootstrap.addTab', 'configuration', 'certificate-page', JText::_('EB_CERTIFICATE_SETTINGS', true));
 		echo $this->loadTemplate('certificate', array('config' => $config, 'editor' => $editor));
 		echo JHtml::_('bootstrap.endTab');
@@ -54,7 +59,7 @@ JHtml::_('script', 'jui/cms.js', false, true);
 		echo $this->loadTemplate('custom_css');
 
 		echo JHtml::_('bootstrap.endTabSet');
-	?>
+		?>
 		<div class="clearfix"></div>
 		<input type="hidden" name="task" value=""/>
 	</form>
