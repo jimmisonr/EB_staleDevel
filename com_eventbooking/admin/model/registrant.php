@@ -131,9 +131,9 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
 
-		// Get list of core fields
-		$query->clear();
-		$query->select('name')
+		// Get list of core fields		
+		$query->clear()
+			->select('name')
 			->from('#__eb_fields')
 			->where('is_core = 1');
 		$db->setQuery($query);
@@ -266,8 +266,13 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 		$query = $db->getQuery(true);
 		$query->update('#__eb_registrants')
 			->set('published = ' . (int) $state)
-			->where("(id IN ($cids) OR group_id IN ($cids))")
-			->where("payment_method LIKE 'os_offline%'");
+			->where("(id IN ($cids) OR group_id IN ($cids))");			
+			
+		if ($state == 0)
+		{
+			$query->where("payment_method LIKE 'os_offline%'");
+		}		
+		
 		$db->setQuery($query);
 		$db->execute();
 	}
