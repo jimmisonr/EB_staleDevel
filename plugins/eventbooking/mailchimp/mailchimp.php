@@ -116,7 +116,7 @@ class plgEventBookingMailchimp extends JPlugin
 
 					foreach ($groupMembers as $groupMember)
 					{
-						$this->subscribeToAcyMailingLists($groupMember, $listIds);
+						$this->subscribeToMailchimpMailingLists($groupMember, $listIds);
 					}
 				}
 			}
