@@ -515,6 +515,7 @@ class EventbookingController extends RADControllerAdmin
 		$fields = array_keys($db->getTableColumns('#__eb_events'));
 
 		$moveEventsImages = false;
+
 		if (!in_array('image', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `image` VARCHAR( 255 ) NULL;";
@@ -545,6 +546,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 			$discountGroups = EventbookingHelper::getConfigValue('member_discount_groups');
+
 			if ($discountGroups)
 			{
 				$sql = 'UPDATE #__eb_events SET discount_groups=' . $db->quote($discountGroups);
@@ -613,6 +615,34 @@ class EventbookingController extends RADControllerAdmin
 		if (!in_array('access', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `access` TINYINT NOT NULL DEFAULT  '0' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('activate_tickets_pdf', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `activate_tickets_pdf` TINYINT NOT NULL DEFAULT  '0' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('ticket_start_number', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `ticket_start_number` INT NOT NULL DEFAULT  '1' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('ticket_prefix', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `ticket_prefix` VARCHAR(10) NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('ticket_layout', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `ticket_layout` TEXT NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
@@ -1583,6 +1613,24 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 
 			$sql = 'UPDATE #__eb_registrants SET `language`="*" ';
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('ticket_number', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `ticket_number`  INT NOT NULL DEFAULT  '0' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('ticket_code', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `ticket_code`  VARCHAR( 40 ) NULL DEFAULT  '*';";
+			$db->setQuery($sql);
+			$db->execute();
+
+			$sql = 'UPDATE #__eb_registrants SET `ticket_code` = `id`';
 			$db->setQuery($sql);
 			$db->execute();
 		}
