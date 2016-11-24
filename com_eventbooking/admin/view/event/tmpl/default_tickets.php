@@ -22,7 +22,7 @@ defined( '_JEXEC' ) or die ;
 		<?php echo EventbookingHelperHtml::getFieldLabel('ticket_start_number', JText::_('EB_TICKET_START_NUMBER'), JText::_('EB_TICKET_START_NUMBER_EXPLAIN')); ?>
 	</div>
 	<div class="controls">
-		<input type="text" name="invoice_start_number" class="inputbox" value="<?php echo $this->item->ticket_start_number ? $this->item->ticket_start_number : 1; ?>" size="10" />
+		<input type="text" name="ticket_start_number" class="inputbox" value="<?php echo $this->item->ticket_start_number ? $this->item->ticket_start_number : 1; ?>" size="10" />
 	</div>
 </div>
 <div class="control-group">
