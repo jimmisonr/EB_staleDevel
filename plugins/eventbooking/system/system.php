@@ -28,6 +28,11 @@ class plgEventbookingSystem extends JPlugin
 				$this->processInvoiceNumber($row);
 			}
 
+			if (!$config->get('multiple_booking') && $config->get('activate_tickets_pdf'))
+			{
+				$this->generateTicketNumbersForRegistration($row);
+			}
+
 			// Update coupon usage
 			if ($row->coupon_id)
 			{
@@ -38,7 +43,6 @@ class plgEventbookingSystem extends JPlugin
 			{
 				$this->processUnpublishEvent($row->event_id);
 			}
-
 		}
 	}
 
@@ -71,6 +75,11 @@ class plgEventbookingSystem extends JPlugin
 		{
 			$this->processUnpublishEvent($row->event_id);
 		}
+
+		if (!$config->get('multiple_booking') && $config->get('activate_tickets_pdf') && !$row->ticket_code)
+		{
+			$this->generateTicketNumbersForRegistration($row);
+		}
 	}
 
 	/***
@@ -80,7 +89,6 @@ class plgEventbookingSystem extends JPlugin
 	 */
 	private function processInvoiceNumber($row)
 	{
-
 		if (EventbookingHelper::needInvoice($row))
 		{
 			$invoiceNumber       = EventbookingHelper::getInvoiceNumber();
@@ -134,6 +142,7 @@ class plgEventbookingSystem extends JPlugin
 			->where('id = ' . $eventId);
 		$db->setQuery($query);
 		$capacity = (int) $db->loadResult();
+
 		if ($capacity > 0)
 		{
 			$query->clear()
@@ -144,6 +153,7 @@ class plgEventbookingSystem extends JPlugin
 				->where('(b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3)))');
 			$db->setQuery($query);
 			$totalRegistrants = (int) $db->loadResult();
+
 			if ($totalRegistrants >= $capacity)
 			{
 				// Un-publish the event
@@ -188,6 +198,96 @@ class plgEventbookingSystem extends JPlugin
 				->where('group_id IN (' . implode(',', $billingRecordIds) . ')');
 			$db->setQuery($query);
 			$db->execute();
+		}
+	}
+
+	/**
+	 * Generate Ticket Number, Ticket Code for registration
+	 *
+	 * @param EventbookingTableRegistrant $row
+	 */
+	private function generateTicketNumbersForRegistration($row)
+	{
+		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/table/event.php';
+
+		$rowEvent = JTable::getInstance('event', 'EventbookingTable');
+		$rowEvent->load($row->event_id);
+
+		if ($rowEvent->activate_tickets_pdf)
+		{
+			jimport('joomla.user.helper');
+
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+
+			// Get the next ticket number
+			$query->select('MAX(ticket_number)')
+				->from('#__eb_registrants')
+				->where('event_id = ' . $row->event_id);
+			$db->setQuery($query);
+			$ticketNumber = (int) $db->loadResult() + 1;
+			$ticketNumber = max($ticketNumber, $rowEvent->ticket_start_number);
+
+
+			$ticketCode = '';
+
+			if ($row->is_group_billing)
+			{
+				$query->clear()
+					->select('id')
+					->from('#__eb_registrants')
+					->where('group_id = ' . $row->id);
+				$db->setQuery($query);
+				$memberIds = $db->loadColumn();
+			}
+			else
+			{
+				$memberIds = array($row->id);
+			}
+
+			foreach ($memberIds as $memberId)
+			{
+				$ticketCode = '';
+
+				while (true)
+				{
+					$ticketCode = md5(JUserHelper::genRandomPassword(16));
+					$query->clear()
+						->select('COUNT(*)')
+						->from('#__eb_registrants')
+						->where('ticket_code = ' . $db->quote($ticketCode));
+					$db->setQuery($query);
+					$total = $db->loadResult();
+
+					if (!$total)
+					{
+						break;
+					}
+				}
+
+				if ($row->is_group_billing)
+				{
+					$query->clear()
+						->update('#__eb_registrants')
+						->set('ticket_code = ' . $db->quote($ticketCode))
+						->set('ticket_number = ' . $db->quote($ticketNumber))
+						->where('id = ' . $memberId);
+					$db->setQuery($query);
+					$db->execute();
+					$ticketNumber++;
+				}
+			}
+
+
+			// Store Ticket Code and Ticket Number, use for next step
+			if (!$row->is_group_billing)
+			{
+				$row->ticket_number = $ticketNumber;
+			}
+
+			$row->ticket_code = $ticketCode;
+
+			$row->store();
 		}
 	}
 }
