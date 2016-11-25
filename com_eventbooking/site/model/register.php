@@ -160,6 +160,8 @@ class EventBookingModelRegister extends RADModel
 			$row->payment_status = 1;
 		}
 
+		$row->fee_fields_values = json_encode($fees['fee_fields_values']);
+
 		$row->user_ip = EventbookingHelper::getUserIp();
 
 		//Save the active language
@@ -384,12 +386,13 @@ class EventBookingModelRegister extends RADModel
 		}
 
 		//Calculate members fee
-		$membersForm           = $fees['members_form'];
-		$membersTotalAmount    = $fees['members_total_amount'];
-		$membersDiscountAmount = $fees['members_discount_amount'];
-		$membersTaxAmount      = $fees['members_tax_amount'];
-		$membersLateFee        = $fees['members_late_fee'];
-		$paymentType           = (int) @$data['payment_type'];
+		$membersForm            = $fees['members_form'];
+		$membersTotalAmount     = $fees['members_total_amount'];
+		$membersDiscountAmount  = $fees['members_discount_amount'];
+		$membersTaxAmount       = $fees['members_tax_amount'];
+		$membersLateFee         = $fees['members_late_fee'];
+		$membersFeeFieldsValues = $fees['members_fee_fields_values'];
+		$paymentType            = (int) @$data['payment_type'];
 
 		if ($paymentType == 0)
 		{
@@ -447,6 +450,8 @@ class EventBookingModelRegister extends RADModel
 		{
 			$row->language = '*';
 		}
+
+		$row->fee_fields_values = json_encode($fees['fee_fields_values']);
 
 		// Unique registration code for the registration
 		while (true)
@@ -515,6 +520,7 @@ class EventBookingModelRegister extends RADModel
 				$rowMember->discount_amount    = $membersDiscountAmount[$i];
 				$rowMember->late_fee           = $membersLateFee[$i];
 				$rowMember->tax_amount         = $membersTaxAmount[$i];
+				$rowMember->fee_fields_values  = json_encode($membersFeeFieldsValues[$i]);
 				$rowMember->amount             = $rowMember->total_amount - $rowMember->discount_amount + $rowMember->tax_amount + $rowMember->late_fee;
 				$rowMember->number_registrants = 1;
 				$membersForm[$i]->removeFieldSuffix();

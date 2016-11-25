@@ -775,6 +775,7 @@ class EventbookingHelperData
 			$headers[] = JText::_('EB_GROUP');
 			$fields[]  = 'registration_group_name';
 		}
+
 		if (count($rowFields))
 		{
 			foreach ($rowFields as $rowField)
@@ -783,6 +784,12 @@ class EventbookingHelperData
 				{
 					$headers[] = $rowField->title;
 					$fields[]  = $rowField->name;
+
+					if ($rowField->fee_field)
+					{
+						$headers[] = $rowField->title . " Fee";
+						$fields[]  = $rowField->name . "_fee";
+					}
 				}
 			}
 		}
@@ -868,6 +875,16 @@ class EventbookingHelperData
 				else
 				{
 					$row->registration_group_name = '';
+				}
+			}
+
+			if ($row->fee_fields_values)
+			{
+				$feeFieldsValues = json_decode($row->fee_fields_values);
+
+				foreach ($feeFieldsValues as $fieldName => $feeAmount)
+				{
+					$row->{$fieldName . '_fee'} = $feeAmount;
 				}
 			}
 

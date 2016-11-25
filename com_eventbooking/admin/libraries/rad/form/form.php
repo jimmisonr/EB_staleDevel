@@ -272,7 +272,7 @@ class RADForm
 	 *
 	 * @return float total fee
 	 */
-	public function calculateFee($replaces = array())
+	public function calculateFee(&$replaces = array(), $isMember = false)
 	{
 		if (!isset($replaces['NUMBER_REGISTRANTS']))
 		{
@@ -284,19 +284,38 @@ class RADForm
 			$replaces['INDIVIDUAL_PRICE'] = 1;
 		}
 
+		$feeFieldsValues = array();
+
 		$fee = 0;
 		$this->buildFieldsDependency();
 		$fieldsFee = $this->calculateFieldsFee();
+
 		foreach ($this->fields as $field)
 		{
 			if ($field->hideOnDisplay)
 			{
 				continue;
 			}
+
 			if (!$field->row->fee_field)
 			{
 				continue;
 			}
+
+			$fieldFeeAmount = 0;
+
+			$formFieldName = $field->name;
+
+			if ($isMember)
+			{
+				$pos = strrpos($formFieldName, '_');
+
+				if ($pos !== false)
+				{
+					$formFieldName = substr($formFieldName, 0, $pos);
+				}
+			}
+
 			if (strtolower($field->type) == 'text' || $field->row->fee_formula)
 			{
 				//Maybe we need to check fee formula
@@ -315,13 +334,14 @@ class RADForm
 						$formula   = str_replace('[' . $fieldName . ']', $fieldFee, $formula);
 					}
 
-					foreach($replaces as $fieldName => $fieldFee)
+					foreach ($replaces as $fieldName => $fieldFee)
 					{
 						$fieldName = strtoupper($fieldName);
 						$formula   = str_replace('[' . $fieldName . ']', $fieldFee, $formula);
 					}
 
 					$feeValue = 0;
+
 					if ($formula)
 					{
 						@eval('$feeValue = ' . $formula . ';');
@@ -330,12 +350,15 @@ class RADForm
 						//Use the code below if eval is disabled on server
 						//$fee += self::calculateFormula($formula);
 					}
+
+					$fieldFeeAmount += $feeValue;
 				}
 			}
 			else
 			{
 				$feeValues = explode("\r\n", $field->row->fee_values);
 				$values    = explode("\r\n", $field->row->values);
+
 				if (is_array($field->value))
 				{
 					$fieldValues = $field->value;
@@ -349,19 +372,28 @@ class RADForm
 				{
 					$fieldValues = array();
 				}
+
 				$values      = array_map('trim', $values);
 				$fieldValues = array_map('trim', $fieldValues);
+
 				for ($j = 0, $m = count($fieldValues); $j < $m; $j++)
 				{
 					$fieldValue      = $fieldValues[$j];
 					$fieldValueIndex = array_search($fieldValue, $values);
+
 					if ($fieldValueIndex !== false && isset($feeValues[$fieldValueIndex]))
 					{
 						$fee += $feeValues[$fieldValueIndex];
+
+						$fieldFeeAmount += $feeValues[$fieldValueIndex];
 					}
 				}
 			}
+
+			$feeFieldsValues[$formFieldName] = $fieldFeeAmount;
 		}
+
+		$replaces['fee_fields_values'] = $feeFieldsValues;
 
 		return $fee;
 	}
@@ -518,7 +550,7 @@ class RADForm
 				continue;
 			}
 			$fieldsFee[$fieldName] = 0;
-			$fieldType = strtolower($field->type);
+			$fieldType             = strtolower($field->type);
 			if (in_array($fieldType, $feeFieldTypes))
 			{
 				if ($fieldType == 'text')

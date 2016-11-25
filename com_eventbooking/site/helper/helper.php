@@ -1045,6 +1045,8 @@ class EventbookingHelper
 
 		$totalAmount = $event->individual_price + $form->calculateFee($feeCalculationTags);
 
+		$fees['fee_fields_values'] = $feeCalculationTags['fee_fields_values'];
+
 		if ($event->has_multiple_ticket_types)
 		{
 			$ticketTypes = EventbookingHelperData::getTicketTypes($event->id);
@@ -1314,12 +1316,15 @@ class EventbookingHelper
 
 		$extraFee = $form->calculateFee($feeCalculationTags);
 
-		$nullDate              = $db->getNullDate();
-		$membersForm           = array();
-		$membersTotalAmount    = array();
-		$membersDiscountAmount = array();
-		$membersLateFee        = array();
-		$membersTaxAmount      = array();
+		$fees['fee_fields_values'] = $feeCalculationTags['fee_fields_values'];
+
+		$nullDate               = $db->getNullDate();
+		$membersForm            = array();
+		$membersTotalAmount     = array();
+		$membersDiscountAmount  = array();
+		$membersLateFee         = array();
+		$membersTaxAmount       = array();
+		$membersFeeFieldsValues = array();
 
 		// Members data
 		if ($config->collect_member_information)
@@ -1344,12 +1349,15 @@ class EventbookingHelper
 				$memberForm = new RADForm($memberFormFields);
 				$memberForm->setFieldSuffix($i + 1);
 				$memberForm->bind($membersData);
-				$memberExtraFee = $memberForm->calculateFee($feeCalculationTags);
+
+				$memberFeeCalculationTags = $feeCalculationTags;
+				$memberExtraFee           = $memberForm->calculateFee($memberFeeCalculationTags, true);
 				$extraFee += $memberExtraFee;
-				$membersTotalAmount[$i]    = $rate + $memberExtraFee;
-				$membersDiscountAmount[$i] = 0;
-				$membersLateFee[$i]        = 0;
-				$membersForm[$i]           = $memberForm;
+				$membersTotalAmount[$i]     = $rate + $memberExtraFee;
+				$membersDiscountAmount[$i]  = 0;
+				$membersLateFee[$i]         = 0;
+				$membersForm[$i]            = $memberForm;
+				$membersFeeFieldsValues[$i] = $memberFeeCalculationTags['fee_fields_values'];
 			}
 		}
 
@@ -1658,17 +1666,18 @@ class EventbookingHelper
 			$depositAmount = 0;
 		}
 
-		$fees['total_amount']            = $totalAmount;
-		$fees['discount_amount']         = $discountAmount;
-		$fees['late_fee']                = $lateFee;
-		$fees['tax_amount']              = $taxAmount;
-		$fees['amount']                  = $amount;
-		$fees['deposit_amount']          = $depositAmount;
-		$fees['members_form']            = $membersForm;
-		$fees['members_total_amount']    = $membersTotalAmount;
-		$fees['members_discount_amount'] = $membersDiscountAmount;
-		$fees['members_tax_amount']      = $membersTaxAmount;
-		$fees['members_late_fee']        = $membersLateFee;
+		$fees['total_amount']              = $totalAmount;
+		$fees['discount_amount']           = $discountAmount;
+		$fees['late_fee']                  = $lateFee;
+		$fees['tax_amount']                = $taxAmount;
+		$fees['amount']                    = $amount;
+		$fees['deposit_amount']            = $depositAmount;
+		$fees['members_form']              = $membersForm;
+		$fees['members_total_amount']      = $membersTotalAmount;
+		$fees['members_discount_amount']   = $membersDiscountAmount;
+		$fees['members_tax_amount']        = $membersTaxAmount;
+		$fees['members_late_fee']          = $membersLateFee;
+		$fees['members_fee_fields_values'] = $membersFeeFieldsValues;
 
 		return $fees;
 	}
@@ -2130,7 +2139,7 @@ class EventbookingHelper
 	{
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('id, name, title, is_core, hide_on_export')
+		$query->select('id, name, title, is_core, hide_on_export, fee_field')
 			->from('#__eb_fields')
 			->where('published = 1')
 			->order('ordering');
@@ -3993,7 +4002,7 @@ class EventbookingHelper
 	/**
 	 * Download PDF Certificates
 	 *
-	 * @param array $rows
+	 * @param array     $rows
 	 * @param RADConfig $config
 	 */
 	public static function downloadCertificates($rows, $config)
@@ -4001,21 +4010,21 @@ class EventbookingHelper
 		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideHelper', 'downloadCertificates'))
 		{
 			EventbookingHelperOverrideHelper::downloadCertificates($rows, $config);
-			
+
 			return;
 		}
-		
+
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/tcpdf.php";
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/config/lang/eng.php";
 
 		self::loadLanguage();
 
-		$sitename    = JFactory::getConfig()->get("sitename");
+		$sitename = JFactory::getConfig()->get("sitename");
 
 		$events = array();
 
-		$db          = JFactory::getDbo();
-		$query       = $db->getQuery(true);
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
 
 		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 		$pdf->SetCreator(PDF_CREATOR);
@@ -4038,7 +4047,7 @@ class EventbookingHelper
 		$font = empty($config->pdf_font) ? 'times' : $config->pdf_font;
 		$pdf->SetFont($font, '', 8);
 
-		foreach($rows as $row)
+		foreach ($rows as $row)
 		{
 			if (!isset($events[$row->event_id]))
 			{
@@ -4161,8 +4170,8 @@ class EventbookingHelper
 			$row = $rows[0];
 
 			//Filename
-			$fileName = self::formatCertificateNumber($row->id, $config).'.pdf';
-			$filePath = JPATH_ROOT . '/media/com_eventbooking/certificates/' . $fileName ;
+			$fileName = self::formatCertificateNumber($row->id, $config) . '.pdf';
+			$filePath = JPATH_ROOT . '/media/com_eventbooking/certificates/' . $fileName;
 		}
 
 		$pdf->Output($filePath, 'F');
