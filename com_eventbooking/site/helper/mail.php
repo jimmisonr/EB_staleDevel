@@ -180,6 +180,7 @@ class EventbookingHelperMail
 			}
 
 			$invoiceFilePath = '';
+
 			if ($config->activate_invoice_feature && $config->send_invoice_to_customer && $row->invoice_number)
 			{
 				if (is_callable('EventbookingHelperOverrideHelper::generateInvoicePDF'))
@@ -193,6 +194,13 @@ class EventbookingHelperMail
 
 				$invoiceFilePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
 				$mailer->addAttachment($invoiceFilePath);
+			}
+
+			if ($row->ticket_code)
+			{
+				EventbookingHelperTicket::generateTicketsPDF($row, $config);
+				$ticketFilePath = JPATH_ROOT . '/media/com_eventbooking/tickets/ticket_' . str_pad($row->id, 5, '0', STR_PAD_LEFT) . '.pdf';
+				$mailer->addAttachment($ticketFilePath);
 			}
 
 			static::addEventAttachments($mailer, $row, $event, $config);
