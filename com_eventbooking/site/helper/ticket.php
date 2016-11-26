@@ -129,6 +129,8 @@ class EventbookingHelperTicket
 					$output = str_ireplace("[$key]", $value, $output);
 				}
 
+				$output = static::processQRCODE($rowMember, $output);
+
 				$pdf->writeHTML($output, true, false, false, false, '');
 			}
 		}
@@ -172,11 +174,56 @@ class EventbookingHelperTicket
 				$ticketLayout = str_ireplace("[$key]", $value, $ticketLayout);
 			}
 
+			$ticketLayout = static::processQRCODE($row, $ticketLayout);
+
 			$pdf->writeHTML($ticketLayout, true, false, false, false, '');
 		}
 
-		$filePath = JPATH_ROOT . '/media/com_eventbooking/tickets/ticket_' . str_pad($row->id, 5, '0', STR_PAD_LEFT).'.pdf';
+		$filePath = JPATH_ROOT . '/media/com_eventbooking/tickets/ticket_' . str_pad($row->id, 5, '0', STR_PAD_LEFT) . '.pdf';
 
 		$pdf->Output($filePath, 'F');
+	}
+
+	/**
+	 * Generate TICKET_QRCODE
+	 *
+	 * @param $row
+	 */
+	public static function generateTicketQrcode($row)
+	{
+		$filename = $row->ticket_code . '.png';
+
+		if (!file_exists(JPATH_ROOT . '/media/com_eventbooking/qrcodes/' . $filename))
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/phpqrcode/qrlib.php';
+			QRcode::png($row->ticket_code, JPATH_ROOT . '/media/com_eventbooking/qrcodes/' . $filename);
+		}
+	}
+
+	/**
+	 * Process QRCODE for ticket. Support [QRCODE] and [TICKET_QRCODE] tag
+	 *
+	 * @param $row
+	 * @param $output
+	 *
+	 * @return mixed
+	 */
+	protected static function processQRCODE($row, $output)
+	{
+		if (strpos($output, '[QRCODE]') !== false)
+		{
+			EventbookingHelper::generateQrcode($row->id);
+			$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+			$output = str_ireplace("[QRCODE]", $imgTag, $output);
+		}
+
+		if ($row->ticket_code && strpos($output, '[TICKET_QRCODE]') !== false)
+		{
+			static::generateTicketQrcode($row);
+			$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->ticket_code . '.png" border="0" />';
+			$output = str_ireplace("[TICKET_QRCODE]", $imgTag, $output);
+		}
+
+		return $output;
 	}
 }
