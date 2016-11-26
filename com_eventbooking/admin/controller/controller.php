@@ -640,6 +640,27 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('ticket_bg_image', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `ticket_bg_image` VARCHAR(255) NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('ticket_bg_top', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `ticket_bg_top` INT NOT NULL DEFAULT  '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('ticket_bg_left', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `ticket_bg_left` INT NOT NULL DEFAULT  '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		if (!in_array('ticket_layout', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `ticket_layout` TEXT NULL;";

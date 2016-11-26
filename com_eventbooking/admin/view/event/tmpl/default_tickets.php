@@ -35,6 +35,23 @@ defined( '_JEXEC' ) or die ;
 </div>
 <div class="control-group">
 	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('ticket_bg_image', JText::_('EB_TICKET_BG_IMAGE'), JText::_('EB_TICKET_BG_IMAGE_EXPLAIN')); ?>
+	</div>
+	<div class="controls">
+		<?php echo EventbookingHelperHtml::getMediaInput($this->item->ticket_bg_image, 'ticket_bg_image'); ?>
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('ticket_bg_left', JText::_('EB_BG_POSSITION')); ?>
+	</div>
+	<div class="controls">
+		<?php echo JText::_('EB_LEFT') . '    ';?><input type="text" name="ticket_bg_left" class="input-mini" value="<?php echo (int) $this->item->ticket_bg_left; ?>" />
+		<?php echo JText::_('EB_TOP') . '    ';?><input type="text" name="ticket_bg_top" class="input-mini" value="<?php echo (int) $this->item->ticket_bg_top; ?>" />
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
 		<?php echo EventbookingHelperHtml::getFieldLabel('ticket_layout', JText::_('EB_TICKET_LAYOUT'), JText::_('EB_TICKET_LAYOUT_EXPLAIN')); ?>
 	</div>
 	<div class="controls">
