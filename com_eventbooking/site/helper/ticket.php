@@ -43,7 +43,7 @@ class EventbookingHelperTicket
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/tcpdf.php";
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/config/lang/eng.php";
 
-		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+		$pdf = new TCPDF($config->get('ticket_page_orientation', PDF_PAGE_ORIENTATION), PDF_UNIT, $config->get('ticket_page_format', PDF_PAGE_FORMAT), true, 'UTF-8', false);
 		$pdf->SetCreator(PDF_CREATOR);
 		$pdf->SetAuthor(JFactory::getConfig()->get("sitename"));
 		$pdf->SetTitle('Ticket');
@@ -77,8 +77,10 @@ class EventbookingHelperTicket
 			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
 		}
 
+
 		$db->setQuery($query);
 		$rowEvent = $db->loadObject();
+
 
 		if (EventbookingHelper::isValidMessage($rowEvent->ticket_layout))
 		{
@@ -87,6 +89,25 @@ class EventbookingHelperTicket
 		else
 		{
 			$ticketLayout = $config->default_ticket_layout;
+		}
+
+		if ($rowEvent->ticket_bg_image)
+		{
+			$backgroundImage = $rowEvent->ticket_bg_image;
+			$pdf->Image(JPATH_ROOT . '/' . $rowEvent->ticket_bg_image, 0, 0, 210, 297, '', '', '', false, 300, '', false, false, 0);
+		}
+		else
+		{
+			$backgroundImage = $config->get('default_ticket_bg_image');
+		}
+
+		if ($backgroundImage && file_exists(JPATH_ROOT . '/' . $backgroundImage))
+		{
+			$backgroundImagePath = JPATH_ROOT . '/' . $backgroundImage;
+		}
+		else
+		{
+			$backgroundImagePath = '';
 		}
 
 		if ($row->is_group_billing && $config->collect_member_information)
@@ -101,6 +122,11 @@ class EventbookingHelperTicket
 			foreach ($rowMembers as $rowMember)
 			{
 				$pdf->AddPage();
+
+				if ($backgroundImagePath)
+				{
+					$pdf->Image($backgroundImagePath, $rowEvent->ticket_bg_left, $rowEvent->ticket_bg_top);
+				}
 
 				$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
 
@@ -137,6 +163,11 @@ class EventbookingHelperTicket
 		else
 		{
 			$pdf->AddPage();
+
+			if ($backgroundImagePath)
+			{
+				$pdf->Image($backgroundImagePath, $rowEvent->ticket_bg_left, $rowEvent->ticket_bg_top);
+			}
 
 			if ($config->multiple_booking)
 			{
