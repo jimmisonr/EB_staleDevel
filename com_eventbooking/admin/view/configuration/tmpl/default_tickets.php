@@ -27,6 +27,30 @@ defined( '_JEXEC' ) or die ;
 </div>
 <div class="control-group">
 	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('ticket_page_orientation', JText::_('EB_PAGE_ORIENTATION')); ?>
+	</div>
+	<div class="controls">
+		<?php echo $this->lists['ticket_page_orientation']; ?>
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('ticket_page_format', JText::_('EB_PAGE_FORMAT')); ?>
+	</div>
+	<div class="controls">
+		<?php echo $this->lists['ticket_page_format']; ?>
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('default_ticket_bg_image', JText::_('EB_DEFAULT_TICKET_BG_IMAGE'), JText::_('EB_DEFAULT_TICKET_BG_IMAGE_EXPLAIN')); ?>
+	</div>
+	<div class="controls">
+		<?php echo EventbookingHelperHtml::getMediaInput($config->get('ticket_bg_image'), 'default_ticket_bg_image'); ?>
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
 		<?php echo EventbookingHelperHtml::getFieldLabel('default_ticket_layout', JText::_('EB_DEFAULT_TICKET_LAYOUT'), JText::_('EB_DEFAULT_TICKET_LAYOUT_EXPLAIN')); ?>
 	</div>
 	<div class="controls">

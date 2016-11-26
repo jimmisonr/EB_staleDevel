@@ -192,6 +192,20 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 
 		$lists['pdf_font'] = JHtml::_('select.genericlist', $options, 'pdf_font', ' class="inputbox"', 'value', 'text', empty($config->pdf_font) ? 'times' : $config->pdf_font);
 
+		$options   = array();
+		$options[] = JHtml::_('select.option', 'P', JText::_('Portrait'));
+		$options[] = JHtml::_('select.option', 'L', JText::_('Landscape'));
+
+		$lists['ticket_page_orientation'] = JHtml::_('select.genericlist', $options, 'ticket_page_orientation', '', 'value', 'text', $config->get('ticket_page_orientation', 'P'));
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', 'A4', JText::_('A4'));
+		$options[] = JHtml::_('select.option', 'A5', JText::_('A5'));
+		$options[] = JHtml::_('select.option', 'A6', JText::_('A6'));
+		$options[] = JHtml::_('select.option', 'A7', JText::_('A7'));
+
+		$lists['ticket_page_format'] = JHtml::_('select.genericlist', $options, 'ticket_page_format', '', 'value', 'text', $config->get('ticket_page_format', 'A4'));
+
 		$this->lists  = $lists;
 		$this->config = $config;
 		$this->addToolbar();
