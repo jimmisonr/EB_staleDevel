@@ -216,7 +216,7 @@ JHtml::_('formbehavior.chosen', 'select');
 							if ($row->ticket_code)
 							{
 							?>
-								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_ticket&id='.$row->id); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo JText::_('EB_DOWNLOAD');?></a>
+								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_ticket&id='.$row->id); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo $row->ticket_number ? EventbookingHelperTicket::formatTicketNumber($row->ticket_prefix, $row->ticket_number, $this->config) : JText::_('EB_DOWNLOAD_TICKETS');?></a>
 							<?php
 							}
 							?>

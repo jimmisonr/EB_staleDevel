@@ -93,8 +93,7 @@ class EventbookingHelperTicket
 
 		if ($rowEvent->ticket_bg_image)
 		{
-			$backgroundImage = $rowEvent->ticket_bg_image;
-			$pdf->Image(JPATH_ROOT . '/' . $rowEvent->ticket_bg_image, 0, 0, 210, 297, '', '', '', false, 300, '', false, false, 0);
+			$backgroundImage = $rowEvent->ticket_bg_image;			
 		}
 		else
 		{
