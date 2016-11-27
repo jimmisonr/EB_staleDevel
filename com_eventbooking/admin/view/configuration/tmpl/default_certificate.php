@@ -35,6 +35,30 @@ defined( '_JEXEC' ) or die ;
 </div>
 <div class="control-group">
 	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('certificate_page_orientation', JText::_('EB_PAGE_ORIENTATION')); ?>
+	</div>
+	<div class="controls">
+		<?php echo $this->lists['certificate_page_orientation']; ?>
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('certificate_page_format', JText::_('EB_PAGE_FORMAT')); ?>
+	</div>
+	<div class="controls">
+		<?php echo $this->lists['certificate_page_format']; ?>
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('default_certificate_bg_image', JText::_('EB_DEFAULT_CERTIFICATE_BG_IMAGE'), JText::_('EB_DEFAULT_CERTIFICATE_BG_IMAGE_EXPLAIN')); ?>
+	</div>
+	<div class="controls">
+		<?php echo EventbookingHelperHtml::getMediaInput($config->get('default_certificate_bg_image'), 'default_certificate_bg_image'); ?>
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
 		<?php echo EventbookingHelperHtml::getFieldLabel('certificate_layout', JText::_('EB_DEFAULT_CERTIFICATE_LAYOUT'), JText::_('EB_DEFAULT_CERTIFICATE_LAYOUT_EXPLAIN')); ?>
 	</div>
 	<div class="controls">

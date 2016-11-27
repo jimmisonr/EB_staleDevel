@@ -28,19 +28,25 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['calendar_start_date'] = JHtml::_('select.genericlist', $options, 'calendar_start_date', ' class="inputbox" ', 'value', 'text',
 			$config->calendar_start_date);
 
-		$options                  = array();
-		$options[]                = JHtml::_('select.option', 1, JText::_('EB_ORDERING'));
-		$options[]                = JHtml::_('select.option', 2, JText::_('EB_EVENT_DATE'));
-		$lists['order_events']    = JHtml::_('select.genericlist', $options, 'order_events', '  class="inputbox" ', 'value', 'text',
+		$options               = array();
+		$options[]             = JHtml::_('select.option', 1, JText::_('EB_ORDERING'));
+		$options[]             = JHtml::_('select.option', 2, JText::_('EB_EVENT_DATE'));
+		$lists['order_events'] = JHtml::_('select.genericlist', $options, 'order_events', '  class="inputbox" ', 'value', 'text',
 			$config->order_events);
+
 		$options                  = array();
-		$options[]                = JHTML::_('select.option', 'asc', JText::_('EB_ASC'));
-		$options[]                = JHTML::_('select.option', 'desc', JText::_('EB_DESC'));
-		$lists['order_direction'] = JHTML::_('select.genericlist', $options, 'order_direction', '', 'value', 'text', $config->order_direction);
+		$options[]                = JHtml::_('select.option', 'asc', JText::_('EB_ASC'));
+		$options[]                = JHtml::_('select.option', 'desc', JText::_('EB_DESC'));
+		$lists['order_direction'] = JHtml::_('select.genericlist', $options, 'order_direction', '', 'value', 'text', $config->order_direction);
+
+		$options                       = array();
+		$options[]                     = JHtml::_('select.option', '0', JText::_('EB_FULL_PAYMENT'));
+		$options[]                     = JHtml::_('select.option', '1', JText::_('EB_DEPOSIT_PAYMENT'));
+		$lists['default_payment_type'] = JHtml::_('select.genericlist', $options, 'default_payment_type', '', 'value', 'text', $config->get('default_payment_type', 0));
 
 		//Get list of country
-		$query->clear();
-		$query->select('name AS value, name AS text')
+		$query->clear()
+			->select('name AS value, name AS text')
 			->from('#__eb_countries')
 			->order('name');
 		$db->setQuery($query);
@@ -66,7 +72,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options[]                         = JHtml::_('select.option', 'simple', JText::_('EB_SIMPLE_FORM'));
 		$lists['submit_event_form_layout'] = JHtml::_('select.genericlist', $options, 'submit_event_form_layout', '', 'value', 'text',
 			$config->submit_event_form_layout);
-		//Theme configuration						
+		//Theme configuration
 		$options                 = array();
 		$options[]               = JHtml::_('select.option', 'default', JText::_('EB_DEFAULT'));
 		$options[]               = JHtml::_('select.option', 'fire', JText::_('EB_FIRE'));
@@ -191,6 +197,23 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		}
 
 		$lists['pdf_font'] = JHtml::_('select.genericlist', $options, 'pdf_font', ' class="inputbox"', 'value', 'text', empty($config->pdf_font) ? 'times' : $config->pdf_font);
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', 'P', JText::_('Portrait'));
+		$options[] = JHtml::_('select.option', 'L', JText::_('Landscape'));
+
+		$lists['ticket_page_orientation']      = JHtml::_('select.genericlist', $options, 'ticket_page_orientation', '', 'value', 'text', $config->get('ticket_page_orientation', 'P'));
+		$lists['certificate_page_orientation'] = JHtml::_('select.genericlist', $options, 'certificate_page_orientation', '', 'value', 'text', $config->get('certificate_page_orientation', 'P'));
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', 'A4', JText::_('A4'));
+		$options[] = JHtml::_('select.option', 'A5', JText::_('A5'));
+		$options[] = JHtml::_('select.option', 'A6', JText::_('A6'));
+		$options[] = JHtml::_('select.option', 'A7', JText::_('A7'));
+
+		$lists['ticket_page_format']      = JHtml::_('select.genericlist', $options, 'ticket_page_format', '', 'value', 'text', $config->get('ticket_page_format', 'A4'));
+		$lists['certificate_page_format'] = JHtml::_('select.genericlist', $options, 'certificate_page_format', '', 'value', 'text', $config->get('certificate_page_format', 'A4'));
+
 
 		$this->lists  = $lists;
 		$this->config = $config;
