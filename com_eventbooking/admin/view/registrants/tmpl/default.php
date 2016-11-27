@@ -118,6 +118,15 @@ else
 					</th>
 				<?php
 				}
+				if ($this->config->activate_tickets_pdf)
+				{
+					$colSpan++;
+				?>
+					<th width="8%" class="center">
+						<?php echo JHtml::_('grid.sort',  JText::_('EB_TICKET_NUMBER'), 'tbl.ticket_number', $this->state->filter_order_Dir, $this->state->filter_order); ?>
+					</th>
+				<?php
+				}
 				?>
 				<th width="5%" class="title">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_REGISTRATION_STATUS'), 'tbl.published', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
@@ -285,6 +294,23 @@ else
 						</td>
 					<?php
 					}
+
+					if ($this->config->activate_tickets_pdf)
+					{
+					?>
+						<td class="center">
+							<?php
+							if ($row->ticket_code)
+							{
+							?>
+								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_ticket&id='.$row->id); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo $row->ticket_number ? EventbookingHelperTicket::formatTicketNumber($row->ticket_prefix, $row->ticket_number, $this->config) : JText::_('EB_DOWNLOAD_TICKETS');?></a>
+							<?php
+							}
+							?>
+						</td>
+					<?php
+					}
+
 					?>
 					<td class="center">
 						<?php

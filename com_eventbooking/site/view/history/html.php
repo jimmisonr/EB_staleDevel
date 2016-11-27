@@ -66,22 +66,29 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 
 		// Check to see whether we should show download certificate feature
 		$showDownloadCertificate = false;
+		$showDownloadTicket      = false;
 
 		foreach ($items as $item)
 		{
 			if ($item->published == 1 && ($item->activate_certificate_feature == 1 || ($item->activate_certificate_feature == 2 && $config->activate_certificate_feature == 1)))
 			{
 				$showDownloadCertificate = true;
-				break;
+			}
+
+			if ($item->ticket_number)
+			{
+				$showDownloadTicket = true;
 			}
 		}
 
+		$this->state                   = $state;
 		$this->lists                   = $lists;
 		$this->items                   = $items;
 		$this->pagination              = $model->getPagination();
 		$this->config                  = $config;
 		$this->showDueAmountColumn     = $showDueAmountColumn;
 		$this->showDownloadCertificate = $showDownloadCertificate;
+		$this->showDownloadTicket      = $showDownloadTicket;
 
 		parent::display();
 	}

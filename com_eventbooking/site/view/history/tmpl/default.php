@@ -86,6 +86,16 @@ JHtml::_('formbehavior.chosen', 'select');
 					<?php
 					}
 
+					if ($this->showDownloadTicket)
+					{
+						$cols++;
+					?>
+						<th class="center">
+							<?php echo JText::_('EB_TICKET'); ?>
+						</th>
+					<?php
+					}
+
 					if ($this->showDownloadCertificate)
 					{
 						$cols++;
@@ -192,6 +202,22 @@ JHtml::_('formbehavior.chosen', 'select');
 							{
 							?>
 								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_invoice&id='.($row->cart_id ? $row->cart_id : ($row->group_id ? $row->group_id : $row->id))); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo EventbookingHelper::formatInvoiceNumber($row->invoice_number, $this->config) ; ?></a>
+							<?php
+							}
+							?>
+						</td>
+					<?php
+					}
+
+					if ($this->showDownloadTicket)
+					{
+					?>
+						<td class="center">
+							<?php
+							if ($row->ticket_code)
+							{
+							?>
+								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_ticket&id='.$row->id); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo $row->ticket_number ? EventbookingHelperTicket::formatTicketNumber($row->ticket_prefix, $row->ticket_number, $this->config) : JText::_('EB_DOWNLOAD_TICKETS');?></a>
 							<?php
 							}
 							?>

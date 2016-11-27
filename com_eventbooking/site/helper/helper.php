@@ -3760,7 +3760,7 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Format invoice number
+	 * Format certificate number
 	 *
 	 * @param int       $id
 	 * @param RADConfig $config
@@ -3771,6 +3771,20 @@ class EventbookingHelper
 	{
 		return $config->certificate_prefix .
 		str_pad($id, $config->certificate_number_length ? $config->certificate_number_length : 5, '0', STR_PAD_LEFT);
+	}
+
+	/**
+	 * Format ticket number
+	 *
+	 * @param EventbookingTableRegistrant       $row
+	 * @param RADConfig $config
+	 *
+	 * @return string formatted ticket number
+	 */
+	public static function formatTicketNumber($row, $config)
+	{
+		return $row->ticket_prefix .
+		str_pad($row->ticket_number, $config->ticket_number_length ? $config->ticket_number_length : 5, '0', STR_PAD_LEFT);
 	}
 
 	/**

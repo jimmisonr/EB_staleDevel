@@ -278,6 +278,68 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 	}
 
 	/**
+	 * Download tickets associated to the registration record
+	 *
+	 * @throws Exception
+	 */
+	public function download_ticket()
+	{
+		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/table/registrant.php';
+
+		$row    = JTable::getInstance('registrant', 'EventbookingTable');
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+		$config = EventbookingHelper::getConfig();
+
+		$downloadCode = $this->input->getString('download_code');
+
+		if (!$user->id && empty($downloadCode))
+		{
+			throw new Exception(JText::_('You do not have permission to download the ticket'), 403);
+		}
+
+		if (!empty($downloadCode))
+		{
+
+			$query->select('id')
+				->from('#__eb_registrants')
+				->where('registration_code = ' . $db->quote($downloadCode));
+			$db->setQuery($query);
+
+			$id = (int) $db->loadResult();
+		}
+		else
+		{
+			$id = $this->input->getInt('id', 0);
+		}
+
+		if (!$row->load($id))
+		{
+			throw new Exception(JText::_('Invalid Registration Record'), 404);
+		}
+
+		if (empty($downloadCode) && $row->user_id != $user->id && $row->email != $user->get('email'))
+		{
+			throw new Exception(JText::_('You do not have permission to download the ticket'), 403);
+		}
+
+		if ($row->published == 0)
+		{
+			throw new Exception(JText::_('Ticket is only allowed for confirmed/paid registrants'), 403);
+		}
+
+		// The person is allowed to download ticket, let process it
+		EventbookingHelperTicket::generateTicketsPDF($row, $config);
+
+		$fileName = 'ticket_' . str_pad($row->id, 5, '0', STR_PAD_LEFT) . '.pdf';
+		$filePath = JPATH_ROOT . '/media/com_eventbooking/tickets/' . $fileName;
+
+		while (@ob_end_clean()) ;
+		EventbookingHelper::processDownload($filePath, $fileName);
+	}
+
+	/**
 	 * Export registrants data into a csv file
 	 */
 	public function export()

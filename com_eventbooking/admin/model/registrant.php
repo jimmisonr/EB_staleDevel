@@ -97,9 +97,9 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
 
-		// Get list of core fields
-		$query->clear();
-		$query->select('name')
+		// Get list of core fields		
+		$query->clear()
+			->select('name')
 			->from('#__eb_fields')
 			->where('is_core = 1');
 		$db->setQuery($query);
@@ -182,6 +182,65 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 				}
 			}
 		}
+	}
+
+	/**
+	 * Method to change the published state of one or more records.
+	 *
+	 * @param array $cid   A list of the primary keys to change.
+	 * @param int   $state The value of the published state.
+	 *
+	 * @throws Exception
+	 */
+	public function publish($cid, $state = 1)
+	{
+		$db = $this->getDbo();
+
+		if (($state == 1) && count($cid))
+		{
+			JPluginHelper::importPlugin('eventbooking');
+			$config = EventbookingHelper::getConfig();
+			$row    = new RADTable('#__eb_registrants', 'id', $db);
+
+			foreach ($cid as $registrantId)
+			{
+				$row->load($registrantId);
+
+				if (!$row->published)
+				{
+					if (empty($row->payment_date) || ($row->payment_date == $db->getNullDate()))
+					{
+						$row->payment_date = JFactory::getDate()->toSql();
+						$row->store();
+					}
+
+					// Trigger event
+					JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));
+
+					// Re-generate invoice with Paid status
+					if ($config->activate_invoice_feature && $row->invoice_number)
+					{
+						EventbookingHelper::generateInvoicePDF($row);
+					}
+
+					EventbookingHelperMail::sendRegistrationApprovedEmail($row, $config);
+				}
+			}
+		}
+
+		$cids  = implode(',', $cid);
+		$query = $db->getQuery(true);
+		$query->update('#__eb_registrants')
+			->set('published = ' . (int) $state)
+			->where("(id IN ($cids) OR group_id IN ($cids))");			
+			
+		if ($state == 0)
+		{
+			$query->where("payment_method LIKE 'os_offline%'");
+		}		
+		
+		$db->setQuery($query);
+		$db->execute();
 	}
 
 	/**

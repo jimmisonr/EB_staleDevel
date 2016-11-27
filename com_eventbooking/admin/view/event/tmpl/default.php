@@ -599,6 +599,7 @@ JHtml::_('behavior.tabstate');
 			</div>
 		<?php
 		echo JHtml::_('bootstrap.endTab');
+
 		if ($this->config->event_custom_field)
 		{
 			echo JHtml::_('bootstrap.addTab', 'event', 'extra-information-page', JText::_('EB_EXTRA_INFORMATION', true));
@@ -623,6 +624,14 @@ JHtml::_('behavior.tabstate');
 			<?php
 			echo JHtml::_('bootstrap.endTab');
 		}
+
+		if ($this->config->activate_tickets_pdf)
+		{
+			echo JHtml::_('bootstrap.addTab', 'event', 'tickets-page', JText::_('EB_TICKETS_SETTINGS', true));
+			echo $this->loadTemplate('tickets', array('editor' => $editor));
+			echo JHtml::_('bootstrap.endTab');
+		}
+
 		echo JHtml::_('bootstrap.addTab', 'event', 'advance-settings-page', JText::_('EB_ADVANCED_SETTINGS', true));
 		?>
 		<div class="control-group">

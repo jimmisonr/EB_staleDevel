@@ -314,6 +314,14 @@ defined( '_JEXEC' ) or die ;
 		<legend><?php echo JText::_('EB_REGISTRATION_SETTINGS'); ?></legend>
 		<div class="control-group">
 			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('activate_tickets_pdf', JText::_('EB_ACTIVATE_TICKETS_PDF'), JText::_('EB_ACTIVATE_TICKETS_PDF_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<?php echo EventbookingHelperHtml::getBooleanInput('activate_tickets_pdf', $config->activate_tickets_pdf); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('user_registration', JText::_('EB_USER_REGISTRATION_INTEGRATION'), JText::_('EB_REGISTRATION_INTEGRATION_EXPLAIN')); ?>
 			</div>
 			<div class="controls">
@@ -323,7 +331,7 @@ defined( '_JEXEC' ) or die ;
 		<?php
 		if (JComponentHelper::isInstalled('com_comprofiler') && JPluginHelper::isEnabled('eventbooking', 'cb'))
 		{
-			?>
+		?>
 			<div class="control-group">
 				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('use_cb_api', JText::_('EB_USE_CB_API'), JText::_('EB_USE_CB_API_EXPLAIN')); ?>
@@ -332,7 +340,7 @@ defined( '_JEXEC' ) or die ;
 					<?php echo EventbookingHelperHtml::getBooleanInput('use_cb_api', $config->use_cb_api); ?>
 				</div>
 			</div>
-			<?php
+		<?php
 		}
 		?>
 		<div class="control-group">

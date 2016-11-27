@@ -40,6 +40,10 @@ defined('_JEXEC') or die;
  * @property $cancel_before_date
  * @property $discount_groups
  * @property $discount_amounts
+ * @property $activate_tickets_pdf
+ * @property $ticket_start_number
+ * @property $ticket_prefix
+ * @property $ticket_layout
  * @property $params
  * @property $created_by
  * @property $ordering

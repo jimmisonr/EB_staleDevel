@@ -180,6 +180,7 @@ class EventbookingHelperMail
 			}
 
 			$invoiceFilePath = '';
+
 			if ($config->activate_invoice_feature && $config->send_invoice_to_customer && $row->invoice_number)
 			{
 				if (is_callable('EventbookingHelperOverrideHelper::generateInvoicePDF'))
@@ -193,6 +194,13 @@ class EventbookingHelperMail
 
 				$invoiceFilePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config) . '.pdf';
 				$mailer->addAttachment($invoiceFilePath);
+			}
+
+			if ($row->ticket_code)
+			{
+				EventbookingHelperTicket::generateTicketsPDF($row, $config);
+				$ticketFilePath = JPATH_ROOT . '/media/com_eventbooking/tickets/ticket_' . str_pad($row->id, 5, '0', STR_PAD_LEFT) . '.pdf';
+				$mailer->addAttachment($ticketFilePath);
 			}
 
 			static::addEventAttachments($mailer, $row, $event, $config);
@@ -455,10 +463,12 @@ class EventbookingHelperMail
 			->from('#__eb_events')
 			->where('id = ' . $row->event_id);
 		$db->setQuery($query);
+
 		if ($fieldSuffix)
 		{
 			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
 		}
+
 		$event = $db->loadObject();
 
 		if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
@@ -506,6 +516,7 @@ class EventbookingHelperMail
 			$subject = str_ireplace("[$key]", $value, $subject);
 			$body    = str_ireplace("[$key]", $value, $body);
 		}
+
 		$body = EventbookingHelper::convertImgTags($body);
 
 		if (strpos($body, '[QRCODE]') !== false)
@@ -527,6 +538,13 @@ class EventbookingHelperMail
 			}
 
 			$mailer->addAttachment(JPATH_ROOT . '/media/com_eventbooking/invoices/' . EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config) . '.pdf');
+		}
+
+		if ($row->ticket_code)
+		{
+			EventbookingHelperTicket::generateTicketsPDF($row, $config);
+			$ticketFilePath = JPATH_ROOT . '/media/com_eventbooking/tickets/ticket_' . str_pad($row->id, 5, '0', STR_PAD_LEFT) . '.pdf';
+			$mailer->addAttachment($ticketFilePath);
 		}
 
 		static::send($mailer, array($row->email), $subject, $body);
@@ -630,6 +648,7 @@ class EventbookingHelperMail
 			->from('#__eb_events')
 			->where('id=' . $row->event_id);
 		$db->setQuery($query);
+
 		if ($fieldSuffix)
 		{
 			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
