@@ -3993,7 +3993,7 @@ class EventbookingHelper
 	/**
 	 * Download PDF Certificates
 	 *
-	 * @param array $rows
+	 * @param array     $rows
 	 * @param RADConfig $config
 	 */
 	public static function downloadCertificates($rows, $config)
@@ -4001,24 +4001,24 @@ class EventbookingHelper
 		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideHelper', 'downloadCertificates'))
 		{
 			EventbookingHelperOverrideHelper::downloadCertificates($rows, $config);
-			
+
 			return;
 		}
-		
+
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/tcpdf.php";
 		require_once JPATH_ROOT . "/components/com_eventbooking/tcpdf/config/lang/eng.php";
 
 		self::loadLanguage();
 
-		$sitename    = JFactory::getConfig()->get("sitename");
+		$sitename = JFactory::getConfig()->get("sitename");
 
 		$events = array();
 
-		$db          = JFactory::getDbo();
-		$query       = $db->getQuery(true);
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
 
-		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-		$pdf->SetCreator(PDF_CREATOR);
+		$pdf = new TCPDF($config->get('certificate_page_orientation', PDF_PAGE_ORIENTATION), PDF_UNIT, $config->get('certificate_page_format', PDF_PAGE_FORMAT), true, 'UTF-8', false);
+		$pdf->SetCreator('Events Booking');
 		$pdf->SetAuthor($sitename);
 		$pdf->SetTitle('Certificate');
 		$pdf->SetSubject('Certificate');
@@ -4038,21 +4038,45 @@ class EventbookingHelper
 		$font = empty($config->pdf_font) ? 'times' : $config->pdf_font;
 		$pdf->SetFont($font, '', 8);
 
-		foreach($rows as $row)
+		foreach ($rows as $row)
 		{
 			if (!isset($events[$row->event_id]))
 			{
 				$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 
 				$query->clear()
-					->select('*, title' . $fieldSuffix . ' AS title')
+					->select('*')
 					->from('#__eb_events')
 					->where('id = ' . (int) $row->event_id);
+
+				if ($fieldSuffix)
+				{
+					EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
+				}
+
 				$db->setQuery($query);
 				$events[$row->event_id] = $db->loadObject();
 			}
 
 			$rowEvent = $events[$row->event_id];
+
+			if ($rowEvent->certificate_bg_image)
+			{
+				$backgroundImage = $rowEvent->certificate_bg_image;
+			}
+			else
+			{
+				$backgroundImage = $config->get('default_certificate_bg_image');
+			}
+
+			if ($backgroundImage && file_exists(JPATH_ROOT . '/' . $backgroundImage))
+			{
+				$backgroundImagePath = JPATH_ROOT . '/' . $backgroundImage;
+			}
+			else
+			{
+				$backgroundImagePath = '';
+			}
 
 			if (self::isValidMessage($rowEvent->certificate_layout))
 			{
@@ -4075,6 +4099,11 @@ class EventbookingHelper
 				foreach ($rowMembers as $rowMember)
 				{
 					$pdf->AddPage();
+
+					if ($backgroundImagePath)
+					{
+						$pdf->Image($backgroundImagePath, $rowEvent->ticket_bg_left, $rowEvent->ticket_bg_top);
+					}
 
 					$rowFields = self::getFormFields($row->event_id, 0);
 
@@ -4103,12 +4132,17 @@ class EventbookingHelper
 						$output = str_ireplace("[$key]", $value, $output);
 					}
 
-					$v = $pdf->writeHTML($output, true, false, false, false, '');
+					$pdf->writeHTML($output, true, false, false, false, '');
 				}
 			}
 			else
 			{
 				$pdf->AddPage();
+
+				if ($backgroundImagePath)
+				{
+					$pdf->Image($backgroundImagePath, $rowEvent->ticket_bg_left, $rowEvent->ticket_bg_top);
+				}
 
 				if ($config->multiple_booking)
 				{
@@ -4146,7 +4180,7 @@ class EventbookingHelper
 					$invoiceOutput = str_ireplace("[$key]", $value, $invoiceOutput);
 				}
 
-				$v = $pdf->writeHTML($invoiceOutput, true, false, false, false, '');
+				$pdf->writeHTML($invoiceOutput, true, false, false, false, '');
 			}
 		}
 
@@ -4161,8 +4195,8 @@ class EventbookingHelper
 			$row = $rows[0];
 
 			//Filename
-			$fileName = self::formatCertificateNumber($row->id, $config).'.pdf';
-			$filePath = JPATH_ROOT . '/media/com_eventbooking/certificates/' . $fileName ;
+			$fileName = self::formatCertificateNumber($row->id, $config) . '.pdf';
+			$filePath = JPATH_ROOT . '/media/com_eventbooking/certificates/' . $fileName;
 		}
 
 		$pdf->Output($filePath, 'F');
