@@ -93,7 +93,7 @@ class EventbookingHelperTicket
 
 		if ($rowEvent->ticket_bg_image)
 		{
-			$backgroundImage = $rowEvent->ticket_bg_image;			
+			$backgroundImage = $rowEvent->ticket_bg_image;
 		}
 		else
 		{

@@ -3774,20 +3774,6 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Format ticket number
-	 *
-	 * @param EventbookingTableRegistrant       $row
-	 * @param RADConfig $config
-	 *
-	 * @return string formatted ticket number
-	 */
-	public static function formatTicketNumber($row, $config)
-	{
-		return $row->ticket_prefix .
-		str_pad($row->ticket_number, $config->ticket_number_length ? $config->ticket_number_length : 5, '0', STR_PAD_LEFT);
-	}
-
-	/**
 	 * Update max child date of a recurring event
 	 *
 	 * @param $parentId
@@ -5198,7 +5184,7 @@ class EventbookingHelper
 			{
 				return true;
 			}
-			
+
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
 
