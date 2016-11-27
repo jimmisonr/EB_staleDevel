@@ -1164,11 +1164,11 @@ class EventbookingController extends RADControllerAdmin
 
 		if (!in_array('activate_certificate_feature', $fields))
 		{
-			$sql = "ALTER TABLE  `#__eb_events` ADD  `activate_certificate_feature` TINYINT NOT NULL DEFAULT  '2' ;";
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `activate_certificate_feature` TINYINT NOT NULL DEFAULT  '0' ;";
 			$db->setQuery($sql);
 			$db->execute();
 
-			$sql = 'UPDATE #__eb_events SET activate_certificate_feature = 2';
+			$sql = 'UPDATE #__eb_events SET activate_certificate_feature = 0';
 			$db->setQuery($sql);
 			$db->execute();
 		}
@@ -1186,6 +1186,27 @@ class EventbookingController extends RADControllerAdmin
 				->values('"certificate_prefix", "CT"')
 				->values('"certificate_number_length", 5');
 			$db->setQuery($query);
+			$db->execute();
+		}
+
+		if (!in_array('certificate_bg_image', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `certificate_bg_image` VARCHAR(255) NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('certificate_bg_left', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `certificate_bg_left` INT NOT NULL DEFAULT  '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('certificate_bg_top', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `certificate_bg_top` INT NOT NULL DEFAULT  '0';";
+			$db->setQuery($sql);
 			$db->execute();
 		}
 

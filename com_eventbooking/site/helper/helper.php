@@ -4031,8 +4031,8 @@ class EventbookingHelper
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 
-		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-		$pdf->SetCreator(PDF_CREATOR);
+		$pdf = new TCPDF($config->get('certificate_page_orientation', PDF_PAGE_ORIENTATION), PDF_UNIT, $config->get('certificate_page_format', PDF_PAGE_FORMAT), true, 'UTF-8', false);
+		$pdf->SetCreator('Events Booking');
 		$pdf->SetAuthor($sitename);
 		$pdf->SetTitle('Certificate');
 		$pdf->SetSubject('Certificate');
@@ -4059,14 +4059,38 @@ class EventbookingHelper
 				$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 
 				$query->clear()
-					->select('*, title' . $fieldSuffix . ' AS title')
+					->select('*')
 					->from('#__eb_events')
 					->where('id = ' . (int) $row->event_id);
+
+				if ($fieldSuffix)
+				{
+					EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
+				}
+
 				$db->setQuery($query);
 				$events[$row->event_id] = $db->loadObject();
 			}
 
 			$rowEvent = $events[$row->event_id];
+
+			if ($rowEvent->certificate_bg_image)
+			{
+				$backgroundImage = $rowEvent->certificate_bg_image;
+			}
+			else
+			{
+				$backgroundImage = $config->get('default_certificate_bg_image');
+			}
+
+			if ($backgroundImage && file_exists(JPATH_ROOT . '/' . $backgroundImage))
+			{
+				$backgroundImagePath = JPATH_ROOT . '/' . $backgroundImage;
+			}
+			else
+			{
+				$backgroundImagePath = '';
+			}
 
 			if (self::isValidMessage($rowEvent->certificate_layout))
 			{
@@ -4089,6 +4113,11 @@ class EventbookingHelper
 				foreach ($rowMembers as $rowMember)
 				{
 					$pdf->AddPage();
+
+					if ($backgroundImagePath)
+					{
+						$pdf->Image($backgroundImagePath, $rowEvent->ticket_bg_left, $rowEvent->ticket_bg_top);
+					}
 
 					$rowFields = self::getFormFields($row->event_id, 0);
 
@@ -4117,12 +4146,17 @@ class EventbookingHelper
 						$output = str_ireplace("[$key]", $value, $output);
 					}
 
-					$v = $pdf->writeHTML($output, true, false, false, false, '');
+					$pdf->writeHTML($output, true, false, false, false, '');
 				}
 			}
 			else
 			{
 				$pdf->AddPage();
+
+				if ($backgroundImagePath)
+				{
+					$pdf->Image($backgroundImagePath, $rowEvent->ticket_bg_left, $rowEvent->ticket_bg_top);
+				}
 
 				if ($config->multiple_booking)
 				{
@@ -4160,7 +4194,7 @@ class EventbookingHelper
 					$invoiceOutput = str_ireplace("[$key]", $value, $invoiceOutput);
 				}
 
-				$v = $pdf->writeHTML($invoiceOutput, true, false, false, false, '');
+				$pdf->writeHTML($invoiceOutput, true, false, false, false, '');
 			}
 		}
 

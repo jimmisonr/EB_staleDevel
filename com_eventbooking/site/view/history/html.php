@@ -70,14 +70,17 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 
 		foreach ($items as $item)
 		{
-			if ($item->published == 1 && ($item->activate_certificate_feature == 1 || ($item->activate_certificate_feature == 2 && $config->activate_certificate_feature == 1)))
+			$item->show_download_certificate = false;
+
+			if ($item->published == 1 && $item->activate_certificate_feature == 1 && $item->event_end_date_minutes >= 0)
 			{
 				$showDownloadCertificate = true;
+				$item->show_download_certificate = true;
 			}
 
 			if ($item->ticket_number)
 			{
-				$showDownloadTicket = true;
+				$showDownloadTicket = true;								
 			}
 		}
 
