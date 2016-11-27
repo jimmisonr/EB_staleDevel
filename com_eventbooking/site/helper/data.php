@@ -834,6 +834,14 @@ class EventbookingHelperData
 			$fields[]  = 'payment_method';
 		}
 
+		if ($config->activate_tickets_pdf)
+		{
+			$headers[] = JText::_('EB_TICKET_NUMBER');
+			$headers[] = JText::_('EB_TICKET_CODE');
+			$fields[]  = 'ticket_number';
+			$fields[]  = 'ticket_code';
+		}
+
 		$headers[] = JText::_('EB_TRANSACTION_ID');
 		$headers[] = JText::_('EB_PAYMENT_STATUS');
 		$fields[]  = 'transaction_id';
@@ -933,6 +941,18 @@ class EventbookingHelperData
 				else
 				{
 					$row->payment_method = '';
+				}
+			}
+
+			if ($config->activate_tickets_pdf)
+			{
+				if ($row->ticket_number)
+				{
+					$row->ticket_number = EventbookingHelperTicket::formatTicketNumber($row->ticket_prefix, $row->ticket_number, $config);
+				}
+				else
+				{
+					$row->ticket_number = '';
 				}
 			}
 
