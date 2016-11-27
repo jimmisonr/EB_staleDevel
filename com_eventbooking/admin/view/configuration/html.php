@@ -37,13 +37,8 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options                  = array();
 		$options[]                = JHtml::_('select.option', 'asc', JText::_('EB_ASC'));
 		$options[]                = JHtml::_('select.option', 'desc', JText::_('EB_DESC'));
-		$lists['order_direction'] = JHtml::_('select.genericlist', $options, 'order_direction', '', 'value', 'text', $config->order_direction);
-
-		$options                       = array();
-		$options[]                     = JHtml::_('select.option', '0', JText::_('EB_FULL_PAYMENT'));
-		$options[]                     = JHtml::_('select.option', '1', JText::_('EB_DEPOSIT_PAYMENT'));
-		$lists['default_payment_type'] = JHtml::_('select.genericlist', $options, 'default_payment_type', '', 'value', 'text', $config->get('default_payment_type', 0));
-
+		$lists['order_direction'] = JHtml::_('select.genericlist', $options, 'order_direction', '', 'value', 'text', $config->order_direction);		
+		
 		//Get list of country
 		$query->clear()
 			->select('name AS value, name AS text')
