@@ -1671,10 +1671,6 @@ class EventbookingController extends RADControllerAdmin
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `ticket_code`  VARCHAR( 40 ) NULL;";
 			$db->setQuery($sql);
 			$db->execute();
-
-			$sql = 'UPDATE #__eb_registrants SET `ticket_code` = `id`';
-			$db->setQuery($sql);
-			$db->execute();
 		}
 
 		if (!in_array('invoice_number', $fields))
