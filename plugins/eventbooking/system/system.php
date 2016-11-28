@@ -123,6 +123,7 @@ class plgEventbookingSystem extends JPlugin
 		$query = $db->getQuery(true);
 		$query->update('#__eb_coupons')
 			->set('used = used + 1')
+			->set('used_amount = used_amount + ' . (float) $row->coupon_discount_amount)
 			->where('id = ' . (int) $row->coupon_id);
 		$db->setQuery($query);
 		$db->execute();

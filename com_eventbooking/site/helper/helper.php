@@ -1107,6 +1107,7 @@ class EventbookingHelper
 				->where('(valid_from = "0000-00-00" OR valid_from <= NOW())')
 				->where('(valid_to = "0000-00-00" OR valid_to >= NOW())')
 				->where('(times = 0 OR times > used)')
+				->where('discount > used_amount')
 				->where('enable_for IN (0, 1)')
 				->where('user_id IN (0, ' . $user->id . ')')
 				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id=' . $event->id . '))')
@@ -1123,7 +1124,7 @@ class EventbookingHelper
 				{
 					$discountAmount = $discountAmount + $totalAmount * $coupon->discount / 100;
 				}
-				else
+				elseif ($coupon->coupon_type == 1)
 				{
 					$discountAmount = $discountAmount + $coupon->discount;
 				}
@@ -1246,6 +1247,26 @@ class EventbookingHelper
 			$fees['payment_processing_fee'] = 0;
 		}
 
+		$couponDiscountAmount = 0;
+
+		if (!empty($coupon) && $coupon->coupon_type == 2)
+		{
+			$couponAvailableAmount = $coupon->discount - $coupon->used_amount;
+
+			if ($couponAvailableAmount >= $amount)
+			{
+				$couponDiscountAmount = $amount;
+				$amount               = 0;
+			}
+			else
+			{
+				$amount               = $amount - $couponAvailableAmount;
+				$couponDiscountAmount = $couponAvailableAmount;
+			}
+		}
+
+		$discountAmount += $couponDiscountAmount;
+
 		// Calculate the deposit amount as well
 		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
 		{
@@ -1263,12 +1284,13 @@ class EventbookingHelper
 			$depositAmount = 0;
 		}
 
-		$fees['total_amount']    = $totalAmount;
-		$fees['discount_amount'] = $discountAmount;
-		$fees['tax_amount']      = $taxAmount;
-		$fees['amount']          = $amount;
-		$fees['deposit_amount']  = $depositAmount;
-		$fees['late_fee']        = $lateFee;
+		$fees['total_amount']           = $totalAmount;
+		$fees['discount_amount']        = $discountAmount;
+		$fees['tax_amount']             = $taxAmount;
+		$fees['amount']                 = $amount;
+		$fees['deposit_amount']         = $depositAmount;
+		$fees['late_fee']               = $lateFee;
+		$fees['coupon_discount_amount'] = $couponDiscountAmount;
 
 		return $fees;
 	}
