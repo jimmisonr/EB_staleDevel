@@ -241,6 +241,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('used_amount', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_coupons` ADD  `used_amount` DECIMAL( 10, 2 ) NULL DEFAULT  '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		$fields = array_keys($db->getTableColumns('#__eb_states'));
 
 		if (!in_array('id', $fields))
