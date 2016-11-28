@@ -196,7 +196,7 @@ class EventbookingHelperMail
 				$mailer->addAttachment($invoiceFilePath);
 			}
 
-			if ($row->ticket_code)
+			if ($row->ticket_code && $config->get('send_tickets_via_email', 1))
 			{
 				EventbookingHelperTicket::generateTicketsPDF($row, $config);
 				$ticketFilePath = JPATH_ROOT . '/media/com_eventbooking/tickets/ticket_' . str_pad($row->id, 5, '0', STR_PAD_LEFT) . '.pdf';
@@ -540,7 +540,7 @@ class EventbookingHelperMail
 			$mailer->addAttachment(JPATH_ROOT . '/media/com_eventbooking/invoices/' . EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config) . '.pdf');
 		}
 
-		if ($row->ticket_code)
+		if ($row->ticket_code && $config->get('send_tickets_via_email', 1))
 		{
 			EventbookingHelperTicket::generateTicketsPDF($row, $config);
 			$ticketFilePath = JPATH_ROOT . '/media/com_eventbooking/tickets/ticket_' . str_pad($row->id, 5, '0', STR_PAD_LEFT) . '.pdf';

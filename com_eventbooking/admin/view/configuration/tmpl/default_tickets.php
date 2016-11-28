@@ -19,6 +19,14 @@ defined( '_JEXEC' ) or die ;
 </div>
 <div class="control-group">
 	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('send_tickets_via_email', JText::_('EB_SEND_TICKETS_VIA_EMAIL'), JText::_('EB_SEND_TICKETS_VIA_EMAIL_EXPLAIN')); ?>
+	</div>
+	<div class="controls">
+		<?php echo EventbookingHelperHtml::getBooleanInput('send_tickets_via_email', $config->get('send_tickets_via_email', 1)); ?>
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
 		<?php echo EventbookingHelperHtml::getFieldLabel('ticket_number_length', JText::_('EB_TICKET_NUMBER_LENGTH'), JText::_('EB_TICKET_NUMBER_LENGTH_EXPLAIN')); ?>
 	</div>
 	<div class="controls">
