@@ -27,7 +27,7 @@ class EventbookingViewCouponHtml extends RADViewItem
 		$options[]                  = JHtml::_('select.option', 0, JText::_('%'));
 		$options[]                  = JHtml::_('select.option', 1, $config->currency_symbol);
 		$options[]                  = JHtml::_('select.option', 2, JText::_('EB_VOUCHER'));
-		$this->lists['coupon_type'] = JHtml::_('select.genericlist', $options, 'coupon_type', 'class="input-mini"', 'value', 'text', $this->item->coupon_type);
+		$this->lists['coupon_type'] = JHtml::_('select.genericlist', $options, 'coupon_type', 'class="input-small"', 'value', 'text', $this->item->coupon_type);
 
 		$options                 = array();
 		$options[]               = JHtml::_('select.option', 0, JText::_('EB_EACH_MEMBER'));

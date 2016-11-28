@@ -406,6 +406,7 @@ class EventBookingModelRegister extends RADModel
 		$data['deposit_amount']         = $fees['deposit_amount'];
 		$data['payment_processing_fee'] = $fees['payment_processing_fee'];
 		$data['amount']                 = $fees['amount'];
+		$data['coupon_discount_amount'] = round($fees['coupon_discount_amount'], 2);
 
 		if (!isset($data['first_name']))
 		{

@@ -1440,6 +1440,7 @@ class EventbookingHelper
 				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
 				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
 				->where('(times = 0 OR times > used)')
+				->where('discount > used_amount')
 				->where('enable_for IN (0, 2)')
 				->where('user_id IN (0, ' . $user->id . ')')
 				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id=' . $event->id . '))')
@@ -1464,7 +1465,7 @@ class EventbookingHelper
 						}
 					}
 				}
-				else
+				elseif ($coupon->coupon_type == 1)
 				{
 					if ($coupon->apply_to == 0)
 					{
@@ -1695,6 +1696,58 @@ class EventbookingHelper
 			$fees['payment_processing_fee'] = 0;
 		}
 
+		$couponDiscountAmount = 0;
+
+		if (!empty($coupon) && $coupon->coupon_type == 2)
+		{
+			$couponAvailableAmount = $coupon->discount - $coupon->used_amount;
+
+			if ($couponAvailableAmount >= $amount)
+			{
+				$couponDiscountAmount = $amount;
+				$amount               = 0;
+
+				if ($config->collect_member_information)
+				{
+					for ($i = 0; $i < $numberRegistrants; $i++)
+					{
+						$memberCouponDiscountAmount = $membersAmount[$i];
+						$membersAmount[$i]          = 0;
+						$membersDiscountAmount[$i]  += $memberCouponDiscountAmount;
+					}
+				}
+			}
+			else
+			{
+				$amount               = $amount - $couponAvailableAmount;
+				$couponDiscountAmount = $couponAvailableAmount;
+
+				if ($config->collect_member_information)
+				{
+					for ($i = 0; $i < $numberRegistrants; $i++)
+					{
+						if ($couponAvailableAmount >= $membersAmount[$i])
+						{
+							$memberCouponDiscountAmount = $membersAmount[$i];
+							$membersAmount[$i]          = 0;
+							$membersDiscountAmount[$i]  += $memberCouponDiscountAmount;
+
+							$couponAvailableAmount = $couponAvailableAmount - $memberCouponDiscountAmount;
+						}
+						elseif ($couponAvailableAmount > 0)
+						{
+							$memberCouponDiscountAmount = $couponAvailableAmount;
+							$membersAmount[$i] = $membersAmount[$i] - $membersDiscountAmount;
+							$membersDiscountAmount[$i] += $memberCouponDiscountAmount;
+							$couponAvailableAmount     = 0;
+						}
+					}
+				}
+			}
+		}
+
+		$discountAmount += $couponDiscountAmount;
+
 		// Deposit amount
 		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
 		{
@@ -1724,6 +1777,7 @@ class EventbookingHelper
 		$fees['members_tax_amount']      = $membersTaxAmount;
 		$fees['members_amount']          = $membersAmount;
 		$fees['members_late_fee']        = $membersLateFee;
+		$fees['coupon_discount_amount']  = $couponDiscountAmount;
 
 		return $fees;
 	}
