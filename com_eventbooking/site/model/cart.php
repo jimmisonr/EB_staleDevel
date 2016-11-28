@@ -189,7 +189,9 @@ class EventbookingModelCart extends RADModel
 			$row->event_id           = $eventId;
 			if ($i == 0)
 			{
-				$row->cart_id = 0;
+				$row->cart_id                = 0;
+				$row->coupon_discount_amount = $fees['coupon_discount_amount'];
+
 				//Store registration code
 				while (true)
 				{
@@ -210,6 +212,7 @@ class EventbookingModelCart extends RADModel
 			else
 			{
 				$row->cart_id = $cartId;
+				$row->coupon_discount_amount =  0;
 			}
 			$row->id       = 0;
 			$row->language = $language;
@@ -220,7 +223,6 @@ class EventbookingModelCart extends RADModel
 			{
 				$cartId = $row->id;
 			}
-
 
 			if ($config->collect_member_information_in_cart)
 			{
@@ -348,6 +350,7 @@ class EventbookingModelCart extends RADModel
 				->where('cart_id = ' . $row->id);
 			$db->setQuery($query);
 			$db->execute();
+
 			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
 			EventbookingHelper::sendEmails($row, $config);
 

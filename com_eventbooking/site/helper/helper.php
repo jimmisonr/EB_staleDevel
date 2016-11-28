@@ -1713,7 +1713,7 @@ class EventbookingHelper
 					{
 						$memberCouponDiscountAmount = $membersAmount[$i];
 						$membersAmount[$i]          = 0;
-						$membersDiscountAmount[$i]  += $memberCouponDiscountAmount;
+						$membersDiscountAmount[$i] += $memberCouponDiscountAmount;
 					}
 				}
 			}
@@ -1730,16 +1730,16 @@ class EventbookingHelper
 						{
 							$memberCouponDiscountAmount = $membersAmount[$i];
 							$membersAmount[$i]          = 0;
-							$membersDiscountAmount[$i]  += $memberCouponDiscountAmount;
+							$membersDiscountAmount[$i] += $memberCouponDiscountAmount;
 
 							$couponAvailableAmount = $couponAvailableAmount - $memberCouponDiscountAmount;
 						}
 						elseif ($couponAvailableAmount > 0)
 						{
 							$memberCouponDiscountAmount = $couponAvailableAmount;
-							$membersAmount[$i] = $membersAmount[$i] - $memberCouponDiscountAmount;
+							$membersAmount[$i]          = $membersAmount[$i] - $memberCouponDiscountAmount;
 							$membersDiscountAmount[$i] += $memberCouponDiscountAmount;
-							$couponAvailableAmount     = 0;
+							$couponAvailableAmount = 0;
 						}
 					}
 				}
@@ -1805,6 +1805,7 @@ class EventbookingHelper
 		$lateFee              = 0;
 		$taxAmount            = 0;
 		$amount               = 0;
+		$couponDiscountAmount = 0;
 		$depositAmount        = 0;
 		$paymentProcessingFee = 0;
 		$feeAmount            = $form->calculateFee();
@@ -1825,6 +1826,7 @@ class EventbookingHelper
 		}
 
 		$couponDiscountedEventIds = array();
+		$couponAvailableAmount    = 0;
 
 		if ($couponCode)
 		{
@@ -1838,6 +1840,7 @@ class EventbookingHelper
 				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
 				->where('user_id IN (0, ' . $user->id . ')')
 				->where('(times = 0 OR times > used)')
+				->where('discount > used_amount')
 				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id IN (' . implode(',', $items) . ')))')
 				->order('id DESC');
 			$db->setQuery($query);
@@ -1856,6 +1859,11 @@ class EventbookingHelper
 						->where('coupon_id = ' . $coupon->id);
 					$db->setQuery($query);
 					$couponDiscountedEventIds = $db->loadColumn();
+				}
+
+				if ($coupon->coupon_type == 2)
+				{
+					$couponAvailableAmount = $coupon->discount - $coupon->used_amount;
 				}
 			}
 			else
@@ -2044,7 +2052,7 @@ class EventbookingHelper
 						}
 					}
 				}
-				else
+				elseif ($coupon->coupon_type == 1)
 				{
 					$registrantDiscount = $registrantDiscount + $coupon->discount;
 
@@ -2152,6 +2160,47 @@ class EventbookingHelper
 				$registrantPaymentProcessingFee = 0;
 			}
 
+			if (!empty($coupon) && $coupon->coupon_type == 2 && ($coupon->event_id == -1 || in_array($eventId, $couponDiscountedEventIds)))
+			{
+				if ($couponAvailableAmount > $registrantAmount)
+				{
+					$registrantCouponDiscountAmount = $registrantAmount;
+				}
+				else
+				{
+					$registrantCouponDiscountAmount = $couponAvailableAmount;
+				}
+
+				$registrantAmount -= $registrantCouponDiscountAmount;
+				$registrantDiscount += $registrantCouponDiscountAmount;
+				$couponAvailableAmount -= $registrantCouponDiscountAmount;
+
+				$couponDiscountAmount += $registrantCouponDiscountAmount;
+
+				if ($config->collect_member_information_in_cart)
+				{
+					$totalMemberDiscountAmount = $registrantCouponDiscountAmount;
+
+					for ($j = 0; $j < $quantity; $j++)
+					{
+						if ($totalMemberDiscountAmount > $membersAmount[$eventId][$j])
+						{
+							$memberCouponDiscountAmount = $membersAmount[$eventId][$j];
+						}
+						else
+						{
+							$memberCouponDiscountAmount = $totalMemberDiscountAmount;
+						}
+
+						$totalMemberDiscountAmount -= $memberCouponDiscountAmount;
+
+						$membersAmount[$eventId][$j] -= $memberCouponDiscountAmount;
+
+						$membersDiscountAmount[$eventId][$j] += $memberCouponDiscountAmount;
+					}
+				}
+			}
+
 			if ($config->activate_deposit_feature && $event->deposit_amount > 0 && $paymentType == 1)
 			{
 				if ($event->deposit_type == 2)
@@ -2195,6 +2244,7 @@ class EventbookingHelper
 		$fees['amount']                 = $amount;
 		$fees['deposit_amount']         = $depositAmount;
 		$fees['payment_processing_fee'] = $paymentProcessingFee;
+		$fees['coupon_discount_amount'] = $couponDiscountAmount;
 
 		if ($collectRecordsData)
 		{
