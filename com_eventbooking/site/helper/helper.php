@@ -1002,7 +1002,6 @@ class EventbookingHelper
 		}
 
 		$replaces['download_certificate_link'] = $siteUrl . 'index.php?option=com_eventbooking&task=registrant.download_certificate&download_code=' . $row->registration_code . '&Itemid=' . $Itemid;
-		$replaces['download_ticket_link']      = $siteUrl . 'index.php?option=com_eventbooking&task=registrant.download_ticket&download_code=' . $row->registration_code . '&Itemid=' . $Itemid;
 
 		return $replaces;
 	}
@@ -1042,7 +1041,6 @@ class EventbookingHelper
 				$feeCalculationTags[strtoupper($customFieldName)] = $filterInput->clean($param['value'], 'float');
 			}
 		}
-
 
 		$totalAmount = $event->individual_price + $form->calculateFee($feeCalculationTags);
 
@@ -1206,16 +1204,25 @@ class EventbookingHelper
 			}
 		}
 
-		if ($event->tax_rate && ($totalAmount - $discountAmount + $lateFee > 0))
+		if ($event->tax_rate > 0 && ($totalAmount - $discountAmount + $lateFee > 0))
 		{
-			$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $event->tax_rate / 100, 2);
+			if ($config->get('setup_price'))
+			{
+				$amount      = $totalAmount - $discountAmount + $lateFee;
+				$totalAmount = $amount / (1 + $event->tax_rate / 100);
+				$taxAmount   = $amount - $totalAmount;
+			}
+			else
+			{
+				$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $event->tax_rate / 100, 2);
+				$amount    = $totalAmount - $discountAmount + $taxAmount + $lateFee;
+			}
 		}
 		else
 		{
 			$taxAmount = 0;
+			$amount    = $totalAmount - $discountAmount + $taxAmount + $lateFee;
 		}
-
-		$amount = $totalAmount - $discountAmount + $taxAmount + $lateFee;
 
 		// Payment processing fee
 		$paymentFeeAmount  = 0;
@@ -1321,6 +1328,7 @@ class EventbookingHelper
 		$membersDiscountAmount = array();
 		$membersLateFee        = array();
 		$membersTaxAmount      = array();
+		$membersAmount         = array();
 
 		// Members data
 		if ($config->collect_member_information)
@@ -1592,33 +1600,56 @@ class EventbookingHelper
 		}
 
 		// Calculate tax amount
-		if ($event->tax_rate && ($totalAmount - $discountAmount + $lateFee > 0))
+		if ($event->tax_rate > 0 && ($totalAmount - $discountAmount + $lateFee > 0))
 		{
-			$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $event->tax_rate / 100, 2);
-
-			if ($config->collect_member_information)
+			if ($config->get('setup_price'))
 			{
-				for ($i = 0; $i < $numberRegistrants; $i++)
+				$amount      = $totalAmount - $discountAmount + $lateFee;
+				$totalAmount = $amount / (1 + $event->tax_rate / 100);
+				$taxAmount   = $amount - $totalAmount;
+
+				if ($config->collect_member_information)
 				{
-					$membersTaxAmount[$i] = round(($membersTotalAmount[$i] - $membersDiscountAmount[$i] + $membersLateFee[$i]) * $event->tax_rate / 100, 2);
+					for ($i = 0; $i < $numberRegistrants; $i++)
+					{
+						$membersAmount[$i]      = $membersTotalAmount[$i] - $membersDiscountAmount[$i] + $membersLateFee[$i];
+						$membersTotalAmount[$i] = $membersAmount[$i] / (1 + $event->tax_rate / 100);
+						$membersTaxAmount[$i]   = $membersAmount[$i] - $membersTotalAmount[$i];
+					}
+				}
+			}
+			else
+			{
+				$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $event->tax_rate / 100, 2);
+
+				// Gross amount
+				$amount = $totalAmount - $discountAmount + $taxAmount + $lateFee;
+
+				if ($config->collect_member_information)
+				{
+					for ($i = 0; $i < $numberRegistrants; $i++)
+					{
+						$membersTaxAmount[$i] = round(($membersTotalAmount[$i] - $membersDiscountAmount[$i] + $membersLateFee[$i]) * $event->tax_rate / 100, 2);
+						$membersAmount[$i]    = $membersTotalAmount[$i] - $membersDiscountAmount[$i] + $membersLateFee[$i] + $membersTaxAmount[$i];
+					}
 				}
 			}
 		}
 		else
 		{
 			$taxAmount = 0;
+			// Gross amount
+			$amount = $totalAmount - $discountAmount + $taxAmount + $lateFee;
 
 			if ($config->collect_member_information)
 			{
 				for ($i = 0; $i < $numberRegistrants; $i++)
 				{
 					$membersTaxAmount[$i] = 0;
+					$membersAmount[$i]    = $membersTotalAmount[$i] - $membersDiscountAmount[$i] + $membersLateFee[$i] + $membersTaxAmount[$i];
 				}
 			}
 		}
-
-		// Gross amount
-		$amount = $totalAmount - $discountAmount + $taxAmount + $lateFee;
 
 		// Payment processing fee
 		$paymentFeeAmount  = 0;
@@ -1669,6 +1700,7 @@ class EventbookingHelper
 		$fees['members_total_amount']    = $membersTotalAmount;
 		$fees['members_discount_amount'] = $membersDiscountAmount;
 		$fees['members_tax_amount']      = $membersTaxAmount;
+		$fees['members_amount']          = $membersAmount;
 		$fees['members_late_fee']        = $membersLateFee;
 
 		return $fees;
@@ -1767,6 +1799,7 @@ class EventbookingHelper
 			$membersDiscountAmount = array();
 			$membersLateFee        = array();
 			$membersTaxAmount      = array();
+			$membersAmount         = array();
 		}
 
 		// Calculate bundle discount if setup
@@ -1989,27 +2022,48 @@ class EventbookingHelper
 
 			if ($event->tax_rate > 0)
 			{
-				$registrantTaxAmount = round($event->tax_rate * ($registrantTotalAmount - $registrantDiscount + $registrantLateFee) / 100, 2);
-
-				if ($config->collect_member_information_in_cart)
+				if ($config->get('setup_price'))
 				{
-					for ($j = 0; $j < $quantity; $j++)
+					$registrantAmount      = $registrantTotalAmount - $registrantDiscount + $registrantLateFee;
+					$registrantTotalAmount = $registrantAmount / (1 + $event->tax_rate / 100);
+					$registrantTaxAmount   = $registrantAmount - $registrantTotalAmount;
+
+					if ($config->collect_member_information_in_cart)
 					{
-						$membersTaxAmount[$eventId][$j] = round($event->tax_rate * ($membersTotalAmount[$eventId][$j] - $membersDiscountAmount[$eventId][$j] + $membersLateFee[$eventId][$j]) / 100, 2);
+						for ($j = 0; $j < $quantity; $j++)
+						{
+							$membersAmount[$eventId][$j]      = $membersTotalAmount[$eventId][$j] - $membersDiscountAmount[$eventId][$j] + $membersLateFee[$eventId][$j];
+							$membersTotalAmount[$eventId][$j] = $membersAmount[$eventId][$j] / (1 + $event->tax_rate / 100);
+							$membersTaxAmount[$eventId][$j]   = $membersAmount[$eventId][$j] - $membersTotalAmount[$eventId][$j];
+						}
+					}
+				}
+				else
+				{
+					$registrantTaxAmount = round($event->tax_rate * ($registrantTotalAmount - $registrantDiscount + $registrantLateFee) / 100, 2);
+					$registrantAmount    = $registrantTotalAmount - $registrantDiscount + $registrantTaxAmount + $registrantLateFee;
+
+					if ($config->collect_member_information_in_cart)
+					{
+						for ($j = 0; $j < $quantity; $j++)
+						{
+							$membersTaxAmount[$eventId][$j] = round($event->tax_rate * ($membersTotalAmount[$eventId][$j] - $membersDiscountAmount[$eventId][$j] + $membersLateFee[$eventId][$j]) / 100, 2);
+							$membersAmount[$eventId][$j]    = $membersTotalAmount[$eventId][$j] - $membersDiscountAmount[$eventId][$j] + $membersLateFee[$eventId][$j] + $membersTaxAmount[$eventId][$j];
+						}
 					}
 				}
 			}
 			else
 			{
 				$registrantTaxAmount = 0;
+				$registrantAmount    = $registrantTotalAmount - $registrantDiscount + $registrantTaxAmount + $registrantLateFee;
 
 				for ($j = 0; $j < $quantity; $j++)
 				{
 					$membersTaxAmount[$eventId][$j] = 0;
+					$membersAmount[$eventId][$j]    = $membersTotalAmount[$eventId][$j] - $membersDiscountAmount[$eventId][$j] + $membersLateFee[$eventId][$j] + $membersTaxAmount[$eventId][$j];
 				}
 			}
-
-			$registrantAmount = $registrantTotalAmount - $registrantDiscount + $registrantTaxAmount + $registrantLateFee;
 
 			if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $registrantAmount > 0)
 			{
@@ -2078,6 +2132,7 @@ class EventbookingHelper
 			$fees['members_discount_amount'] = $membersDiscountAmount;
 			$fees['members_tax_amount']      = $membersTaxAmount;
 			$fees['members_late_fee']        = $membersLateFee;
+			$fees['members_amount']          = $membersAmount;
 		}
 
 		return $fees;

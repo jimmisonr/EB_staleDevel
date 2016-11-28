@@ -185,6 +185,13 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 			$config->insert_category);
 
 		$options   = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_PRICE_WITHOUT_TAX'));
+		$options[] = JHtml::_('select.option', 1, JText::_('EB_PRICE_TAX_INCLUDED'));
+
+		$lists['setup_price'] = JHtml::_('select.genericlist', $options, 'setup_price', ' class="inputbox"', 'value', 'text',
+			$config->get('setup_price', '0'));
+
+		$options   = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_ENABLE'));
 		$options[] = JHtml::_('select.option', 1, JText::_('EB_ONLY_TO_ADMIN'));
 		$options[] = JHtml::_('select.option', 2, JText::_('EB_ONLY_TO_REGISTRANT'));

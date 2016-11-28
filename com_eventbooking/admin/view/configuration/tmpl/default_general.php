@@ -314,14 +314,6 @@ defined( '_JEXEC' ) or die ;
 		<legend><?php echo JText::_('EB_REGISTRATION_SETTINGS'); ?></legend>
 		<div class="control-group">
 			<div class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('activate_tickets_pdf', JText::_('EB_ACTIVATE_TICKETS_PDF'), JText::_('EB_ACTIVATE_TICKETS_PDF_EXPLAIN')); ?>
-			</div>
-			<div class="controls">
-				<?php echo EventbookingHelperHtml::getBooleanInput('activate_tickets_pdf', $config->activate_tickets_pdf); ?>
-			</div>
-		</div>
-		<div class="control-group">
-			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('user_registration', JText::_('EB_USER_REGISTRATION_INTEGRATION'), JText::_('EB_REGISTRATION_INTEGRATION_EXPLAIN')); ?>
 			</div>
 			<div class="controls">
@@ -477,6 +469,14 @@ defined( '_JEXEC' ) or die ;
 			</div>
 			<div class="controls">
 				<?php echo EventbookingHelperHtml::getBooleanInput('show_price_including_tax', $config->show_price_including_tax); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('setup_price', JText::_('EB_SETUP_PRICE'), JText::_('EB_SETUP_PRICE_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<?php echo $this->lists['setup_price'];?>
 			</div>
 		</div>
 		<div class="control-group">

@@ -29,7 +29,7 @@ defined('_JEXEC') or die;
 		<?php
 		$i = 0 ;
 
-		if ($this->config->show_price_including_tax)
+		if ($this->config->show_price_including_tax && !$this->config->get('setup_price'))
 		{
 			$taxRate = $this->item->tax_rate;
 		}

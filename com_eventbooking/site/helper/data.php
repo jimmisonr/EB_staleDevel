@@ -572,7 +572,7 @@ class EventbookingHelperData
 		}
 
 		// Calculate price including tax
-		if ($config->show_price_including_tax)
+		if ($config->show_price_including_tax && !$config->get('setup_price'))
 		{
 			foreach ($rows as $row)
 			{
