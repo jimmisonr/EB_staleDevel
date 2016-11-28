@@ -1737,7 +1737,7 @@ class EventbookingHelper
 						elseif ($couponAvailableAmount > 0)
 						{
 							$memberCouponDiscountAmount = $couponAvailableAmount;
-							$membersAmount[$i] = $membersAmount[$i] - $membersDiscountAmount;
+							$membersAmount[$i] = $membersAmount[$i] - $memberCouponDiscountAmount;
 							$membersDiscountAmount[$i] += $memberCouponDiscountAmount;
 							$couponAvailableAmount     = 0;
 						}
