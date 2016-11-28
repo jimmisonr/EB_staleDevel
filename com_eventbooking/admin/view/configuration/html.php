@@ -242,6 +242,11 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['ticket_page_format']      = JHtml::_('select.genericlist', $options, 'ticket_page_format', '', 'value', 'text', $config->get('ticket_page_format', 'A4'));
 		$lists['certificate_page_format'] = JHtml::_('select.genericlist', $options, 'certificate_page_format', '', 'value', 'text', $config->get('certificate_page_format', 'A4'));
 
+		if (empty($config->default_ticket_layout))
+		{
+			$config->default_ticket_layout = $config->certificate_layout;
+		}
+
 		$this->lists     = $lists;
 		$this->config    = $config;
 		$this->languages = EventbookingHelper::getLanguages();
