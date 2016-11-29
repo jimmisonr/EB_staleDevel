@@ -6,921 +6,164 @@
  * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
+
 // no direct access
-defined( '_JEXEC' ) or die ;
-$editor = JEditor::getInstance(JFactory::getConfig()->get('editor'));
+defined('_JEXEC') or die;
+
 JHtml::_('behavior.tooltip');
 JHtml::_('behavior.modal');
-$format = 'Y-m-d';
-
-$translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 JHtml::_('formbehavior.chosen', '.advancedSelect', null, array('placeholder_text_multiple' => JText::_('EB_SELECT_CATEGORIES')));
 JHtml::_('behavior.tabstate');
+
+$translatable = JLanguageMultilang::isEnabled() && count($this->languages);
+$editor       = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 ?>
 <style>
 	.calendar {
 		vertical-align: bottom;
 	}
 </style>
-	<form action="index.php?option=com_eventbooking&view=event" method="post" name="adminForm" id="adminForm" class="form form-horizontal" enctype="multipart/form-data">
-		<?php echo JHtml::_('bootstrap.startTabSet', 'event', array('active' => 'basic-information-page')); ?>
-		<?php echo JHtml::_('bootstrap.addTab', 'event', 'basic-information-page', JText::_('EB_BASIC_INFORMATION', true)); ?>
-		<div class="row-fluid">
-			<div class="span8">
-				<fieldset class="form-horizontal">
-					<legend><?php echo JText::_('EB_EVENT_DETAIL');?></legend>
-					<div class="control-group">
-						<label class="control-label"><?php echo JText::_('EB_TITLE') ; ?></label>
-						<div class="controls">
-							<input type="text" name="title" value="<?php echo htmlspecialchars($this->item->title, ENT_COMPAT, 'UTF-8'); ?>" class="input-xlarge" size="70" />
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label"><?php echo JText::_('EB_ALIAS') ; ?></label>
-						<div class="controls">
-							<input type="text" name="alias" value="<?php echo $this->item->alias; ?>" class="input-xlarge" size="70" />
-						</div>
-					</div>
-
-					<div class="control-group">
-						<label class="control-label"><?php echo JText::_('EB_MAIN_EVENT_CATEGORY') ; ?></label>
-						<div class="controls">
-							<div style="float: left;"><?php echo $this->lists['main_category_id'] ; ?></div>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<span class="editlinktip hasTip" title="Press <strong>Ctrl</strong> to select multiple categories"><?php echo JText::_('EB_ADDITIONAL_CATEGORIES') ; ?></span>
-						</label>
-						<div class="controls">
-							<div style="float: left;"><?php echo $this->lists['category_id'] ; ?></div>
-							<div style="float: left; padding-top: 25px; padding-left: 10px;"></div>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label"><?php echo JText::_('EB_IMAGE') ; ?></label>
-						<div class="controls">
-							<?php echo EventbookingHelperHtml::getMediaInput($this->item->image, 'image'); ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label"><?php echo JText::_('EB_LOCATION') ; ?></label>
-						<div class="controls">
-							<?php echo $this->lists['location_id'] ; ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo JText::_('EB_EVENT_START_DATE'); ?>
-						</label>
-						<div class="controls">
-							<?php echo JHtml::_('calendar', ($this->item->event_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_date, $format, null), 'event_date', 'event_date', '%Y-%m-%d', array('class' => 'input-small')) ; ?>
-							<?php echo $this->lists['event_date_hour'].' '.$this->lists['event_date_minute']; ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo JText::_('EB_EVENT_END_DATE'); ?>
-						</label>
-						<div class="controls">
-							<?php echo JHtml::_('calendar', ($this->item->event_end_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_end_date, $format, null), 'event_end_date', 'event_end_date', '%Y-%m-%d', array('class' => 'input-small')) ; ?>
-							<?php echo $this->lists['event_end_date_hour'].' '.$this->lists['event_end_date_minute']; ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo JText::_('EB_REGISTRATION_START_DATE'); ?>
-						</label>
-						<div class="controls">
-							<?php echo JHtml::_('calendar', ($this->item->registration_start_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->registration_start_date, $format, null), 'registration_start_date', 'registration_start_date', '%Y-%m-%d', array('class' => 'input-small')) ; ?>
-							<?php echo $this->lists['registration_start_hour'].' '.$this->lists['registration_start_minute']; ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_CUT_OFF_DATE' );?>::<?php echo JText::_('EB_CUT_OFF_DATE_EXPLAIN'); ?>"><?php echo JText::_('EB_CUT_OFF_DATE') ; ?></span>
-						</label>
-						<div class="controls">
-							<?php echo JHtml::_('calendar', ($this->item->cut_off_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->cut_off_date, $format, null), 'cut_off_date', 'cut_off_date', '%Y-%m-%d', array('class' => 'input-small')) ; ?>
-							<?php echo $this->lists['cut_off_hour'].' '.$this->lists['cut_off_minute']; ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo JText::_('EB_PRICE'); ?>
-						</label>
-						<div class="controls">
-							<input type="text" name="individual_price" id="individual_price" class="input-small" size="10" value="<?php echo $this->item->individual_price; ?>" />
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo EventbookingHelperHtml::getFieldLabel('price_text', JText::_('EB_PRICE_TEXT'), JText::_('EB_PRICE_TEXT_EXPLAIN')); ?>
-						</label>
-						<div class="controls">
-							<input type="text" name="price_text" id="price_text" class="input-xlarge" value="<?php echo $this->item->price_text; ?>" />
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo JText::_('EB_TAX_RATE'); ?>
-						</label>
-						<div class="controls">
-							<input type="text" name="tax_rate" id="tax_rate" class="input-small" size="10" value="<?php echo $this->item->tax_rate; ?>" />
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_EVENT_CAPACITY' );?>::<?php echo JText::_('EB_CAPACITY_EXPLAIN'); ?>"><?php echo JText::_('EB_CAPACITY'); ?></span>
-						</label>
-						<div class="controls">
-							<input type="text" name="event_capacity" id="event_capacity" class="input-small" size="10" value="<?php echo $this->item->event_capacity; ?>" />
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label"><?php echo JText::_('EB_REGISTRATION_TYPE'); ?></label>
-						<div class="controls">
-							<?php echo $this->lists['registration_type'] ; ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_CUSTOM_REGISTRATION_HANDLE_URL' );?>::<?php echo JText::_('EB_CUSTOM_REGISTRATION_HANDLE_URL_EXPLAIN'); ?>"><?php echo JText::_('EB_CUSTOM_REGISTRATION_HANDLE_URL'); ?></span>
-						</label>
-						<div class="controls">
-							<input type="text" name="registration_handle_url" id="registration_handle_url" class="input-xxlarge" size="10" value="<?php echo $this->item->registration_handle_url; ?>" />
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_ATTACHMENT' );?>::<?php echo JText::_('EB_ATTACHMENT_EXPLAIN'); ?>"><?php echo JText::_('EB_ATTACHMENT'); ?></span>
-						</label>
-						<div class="controls">
-							<input type="file" name="attachment"/>
-							<?php
-							echo $this->lists['available_attachment'];
-
-							if ($this->item->attachment)
-							{
-							?>
-								<?php echo JText::_('EB_CURRENT_ATTACHMENT'); ?>&nbsp;<a href="<?php echo JURI::root().'media/com_eventbooking/'.$this->item->attachment; ?>" target="_blank"><?php echo $this->item->attachment; ?></a>
-								<input type="checkbox" name="del_attachment" value="1" /><?php echo JText::_('EB_DELETE_CURRENT_ATTACHMENT'); ?>
-							<?php
-							}
-							?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo  JText::_('EB_SHORT_DESCRIPTION'); ?>
-						</label>
-						<div class="controls">
-							<?php echo $editor->display( 'short_description',  $this->item->short_description , '100%', '180', '90', '6' ) ; ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo  JText::_('EB_DESCRIPTION'); ?>
-						</label>
-						<div class="controls">
-							<?php echo $editor->display( 'description',  $this->item->description , '100%', '250', '90', '10' ) ; ?>
-						</div>
-					</div>
-				</fieldset>
-			</div>
-			<div class="span4">
-				<fieldset class="adminform">
-					<legend class="adminform"><?php echo JText::_('EB_GROUP_REGISTRATION_RATES'); ?></legend>
-					<table class="adminlist" id="price_list" width="100%">
-						<tr>
-							<th width="50%" class="eb-left-align">
-								<?php echo JText::_('EB_REGISTRANT_NUMBER'); ?>
-							</th>
-							<th class="eb-left-align">
-								<?php echo JText::_('EB_RATE'); ?>
-							</th>
-						</tr>
-						<?php
-						$n = max(count($this->prices), 3);
-						for ($i = 0 ; $i < $n ; $i++)
-						{
-							if (isset($this->prices[$i]))
-							{
-								$price = $this->prices[$i] ;
-								$registrantNumber = $price->registrant_number ;
-								$price = $price->price ;
-							}
-							else
-							{
-								$registrantNumber =  null ;
-								$price =  null ;
-							}
-							?>
-							<tr>
-								<td class="eb-left-align">
-									<input type="text" class="input-mini" name="registrant_number[]" size="10" value="<?php echo $registrantNumber; ?>" />
-								</td>
-								<td class="eb-left-align">
-									<input type="text" class="input-mini" name="price[]" size="10" value="<?php echo $price; ?>" />
-								</td>
-							</tr>
-							<?php
-						}
-						?>
-						<tr>
-							<td colspan="3">
-								<input type="button" class="button" value="<?php echo JText::_('EB_ADD'); ?>" onclick="addRow();" />
-								&nbsp;
-								<input type="button" class="button" value="<?php echo JText::_('EB_REMOVE'); ?>" onclick="removeRow();" />
-							</td>
-						</tr>
-					</table>
-				</fieldset>
-				<div class="clearfix"></div>
-				<fieldset class="adminform">
-					<legend class="adminform"><?php echo JText::_('EB_MISC'); ?></legend>
-					<div class="control-group">
-						<label class="control-label">
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_EVENT_PASSWORD' );?>::<?php echo JText::_('EB_EVENT_PASSWORD_EXPLAIN'); ?>"><?php echo JText::_('EB_EVENT_PASSWORD'); ?></span>
-						</label>
-						<div class="controls">
-							<input type="text" name="event_password" id="event_password" class="input-small" size="10" value="<?php echo $this->item->event_password; ?>" />
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_ACCESS' );?>::<?php echo JText::_('EB_ACCESS_EXPLAIN'); ?>"><?php echo JText::_('EB_ACCESS'); ?></span>
-						</label>
-						<div class="controls">
-							<?php echo $this->lists['access']; ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_REGISTRATION_ACCESS' );?>::<?php echo JText::_('EB_REGISTRATION_ACCESS_EXPLAIN'); ?>"><?php echo JText::_('EB_REGISTRATION_ACCESS'); ?></span>
-						</label>
-						<div class="controls">
-							<?php echo $this->lists['registration_access']; ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo JText::_('EB_FEATURED'); ?>
-						</label>
-						<div class="controls">
-							<?php echo EventbookingHelperHtml::getBooleanInput('featured', $this->item->featured); ?>
-						</div>
-					</div>
-					<?php
-					if (JLanguageMultilang::isEnabled())
-					{
-					?>
-						<div class="control-group">
-							<label class="control-label">
-								<?php echo JText::_('EB_LANGUAGE'); ?>
-							</label>
-							<div class="controls">
-								<?php echo $this->lists['language']; ?>
-							</div>
-						</div>
-					<?php
-					}
-					?>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo JText::_('EB_PUBLISHED'); ?>
-						</label>
-						<div class="controls">
-							<?php echo $this->lists['published']; ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label"><?php echo JText::_('EB_CREATED_BY') ; ?></label>
-						<div class="controls">
-							<?php echo EventbookingHelper::getUserInput($this->item->created_by, 'created_by', 1) ; ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_MIN_NUMBER_REGISTRANTS' );?>::<?php echo JText::_('EB_MIN_NUMBER_REGISTRANTS_EXPLAIN'); ?>"><?php echo JText::_('EB_MIN_NUMBER_REGISTRANTS'); ?></span>
-						</label>
-						<div class="controls">
-							<input type="text" name="min_group_number" id="min_group_number" class="input-mini" size="10" value="<?php echo $this->item->min_group_number; ?>" />
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_MAX_NUMBER_REGISTRANTS' );?>::<?php echo JText::_('EB_MAX_NUMBER_REGISTRANTS_EXPLAIN'); ?>"><?php echo JText::_('EB_MAX_NUMBER_REGISTRANT_GROUP'); ?></span>
-						</label>
-						<div class="controls">
-							<input type="text" name="max_group_number" id="max_group_number" class="input-mini" size="10" value="<?php echo $this->item->max_group_number; ?>" />
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo JText::_('ENABLE_COUPON'); ?>
-						</label>
-						<div class="controls">
-							<?php echo $this->lists['enable_coupon']; ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo JText::_('EB_ENABLE_WAITING_LIST'); ?>
-						</label>
-						<div class="controls">
-							<?php echo $this->lists['activate_waiting_list']; ?>
-						</div>
-					</div>
-					<?php
-					if ($this->config->activate_deposit_feature)
-					{
-						?>
-						<div class="control-group">
-							<label class="control-label">
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_DEPOSIT_AMOUNT' );?>::<?php echo JText::_('EB_DEPOSIT_AMOUNT_EXPLAIN'); ?>"><?php echo JText::_('EB_DEPOSIT_AMOUNT'); ?></span>
-							</label>
-							<div class="controls">
-								<input type="text" name="deposit_amount" id="deposit_amount" class="input-mini" size="5" value="<?php echo $this->item->deposit_amount; ?>" />&nbsp;&nbsp;<?php echo $this->lists['deposit_type'] ; ?>
-							</div>
-						</div>
-						<?php
-					}
-					?>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo JText::_('EB_ENABLE_CANCEL'); ?>
-						</label>
-						<div class="controls">
-							<?php echo EventbookingHelperHtml::getBooleanInput('enable_cancel_registration', $this->item->enable_cancel_registration); ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo JText::_('EB_CANCEL_BEFORE_DATE'); ?>
-						</label>
-						<div class="controls">
-							<?php echo JHtml::_('calendar', $this->item->cancel_before_date != $this->nullDate ? JHtml::_('date', $this->item->cancel_before_date, $format, null) : '', 'cancel_before_date', 'cancel_before_date', '%Y-%m-%d', array('class' => 'input-small')); ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo JText::_('EB_AUTO_REMINDER'); ?>
-						</label>
-						<div class="controls">
-							<?php echo EventbookingHelperHtml::getBooleanInput('enable_auto_reminder', $this->item->enable_auto_reminder); ?>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo JText::_('EB_REMIND_BEFORE'); ?>
-						</label>
-						<div class="controls">
-							<input type="text" name="remind_before_x_days" class="input-mini" size="5" value="<?php echo $this->item->remind_before_x_days; ?>" /> days
-						</div>
-					</div>
-					<?php
-					if ($this->config->term_condition_by_event)
-					{
-					?>
-						<div class="control-group">
-							<label class="control-label">
-								<?php echo JText::_('EB_TERMS_CONDITIONS'); ?>
-							</label>
-							<div class="controls">
-								<?php echo EventbookingHelper::getArticleInput($this->item->article_id); ?>
-							</div>
-						</div>
-					<?php
-					}
-					?>
-				</fieldset>
-				<div class="clearfix"></div>
-				<?php
-				if ($this->config->activate_recurring_event && (!$this->item->id || $this->item->event_type == 1)) {
-					?>
-					<fieldset class="adminform">
-						<legend class="adminform"><?php echo JText::_('EB_RECURRING_SETTINGS'); ?></legend>
-						<div  class="control-group">
-							<div  class="control-label">
-								<strong><?php echo JText::_('EB_REPEAT_TYPE'); ?></strong>
-							</div>
-							<div  class="controls">
-								<table style="width: 100%;">
-									<tr>
-										<td>
-											<input type="radio" name="recurring_type" value="0" <?php if ($this->item->recurring_type == 0) echo ' checked="checked" ' ; ?> onclick="setDefaultDate();" /> <?php echo JText::_('EB_NO_REPEAT'); ?>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<input type="radio" name="recurring_type" value="1" <?php if ($this->item->recurring_type == 1) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" /> <?php echo JText::_('EB_REPEAT_EVERY'); ?> <input type="text" name="number_days" size="5" class="input-mini clearfloat" value="<?php echo $this->item->number_days ; ?>" /> <?php echo JText::_('EB_DAYS'); ?>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<input type="radio" name="recurring_type" value="2" <?php if ($this->item->recurring_type == 2) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" /> <?php echo JText::_('EB_REPEAT_EVERY'); ?> <input type="text" name="number_weeks" size="5" class="input-mini clearfloat" value="<?php echo $this->item->number_weeks ; ?>" /> <?php echo JText::_('EB_WEEKS'); ?>
-											<br />
-											<strong><?php echo JText::_('EB_ON'); ?></strong>
-											<?php
-											$weekDays = explode(',', $this->item->weekdays) ;
-											$daysOfWeek = array(0=> 'EB_SUN', 1 => 'EB_MON', 2=> 'EB_TUE', 3=>'EB_WED', 4 => 'EB_THUR', 5=>'EB_FRI', 6=> 'EB_SAT') ;
-											foreach ($daysOfWeek as $key=>$value) {
-												?>
-												<input type="checkbox" class="inputbox clearfloat" value="<?php echo $key; ?>" name="weekdays[]" <?php if (in_array($key, $weekDays)) echo ' checked="checked"' ; ?> /> <?php echo JText::_($value); ?>&nbsp;&nbsp;
-												<?php
-											}
-											?>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<input type="radio" name="recurring_type" value="3" <?php if ($this->item->recurring_type == 3) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" /> <?php echo JText::_('EB_REPEAT_EVERY'); ?> <input type="text" name="number_months" size="5" class="input-mini clearfloat" value="<?php echo $this->item->number_months ; ?>" /> <?php echo JText::_('EB_MONTHS'); ?>
-											<?php echo JText::_('EB_ON'); ?> <input type="text" name="monthdays" class="input-mini clearfloat" size="10" value="<?php echo $this->item->monthdays; ?>" />
-										</td>
-									</tr>
-
-									<tr>
-										<td>
-											<?php
-											$params = new JRegistry($this->item->params);
-											$options = array();
-											$options[] = JHtml::_('select.option', 'first', JText::_('EB_FIRST'));
-											$options[] = JHtml::_('select.option', 'second', JText::_('EB_SECOND'));
-											$options[] = JHtml::_('select.option', 'third', JText::_('EB_THIRD'));
-											$options[] = JHtml::_('select.option', 'fourth', JText::_('EB_FOURTH'));
-											$options[] = JHtml::_('select.option', 'fifth', JText::_('EB_FIFTH'));
-											$daysOfWeek = array(
-													'Sun' => JText::_('EB_SUNDAY'),
-													'Mon' => JText::_('EB_MONDAY'),
-													'Tue' => JText::_('EB_TUESDAY'),
-													'Wed' => JText::_('EB_WEDNESDAY'),
-													'Thu' => JText::_('EB_THURSDAY'),
-													'Fri' => JText::_('EB_FRIDAY'),
-													'Sat' => JText::_('EB_SATURDAY')
-											);
-											?>
-											<input type="radio" name="recurring_type" value="4" <?php if ($this->item->recurring_type == 4) echo ' checked="checked" ' ; ?> onclick="setDefaultData();" />
-											<?php echo JText::_('EB_REPEAT_EVERY'); ?>
-											<input type="text" name="weekly_number_months" size="5" class="input-mini clearfloat" value="<?php echo $params->get('weekly_number_months', ''); ?>" />
-											<?php echo JText::_('EB_MONTHS'); ?>
-											<?php echo JText::_('EB_ON'); ?>
-											<?php echo JHtml::_('select.genericlist', $options, 'week_in_month', ' class="input-small" ', 'value', 'text', $params->get('week_in_month', 'first')); ?>
-											<?php echo JHtml::_('select.genericlist', $daysOfWeek, 'day_of_week', ' class="input-small" ', 'value', 'text', $params->get('day_of_week', 'Sun'));?>
-											of the month
-										</td>
-									</tr>
-								</table>
-							</div>
-						</div>
-						<div  class="control-group">
-							<div  class="control-label">
-								<strong><?php echo JText::_('EB_RECURRING_ENDING'); ?></strong>
-							</div>
-							<div  class="controls">
-								<table style="width: 100%;">
-									<tr>
-										<td>
-											<input type="radio" name="repeat_until" value="1"  <?php if (($this->item->recurring_occurrencies > 0) || ($this->item->recurring_end_date == '') || ($this->item->recurring_end_date == '0000-00-00 00:00:00')) echo ' checked="checked" ' ; ?> /> <?php echo JText::_('EB_AFTER'); ?> <input type="text" name="recurring_occurrencies" size="5" class="input-small clearfloat" value="<?php echo $this->item->recurring_occurrencies ; ?>" /> <?php echo JText::_('EB_OCCURENCIES'); ?>
-											<br />
-											<input type="radio" name="repeat_until" value="2" <?php if (($this->item->recurring_end_date != '') && ($this->item->recurring_end_date != '0000-00-00 00:00:00')) echo ' checked="checked"' ; ?> /> <?php echo JText::_('EB_AFTER_DATE') ?> <?php echo JHtml::_('calendar', $this->item->recurring_end_date != '0000-00-00 00:00:00' ? JHtml::_('date', $this->item->recurring_end_date, $format, null) : '', 'recurring_end_date', 'recurring_end_date', '%Y-%m-%d', array('class' => 'input-small')); ?>
-											<br />
-										</td>
-									</tr>
-									<?php
-									if ($this->item->id) {
-										?>
-										<tr>
-											<td class="key"><strong><?php echo JText::_('EB_UPDATE_CHILD_EVENT');?></strong></td>
-											<td>
-												<input type="checkbox" name="update_children_event" value="1" class="inputbox" />
-											</td>
-										</tr>
-										<?php
-									}
-									?>
-								</table>
-							</div>
-						</div>
-
-					</fieldset>
-					<?php
-				}
-				?>
-				<div class="clearfix"></div>
-				<fieldset class="adminform">
-					<legend class="adminform"><?php echo JText::_('EB_META_DATA'); ?></legend>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo  JText::_('EB_META_KEYWORDS'); ?>
-						</label>
-						<div class="controls">
-							<textarea rows="5" cols="30" class="input-lage" name="meta_keywords"><?php echo $this->item->meta_keywords; ?></textarea>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">
-							<?php echo  JText::_('EB_META_DESCRIPTION'); ?>
-						</label>
-						<div class="controls">
-							<textarea rows="5" cols="30" class="input-lage" name="meta_description"><?php echo $this->item->meta_description; ?></textarea>
-						</div>
-					</div>
-				</fieldset>
-			</div>
+<form action="index.php?option=com_eventbooking&view=event" method="post" name="adminForm" id="adminForm"
+      class="form form-horizontal" enctype="multipart/form-data">
+	<?php echo JHtml::_('bootstrap.startTabSet', 'event', array('active' => 'basic-information-page')); ?>
+	<?php echo JHtml::_('bootstrap.addTab', 'event', 'basic-information-page', JText::_('EB_BASIC_INFORMATION', true)); ?>
+	<div class="row-fluid">
+		<div class="span8">
+			<?php echo $this->loadTemplate('general', array('editor' => $editor)); ?>
 		</div>
-		<div class="clearfix"></div>
-		<?php
-		echo JHtml::_('bootstrap.endTab');
-		echo JHtml::_('bootstrap.addTab', 'event', 'discount-page', JText::_('EB_DISCOUNT_SETTING', true));
-		?>
-			<div class="control-group">
-				<label class="control-label">
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_MEMBER_DISCOUNT_GROUPS' );?>::<?php echo JText::_('EB_MEMBER_DISCOUNT_GROUPS_EXPLAIN'); ?>"><?php echo JText::_('EB_MEMBER_DISCOUNT_GROUPS'); ?></span>
-				</label>
-				<div class="controls">
-					<?php echo $this->lists['discount_groups']; ?>
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_MEMBER_DISCOUNT' );?>::<?php echo JText::_('EB_MEMBER_DISCOUNT_EXPLAIN'); ?>"><?php echo JText::_('EB_MEMBER_DISCOUNT'); ?></span>
-				</label>
-				<div class="controls">
-					<input type="text" name="discount_amounts" id="discount_amounts" class="input-large" size="5" value="<?php echo $this->item->discount_amounts; ?>" />&nbsp;&nbsp;<?php echo $this->lists['discount_type'] ; ?>
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_EARLY_BIRD_DISCOUNT' );?>::<?php echo JText::_('EB_EARLY_BIRD_DISCOUNT_EXPLAIN'); ?>"><?php echo JText::_('EB_EARLY_BIRD_DISCOUNT'); ?></span>
-				</label>
-				<div class="controls">
-					<input type="text" name="early_bird_discount_amount" id="early_bird_discount_amount" class="input-mini" size="5" value="<?php echo $this->item->early_bird_discount_amount; ?>" />&nbsp;&nbsp;<?php echo $this->lists['early_bird_discount_type'] ; ?>
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_EARLY_BIRD_DISCOUNT_DATE' );?>::<?php echo JText::_('EB_EARLY_BIRD_DISCOUNT_DATE_EXPLAIN'); ?>"><?php echo JText::_('EB_EARLY_BIRD_DISCOUNT_DATE'); ?></span>
-				</label>
-				<div class="controls">
-					<?php echo JHtml::_('calendar', $this->item->early_bird_discount_date != $this->nullDate ? JHtml::_('date', $this->item->early_bird_discount_date, $format, null) : '', 'early_bird_discount_date', 'early_bird_discount_date'); ?>
-				</div>
-			</div>
-	
-			<div class="control-group">
-				<label class="control-label">
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_LATE_FEE' );?>::<?php echo JText::_('EB_LATE_FEE_EXPLAIN'); ?>"><?php echo JText::_('EB_LATE_FEE'); ?></span>
-				</label>
-				<div class="controls">
-					<input type="text" name="late_fee_amount" id="late_fee_amount" class="input-mini" size="5" value="<?php echo $this->item->late_fee_amount; ?>" />&nbsp;&nbsp;<?php echo $this->lists['late_fee_type'] ; ?>
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_LATE_FEE_DATE' );?>::<?php echo JText::_('EB_LATE_FEE_DATE_EXPLAIN'); ?>"><?php echo JText::_('EB_LATE_FEE_DATE'); ?></span>
-				</label>
-				<div class="controls">
-					<?php echo JHtml::_('calendar', $this->item->late_fee_date && $this->item->late_fee_date != $this->nullDate ? JHtml::_('date', $this->item->late_fee_date, $format, null) : '', 'late_fee_date', 'late_fee_date'); ?>
-				</div>
-			</div>
-		<?php
-		echo JHtml::_('bootstrap.endTab');
+		<div class="span4">
+			<?php
+			echo $this->loadTemplate('group_rates');
+			echo $this->loadTemplate('misc');
 
-		if ($this->config->event_custom_field)
-		{
-			echo JHtml::_('bootstrap.addTab', 'event', 'extra-information-page', JText::_('EB_EXTRA_INFORMATION', true));
+			if ($this->config->activate_recurring_event && (!$this->item->id || $this->item->event_type == 1))
+			{
+				echo $this->loadTemplate('recurring_settings');
+			}
 			?>
-			<table class="admintable" width="100%">
-				<?php
+			<fieldset class="adminform">
+				<legend class="adminform"><?php echo JText::_('EB_META_DATA'); ?></legend>
+				<div class="control-group">
+					<label class="control-label">
+						<?php echo JText::_('EB_META_KEYWORDS'); ?>
+					</label>
+					<div class="controls">
+						<textarea rows="5" cols="30" class="input-lage"
+						          name="meta_keywords"><?php echo $this->item->meta_keywords; ?></textarea>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">
+						<?php echo JText::_('EB_META_DESCRIPTION'); ?>
+					</label>
+					<div class="controls">
+						<textarea rows="5" cols="30" class="input-lage"
+						          name="meta_description"><?php echo $this->item->meta_description; ?></textarea>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+	<?php
+
+	echo JHtml::_('bootstrap.endTab');
+	echo JHtml::_('bootstrap.addTab', 'event', 'discount-page', JText::_('EB_DISCOUNT_SETTING', true));
+	echo $this->loadTemplate('discount_settings');
+	echo JHtml::_('bootstrap.endTab');
+
+	if ($this->config->event_custom_field)
+	{
+		echo JHtml::_('bootstrap.addTab', 'event', 'extra-information-page', JText::_('EB_EXTRA_INFORMATION', true));
+	?>
+		<table class="admintable" width="100%">
+			<?php
 				foreach ($this->form->getFieldset('basic') as $field)
 				{
 				?>
 					<div class="control-group">
 						<label class="control-label">
-							<?php echo $field->label ;?>
+							<?php echo $field->label; ?>
 						</label>
 						<div class="controls">
-							<?php echo  $field->input ; ?>
+							<?php echo $field->input; ?>
 						</div>
 					</div>
 				<?php
 				}
-				?>
-			</table>
-			<?php
-			echo JHtml::_('bootstrap.endTab');
-		}
-
-		if ($this->config->activate_tickets_pdf)
-		{
-			echo JHtml::_('bootstrap.addTab', 'event', 'tickets-page', JText::_('EB_TICKETS_SETTINGS', true));
-			echo $this->loadTemplate('tickets', array('editor' => $editor));
-		}	
-		
-		if ($this->config->activate_certificate_feature)
-		{
-			echo JHtml::_('bootstrap.addTab', 'event', 'certificate-page', JText::_('EB_CERTIFICATE_SETTINGS', true));
-			echo $this->loadTemplate('certificate', array('editor' => $editor));
-			echo JHtml::_('bootstrap.endTab');
-		}
-
-		echo JHtml::_('bootstrap.addTab', 'event', 'advance-settings-page', JText::_('EB_ADVANCED_SETTINGS', true));
-		?>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('payment_methods', JText::_('EB_PAYMENT_METHODS'), JText::_('EB_PAYMENT_METHODS_EXPLAIN')); ?>
-			</label>
-			<div class="controls">
-				<?php echo $this->lists['payment_methods'] ?>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('fixed_group_price', JText::_('EB_FIXED_GROUP_PRICE'), JText::_('EB_FIXED_GROUP_PRICE_EXPLAIN')); ?>
-			</label>
-			<div class="controls">
-				<input type="text" name="fixed_group_price" id="fixed_group_price" class="inputbox" size="10" value="<?php echo $this->item->fixed_group_price; ?>" />
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('currency_code', JText::_('EB_CURRENCY'), JText::_('EB_CURRENCY_CODE_EXPLAIN')); ?>
-			</label>
-			<div class="controls">
-				<?php echo $this->lists['currency_code'] ?>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('currency_symbol', JText::_('EB_CURRENCY_SYMBOL'), JText::_('EB_CURRENCY_SYMBOL_EXPLAIN')); ?>
-			</label>
-			<div class="controls">
-				<input type="text" name="currency_symbol" size="5" class="inputbox" value="<?php echo $this->item->currency_symbol; ?>" />
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('paypal_email', JText::_('EB_PAYPAL_EMAIL'), JText::_('EB_PAYPAL_EMAIL_EXPLAIN')); ?>
-			</label>
-			<div class="controls">
-				<input type="text" name="paypal_email" class="inputbox" size="50" value="<?php echo $this->item->paypal_email ; ?>" />
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label"><?php echo JText::_('EB_API_LOGIN') ; ?></label>
-			<div class="controls">
-				<input type="text" name="api_login" value="<?php echo $this->item->api_login; ?>" class="inputbox" size="30" />
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label"><?php echo JText::_('EB_TRANSACTION_KEY') ; ?></label>
-			<div class="controls">
-				<input type="text" name="transaction_key" value="<?php echo $this->item->transaction_key; ?>" class="inputbox" size="30" />
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('custom_field_ids', JText::_('EB_CUSTOM_FIELD_IDS'), JText::_('EB_CUSTOM_FIELD_IDS_EXPLAIN')); ?>
-			</label>
-			<div class="controls">
-				<input type="text" name="custom_field_ids" class="inputbox" size="70" value="<?php echo $this->item->custom_field_ids ; ?>" />
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('notification_emails', JText::_('EB_NOTIFICATION_EMAILS'), JText::_('EB_NOTIFICATION_EMAIL_EXPLAIN')); ?>
-			</label>
-			<div class="controls">
-				<input type="text" name="notification_emails" class="inputbox" size="70" value="<?php echo $this->item->notification_emails ; ?>" />
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('registration_form_message', JText::_('EB_REGISTRATION_FORM_MESSAGE'), JText::_('EB_AVAILABLE_TAGS').': [EVENT_TITLE]'); ?>
-			</label>
-			<div class="controls">
-				<?php echo $editor->display( 'registration_form_message',  $this->item->registration_form_message , '100%', '250', '90', '10' ) ; ?>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('registration_form_message_group', JText::_('EB_REGISTRATION_FORM_MESSAGE_GROUP'), JText::_('EB_AVAILABLE_TAGS').': [EVENT_TITLE]'); ?>
-			</label>
-			<div class="controls">
-				<?php echo $editor->display( 'registration_form_message_group',  $this->item->registration_form_message_group , '100%', '250', '90', '10' ) ; ?>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('user_email_body', JText::_('EB_USER_EMAIL_BODY'), JText::_('EB_AVAILABLE_TAGS').': [REGISTRATION_DETAIL], [FIRST_NAME], [LAST_NAME], [ORGANIZATION], [ADDRESS], [ADDRESS2], [CITY], [STATE], [CITY], [ZIP], [COUNTRY], [PHONE], [FAX], [EMAIL], [COMMENT], [AMOUNT]'); ?>
-			</label>
-			<div class="controls">
-				<?php echo $editor->display( 'user_email_body',  $this->item->user_email_body , '100%', '250', '90', '10' ) ; ?>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('user_email_body_offline', JText::_('EB_USER_EMAIL_BODY_OFFLINE'), JText::_('EB_AVAILABLE_TAGS').': [REGISTRATION_DETAIL], [FIRST_NAME], [LAST_NAME], [ORGANIZATION], [ADDRESS], [ADDRESS2], [CITY], [STATE], [CITY], [ZIP], [COUNTRY], [PHONE], [FAX], [EMAIL], [COMMENT], [AMOUNT]'); ?>
-			</label>
-			<div class="controls">
-				<?php echo $editor->display( 'user_email_body_offline',  $this->item->user_email_body_offline , '100%', '250', '90', '10' ) ; ?>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo  JText::_('EB_THANKYOU_MESSAGE'); ?>
-			</label>
-			<div class="controls">
-				<?php echo $editor->display( 'thanks_message',  $this->item->thanks_message , '100%', '180', '90', '6' ) ; ?>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo  JText::_('EB_THANKYOU_MESSAGE_OFFLINE'); ?>
-			</label>
-			<div class="controls">
-				<?php echo $editor->display( 'thanks_message_offline',  $this->item->thanks_message_offline , '100%', '180', '90', '6' ) ; ?>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo  JText::_('EB_REGISTRATION_APPROVED_EMAIL_BODY'); ?>
-			</label>
-			<div class="controls">
-				<?php echo $editor->display( 'registration_approved_email_body',  $this->item->registration_approved_email_body , '100%', '180', '90', '6' ) ; ?>
-			</div>
-		</div>
-		<?php
+			?>
+		</table>
+	<?php
 		echo JHtml::_('bootstrap.endTab');
-		if ($translatable)
+	}
+
+	if ($this->config->activate_tickets_pdf)
+	{
+		echo JHtml::_('bootstrap.addTab', 'event', 'tickets-page', JText::_('EB_TICKETS_SETTINGS', true));
+		echo $this->loadTemplate('tickets', array('editor' => $editor));
+		echo JHtml::_('bootstrap.endTab');
+	}
+
+	if ($this->config->activate_certificate_feature)
+	{
+		echo JHtml::_('bootstrap.addTab', 'event', 'certificate-page', JText::_('EB_CERTIFICATE_SETTINGS', true));
+		echo $this->loadTemplate('certificate', array('editor' => $editor));
+		echo JHtml::_('bootstrap.endTab');
+	}
+
+	echo JHtml::_('bootstrap.addTab', 'event', 'advance-settings-page', JText::_('EB_ADVANCED_SETTINGS', true));
+	echo $this->loadTemplate('advanced_settings', array('editor' => $editor));
+	echo JHtml::_('bootstrap.endTab');
+
+	if ($translatable)
+	{
+		echo $this->loadTemplate('translation', array('editor' => $editor));
+	}
+
+	if (count($this->plugins))
+	{
+		$count = 0;
+
+		foreach ($this->plugins as $plugin)
 		{
-			echo JHtml::_('bootstrap.addTab', 'event', 'translation-page', JText::_('EB_TRANSLATION', true));
-			echo JHtml::_('bootstrap.startTabSet', 'event-translation', array('active' => 'translation-page-'.$this->languages[0]->sef));
-			foreach ($this->languages as $language)
-			{
-				$sef = $language->sef;
-				echo JHtml::_('bootstrap.addTab', 'event-translation', 'translation-page-' . $sef, $language->title . ' <img src="' . JUri::root() . 'media/com_eventbooking/flags/' . $sef . '.png" />');
-				?>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo EventbookingHelperHtml::getFieldLabel('use_data_from_default_language_'.$sef, JText::_('EB_USE_DATA_FROM_DEFAULT_LANGUAGE'), JText::_('EB_USE_DATA_FROM_DEFAULT_LANGUAGE_EXPLAIN')) ?>
-					</label>
-					<div class="controls">
-						<input type="checkbox" name="use_data_from_default_language_<?php echo $sef; ?>" value="1" />
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo  JText::_('EB_TITLE'); ?>
-					</label>
-					<div class="controls">
-						<input class="input-xlarge" type="text" name="title_<?php echo $sef; ?>" id="title_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'title_'.$sef}; ?>" />
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo  JText::_('EB_ALIAS'); ?>
-					</label>
-					<div class="controls">
-						<input class="input-xlarge" type="text" name="alias_<?php echo $sef; ?>" id="alias_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'alias_'.$sef}; ?>" />
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo JText::_('EB_SHORT_DESCRIPTION'); ?>
-					</label>
-					<div class="controls">
-						<?php echo $editor->display( 'short_description_'.$sef,  $this->item->{'short_description_'.$sef} , '100%', '250', '75', '10' ) ; ?>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo JText::_('EB_DESCRIPTION'); ?>
-					</label>
-					<div class="controls">
-						<?php echo $editor->display( 'description_'.$sef,  $this->item->{'description_'.$sef} , '100%', '250', '75', '10' ) ; ?>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo  JText::_('EB_META_KEYWORDS'); ?>
-					</label>
-					<div class="controls">
-						<textarea rows="5" cols="30" class="input-lage" name="meta_keywords_<?php echo $sef; ?>"><?php echo $this->item->{'meta_keywords_'.$sef}; ?></textarea>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo  JText::_('EB_META_DESCRIPTION'); ?>
-					</label>
-					<div class="controls">
-						<textarea rows="5" cols="30" class="input-lage" name="meta_description_<?php echo $sef; ?>"><?php echo $this->item->{'meta_description_'.$sef}; ?></textarea>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo EventbookingHelperHtml::getFieldLabel('registration_form_message_'.$sef, JText::_('EB_REGISTRATION_FORM_MESSAGE'), JText::_('EB_AVAILABLE_TAGS').': [EVENT_TITLE]'); ?>
-					</label>
-					<div class="controls">
-						<?php echo $editor->display('registration_form_message_' . $sef, $this->item->{'registration_form_message_' . $sef}, '100%', '250', '90', '10'); ?>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo EventbookingHelperHtml::getFieldLabel('registration_form_message_group_'.$sef, JText::_('EB_REGISTRATION_FORM_MESSAGE_GROUP'), JText::_('EB_AVAILABLE_TAGS').': [EVENT_TITLE]'); ?>
-					</label>
-					<div class="controls">
-						<?php echo $editor->display('registration_form_message_group_' . $sef, $this->item->{'registration_form_message_group_' . $sef}, '100%', '250', '90', '10'); ?>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo EventbookingHelperHtml::getFieldLabel('user_email_body', JText::_('EB_USER_EMAIL_BODY'), JText::_('EB_AVAILABLE_TAGS').': [REGISTRATION_DETAIL], [FIRST_NAME], [LAST_NAME], [ORGANIZATION], [ADDRESS], [ADDRESS2], [CITY], [STATE], [CITY], [ZIP], [COUNTRY], [PHONE], [FAX], [EMAIL], [COMMENT], [AMOUNT]'); ?>
-					</label>
-					<div class="controls">
-						<?php echo $editor->display('user_email_body_' . $sef, $this->item->{'user_email_body_' . $sef}, '100%', '250', '90', '10'); ?>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo EventbookingHelperHtml::getFieldLabel('user_email_body_offline_'.$sef, JText::_('EB_USER_EMAIL_BODY_OFFLINE'), JText::_('EB_AVAILABLE_TAGS').': [REGISTRATION_DETAIL], [FIRST_NAME], [LAST_NAME], [ORGANIZATION], [ADDRESS], [ADDRESS2], [CITY], [STATE], [CITY], [ZIP], [COUNTRY], [PHONE], [FAX], [EMAIL], [COMMENT], [AMOUNT]'); ?>
-					</label>
-					<div class="controls">
-						<?php echo $editor->display('user_email_body_offline_' . $sef, $this->item->{'user_email_body_offline_' . $sef}, '100%', '250', '90', '10'); ?>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo  JText::_('EB_THANKYOU_MESSAGE'); ?>
-					</label>
-					<div class="controls">
-						<?php echo $editor->display( 'thanks_message_'.$sef,  $this->item->{'thanks_message_'.$sef} , '100%', '180', '90', '6' ) ; ?>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo  JText::_('EB_THANKYOU_MESSAGE_OFFLINE'); ?>
-					</label>
-					<div class="controls">
-						<?php echo $editor->display( 'thanks_message_offline_'.$sef,  $this->item->{'thanks_message_offline_'.$sef} , '100%', '180', '90', '6' ) ; ?>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">
-						<?php echo  JText::_('EB_REGISTRATION_APPROVED_EMAIL_BODY'); ?>
-					</label>
-					<div class="controls">
-						<?php echo $editor->display( 'registration_approved_email_body_'.$sef,  $this->item->{'registration_approved_email_body_'.$sef} , '100%', '180', '90', '6' ) ; ?>
-					</div>
-				</div>
-				<?php
-				echo JHtml::_('bootstrap.endTab');
-			}
-			echo JHtml::_('bootstrap.endTabSet');
+			$count++;
+			echo JHtml::_('bootstrap.addTab', 'event', 'tab_' . $count, JText::_($plugin['title'], true));
+			echo $plugin['form'];
 			echo JHtml::_('bootstrap.endTab');
 		}
-		if (count($this->plugins))
-		{
-			$count = 0 ;
-			foreach ($this->plugins as $plugin)
-			{
-				$count++ ;
-				echo JHtml::_('bootstrap.addTab', 'event', 'tab_'.$count, JText::_($plugin['title'], true));
-				echo $plugin['form'];
-				echo JHtml::_('bootstrap.endTab');
-			}
-		}
-		echo JHtml::_('bootstrap.endTabSet');
-		?>
-<input type="hidden" name="option" value="com_eventbooking" />
-<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
-<input type="hidden" name="task" value="" />
-<?php echo JHtml::_( 'form.token' ); ?>
+	}
+
+	echo JHtml::_('bootstrap.endTabSet');
+	?>
+	<input type="hidden" name="option" value="com_eventbooking"/>
+	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>"/>
+	<input type="hidden" name="task" value=""/>
+	<?php echo JHtml::_('form.token'); ?>
 </form>
 <script type="text/javascript">
-	Joomla.submitbutton = function(pressbutton) {
+	Joomla.submitbutton = function (pressbutton) {
 		var form = document.adminForm;
-		if (pressbutton == 'cancel') {
-			Joomla.submitform( pressbutton );
-			return;
-		} else {
+		if (pressbutton == 'cancel')
+		{
+			Joomla.submitform(pressbutton);
+		}
+		else
+		{
 			//Should have some validations rule here
 			//Check something here
 			if (form.title.value == '') {
 				alert("<?php echo JText::_('EB_PLEASE_ENTER_TITLE'); ?>");
 				form.title.focus();
-				return ;
+				return;
 			}
-			if (form.main_category_id.value == 0)
-			{
+			if (form.main_category_id.value == 0) {
 				alert("<?php echo JText::_("EB_CHOOSE_CATEGORY"); ?>");
 				form.category_id.focus();
-				return ;
+				return;
 			}
 			if (form.event_date.value == '') {
 				alert("<?php echo JText::_('EB_ENTER_EVENT_DATE'); ?>");
 				form.event_date.focus();
-				return ;
+				return;
 			}
 			if (form.recurring_type) {
 				//Check the recurring setting
@@ -928,67 +171,68 @@ JHtml::_('behavior.tabstate');
 					if (form.number_days.value == '') {
 						alert("<?php echo JText::_("EB_ENTER_NUMBER_OF_DAYS"); ?>");
 						form.number_days.focus();
-						return ;
+						return;
 					}
 					if (!parseInt(form.number_days.value)) {
 						alert("<?php echo JText::_("EB_NUMBER_DAY_INTEGER"); ?>");
 						form.number_days.focus();
-						return ;
+						return;
 					}
-				}else if (form.recurring_type[2].checked) {
+				} else if (form.recurring_type[2].checked) {
 					if (form.number_weeks.value == '') {
 						alert("<?php echo JText::_("EB_ENTER_NUMBER_OF_WEEKS"); ?>");
 						form.number_weeks.focus();
-						return ;
+						return;
 					}
 					if (!parseInt(form.number_weeks.value)) {
 						alert("<?php echo JText::_("EB_NUMBER_WEEKS_INTEGER"); ?>");
 						form.number_weeks.focus();
-						return ;
+						return;
 					}
 					//Check whether any days in the week
-					var checked = false ;
-					for (var i = 0 ; i < form['weekdays[]'].length ; i++) {
+					var checked = false;
+					for (var i = 0; i < form['weekdays[]'].length; i++) {
 						if (form['weekdays[]'][i].checked)
-							checked = true ;
+							checked = true;
 					}
 					if (!checked) {
 						alert("<?php echo JText::_("EB_CHOOSE_ONEDAY"); ?>");
 						form['weekdays[]'][0].focus();
-						return ;
+						return;
 					}
 				} else if (form.recurring_type[3].checked) {
 					if (form.number_months.value == '') {
 						alert("<?php echo JText::_("EB_ENTER_NUMBER_MONTHS"); ?>");
 						form.number_months.focus();
-						return ;
+						return;
 					}
 					if (!parseInt(form.number_months.value)) {
 						alert("<?php echo JText::_("EB_NUMBER_MONTH_INTEGER"); ?>");
 						form.number_months.focus();
-						return ;
+						return;
 					}
 					if (form.monthdays.value == '') {
 						alert("<?php echo JText::_("EB_ENTER_DAY_IN_MONTH"); ?>");
 						form.monthdays.focus();
-						return ;
+						return;
 					}
 				}
 			}
 
 			<?php
-				$editorFields = array('short_description', 'description', 'user_email_body', 'user_email_body_offline', 'thanks_message', 'thanks_message_offline', 'registration_approved_email_body');
-				foreach ($editorFields as $editorField) {
-					echo $editor->save($editorField);
-				}
+			$editorFields = array('short_description', 'description', 'user_email_body', 'user_email_body_offline', 'thanks_message', 'thanks_message_offline', 'registration_approved_email_body');
+			foreach ($editorFields as $editorField)
+			{
+				echo $editor->save($editorField);
+			}
 
 			?>
-			Joomla.submitform( pressbutton );
+			Joomla.submitform(pressbutton);
 		}
 	}
 	function addRow() {
 		var table = document.getElementById('price_list');
-		var newRowIndex = table.rows.length - 1 ;
+		var newRowIndex = table.rows.length - 1;
 		var row = table.insertRow(newRowIndex);
 		var registrantNumber = row.insertCell(0);
 		var price = row.insertCell(1);
@@ -998,7 +242,7 @@ JHtml::_('behavior.tabstate');
 	}
 	function removeRow() {
 		var table = document.getElementById('price_list');
-		var deletedRowIndex = table.rows.length - 2 ;
+		var deletedRowIndex = table.rows.length - 2;
 		if (deletedRowIndex >= 1) {
 			table.deleteRow(deletedRowIndex);
 		} else {
@@ -1007,22 +251,22 @@ JHtml::_('behavior.tabstate');
 	}
 
 	function setDefaultData() {
-		var form = document.adminForm ;
+		var form = document.adminForm;
 		if (form.recurring_type[1].checked) {
 			if (form.number_days.value == '') {
-				form.number_days.value =1 ;
+				form.number_days.value = 1;
 			}
 		} else if (form.recurring_type[2].checked) {
 			if (form.number_weeks.value == '') {
-				form.number_weeks.value = 1 ;
+				form.number_weeks.value = 1;
 			}
 		} else if (form.recurring_type[3].checked) {
 			if (form.number_months.value == '') {
-				form.number_months.value = 1 ;
+				form.number_months.value = 1;
 			}
 		} else if (form.recurring_type[4].checked) {
 			if (form.weekly_number_months.value == '') {
-				form.weekly_number_months.value = 1 ;
+				form.weekly_number_months.value = 1;
 			}
 		}
 	}
