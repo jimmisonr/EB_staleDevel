@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>tuanpn@joomdonation.com</authorEmail>
 	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>2.11.2</version>
+	<version>2.12.0</version>
 	<description>This module will display list of cities in Events Booking. Users can click on a city to see all events from that city</description>
 	<files>		
 		<filename module="mod_eb_cities">mod_eb_cities.php</filename>		
