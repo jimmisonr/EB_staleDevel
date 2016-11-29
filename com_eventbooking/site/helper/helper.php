@@ -1705,42 +1705,35 @@ class EventbookingHelper
 			if ($couponAvailableAmount >= $amount)
 			{
 				$couponDiscountAmount = $amount;
-				$amount               = 0;
-
-				if ($config->collect_member_information)
-				{
-					for ($i = 0; $i < $numberRegistrants; $i++)
-					{
-						$memberCouponDiscountAmount = $membersAmount[$i];
-						$membersAmount[$i]          = 0;
-						$membersDiscountAmount[$i] += $memberCouponDiscountAmount;
-					}
-				}
 			}
 			else
 			{
-				$amount               = $amount - $couponAvailableAmount;
 				$couponDiscountAmount = $couponAvailableAmount;
+			}
 
-				if ($config->collect_member_information)
+			$amount -= $couponDiscountAmount;
+
+			if ($config->collect_member_information)
+			{
+				for ($i = 0; $i < $numberRegistrants; $i++)
 				{
-					for ($i = 0; $i < $numberRegistrants; $i++)
+					if ($couponAvailableAmount >= $membersAmount[$i])
 					{
-						if ($couponAvailableAmount >= $membersAmount[$i])
-						{
-							$memberCouponDiscountAmount = $membersAmount[$i];
-							$membersAmount[$i]          = 0;
-							$membersDiscountAmount[$i] += $memberCouponDiscountAmount;
+						$memberCouponDiscountAmount = $membersAmount[$i];
+					}
+					else
+					{
+						$memberCouponDiscountAmount = $couponAvailableAmount;
+					}
 
-							$couponAvailableAmount = $couponAvailableAmount - $memberCouponDiscountAmount;
-						}
-						elseif ($couponAvailableAmount > 0)
-						{
-							$memberCouponDiscountAmount = $couponAvailableAmount;
-							$membersAmount[$i]          = $membersAmount[$i] - $memberCouponDiscountAmount;
-							$membersDiscountAmount[$i] += $memberCouponDiscountAmount;
-							$couponAvailableAmount = 0;
-						}
+					$membersAmount[$i] = $membersAmount[$i] - $memberCouponDiscountAmount;
+					$membersDiscountAmount[$i] += $memberCouponDiscountAmount;
+
+					$couponAvailableAmount -= $memberCouponDiscountAmount;
+
+					if ($couponAvailableAmount <= 0)
+					{
+						break;
 					}
 				}
 			}
@@ -2197,6 +2190,11 @@ class EventbookingHelper
 						$membersAmount[$eventId][$j] -= $memberCouponDiscountAmount;
 
 						$membersDiscountAmount[$eventId][$j] += $memberCouponDiscountAmount;
+
+						if ($totalMemberDiscountAmount <= 0)
+						{
+							break;
+						}
 					}
 				}
 			}
