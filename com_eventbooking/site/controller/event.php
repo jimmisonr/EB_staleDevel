@@ -28,6 +28,23 @@ class EventbookingControllerEvent extends EventbookingController
 		$user   = JFactory::getUser();
 		$config = EventbookingHelper::getConfig();
 
+		// Permission check
+		$id = $this->input->getInt('id', 0);
+
+		if ($id)
+		{
+			$ret = EventbookingHelper::checkEditEvent($id);
+		}
+		else
+		{
+			$ret = EventbookingHelper::checkAddEvent();
+		}
+
+		if (!$ret)
+		{
+			throw new Exception('You do not have submit event permission, please contact Administrator', 403);
+		}
+
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1') && !$this->validateCaptcha())
 		{
 			$this->app->enqueueMessage(JText::_('EB_INVALID_CAPTCHA_ENTERED'), 'warning');
