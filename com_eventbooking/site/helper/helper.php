@@ -4007,12 +4007,20 @@ class EventbookingHelper
 		$config      = self::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 		$sitename    = JFactory::getConfig()->get("sitename");
-		$query->select('*, title' . $fieldSuffix . ' AS title')
+
+		$query->select('*')
 			->from('#__eb_events')
 			->where('id = ' . (int) $row->event_id);
+
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
+		}
+
 		$db->setQuery($query);
 		$rowEvent = $db->loadObject();
-		$pdf      = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 		$pdf->SetCreator(PDF_CREATOR);
 		$pdf->SetAuthor($sitename);
 		$pdf->SetTitle('Invoice');
@@ -4047,7 +4055,11 @@ class EventbookingHelper
 		}
 		else
 		{
-			if (self::isValidMessage($config->{'invoice_format' . $fieldSuffix}))
+			if (self::isValidMessage($rowEvent->invoice_format))
+			{
+				$invoiceOutput = $rowEvent->invoice_format;
+			}
+			elseif (self::isValidMessage($config->{'invoice_format' . $fieldSuffix}))
 			{
 				$invoiceOutput = $config->{'invoice_format' . $fieldSuffix};
 			}

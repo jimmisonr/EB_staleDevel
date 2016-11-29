@@ -675,6 +675,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('invoice_format', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `invoice_format` TEXT NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		if (!in_array('registration_access', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `registration_access` TINYINT NOT NULL DEFAULT  '0' ;";
