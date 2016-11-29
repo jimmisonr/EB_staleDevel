@@ -434,7 +434,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$user        = JFactory::getUser();
 		$showCaptcha = 0;
 
-		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
+		if ($config->enable_captcha && $user->id == 0)
 		{
 			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
 

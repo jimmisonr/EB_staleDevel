@@ -45,7 +45,7 @@ class EventbookingControllerEvent extends EventbookingController
 			throw new Exception('You do not have submit event permission, please contact Administrator', 403);
 		}
 
-		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1') && !$this->validateCaptcha())
+		if ($config->enable_captcha && $user->id == 0 && !$this->validateCaptcha())
 		{
 			$this->app->enqueueMessage(JText::_('EB_INVALID_CAPTCHA_ENTERED'), 'warning');
 			$this->input->set('view', 'event');
