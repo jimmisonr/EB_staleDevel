@@ -3846,21 +3846,73 @@ class EventbookingHelper
 	 */
 	public static function getUserInput($userId, $fieldName = 'user_id', $registrantId = 0)
 	{
-		JHtml::_('jquery.framework');
-		$field = JFormHelper::loadFieldType('User');
-
-		$element = new SimpleXMLElement('<field />');
-		$element->addAttribute('name', $fieldName);
-		$element->addAttribute('class', 'readonly input-medium');
-
-		if (!$registrantId)
+		if (JFactory::getApplication()->isSite())
 		{
-			$element->addAttribute('onchange', 'populateRegistrantData();');
+			// Initialize variables.
+			$html = array();
+			$link = 'index.php?option=com_eventbooking&amp;view=users&amp;layout=modal&amp;tmpl=component&amp;field=user_id';
+			// Initialize some field attributes.
+			$attr = ' class="inputbox"';
+			// Load the modal behavior script.
+			JHtml::_('behavior.modal', 'a.modal_user_id');
+			// Build the script.
+			$script   = array();
+			$script[] = '	function jSelectUser_user_id(id, title) {';
+			$script[] = '			document.getElementById("jform_user_id").value = title; ';
+			$script[] = '			document.getElementById("user_id").value = id; ';
+
+			if (!$registrantId)
+			{
+				$script[] = 'populateRegistrantData()';
+			}
+
+			$script[] = '		SqueezeBox.close();';
+			$script[] = '	}';
+
+			// Add the script to the document head.
+			JFactory::getDocument()->addScriptDeclaration(implode("\n", $script));
+			// Load the current username if available.
+			$table = JTable::getInstance('user');
+
+			if ($userId)
+			{
+				$table->load($userId);
+			}
+			else
+			{
+				$table->name = '';
+			}
+
+			// Create a dummy text field with the user name.
+			$html[] = '<div class="input-append">';
+			$html[] = '	<input type="text" readonly="" name="jform[user_id]" id="jform_user_id"' . ' value="' . $table->name . '"' . $attr . ' />';
+			$html[] = '	<input type="hidden" name="user_id" id="user_id"' . ' value="' . $userId . '"' . $attr . ' />';
+			// Create the user select button.
+			$html[] = '<a class="btn btn-primary button-select modal_user_id" title="' . JText::_('JLIB_FORM_CHANGE_USER') . '"' . ' href="' . $link . '"' .
+				' rel="{handler: \'iframe\', size: {x: 800, y: 500}}">';
+			$html[] = ' <span class="icon-user"></span></a>';
+			$html[] = '</div>';
+
+			return implode("\n", $html);
 		}
+		else
+		{
+			JHtml::_('jquery.framework');
+			$field = JFormHelper::loadFieldType('User');
 
-		$field->setup($element, $userId);
+			$element = new SimpleXMLElement('<field />');
+			$element->addAttribute('name', $fieldName);
+			$element->addAttribute('class', 'readonly input-medium');
 
-		return $field->input;
+			if (!$registrantId)
+			{
+				$element->addAttribute('onchange', 'populateRegistrantData();');
+			}
+
+			$field->setup($element, $userId);
+
+			return $field->input;
+		}
 	}
 
 	/**

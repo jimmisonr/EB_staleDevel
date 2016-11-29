@@ -453,7 +453,7 @@ class EventbookingController extends RADController
 			}
 
 			$json['success'] = JText::sprintf('EB_FILE_UPLOADED', $fileName);
-			$json['file'] = $targetFileName;
+			$json['file']    = $targetFileName;
 		}
 		else
 		{
@@ -461,6 +461,61 @@ class EventbookingController extends RADController
 		}
 
 		echo json_encode($json);
+
+		$this->app->close();
+	}
+
+	/**
+	 * Get profile data of the registrant, return JSON format using for ajax request
+	 */
+	public function get_profile_data()
+	{
+		$config  = EventbookingHelper::getConfig();
+		$input   = JFactory::getApplication()->input;
+		$userId  = $input->getInt('user_id', 0);
+		$eventId = $input->getInt('event_id');
+		$data    = array();
+
+		if ($userId && $eventId)
+		{
+			$rowFields = EventbookingHelper::getFormFields($eventId, 0);
+			$data      = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);
+		}
+
+		if ($userId && !isset($data['first_name']))
+		{
+			//Load the name from Joomla default name
+			$user = JFactory::getUser($userId);
+			$name = $user->name;
+
+			if ($name)
+			{
+				$pos = strpos($name, ' ');
+
+				if ($pos !== false)
+				{
+					$data['first_name'] = substr($name, 0, $pos);
+					$data['last_name']  = substr($name, $pos + 1);
+				}
+				else
+				{
+					$data['first_name'] = $name;
+					$data['last_name']  = '';
+				}
+			}
+		}
+
+		if ($userId && !isset($data['email']))
+		{
+			if (empty($user))
+			{
+				$user = JFactory::getUser($userId);
+			}
+
+			$data['email'] = $user->email;
+		}
+
+		echo json_encode($data);
 
 		$this->app->close();
 	}
