@@ -471,7 +471,7 @@ defined( '_JEXEC' ) or die ;
 				<?php echo EventbookingHelperHtml::getBooleanInput('show_price_including_tax', $config->show_price_including_tax); ?>
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group" data-showon='[{"field":"show_price_including_tax","values":["1"],"op":""}]'>
 			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('setup_price', JText::_('EB_SETUP_PRICE'), JText::_('EB_SETUP_PRICE_EXPLAIN')); ?>
 			</div>
