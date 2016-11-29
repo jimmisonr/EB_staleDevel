@@ -124,12 +124,14 @@ class EventbookingViewLocationHtml extends RADViewHtml
 		$document->addScriptDeclaration(
 			'var siteUrl = "' . EventbookingHelper::getSiteUrl() . '";'
 		);
+
 		$config = EventbookingHelper::getConfig();
 		$item   = $this->model->getLocationData();
 
 		$options   = array();
 		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_COUNTRY'), 'id', 'name');
 		$countries = EventbookingHelperDatabase::getAllCountries();
+
 		foreach ($countries as $country)
 		{
 			$options[] = JHtml::_('select.option', $country->name, $country->name);

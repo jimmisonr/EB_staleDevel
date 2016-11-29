@@ -177,10 +177,12 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$item        = $this->model->getData();
 		$config      = EventbookingHelper::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+
 		if ($config->submit_event_form_layout == 'simple')
 		{
 			$this->setLayout('simple');
 		}
+
 		if ($item->id)
 		{
 			$ret = EventbookingHelper::checkEditEvent($item->id);
@@ -189,10 +191,12 @@ class EventbookingViewEventHtml extends RADViewHtml
 		{
 			$ret = EventbookingHelper::checkAddEvent();
 		}
+
 		if (!$ret)
 		{
 			//Redirect users to login page if they are not logged in
 			$user = JFactory::getUser();
+
 			if (!$user->id)
 			{
 				$currentUrl = JUri::current();
@@ -213,19 +217,20 @@ class EventbookingViewEventHtml extends RADViewHtml
 			->from('#__eb_locations')
 			->where('published = 1')
 			->order('name');
-		
+
 		if (!$user->authorise('core.admin') && !$config->show_all_locations_in_event_submission_form)
 		{
-			$query->where('user_id = '. (int) $user->id);
-		}	
+			$query->where('user_id = ' . (int) $user->id);
+		}
+
 		$db->setQuery($query);
 		$options[]            = JHtml::_('select.option', '', JText::_('EB_SELECT_LOCATION'), 'id', 'name');
 		$options              = array_merge($options, $db->loadObjectList());
 		$lists['location_id'] = JHtml::_('select.genericlist', $options, 'location_id', '', 'id', 'name', $item->location_id);
 
 		// Categories dropdown
-		$query->clear();
-		$query->select("id, parent AS parent_id, show_on_submit_event_form, name" . $fieldSuffix . " AS title")
+		$query->clear()
+			->select("id, parent AS parent_id, show_on_submit_event_form, name" . $fieldSuffix . " AS title")
 			->from('#__eb_categories')
 			->where('published = 1')
 			->order('name' . $fieldSuffix);
@@ -235,6 +240,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$db->setQuery($query);
 		$rows     = $db->loadObjectList();
 		$children = array();
+
 		if ($rows)
 		{
 			// first pass - collect children
@@ -249,6 +255,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 
 		$list    = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
 		$options = array();
+
 		foreach ($list as $listItem)
 		{
 			if ($isAdmin || $listItem->show_on_submit_event_form)
@@ -259,15 +266,16 @@ class EventbookingViewEventHtml extends RADViewHtml
 
 		if ($item->id)
 		{
-			$query->clear();
-			$query->select('category_id')
+			$query->clear()
+				->select('category_id')
 				->from('#__eb_event_categories')
 				->where('event_id=' . $item->id)
 				->where('main_category=1');
 			$db->setQuery($query);
 			$mainCategoryId = $db->loadResult();
-			$query->clear();
-			$query->select('category_id')
+
+			$query->clear()
+				->select('category_id')
 				->from('#__eb_event_categories')
 				->where('event_id=' . $item->id)
 				->where('main_category=0');
@@ -286,14 +294,14 @@ class EventbookingViewEventHtml extends RADViewHtml
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => '',
-				'list.select'        => $mainCategoryId, ));
+				'list.select'        => $mainCategoryId,));
 		$lists['category_id']                = JHtml::_('select.genericlist', $options, 'category_id[]',
 			array(
 				'option.text.toHtml' => false,
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => 'class="inputbox"  size="5" multiple="multiple"',
-				'list.select'        => $additionalCategories, ));
+				'list.select'        => $additionalCategories,));
 		$options                             = array();
 		$options[]                           = JHtml::_('select.option', 1, JText::_('%'));
 		$options[]                           = JHtml::_('select.option', 2, $config->currency_symbol);
@@ -315,6 +323,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$lists['enable_auto_reminder']       = JHtml::_('select.booleanlist', 'enable_auto_reminder', ' class="inputbox" ', $item->enable_auto_reminder);
 
 		$lists['published'] = JHtml::_('select.booleanlist', 'published', ' class="inputbox" ', $item->published);
+
 		if ($item->event_date != $db->getNullDate())
 		{
 			$selectedHour   = date('G', strtotime($item->event_date));
@@ -325,8 +334,10 @@ class EventbookingViewEventHtml extends RADViewHtml
 			$selectedHour   = 0;
 			$selectedMinute = 0;
 		}
+
 		$lists['event_date_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'event_date_hour', ' class="input-mini" ', $selectedHour);
 		$lists['event_date_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'event_date_minute', ' class="input-mini" ', $selectedMinute, '%02d');
+
 		if ($item->event_end_date != $db->getNullDate())
 		{
 			$selectedHour   = date('G', strtotime($item->event_end_date));
@@ -337,6 +348,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 			$selectedHour   = 0;
 			$selectedMinute = 0;
 		}
+
 		$lists['event_end_date_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'event_end_date_hour', ' class="input-mini" ', $selectedHour);
 		$lists['event_end_date_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'event_end_date_minute', ' class="input-mini" ', $selectedMinute,
 			'%02d');
@@ -352,6 +364,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 			$selectedHour   = 0;
 			$selectedMinute = 0;
 		}
+
 		$lists['cut_off_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'cut_off_hour', ' class="inputbox input-mini" ', $selectedHour);
 		$lists['cut_off_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'cut_off_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d');
 
@@ -366,11 +379,12 @@ class EventbookingViewEventHtml extends RADViewHtml
 			$selectedHour   = 0;
 			$selectedMinute = 0;
 		}
+
 		$lists['registration_start_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'registration_start_hour', ' class="inputbox input-mini" ', $selectedHour);
 		$lists['registration_start_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d');
 
-		$query->clear();
-		$query->select('id, title')
+		$query->clear()
+			->select('id, title')
 			->from('#__content')
 			->where('`state` = 1')
 			->order('title');
@@ -392,6 +406,11 @@ class EventbookingViewEventHtml extends RADViewHtml
 			$form->bind($data);
 			$this->form = $form;
 		}
+
+
+		// Load captcha
+		$this->loadCaptcha();
+
 		$this->item     = $item;
 		$this->prices   = $prices;
 		$this->lists    = $lists;
@@ -400,5 +419,52 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$this->return   = $this->input->getString('return');
 
 		parent::display();
+	}
+
+	/**
+	 * Load captcha for registration form
+	 *
+	 * @param bool $initOnly
+	 *
+	 * @throws Exception
+	 */
+	protected function loadCaptcha($initOnly = false)
+	{
+		$config      = EventbookingHelper::getConfig();
+		$user        = JFactory::getUser();
+		$showCaptcha = 0;
+
+		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
+		{
+			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+
+			if (!$captchaPlugin)
+			{
+				// Hardcode to recaptcha, reduce support request
+				$captchaPlugin = 'recaptcha';
+			}
+
+			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+
+			if ($plugin)
+			{
+				$showCaptcha = 1;
+
+				if ($initOnly)
+				{
+					JCaptcha::getInstance($captchaPlugin)->initialise('dynamic_recaptcha_1');
+				}
+				else
+				{
+					$this->captcha = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
+				}
+			}
+			else
+			{
+				JFactory::getApplication()->enqueueMessage(JText::_('EB_CAPTCHA_NOT_ACTIVATED_IN_YOUR_SITE'), 'error');
+			}
+		}
+
+		$this->showCaptcha = $showCaptcha;
 	}
 }

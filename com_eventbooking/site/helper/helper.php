@@ -4920,9 +4920,7 @@ class EventbookingHelper
 	 */
 	public static function checkAddEvent()
 	{
-		$user = JFactory::getUser();
-
-		return $user->id > 0 && $user->authorise('eventbooking.addevent', 'com_eventbooking');
+		return JFactory::getUser()->authorise('eventbooking.addevent', 'com_eventbooking');
 	}
 
 	/**

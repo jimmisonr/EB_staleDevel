@@ -234,6 +234,14 @@ defined( '_JEXEC' ) or die ;
 		</div>
 		<div class="control-group">
 			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('submit_event_redirect_url', JText::_('EB_SUBMIT_EVENT_REDIRECT_URL'), JText::_('EB_SUBMIT_EVENT_REDIRECT_URL_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<input type="text" name="submit_event_redirect_url" class="input-xlarge" value="<?php echo $config->get('submit_event_redirect_url'); ?>" size="50" />
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('default_country', JText::_('EB_DEFAULT_COUNTRY')); ?>
 			</div>
 			<div class="controls">

@@ -298,6 +298,21 @@ $format = 'Y-m-d' ;
 						<?php echo $editor->display( 'description',  $this->item->description , '100%', '250', '90', '10' ) ; ?>
 					</td>
 				</tr>
+				<?php
+					if ($this->showCaptcha)
+					{
+					?>
+						<tr>
+							<td class="key">
+								<?php echo  JText::_('EB_CAPTCHA'); ?>
+							</td>
+							<td>
+								<?php echo $this->captcha; ?>
+							</td>
+						</tr>
+					<?php
+					}
+				?>
 			</table>
 		</div>
 		<?php
