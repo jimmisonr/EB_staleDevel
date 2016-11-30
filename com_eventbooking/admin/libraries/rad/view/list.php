@@ -139,7 +139,7 @@ class RADViewList extends RADViewHtml
 			}
 		}
 
-		if ($canDo->get('core.admin'))
+		if ($this->isAdminView && $canDo->get('core.admin'))
 		{
 			JToolbarHelper::preferences($this->option);
 		}
