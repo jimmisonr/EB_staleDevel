@@ -344,7 +344,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 	 */
 	public function export()
 	{
-		$eventId = $this->input->getInt('event_id', 0);
+		$eventId = $this->input->getInt('event_id', $this->input->getInt('filter_event_id'));
 
 		if (!EventbookingHelper::canExportRegistrants($eventId))
 		{
