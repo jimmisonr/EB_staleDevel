@@ -71,7 +71,7 @@ class plgEventbookingSystem extends JPlugin
 			$this->processUnpublishEvent($row->event_id);
 		}
 
-		if (!$config->get('multiple_booking') && $config->get('activate_tickets_pdf') && !$row->ticket_code)
+		if ($config->get('activate_tickets_pdf') && !$row->ticket_code)
 		{
 			$this->generateTicketNumbersForRegistration($row);
 		}
@@ -204,86 +204,143 @@ class plgEventbookingSystem extends JPlugin
 	 */
 	private function generateTicketNumbersForRegistration($row)
 	{
+		jimport('joomla.user.helper');
 		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/table/event.php';
 
-		$rowEvent = JTable::getInstance('event', 'EventbookingTable');
-		$rowEvent->load($row->event_id);
 
-		if ($rowEvent->activate_tickets_pdf)
+		$config = EventbookingHelper::getConfig();
+
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+
+		if ($config->get('multiple_booking'))
 		{
-			jimport('joomla.user.helper');
-
-			$db    = JFactory::getDbo();
-			$query = $db->getQuery(true);
-
-			// Get the next ticket number
-			$query->select('MAX(ticket_number)')
+			$query->select('*')
 				->from('#__eb_registrants')
-				->where('event_id = ' . $row->event_id);
+				->where('id = ' . $row->id . ' OR cart_id = ' . $row->id);
 			$db->setQuery($query);
-			$ticketNumber = (int) $db->loadResult() + 1;
-			$ticketNumber = max($ticketNumber, $rowEvent->ticket_start_number);
+			$rows = $db->loadObjectList();
+		}
+		else
+		{
+			$rows = array($row);
+		}
 
+		foreach ($rows as $rowRegistrant)
+		{
+			$rowEvent = JTable::getInstance('event', 'EventbookingTable');
+			$rowEvent->load($rowRegistrant->event_id);
 
-			$ticketCode = '';
+			/* @var EventbookingTableRegistrant $rowRegistrant */
 
-			if ($row->is_group_billing)
+			if ($rowEvent->activate_tickets_pdf)
 			{
-				$query->clear()
-					->select('id')
+				jimport('joomla.user.helper');
+
+				$db    = JFactory::getDbo();
+				$query = $db->getQuery(true);
+
+				// Get the next ticket number
+				$query->select('MAX(ticket_number)')
 					->from('#__eb_registrants')
-					->where('group_id = ' . $row->id);
+					->where('event_id = ' . $rowRegistrant->event_id);
 				$db->setQuery($query);
-				$memberIds = $db->loadColumn();
-			}
-			else
-			{
-				$memberIds = array($row->id);
-			}
+				$ticketNumber = (int) $db->loadResult() + 1;
 
-			foreach ($memberIds as $memberId)
-			{
-				$ticketCode = '';
+				$ticketNumber = max($ticketNumber, $rowEvent->ticket_start_number);
 
-				while (true)
+				if ($rowRegistrant->is_group_billing)
 				{
-					$ticketCode = md5(JUserHelper::genRandomPassword(16));
-					$query->clear()
-						->select('COUNT(*)')
-						->from('#__eb_registrants')
-						->where('ticket_code = ' . $db->quote($ticketCode));
-					$db->setQuery($query);
-					$total = $db->loadResult();
+					$ticketCode = self::getTicketCode();
 
-					if (!$total)
-					{
-						break;
-					}
-				}
-
-				if ($row->is_group_billing)
-				{
 					$query->clear()
 						->update('#__eb_registrants')
 						->set('ticket_code = ' . $db->quote($ticketCode))
-						->set('ticket_number = ' . $db->quote($ticketNumber))
-						->where('id = ' . $memberId);
+						->where('id = ' . $rowRegistrant->id);
 					$db->setQuery($query);
 					$db->execute();
-					$ticketNumber++;
+
+					if ($rowRegistrant->id == $row->id)
+					{
+						$row->ticket_code = $ticketCode;
+					}
+
+					$query->clear()
+						->select('id')
+						->from('#__eb_registrants')
+						->where('group_id = ' . $rowRegistrant->id)
+						->order('id');
+					$db->setQuery($query);
+
+					$memberIds = $db->loadColumn();
+
+					foreach ($memberIds as $memberId)
+					{
+						$ticketCode = self::getTicketCode();
+
+						$query->clear()
+							->update('#__eb_registrants')
+							->set('ticket_code = ' . $db->quote($ticketCode))
+							->set('ticket_number = ' . $ticketNumber)
+							->where('id = ' . $memberId);
+						$db->setQuery($query);
+						$db->execute();
+
+						$ticketNumber++;
+					}
+				}
+				else
+				{
+					$ticketCode = self::getTicketCode();
+
+					$query->clear()
+						->update('#__eb_registrants')
+						->set('ticket_code = ' . $db->quote($ticketCode))
+						->set('ticket_number = ' . $ticketNumber)
+						->where('id = ' . $rowRegistrant->id);
+					$db->setQuery($query);
+					$db->execute();
+
+					if ($rowRegistrant->id == $row->id)
+					{
+						$row->ticket_code   = $ticketCode;
+						$row->ticket_number = $ticketNumber;
+					}
 				}
 			}
-
-
-			// Store Ticket Code and Ticket Number, use for next step
-			if (!$row->is_group_billing)
-			{
-				$row->ticket_number = $ticketNumber;
-			}
-
-			$row->ticket_code = $ticketCode;
-
-			$row->store();
 		}
+
+		$row->store();
+	}
+
+	/**
+	 * Generate Random Ticket Code
+	 *
+	 * @return string
+	 */
+	protected function getTicketCode()
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+
+		$ticketCode = '';
+
+		while (true)
+		{
+			$ticketCode = md5(JUserHelper::genRandomPassword(16));
+			$query->clear()
+				->select('COUNT(*)')
+				->from('#__eb_registrants')
+				->where('ticket_code = ' . $db->quote($ticketCode));
+			$db->setQuery($query);
+			$total = $db->loadResult();
+
+			if (!$total)
+			{
+				break;
+			}
+		}
+
+		return $ticketCode;
 	}
 }

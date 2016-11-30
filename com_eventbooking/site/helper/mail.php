@@ -196,11 +196,36 @@ class EventbookingHelperMail
 				$mailer->addAttachment($invoiceFilePath);
 			}
 
-			if ($row->ticket_code && $config->get('send_tickets_via_email', 1))
+			if ($config->get('activate_tickets_pdf') && $config->get('send_tickets_via_email', 1))
 			{
-				EventbookingHelperTicket::generateTicketsPDF($row, $config);
-				$ticketFilePath = JPATH_ROOT . '/media/com_eventbooking/tickets/ticket_' . str_pad($row->id, 5, '0', STR_PAD_LEFT) . '.pdf';
-				$mailer->addAttachment($ticketFilePath);
+				if ($config->get('multiple_booking'))
+				{
+					$query->clear()
+						->select('*')
+						->from('#__eb_registrants')
+						->where('id = ' . $row->id . ' OR cart_id = ' . $row->id);
+					$db->setQuery($query);
+					$rowRegistrants = $db->loadObjectList();
+
+					foreach ($rowRegistrants as $rowRegistrant)
+					{
+						if ($rowRegistrant->ticket_code)
+						{
+							EventbookingHelperTicket::generateTicketsPDF($rowRegistrant, $config);
+							$ticketFilePath = JPATH_ROOT . '/media/com_eventbooking/tickets/ticket_' . str_pad($rowRegistrant->id, 5, '0', STR_PAD_LEFT) . '.pdf';
+							$mailer->addAttachment($ticketFilePath);
+						}
+					}
+				}
+				else
+				{
+					if ($row->ticket_code)
+					{
+						EventbookingHelperTicket::generateTicketsPDF($row, $config);
+						$ticketFilePath = JPATH_ROOT . '/media/com_eventbooking/tickets/ticket_' . str_pad($row->id, 5, '0', STR_PAD_LEFT) . '.pdf';
+						$mailer->addAttachment($ticketFilePath);
+					}
+				}
 			}
 
 			static::addEventAttachments($mailer, $row, $event, $config);

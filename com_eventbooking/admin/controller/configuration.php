@@ -16,16 +16,10 @@ class EventbookingControllerConfiguration extends EventbookingController
 	 */
 	public function save()
 	{
-		$data  = $this->input->getData(RAD_INPUT_ALLOWRAW);
+		$data = $this->input->getData(RAD_INPUT_ALLOWRAW);
+
+		/* @var EventbookingModelConfiguration $model */
 		$model = $this->getModel();
-
-		if ($data['multiple_booking'] && $data['activate_tickets_pdf'])
-		{
-			$data['activate_tickets_pdf'] = 0;
-
-			$this->app->enqueueMessage('Tickets PDF feature only works with Individual / Group Registration for now. Please set Activate Shopping Cart config option to No if you want to use Ticket PDF feature', 'warning');
-		}
-
 		$model->store($data);
 
 		$task = $this->getTask();
