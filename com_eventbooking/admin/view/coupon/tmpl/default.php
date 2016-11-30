@@ -100,7 +100,8 @@ if (!empty($this->registrants))
 					<?php echo JText::_('EB_USED_AMOUNT'); ?>
 				</label>
 				<div class="controls">
-					<?php echo round($this->item->used_amount, 2); ?>
+					<input class="input-small" type="text" name="used_amount" id="used_amount" size="5" maxlength="250"
+			       value="<?php echo $this->item->used_amount; ?>" />					
 				</div>
 			</div>
 			<div class="control-group">
