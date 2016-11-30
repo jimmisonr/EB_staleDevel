@@ -15,23 +15,24 @@ JHtml::_('formbehavior.chosen', 'select');
 <div id="eb-registration-history-page" class="eb-container row-fluid eb-event">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_REGISTRATION_HISTORY'); ?></h1>
 <form action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=history&Itemid='.$this->Itemid); ; ?>" method="post" name="adminForm"  id="adminForm">
-	<table width="100%" class="hidden-phone" style="margin-bottom: 5px;">
-		<tr>
-			<td align="left">
-				<?php echo JText::_( 'EB_FILTER' ); ?>:
-				<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->lists['search'];?>" class="input-medium text_area search-query" onchange="document.adminForm.submit();" />
-				<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'EB_GO' ); ?></button>
-			</td >
-			<td style="float: right;">
-				<?php echo $this->lists['filter_event_id']; ?>
-			</td>
-		</tr>
-	</table>
+	<fieldset class="filters btn-toolbar clearfix">
+		<div class="filter-search btn-group pull-left">
+			<label for="filter_search" class="element-invisible"><?php echo JText::_('EB_FILTER_SEARCH_REGISTRATION_RECORDS_DESC');?></label>
+			<input type="text" name="filter_search" id="filter_search" placeholder="<?php echo JText::_('JSEARCH_FILTER'); ?>" value="<?php echo $this->escape($this->lists['search']); ?>" class="hasTooltip" title="<?php echo JHtml::tooltipText('EB_SEARCH_REGISTRATION_RECORDS_DESC'); ?>" />
+		</div>
+		<div class="btn-group pull-left">
+			<button type="submit" class="btn hasTooltip" title="<?php echo JHtml::tooltipText('JSEARCH_FILTER_SUBMIT'); ?>"><span class="icon-search"></span></button>
+			<button type="button" class="btn hasTooltip" title="<?php echo JHtml::tooltipText('JSEARCH_FILTER_CLEAR'); ?>" onclick="document.getElementById('filter_search').value='';this.form.submit();"><span class="icon-remove"></span></button>
+		</div>
+		<div class="btn-group pull-left hidden-phone">
+			<?php echo $this->lists['filter_event_id'] ; ?>
+		</div>
+	</fieldset>
 <?php
 	if (count($this->items))
 	{
 	?>
-	<table class="table table-striped table-bordered table-condensed">
+		<table class="table table-striped table-bordered table-hover">
 		<thead>
 			<tr>
 				<th width="5" class="hidden-phone">
@@ -85,6 +86,16 @@ JHtml::_('formbehavior.chosen', 'select');
 					<?php
 					}
 
+					if ($this->showDownloadTicket)
+					{
+						$cols++;
+					?>
+						<th class="center">
+							<?php echo JText::_('EB_TICKET'); ?>
+						</th>
+					<?php
+					}
+
 					if ($this->showDownloadCertificate)
 					{
 						$cols++;
@@ -117,7 +128,7 @@ JHtml::_('formbehavior.chosen', 'select');
 		for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 		{
 			$row = $this->items[$i];
-			$link 	= JRoute::_( 'index.php?option=com_eventbooking&task=edit_registrant&id='. $row->id.'&Itemid='.$this->Itemid.'&return='.$return);
+			$link 	= JRoute::_( 'index.php?option=com_eventbooking&view=registrant&id='. $row->id.'&Itemid='.$this->Itemid.'&return='.$return);
 			?>
 			<tr>
 				<td class="hidden-phone">
@@ -191,6 +202,22 @@ JHtml::_('formbehavior.chosen', 'select');
 							{
 							?>
 								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_invoice&id='.($row->cart_id ? $row->cart_id : ($row->group_id ? $row->group_id : $row->id))); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo EventbookingHelper::formatInvoiceNumber($row->invoice_number, $this->config) ; ?></a>
+							<?php
+							}
+							?>
+						</td>
+					<?php
+					}
+
+					if ($this->showDownloadTicket)
+					{
+					?>
+						<td class="center">
+							<?php
+							if ($row->ticket_code)
+							{
+							?>
+								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_ticket&id='.$row->id); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo $row->ticket_number ? EventbookingHelperTicket::formatTicketNumber($row->ticket_prefix, $row->ticket_number, $this->config) : JText::_('EB_DOWNLOAD_TICKETS');?></a>
 							<?php
 							}
 							?>

@@ -117,15 +117,15 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 
 		EventbookingHelperData::calculateDiscount($rows);
 
-		if ($config->show_price_including_tax)
+		if ($config->show_price_including_tax && !$config->get('setup_price'))
 		{
-
 			for ($i = 0, $n = count($rows); $i < $n; $i++)
 			{
 				$row                    = $rows[$i];
 				$taxRate                = $row->tax_rate;
 				$row->individual_price  = round($row->individual_price * (1 + $taxRate / 100), 2);
 				$row->fixed_group_price = round($row->fixed_group_price * (1 + $taxRate / 100), 2);
+
 				if ($config->show_discounted_price)
 				{
 					$row->discounted_price = round($row->discounted_price * (1 + $taxRate / 100), 2);

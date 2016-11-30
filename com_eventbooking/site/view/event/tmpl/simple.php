@@ -225,6 +225,21 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				<?php echo $editor->display( 'description',  $this->item->description , '100%', '250', '90', '10' ) ; ?>
 			</div>
 		</div>
+		<?php
+			if ($this->showCaptcha)
+			{
+			?>
+				<div class="<?php echo $controlGroupClass;  ?>">
+					<label class="<?php echo $controlLabelClass; ?>">
+						<?php echo  JText::_('EB_CAPTCHA'); ?>
+					</label>
+					<div class="<?php echo $controlsClass; ?>">
+						<?php echo $this->captcha; ?>
+					</div>
+				</div>
+			<?php
+			}
+		?>
 </div>
 	<script type="text/javascript">
 		Eb.jQuery(document).ready(function($){

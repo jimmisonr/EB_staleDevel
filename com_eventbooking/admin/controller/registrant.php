@@ -214,11 +214,11 @@ class EventbookingControllerRegistrant extends EventbookingController
 	{
 		$cid = $this->input->get('cid', array(), 'array');
 
-		$db = JFactory::getDbo();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('*')
 			->from('#__eb_registrants')
-			->where('id IN ('.implode(',', $cid).')')
+			->where('id IN (' . implode(',', $cid) . ')')
 			->order('id');
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
@@ -313,5 +313,35 @@ class EventbookingControllerRegistrant extends EventbookingController
 			$this->setRedirect('index.php?option=com_eventbooking&view=registrant&layout=import');
 			$this->setMessage($e->getMessage(), 'error');
 		}
+	}
+
+	public function download_ticket()
+	{
+		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/table/registrant.php';
+
+		$config = EventbookingHelper::getConfig();
+
+		$row = JTable::getInstance('registrant', 'EventbookingTable');
+
+		$id = $this->input->getInt('id', 0);
+
+		if (!$row->load($id))
+		{
+			throw new Exception(JText::_('Invalid Registration Record'), 404);
+		}
+
+		if ($row->published == 0)
+		{
+			throw new Exception(JText::_('Ticket is only allowed for confirmed/paid registrants'), 403);
+		}
+
+		// The person is allowed to download ticket, let process it
+		EventbookingHelperTicket::generateTicketsPDF($row, $config);
+
+		$fileName = 'ticket_' . str_pad($row->id, 5, '0', STR_PAD_LEFT) . '.pdf';
+		$filePath = JPATH_ROOT . '/media/com_eventbooking/tickets/' . $fileName;
+
+		while (@ob_end_clean()) ;
+		EventbookingHelper::processDownload($filePath, $fileName);
 	}
 }

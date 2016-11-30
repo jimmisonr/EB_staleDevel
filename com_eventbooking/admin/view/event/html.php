@@ -35,6 +35,7 @@ class EventbookingViewEventHtml extends RADViewItem
 		// Categories dropdown
 		$rows     = EventbookingHelperDatabase::getAllCategories();
 		$children = array();
+
 		if ($rows)
 		{
 			// first pass - collect children
@@ -46,13 +47,16 @@ class EventbookingViewEventHtml extends RADViewItem
 				$children[$pt] = $list;
 			}
 		}
+
 		$list      = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
 		$options   = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_SELECT_CATEGORY'));
+
 		foreach ($list as $listItem)
 		{
 			$options[] = JHtml::_('select.option', $listItem->id, '&nbsp;&nbsp;&nbsp;' . $listItem->treename);
 		}
+
 		if ($item->id)
 		{
 			$query->clear();
@@ -75,6 +79,7 @@ class EventbookingViewEventHtml extends RADViewItem
 			$mainCategoryId       = 0;
 			$additionalCategories = array(0);
 		}
+
 		$this->lists['main_category_id'] = JHtml::_('select.genericlist', $options, 'main_category_id', array(
 			'option.text.toHtml' => false,
 			'option.text'        => 'text',
@@ -85,19 +90,21 @@ class EventbookingViewEventHtml extends RADViewItem
 
 		array_shift($options);
 
-		$this->lists['category_id']              = JHtml::_('select.genericlist', $options, 'category_id[]', array(
+		$this->lists['category_id'] = JHtml::_('select.genericlist', $options, 'category_id[]', array(
 			'option.text.toHtml' => false,
 			'option.text'        => 'text',
 			'option.value'       => 'value',
 			'list.attr'          => 'class="advancedSelect input-xlarge"  size="5" multiple="multiple"',
 			'list.select'        => $additionalCategories,
 		));
+
 		$options                                 = array();
 		$options[]                               = JHtml::_('select.option', 1, JText::_('%'));
 		$options[]                               = JHtml::_('select.option', 2, $config->currency_symbol);
 		$this->lists['discount_type']            = JHtml::_('select.genericlist', $options, 'discount_type', ' class="input-small" ', 'value', 'text', $item->discount_type);
 		$this->lists['early_bird_discount_type'] = JHtml::_('select.genericlist', $options, 'early_bird_discount_type', 'class="input-small"', 'value', 'text', $item->early_bird_discount_type);
 		$this->lists['late_fee_type']            = JHtml::_('select.genericlist', $options, 'late_fee_type', 'class="input-small"', 'value', 'text', $item->late_fee_type);
+
 		if ($config->activate_deposit_feature)
 		{
 			$this->lists['deposit_type'] = JHtml::_('select.genericlist', $options, 'deposit_type', ' class="input-small" ', 'value', 'text', $item->deposit_type);
@@ -106,28 +113,33 @@ class EventbookingViewEventHtml extends RADViewItem
 		{
 			$item->registration_type = $config->registration_type;
 		}
-		$options                          = array();
-		$options[]                        = JHtml::_('select.option', 0, JText::_('EB_INDIVIDUAL_GROUP'));
-		$options[]                        = JHtml::_('select.option', 1, JText::_('EB_INDIVIDUAL_ONLY'));
-		$options[]                        = JHtml::_('select.option', 2, JText::_('EB_GROUP_ONLY'));
-		$options[]                        = JHtml::_('select.option', 3, JText::_('EB_DISABLE_REGISTRATION'));
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_INDIVIDUAL_GROUP'));
+		$options[] = JHtml::_('select.option', 1, JText::_('EB_INDIVIDUAL_ONLY'));
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_GROUP_ONLY'));
+		$options[] = JHtml::_('select.option', 3, JText::_('EB_DISABLE_REGISTRATION'));
+
 		$this->lists['registration_type'] = JHtml::_('select.genericlist', $options, 'registration_type', ' class="input-xlarge" ', 'value', 'text', $item->registration_type);
 
-		$options                      = array();
-		$options[]                    = JHtml::_('select.option', 0, JText::_('EB_USE_GLOBAL_CONFIGURATION'));
-		$options[]                    = JHtml::_('select.option', 1, JText::_('EB_INDIVIDUAL_ONLY'));
-		$options[]                    = JHtml::_('select.option', 2, JText::_('EB_GROUP_ONLY'));
-		$options[]                    = JHtml::_('select.option', 3, JText::_('EB_INDIVIDUAL_GROUP'));
+		$options   = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_USE_GLOBAL_CONFIGURATION'));
+		$options[] = JHtml::_('select.option', 1, JText::_('EB_INDIVIDUAL_ONLY'));
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_GROUP_ONLY'));
+		$options[] = JHtml::_('select.option', 3, JText::_('EB_INDIVIDUAL_GROUP'));
+
 		$this->lists['enable_coupon'] = JHtml::_('select.genericlist', $options, 'enable_coupon', ' class="inputbox" ', 'value', 'text', $item->enable_coupon);
 
-		$options                      = array();
-		$options[]                    = JHtml::_('select.option', 0, JText::_('No'));
-		$options[]                    = JHtml::_('select.option', 1, JText::_('Yes'));
-		$options[]                    = JHtml::_('select.option', 2, JText::_('EB_USE_GLOBAL_CONFIGURATION'));
+		$options   = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('No'));
+		$options[] = JHtml::_('select.option', 1, JText::_('Yes'));
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_USE_GLOBAL_CONFIGURATION'));
+
 		$this->lists['activate_waiting_list'] = JHtml::_('select.genericlist', $options, 'activate_waiting_list', ' class="inputbox" ', 'value', 'text', $item->activate_waiting_list);
 
-		$this->lists['access']                     = JHtml::_('access.level', 'access', $item->access, 'class="inputbox"', false);
-		$this->lists['registration_access']        = JHtml::_('access.level', 'registration_access', $item->registration_access, 'class="inputbox"', false);
+		$this->lists['access']              = JHtml::_('access.level', 'access', $item->access, 'class="inputbox"', false);
+		$this->lists['registration_access'] = JHtml::_('access.level', 'registration_access', $item->registration_access, 'class="inputbox"', false);
+
 		if ($item->event_date != $db->getNullDate())
 		{
 			$selectedHour   = date('G', strtotime($item->event_date));
@@ -138,8 +150,10 @@ class EventbookingViewEventHtml extends RADViewItem
 			$selectedHour   = 0;
 			$selectedMinute = 0;
 		}
+
 		$this->lists['event_date_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'event_date_hour', ' class="inputbox input-mini" ', $selectedHour);
 		$this->lists['event_date_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'event_date_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d');
+
 		if ($item->event_end_date != $db->getNullDate())
 		{
 			$selectedHour   = date('G', strtotime($item->event_end_date));
@@ -150,6 +164,7 @@ class EventbookingViewEventHtml extends RADViewItem
 			$selectedHour   = 0;
 			$selectedMinute = 0;
 		}
+
 		$this->lists['event_end_date_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'event_end_date_hour', ' class="inputbox input-mini" ', $selectedHour);
 		$this->lists['event_end_date_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'event_end_date_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d');
 
@@ -164,6 +179,7 @@ class EventbookingViewEventHtml extends RADViewItem
 			$selectedHour   = 0;
 			$selectedMinute = 0;
 		}
+
 		$this->lists['cut_off_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'cut_off_hour', ' class="inputbox input-mini" ', $selectedHour);
 		$this->lists['cut_off_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'cut_off_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d');
 
@@ -178,10 +194,12 @@ class EventbookingViewEventHtml extends RADViewItem
 			$selectedHour   = 0;
 			$selectedMinute = 0;
 		}
+
 		$this->lists['registration_start_hour']   = JHtml::_('select.integerlist', 0, 23, 1, 'registration_start_hour', ' class="inputbox input-mini" ', $selectedHour);
 		$this->lists['registration_start_minute'] = JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_minute', ' class="inputbox input-mini" ', $selectedMinute, '%02d');
 
 		$nullDate = $db->getNullDate();
+
 		//Custom field handles
 		if ($config->event_custom_field)
 		{
@@ -194,10 +212,11 @@ class EventbookingViewEventHtml extends RADViewItem
 			$this->form = $form;
 		}
 
-		$query->clear();
 		$options   = array();
 		$options[] = JHtml::_('select.option', '', JText::_('EB_ALL_PAYMENT_METHODS'), 'id', 'title');
-		$query->select('id, title')
+
+		$query->clear()
+			->select('id, title')
 			->from('#__eb_payment_plugins')
 			->where('published=1');
 		$db->setQuery($query);
@@ -206,10 +225,12 @@ class EventbookingViewEventHtml extends RADViewItem
 		$currencies = require_once JPATH_ROOT . '/components/com_eventbooking/helper/currencies.php';
 		$options    = array();
 		$options[]  = JHtml::_('select.option', '', JText::_('EB_SELECT_CURRENCY'));
+
 		foreach ($currencies as $code => $title)
 		{
 			$options[] = JHtml::_('select.option', $code, $title);
 		}
+
 		$this->lists['currency_code'] = JHtml::_('select.genericlist', $options, 'currency_code', '', 'value', 'text', $item->currency_code);
 
 		$this->lists['discount_groups'] = JHtml::_('access.usergroup', 'discount_groups[]', explode(',', $item->discount_groups),
@@ -233,6 +254,7 @@ class EventbookingViewEventHtml extends RADViewItem
 	protected function addToolbar()
 	{
 		$layout = $this->getLayout();
+
 		if ($layout == 'default')
 		{
 			parent::addToolbar();

@@ -44,6 +44,8 @@ defined('_JEXEC') or die;
  * @property $is_group_billing
  * @property $invoice_number
  * @property $registration_code
+ * @property $ticket_code
+ * @property $ticket_number
  * @property $params
  * @property $cart_id
  * @property $deposit_amount

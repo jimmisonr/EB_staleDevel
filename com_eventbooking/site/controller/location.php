@@ -17,10 +17,12 @@ class EventbookingControllerLocation extends EventbookingController
 	public function save()
 	{
 		$this->csrfProtection();
+
 		if (JFactory::getUser()->authorise('eventbooking.addlocation', 'com_eventbooking'))
 		{
 			$post  = $this->input->post->getData();
 			$model = $this->getModel();
+
 			try
 			{
 				$model->store($post);
@@ -41,12 +43,14 @@ class EventbookingControllerLocation extends EventbookingController
 	public function save_ajax()
 	{
 		$this->csrfProtection();
+
 		if (JFactory::getUser()->authorise('eventbooking.addlocation', 'com_eventbooking'))
 		{
 			$post  = $this->input->post->getData();
 			$model = $this->getModel();
 
 			$json = array();
+
 			try
 			{
 				$model->store($post);
@@ -61,6 +65,7 @@ class EventbookingControllerLocation extends EventbookingController
 			}
 
 			echo json_encode($json);
+
 			$this->app->close();
 		}
 	}
@@ -71,6 +76,7 @@ class EventbookingControllerLocation extends EventbookingController
 	public function delete()
 	{
 		$this->csrfProtection();
+
 		// Check permission
 		if (!JFactory::getUser()->authorise('eventbooking.addlocation', 'com_eventbooking'))
 		{
@@ -79,12 +85,14 @@ class EventbookingControllerLocation extends EventbookingController
 			return;
 		}
 
-		$model = $this->getModel();
-		$cid   = JRequest::getVar('cid', array());
+		$cid = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid);
+
+		/* @var EventbookingModelLocation $model */
+		$model = $this->getModel();
 		$model->delete($cid);
-		$msg = JText::_('EB_LOCATION_REMOVED');
-		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=locations&Itemid=' . $this->input->getInt('Itemid', 0)), $msg);
+
+		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=locations&Itemid=' . $this->input->getInt('Itemid', 0)), JText::_('EB_LOCATION_REMOVED'));
 	}
 
 	/**

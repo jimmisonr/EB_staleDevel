@@ -241,6 +241,12 @@ class EventbookingRouter extends JComponentRouterBase
 			case 'search':
 				$segments[] = 'search result';
 				break;
+			case 'registrant':
+				$segments[] = 'Edit Registrant';
+				break;
+			case 'users':
+				$segments[] = 'users list';
+				break;
 			case 'payment':
 				$segments[] = 'payment deposit';
 

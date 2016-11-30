@@ -16,7 +16,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '2.11.2';
+		return '2.12.0';
 	}
 
 	/**
@@ -1042,7 +1042,6 @@ class EventbookingHelper
 			}
 		}
 
-
 		$totalAmount = $event->individual_price + $form->calculateFee($feeCalculationTags);
 
 		if ($event->has_multiple_ticket_types)
@@ -1108,6 +1107,7 @@ class EventbookingHelper
 				->where('(valid_from = "0000-00-00" OR valid_from <= NOW())')
 				->where('(valid_to = "0000-00-00" OR valid_to >= NOW())')
 				->where('(times = 0 OR times > used)')
+				->where('discount > used_amount')
 				->where('enable_for IN (0, 1)')
 				->where('user_id IN (0, ' . $user->id . ')')
 				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id=' . $event->id . '))')
@@ -1124,7 +1124,7 @@ class EventbookingHelper
 				{
 					$discountAmount = $discountAmount + $totalAmount * $coupon->discount / 100;
 				}
-				else
+				elseif ($coupon->coupon_type == 1)
 				{
 					$discountAmount = $discountAmount + $coupon->discount;
 				}
@@ -1205,16 +1205,25 @@ class EventbookingHelper
 			}
 		}
 
-		if ($event->tax_rate && ($totalAmount - $discountAmount + $lateFee > 0))
+		if ($event->tax_rate > 0 && ($totalAmount - $discountAmount + $lateFee > 0))
 		{
-			$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $event->tax_rate / 100, 2);
+			if ($config->get('setup_price'))
+			{
+				$amount      = $totalAmount - $discountAmount + $lateFee;
+				$totalAmount = $amount / (1 + $event->tax_rate / 100);
+				$taxAmount   = $amount - $totalAmount;
+			}
+			else
+			{
+				$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $event->tax_rate / 100, 2);
+				$amount    = $totalAmount - $discountAmount + $taxAmount + $lateFee;
+			}
 		}
 		else
 		{
 			$taxAmount = 0;
+			$amount    = $totalAmount - $discountAmount + $taxAmount + $lateFee;
 		}
-
-		$amount = $totalAmount - $discountAmount + $taxAmount + $lateFee;
 
 		// Payment processing fee
 		$paymentFeeAmount  = 0;
@@ -1238,6 +1247,26 @@ class EventbookingHelper
 			$fees['payment_processing_fee'] = 0;
 		}
 
+		$couponDiscountAmount = 0;
+
+		if (!empty($coupon) && $coupon->coupon_type == 2)
+		{
+			$couponAvailableAmount = $coupon->discount - $coupon->used_amount;
+
+			if ($couponAvailableAmount >= $amount)
+			{
+				$couponDiscountAmount = $amount;
+				$amount               = 0;
+			}
+			else
+			{
+				$amount               = $amount - $couponAvailableAmount;
+				$couponDiscountAmount = $couponAvailableAmount;
+			}
+		}
+
+		$discountAmount += $couponDiscountAmount;
+
 		// Calculate the deposit amount as well
 		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
 		{
@@ -1255,12 +1284,13 @@ class EventbookingHelper
 			$depositAmount = 0;
 		}
 
-		$fees['total_amount']    = $totalAmount;
-		$fees['discount_amount'] = $discountAmount;
-		$fees['tax_amount']      = $taxAmount;
-		$fees['amount']          = $amount;
-		$fees['deposit_amount']  = $depositAmount;
-		$fees['late_fee']        = $lateFee;
+		$fees['total_amount']           = $totalAmount;
+		$fees['discount_amount']        = $discountAmount;
+		$fees['tax_amount']             = $taxAmount;
+		$fees['amount']                 = $amount;
+		$fees['deposit_amount']         = $depositAmount;
+		$fees['late_fee']               = $lateFee;
+		$fees['coupon_discount_amount'] = $couponDiscountAmount;
 
 		return $fees;
 	}
@@ -1320,6 +1350,7 @@ class EventbookingHelper
 		$membersDiscountAmount = array();
 		$membersLateFee        = array();
 		$membersTaxAmount      = array();
+		$membersAmount         = array();
 
 		// Members data
 		if ($config->collect_member_information)
@@ -1409,6 +1440,7 @@ class EventbookingHelper
 				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
 				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
 				->where('(times = 0 OR times > used)')
+				->where('discount > used_amount')
 				->where('enable_for IN (0, 2)')
 				->where('user_id IN (0, ' . $user->id . ')')
 				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id=' . $event->id . '))')
@@ -1433,7 +1465,7 @@ class EventbookingHelper
 						}
 					}
 				}
-				else
+				elseif ($coupon->coupon_type == 1)
 				{
 					if ($coupon->apply_to == 0)
 					{
@@ -1591,33 +1623,56 @@ class EventbookingHelper
 		}
 
 		// Calculate tax amount
-		if ($event->tax_rate && ($totalAmount - $discountAmount + $lateFee > 0))
+		if ($event->tax_rate > 0 && ($totalAmount - $discountAmount + $lateFee > 0))
 		{
-			$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $event->tax_rate / 100, 2);
-
-			if ($config->collect_member_information)
+			if ($config->get('setup_price'))
 			{
-				for ($i = 0; $i < $numberRegistrants; $i++)
+				$amount      = $totalAmount - $discountAmount + $lateFee;
+				$totalAmount = $amount / (1 + $event->tax_rate / 100);
+				$taxAmount   = $amount - $totalAmount;
+
+				if ($config->collect_member_information)
 				{
-					$membersTaxAmount[$i] = round(($membersTotalAmount[$i] - $membersDiscountAmount[$i] + $membersLateFee[$i]) * $event->tax_rate / 100, 2);
+					for ($i = 0; $i < $numberRegistrants; $i++)
+					{
+						$membersAmount[$i]      = $membersTotalAmount[$i] - $membersDiscountAmount[$i] + $membersLateFee[$i];
+						$membersTotalAmount[$i] = $membersAmount[$i] / (1 + $event->tax_rate / 100);
+						$membersTaxAmount[$i]   = $membersAmount[$i] - $membersTotalAmount[$i];
+					}
+				}
+			}
+			else
+			{
+				$taxAmount = round(($totalAmount - $discountAmount + $lateFee) * $event->tax_rate / 100, 2);
+
+				// Gross amount
+				$amount = $totalAmount - $discountAmount + $taxAmount + $lateFee;
+
+				if ($config->collect_member_information)
+				{
+					for ($i = 0; $i < $numberRegistrants; $i++)
+					{
+						$membersTaxAmount[$i] = round(($membersTotalAmount[$i] - $membersDiscountAmount[$i] + $membersLateFee[$i]) * $event->tax_rate / 100, 2);
+						$membersAmount[$i]    = $membersTotalAmount[$i] - $membersDiscountAmount[$i] + $membersLateFee[$i] + $membersTaxAmount[$i];
+					}
 				}
 			}
 		}
 		else
 		{
 			$taxAmount = 0;
+			// Gross amount
+			$amount = $totalAmount - $discountAmount + $taxAmount + $lateFee;
 
 			if ($config->collect_member_information)
 			{
 				for ($i = 0; $i < $numberRegistrants; $i++)
 				{
 					$membersTaxAmount[$i] = 0;
+					$membersAmount[$i]    = $membersTotalAmount[$i] - $membersDiscountAmount[$i] + $membersLateFee[$i] + $membersTaxAmount[$i];
 				}
 			}
 		}
-
-		// Gross amount
-		$amount = $totalAmount - $discountAmount + $taxAmount + $lateFee;
 
 		// Payment processing fee
 		$paymentFeeAmount  = 0;
@@ -1640,6 +1695,51 @@ class EventbookingHelper
 		{
 			$fees['payment_processing_fee'] = 0;
 		}
+
+		$couponDiscountAmount = 0;
+
+		if (!empty($coupon) && $coupon->coupon_type == 2)
+		{
+			$couponAvailableAmount = $coupon->discount - $coupon->used_amount;
+
+			if ($couponAvailableAmount >= $amount)
+			{
+				$couponDiscountAmount = $amount;
+			}
+			else
+			{
+				$couponDiscountAmount = $couponAvailableAmount;
+			}
+
+			$amount -= $couponDiscountAmount;
+
+			if ($config->collect_member_information)
+			{
+				for ($i = 0; $i < $numberRegistrants; $i++)
+				{
+					if ($couponAvailableAmount >= $membersAmount[$i])
+					{
+						$memberCouponDiscountAmount = $membersAmount[$i];
+					}
+					else
+					{
+						$memberCouponDiscountAmount = $couponAvailableAmount;
+					}
+
+					$membersAmount[$i] = $membersAmount[$i] - $memberCouponDiscountAmount;
+					$membersDiscountAmount[$i] += $memberCouponDiscountAmount;
+
+					$couponAvailableAmount -= $memberCouponDiscountAmount;
+
+					if ($couponAvailableAmount <= 0)
+					{
+						break;
+					}
+				}
+			}
+		}
+
+		$discountAmount += $couponDiscountAmount;
 
 		// Deposit amount
 		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
@@ -1668,7 +1768,9 @@ class EventbookingHelper
 		$fees['members_total_amount']    = $membersTotalAmount;
 		$fees['members_discount_amount'] = $membersDiscountAmount;
 		$fees['members_tax_amount']      = $membersTaxAmount;
+		$fees['members_amount']          = $membersAmount;
 		$fees['members_late_fee']        = $membersLateFee;
+		$fees['coupon_discount_amount']  = $couponDiscountAmount;
 
 		return $fees;
 	}
@@ -1696,6 +1798,7 @@ class EventbookingHelper
 		$lateFee              = 0;
 		$taxAmount            = 0;
 		$amount               = 0;
+		$couponDiscountAmount = 0;
 		$depositAmount        = 0;
 		$paymentProcessingFee = 0;
 		$feeAmount            = $form->calculateFee();
@@ -1716,6 +1819,7 @@ class EventbookingHelper
 		}
 
 		$couponDiscountedEventIds = array();
+		$couponAvailableAmount    = 0;
 
 		if ($couponCode)
 		{
@@ -1729,6 +1833,7 @@ class EventbookingHelper
 				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
 				->where('user_id IN (0, ' . $user->id . ')')
 				->where('(times = 0 OR times > used)')
+				->where('discount > used_amount')
 				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id IN (' . implode(',', $items) . ')))')
 				->order('id DESC');
 			$db->setQuery($query);
@@ -1748,6 +1853,11 @@ class EventbookingHelper
 					$db->setQuery($query);
 					$couponDiscountedEventIds = $db->loadColumn();
 				}
+
+				if ($coupon->coupon_type == 2)
+				{
+					$couponAvailableAmount = $coupon->discount - $coupon->used_amount;
+				}
 			}
 			else
 			{
@@ -1766,6 +1876,7 @@ class EventbookingHelper
 			$membersDiscountAmount = array();
 			$membersLateFee        = array();
 			$membersTaxAmount      = array();
+			$membersAmount         = array();
 		}
 
 		// Calculate bundle discount if setup
@@ -1934,7 +2045,7 @@ class EventbookingHelper
 						}
 					}
 				}
-				else
+				elseif ($coupon->coupon_type == 1)
 				{
 					$registrantDiscount = $registrantDiscount + $coupon->discount;
 
@@ -1988,27 +2099,48 @@ class EventbookingHelper
 
 			if ($event->tax_rate > 0)
 			{
-				$registrantTaxAmount = round($event->tax_rate * ($registrantTotalAmount - $registrantDiscount + $registrantLateFee) / 100, 2);
-
-				if ($config->collect_member_information_in_cart)
+				if ($config->get('setup_price'))
 				{
-					for ($j = 0; $j < $quantity; $j++)
+					$registrantAmount      = $registrantTotalAmount - $registrantDiscount + $registrantLateFee;
+					$registrantTotalAmount = $registrantAmount / (1 + $event->tax_rate / 100);
+					$registrantTaxAmount   = $registrantAmount - $registrantTotalAmount;
+
+					if ($config->collect_member_information_in_cart)
 					{
-						$membersTaxAmount[$eventId][$j] = round($event->tax_rate * ($membersTotalAmount[$eventId][$j] - $membersDiscountAmount[$eventId][$j] + $membersLateFee[$eventId][$j]) / 100, 2);
+						for ($j = 0; $j < $quantity; $j++)
+						{
+							$membersAmount[$eventId][$j]      = $membersTotalAmount[$eventId][$j] - $membersDiscountAmount[$eventId][$j] + $membersLateFee[$eventId][$j];
+							$membersTotalAmount[$eventId][$j] = $membersAmount[$eventId][$j] / (1 + $event->tax_rate / 100);
+							$membersTaxAmount[$eventId][$j]   = $membersAmount[$eventId][$j] - $membersTotalAmount[$eventId][$j];
+						}
+					}
+				}
+				else
+				{
+					$registrantTaxAmount = round($event->tax_rate * ($registrantTotalAmount - $registrantDiscount + $registrantLateFee) / 100, 2);
+					$registrantAmount    = $registrantTotalAmount - $registrantDiscount + $registrantTaxAmount + $registrantLateFee;
+
+					if ($config->collect_member_information_in_cart)
+					{
+						for ($j = 0; $j < $quantity; $j++)
+						{
+							$membersTaxAmount[$eventId][$j] = round($event->tax_rate * ($membersTotalAmount[$eventId][$j] - $membersDiscountAmount[$eventId][$j] + $membersLateFee[$eventId][$j]) / 100, 2);
+							$membersAmount[$eventId][$j]    = $membersTotalAmount[$eventId][$j] - $membersDiscountAmount[$eventId][$j] + $membersLateFee[$eventId][$j] + $membersTaxAmount[$eventId][$j];
+						}
 					}
 				}
 			}
 			else
 			{
 				$registrantTaxAmount = 0;
+				$registrantAmount    = $registrantTotalAmount - $registrantDiscount + $registrantTaxAmount + $registrantLateFee;
 
 				for ($j = 0; $j < $quantity; $j++)
 				{
 					$membersTaxAmount[$eventId][$j] = 0;
+					$membersAmount[$eventId][$j]    = $membersTotalAmount[$eventId][$j] - $membersDiscountAmount[$eventId][$j] + $membersLateFee[$eventId][$j] + $membersTaxAmount[$eventId][$j];
 				}
 			}
-
-			$registrantAmount = $registrantTotalAmount - $registrantDiscount + $registrantTaxAmount + $registrantLateFee;
 
 			if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $registrantAmount > 0)
 			{
@@ -2019,6 +2151,52 @@ class EventbookingHelper
 			{
 
 				$registrantPaymentProcessingFee = 0;
+			}
+
+			if (!empty($coupon) && $coupon->coupon_type == 2 && ($coupon->event_id == -1 || in_array($eventId, $couponDiscountedEventIds)))
+			{
+				if ($couponAvailableAmount > $registrantAmount)
+				{
+					$registrantCouponDiscountAmount = $registrantAmount;
+				}
+				else
+				{
+					$registrantCouponDiscountAmount = $couponAvailableAmount;
+				}
+
+				$registrantAmount -= $registrantCouponDiscountAmount;
+				$registrantDiscount += $registrantCouponDiscountAmount;
+				$couponAvailableAmount -= $registrantCouponDiscountAmount;
+
+				$couponDiscountAmount += $registrantCouponDiscountAmount;
+
+				if ($config->collect_member_information_in_cart)
+				{
+					$totalMemberDiscountAmount = $registrantCouponDiscountAmount;
+
+					for ($j = 0; $j < $quantity; $j++)
+					{
+						if ($totalMemberDiscountAmount > $membersAmount[$eventId][$j])
+						{
+							$memberCouponDiscountAmount = $membersAmount[$eventId][$j];
+						}
+						else
+						{
+							$memberCouponDiscountAmount = $totalMemberDiscountAmount;
+						}
+
+						$totalMemberDiscountAmount -= $memberCouponDiscountAmount;
+
+						$membersAmount[$eventId][$j] -= $memberCouponDiscountAmount;
+
+						$membersDiscountAmount[$eventId][$j] += $memberCouponDiscountAmount;
+
+						if ($totalMemberDiscountAmount <= 0)
+						{
+							break;
+						}
+					}
+				}
 			}
 
 			if ($config->activate_deposit_feature && $event->deposit_amount > 0 && $paymentType == 1)
@@ -2064,6 +2242,7 @@ class EventbookingHelper
 		$fees['amount']                 = $amount;
 		$fees['deposit_amount']         = $depositAmount;
 		$fees['payment_processing_fee'] = $paymentProcessingFee;
+		$fees['coupon_discount_amount'] = $couponDiscountAmount;
 
 		if ($collectRecordsData)
 		{
@@ -2077,6 +2256,7 @@ class EventbookingHelper
 			$fees['members_discount_amount'] = $membersDiscountAmount;
 			$fees['members_tax_amount']      = $membersTaxAmount;
 			$fees['members_late_fee']        = $membersLateFee;
+			$fees['members_amount']          = $membersAmount;
 		}
 
 		return $fees;
@@ -3664,21 +3844,73 @@ class EventbookingHelper
 	 */
 	public static function getUserInput($userId, $fieldName = 'user_id', $registrantId = 0)
 	{
-		JHtml::_('jquery.framework');
-		$field = JFormHelper::loadFieldType('User');
-
-		$element = new SimpleXMLElement('<field />');
-		$element->addAttribute('name', $fieldName);
-		$element->addAttribute('class', 'readonly input-medium');
-
-		if (!$registrantId)
+		if (JFactory::getApplication()->isSite())
 		{
-			$element->addAttribute('onchange', 'populateRegistrantData();');
+			// Initialize variables.
+			$html = array();
+			$link = 'index.php?option=com_eventbooking&amp;view=users&amp;layout=modal&amp;tmpl=component&amp;field=user_id';
+			// Initialize some field attributes.
+			$attr = ' class="inputbox"';
+			// Load the modal behavior script.
+			JHtml::_('behavior.modal', 'a.modal_user_id');
+			// Build the script.
+			$script   = array();
+			$script[] = '	function jSelectUser_user_id(id, title) {';
+			$script[] = '			document.getElementById("jform_user_id").value = title; ';
+			$script[] = '			document.getElementById("user_id").value = id; ';
+
+			if (!$registrantId)
+			{
+				$script[] = 'populateRegistrantData()';
+			}
+
+			$script[] = '		SqueezeBox.close();';
+			$script[] = '	}';
+
+			// Add the script to the document head.
+			JFactory::getDocument()->addScriptDeclaration(implode("\n", $script));
+			// Load the current username if available.
+			$table = JTable::getInstance('user');
+
+			if ($userId)
+			{
+				$table->load($userId);
+			}
+			else
+			{
+				$table->name = '';
+			}
+
+			// Create a dummy text field with the user name.
+			$html[] = '<div class="input-append">';
+			$html[] = '	<input type="text" readonly="" name="jform[user_id]" id="jform_user_id"' . ' value="' . $table->name . '"' . $attr . ' />';
+			$html[] = '	<input type="hidden" name="user_id" id="user_id"' . ' value="' . $userId . '"' . $attr . ' />';
+			// Create the user select button.
+			$html[] = '<a class="btn btn-primary button-select modal_user_id" title="' . JText::_('JLIB_FORM_CHANGE_USER') . '"' . ' href="' . $link . '"' .
+				' rel="{handler: \'iframe\', size: {x: 800, y: 500}}">';
+			$html[] = ' <span class="icon-user"></span></a>';
+			$html[] = '</div>';
+
+			return implode("\n", $html);
 		}
+		else
+		{
+			JHtml::_('jquery.framework');
+			$field = JFormHelper::loadFieldType('User');
 
-		$field->setup($element, $userId);
+			$element = new SimpleXMLElement('<field />');
+			$element->addAttribute('name', $fieldName);
+			$element->addAttribute('class', 'readonly input-medium');
 
-		return $field->input;
+			if (!$registrantId)
+			{
+				$element->addAttribute('onchange', 'populateRegistrantData();');
+			}
+
+			$field->setup($element, $userId);
+
+			return $field->input;
+		}
 	}
 
 	/**
@@ -3760,7 +3992,7 @@ class EventbookingHelper
 	}
 
 	/**
-	 * Format invoice number
+	 * Format certificate number
 	 *
 	 * @param int       $id
 	 * @param RADConfig $config
@@ -3825,12 +4057,20 @@ class EventbookingHelper
 		$config      = self::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 		$sitename    = JFactory::getConfig()->get("sitename");
-		$query->select('*, title' . $fieldSuffix . ' AS title')
+
+		$query->select('*')
 			->from('#__eb_events')
 			->where('id = ' . (int) $row->event_id);
+
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
+		}
+
 		$db->setQuery($query);
 		$rowEvent = $db->loadObject();
-		$pdf      = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 		$pdf->SetCreator(PDF_CREATOR);
 		$pdf->SetAuthor($sitename);
 		$pdf->SetTitle('Invoice');
@@ -3865,7 +4105,11 @@ class EventbookingHelper
 		}
 		else
 		{
-			if (self::isValidMessage($config->{'invoice_format' . $fieldSuffix}))
+			if (self::isValidMessage($rowEvent->invoice_format))
+			{
+				$invoiceOutput = $rowEvent->invoice_format;
+			}
+			elseif (self::isValidMessage($config->{'invoice_format' . $fieldSuffix}))
 			{
 				$invoiceOutput = $config->{'invoice_format' . $fieldSuffix};
 			}
@@ -4674,9 +4918,7 @@ class EventbookingHelper
 	 */
 	public static function checkAddEvent()
 	{
-		$user = JFactory::getUser();
-
-		return $user->id > 0 && $user->authorise('eventbooking.addevent', 'com_eventbooking');
+		return JFactory::getUser()->authorise('eventbooking.addevent', 'com_eventbooking');
 	}
 
 	/**
@@ -5154,5 +5396,53 @@ class EventbookingHelper
 	public static function getUserIp()
 	{
 		return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+	}
+
+	/**
+	 * Check to see whether the current user can delete the given registrant
+	 *
+	 * @param int $id
+	 *
+	 * @return bool
+	 */
+	public static function canDeleteRegistrant($id = 0)
+	{
+		$user   = JFactory::getUser();
+		$config = EventbookingHelper::getConfig();
+
+		if (!$user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
+		{
+			return false;
+		}
+
+		if ($user->authorise('core.delete', 'com_eventbooking'))
+		{
+			return true;
+		}
+
+		if ($config->get('only_show_registrants_of_event_owner') && $config->get('enable_delete_registrants', 1))
+		{
+			if ($id = 0)
+			{
+				return true;
+			}
+
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+
+			$query->select('b.created_by')
+				->from('#__eb_registrants AS a')
+				->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+				->where('a.id = ' . $id);
+			$db->setQuery($query);
+			$eventCreatorID = $db->loadObject();
+
+			if ($eventCreatorID == $user->id)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

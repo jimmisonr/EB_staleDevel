@@ -13,22 +13,24 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 {
 	public function display()
 	{
-		$document = JFactory::getDocument();
 		$rootUri  = JUri::root(true);
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
+		$config   = EventbookingHelper::getConfig();
+		$db       = JFactory::getDbo();
+		$query    = $db->getQuery(true);
+
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$userId      = $user->get('id');
+		$lists       = array();
+
 		EventbookingHelper::addLangLinkForAjax();
 		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
 		$document->addScript($rootUri . '/media/com_eventbooking/assets/js/paymentmethods.js');
 		$document->addScript($rootUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
 
-		$this->setLayout('default');
+		$item = $this->model->getData();
 
-		$db          = JFactory::getDbo();
-		$query       = $db->getQuery(true);
-		$user        = JFactory::getUser();
-		$item        = $this->model->getData();
-		$config      = EventbookingHelper::getConfig();
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$userId      = $user->get('id');
 		EventbookingHelper::checkEditRegistrant($item);
 
 		if ($item->id)
@@ -51,11 +53,11 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 
 			$data = EventbookingHelper::getRegistrantData($item, $rowFields);
 
-			$query->clear();
-			$query->select('*')
-					->from('#__eb_registrants')
-					->where('group_id=' . $item->id)
-					->order('id');
+			$query->clear()
+				->select('*')
+				->from('#__eb_registrants')
+				->where('group_id=' . $item->id)
+				->order('id');
 			$db->setQuery($query, 0, $item->number_registrants);
 			$rowMembers = $db->loadObjectList();
 
@@ -63,21 +65,23 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		}
 		else
 		{
-			$rowFields  = EventbookingHelper::getFormFields($item->event_id, 0);
+			$rowFields = EventbookingHelper::getFormFields($item->event_id, 0);
 
 			$useDefault = true;
-			$data = array();
+			$data       = array();
 			$rowMembers = array();
 		}
 
 		if ($userId && $user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
-			$canChangeStatus    = true;
-			$options            = array();
-			$options[]          = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
-			$options[]          = JHtml::_('select.option', 1, JText::_('EB_PAID'));
-			$options[]          = JHtml::_('select.option', 3, JText::_('EB_WAITING_LIST'));
-			$options[]          = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
+			$canChangeStatus = true;
+
+			$options   = array();
+			$options[] = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
+			$options[] = JHtml::_('select.option', 1, JText::_('EB_PAID'));
+			$options[] = JHtml::_('select.option', 3, JText::_('EB_WAITING_LIST'));
+			$options[] = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
+
 			$lists['published'] = JHtml::_('select.genericlist', $options, 'published', ' class="inputbox" ', 'value', 'text', $item->published);
 		}
 		else
@@ -101,33 +105,36 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		{
 			//Build list of event dropdown
 			$options = array();
-			$query->clear();
-			$query->select('id, title' . $fieldSuffix . ' AS title, event_date')
+			$query->clear()
+				->select('id, title' . $fieldSuffix . ' AS title, event_date')
 				->from('#__eb_events')
 				->where('published=1')
 				->order('title');
 			$db->setQuery($query);
 			$options[] = JHtml::_('select.option', '', JText::_('Select Event'), 'id', 'title');
+
+			$rows = $db->loadObjectList();
+
 			if ($config->show_event_date)
 			{
-				$rows = $db->loadObjectList();
-				for ($i = 0, $n = count($rows); $i < $n; $i++)
+				foreach ($rows as $row)
 				{
-					$row       = $rows[$i];
 					$options[] = JHtml::_('select.option', $row->id, $row->title . ' (' . JHtml::_('date', $row->event_date, $config->date_format) . ')' .
 						'', 'id', 'title');
 				}
 			}
 			else
 			{
-				$options = array_merge($options, $db->loadObjectList());
+				$options = array_merge($options, $rows);
 			}
+
 			$lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id', ' class="inputbox validate[required]" ', 'id', 'title', $item->event_id);
 		}
 
 		if ($config->collect_member_information && !$rowMembers && $item->number_registrants > 1)
 		{
 			$rowMembers = array();
+
 			for ($i = 0; $i < $item->number_registrants; $i++)
 			{
 				$rowMember           = new RADTable('#__eb_registrants', 'id', $db);
@@ -163,7 +170,6 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		{
 			$this->ticketTypes = EventbookingHelperData::getTicketTypes($event->id);
 
-			$registrantTickets = array();
 			if ($item->id)
 			{
 				$query->clear()
@@ -173,13 +179,20 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 				$db->setQuery($query);
 				$registrantTickets = $db->loadObjectList('ticket_type_id');
 			}
+			else
+			{
+				$registrantTickets = array();
+			}
 
 			$this->registrantTickets = $registrantTickets;
 
-			$canChangeTicketsQuantity = false;
 			if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 			{
 				$canChangeTicketsQuantity = true;
+			}
+			else
+			{
+				$canChangeTicketsQuantity = false;
 			}
 
 			$this->canChangeTicketsQuantity = $canChangeTicketsQuantity;
@@ -194,6 +207,30 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		$this->return             = $this->input->get('return', '', 'string');
 		$this->canChangeFeeFields = $canChangeFeeFields;
 
+		$this->addToolbar();
+
+		$this->setLayout('default');
+
 		parent::display();
+	}
+
+	/**
+	 * Build Form Toolbar
+	 */
+	protected function addToolbar()
+	{
+		require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
+
+		JToolbarHelper::save('registrant.save', 'JTOOLBAR_SAVE');
+
+		if ($this->item->id &&
+			$this->item->published != 2 &&
+			EventbookingHelper::canCancelRegistration($this->item->event_id)
+		)
+		{
+			JToolbarHelper::custom('registrant.cancel', 'delete', 'delete', JText::_('EB_CANCEL_REGISTRATION'), false);
+		}
+
+		JToolbarHelper::cancel('registrant.cancel_edit', 'JTOOLBAR_CLOSE');
 	}
 }

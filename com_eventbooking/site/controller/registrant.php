@@ -9,20 +9,46 @@
 // no direct access
 defined('_JEXEC') or die;
 
-class EventbookingControllerRegistrant extends EventbookingController
+class EventbookingControllerRegistrant extends RADControllerAdmin
 {
+	public function display($cachable = false, array $urlparams = array())
+	{
+		/*  @var JDocumentHtml $document */
+		$document = JFactory::getDocument();
+		$config   = EventbookingHelper::getConfig();
+
+		// Always load jquery
+		JHtml::_('jquery.framework');
+
+		$rootUrl = JUri::root(true);
+
+		if ($config->load_bootstrap_css_in_frontend !== '0')
+		{
+			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap.css');
+		}
+
+		$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/css/style.css');
+
+		JHtml::_('script', EventbookingHelper::getURL() . 'media/com_eventbooking/assets/js/noconflict.js', false, false);
+
+		if (file_exists(JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css') && filesize(JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css') > 0)
+		{
+			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/css/custom.css');
+		}
+
+		parent::display($cachable, $urlparams);
+	}
+
 	/**
 	 * Save the registration record and back to registration record list
 	 */
 	public function save()
 	{
-		$this->csrfProtection();
-		$model = $this->getModel('registrant');
-		$model->store($this->input);
-		$return = base64_decode($this->input->getString('return', ''));
-		if ($return)
+		parent::save();
+
+		if ($return = $this->input->getString('return', ''))
 		{
-			$this->setRedirect($return);
+			$this->setRedirect(base64_decode($return));
 		}
 		else
 		{
@@ -35,56 +61,9 @@ class EventbookingControllerRegistrant extends EventbookingController
 	 */
 	public function delete()
 	{
-		$this->csrfProtection();
+		parent::delete();
 
-		$user   = JFactory::getUser();
-		$config = EventbookingHelper::getConfig();
-		$db     = JFactory::getDbo();
-		$query  = $db->getQuery(true);
-
-		$registrantId = $this->input->getInt('registrant_id', 0);
-		$canDelete    = false;
-
-		$query->select('a.*, b.created_by')
-			->from('#__eb_registrants AS a')
-			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
-			->where('a.id = ' . $registrantId);
-		$db->setQuery($query);
-		$rowRegistrant = $db->loadObject();
-
-		if (!$config->get('enable_delete_registrants', 1))
-		{
-			throw new RuntimeException('Delete registrants option is disabled. Please contact administrator', 403);
-		}
-
-		if (!$rowRegistrant)
-		{
-			throw new RuntimeException('Invalid registration record');
-		}
-
-		if ($user->authorise('core.admin', 'com_eventbooking'))
-		{
-			$canDelete = true;
-		}
-		elseif ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
-		{
-			if (!$config->only_show_registrants_of_event_owner || ($rowRegistrant->created_by == $user->id))
-			{
-				$canDelete = true;
-			}
-		}
-
-		if ($canDelete)
-		{
-			$model = $this->getModel('Registrant');
-			$model->delete(array($registrantId));
-
-			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=registrants&Itemid=' . $this->input->getInt('Itemid')), JText::_('EB_REGISTRANT_DELETED'));
-		}
-		else
-		{
-			throw new RuntimeException('You don\'t have permission to delete registrant', 403);
-		}
+		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', $this->input->getInt('Itemid')), false));
 	}
 
 	/**
@@ -100,6 +79,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 		$id               = $this->input->getInt('id', 0);
 		$registrationCode = $this->input->getString('cancel_code', '');
 		$fieldSuffix      = EventbookingHelper::getFieldSuffix();
+
 		if ($id)
 		{
 			$query->select('a.id, a.title' . $fieldSuffix . ' AS title, b.user_id, cancel_before_date, DATEDIFF(cancel_before_date, NOW()) AS number_days')
@@ -114,6 +94,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 				->innerJoin('#__eb_registrants AS b ON a.id = b.event_id')
 				->where('b.registration_code = ' . $db->quote($registrationCode));
 		}
+
 		$db->setQuery($query);
 		$rowEvent = $db->loadObject();
 
@@ -138,8 +119,10 @@ class EventbookingControllerRegistrant extends EventbookingController
 			$id = $rowEvent->registrant_id;
 		}
 
+		/* @var EventbookingModelRegister $model */
 		$model = $this->getModel('register');
 		$model->cancelRegistration($id);
+
 		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=registrationcancel&id=' . $id . '&Itemid=' . $Itemid, false));
 	}
 
@@ -148,10 +131,9 @@ class EventbookingControllerRegistrant extends EventbookingController
 	 */
 	public function cancel_edit()
 	{
-		$return = base64_decode($this->input->getString('return', ''));
-		if ($return)
+		if ($return = $this->input->getString('return', ''))
 		{
-			$this->setRedirect($return);
+			$this->setRedirect(base64_decode($return));
 		}
 		else
 		{
@@ -167,6 +149,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 	public function download_invoice()
 	{
 		$user = JFactory::getUser();
+
 		if (!$user->id)
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('You do not have permission to download the invoice'));
@@ -188,6 +171,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 			if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 			{
 				$config = EventbookingHelper::getConfig();
+
 				if ($config->only_show_registrants_of_event_owner)
 				{
 					$db    = JFactory::getDbo();
@@ -197,6 +181,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 						->where('id = ' . $row->event_id);
 					$db->setQuery($query);
 					$createdBy = $db->loadResult();
+
 					if ($createdBy == $user->id)
 					{
 						$canDownload = true;
@@ -293,11 +278,74 @@ class EventbookingControllerRegistrant extends EventbookingController
 	}
 
 	/**
+	 * Download tickets associated to the registration record
+	 *
+	 * @throws Exception
+	 */
+	public function download_ticket()
+	{
+		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/table/registrant.php';
+
+		$row    = JTable::getInstance('registrant', 'EventbookingTable');
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+		$config = EventbookingHelper::getConfig();
+
+		$downloadCode = $this->input->getString('download_code');
+
+		if (!$user->id && empty($downloadCode))
+		{
+			throw new Exception(JText::_('You do not have permission to download the ticket'), 403);
+		}
+
+		if (!empty($downloadCode))
+		{
+
+			$query->select('id')
+				->from('#__eb_registrants')
+				->where('registration_code = ' . $db->quote($downloadCode));
+			$db->setQuery($query);
+
+			$id = (int) $db->loadResult();
+		}
+		else
+		{
+			$id = $this->input->getInt('id', 0);
+		}
+
+		if (!$row->load($id))
+		{
+			throw new Exception(JText::_('Invalid Registration Record'), 404);
+		}
+
+		if (empty($downloadCode) && $row->user_id != $user->id && $row->email != $user->get('email'))
+		{
+			throw new Exception(JText::_('You do not have permission to download the ticket'), 403);
+		}
+
+		if ($row->published == 0)
+		{
+			throw new Exception(JText::_('Ticket is only allowed for confirmed/paid registrants'), 403);
+		}
+
+		// The person is allowed to download ticket, let process it
+		EventbookingHelperTicket::generateTicketsPDF($row, $config);
+
+		$fileName = 'ticket_' . str_pad($row->id, 5, '0', STR_PAD_LEFT) . '.pdf';
+		$filePath = JPATH_ROOT . '/media/com_eventbooking/tickets/' . $fileName;
+
+		while (@ob_end_clean()) ;
+		EventbookingHelper::processDownload($filePath, $fileName);
+	}
+
+	/**
 	 * Export registrants data into a csv file
 	 */
 	public function export()
 	{
-		$eventId = $this->input->getInt('event_id', 0);
+		$eventId = $this->input->getInt('event_id', $this->input->getInt('filter_event_id'));
+
 		if (!EventbookingHelper::canExportRegistrants($eventId))
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('EB_NOT_ALLOWED_TO_EXPORT'));
@@ -325,6 +373,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		$rowFields = EventbookingHelper::getAllEventFields($eventId);
 		$fieldIds  = array();
+
 		foreach ($rowFields as $rowField)
 		{
 			$fieldIds[] = $rowField->id;
@@ -338,16 +387,45 @@ class EventbookingControllerRegistrant extends EventbookingController
 	}
 
 	/**
+	 * Resend confirmation email to registrants in case they didn't receive it
+	 */
+	public function resend_email()
+	{
+		$this->csrfProtection();
+
+		$cid = $this->input->get('cid', array(), 'array');
+		$id  = (int) $cid[0];
+
+		/* @var EventbookingModelRegistrant $model */
+
+		$model = $this->getModel();
+		$ret   = $model->resendEmail($id);
+
+		if ($ret)
+		{
+			$this->setMessage(JText::_('EB_EMAIL_SUCCESSFULLY_RESENT'));
+		}
+		else
+		{
+			$this->setMessage(JText::_('EB_COULD_NOT_RESEND_EMAIL_TO_GROUP_MEMBER'), 'notice');
+		}
+
+		$this->setRedirect($this->getViewListUrl());
+	}
+
+	/**
 	 * Checkin registrant from given ID
 	 */
 	public function checkin()
 	{
 		$user = JFactory::getUser();
+
 		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
 			$model  = $this->getModel();
 			$id     = $this->input->getInt('id');
 			$result = $model->checkin($id);
+
 			switch ($result)
 			{
 				case 0:
@@ -377,6 +455,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 		JSession::checkToken('get');
 
 		$user = JFactory::getUser();
+
 		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
 			$id = $this->input->getInt('id');
@@ -409,10 +488,12 @@ class EventbookingControllerRegistrant extends EventbookingController
 		JSession::checkToken('get');
 
 		$user = JFactory::getUser();
+
 		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
 			$id    = $this->input->getInt('id');
 			$model = $this->getModel();
+
 			try
 			{
 				$model->resetCheckin($id);
@@ -423,11 +504,134 @@ class EventbookingControllerRegistrant extends EventbookingController
 				$this->setMessage($e->getMessage(), 'error');
 			}
 
-			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', null)), $message);
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', null)));
 		}
 		else
 		{
 			throw new Exception('You do not have permission to checkin registrant', 403);
 		}
+	}
+
+	/**
+	 * Get url of the page which display list of records
+	 *
+	 * @return string
+	 */
+	protected function getViewListUrl()
+	{
+		$url = 'index.php?option=com_eventbooking&view=registrants&Itemid=' . $this->input->getInt('Itemid', EventbookingHelperRoute::findView('registrants', 0));
+
+		return JRoute::_($url);
+	}
+
+	/**
+	 * Get url of the page which allow adding/editing a record
+	 *
+	 * @param int $recordId
+	 *
+	 * @return string
+	 */
+	protected function getViewItemUrl($recordId = null)
+	{
+		$url = 'index.php?option=' . $this->option . '&view=' . $this->viewItem;
+
+		if ($recordId)
+		{
+			$url .= '&id=' . $recordId;
+		}
+
+		$url .= '&Itemid=' . $this->input->getInt('Itemid', EventbookingHelperRoute::findView('registrants', 0));
+
+		return JRoute::_($url);
+	}
+
+	/**
+	 * Method to check if you can add a new record.
+	 *
+	 * Extended classes can override this if necessary.
+	 *
+	 * @param   array $data An array of input data.
+	 *
+	 * @return  boolean
+	 */
+	protected function allowAdd($data = array())
+	{
+		if (!JFactory::getUser()->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
+		{
+			return false;
+		}
+
+		return parent::allowAdd($data);
+	}
+
+	/**
+	 * Method to check if you can edit a new record.
+	 *
+	 * Extended classes can override this if necessary.
+	 *
+	 * @param   array  $data An array of input data.
+	 * @param   string $key  The name of the key for the primary key; default is id.
+	 *
+	 * @return  boolean
+	 */
+	protected function allowEdit($data = array(), $key = 'id')
+	{
+		$user = JFactory::getUser();
+
+		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
+		{
+			return true;
+		}
+
+		if (!empty($data['id']))
+		{
+			$user  = JFactory::getUser();
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+
+			$query->select('COUNT(*)')
+				->from('#__eb_registrants')
+				->where('id = ' . (int) $data['id'])
+				->where('(user_id = ' . $user->get('id') . ' OR email = ' . $db->quote($user->get('email')) . ')');
+			$db->setQuery($query);
+
+			$total = $db->loadResult();
+
+			if ($total)
+			{
+				return true;
+			}
+		}
+
+		return parent::allowEdit($data, $key);
+	}
+
+	/**
+	 * Method to check whether the current user is allowed to delete a record
+	 *
+	 * @param   int $id Record ID
+	 *
+	 * @return  boolean  True if allowed to delete the record. Defaults to the permission for the component.
+	 */
+	protected function allowDelete($id)
+	{
+		return EventbookingHelper::canDeleteRegistrant($id);
+	}
+
+	/**
+	 * Method to check whether the current user can change status (publish, unpublish of a record)
+	 *
+	 * @param   int $id Id of the record
+	 *
+	 * @return  boolean  True if allowed to change the state of the record. Defaults to the permission for the component.
+	 */
+	protected function allowEditState($id)
+	{
+		if (!JFactory::getUser()->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
+		{
+			return false;
+		}
+
+		return parent::allowEditState($id);
 	}
 }

@@ -35,40 +35,6 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 		$this->data->event_id = $this->state->filter_event_id;
 	}
 
-	/**
-	 * Resend confirmation email to registrant
-	 *
-	 * @param $id
-	 *
-	 * @return bool True if email is successfully delivered
-	 */
-	public function resendEmail($id)
-	{
-		$row = $this->getTable();
-		$row->load($id);
-
-		if ($row->group_id > 0)
-		{
-			// We don't send email to group members, return false
-			return false;
-		}
-
-		// Load the default frontend language
-		$lang = JFactory::getLanguage();
-		$tag  = $row->language;
-
-		if (!$tag || $tag == '*')
-		{
-			$tag = JComponentHelper::getParams('com_languages')->get('site', 'en-GB');
-		}
-
-		$lang->load('com_eventbooking', JPATH_ROOT, $tag);
-
-		$config = EventbookingHelper::getConfig();
-		EventbookingHelper::sendEmails($row, $config);
-
-		return true;
-	}
 
 	/**
 	 * Send batch emails to selected registrants

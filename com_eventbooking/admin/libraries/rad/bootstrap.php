@@ -21,6 +21,7 @@ if ($app->isAdmin())
 	JLoader::register('EventbookingHelperData', JPATH_ROOT . '/components/com_eventbooking/helper/data.php');
 	JLoader::register('EventbookingHelperDatabase', JPATH_ROOT . '/components/com_eventbooking/helper/database.php');
 	JLoader::register('EventbookingHelperMail', JPATH_ROOT . '/components/com_eventbooking/helper/mail.php');
+	JLoader::register('EventbookingHelperTicket', JPATH_ROOT . '/components/com_eventbooking/helper/ticket.php');
 
 	// Register override classes
 	$possibleOverrides = array(

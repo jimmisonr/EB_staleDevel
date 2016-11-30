@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package            Joomla
  * @subpackage         Event Booking
@@ -324,7 +323,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		}
 
 		// Add support for deposit payment
-		$paymentType = $input->post->getInt('payment_type', 0);
+		$paymentType = $input->post->getInt('payment_type', $config->get('default_payment_type', 0));
 
 		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
 		{

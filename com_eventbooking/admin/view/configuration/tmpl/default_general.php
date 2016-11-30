@@ -234,6 +234,14 @@ defined( '_JEXEC' ) or die ;
 		</div>
 		<div class="control-group">
 			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('submit_event_redirect_url', JText::_('EB_SUBMIT_EVENT_REDIRECT_URL'), JText::_('EB_SUBMIT_EVENT_REDIRECT_URL_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<input type="text" name="submit_event_redirect_url" class="input-xlarge" value="<?php echo $config->get('submit_event_redirect_url'); ?>" size="50" />
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('default_country', JText::_('EB_DEFAULT_COUNTRY')); ?>
 			</div>
 			<div class="controls">
@@ -323,7 +331,7 @@ defined( '_JEXEC' ) or die ;
 		<?php
 		if (JComponentHelper::isInstalled('com_comprofiler') && JPluginHelper::isEnabled('eventbooking', 'cb'))
 		{
-			?>
+		?>
 			<div class="control-group">
 				<div class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('use_cb_api', JText::_('EB_USE_CB_API'), JText::_('EB_USE_CB_API_EXPLAIN')); ?>
@@ -332,7 +340,7 @@ defined( '_JEXEC' ) or die ;
 					<?php echo EventbookingHelperHtml::getBooleanInput('use_cb_api', $config->use_cb_api); ?>
 				</div>
 			</div>
-			<?php
+		<?php
 		}
 		?>
 		<div class="control-group">
@@ -399,6 +407,14 @@ defined( '_JEXEC' ) or die ;
 				<?php echo EventbookingHelperHtml::getBooleanInput('activate_deposit_feature', $config->activate_deposit_feature); ?>
 			</div>
 		</div>
+		<div class="control-group" data-showon='[{"field":"activate_deposit_feature","values":["1"],"op":""}]'>
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('default_payment_type', JText::_('EB_DEFAULT_PAYMENT_TYPE')); ?>
+			</div>
+			<div class="controls">
+				<?php echo $this->lists['default_payment_type']; ?>
+			</div>
+		</div>
 		<div class="control-group">
 			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('activate_waitinglist_feature', JText::_('EB_ACTIVATE_WAITINGLIST_FEATURE'), JText::_('EB_ACTIVATE_WAITINGLIST_FEATURE_EXPLAIN')); ?>
@@ -461,6 +477,14 @@ defined( '_JEXEC' ) or die ;
 			</div>
 			<div class="controls">
 				<?php echo EventbookingHelperHtml::getBooleanInput('show_price_including_tax', $config->show_price_including_tax); ?>
+			</div>
+		</div>
+		<div class="control-group" data-showon='[{"field":"show_price_including_tax","values":["1"],"op":""}]'>
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('setup_price', JText::_('EB_SETUP_PRICE'), JText::_('EB_SETUP_PRICE_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<?php echo $this->lists['setup_price'];?>
 			</div>
 		</div>
 		<div class="control-group">

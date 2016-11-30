@@ -178,9 +178,9 @@ class EventbookingModelRegistrants extends RADModelList
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
 		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
-		$query->select('tbl.*, ev.title, ev.event_date, ev.event_end_date, cp.code AS coupon_code, cp.id AS coupon_id')
+		$query->select('tbl.*, ev.title, ev.event_date, ev.event_end_date, ev.ticket_prefix, cp.code AS coupon_code, cp.id AS coupon_id')
 			->select("TIMESTAMPDIFF(MINUTE, ev.event_end_date, '$currentDate') AS event_end_date_minutes");
-
+			
 		return $this;
 	}
 

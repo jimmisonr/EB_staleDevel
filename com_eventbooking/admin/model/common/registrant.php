@@ -51,8 +51,8 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	 */
 	public function store($input, $ignore = array())
 	{
-		$app = JFactory::getApplication();
-		$user = JFactory::getUser();
+		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
 		$config = EventbookingHelper::getConfig();
 		$db     = $this->getDbo();
 		$query  = $db->getQuery(true);
@@ -190,7 +190,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				$memberFormFields = EventbookingHelper::getFormFields($row->event_id, 2);
 				for ($i = 0; $i < $row->number_registrants; $i++)
 				{
-					$memberId  = $ids[$i];
+					$memberId = $ids[$i];
 
 					/* @var $rowMember EventbookingTableRegistrant */
 					$rowMember = $this->getTable();
@@ -201,11 +201,11 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 					$rowMember->transaction_id = $row->transaction_id;
 					if (!$memberId)
 					{
-						$rowMember->group_id       = $row->id;
-						$rowMember->user_id         = $row->user_id;
+						$rowMember->group_id = $row->id;
+						$rowMember->user_id  = $row->user_id;
 					}
 
-					$memberForm                = new RADForm($memberFormFields);
+					$memberForm = new RADForm($memberFormFields);
 					$memberForm->setFieldSuffix($i + 1);
 					$memberForm->bind($data);
 					$memberForm->removeFieldSuffix();
@@ -214,11 +214,11 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 
 					if ($recalculateFee)
 					{
-						$rowMember->total_amount       = $membersTotalAmount[$i];
-						$rowMember->discount_amount    = $membersDiscountAmount[$i];
-						$rowMember->late_fee           = $membersLateFee[$i];
-						$rowMember->tax_amount         = $membersTaxAmount[$i];
-						$rowMember->amount             = $rowMember->total_amount - $rowMember->discount_amount + $rowMember->tax_amount + $rowMember->late_fee;
+						$rowMember->total_amount    = $membersTotalAmount[$i];
+						$rowMember->discount_amount = $membersDiscountAmount[$i];
+						$rowMember->late_fee        = $membersLateFee[$i];
+						$rowMember->tax_amount      = $membersTaxAmount[$i];
+						$rowMember->amount          = $rowMember->total_amount - $rowMember->discount_amount + $rowMember->tax_amount + $rowMember->late_fee;
 					}
 					$rowMember->store();
 					$memberForm->storeData($rowMember->id, $memberData);
@@ -331,6 +331,100 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	}
 
 	/**
+	 * Resend confirmation email to registrant
+	 *
+	 * @param $id
+	 *
+	 * @return bool True if email is successfully delivered
+	 */
+	public function resendEmail($id)
+	{
+		$row = $this->getTable();
+		$row->load($id);
+
+		if ($row->group_id > 0)
+		{
+			// We don't send email to group members, return false
+			return false;
+		}
+
+		// Load the default frontend language
+		$lang = JFactory::getLanguage();
+		$tag  = $row->language;
+
+		if (!$tag || $tag == '*')
+		{
+			$tag = JComponentHelper::getParams('com_languages')->get('site', 'en-GB');
+		}
+
+		$lang->load('com_eventbooking', JPATH_ROOT, $tag);
+
+		$config = EventbookingHelper::getConfig();
+		EventbookingHelper::sendEmails($row, $config);
+
+		return true;
+	}
+
+	/**
+	 * Method to change the published state of one or more records.
+	 *
+	 * @param array $cid   A list of the primary keys to change.
+	 * @param int   $state The value of the published state.
+	 *
+	 * @throws Exception
+	 */
+	public function publish($cid, $state = 1)
+	{
+		$db = $this->getDbo();
+
+		if ($state == 1 && count($cid))
+		{
+			JPluginHelper::importPlugin('eventbooking');
+			$config = EventbookingHelper::getConfig();
+			$row    = new RADTable('#__eb_registrants', 'id', $db);
+
+			foreach ($cid as $registrantId)
+			{
+				$row->load($registrantId);
+
+				if (!$row->published)
+				{
+					if (empty($row->payment_date) || ($row->payment_date == $db->getNullDate()))
+					{
+						$row->payment_date = JFactory::getDate()->toSql();
+						$row->store();
+					}
+
+					// Trigger event
+					JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));
+
+					// Re-generate invoice with Paid status
+					if ($config->activate_invoice_feature && $row->invoice_number)
+					{
+						EventbookingHelper::generateInvoicePDF($row);
+					}
+
+					EventbookingHelperMail::sendRegistrationApprovedEmail($row, $config);
+				}
+			}
+		}
+
+		$cids  = implode(',', $cid);
+		$query = $db->getQuery(true);
+		$query->update('#__eb_registrants')
+			->set('published = ' . (int) $state)
+			->where("(id IN ($cids) OR group_id IN ($cids))");
+
+		if ($state == 0)
+		{
+			$query->where("payment_method LIKE 'os_offline%'");
+		}
+
+		$db->setQuery($query);
+		$db->execute();
+	}
+
+	/**
 	 * Method to remove registrants
 	 *
 	 * @access    public
@@ -343,6 +437,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 
 		/* @var EventbookingTableRegistrant $row */
 		$row = $this->getTable();
+
 		if (count($cid))
 		{
 			foreach ($cid as $registrantId)

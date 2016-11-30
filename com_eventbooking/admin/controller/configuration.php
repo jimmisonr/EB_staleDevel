@@ -16,11 +16,14 @@ class EventbookingControllerConfiguration extends EventbookingController
 	 */
 	public function save()
 	{
-		$data  = $this->input->getData(RAD_INPUT_ALLOWRAW);
+		$data = $this->input->getData(RAD_INPUT_ALLOWRAW);
+
+		/* @var EventbookingModelConfiguration $model */
 		$model = $this->getModel();
 		$model->store($data);
 
 		$task = $this->getTask();
+
 		if ($task == 'save')
 		{
 			$this->setRedirect('index.php?option=com_eventbooking&view=dashboard', JText::_('EB_CONFIGURATION_DATA_SAVED'));

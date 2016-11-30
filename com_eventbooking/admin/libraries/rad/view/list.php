@@ -65,6 +65,7 @@ class RADViewList extends RADViewHtml
 	public function display()
 	{
 		$this->prepareView();
+
 		parent::display();
 	}
 
@@ -108,7 +109,11 @@ class RADViewList extends RADViewHtml
 		}
 
 		$languagePrefix = $this->viewConfig['language_prefix'];
-		JToolbarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')), 'link ' . $this->name);
+
+		if ($this->isAdminView)
+		{
+			JToolbarHelper::title(JText::_(strtoupper($languagePrefix . '_' . RADInflector::singularize($this->name) . '_MANAGEMENT')), 'link ' . $this->name);
+		}
 
 		if ($canDo->get('core.create') && !in_array('add', $this->hideButtons))
 		{
@@ -134,7 +139,7 @@ class RADViewList extends RADViewHtml
 			}
 		}
 
-		if ($canDo->get('core.admin'))
+		if ($this->isAdminView && $canDo->get('core.admin'))
 		{
 			JToolbarHelper::preferences($this->option);
 		}

@@ -91,6 +91,30 @@ if (!empty($this->registrants))
 			<?php echo $this->item->used; ?>
 		</div>
 	</div>
+	<?php
+		if ($this->item->coupon_type == 2)
+		{
+		?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_USED_AMOUNT'); ?>
+				</label>
+				<div class="controls">
+					<input class="input-small" type="text" name="used_amount" id="used_amount" size="5" maxlength="250"
+			       value="<?php echo $this->item->used_amount; ?>" />					
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_REMAINING_AMOUNT'); ?>
+				</label>
+				<div class="controls">
+					<?php echo round($this->item->discount - $this->item->used_amount, 2); ?>
+				</div>
+			</div>
+		<?php
+		}
+	?>
 	<div class="control-group">
 		<label class="control-label">
 			<?php echo JText::_('EB_VALID_FROM_DATE'); ?>

@@ -1233,4 +1233,12 @@ h3.eb-heading
         float: none !important;
     }
 }
+img.eb-payment-method-icon
+{
+    margin-bottom: 8px;
+}
 
+.btn-toolbar .btn-wrapper {
+    display: inline-block;
+    margin: 0 0 5px 5px;
+}

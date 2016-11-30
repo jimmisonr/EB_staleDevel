@@ -9,11 +9,14 @@
 // no direct access
 defined('_JEXEC') or die;
 
-class EventbookingViewRegistrantsHtml extends RADViewHtml
+class EventbookingViewRegistrantsHtml extends RADViewList
 {
-	public function display()
+	protected function prepareView()
 	{
+		parent::prepareView();
+
 		$user = JFactory::getUser();
+
 		if (!$user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
 			if ($user->get('guest'))
@@ -30,8 +33,6 @@ class EventbookingViewRegistrantsHtml extends RADViewHtml
 		$db          = JFactory::getDbo();
 		$query       = $db->getQuery(true);
 		$config      = EventbookingHelper::getConfig();
-		$model       = $this->getModel();
-		$state       = $model->getState();
 
 		//Get list of events
 		$query->select('id, title' . $fieldSuffix . ' AS title, event_date')
@@ -41,7 +42,7 @@ class EventbookingViewRegistrantsHtml extends RADViewHtml
 
 		if ($config->hide_past_events_from_events_dropdown)
 		{
-			$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
 			$query->where('(DATE(event_date) >= ' . $currentDate . ' OR DATE(event_end_date) >= ' . $currentDate . ')');
 		}
 
@@ -49,12 +50,15 @@ class EventbookingViewRegistrantsHtml extends RADViewHtml
 		{
 			$query->where('created_by = ' . (int) $user->id);
 		}
+
 		$db->setQuery($query);
+		$rows = $db->loadObjectList();
+
 		$options   = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_SELECT_EVENT'), 'id', 'title');
+
 		if ($config->show_event_date)
 		{
-			$rows = $db->loadObjectList();
 			for ($i = 0, $n = count($rows); $i < $n; $i++)
 			{
 				$row       = $rows[$i];
@@ -64,30 +68,47 @@ class EventbookingViewRegistrantsHtml extends RADViewHtml
 		}
 		else
 		{
-			$options = array_merge($options, $db->loadObjectList());
+			$options = array_merge($options, $rows);
 		}
-		$lists['filter_event_id']  = JHtml::_('select.genericlist', $options, 'filter_event_id', ' class="inputbox" onchange="submit();"', 'id', 'title',
-			$state->filter_event_id);
-		$options                   = array();
-		$options[]                 = JHtml::_('select.option', -1, JText::_('EB_REGISTRATION_STATUS'));
-		$options[]                 = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
-		$options[]                 = JHtml::_('select.option', 1, JText::_('EB_PAID'));
+
+		$this->lists['filter_event_id'] = JHtml::_('select.genericlist', $options, 'filter_event_id', ' class="inputbox" onchange="submit();"', 'id', 'title',
+			$this->state->filter_event_id);
+		$options                        = array();
+		$options[]                      = JHtml::_('select.option', -1, JText::_('EB_REGISTRATION_STATUS'));
+		$options[]                      = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
+		$options[]                      = JHtml::_('select.option', 1, JText::_('EB_PAID'));
+
 		if ($config->activate_waitinglist_feature)
 		{
 			$options[] = JHtml::_('select.option', 3, JText::_('EB_WAITING_LIST'));
 		}
-		$options[]                 = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
-		$lists['filter_published'] = JHtml::_('select.genericlist', $options, 'filter_published', ' class="input-medium" onchange="submit()" ', 'value', 'text',
-			$state->filter_published);
-		$lists['search']           = $state->filter_search;
-		$lists['order_Dir']        = $state->filter_order_Dir;
-		$lists['order']            = $state->filter_order;
-		$this->lists               = $lists;
-		$this->items               = $model->getData();
-		$this->pagination          = $model->getPagination();
-		$this->config              = $config;
-		$this->coreFields          = EventbookingHelper::getPublishedCoreFields();
 
-		parent::display();
+		$options[]                       = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
+		$this->lists['filter_published'] = JHtml::_('select.genericlist', $options, 'filter_published', ' class="input-medium" onchange="submit()" ', 'value', 'text',
+			$this->state->filter_published);
+
+		$this->config     = $config;
+		$this->coreFields = EventbookingHelper::getPublishedCoreFields();
+
+		$this->addToolbar();
+	}
+
+	/**
+	 * Override addToolbar method to add custom csv export function
+	 * @see RADViewList::addToolbar()
+	 */
+	protected function addToolbar()
+	{
+		require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
+
+		if (!EventbookingHelper::canDeleteRegistrant())
+		{
+			$this->hideButtons[] = 'delete';
+		}
+
+		parent::addToolbar();
+
+		JToolbarHelper::custom('resend_email', 'envelope', 'envelope', 'Resend Email', true);
+		JToolbarHelper::custom('export', 'download', 'download', 'Export Registration', false);
 	}
 }

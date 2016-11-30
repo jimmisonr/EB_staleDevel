@@ -138,6 +138,7 @@ class EventbookingModelCart extends RADModel
 			$membersDiscountAmount = $fees['members_discount_amount'];
 			$membersTaxAmount      = $fees['members_tax_amount'];
 			$membersLateFee        = $fees['members_late_fee'];
+			$membersAmount         = $fees['members_amount'];
 		}
 
 		$count  = 0;
@@ -188,7 +189,9 @@ class EventbookingModelCart extends RADModel
 			$row->event_id           = $eventId;
 			if ($i == 0)
 			{
-				$row->cart_id = 0;
+				$row->cart_id                = 0;
+				$row->coupon_discount_amount = $fees['coupon_discount_amount'];
+
 				//Store registration code
 				while (true)
 				{
@@ -209,6 +212,7 @@ class EventbookingModelCart extends RADModel
 			else
 			{
 				$row->cart_id = $cartId;
+				$row->coupon_discount_amount =  0;
 			}
 			$row->id       = 0;
 			$row->language = $language;
@@ -219,7 +223,6 @@ class EventbookingModelCart extends RADModel
 			{
 				$cartId = $row->id;
 			}
-
 
 			if ($config->collect_member_information_in_cart)
 			{
@@ -241,7 +244,7 @@ class EventbookingModelCart extends RADModel
 					$rowMember->discount_amount    = $membersDiscountAmount[$eventId][$j];
 					$rowMember->late_fee           = $membersLateFee[$eventId][$j];
 					$rowMember->tax_amount         = $membersTaxAmount[$eventId][$j];
-					$rowMember->amount             = $rowMember->total_amount - $rowMember->discount_amount + $rowMember->tax_amount + $rowMember->late_fee;
+					$rowMember->amount             = $membersAmount[$eventId][$j];
 					$rowMember->number_registrants = 1;
 
 					/* @var RADForm $memberForm */
@@ -347,6 +350,7 @@ class EventbookingModelCart extends RADModel
 				->where('cart_id = ' . $row->id);
 			$db->setQuery($query);
 			$db->execute();
+
 			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
 			EventbookingHelper::sendEmails($row, $config);
 
@@ -364,13 +368,15 @@ class EventbookingModelCart extends RADModel
 		$config = EventbookingHelper::getConfig();
 		$cart   = new EventbookingHelperCart();
 		$rows   = $cart->getEvents();
-		if ($config->show_price_including_tax)
+
+		if ($config->show_price_including_tax && !$config->get('setup_price'))
 		{
 			for ($i = 0, $n = count($rows); $i < $n; $i++)
 			{
 				$row       = $rows[$i];
 				$taxRate   = $row->tax_rate;
 				$row->rate = round($row->rate * (1 + $taxRate / 100), 2);
+
 				if ($config->show_discounted_price)
 				{
 					$row->discounted_rate = round($row->discounted_rate * (1 + $taxRate / 100), 2);
