@@ -28,11 +28,6 @@ class plgEventbookingSystem extends JPlugin
 				$this->processInvoiceNumber($row);
 			}
 
-			if (!$config->get('multiple_booking') && $config->get('activate_tickets_pdf'))
-			{
-				$this->generateTicketNumbersForRegistration($row);
-			}
-
 			// Update coupon usage
 			if ($row->coupon_id)
 			{
