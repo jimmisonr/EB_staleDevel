@@ -48,6 +48,7 @@ class plgEventBookingTicketTypes extends JPlugin
 	{
 		// The plugin will only be available in the backend
 		$app = JFactory::getApplication();
+
 		if ($app->isSite())
 		{
 			return;
@@ -65,9 +66,20 @@ class plgEventBookingTicketTypes extends JPlugin
 
 		$hasMultipleTicketTypes = 0;
 		$ticketTypeIds          = array();
+
+		if ($isNew)
+		{
+			// Reset ID of ticket type
+			for ($i = 0, $n = count($ids); $i < $n; $i++)
+			{
+				$ids[$i] = 0;
+			}
+		}
+
 		for ($i = 0, $n = count($titles); $i < $n; $i++)
 		{
 			$id = $ids[$i];
+
 			if (empty($titles[$i]))
 			{
 				continue;
@@ -80,6 +92,7 @@ class plgEventBookingTicketTypes extends JPlugin
 			$maxTicketsPerBooking = (int) $maxTicketsPerBookings[$i];
 
 			$query->clear();
+
 			if ($id)
 			{
 				$query->update('#__eb_ticket_types')
@@ -99,6 +112,7 @@ class plgEventBookingTicketTypes extends JPlugin
 
 			$db->setQuery($query)
 				->execute();
+
 			if ($id)
 			{
 				$ticketTypeIds[] = $id;
