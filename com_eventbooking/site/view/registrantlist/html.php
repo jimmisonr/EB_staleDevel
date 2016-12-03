@@ -51,6 +51,7 @@ class EventbookingViewRegistrantlistHtml extends RADViewHtml
 				$query->select('id, name,title' . $fieldSuffix . ' AS title, is_core')
 					->from('#__eb_fields')
 					->where('id IN (' . $customFieldIds . ')');
+				$db->setQuery($query);	
 				$rowFields = $db->loadObjectList();
 				foreach ($rowFields as $rowField)
 				{
