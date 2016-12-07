@@ -350,7 +350,7 @@ defined('_JEXEC') or die;
 		}
 	}
 
-	if ($showLocation && $item->location_id)
+	if ($showLocation && $location)
 	{
 		$width = (int) $config->map_width;
 
@@ -374,31 +374,25 @@ defined('_JEXEC') or die;
 				<?php
 				if ($location->address)
 				{
-					if (!empty($renderSemanticData))
-					{
-					?>
-						<div style="display:none" itemprop="location" itemscope itemtype="http://schema.org/Place">
-							<div itemprop="name"><?php echo $location->name; ?></div>
-							<div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-								<span itemprop="streetAddress"><?php echo $location->address; ?></span>
-								<?php
-								if ($location->city && $location->state && $location->zip)
-								{
-								?>
-									<span itemprop="addressLocality"><?php echo $location->city; ?></span>,
-									<span itemprop="addressRegion"><?php echo $location->state; ?></span>
-									<span itemprop="postalCode"><?php echo $location->zip; ?></span>
-									<span itemprop="addressCountry"><?php echo $location->country; ?></span>
-								<?php
-								}
-								?>
-							</div>
+				?>
+					<div style="display:none" itemprop="location" itemscope itemtype="http://schema.org/Place">
+						<div itemprop="name"><?php echo $location->name; ?></div>
+						<div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+							<span itemprop="streetAddress"><?php echo $location->address; ?></span>
+							<?php
+							if ($location->city && $location->state && $location->zip)
+							{
+							?>
+								<span itemprop="addressLocality"><?php echo $location->city; ?></span>,
+								<span itemprop="addressRegion"><?php echo $location->state; ?></span>
+								<span itemprop="postalCode"><?php echo $location->zip; ?></span>
+								<span itemprop="addressCountry"><?php echo $location->country; ?></span>
+							<?php
+							}
+							?>
 						</div>
-					<?php
-					}
-					?>
-
-				<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id=' . $item->location_id . '&tmpl=component&format=html'); ?>"
+					</div>
+					<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id=' . $item->location_id . '&tmpl=component&format=html'); ?>"
 				   class="eb-colorbox-map" title="<?php echo $location->name; ?>"><?php echo $location->name; ?></a>
 					<?php
 				}

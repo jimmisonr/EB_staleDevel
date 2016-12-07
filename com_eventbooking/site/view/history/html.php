@@ -15,7 +15,8 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 	{
 		if (!JFactory::getUser()->id)
 		{
-			JFactory::getApplication()->redirect('index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString()));
+			$redirectUrl = JRoute::_('index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString());
+			JFactory::getApplication()->redirect($redirectUrl);
 		}
 
 		$model              = $this->getModel();

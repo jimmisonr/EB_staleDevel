@@ -77,7 +77,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 
 		if ($item->location_id)
 		{
-			$this->location = EventbookingHelperDatabase::getLocation($item->location_id);
+			$this->location = $item->location;
 		}
 
 		$params = EventbookingHelper::getViewParams($active, array('event'));

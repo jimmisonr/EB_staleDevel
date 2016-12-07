@@ -103,13 +103,10 @@ $baseUri = JUri::base(true);
 					</div>
 						<div class="<?php echo $span5Class; ?>">
 							<?php
-								$location = new stdClass;
-								$location->address =  $event->location_address;
-								$location->name = $event->location_name;
 								$layoutData = array(
 									'item'  => $event,
 									'config' => $config,
-									'location' => $location,
+									'location' => $event->location,
 									'showLocation'=> $config->show_location_in_category_view,
 									'isMultipleDate' => $isMultipleDate,
 									'nullDate' => $nullDate,

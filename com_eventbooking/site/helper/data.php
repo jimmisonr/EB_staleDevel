@@ -546,6 +546,10 @@ class EventbookingHelperData
 			{
 				$row->location = $locations[$row->location_id];
 			}
+			else
+			{
+				$row->location = null;
+			}
 
 			$query->clear('where');
 		}
