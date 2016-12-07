@@ -190,6 +190,7 @@ $baseUri = JUri::base(true);
 					<?php
 						if ($event->location_id)
 						{
+							$location = $event->location;
 						?>
 						<div class="clearfix">
 							<i class="<?php echo $iconMapMakerClass; ?>"></i>
@@ -198,13 +199,31 @@ $baseUri = JUri::base(true);
 								{
 								?>
 									<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$event->location_id.'&tmpl=component'); ?>" class="eb-colorbox-map"><span><?php echo $event->location_name ; ?></span></a>
+									
+									<div style="display:none" itemprop="location" itemscope itemtype="http://schema.org/Place">
+									<div itemprop="name"><?php echo $location->name; ?></div>
+									<div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+										<span itemprop="streetAddress"><?php echo $location->address; ?></span>
+										<?php
+										if ($location->city && $location->state && $location->zip)
+										{
+										?>
+											<span itemprop="addressLocality"><?php echo $location->city; ?></span>,
+											<span itemprop="addressRegion"><?php echo $location->state; ?></span>
+											<span itemprop="postalCode"><?php echo $location->zip; ?></span>
+											<span itemprop="addressCountry"><?php echo $location->country; ?></span>
+										<?php
+										}
+										?>
+									</div>
+								</div>										
 								<?php
 								}
 								else
 								{
 									echo $event->location_name;
 								}
-							?>
+							?>																									
 						</div>
 						<?php
 						}
