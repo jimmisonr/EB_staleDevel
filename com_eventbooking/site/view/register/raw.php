@@ -330,8 +330,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 			$options               = array();
 			$options[]             = JHtml::_('select.option', 0, JText::_('EB_FULL_PAYMENT'));
 			$options[]             = JHtml::_('select.option', 1, JText::_('EB_DEPOSIT_PAYMENT'));
-			$lists['payment_type'] = JHtml::_('select.genericlist', $options, 'payment_type', ' class="input-large" onchange="showDepositAmount(this);" ', 'value', 'text',
-				$input->post->getInt('payment_type', 0));
+			$lists['payment_type'] = JHtml::_('select.genericlist', $options, 'payment_type', ' class="input-large" onchange="showDepositAmount(this);" ', 'value', 'text', $paymentType);
 			$depositPayment        = 1;
 		}
 		else
