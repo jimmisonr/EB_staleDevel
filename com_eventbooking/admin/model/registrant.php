@@ -222,7 +222,9 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 					{
 						EventbookingHelper::generateInvoicePDF($row);
 					}
-
+					
+					$row->published = 1;
+					
 					EventbookingHelperMail::sendRegistrationApprovedEmail($row, $config);
 				}
 			}

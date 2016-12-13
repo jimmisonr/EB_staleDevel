@@ -635,6 +635,8 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					'max_group_number',
 					'discount_type',
 					'discount',
+					'discount_groups',
+					'discount_amounts',
 					'early_bird_discount_amount',
 					'early_bird_discount_type',
 					'paypal_email',

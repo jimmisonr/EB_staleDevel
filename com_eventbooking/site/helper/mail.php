@@ -551,7 +551,7 @@ class EventbookingHelperMail
 			$body   = str_ireplace("[QRCODE]", $imgTag, $body);
 		}
 
-		if ($config->activate_invoice_feature && $row->invoice_number)
+		if ($config->activate_invoice_feature && $row->invoice_number && !$row->group_id)
 		{
 			if (is_callable('EventbookingHelperOverrideHelper::generateInvoicePDF'))
 			{
