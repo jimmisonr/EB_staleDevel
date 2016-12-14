@@ -324,6 +324,7 @@ class EventbookingController extends RADControllerAdmin
 		##Locations table
 
 		$fields = array_keys($db->getTableColumns('#__eb_locations'));
+
 		if (!in_array('user_id', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_locations` ADD  `user_id` INT NOT NULL DEFAULT  '0' ;";
@@ -345,6 +346,20 @@ class EventbookingController extends RADControllerAdmin
 		if (!in_array('layout', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_locations` ADD  `layout` VARCHAR( 50 ) NULL DEFAULT  NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('image', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_locations` ADD  `image` VARCHAR( 255 ) NULL DEFAULT  NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('description', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_locations` ADD  `description` TEXT NULL;";
 			$db->setQuery($sql);
 			$db->execute();
 		}

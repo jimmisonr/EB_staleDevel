@@ -13,6 +13,7 @@ JHtml::_('behavior.framework') ;
 
 $config = EventbookingHelper::getConfig();
 $mapApiKye = $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4');
+
 if ($this->item->id)
 {
 	$coordinates = $this->item->lat.','.$this->item->long;
@@ -33,6 +34,8 @@ else
 		$coordinates = '37.09024,-95.712891';
 	}
 }
+
+$editor = JFactory::getEditor();
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function(pressbutton) {
@@ -156,7 +159,7 @@ else
 </script>
 <form action="index.php?option=com_eventbooking&view=location" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
 <div class="row-fluid">
-	<div class="span5">
+	<div class="span6">
 		<div class="control-group">
 			<label class="control-label">
 				<?php echo JText::_('EB_NAME'); ?>
@@ -230,6 +233,20 @@ else
 				<input class="text_area" type="text" name="coordinates" id="coordinates" size="30" maxlength="250" value="<?php echo $this->item->lat.','.$this->item->long;?>" />
 			</div>
 		</div>
+		<div class="control-group">
+			<label class="control-label"><?php echo JText::_('EB_IMAGE'); ?></label>
+			<div class="controls">
+				<?php echo EventbookingHelperHtml::getMediaInput($this->item->image, 'image'); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo  JText::_('EB_DESCRIPTION'); ?>
+			</label>
+			<div class="controls">
+				<?php echo $editor->display( 'description',  $this->item->description , '100%', '250', '90', '10' ) ; ?>
+			</div>
+		</div>
 		<?php
 			if (JLanguageMultilang::isEnabled())
 			{
@@ -254,7 +271,7 @@ else
 			</div>
 		</div>
 	</div>
-	<div class="span7">
+	<div class="span6">
 		<div class="control-group">
 			<input type="button" onclick="getLocationFromAddress();" value="<?php echo JText::_('EB_PINPOINT'); ?> &raquo;" />
 			<br/><br/>
