@@ -179,6 +179,14 @@ if (JPluginHelper::isEnabled('eventbooking', 'tickettypes'))
 </div>
 <div class="control-group">
 	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('show_location_info_in_event_details', JText::_('EB_SHOW_LOCATION_INFO_ON_EVENT_DETAILS'), JText::_('EB_SHOW_LOCATION_INFO_ON_EVENT_DETAILS_EXPLAIN')); ?>
+	</div>
+	<div class="controls">
+		<?php echo EventbookingHelperHtml::getBooleanInput('show_location_info_in_event_details', $config->show_location_info_in_event_details); ?>
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
 		<?php echo EventbookingHelperHtml::getFieldLabel('show_event_location_in_email', JText::_('EB_SHOW_LOCATION_IN_EMAIL')); ?>
 	</div>
 	<div class="controls">

@@ -168,6 +168,12 @@ $offset = JFactory::getConfig()->get('offset');
 		</div>
 		<div class="clearfix"></div>
 	<?php
+
+	if ($this->config->show_location_info_in_event_details && $item->location && ($item->location->image || EventbookingHelper::isValidMessage($item->location->description)))
+	{
+		echo $this->loadTemplate('location', array('location' => $item->location));
+	}
+
 	if (!empty($item->ticketTypes))
 	{
 		echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/tickettypes.php', array('ticketTypes' => $item->ticketTypes, 'config' => $this->config));
