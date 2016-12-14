@@ -1242,3 +1242,8 @@ img.eb-payment-method-icon
     display: inline-block;
     margin: 0 0 5px 5px;
 }
+
+.eb-location-description
+{
+	padding-top: 15px;
+}

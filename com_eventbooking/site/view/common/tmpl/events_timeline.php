@@ -197,9 +197,19 @@ $baseUri = JUri::base(true);
 							<?php
 								if ($event->location_address)
 								{
+									if ($location->image || EventbookingHelper::isValidMessage($location->description))
+									{
+									?>
+										<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$event->location_id.'&Itemid='.$Itemid); ?>"><span><?php echo $event->location_name ; ?></span></a>
+									<?php
+									}
+									else
+									{
+									?>
+										<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$event->location_id.'&tmpl=component'); ?>" class="eb-colorbox-map"><span><?php echo $event->location_name ; ?></span></a>
+									<?php
+									}
 								?>
-									<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$event->location_id.'&tmpl=component'); ?>" class="eb-colorbox-map"><span><?php echo $event->location_name ; ?></span></a>
-									
 									<div style="display:none" itemprop="location" itemscope itemtype="http://schema.org/Place">
 									<div itemprop="name"><?php echo $location->name; ?></div>
 									<div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">

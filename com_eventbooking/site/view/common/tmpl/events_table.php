@@ -230,9 +230,20 @@ $baseUri             = JUri::base(true);
 							{
 								if ($item->location_address)
 								{
-								?>
-									<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$item->location_id.'&Itemid='.$Itemid.'&tmpl=component'); ?>" class="eb-colorbox-map"><?php echo $item->location_name ; ?></a>
-								<?php
+									$location = $item->location;
+
+									if ($location->image || EventbookingHelper::isValidMessage($location->description))
+									{
+									?>
+										<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$item->location_id.'&Itemid='.$Itemid); ?>"><?php echo $item->location_name ; ?></a>
+									<?php
+									}
+									else
+									{
+									?>
+										<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$item->location_id.'&Itemid='.$Itemid.'&tmpl=component'); ?>" class="eb-colorbox-map"><?php echo $item->location_name ; ?></a>
+									<?php
+									}
 								}
 								else
 								{

@@ -392,9 +392,21 @@ defined('_JEXEC') or die;
 							?>
 						</div>
 					</div>
-					<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id=' . $item->location_id . '&tmpl=component&format=html'); ?>"
-				   class="eb-colorbox-map" title="<?php echo $location->name; ?>"><?php echo $location->name; ?></a>
 					<?php
+					if ($location->image || EventbookingHelper::isValidMessage($location->description))
+					{
+					?>
+						<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id=' . $item->location_id . '&Itemid='.$Itemid); ?>"
+						   title="<?php echo $location->name; ?>"><?php echo $location->name; ?></a>
+					<?php
+					}
+					else
+					{
+					?>
+						<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id=' . $item->location_id . '&tmpl=component&format=html'); ?>"
+						   class="eb-colorbox-map" title="<?php echo $location->name; ?>"><?php echo $location->name; ?></a>
+					<?php
+					}
 				}
 				else
 				{
