@@ -30,10 +30,6 @@ $doc->addScript('https://maps.google.com/maps/api/js?key=' . $config->get('map_a
 $doc->addScriptDeclaration('
 	var geocoder, map;
 	function initialize() {
-	    var height = jQuery(window).height() - 50;
-        var width = jQuery(window).width();
-        jQuery("#inline_map").height(height);
-        jQuery("#inline_map").width(width);
 		var latlng = new google.maps.LatLng("'.$this->location->lat.'", "'.$this->location->long.'");
 		var options = {
 			zoom: '.$zoomLevel.',

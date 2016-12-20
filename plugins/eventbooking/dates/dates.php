@@ -111,7 +111,7 @@ class plgEventBookingDates extends JPlugin
 
 			$rowEvent->location_id        = $data['location_id_' . $i];
 			$rowEvent->parent_id          = $row->id;
-			$rowEvent->event_type         = 2;
+			$rowEvent->event_type         = 2;			
 			$rowEvent->is_additional_date = 1;
 
 			if (!$rowEvent->id)

@@ -339,10 +339,10 @@ defined('_JEXEC') or die;
 			?>
 				<tr>
 					<td>
-						<strong><?php echo $param['title']; ?></strong>
+						<strong><?php echo JText::_($param['title']); ?></strong>
 					</td>
 					<td>
-						<?php echo $paramValue; ?>
+						<?php echo JText::_($paramValue); ?>
 					</td>
 				</tr>
 			<?php
