@@ -4932,26 +4932,39 @@ class EventbookingHelper
 	public static function saveRegistration($data)
 	{
 		$config = static::getConfig();
+
 		if ($config->use_cb_api)
 		{
 			return static::userRegistrationCB($data['first_name'], $data['last_name'], $data['email'], $data['username'], $data['password1']);
 		}
 		else
 		{
+			// Add path to load xml form definition
+			if (JLanguageMultilang::isEnabled())
+			{
+				JForm::addFormPath(JPATH_ROOT . '/components/com_users/models/forms');
+				JForm::addFieldPath(JPATH_ROOT . '/components/com_users/models/fields');
+			}
+
 			//Need to load com_users language file
 			$lang = JFactory::getLanguage();
 			$tag  = $lang->getTag();
+
 			if (!$tag)
 			{
 				$tag = 'en-GB';
 			}
+
 			$lang->load('com_users', JPATH_ROOT, $tag);
-			$data['name']     = $data['first_name'] . ' ' . $data['last_name'];
+			$data['name']     = rtrim($data['first_name'] . ' ' . $data['last_name']);
 			$data['password'] = $data['password2'] = $data['password1'];
 			$data['email1']   = $data['email2'] = $data['email'];
+
 			require_once JPATH_ROOT . '/components/com_users/models/registration.php';
+
 			$model = new UsersModelRegistration();
-			$ret   = $model->register($data);
+
+			$ret = $model->register($data);
 
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
