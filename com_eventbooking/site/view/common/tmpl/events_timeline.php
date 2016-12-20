@@ -59,7 +59,7 @@ $baseUri = JUri::base(true);
 			}
 			else
 			{
-				$activateWaitingList = $item->activate_waiting_list;
+				$activateWaitingList = $event->activate_waiting_list;
 			}
 
 			if ($event->event_capacity > 0 && $event->event_capacity <= $event->total_registrants && $activateWaitingList && !@$event->user_registered && $registrationOpen)
@@ -226,14 +226,14 @@ $baseUri = JUri::base(true);
 										}
 										?>
 									</div>
-								</div>										
+								</div>
 								<?php
 								}
 								else
 								{
 									echo $event->location_name;
 								}
-							?>																									
+							?>
 						</div>
 						<?php
 						}
