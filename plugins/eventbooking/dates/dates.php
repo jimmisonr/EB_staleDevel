@@ -111,13 +111,54 @@ class plgEventBookingDates extends JPlugin
 
 			$rowEvent->location_id        = $data['location_id_' . $i];
 			$rowEvent->parent_id          = $row->id;
-			$rowEvent->event_type         = 2;			
+			$rowEvent->event_type         = 2;
 			$rowEvent->is_additional_date = 1;
 
 			if (!$rowEvent->id)
 			{
 				$rowEvent->alias = JApplicationHelper::stringURLSafe($rowEvent->title . '-' . JHtml::_('date', $rowEvent->event_date, $config->date_format, null));
 				$rowEvent->hits  = 0;
+			}
+			else
+			{
+				$fieldsToUpdate = array(
+					'category_id',
+					'thumb',
+					'image',
+					'tax_rate',
+					'registration_type',
+					'title',
+					'short_description',
+					'description',
+					'access',
+					'registration_access',
+					'individual_price',
+					'event_capacity',
+					'registration_type',
+					'max_group_number',
+					'discount_type',
+					'discount',
+					'discount_groups',
+					'discount_amounts',
+					'early_bird_discount_amount',
+					'early_bird_discount_type',
+					'paypal_email',
+					'notification_emails',
+					'user_email_body',
+					'user_email_body_offline',
+					'thanks_message',
+					'thanks_message_offline',
+					'params',
+					'currency_code',
+					'currency_symbol',
+					'custom_field_ids',
+					'custom_fields',
+					'published',);
+
+				foreach ($fieldsToUpdate as $field)
+				{
+					$rowEvent->$field = $row->$field;
+				}
 			}
 
 			$rowEvent->store();
