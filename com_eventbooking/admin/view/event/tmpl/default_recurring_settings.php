@@ -1,4 +1,14 @@
 <?php
+/**
+ * @package            Joomla
+ * @subpackage         Event Booking
+ * @author             Tuan Pham Ngoc
+ * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @license            GNU/GPL, see LICENSE.php
+ */
+// no direct access
+defined('_JEXEC') or die;
+$format = 'Y-m-d';
 ?>
 <fieldset class="adminform">
 	<legend class="adminform"><?php echo JText::_('EB_RECURRING_SETTINGS'); ?></legend>

@@ -8,6 +8,7 @@
  */
 // no direct access
 defined('_JEXEC') or die;
+$format = 'Y-m-d';
 ?>
 <fieldset class="adminform">
 	<legend class="adminform"><?php echo JText::_('EB_MISC'); ?></legend>
