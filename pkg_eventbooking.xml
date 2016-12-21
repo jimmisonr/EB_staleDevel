@@ -58,6 +58,6 @@
         <file type="component" id="eventbooking">com_eventbooking.zip</file>
     </files>
 	<updateservers>	
-		<server type="extension" priority="1" name="Events Booking Extension">http://joomdonation.com/updates/eventsbooking.xml</server>
+		<server type="extension" priority="1" name="Events Booking Extension">https://www.joomdonation.com/updates/eventsbooking.xml</server>
 	</updateservers>
 </extension>
