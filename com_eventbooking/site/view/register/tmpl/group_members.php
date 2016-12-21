@@ -243,6 +243,7 @@ if ($this->showCaptcha)
 					$params = $captchaPlugin->params;
 					$version    = $params->get('version', '1.0');
 					$pubkey = $params->get('public_key', '');
+
 					if ($version == '1.0')
 					{
 						$theme  = $params->get('theme', 'clean');
@@ -252,20 +253,22 @@ if ($this->showCaptcha)
 					}
 					else
 					{
-						$theme = $params->get('theme2', 'light');
-						$langTag = JFactory::getLanguage()->getTag();
-						if (JFactory::getApplication()->isSSLConnection())
+						if (version_compare(JVERSION, '3.5.0', 'ge'))
 						{
-							$file = 'https://www.google.com/recaptcha/api.js?hl=' . $langTag . '&onload=onloadCallback&render=explicit';
+						?>
+							JoomlaInitReCaptcha2();
+						<?php
 						}
 						else
 						{
-							$file = 'http://www.google.com/recaptcha/api.js?hl=' . $langTag . '&onload=onloadCallback&render=explicit';
+							$theme = $params->get('theme2', 'light');
+							$langTag = JFactory::getLanguage()->getTag();
+							$file = 'https://www.google.com/recaptcha/api.js?hl=' . $langTag . '&onload=onloadCallback&render=explicit';
+							JHtml::_('script', $file, true, true);
+							?>
+								grecaptcha.render("dynamic_recaptcha_1", {sitekey: "' . <?php echo $pubkey;?> . '", theme: "' . <?php echo $theme; ?> . '"});
+							<?php
 						}
-						JHtml::_('script', $file, true, true);
-					?>
-						grecaptcha.render("dynamic_recaptcha_1", {sitekey: "' . <?php echo $pubkey;?> . '", theme: "' . <?php echo $theme; ?> . '"});
-					<?php
 					}
 				}
 				if ($this->showBillingStep)
