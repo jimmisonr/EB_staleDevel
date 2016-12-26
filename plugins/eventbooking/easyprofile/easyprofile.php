@@ -60,6 +60,7 @@ class plgEventbookingEasyprofile extends JPlugin
 			$fields = array_diff($fields, array('id', 'params'));
 
 			$options = array();
+
 			foreach ($fields as $field)
 			{
 				$options[] = JHtml::_('select.option', $field, $field);
@@ -114,11 +115,13 @@ class plgEventbookingEasyprofile extends JPlugin
 			$data = EventbookingHelper::getRegistrantData($row, $rowFields);
 
 			$fieldValues = array();
+
 			foreach ($rowFields as $rowField)
 			{
 				if ($rowField->field_mapping && in_array($rowField->field_mapping, $fieldList) && isset($data[$rowField->name]))
 				{
 					$fieldValue = $data[$rowField->name];
+
 					if (is_string($fieldValue) && is_array(json_decode($fieldValue)))
 					{
 						$fieldValues[$rowField->field_mapping] = implode('|*|', json_decode($fieldValue));
@@ -136,10 +139,12 @@ class plgEventbookingEasyprofile extends JPlugin
 				// Update User
 				$query = $db->getQuery(true);
 				$query->update("#__jsn_users");
+
 				foreach ($fieldValues as $key => $value)
 				{
 					$query->set($db->quoteName($key) . ' = ' . $db->quote($value));
 				}
+
 				$query->where('id = ' . $row->user_id);
 				$db->setQuery($query);
 				$db->execute();
@@ -149,11 +154,13 @@ class plgEventbookingEasyprofile extends JPlugin
 				// New User
 				$fields = array();
 				$values = array();
+
 				foreach ($fieldValues as $key => $value)
 				{
 					$fields[] = $db->quoteName($key);
 					$values[] = $db->quote($value);
 				}
+
 				$query = "INSERT INTO #__jsn_users(id," . implode(', ', $fields) . ") VALUES(" . $row->user_id . ", " . implode(', ', $values) . ")";
 				$db->setQuery($query);
 				$db->execute();

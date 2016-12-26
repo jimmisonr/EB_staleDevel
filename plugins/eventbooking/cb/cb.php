@@ -72,8 +72,6 @@ class plgEventBookingCB extends JPlugin
 
 		if ($row->user_id)
 		{
-			$config = EventbookingHelper::getConfig();
-
 			$db  = JFactory::getDbo();
 			$sql = 'SELECT count(*) FROM `#__comprofiler` WHERE `user_id` = ' . $db->quote($row->user_id);
 			$db->setQuery($sql);

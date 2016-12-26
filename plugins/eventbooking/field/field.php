@@ -64,18 +64,21 @@ class plgEventBookingField extends JPlugin
 		}
 
 		$feeValues = array();
+
 		foreach ($priceFields as $field)
 		{
 			$feeValues[] = isset($data['params'][$field]) ? $data['params'][$field] : 0;
 		}
 
 		$fieldValues = explode("\r\n", $fieldValues);
+
 		for ($i = 0, $n = count($feeValues); $i < $n; $i++)
 		{
 			$fieldValues[$i] = $fieldValues[$i] . ' - ' . $feeValues[$i];
 		}
 
 		$inputFilter = JFilterInput::getInstance();
+
 		for ($i = 0, $n = count($feeValues); $i < $n; $i++)
 		{
 			$feeValues[$i] = $inputFilter->clean($feeValues[$i], 'FLOAT');
@@ -88,6 +91,7 @@ class plgEventBookingField extends JPlugin
 
 		$fieldName = 'event_field_' . $row->id;
 		$fieldId   = 0;
+
 		if (!$isNew)
 		{
 			$query->select('id')
@@ -96,7 +100,9 @@ class plgEventBookingField extends JPlugin
 			$db->setQuery($query);
 			$fieldId = $db->loadResult();
 		}
+
 		$rowField = JTable::getInstance('Field', 'EventbookingTable');
+
 		if ($fieldId)
 		{
 			$rowField->load($fieldId);
@@ -120,8 +126,8 @@ class plgEventBookingField extends JPlugin
 
 		if (!$fieldId)
 		{
-			$query->clear();
-			$query->insert('#__eb_field_events')
+			$query->clear()
+				->insert('#__eb_field_events')
 				->columns('field_id, event_id')
 				->values("$rowField->id, $row->id");
 			$db->setQuery($query);

@@ -22,11 +22,9 @@ class plgEventBookingJcomments extends JPlugin
 	{
 		ob_start();
 		$this->displayCommentForm($row);
-		$form = ob_get_contents();
-		ob_end_clean();
 
 		return array('title' => JText::_('Comment'),
-		             'form'  => $form,
+		             'form'  => ob_get_clean(),
 		);
 	}
 
@@ -38,6 +36,7 @@ class plgEventBookingJcomments extends JPlugin
 	private function displayCommentForm($row)
 	{
 		$comments = JPATH_ROOT . '/components/com_jcomments/jcomments.php';
+
 		if (file_exists($comments))
 		{
 			require_once $comments;
