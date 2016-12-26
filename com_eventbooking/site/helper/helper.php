@@ -124,7 +124,7 @@ class EventbookingHelper
 	public static function needInvoice($row)
 	{
 		// Don't generate invoice for waiting list records
-		if ($row->published === 3)
+		if ($row->published === 3 || $row->cart_id > 0 || $row->group_id > 0)
 		{
 			return false;
 		}
