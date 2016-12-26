@@ -9,6 +9,7 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\Registry\Registry;
 use Joomla\Utilities\ArrayHelper;
 
 class EventbookingModelCart extends RADModel
@@ -316,7 +317,7 @@ class EventbookingModelCart extends RADModel
 				->from('#__eb_payment_plugins')
 				->where('name=' . $db->quote($paymentMethod));
 			$db->setQuery($query);
-			$params       = new JRegistry($db->loadResult());
+			$params       = new Registry($db->loadResult());
 			$paymentClass = new $paymentMethod($params);
 
 			// Convert payment amount to USD if the currency is not supported by payment gateway

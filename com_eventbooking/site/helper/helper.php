@@ -9,6 +9,8 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\Registry\Registry;
+
 class EventbookingHelper
 {
 	/**
@@ -201,7 +203,7 @@ class EventbookingHelper
 	 * @param $active
 	 * @param $views
 	 *
-	 * @return JRegistry
+	 * @return Registry
 	 */
 	public static function getViewParams($active, $views)
 	{
@@ -210,7 +212,7 @@ class EventbookingHelper
 			return $active->params;
 		}
 
-		return new JRegistry();
+		return new Registry();
 	}
 
 	/**
@@ -1233,7 +1235,7 @@ class EventbookingHelper
 		if ($paymentMethod)
 		{
 			$method            = os_payments::loadPaymentMethod($paymentMethod);
-			$params            = new JRegistry($method->params);
+			$params            = new Registry($method->params);
 			$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
 			$paymentFeePercent = (float) $params->get('payment_fee_percent');
 		}
@@ -1682,7 +1684,7 @@ class EventbookingHelper
 		if ($paymentMethod)
 		{
 			$method            = os_payments::loadPaymentMethod($paymentMethod);
-			$params            = new JRegistry($method->params);
+			$params            = new Registry($method->params);
 			$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
 			$paymentFeePercent = (float) $params->get('payment_fee_percent');
 		}
@@ -1814,7 +1816,7 @@ class EventbookingHelper
 		if ($paymentMethod)
 		{
 			$method            = os_payments::loadPaymentMethod($paymentMethod);
-			$params            = new JRegistry($method->params);
+			$params            = new Registry($method->params);
 			$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
 			$paymentFeePercent = (float) $params->get('payment_fee_percent');
 		}

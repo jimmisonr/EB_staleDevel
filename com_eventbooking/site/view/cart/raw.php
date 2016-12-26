@@ -9,6 +9,8 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\Registry\Registry;
+
 class EventbookingViewCartRaw extends RADViewHtml
 {
 	/**
@@ -17,6 +19,7 @@ class EventbookingViewCartRaw extends RADViewHtml
 	public function display()
 	{
 		$layout = $this->getLayout();
+
 		if ($layout == 'module')
 		{
 			$this->displayModule();
@@ -77,7 +80,7 @@ class EventbookingViewCartRaw extends RADViewHtml
 	{
 		jimport('joomla.application.module.helper');
 		$module = JModuleHelper::getModule('mod_eb_cart');
-		$params = new JRegistry($module->params);
+		$params = new Registry($module->params);
 		if ($params->get('item_id'))
 		{
 			$Itemid = $params->get('item_id');
