@@ -8,6 +8,9 @@
  */
 // no direct access
 defined('_JEXEC') or die;
+
+use Joomla\Registry\Registry;
+
 jimport('joomla.filesystem.file');
 jimport('joomla.filesystem.folder');
 
@@ -66,19 +69,19 @@ class com_eventbookingInstallerScript
 		{
 			JFile::copy(JPATH_ROOT . '/components/com_eventbooking/assets/css/custom.css', JPATH_ROOT . '/components/com_eventbooking/custom.css');
 		}
-		
+
 		if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/view/common'))
 		{
 			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/view/common');
 		}
-		
+
 		if (JFolder::exists(JPATH_ROOT . '/components/com_eventbooking/emailtemplates'))
 		{
 			JFolder::delete(JPATH_ROOT . '/components/com_eventbooking/emailtemplates');
 		}
 
 		// Fix mistake causes by a bug in version 2.9.0
-		$db = JFactory::getDbo();
+		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('extension_id, manifest_cache')
 			->from('#__extensions')
@@ -94,16 +97,16 @@ class com_eventbookingInstallerScript
 
 			$installer = new JInstaller();
 
-			foreach($plugins as $plugin)
+			foreach ($plugins as $plugin)
 			{
-				$params = new JRegistry($plugin->manifest_cache);
+				$params   = new Registry($plugin->manifest_cache);
 				$filename = $params->get('filename');
 				if ($filename && !in_array($filename, $processedPlugins))
 				{
 					$processedPlugins[] = $filename;
 					$query->clear()
 						->update('#__extensions')
-						->set('`element` = '. $db->quote($filename))
+						->set('`element` = ' . $db->quote($filename))
 						->where('extension_id = ' . $plugin->extension_id);
 					$db->setQuery($query);
 					$db->execute();
@@ -147,11 +150,12 @@ class com_eventbookingInstallerScript
 	public function postflight($type, $parent)
 	{
 		//Restore the modified language strings by merging to language files
-		$registry = new JRegistry();
+		$registry = new Registry();
 		foreach (self::$languageFiles as $languageFile)
 		{
 			$backupFile  = JPATH_ROOT . '/language/en-GB/bak.' . $languageFile;
 			$currentFile = JPATH_ROOT . '/language/en-GB/' . $languageFile;
+
 			if (JFile::exists($currentFile) && JFile::exists($backupFile))
 			{
 				$registry->loadFile($currentFile, 'INI');
@@ -213,6 +217,6 @@ class com_eventbookingInstallerScript
 					}
 				}
 			}
-		}		
+		}
 	}
 }

@@ -8,6 +8,7 @@
  */
 // no direct access
 defined('_JEXEC') or die;
+
 $format = 'Y-m-d';
 ?>
 <fieldset class="adminform">
@@ -73,7 +74,7 @@ $format = 'Y-m-d';
 				<tr>
 					<td>
 						<?php
-						$params     = new JRegistry($this->item->params);
+						$params     = new \Joomla\Registry\Registry($this->item->params);
 						$options    = array();
 						$options[]  = JHtml::_('select.option', 'first', JText::_('EB_FIRST'));
 						$options[]  = JHtml::_('select.option', 'second', JText::_('EB_SECOND'));

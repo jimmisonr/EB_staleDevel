@@ -307,7 +307,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 
 		if ($this->item->payment_method == "os_offline_creditcard")
 		{
-			$params = new JRegistry($this->item->params);
+			$params = new \Joomla\Registry\Registry($this->item->params);
 		?>
 			<div class="control-group">
 				<label class="control-label">

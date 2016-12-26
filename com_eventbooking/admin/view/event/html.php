@@ -9,6 +9,8 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\Registry\Registry;
+
 class EventbookingViewEventHtml extends RADViewItem
 {
 	protected function prepareView()
@@ -203,7 +205,7 @@ class EventbookingViewEventHtml extends RADViewItem
 		//Custom field handles
 		if ($config->event_custom_field)
 		{
-			$registry = new JRegistry;
+			$registry = new Registry();
 			$registry->loadString($item->custom_fields);
 			$data         = new stdClass();
 			$data->params = $registry->toArray();

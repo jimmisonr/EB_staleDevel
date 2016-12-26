@@ -9,13 +9,15 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\Registry\Registry;
+
 class EventBookingViewPluginHtml extends RADViewItem
 {
 	protected function prepareView()
 	{
 		parent::prepareView();
 
-		$registry = new JRegistry();
+		$registry = new Registry();
 		$registry->loadString($this->item->params);
 		$data         = new stdClass();
 		$data->params = $registry->toArray();

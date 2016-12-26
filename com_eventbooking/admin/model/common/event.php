@@ -9,6 +9,7 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\Registry\Registry;
 use Joomla\String\StringHelper;
 
 class EventbookingModelCommonEvent extends RADModelAdmin
@@ -443,7 +444,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			$eventDates               = EventbookingHelper::getMonthlyRecurringAtDayInWeekEventDates($row->event_date, $data['recurring_end_date'], (int) $data['weekly_number_months'], (int) $data['recurring_occurrencies'], $data['week_in_month'], $data['day_of_week']);
 			$row->recurring_frequency = $data['weekly_number_months'];
 
-			$params = new JRegistry($row->params);
+			$params = new Registry($row->params);
 			$params->set('weekly_number_months', $data['weekly_number_months']);
 			$params->set('week_in_month', $data['week_in_month']);
 			$params->set('day_of_week', $data['day_of_week']);
