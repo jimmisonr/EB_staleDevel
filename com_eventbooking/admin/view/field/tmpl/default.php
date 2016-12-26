@@ -24,7 +24,8 @@ if ($translatable)
 <script type="text/javascript">
 	Joomla.submitbutton = function(pressbutton) {
 		var form = document.adminForm;
-		if (pressbutton == 'cancel') 
+
+		if (pressbutton == 'cancel')
 		{
 			Joomla.submitform( pressbutton );
 			return;				
@@ -46,7 +47,19 @@ if ($translatable)
 			}				
 			Joomla.submitform( pressbutton );
 		}
-	}
+	};
+
+	showHideEventsSelection = function(assignment)
+	{
+		if (assignment.value == 0)
+		{
+			jQuery('#events_selection_container').hide();
+		}
+		else
+		{
+			jQuery('#events_selection_container').show();
+		}
+	};
 </script>
 <form action="index.php?option=com_eventbooking&view=field" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
 <div class="row-fluid">
@@ -76,8 +89,16 @@ if ($translatable)
 			}
 			else
 			{
-				?>
+			?>
 				<div class="control-group">
+					<label class="control-label">
+						<?php echo JText::_('EB_FIELD_ASSIGNMENT'); ?>
+					</label>
+					<div class="controls">
+						<?php echo $this->lists['assignment'] ; ?>
+					</div>
+				</div>
+				<div class="control-group" id="events_selection_container"<?php if ($this->assignment == 0) echo 'style="display:none;"'; ?>>
 					<label class="control-label">
 						<?php echo JText::_('EB_EVENT'); ?>
 					</label>

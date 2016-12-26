@@ -22,6 +22,7 @@ class EventbookingModelField extends RADModelAdmin
 	protected function beforeStore($row, $input, $isNew)
 	{
 		$input->set('depend_on_options', json_encode($input->get('depend_on_options', array(), 'array')));
+
 		if (in_array($row->id, $this->getRestrictedFieldIds()))
 		{
 			$data = $input->getData(RAD_INPUT_ALLOWRAW);
@@ -35,17 +36,20 @@ class EventbookingModelField extends RADModelAdmin
 	/**
 	 * Post - process, Store custom fields mapping with events.
 	 *
-	 * @param JTable   $row
-	 * @param RADInput $input
-	 * @param bool     $isNew
+	 * @param EventbookingTableField $row
+	 * @param RADInput               $input
+	 * @param bool                   $isNew
 	 */
 	protected function afterStore($row, $input, $isNew)
 	{
 		$config = EventbookingHelper::getConfig();
+
 		if (!$config->custom_field_by_category)
 		{
-			$eventIds = $input->get('event_id', array(), 'array');
-			if (count($eventIds) == 0 || $eventIds[0] == -1 || $row->name == 'first_name' || $row->name == 'email')
+			$assignment = $input->getInt('assignment', 0);
+			$eventIds   = $input->get('event_id', array(), 'array');
+
+			if ($assignment == 0 || count($eventIds) == 0 || $row->name == 'first_name' || $row->name == 'email')
 			{
 				$row->event_id = -1;
 			}
@@ -53,36 +57,44 @@ class EventbookingModelField extends RADModelAdmin
 			{
 				$row->event_id = 1;
 			}
+
 			$row->store();
 
 			$fieldId = $row->id;
 			$db      = $this->getDbo();
 			$query   = $db->getQuery(true);
-			$query->clear();
+
 			if (!$isNew)
 			{
 				$query->delete('#__eb_field_events')->where('field_id = ' . $fieldId);
+
 				if ($config->hide_past_events_from_events_dropdown)
 				{
-					$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+					$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
 					$query->where('event_id IN (SELECT id FROM #__eb_events AS a WHERE a.published = 1 AND (DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.event_end_date) >= ' . $currentDate . '))');
 				}
+
 				$db->setQuery($query);
 				$db->execute();
+
+				$query->clear();
 			}
 
 			if ($row->event_id != -1)
 			{
-				$query->clear();
 				$query->insert('#__eb_field_events')->columns('field_id, event_id');
+
 				for ($i = 0, $n = count($eventIds); $i < $n; $i++)
 				{
 					$eventId = (int) $eventIds[$i];
+
 					if ($eventId > 0)
 					{
+						$eventId *= $assignment;
 						$query->values("$fieldId, $eventId");
 					}
 				}
+
 				$db->setQuery($query);
 				$db->execute();
 			}
@@ -90,6 +102,7 @@ class EventbookingModelField extends RADModelAdmin
 		else
 		{
 			$categoryIds = $input->get('category_id', array(), 'array');
+
 			if (count($categoryIds) == 0 || $categoryIds[0] == -1 || $row->name == 'first_name' || $row->name == 'email')
 			{
 				$row->category_id = -1;
@@ -98,31 +111,36 @@ class EventbookingModelField extends RADModelAdmin
 			{
 				$row->category_id = 1;
 			}
+
 			$row->store();
 
 			$fieldId = $row->id;
 			$db      = $this->getDbo();
 			$query   = $db->getQuery(true);
-			$query->clear();
+
 			if (!$isNew)
 			{
 				$query->delete('#__eb_field_categories')->where('field_id = ' . $fieldId);
 				$db->setQuery($query);
 				$db->execute();
+
+				$query->clear();
 			}
 
 			if ($row->category_id != -1)
 			{
-				$query->clear();
 				$query->insert('#__eb_field_categories')->columns('field_id, category_id');
+
 				for ($i = 0, $n = count($categoryIds); $i < $n; $i++)
 				{
 					$categoryId = (int) $categoryIds[$i];
+
 					if ($categoryId > 0)
 					{
 						$query->values("$fieldId, $categoryId");
 					}
 				}
+
 				$db->setQuery($query);
 				$db->execute();
 			}
@@ -132,6 +150,7 @@ class EventbookingModelField extends RADModelAdmin
 		if (JLanguageMultilang::isEnabled())
 		{
 			$languages = EventbookingHelper::getLanguages();
+
 			if (count($languages))
 			{
 				if ($row->depend_on_field_id > 0)
@@ -141,19 +160,23 @@ class EventbookingModelField extends RADModelAdmin
 					$masterFieldValues = explode("\r\n", $masterField->values);
 					$dependOnOptions   = json_decode($row->depend_on_options);
 					$dependOnIndexes   = array();
+
 					foreach ($dependOnOptions as $option)
 					{
 						$index = array_search($option, $masterFieldValues);
+
 						if ($index !== false)
 						{
 							$dependOnIndexes[] = $index;
 						}
 					}
+
 					foreach ($languages as $language)
 					{
 						$sef                             = $language->sef;
 						$dependOnOptionsWithThisLanguage = array();
 						$values                          = explode("\r\n", $masterField->{'values_' . $sef});
+
 						foreach ($dependOnIndexes as $index)
 						{
 							if (isset($values[$index]))
@@ -161,8 +184,10 @@ class EventbookingModelField extends RADModelAdmin
 								$dependOnOptionsWithThisLanguage[] = $values[$index];
 							}
 						}
+
 						$row->{'depend_on_options_' . $sef} = json_encode($dependOnOptionsWithThisLanguage);
 					}
+
 					$row->store();
 				}
 			}
@@ -183,11 +208,13 @@ class EventbookingModelField extends RADModelAdmin
 			$query  = $db->getQuery(true);
 			$config = EventbookingHelper::getConfig();
 			$cids   = implode(',', $cid);
+
 			//Delete data from field values table
 			$query->delete('#__eb_field_values')->where('field_id IN (' . $cids . ')');
 			$db->setQuery($query);
 			$db->execute();
 			$query->clear();
+
 			if (!$config->custom_field_by_category)
 			{
 				$query->delete('#__eb_field_events')->where('field_id IN (' . $cids . ')');
@@ -196,11 +223,13 @@ class EventbookingModelField extends RADModelAdmin
 			{
 				$query->delete('#__eb_field_categories')->where('field_id IN (' . $cids . ')');
 			}
+
 			$db->setQuery($query);
 			$db->execute();
+
 			//Do not allow deleting core fields
-			$query->clear();
-			$query->delete('#__eb_fields')->where('id IN (' . $cids . ') AND is_core=0');
+			$query->clear()
+				->delete('#__eb_fields')->where('id IN (' . $cids . ') AND is_core=0');
 			$db->setQuery($query);
 			$db->execute();
 		}
@@ -240,6 +269,7 @@ class EventbookingModelField extends RADModelAdmin
 	{
 		$restrictedFieldIds = $this->getRestrictedFieldIds();
 		$pks                = array_diff($pks, $restrictedFieldIds);
+
 		if (count($pks))
 		{
 			parent::publish($pks, $value);
