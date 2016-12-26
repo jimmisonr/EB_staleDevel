@@ -61,6 +61,7 @@ class RADHelper
 			->order('id');
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
+
 		foreach ($rows as $row)
 		{
 			JSubMenuHelper::addEntry(JText::_($row->title), $row->link, $row->link == $currentViewLink);

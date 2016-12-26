@@ -202,6 +202,7 @@ class RADModel
 			{
 				$tablePrefix = '#__' . $component . '_';
 			}
+
 			$this->table = $tablePrefix . strtolower(RADInflector::pluralize($this->name));
 		}
 
@@ -273,15 +274,16 @@ class RADModel
 	/**
 	 * Set the model state properties
 	 *
-	 * @param string|array The   name of the property, an array
+	 * @param   string|array $property The    name of the property, an array
 	 *
-	 * @param              mixed The value of the property
+	 * @param   mixed        $value    The value of the property
 	 *
-	 * @return RADModel
+	 * @return $this
 	 */
 	public function setState($property, $value = null)
 	{
 		$changed = false;
+
 		if (is_array($property))
 		{
 			foreach ($property as $key => $value)
@@ -389,9 +391,9 @@ class RADModel
 	 *
 	 * For example : $model->filter_order('name')->filter_order_Dir('DESC')->limit(10)->getData();
 	 *
-	 * @param string Method name
+	 * @param string $method Method name
 	 *
-	 * @param array  Array containing all the arguments for the original call
+	 * @param array  $args   Array containing all the arguments for the original call
 	 *
 	 * @return RADModel
 	 */
