@@ -10,9 +10,9 @@
 defined( '_JEXEC' ) or die ;
 JHtml::_('formbehavior.chosen', 'select');
 
-JToolBarHelper::title(JText::_('EB_BATCH_COUPONS_TITLE'));
-JToolBarHelper::custom('coupon.batch', 'upload', 'upload', 'Generate Coupons', false);
-JToolBarHelper::cancel('coupon.cancel');	
+JToolbarHelper::title(JText::_('EB_BATCH_COUPONS_TITLE'));
+JToolbarHelper::custom('coupon.batch', 'upload', 'upload', 'EB_GENERATE_COUPONS', false);
+JToolbarHelper::cancel('coupon.cancel');
 ?>
 <form action="index.php?option=com_eventbooking&view=coupon" method="post" name="adminForm" id="adminForm" class="form form-horizontal">		
 	<div class="control-group">

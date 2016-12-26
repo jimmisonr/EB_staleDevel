@@ -9,7 +9,7 @@
 // no direct access
 defined('_JEXEC') or die;
 JToolbarHelper::title(JText::_('EB_IMPORT_EVENTS_TITLE'));
-JToolbarHelper::custom('event.import', 'upload', 'upload', 'Import Events', false);
+JToolbarHelper::custom('event.import', 'upload', 'upload', 'EB_IMPORT_EVENTS', false);
 JToolbarHelper::cancel('event.cancel');
 ?>
 <form action="index.php?option=com_eventbooking&view=event&layout=import" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data">
