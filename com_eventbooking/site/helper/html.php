@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package            Joomla
  * @subpackage         Event Booking
@@ -345,9 +346,10 @@ abstract class EventbookingHelperHtml
 		$data['siteurl']    = urlencode(JUri::root());
 		$data['rawdetails'] = urlencode($row->description);
 		$data['details']    = strip_tags($row->description);
+
 		if (strlen($data['details']) > 100)
 		{
-			$data['details'] = JString::substr($data['details'], 0, 100) . ' ...';
+			$data['details'] = \Joomla\String\StringHelper::substr($data['details'], 0, 100) . ' ...';
 		}
 
 		$data['details'] = urlencode($data['details']);

@@ -3700,15 +3700,18 @@ class EventbookingHelper
 	{
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
+
 		if (empty($countryName))
 		{
 			$countryName = self::getConfigValue('default_country');
 		}
+
 		$query->select('country_2_code')
 			->from('#__eb_countries')
-			->where('LOWER(name) = ' . $db->quote(JString::strtolower($countryName)));
+			->where('LOWER(name) = ' . $db->quote(\Joomla\String\StringHelper::strtolower($countryName)));
 		$db->setQuery($query);
 		$countryCode = $db->loadResult();
+
 		if (!$countryCode)
 		{
 			$countryCode = 'US';

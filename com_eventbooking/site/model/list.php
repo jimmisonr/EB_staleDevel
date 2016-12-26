@@ -9,6 +9,8 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\String\StringHelper;
+
 class EventbookingModelList extends RADModelList
 {
 	/**
@@ -241,12 +243,12 @@ class EventbookingModelList extends RADModelList
 
 		if ($state->filter_city)
 		{
-			$query->where(' tbl.location_id IN (SELECT id FROM #__eb_locations WHERE LOWER(`city`) = ' . $db->quote(JString::strtolower($state->filter_city)) . ')');
+			$query->where(' tbl.location_id IN (SELECT id FROM #__eb_locations WHERE LOWER(`city`) = ' . $db->quote(StringHelper::strtolower($state->filter_city)) . ')');
 		}
 
 		if ($state->filter_state)
 		{
-			$query->where(' tbl.location_id IN (SELECT id FROM #__eb_locations WHERE LOWER(`state`) = ' . $db->quote(JString::strtolower($state->filter_state)) . ')');
+			$query->where(' tbl.location_id IN (SELECT id FROM #__eb_locations WHERE LOWER(`state`) = ' . $db->quote(StringHelper::strtolower($state->filter_state)) . ')');
 		}
 
 		if ($state->created_by)
