@@ -8,6 +8,8 @@
  */
 defined('_JEXEC') or die;
 
+use Joomla\String\StringHelper;
+
 class plgContentEBRestriction extends JPlugin
 {
 	public function onContentPrepare($context, &$row, &$params, $page = 0)
@@ -15,7 +17,7 @@ class plgContentEBRestriction extends JPlugin
 		if (file_exists(JPATH_ROOT . '/components/com_eventbooking/eventbooking.php') && is_object($row))
 		{
 			// Check whether the plugin should process or not
-			if (JString::strpos($row->text, 'ebrestriction') === false)
+			if (StringHelper::strpos($row->text, 'ebrestriction') === false)
 			{
 				return true;
 			}
