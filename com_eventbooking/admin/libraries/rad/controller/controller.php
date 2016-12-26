@@ -23,7 +23,7 @@ class RADController
 	/**
 	 * Array which hold all the controller objects has been created
 	 *
-	 * @var Array
+	 * @var array
 	 */
 	protected static $instances = array();
 
@@ -140,6 +140,7 @@ class RADController
 		else
 		{
 			$name = RADInflector::singularize($input->getCmd('view'));
+
 			if (!$name)
 			{
 				$name = 'controller';
@@ -225,6 +226,7 @@ class RADController
 		foreach ($rMethods as $rMethod)
 		{
 			$mName = $rMethod->getName();
+
 			if (!in_array($mName, $xMethods) || $mName == 'display')
 			{
 				$this->taskMap[strtolower($mName)] = $mName;
@@ -291,7 +293,9 @@ class RADController
 		$viewType   = $this->input->get('format', 'html');
 		$viewName   = $this->input->get('view', $this->config['default_view']);
 		$viewLayout = $this->input->get('layout', 'default');
-		$view       = $this->getView($viewName, $viewType, $viewLayout);
+
+		/* @var RADViewHtml $view */
+		$view = $this->getView($viewName, $viewType, $viewLayout);
 
 		// If view has model, create the model, and assign it to the view
 		if ($view->hasModel)

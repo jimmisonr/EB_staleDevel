@@ -8,6 +8,8 @@
  */
 defined('_JEXEC') or die;
 
+use Joomla\Utilities\ArrayHelper;
+
 /**
  * Base class for a Joomla Administrator Controller. It handles add, edit, delete, publish, unpublish records....
  *
@@ -138,6 +140,7 @@ class RADControllerAdmin extends RADController
 		{
 			try
 			{
+				/* @var RADModelAdmin $model */
 				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin'));
 				$model->store($this->input);
 
@@ -198,10 +201,13 @@ class RADControllerAdmin extends RADController
 	{
 		// Check for request forgeries.
 		$this->csrfProtection();
+
 		$order = $this->input->get('order', array(), 'array');
 		$cid   = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($order);
-		JArrayHelper::toInteger($cid);
+
+		//Sanitize input
+		$order = ArrayHelper::toInteger($order);
+		$cid   = ArrayHelper::toInteger($cid);
 
 		for ($i = 0, $n = count($cid); $i < $n; $i++)
 		{
@@ -215,6 +221,7 @@ class RADControllerAdmin extends RADController
 		{
 			try
 			{
+				/* @var RADModelAdmin $model */
 				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin', 'ignore_request' => true));
 				$model->saveorder($cid, $order);
 				$this->setMessage(JText::_('JLIB_APPLICATION_SUCCESS_ORDERING_SAVED'));
@@ -226,8 +233,7 @@ class RADControllerAdmin extends RADController
 		}
 		else
 		{
-			$languagePrefix = $this->config['language_prefix'];
-			$this->setMessage($languagePrefix . '_NO_ITEM_SELECTED', 'warning');
+			$this->setMessage($this->config['language_prefix'] . '_NO_ITEM_SELECTED', 'warning');
 		}
 
 		$this->setRedirect(JRoute::_($this->getViewListUrl(), false));
@@ -242,15 +248,18 @@ class RADControllerAdmin extends RADController
 	{
 		// Check for request forgeries.
 		$this->csrfProtection();
+
 		$cid = $this->input->post->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		if (count($cid) && $this->allowEditState($cid[0]))
 		{
 			try
 			{
-				$task  = $this->getTask();
-				$inc   = ($task == 'orderup' ? -1 : 1);
+				$task = $this->getTask();
+				$inc  = ($task == 'orderup' ? -1 : 1);
+
+				/* @var RADModelAdmin $model */
 				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin', 'ignore_request' => true));
 				$model->reorder($cid, $inc);
 				$this->setMessage(JText::_('JLIB_APPLICATION_SUCCESS_ITEM_REORDERED'), 'message');
@@ -262,8 +271,7 @@ class RADControllerAdmin extends RADController
 		}
 		else
 		{
-			$languagePrefix = $this->config['language_prefix'];
-			$this->setMessage($languagePrefix . '_NO_ITEM_SELECTED', 'warning');
+			$this->setMessage($this->config['language_prefix'] . '_NO_ITEM_SELECTED', 'warning');
 		}
 
 		$this->setRedirect(JRoute::_($this->getViewListUrl(), false));
@@ -278,9 +286,10 @@ class RADControllerAdmin extends RADController
 	{
 		// Check for request forgeries
 		$this->csrfProtection();
+
 		// Get items to remove from the request.
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		for ($i = 0, $n = count($cid); $i < $n; $i++)
 		{
@@ -296,6 +305,7 @@ class RADControllerAdmin extends RADController
 		{
 			try
 			{
+				/* @var RADModelAdmin $model */
 				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin', 'ignore_request' => true));
 				$model->delete($cid);
 				$this->setMessage(JText::plural($languagePrefix . '_N_ITEMS_DELETED', count($cid)));
@@ -322,13 +332,14 @@ class RADControllerAdmin extends RADController
 	{
 		// Check for request forgeries
 		$this->csrfProtection();
+
 		// Get items to publish from the request.
 		$cid       = $this->input->get('cid', array(), 'array');
 		$data      = array('publish' => 1, 'unpublish' => 0, 'archive' => 2);
 		$task      = $this->getTask();
-		$published = JArrayHelper::getValue($data, $task, 0, 'int');
+		$published = ArrayHelper::getValue($data, $task, 0, 'int');
 
-		JArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		for ($i = 0, $n = count($cid); $i < $n; $i++)
 		{
@@ -344,6 +355,7 @@ class RADControllerAdmin extends RADController
 		{
 			try
 			{
+				/* @var RADModelAdmin $model */
 				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin', 'ignore_request' => true));
 				$model->publish($cid, $published);
 
@@ -390,10 +402,11 @@ class RADControllerAdmin extends RADController
 		$order = $this->input->post->get('order', array(), 'array');
 
 		// Sanitize the input
-		JArrayHelper::toInteger($pks);
-		JArrayHelper::toInteger($order);
+		$pks   = ArrayHelper::toInteger($pks);
+		$order = ArrayHelper::toInteger($order);
 
 		// Get the model
+		/* @var RADModelAdmin $model */
 		$model = $this->getModel();
 
 		// Save the ordering
@@ -419,9 +432,7 @@ class RADControllerAdmin extends RADController
 	 */
 	protected function allowAdd($data = array())
 	{
-		$user = JFactory::getUser();
-
-		return $user->authorise('core.create', $this->option);
+		return JFactory::getUser()->authorise('core.create', $this->option);
 	}
 
 	/**
@@ -464,7 +475,7 @@ class RADControllerAdmin extends RADController
 	/**
 	 * Method to check whether the current user is allowed to delete a record
 	 *
-	 * @param   int  id  Record ID
+	 * @param   int $id Record ID
 	 *
 	 * @return  boolean  True if allowed to delete the record. Defaults to the permission for the component.
 	 */
@@ -505,6 +516,7 @@ class RADControllerAdmin extends RADController
 	protected function getViewItemUrl($recordId = null)
 	{
 		$url = 'index.php?option=' . $this->option . '&view=' . $this->viewItem;
+
 		if ($recordId)
 		{
 			$url .= '&id=' . $recordId;
