@@ -10,7 +10,7 @@
 // no direct access
 defined( '_JEXEC' ) or die ;
 JHtml::_('formbehavior.chosen', 'select');
-JToolBarHelper::custom('export', 'download', 'download', 'Export Coupons', false);
+JToolbarHelper::custom('export', 'download', 'download', 'EB_EXPORT_COUPONS', false);
 ?>
 <form action="index.php?option=com_eventbooking&view=coupons" method="post" name="adminForm" id="adminForm">
 	<div id="j-main-container">

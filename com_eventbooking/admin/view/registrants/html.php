@@ -52,10 +52,10 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 
 		if ($config->activate_checkin_registrants)
 		{
-			$options                        = array();
-			$options[]                      = JHtml::_('select.option', -1, JText::_('EB_CHECKIN_STATUS'));
-			$options[]                      = JHtml::_('select.option', 0, JText::_('EB_CHECKED_IN'));
-			$options[]                      = JHtml::_('select.option', 1, JText::_('EB_NOT_CHECKED_IN'));
+			$options                          = array();
+			$options[]                        = JHtml::_('select.option', -1, JText::_('EB_CHECKIN_STATUS'));
+			$options[]                        = JHtml::_('select.option', 0, JText::_('EB_CHECKED_IN'));
+			$options[]                        = JHtml::_('select.option', 1, JText::_('EB_NOT_CHECKED_IN'));
 			$this->lists['filter_checked_in'] = JHtml::_('select.genericlist', $options, 'filter_checked_in', ' class="inputbox" onchange="submit()" ', 'value', 'text',
 				$this->state->filter_checked_in);
 		}
@@ -81,19 +81,19 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 		// Instantiate a new JLayoutFile instance and render the batch button
 		$layout = new JLayoutFile('joomla.toolbar.batch');
 
-		$bar = JToolbar::getInstance('toolbar');
+		$bar   = JToolbar::getInstance('toolbar');
 		$dhtml = $layout->render(array('title' => JText::_('EB_MASS_MAIL')));
 		$bar->appendButton('Custom', $dhtml, 'batch');
 
-		JToolbarHelper::custom('resend_email', 'envelope', 'envelope', 'Resend Email', true);
-		JToolbarHelper::custom('export', 'download', 'download', 'Export Registration', false);
+		JToolbarHelper::custom('resend_email', 'envelope', 'envelope', 'EB_RESEND_EMAIL', true);
+		JToolbarHelper::custom('export', 'download', 'download', 'EB_EXPORT_REGISTRANTS', false);
 
 
 		$config = EventbookingHelper::getConfig();
 
 		if ($config->activate_certificate_feature)
 		{
-			JToolbarHelper::custom('download_certificates', 'download', 'download', 'Download Certificates', true);
+			JToolbarHelper::custom('download_certificates', 'download', 'download', 'EB_DOWNLOAD_CERTIFICATES', true);
 		}
 	}
 }
