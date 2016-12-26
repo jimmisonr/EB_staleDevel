@@ -37,10 +37,11 @@ class RADConfig
 			->from($table);
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
+
 		for ($i = 0, $n = count($rows); $i < $n; $i++)
 		{
-			$row = $rows[$i];
-			$key = $row->config_key;
+			$row   = $rows[$i];
+			$key   = $row->config_key;
 			$value = $row->config_value;
 
 			$this->data[$key] = $value;
@@ -59,6 +60,7 @@ class RADConfig
 	public function get($key, $default = null)
 	{
 		$result = $default;
+
 		if (isset($this->data[$key]))
 		{
 			$result = $this->data[$key];
@@ -97,9 +99,9 @@ class RADConfig
 	/**
 	 * Set config option value
 	 *
-	 * @param string The user-specified config option
+	 * @param string $name  The user-specified config option
 	 *
-	 * @param mixed  The user-specified config option value.
+	 * @param mixed  $value The user-specified config option value.
 	 *
 	 * @return void
 	 */
