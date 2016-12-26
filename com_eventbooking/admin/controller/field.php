@@ -9,6 +9,8 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\Utilities\ArrayHelper;
+
 class EventbookingControllerField extends EventbookingController
 {
 	public function __construct(RADInput $input = null, array $config = array())
@@ -23,9 +25,10 @@ class EventbookingControllerField extends EventbookingController
 	 */
 	public function required()
 	{
-		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		$cid  = $this->input->get('cid', array(), 'array');
+		$cid  = ArrayHelper::toInteger($cid);
 		$task = $this->getTask();
+
 		if ($task == 'required')
 		{
 			$state = 1;
@@ -35,9 +38,10 @@ class EventbookingControllerField extends EventbookingController
 			$state = 0;
 		}
 
+		/* @var EventbookingModelField $model */
 		$model = $this->getModel();
 		$model->required($cid, $state);
-		$msg = JText::_('EB_FIELD_REQUIRED_STATE_UPDATED');
-		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=fields', false), $msg);
+
+		$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=fields', false), JText::_('EB_FIELD_REQUIRED_STATE_UPDATED'));
 	}
 }
