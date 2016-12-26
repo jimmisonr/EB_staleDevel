@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Form Field class for the Joomla RAD.
  * Supports a radiolist custom field.
@@ -29,10 +28,12 @@ class RADFormFieldRadio extends RADFormField
 		$value      = trim($this->value);
 
 		$size = (int) $this->row->size;
+
 		if (!$size)
 		{
 			$size = 1;
 		}
+
 		$span      = intval(12 / $size);
 		$rowFluid  = $bootstrapHelper ? $bootstrapHelper->getClassMapping('row-fluid') : 'row-fluid';
 		$spanClass = $bootstrapHelper ? $bootstrapHelper->getClassMapping('span' . $span) : 'span' . $span;
@@ -41,6 +42,7 @@ class RADFormFieldRadio extends RADFormField
 		$html[]        = '<ul class="nav clearfix">';
 		$i             = 0;
 		$numberOptions = count($options);
+
 		foreach ($options as $option)
 		{
 			$i++;
@@ -51,12 +53,14 @@ class RADFormFieldRadio extends RADFormField
 				htmlspecialchars($optionValue, ENT_COMPAT, 'UTF-8') . '"' . $checked . $attributes . $this->row->extra_attributes . '/> ' . $option .
 				'</label>';
 			$html[]      = '</li>';
+
 			if ($i % $size == 0 && $i < $numberOptions)
 			{
 				$html[] = '</ul>';
 				$html[] = '<ul class="nav clearfix">';
 			}
 		}
+
 		// End the checkbox field output.
 		$html[] = '</fieldset>';
 
@@ -86,6 +90,7 @@ class RADFormFieldRadio extends RADFormField
 		{
 
 			$multilingualValues = array();
+
 			if (JLanguageMultilang::isEnabled())
 			{
 				$multilingualValues = RADFormField::getMultilingualOptions($this->row->id);

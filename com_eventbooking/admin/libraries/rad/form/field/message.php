@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Form Field class for the Joomla RAD.
  * Supports a message form field
@@ -23,6 +24,7 @@ class RADFormFieldMessage extends RADFormField
 	public function getInput($bootstrapHelper = null)
 	{
 		$controlGroupAttributes = 'id="field_' . $this->name . '" ';
+
 		if ($this->hideOnDisplay)
 		{
 			$controlGroupAttributes .= ' style="display:none;" ';
@@ -52,9 +54,7 @@ class RADFormFieldMessage extends RADFormField
 		{
 			return $this->getInput($bootstrapHelper);
 		}
-		else
-		{
-			return '<tr>' . '<td class="eb-message" colspan="2">' . $this->description . '</td></tr>';
-		}
+
+		return '<tr>' . '<td class="eb-message" colspan="2">' . $this->description . '</td></tr>';
 	}
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Form Field class for the Joomla RAD.
  * Supports a generic list of options.
@@ -25,6 +24,7 @@ class RADFormFieldList extends RADFormField
 	public function __construct($row, $value)
 	{
 		parent::__construct($row, $value);
+
 		if ($row->multiple)
 		{
 			$this->attributes['multiple'] = true;
@@ -42,6 +42,7 @@ class RADFormFieldList extends RADFormField
 		// Get the field options.
 		$options    = (array) $this->getOptions();
 		$attributes = $this->buildAttributes();
+
 		if ($this->row->multiple)
 		{
 			if (is_array($this->value))
@@ -81,6 +82,7 @@ class RADFormFieldList extends RADFormField
 
 		$options   = array();
 		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT'));
+
 		if (is_array($this->row->values))
 		{
 			$values = $this->row->values;
@@ -99,6 +101,7 @@ class RADFormFieldList extends RADFormField
 		if ($this->row->quantity_field && count($values) && count($quantityValues) && $this->eventId && !$user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
 			$multilingualValues = array();
+
 			if (JLanguageMultilang::isEnabled())
 			{
 				$multilingualValues = RADFormField::getMultilingualOptions($this->row->id);

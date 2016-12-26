@@ -1,5 +1,4 @@
 <?php
-
 class RADFormFieldFile extends RADFormField
 {
 	/**
@@ -18,6 +17,7 @@ class RADFormFieldFile extends RADFormField
 	public function __construct($row, $value = null, $fieldSuffix = null)
 	{
 		parent::__construct($row, $value, $fieldSuffix);
+
 		if ($row->size)
 		{
 			$this->attributes['size'] = $row->size;
@@ -32,6 +32,7 @@ class RADFormFieldFile extends RADFormField
 	protected function getInput($bootstrapHelper = null)
 	{
 		$html = '<input type="button" value="' . JText::_('EB_SELECT_FILE') . '" id="button-file-' . $this->name . '" class="btn btn-primary" />';
+
 		if ($this->value && file_exists(JPATH_ROOT . '/media/com_eventbooking/files/' . $this->value))
 		{
 			$html .= '<span class="eb-uploaded-file" id="uploaded-file-' . $this->name . '"><a href="index.php?option=com_eventbooking&task=download_file&file_name=' . $this->value . '"><i class="icon-donwload"></i><strong>' . $this->value . '</strong></a></span>';

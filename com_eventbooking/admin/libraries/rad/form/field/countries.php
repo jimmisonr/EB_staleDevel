@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Supports a custom field which display list of countries
  *
@@ -52,8 +51,9 @@ class RADFormFieldCountries extends RADFormFieldList
 			$options   = array();
 			$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_COUNTRY'));
 
-			$countries = $db->loadObjectlist();
-			foreach($countries as $country)
+			$countries = $db->loadObjectList();
+
+			foreach ($countries as $country)
 			{
 				$options[] = JHtml::_('select.option', $country->value, JText::_($country->text));
 			}

@@ -30,6 +30,7 @@ class RADForm
 		foreach ($fields as $field)
 		{
 			$class = 'RADFormField' . ucfirst($field->fieldtype);
+
 			if (class_exists($class))
 			{
 				$this->fields[$field->name] = new $class($field, $field->default_values);
@@ -113,6 +114,7 @@ class RADForm
 	public function getFormData()
 	{
 		$data = array();
+
 		foreach ($this->fields as $field)
 		{
 			$data[$field->name] = $field->value;
@@ -129,6 +131,7 @@ class RADForm
 	public function prepareFormFields($calculationFeeMethod)
 	{
 		$feeFormula = '';
+
 		foreach ($this->fields as $field)
 		{
 			if ($field->fee_formula)
@@ -136,11 +139,13 @@ class RADForm
 				$feeFormula .= $field->fee_formula;
 			}
 		}
+
 		foreach ($this->fields as $field)
 		{
 			if ($field->fee_field || strpos($feeFormula, '[' . strtoupper($field->name) . ']') !== false)
 			{
 				$field->setFeeCalculation(true);
+
 				switch ($field->type)
 				{
 					case 'List':
@@ -163,24 +168,31 @@ class RADForm
 	{
 		$masterFields = array();
 		$fieldsAssoc  = array();
+
 		foreach ($this->fields as $field)
 		{
 			if ($field->depend_on_field_id)
 			{
 				$masterFields[] = $field->depend_on_field_id;
 			}
+
 			$fieldsAssoc[$field->id] = $field;
 		}
+
 		$masterFields = array_unique($masterFields);
+
 		if (count($masterFields))
 		{
 			$hiddenFields = array();
+
+
 			foreach ($this->fields as $field)
 			{
 				if (in_array($field->id, $masterFields))
 				{
 					$field->setFeeCalculation(true);
 					$field->setMasterField(true);
+
 					switch (strtolower($field->type))
 					{
 						case 'list':
@@ -204,6 +216,7 @@ class RADForm
 					else
 					{
 						$masterFieldValues = $fieldsAssoc[$field->depend_on_field_id]->value;
+
 						if (is_array($masterFieldValues))
 						{
 							$selectedOptions = $masterFieldValues;
@@ -220,7 +233,9 @@ class RADForm
 						{
 							$selectedOptions = array($masterFieldValues);
 						}
+
 						$dependOnOptions = json_decode($field->depend_on_options);
+
 						if (!count(array_intersect($selectedOptions, $dependOnOptions)))
 						{
 							$field->hideOnDisplay();
@@ -240,6 +255,7 @@ class RADForm
 	public function containFeeFields()
 	{
 		$containFeeFields = false;
+
 		foreach ($this->fields as $field)
 		{
 			if ($field->fee_field)
@@ -287,16 +303,19 @@ class RADForm
 		$fee = 0;
 		$this->buildFieldsDependency();
 		$fieldsFee = $this->calculateFieldsFee();
+
 		foreach ($this->fields as $field)
 		{
 			if ($field->hideOnDisplay)
 			{
 				continue;
 			}
+
 			if (!$field->row->fee_field)
 			{
 				continue;
 			}
+
 			if (strtolower($field->type) == 'text' || $field->row->fee_formula)
 			{
 				//Maybe we need to check fee formula
@@ -315,13 +334,14 @@ class RADForm
 						$formula   = str_replace('[' . $fieldName . ']', $fieldFee, $formula);
 					}
 
-					foreach($replaces as $fieldName => $fieldFee)
+					foreach ($replaces as $fieldName => $fieldFee)
 					{
 						$fieldName = strtoupper($fieldName);
 						$formula   = str_replace('[' . $fieldName . ']', $fieldFee, $formula);
 					}
 
 					$feeValue = 0;
+
 					if ($formula)
 					{
 						@eval('$feeValue = ' . $formula . ';');
@@ -336,6 +356,7 @@ class RADForm
 			{
 				$feeValues = explode("\r\n", $field->row->fee_values);
 				$values    = explode("\r\n", $field->row->values);
+
 				if (is_array($field->value))
 				{
 					$fieldValues = $field->value;
@@ -349,12 +370,15 @@ class RADForm
 				{
 					$fieldValues = array();
 				}
+
 				$values      = array_map('trim', $values);
 				$fieldValues = array_map('trim', $fieldValues);
+
 				for ($j = 0, $m = count($fieldValues); $j < $m; $j++)
 				{
 					$fieldValue      = $fieldValues[$j];
 					$fieldValueIndex = array_search($fieldValue, $values);
+
 					if ($fieldValueIndex !== false && isset($feeValues[$fieldValueIndex]))
 					{
 						$fee += $feeValues[$fieldValueIndex];
@@ -385,9 +409,11 @@ class RADForm
 		$dateFormat    = str_replace('%', '', $dateFormat);
 		$fieldIds      = array(0);
 		$fileFieldIds  = array(0);
+
 		foreach ($this->fields as $field)
 		{
 			$fieldType = strtolower($field->type);
+
 			if ($fieldType == 'file')
 			{
 				$fileFieldIds[] = $field->id;
@@ -404,9 +430,11 @@ class RADForm
 			->where('field_id IN (' . implode(',', $fieldIds) . ')');
 		$db->setQuery($query);
 		$db->execute();
+
 		foreach ($this->fields as $field)
 		{
 			$fieldType = strtolower($field->type);
+
 			if ($field->row->is_core || $fieldType == 'heading' || $fieldType == 'message')
 			{
 				continue;
@@ -421,12 +449,14 @@ class RADForm
 			if ($fieldType == 'date')
 			{
 				$fieldValue = $data[$field->name];
+
 				if ($fieldValue)
 				{
 					// Try to convert the format
 					try
 					{
 						$date = DateTime::createFromFormat($dateFormat, $fieldValue);
+
 						if ($date)
 						{
 							$fieldValue = $date->format('Y-m-d');
@@ -440,25 +470,29 @@ class RADForm
 					{
 						$fieldValue = '';
 					}
+
 					$data[$field->name] = $fieldValue;
 				}
 			}
 
 			$fieldValue = isset($data[$field->name]) ? $data[$field->name] : '';
+
 			if ($fieldValue != '')
 			{
 				if (in_array($field->id, $fileFieldIds))
 				{
-					$query->clear();
-					$query->delete('#__eb_field_values')
+					$query->clear()
+						->delete('#__eb_field_values')
 						->where('registrant_id=' . (int) $registrantId)
 						->where('field_id = ' . $field->id);
 					$db->setQuery($query);
 					$db->execute();
 				}
+
 				$rowFieldValue->id            = 0;
 				$rowFieldValue->field_id      = $field->row->id;
 				$rowFieldValue->registrant_id = $registrantId;
+
 				if (is_array($fieldValue))
 				{
 					$rowFieldValue->field_value = json_encode($fieldValue);
@@ -467,6 +501,7 @@ class RADForm
 				{
 					$rowFieldValue->field_value = $fieldValue;
 				}
+
 				$rowFieldValue->store();
 			}
 		}
@@ -482,6 +517,7 @@ class RADForm
 	public function setFieldSuffix($suffix)
 	{
 		$this->fieldSuffix = $suffix;
+
 		foreach ($this->fields as $field)
 		{
 			$field->setFieldSuffix($suffix);
@@ -490,8 +526,6 @@ class RADForm
 
 	/**
 	 * Remove the suffix for the form fields which will change the name of it
-	 *
-	 * @param string $suffix
 	 */
 	public function removeFieldSuffix()
 	{
@@ -510,6 +544,7 @@ class RADForm
 	{
 		$fieldsFee     = array();
 		$feeFieldTypes = array('text', 'radio', 'list', 'checkboxes');
+
 		foreach ($this->fields as $fieldName => $field)
 		{
 			if ($field->hideOnDisplay)
@@ -517,8 +552,10 @@ class RADForm
 				$fieldsFee[$fieldName] = 0;
 				continue;
 			}
+
 			$fieldsFee[$fieldName] = 0;
-			$fieldType = strtolower($field->type);
+			$fieldType             = strtolower($field->type);
+
 			if (in_array($fieldType, $feeFieldTypes))
 			{
 				if ($fieldType == 'text')
@@ -547,11 +584,13 @@ class RADForm
 					{
 						$selectedOptions = array($field->value);
 					}
+
 					if (is_array($selectedOptions))
 					{
 						foreach ($selectedOptions as $selectedOption)
 						{
 							$index = array_search($selectedOption, $values);
+
 							if ($index !== false)
 							{
 								if (isset($feeValues[$index]))
@@ -570,6 +609,7 @@ class RADForm
 					$values     = explode("\r\n", $field->row->values);
 					$values     = array_map('trim', $values);
 					$valueIndex = array_search(trim($field->value), $values);
+
 					if ($valueIndex !== false && isset($feeValues[$valueIndex]))
 					{
 						$fieldsFee[$fieldName] = floatval($feeValues[$valueIndex]);
@@ -591,7 +631,7 @@ class RADForm
 	public static function calculateFormula($formula)
 	{
 		$formula = trim($formula);     // trim white spaces
-		$formula = ereg_replace('[^0-9\+-\*\/\(\) ]', '', $formula);    // remove any non-numbers chars; exception for math operators
+		$formula = preg_replace('/[^0-9\+-\*\/\(\) ]/', '', $formula);    // remove any non-numbers chars; exception for math operators
 		$compute = create_function("", "return (" . $formula . ");");
 
 		return 0 + $compute();
