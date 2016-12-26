@@ -10,6 +10,8 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\Registry\Registry;
+
 class plgEventBookingAcymailing extends JPlugin
 {
 	public function __construct(& $subject, $config)
@@ -34,26 +36,26 @@ class plgEventBookingAcymailing extends JPlugin
 			             'form'  => JText::_('Please install component Acymailing'),
 			);
 		}
+
 		ob_start();
+
 		$this->drawSettingForm($row);
-		$form = ob_get_contents();
-		ob_end_clean();
 
 		return array('title' => JText::_('PLG_EB_ACYMAILING_LIST_SETTINGS'),
-		             'form'  => $form,
+		             'form'  => ob_get_clean(),
 		);
 	}
 
 	/**
 	 * Store setting into database, in this case, use params field of plans table
 	 *
-	 * @param event   $row
-	 * @param Boolean $isNew true if create new plan, false if edit
+	 * @param EventbookingTableEvent $row
+	 * @param bool                   $isNew true if create new plan, false if edit
 	 */
 	public function onAfterSaveEvent($row, $data, $isNew)
 	{
 		// $row of table EB_plans
-		$params = new JRegistry($row->params);
+		$params = new Registry($row->params);
 		$params->set('acymailing_list_ids', implode(',', $data['acymailing_list_ids']));
 		$row->params = $params->toString();
 
@@ -85,6 +87,7 @@ class plgEventBookingAcymailing extends JPlugin
 			$field     = $db->loadObject();
 			$fieldType = $field->fieldtype;
 			$fieldName = $field->name;
+
 			if ($fieldType == 'Checkboxes')
 			{
 				if (!isset($_POST[$fieldName]))
@@ -95,6 +98,7 @@ class plgEventBookingAcymailing extends JPlugin
 			else
 			{
 				$fieldValue = strtolower(JFactory::getApplication()->input->getString($fieldName));
+
 				if (empty($fieldValue) || $fieldValue == 'no' || $fieldValue == '0')
 				{
 					return;
@@ -104,8 +108,9 @@ class plgEventBookingAcymailing extends JPlugin
 
 		$event = JTable::getInstance('EventBooking', 'Event');
 		$event->load($row->event_id);
-		$params  = new JRegistry($event->params);
+		$params  = new Registry($event->params);
 		$listIds = $params->get('acymailing_list_ids', '');
+
 		if ($listIds != '')
 		{
 			require_once JPATH_ADMINISTRATOR . '/components/com_acymailing/helpers/helper.php';
@@ -155,6 +160,7 @@ class plgEventBookingAcymailing extends JPlugin
 		}
 
 		$newEvent = array();
+
 		foreach ($listIds as $listId)
 		{
 			$newList           = array();
@@ -173,7 +179,7 @@ class plgEventBookingAcymailing extends JPlugin
 	private function drawSettingForm($row)
 	{
 		require_once JPATH_ADMINISTRATOR . '/components/com_acymailing/helpers/helper.php';
-		$params    = new JRegistry($row->params);
+		$params    = new Registry($row->params);
 		$listIds   = explode(',', $params->get('acymailing_list_ids', ''));
 		$listClass = acymailing_get('class.list');
 		$allLists  = $listClass->getLists();

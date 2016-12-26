@@ -10,6 +10,8 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\Registry\Registry;
+
 class plgEventBookingMailchimp extends JPlugin
 {
 	public function __construct(& $subject, $config)
@@ -30,11 +32,9 @@ class plgEventBookingMailchimp extends JPlugin
 	{
 		ob_start();
 		$this->drawSettingForm($row);
-		$form = ob_get_contents();
-		ob_end_clean();
 
 		return array('title' => JText::_('PLG_EB_MAILCHIMP_SETTINGS'),
-		             'form'  => $form,
+		             'form'  => ob_get_clean(),
 		);
 	}
 
@@ -47,7 +47,7 @@ class plgEventBookingMailchimp extends JPlugin
 	public function onAfterSaveEvent($row, $data, $isNew)
 	{
 		// $row of table EB_plans
-		$params = new JRegistry($row->params);
+		$params = new Registry($row->params);
 		$params->set('mailchimp_list_ids', implode(',', $data['mailchimp_list_ids']));
 		$row->params = $params->toString();
 
@@ -85,6 +85,7 @@ class plgEventBookingMailchimp extends JPlugin
 			else
 			{
 				$fieldValue = strtolower(JFactory::getApplication()->input->getString($fieldName));
+
 				if (empty($fieldValue) || $fieldValue == 'no' || $fieldValue == '0')
 				{
 					return;
@@ -94,11 +95,13 @@ class plgEventBookingMailchimp extends JPlugin
 
 		$event = JTable::getInstance('EventBooking', 'Event');
 		$event->load($row->event_id);
-		$params  = new JRegistry($event->params);
+		$params  = new Registry($event->params);
 		$listIds = $params->get('mailchimp_list_ids', '');
+
 		if ($listIds != '')
 		{
 			$listIds = explode(',', $listIds);
+
 			if (count($listIds))
 			{
 				require_once dirname(__FILE__) . '/api/MailChimp.php';
@@ -136,6 +139,7 @@ class plgEventBookingMailchimp extends JPlugin
 		}
 
 		$mailchimp = new MailChimp($this->params->get('api_key'));
+
 		foreach ($listIds as $listId)
 		{
 			if ($listId)
@@ -161,17 +165,20 @@ class plgEventBookingMailchimp extends JPlugin
 	private function drawSettingForm($row)
 	{
 		require_once dirname(__FILE__) . '/api/MailChimp.php';
+
 		$mailchimp = new MailChimp($this->params->get('api_key'));
 		$lists     = $mailchimp->call('lists/list');
+
 		if ($lists === false)
 		{
 			return;
 		}
 
-		$params  = new JRegistry($row->params);
+		$params  = new Registry($row->params);
 		$listIds = explode(',', $params->get('mailchimp_list_ids', ''));
 		$options = array();
 		$lists   = $lists['data'];
+
 		if (count($lists))
 		{
 			foreach ($lists as $list)
