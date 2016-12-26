@@ -217,11 +217,12 @@ abstract class RADPayment
 	 */
 	protected function onPaymentSuccess($row, $transactionId)
 	{
-		$config              = EventbookingHelper::getConfig();
+		$config = EventbookingHelper::getConfig();
+
 		if ($row->process_deposit_payment)
 		{
 			$row->deposit_payment_transaction_id = $transactionId;
-			$row->payment_status = 1;
+			$row->payment_status                 = 1;
 			$row->store();
 
 			JPluginHelper::importPlugin('eventbooking');
@@ -236,10 +237,12 @@ abstract class RADPayment
 			$row->payment_date   = gmdate('Y-m-d H:i:s');
 			$row->published      = 1;
 			$row->store();
+
 			if ($row->is_group_billing)
 			{
 				EventbookingHelper::updateGroupRegistrationRecord($row->id);
 			}
+
 			JPluginHelper::importPlugin('eventbooking');
 			$dispatcher = JEventDispatcher::getInstance();
 			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
@@ -272,6 +275,7 @@ abstract class RADPayment
 		//Get redirect heading
 		$language    = JFactory::getLanguage();
 		$languageKey = 'EB_WAIT_' . strtoupper(substr($this->name, 3));
+
 		if ($language->hasKey($languageKey))
 		{
 			$redirectHeading = JText::_($languageKey);
@@ -297,7 +301,7 @@ abstract class RADPayment
 				setTimeout('redirect()', 5000);
 			</script>
 		</form>
-	<?php
+		<?php
 	}
 
 	/***
@@ -318,6 +322,7 @@ abstract class RADPayment
 
 		$text = '[' . date('m/d/Y g:i A') . '] - ';
 		$text .= "Notification Data From : " . $this->title . " \n";
+
 		foreach ($this->notificationData as $key => $value)
 		{
 			$text .= "$key=$value, ";

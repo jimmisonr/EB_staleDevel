@@ -152,10 +152,12 @@ class RADPaymentOmnipay extends OmnipayPayment
 			$row->payment_date   = gmdate('Y-m-d H:i:s');
 			$row->published      = 1;
 			$row->store();
+
 			if ($row->is_group_billing)
 			{
 				EventbookingHelper::updateGroupRegistrationRecord($row->id);
 			}
+
 			JPluginHelper::importPlugin('eventbooking');
 			$dispatcher = JEventDispatcher::getInstance();
 			$dispatcher->trigger('onAfterPaymentSuccess', array($row));
@@ -216,6 +218,7 @@ class RADPaymentOmnipay extends OmnipayPayment
 		{
 			$language    = JFactory::getLanguage();
 			$languageKey = 'EB_WAIT_' . strtoupper(substr($this->name, 3));
+
 			if ($language->hasKey($languageKey))
 			{
 				$redirectHeading = JText::_($languageKey);
