@@ -9,6 +9,8 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\Utilities\ArrayHelper;
+
 class EventbookingControllerLocation extends EventbookingController
 {
 	/**
@@ -25,6 +27,7 @@ class EventbookingControllerLocation extends EventbookingController
 
 			try
 			{
+				/* @var EventbookingModelLocation $model */
 				$model->store($post);
 				$msg = JText::_('EB_LOCATION_SAVED');
 			}
@@ -53,6 +56,7 @@ class EventbookingControllerLocation extends EventbookingController
 
 			try
 			{
+				/* @var EventbookingModelLocation $model */
 				$model->store($post);
 				$json['success'] = true;
 				$json['id']      = $post['id'];
@@ -86,7 +90,7 @@ class EventbookingControllerLocation extends EventbookingController
 		}
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		/* @var EventbookingModelLocation $model */
 		$model = $this->getModel();

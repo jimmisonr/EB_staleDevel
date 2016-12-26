@@ -9,6 +9,8 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\Utilities\ArrayHelper;
+
 class EventbookingModelCart extends RADModel
 {
 	/**
@@ -29,7 +31,7 @@ class EventbookingModelCart extends RADModel
 			$eventIds = array($data['id']);
 		}
 
-		JArrayHelper::toInteger($eventIds);
+		$eventIds = ArrayHelper::toInteger($eventIds);
 
 		$cart = new EventbookingHelperCart();
 		$cart->addEvents($eventIds);
@@ -47,8 +49,8 @@ class EventbookingModelCart extends RADModel
 	 */
 	public function processUpdateCart($eventIds, $quantities)
 	{
-		JArrayHelper::toInteger($eventIds);
-		JArrayHelper::toInteger($quantities);
+		$eventIds   = ArrayHelper::toInteger($eventIds);
+		$quantities = ArrayHelper::toInteger($quantities);
 
 		$cart = new EventbookingHelperCart();
 		$cart->updateCart($eventIds, $quantities);
@@ -211,8 +213,8 @@ class EventbookingModelCart extends RADModel
 			}
 			else
 			{
-				$row->cart_id = $cartId;
-				$row->coupon_discount_amount =  0;
+				$row->cart_id                = $cartId;
+				$row->coupon_discount_amount = 0;
 			}
 			$row->id       = 0;
 			$row->language = $language;

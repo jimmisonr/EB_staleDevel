@@ -2764,13 +2764,16 @@ class EventbookingHelper
 		{
 			return 0;
 		}
+
 		if (!$groupIds)
 		{
 			return $discount;
 		}
+
 		$userGroupIds = explode(',', $groupIds);
-		JArrayHelper::toInteger($userGroupIds);
-		$groups = $user->get('groups');
+		$userGroupIds = \Joomla\Utilities\ArrayHelper::toInteger($userGroupIds);
+		$groups       = $user->get('groups');
+
 		if (count(array_intersect($groups, $userGroupIds)))
 		{
 			//Calculate discount amount
