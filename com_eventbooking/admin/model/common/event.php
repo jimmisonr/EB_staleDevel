@@ -9,6 +9,8 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\String\StringHelper;
+
 class EventbookingModelCommonEvent extends RADModelAdmin
 {
 	/**
@@ -81,18 +83,18 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 		if ($thumbImage['name'])
 		{
-			$fileExt        = JString::strtoupper(JFile::getExt($thumbImage['name']));
+			$fileExt        = StringHelper::strtoupper(JFile::getExt($thumbImage['name']));
 			$supportedTypes = array('JPG', 'PNG', 'GIF', 'JPEG');
 
 			if (in_array($fileExt, $supportedTypes))
 			{
-				if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . JString::strtolower($thumbImage['name'])))
+				if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . StringHelper::strtolower($thumbImage['name'])))
 				{
-					$fileName = time() . '_' . JString::strtolower($thumbImage['name']);
+					$fileName = time() . '_' . StringHelper::strtolower($thumbImage['name']);
 				}
 				else
 				{
-					$fileName = JString::strtolower($thumbImage['name']);
+					$fileName = StringHelper::strtolower($thumbImage['name']);
 				}
 
 				$imagePath = JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName;

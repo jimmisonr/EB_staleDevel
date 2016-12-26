@@ -593,7 +593,7 @@ class RADModelAdmin extends RADModel
 			}
 			else
 			{
-				$row->{$titleField} = JString::increment($row->{$titleField});
+				$row->{$titleField} = StringHelper::increment($row->{$titleField});
 			}
 		}
 
