@@ -8,7 +8,7 @@ class plgInstallerEventbooking extends JPlugin
 		$uri = JUri::getInstance($url);
 
 		$host       = $uri->getHost();
-		$validHosts = array('joomdonation.com');
+		$validHosts = array('joomdonation.com', 'www.joomdonation.com');
 		if (!in_array($host, $validHosts))
 		{
 			return true;
