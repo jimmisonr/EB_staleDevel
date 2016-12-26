@@ -16,7 +16,9 @@ class EventbookingControllerRegistrant extends EventbookingController
 	 */
 	public function batch_mail()
 	{
+		/* @var EventbookingModelRegistrant $model */
 		$model = $this->getModel();
+
 		try
 		{
 			$model->batchMail($this->input);
@@ -35,10 +37,13 @@ class EventbookingControllerRegistrant extends EventbookingController
 	 */
 	public function resend_email()
 	{
-		$cid   = $this->input->get('cid', array(), 'array');
-		$id    = (int) $cid[0];
+		$cid = $this->input->get('cid', array(), 'array');
+		$id  = (int) $cid[0];
+
+		/* @var EventbookingModelRegistrant $model */
 		$model = $this->getModel();
 		$ret   = $model->resendEmail($id);
+
 		if ($ret)
 		{
 			$this->setMessage(JText::_('EB_EMAIL_SUCCESSFULLY_RESENT'));
@@ -192,6 +197,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 	{
 		$cid = $this->input->get('cid', array(), 'array');
 
+		/* @var EventbookingModelRegistrant $model */
 		$model = $this->getModel();
 
 		try
@@ -235,6 +241,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 	{
 		$cid = $this->input->get('cid', array(), 'array');
 
+		/* @var EventbookingModelRegistrant $model */
 		$model = $this->getModel();
 
 		try
@@ -257,6 +264,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 	{
 		$id            = $this->input->getInt('id');
 		$groupMemberId = $this->input->getInt('group_member_id');
+
 		/* @var $model EventbookingModelRegistrant */
 		$model = $this->getModel();
 		$model->delete(array($groupMemberId));
