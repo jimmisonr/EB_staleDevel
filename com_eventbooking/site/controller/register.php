@@ -97,7 +97,7 @@ class EventbookingControllerRegister extends EventbookingController
 			$negEventId = -1 * $eventId;
 			$subQuery   = $db->getQuery(true);
 			$subQuery->select('field_id')
-				->from('__eb_field_events')
+				->from('#__eb_field_events')
 				->where("(event_id = $eventId OR (event_id < 0 AND event_id != $negEventId))");
 
 			$query->select('COUNT(id)')

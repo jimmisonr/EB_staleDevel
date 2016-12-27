@@ -364,7 +364,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			$negEventId = -1 * $event->id;
 			$subQuery   = $db->getQuery(true);
 			$subQuery->select('field_id')
-				->from('__eb_field_events')
+				->from('#__eb_field_events')
 				->where("(event_id = $event->id OR (event_id < 0 AND event_id != $negEventId))");
 
 			$query->where(' (event_id = -1 OR id IN (' . (string) $subQuery . '))');
