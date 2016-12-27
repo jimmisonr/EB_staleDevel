@@ -30,11 +30,11 @@ class EventbookingController extends RADController
 			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap.css');
 		}
 
-		$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/style.css');
+		$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/css/style.css');
 
 		if ($config->multiple_booking)
 		{
-			$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/font-awesome.css');
+			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/css/font-awesome.css');
 		}
 
 		JHtml::_('script', EventbookingHelper::getURL() . 'media/com_eventbooking/assets/js/noconflict.js', false, false);
@@ -48,11 +48,11 @@ class EventbookingController extends RADController
 			$theme = 'default';
 		}
 
-		$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/themes/' . $theme . '.css');
+		$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/css/themes/' . $theme . '.css');
 
 		if (file_exists(JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css') && filesize(JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css') > 0)
 		{
-			$document->addStylesheet($rootUrl . '/media/com_eventbooking/assets/css/custom.css');
+			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/css/custom.css');
 		}
 
 		switch ($task)
@@ -84,28 +84,20 @@ class EventbookingController extends RADController
 				$this->input->set('layout', 'cart');
 				break;
 			default:
-
 				$view = $this->input->getCmd('view');
+
 				if (!$view)
 				{
 					$this->input->set('view', 'categories');
 					$this->input->set('layout', 'default');
 				}
+
 				break;
 		}
 
 		parent::display($cachable, $urlparams);
 	}
 
-	/**
-	 * Send reminder to registrants about events
-	 */
-	public function event_reminder()
-	{
-		$model = $this->getModel('reminder');
-		$model->sendReminder();
-		JFactory::getApplication()->close();
-	}
 
 	/**
 	 * Process download a file
@@ -114,10 +106,12 @@ class EventbookingController extends RADController
 	{
 		$filePath = JPATH_ROOT . '/media/com_eventbooking/files';
 		$fileName = basename($this->input->getString('file_name'));
+
 		if (file_exists($filePath . '/' . $fileName))
 		{
 			while (@ob_end_clean()) ;
 			EventbookingHelper::processDownload($filePath . '/' . $fileName, $fileName, true);
+
 			$this->app->close();
 		}
 		else
@@ -138,6 +132,7 @@ class EventbookingController extends RADController
 		$layout     = $this->input->getCmd('layout', '');
 
 		$url = 'index.php?option=com_eventbooking&view=search';
+
 		if ($categoryId)
 		{
 			$url .= '&category_id=' . $categoryId;
@@ -180,6 +175,7 @@ class EventbookingController extends RADController
 		$total        = $db->loadResult();
 		$arrayToJs    = array();
 		$arrayToJs[0] = $validateId;
+
 		if ($total)
 		{
 			$arrayToJs[1] = false;
@@ -188,6 +184,7 @@ class EventbookingController extends RADController
 		{
 			$arrayToJs[1] = true;
 		}
+
 		echo json_encode($arrayToJs);
 
 		$this->app->close();
@@ -210,7 +207,6 @@ class EventbookingController extends RADController
 
 		if ($config->prevent_duplicate_registration && !$config->multiple_booking)
 		{
-			$query->clear();
 			$query->select('COUNT(id)')
 				->from('#__eb_registrants')
 				->where('event_id = ' . $eventId)
@@ -218,6 +214,7 @@ class EventbookingController extends RADController
 				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 			$db->setQuery($query);
 			$total = $db->loadResult();
+
 			if ($total)
 			{
 				$arrayToJs[1] = false;
@@ -227,12 +224,13 @@ class EventbookingController extends RADController
 
 		if (!isset($arrayToJs[1]))
 		{
-			$query->clear();
-			$query->select('COUNT(*)')
+			$query->clear()
+				->select('COUNT(*)')
 				->from('#__users')
 				->where('email = ' . $db->quote($email));
 			$db->setQuery($query);
 			$total = $db->loadResult();
+
 			if (!$total || $user->id || !$config->user_registration)
 			{
 				$arrayToJs[1] = true;
@@ -243,7 +241,9 @@ class EventbookingController extends RADController
 				$arrayToJs[2] = JText::_('EB_EMAIL_USED_BY_OTHER_CUSTOMER');
 			}
 		}
+
 		echo json_encode($arrayToJs);
+
 		$this->app->close();
 	}
 
@@ -255,14 +255,15 @@ class EventbookingController extends RADController
 		$countryName = $this->input->getString('country_name', '');
 		$fieldName   = $this->input->getString('field_name', 'state');
 		$stateName   = $this->input->getString('state_name', '');
+
 		if (!$countryName)
 		{
 			$config      = EventbookingHelper::getConfig();
 			$countryName = $config->default_country;
 		}
+
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->clear();
 		$query->select('required')
 			->from('#__eb_fields')
 			->where('name=' . $db->quote('state'));
@@ -270,21 +271,22 @@ class EventbookingController extends RADController
 		$required = $db->loadResult();
 		($required) ? $class = 'validate[required]' : $class = '';
 
-		$query->clear();
-		$query->select('country_id')
+		$query->clear()
+			->select('country_id')
 			->from('#__eb_countries')
 			->where('name=' . $db->quote($countryName));
 		$db->setQuery($query);
 		$countryId = $db->loadResult();
 
 		//get states
-		$query->clear();
-		$query->select('state_name AS value, state_name AS text')
+		$query->clear()
+			->select('state_name AS value, state_name AS text')
 			->from('#__eb_states')
 			->where('country_id=' . (int) $countryId);
 		$db->setQuery($query);
 		$states  = $db->loadObjectList();
 		$options = array();
+
 		if (count($states))
 		{
 			$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_STATE'));
@@ -294,8 +296,10 @@ class EventbookingController extends RADController
 		{
 			$options[] = JHtml::_('select.option', 'N/A', JText::_('EB_NA'));
 		}
+
 		echo JHtml::_('select.genericlist', $options, $fieldName, ' class="input-large ' . $class . '" id="' . $fieldName . '"', 'value', 'text',
 			$stateName);
+
 		$this->app->close();
 	}
 
@@ -325,18 +329,23 @@ class EventbookingController extends RADController
 		$rowFields    = $db->loadObjectList();
 		$masterFields = array();
 		$fieldsAssoc  = array();
+
 		foreach ($rowFields as $rowField)
 		{
 			if ($rowField->depend_on_field_id)
 			{
 				$masterFields[] = $rowField->depend_on_field_id;
 			}
+
 			$fieldsAssoc[$rowField->id] = $rowField;
 		}
+
 		$masterFields = array_unique($masterFields);
+
 		if (count($masterFields))
 		{
 			$hiddenFields = array();
+
 			foreach ($rowFields as $rowField)
 			{
 				if ($rowField->depend_on_field_id && isset($fieldsAssoc[$rowField->depend_on_field_id]))
@@ -367,7 +376,9 @@ class EventbookingController extends RADController
 						{
 							$selectedOptions = array($masterFieldValues);
 						}
+
 						$dependOnOptions = json_decode($rowField->depend_on_options);
+
 						if (!count(array_intersect($selectedOptions, $dependOnOptions)))
 						{
 							$hiddenFields[] = $rowField->id;
@@ -379,6 +390,7 @@ class EventbookingController extends RADController
 
 		$showFields = array();
 		$hideFields = array();
+
 		foreach ($rowFields as $rowField)
 		{
 			if (in_array($rowField->id, $hiddenFields))
@@ -390,6 +402,7 @@ class EventbookingController extends RADController
 				$showFields[] = 'field_' . $rowField->name . ($fieldSuffix ? '_' . $fieldSuffix : '');
 			}
 		}
+
 		echo json_encode(array('show_fields' => implode(',', $showFields), 'hide_fields' => implode(',', $hideFields)));
 
 		$this->app->close();
@@ -400,6 +413,7 @@ class EventbookingController extends RADController
 	 */
 	public function payment_confirm()
 	{
+		/* @var EventBookingModelRegister $model */
 		$model         = $this->getModel('Register');
 		$paymentMethod = $this->input->getString('payment_method');
 		$model->paymentConfirm($paymentMethod);
@@ -415,15 +429,19 @@ class EventbookingController extends RADController
 		$config     = EventbookingHelper::getConfig();
 		$json       = array();
 		$pathUpload = JPATH_ROOT . '/media/com_eventbooking/files';
+
 		if (!JFolder::exists($pathUpload))
 		{
 			JFolder::create($pathUpload);
 		}
+
 		$allowedExtensions = $config->attachment_file_types;
+
 		if (!$allowedExtensions)
 		{
 			$allowedExtensions = 'doc|docx|ppt|pptx|pdf|zip|rar|bmp|gif|jpg|jepg|png|swf|zipx';
 		}
+
 		$allowedExtensions = explode('|', $allowedExtensions);
 		$allowedExtensions = array_map('trim', $allowedExtensions);
 
@@ -434,6 +452,7 @@ class EventbookingController extends RADController
 		if (in_array(strtolower($fileExt), $allowedExtensions))
 		{
 			$fileName = JFile::makeSafe($fileName);
+
 			if (JFile::exists($pathUpload . '/' . $fileName))
 			{
 				$targetFileName = time() . '_' . $fileName;
@@ -443,14 +462,7 @@ class EventbookingController extends RADController
 				$targetFileName = $fileName;
 			}
 
-			if (version_compare(JVERSION, '3.4.4', 'ge'))
-			{
-				JFile::upload($file['tmp_name'], $pathUpload . '/' . $targetFileName, false, true);
-			}
-			else
-			{
-				JFile::upload($file['tmp_name'], $pathUpload . '/' . $targetFileName);
-			}
+			JFile::upload($file['tmp_name'], $pathUpload . '/' . $targetFileName, false, true);
 
 			$json['success'] = JText::sprintf('EB_FILE_UPLOADED', $fileName);
 			$json['file']    = $targetFileName;

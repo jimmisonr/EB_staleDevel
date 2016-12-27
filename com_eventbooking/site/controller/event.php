@@ -6,6 +6,7 @@
  * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
+
 // no direct access
 defined('_JEXEC') or die;
 

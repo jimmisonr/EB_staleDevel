@@ -226,7 +226,6 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 
 		if (!empty($downloadCode))
 		{
-
 			$query->select('id')
 				->from('#__eb_registrants')
 				->where('registration_code = ' . $db->quote($downloadCode));
@@ -288,8 +287,6 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 
 		$row    = JTable::getInstance('registrant', 'EventbookingTable');
 		$user   = JFactory::getUser();
-		$db     = JFactory::getDbo();
-		$query  = $db->getQuery(true);
 		$config = EventbookingHelper::getConfig();
 
 		$downloadCode = $this->input->getString('download_code');
@@ -301,7 +298,8 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 
 		if (!empty($downloadCode))
 		{
-
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
 			$query->select('id')
 				->from('#__eb_registrants')
 				->where('registration_code = ' . $db->quote($downloadCode));
@@ -422,6 +420,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 
 		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
+			/* @var EventbookingModelRegistrant $model */
 			$model  = $this->getModel();
 			$id     = $this->input->getInt('id');
 			$result = $model->checkin($id);
@@ -454,12 +453,11 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 	{
 		JSession::checkToken('get');
 
-		$user = JFactory::getUser();
-
-		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
+		if (JFactory::getUser()->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
 			$id = $this->input->getInt('id');
 
+			/* @var EventbookingModelRegistrant $model */
 			$model = $this->getModel();
 
 			try
@@ -487,11 +485,11 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 	{
 		JSession::checkToken('get');
 
-		$user = JFactory::getUser();
-
-		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
+		if (JFactory::getUser()->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
-			$id    = $this->input->getInt('id');
+			$id = $this->input->getInt('id');
+
+			/* @var EventbookingModelRegistrant $model */
 			$model = $this->getModel();
 
 			try
