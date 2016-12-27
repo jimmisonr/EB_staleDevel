@@ -2321,6 +2321,7 @@ class EventbookingHelper
 		if ($eventId)
 		{
 			$config = EventbookingHelper::getConfig();
+
 			if ($config->custom_field_by_category)
 			{
 				$subQuery = $db->getQuery(true);
@@ -2334,9 +2335,15 @@ class EventbookingHelper
 			}
 			else
 			{
-				$query->where('(event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . '))');
+				$negEventId = -1 * $eventId;
+				$subQuery   = $db->getQuery(true);
+				$subQuery->select('field_id')
+					->from('__eb_field_events')
+					->where("(event_id = $eventId OR (event_id < 0 AND event_id != $negEventId))");
+				$query->where('(event_id = -1 OR id IN (' . (string) $subQuery . '))');
 			}
 		}
+
 		$db->setQuery($query);
 
 		return $db->loadObjectList();
@@ -2356,6 +2363,7 @@ class EventbookingHelper
 		static $cache;
 
 		$cacheKey = md5(serialize(func_get_args()));
+
 		if (empty($cache[$cacheKey]))
 		{
 			$user        = JFactory::getUser();
@@ -2387,10 +2395,12 @@ class EventbookingHelper
 			}
 
 			$subQuery = $db->getQuery(true);
+
 			if ($registrationType == 4)
 			{
 				$cart  = new EventbookingHelperCart();
 				$items = $cart->getItems();
+
 				if ($config->custom_field_by_category)
 				{
 					if (!count($items))
@@ -2427,7 +2437,8 @@ class EventbookingHelper
 						$db->setQuery($subQuery);
 						$items = $db->loadColumn();
 					}
-					$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id IN (' . implode(',', $items) . ')))');
+
+					$query->where('(event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id IN (' . implode(',', $items) . ')))');
 				}
 
 				$query->where('display_in IN (0, 1, 2, 3)');
@@ -2447,12 +2458,20 @@ class EventbookingHelper
 				}
 				else
 				{
-					$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . '))');
+					$negEventId = -1 * $eventId;
+					$subQuery   = $db->getQuery(true);
+					$subQuery->select('field_id')
+						->from('__eb_field_events')
+						->where("(event_id = $eventId OR (event_id < 0 AND event_id != $negEventId))");
+
+					$query->where('(event_id = -1 OR id IN (' . (string) $subQuery . ')))');
 				}
 			}
 
 			$query->order('ordering');
 			$db->setQuery($query);
+
+			echo $db->getQuery();
 
 			$cache[$cacheKey] = $db->loadObjectList();
 		}
@@ -2653,8 +2672,15 @@ class EventbookingHelper
 			}
 			else
 			{
-				$query->where('(event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id = ' . $eventId . '))');
+				$negEventId = -1 * $eventId;
+				$subQuery   = $db->getQuery(true);
+				$subQuery->select('field_id')
+					->from('__eb_field_events')
+					->where("(event_id = $eventId OR (event_id < 0 AND event_id != $negEventId))");
+
+				$query->where('(event_id = -1 OR id IN (' . (string) $subQuery . '))');
 			}
+
 			$db->setQuery($query);
 
 			$numberFeeFields = (int) $db->loadResult();
@@ -3435,11 +3461,18 @@ class EventbookingHelper
 			}
 			else
 			{
-				$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $event->id . '))');
+				$negEventId = -1 * $event->id;
+				$subQuery   = $db->getQuery(true);
+				$subQuery->select('field_id')
+					->from('__eb_field_events')
+					->where("(event_id = $event->id OR (event_id < 0 AND event_id != $negEventId))");
+
+				$query->where(' (event_id = -1 OR id IN (' . (string) $subQuery . '))');
 			}
 
 			$db->setQuery($query);
 			$quantityFields = $db->loadObjectList();
+
 			if (count($quantityFields))
 			{
 				foreach ($quantityFields as $field)

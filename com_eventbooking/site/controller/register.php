@@ -84,8 +84,9 @@ class EventbookingControllerRegister extends EventbookingController
 				->where('main_category=1');
 			$db->setQuery($query);
 			$categoryId = (int) $db->loadResult();
-			$query->clear();
-			$query->select('COUNT(id)')
+
+			$query->clear()
+				->select('COUNT(id)')
 				->from('#__eb_fields')
 				->where('published=1 AND fee_field=1 AND (category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 			$db->setQuery($query);
@@ -93,9 +94,15 @@ class EventbookingControllerRegister extends EventbookingController
 		}
 		else
 		{
+			$negEventId = -1 * $eventId;
+			$subQuery   = $db->getQuery(true);
+			$subQuery->select('field_id')
+				->from('__eb_field_events')
+				->where("(event_id = $eventId OR (event_id < 0 AND event_id != $negEventId))");
+
 			$query->select('COUNT(id)')
 				->from('#__eb_fields')
-				->where('published=1 AND fee_field=1 AND (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . '))');
+				->where('published=1 AND fee_field=1 AND (event_id = -1 OR id IN (' . (string) $subQuery . '))');
 			$db->setQuery($query);
 			$total = (int) $db->loadResult();
 		}
@@ -366,7 +373,7 @@ class EventbookingControllerRegister extends EventbookingController
 
 		if ($bypassBilling)
 		{
-			$membersData       = $session->get('eb_group_members_data', null);
+			$membersData = $session->get('eb_group_members_data', null);
 
 			if ($membersData)
 			{
