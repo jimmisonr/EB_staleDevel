@@ -138,7 +138,11 @@ class EventbookingViewFieldHtml extends RADViewItem
 			$options   = array();
 			$options[] = JHtml::_('select.option', 0, JText::_('EB_ALL_EVENTS'));
 			$options[] = JHtml::_('select.option', 1, JText::_('EB_ALL_SELECTED_EVENTS'));
-			$options[] = JHtml::_('select.option', -1, JText::_('EB_ALL_EXCEPT_SELECTED_EVENTS'));
+
+			if (!$config->multiple_booking)
+			{
+				$options[] = JHtml::_('select.option', -1, JText::_('EB_ALL_EXCEPT_SELECTED_EVENTS'));
+			}
 
 			$this->lists['assignment'] = JHtml::_('select.genericlist', $options, 'assignment', ' onchange="showHideEventsSelection(this);"', 'value', 'text', $assignment);
 			$this->assignment          = $assignment;
