@@ -2464,15 +2464,13 @@ class EventbookingHelper
 						->from('#__eb_field_events')
 						->where("(event_id = $eventId OR (event_id < 0 AND event_id != $negEventId))");
 
-					$query->where('(event_id = -1 OR id IN (' . (string) $subQuery . ')))');
+					$query->where('(event_id = -1 OR id IN (' . (string) $subQuery . '))');
 				}
 			}
 
 			$query->order('ordering');
 			$db->setQuery($query);
-
-			echo $db->getQuery();
-
+			
 			$cache[$cacheKey] = $db->loadObjectList();
 		}
 
