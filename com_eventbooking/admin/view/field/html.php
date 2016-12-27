@@ -128,6 +128,8 @@ class EventbookingViewFieldHtml extends RADViewItem
 				{
 					$assignment = 1;
 				}
+
+				$selectedEventIds = array_map('abs', $selectedEventIds);
 			}
 
 			$this->lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id[]', 'class="input-xlarge" multiple="multiple" size="5" ', 'id',
@@ -139,7 +141,7 @@ class EventbookingViewFieldHtml extends RADViewItem
 			$options[] = JHtml::_('select.option', -1, JText::_('EB_ALL_EXCEPT_SELECTED_EVENTS'));
 
 			$this->lists['assignment'] = JHtml::_('select.genericlist', $options, 'assignment', ' onchange="showHideEventsSelection(this);"', 'value', 'text', $assignment);
-			$this->assignment = $assignment;
+			$this->assignment          = $assignment;
 		}
 
 		// Trigger plugins to get list of fields for mapping
