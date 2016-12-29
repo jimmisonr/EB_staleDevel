@@ -26,10 +26,8 @@ else
 	error_reporting(0);
 }
 
-if ($config->load_jquery !== '0')
-{
-	JHtml::_('jquery.framework');
-}
+JHtml::_('jquery.framework');
+
 if ($config->load_bootstrap_css_in_frontend !== '0')
 {
 	$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/bootstrap/css/bootstrap.css');
