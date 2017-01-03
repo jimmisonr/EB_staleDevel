@@ -212,7 +212,8 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			if (in_array(strtolower($fileExt), $allowedExtensions))
 			{
 				$fileName = JFile::makeSafe($fileName);
-				if (version_compare(JVERSION, '3.4.4', 'ge') && JFactory::getApplication()->isAdmin())
+
+				if (JFactory::getApplication()->isAdmin())
 				{
 					JFile::upload($attachment['tmp_name'], $pathUpload . '/' . $fileName, false, true);
 				}
@@ -242,10 +243,13 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		//Init default data
 		$this->sanitizeData($data);
 
-		if ($input->getCmd('task') == 'save2copy')
+		$task = $input->getCmd('task');
+
+		if ($task == 'save2copy')
 		{
 			$sourceRow = $this->getTable();
 			$sourceRow->load($input->getInt('source_id'));
+
 			if ($sourceRow)
 			{
 				if (empty($data['attachment']))
@@ -358,6 +362,15 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 			$this->storeEventGroupRegistrationRates($row->id, $data, $isNew);
 			$this->storeEventCategories($row->id, $data, $isNew);
+
+			if ($task == 'save2copy')
+			{
+				$sourceEventId = $input->getInt('source_id');
+
+				$sql = "INSERT INTO #__eb_field_events(field_id, event_id) SELECT field_id, $row->id FROM #__eb_field_events WHERE event_id = $sourceEventId";
+				$db->setQuery($sql);
+				$db->execute();
+			}
 
 			$input->set('id', $row->id);
 
