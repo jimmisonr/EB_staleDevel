@@ -603,6 +603,20 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('publish_up', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `publish_up` DATETIME NULL DEFAULT '0000-00-00 00:00:00';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('publish_down', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `publish_down` DATETIME NULL DEFAULT '0000-00-00 00:00:00';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		if (!in_array('max_end_date', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `max_end_date` DATETIME NULL DEFAULT '0000-00-00 00:00:00';";

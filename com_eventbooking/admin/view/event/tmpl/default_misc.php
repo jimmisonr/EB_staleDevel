@@ -138,6 +138,22 @@ $format = 'Y-m-d';
 	</div>
 	<div class="control-group">
 		<label class="control-label">
+			<?php echo JText::_('EB_PUBLISH_UP'); ?>
+		</label>
+		<div class="controls">
+			<?php echo JHtml::_('calendar', $this->item->publish_up != $this->nullDate ? JHtml::_('date', $this->item->publish_up, $format, null) : '', 'publish_up', 'publish_up', '%Y-%m-%d', array('class' => 'input-small')); ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_PUBLISH_DOWN'); ?>
+		</label>
+		<div class="controls">
+			<?php echo JHtml::_('calendar', $this->item->publish_down != $this->nullDate ? JHtml::_('date', $this->item->publish_up, $format, null) : '', 'publish_down', 'publish_down', '%Y-%m-%d', array('class' => 'input-small')); ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
 			<?php echo JText::_('EB_AUTO_REMINDER'); ?>
 		</label>
 		<div class="controls">
