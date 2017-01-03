@@ -46,6 +46,12 @@ $popup = 'class="eb-modal" rel="{handler: \'iframe\', size: {x: 800, y: 500}}"';
 		for ($i = 0 , $n = count($this->items) ; $i < $n; $i++)
 		{
 			$item = $this->items[$i] ;
+
+			if ($this->config->show_discounted_price)
+			{
+				$item->rate = $item->discounted_rate;
+			}
+
 			$total += $item->quantity*$item->rate ;
 			$url = JRoute::_('index.php?option=com_eventbooking&view=event&id='.$item->id.'&tmpl=component&Itemid='.$this->Itemid);
 		?>
