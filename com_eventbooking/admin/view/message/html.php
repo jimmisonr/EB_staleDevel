@@ -31,7 +31,6 @@ class EventbookingViewMessageHtml extends RADViewHtml
 				'registration_form_message_group',
 				'number_members_form_message',
 				'member_information_form_message',
-				'confirmation_message',
 				'thanks_message',
 				'thanks_message_offline',
 				'cancel_message',
