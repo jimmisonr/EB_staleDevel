@@ -150,6 +150,7 @@ class EventbookingHelper
 				->where('id=' . $row->id . ' OR cart_id=' . $row->id);
 			$db->setQuery($query);
 			$totalAmount = $db->loadResult();
+
 			if ($totalAmount > 0)
 			{
 				return true;
@@ -224,6 +225,7 @@ class EventbookingHelper
 	{
 		//Remove cookie vars from request data
 		$cookieVars = array_keys($_COOKIE);
+
 		if (count($cookieVars))
 		{
 			foreach ($cookieVars as $key)
@@ -234,10 +236,12 @@ class EventbookingHelper
 				}
 			}
 		}
+
 		if (isset($_REQUEST['start']) && !isset($_REQUEST['limitstart']))
 		{
 			$_REQUEST['limitstart'] = $_REQUEST['start'];
 		}
+
 		if (!isset($_REQUEST['limitstart']))
 		{
 			$_REQUEST['limitstart'] = 0;
@@ -252,6 +256,7 @@ class EventbookingHelper
 	public static function getMessages()
 	{
 		static $message;
+
 		if (!$message)
 		{
 			$message = new stdClass();
@@ -260,6 +265,7 @@ class EventbookingHelper
 			$query->select('*')->from('#__eb_messages');
 			$db->setQuery($query);
 			$rows = $db->loadObjectList();
+
 			for ($i = 0, $n = count($rows); $i < $n; $i++)
 			{
 				$row           = $rows[$i];
@@ -282,12 +288,14 @@ class EventbookingHelper
 	public static function getFieldSuffix($activeLanguage = null)
 	{
 		$prefix = '';
+
 		if (JLanguageMultilang::isEnabled())
 		{
 			if (!$activeLanguage)
 			{
 				$activeLanguage = JFactory::getLanguage()->getTag();
 			}
+
 			if ($activeLanguage != self::getDefaultLanguage())
 			{
 				$db    = JFactory::getDbo();
@@ -298,6 +306,7 @@ class EventbookingHelper
 					->where('published = 1');
 				$db->setQuery($query);
 				$sef = $db->loadResult();
+
 				if ($sef)
 				{
 					$prefix = '_' . $sef;
@@ -324,9 +333,8 @@ class EventbookingHelper
 			->where('lang_code != ' . $db->quote($default))
 			->order('ordering');
 		$db->setQuery($query);
-		$languages = $db->loadObjectList();
 
-		return $languages;
+		return $db->loadObjectList();
 	}
 
 	/**
@@ -349,6 +357,7 @@ class EventbookingHelper
 	public static function addLangLinkForAjax()
 	{
 		$langLink = '';
+
 		if (JLanguageMultilang::isEnabled())
 		{
 			$db    = JFactory::getDbo();
@@ -377,11 +386,13 @@ class EventbookingHelper
 		$db             = JFactory::getDbo();
 		$fields         = array_keys($db->getTableColumns('#__eb_categories'));
 		$extraLanguages = self::getLanguages();
+
 		if (count($extraLanguages))
 		{
 			foreach ($extraLanguages as $extraLanguage)
 			{
 				$prefix = $extraLanguage->sef;
+
 				if (!in_array('name_' . $prefix, $fields))
 				{
 					return false;
@@ -405,10 +416,12 @@ class EventbookingHelper
 		$http     = JHttpFactory::getHttp();
 		$url      = 'http://download.finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s=USD' . $currency . '=X';
 		$response = $http->get($url);
+
 		if ($response->code == 200)
 		{
 			$currencyData = explode(',', $response->body);
 			$rate         = floatval($currencyData[1]);
+
 			if ($rate > 0)
 			{
 				$amount = $amount / $rate;
@@ -425,16 +438,18 @@ class EventbookingHelper
 	{
 		$db        = JFactory::getDbo();
 		$languages = self::getLanguages();
+
 		if (count($languages))
 		{
 			$categoryTableFields = array_keys($db->getTableColumns('#__eb_categories'));
 			$eventTableFields    = array_keys($db->getTableColumns('#__eb_events'));
 			$fieldTableFields    = array_keys($db->getTableColumns('#__eb_fields'));
+
 			foreach ($languages as $language)
 			{
-				$prefix = $language->sef;
-
+				$prefix    = $language->sef;
 				$fieldName = 'name_' . $prefix;
+
 				if (!in_array($fieldName, $categoryTableFields))
 				{
 					$sql = "ALTER TABLE  `#__eb_categories` ADD  `$fieldName` VARCHAR( 255 );";
@@ -443,6 +458,7 @@ class EventbookingHelper
 				}
 
 				$fieldName = 'alias_' . $prefix;
+
 				if (!in_array($fieldName, $categoryTableFields))
 				{
 					$sql = "ALTER TABLE  `#__eb_categories` ADD  `$fieldName` VARCHAR( 255 );";
@@ -451,6 +467,7 @@ class EventbookingHelper
 				}
 
 				$fieldName = 'description_' . $prefix;
+
 				if (!in_array($fieldName, $categoryTableFields))
 				{
 					$sql = "ALTER TABLE  `#__eb_categories` ADD  `$fieldName` TEXT NULL;";
@@ -459,6 +476,7 @@ class EventbookingHelper
 				}
 
 				$fieldName = 'title_' . $prefix;
+
 				if (!in_array('title_' . $prefix, $eventTableFields))
 				{
 					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
@@ -467,6 +485,7 @@ class EventbookingHelper
 				}
 
 				$fieldName = 'alias_' . $prefix;
+
 				if (!in_array($fieldName, $eventTableFields))
 				{
 					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
@@ -475,6 +494,7 @@ class EventbookingHelper
 				}
 
 				$fieldName = 'meta_keywords_' . $prefix;
+
 				if (!in_array($fieldName, $eventTableFields))
 				{
 					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
@@ -483,6 +503,7 @@ class EventbookingHelper
 				}
 
 				$fieldName = 'meta_description_' . $prefix;
+
 				if (!in_array($fieldName, $eventTableFields))
 				{
 					$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` VARCHAR( 255 );";
@@ -505,6 +526,7 @@ class EventbookingHelper
 				foreach ($eventTextFields as $eventTextField)
 				{
 					$fieldName = $eventTextField . '_' . $prefix;
+
 					if (!in_array($fieldName, $eventTableFields))
 					{
 						$sql = "ALTER TABLE  `#__eb_events` ADD  `$fieldName` TEXT NULL;";
@@ -514,6 +536,7 @@ class EventbookingHelper
 				}
 
 				$fieldName = 'title_' . $prefix;
+
 				if (!in_array($fieldName, $fieldTableFields))
 				{
 					$sql = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` VARCHAR( 255 );";
@@ -522,6 +545,7 @@ class EventbookingHelper
 				}
 
 				$fieldName = 'description_' . $prefix;
+
 				if (!in_array($fieldName, $fieldTableFields))
 				{
 					$sql = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
@@ -530,6 +554,7 @@ class EventbookingHelper
 				}
 
 				$fieldName = 'values_' . $prefix;
+
 				if (!in_array($fieldName, $fieldTableFields))
 				{
 					$sql = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
@@ -538,6 +563,7 @@ class EventbookingHelper
 				}
 
 				$fieldName = 'default_values_' . $prefix;
+
 				if (!in_array($fieldName, $fieldTableFields))
 				{
 					$sql = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
@@ -546,6 +572,7 @@ class EventbookingHelper
 				}
 
 				$fieldName = 'depend_on_options_' . $prefix;
+
 				if (!in_array($fieldName, $fieldTableFields))
 				{
 					$sql = "ALTER TABLE  `#__eb_fields` ADD  `$fieldName` TEXT NULL;";
@@ -567,6 +594,7 @@ class EventbookingHelper
 		$tag       = explode('-', $language->getTag());
 		$tag       = $tag[0];
 		$available = array('en', 'pt', 'fr', 'de', 'nl', 'ru', 'es', 'tr');
+
 		if (in_array($tag, $available))
 		{
 			return "lang : '" . $tag . "',";
@@ -580,7 +608,6 @@ class EventbookingHelper
 	 */
 	public static function getNumberNoneOfflinePaymentMethods()
 	{
-
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true)
 			->select('COUNT(*)')
@@ -607,6 +634,7 @@ class EventbookingHelper
 
 		$rowFields = static::getDepositPaymentFormFields();
 		$replaces  = array();
+
 		foreach ($rowFields as $rowField)
 		{
 			$replaces[$rowField->name] = $row->{$rowField->name};
@@ -646,30 +674,37 @@ class EventbookingHelper
 		$replaces['event_end_date']    = JHtml::_('date', $event->event_end_date, $config->event_date_format, null);
 		$replaces['short_description'] = $event->short_description;
 		$replaces['description']       = $event->description;
+
 		if ($event->location_id > 0)
 		{
 			$rowLocation         = EventbookingHelperDatabase::getLocation($event->location_id);
 			$locationInformation = array();
+
 			if ($rowLocation->address)
 			{
 				$locationInformation[] = $rowLocation->address;
 			}
+
 			if ($rowLocation->city)
 			{
 				$locationInformation[] = $rowLocation->city;
 			}
+
 			if ($rowLocation->state)
 			{
 				$locationInformation[] = $rowLocation->state;
 			}
+
 			if ($rowLocation->zip)
 			{
 				$locationInformation[] = $rowLocation->zip;
 			}
+
 			if ($rowLocation->country)
 			{
 				$locationInformation[] = $rowLocation->country;
 			}
+
 			$replaces['location']      = $rowLocation->name . ' (' . implode(', ', $locationInformation) . ')';
 			$replaces['location_name'] = $rowLocation->name;
 		}
@@ -782,6 +817,7 @@ class EventbookingHelper
 		if ($config->event_custom_field && file_exists(JPATH_ROOT . '/components/com_eventbooking/fields.xml'))
 		{
 			EventbookingHelperData::prepareCustomFieldsData(array($event));
+
 			foreach ($event->paramData as $customFieldName => $param)
 			{
 				$replaces[$customFieldName] = $param['value'];
@@ -790,6 +826,7 @@ class EventbookingHelper
 
 		// Form fields
 		$fields = $form->getFields();
+
 		foreach ($fields as $field)
 		{
 			if ($field->hideOnDisplay)
@@ -833,8 +870,8 @@ class EventbookingHelper
 
 		if ($row->coupon_id)
 		{
-			$query->clear();
-			$query->select('a.code')
+			$query->clear()
+				->select('a.code')
 				->from('#__eb_coupons AS a')
 				->innerJoin('#__eb_registrants AS b ON a.id = b.coupon_id')
 				->where('b.id=' . $row->id);
@@ -847,6 +884,7 @@ class EventbookingHelper
 		}
 
 		$replaces['user_id'] = $row->user_id;
+
 		if ($row->user_id)
 		{
 			$query->clear()
@@ -920,37 +958,43 @@ class EventbookingHelper
 		$replaces['individual_price'] = EventbookingHelper::formatCurrency($event->individual_price, $config, $event->currency_symbol);
 
 		// Add support for location tag
-		$query->clear();
-		$query->select('a.*')
+		$query->clear()
+			->select('a.*')
 			->from('#__eb_locations AS a')
 			->innerJoin('#__eb_events AS b ON a.id=b.location_id')
 			->where('b.id=' . $row->event_id);
-
 		$db->setQuery($query);
 		$rowLocation = $db->loadObject();
+
 		if ($rowLocation)
 		{
 			$locationInformation = array();
+
 			if ($rowLocation->address)
 			{
 				$locationInformation[] = $rowLocation->address;
 			}
+
 			if ($rowLocation->city)
 			{
 				$locationInformation[] = $rowLocation->city;
 			}
+
 			if ($rowLocation->state)
 			{
 				$locationInformation[] = $rowLocation->state;
 			}
+
 			if ($rowLocation->zip)
 			{
 				$locationInformation[] = $rowLocation->zip;
 			}
+
 			if ($rowLocation->country)
 			{
 				$locationInformation[] = $rowLocation->country;
 			}
+
 			$replaces['location'] = $rowLocation->name . ' (' . implode(', ', $locationInformation) . ')';
 		}
 		else
@@ -965,7 +1009,9 @@ class EventbookingHelper
 		$replaces['transaction_id']     = $row->transaction_id;
 		$replaces['id']                 = $row->id;
 		$replaces['date']               = JHtml::_('date', 'Now', $config->date_format);
-		$method                         = os_payments::loadPaymentMethod($row->payment_method);
+
+		$method = os_payments::loadPaymentMethod($row->payment_method);
+
 		if ($method)
 		{
 			$replaces['payment_method'] = JText::_($method->title);
@@ -979,12 +1025,13 @@ class EventbookingHelper
 		$replaces['registration_detail'] = self::getEmailContent($config, $row, $loadCss, $form);
 
 		// Cancel link
-		$query->clear();
-		$query->select('enable_cancel_registration')
+		$query->clear()
+			->select('enable_cancel_registration')
 			->from('#__eb_events')
 			->where('id = ' . $row->event_id);
 		$db->setQuery($query);
 		$enableCancel = $db->loadResult();
+
 		if ($enableCancel)
 		{
 			$replaces['cancel_registration_link'] = $siteUrl . 'index.php?option=com_eventbooking&task=registrant.cancel&cancel_code=' . $row->registration_code . '&Itemid=' . $Itemid;
@@ -2288,6 +2335,7 @@ class EventbookingHelper
 	{
 		$uri  = JUri::getInstance();
 		$base = $uri->toString(array('scheme', 'host', 'port'));
+
 		if (strpos(php_sapi_name(), 'cgi') !== false && !ini_get('cgi.fix_pathinfo') && !empty($_SERVER['REQUEST_URI']))
 		{
 			$script_name = $_SERVER['PHP_SELF'];
@@ -2296,7 +2344,9 @@ class EventbookingHelper
 		{
 			$script_name = $_SERVER['SCRIPT_NAME'];
 		}
+
 		$path = rtrim(dirname($script_name), '/\\');
+
 		if ($path)
 		{
 			$siteUrl = $base . $path . '/';
@@ -2305,6 +2355,7 @@ class EventbookingHelper
 		{
 			$siteUrl = $base . '/';
 		}
+
 		if (JFactory::getApplication()->isAdmin())
 		{
 			$adminPos = strrpos($siteUrl, 'administrator/');
@@ -2549,9 +2600,11 @@ class EventbookingHelper
 	public static function getFormData($rowFields, $eventId, $userId, $config)
 	{
 		$data = array();
+
 		if ($userId)
 		{
 			$mappings = array();
+
 			foreach ($rowFields as $rowField)
 			{
 				if ($rowField->field_mapping)
@@ -2562,6 +2615,7 @@ class EventbookingHelper
 
 			JPluginHelper::importPlugin('eventbooking');
 			$results = JFactory::getApplication()->triggerEvent('onGetProfileData', array($userId, $mappings));
+
 			if (count($results))
 			{
 				foreach ($results as $res)
@@ -2584,6 +2638,7 @@ class EventbookingHelper
 					->order('id DESC');
 				$db->setQuery($query, 0, 1);
 				$rowRegistrant = $db->loadObject();
+
 				if (!$rowRegistrant)
 				{
 					//Try to get registration record from other events if available
@@ -2591,6 +2646,7 @@ class EventbookingHelper
 					$db->setQuery($query, 0, 1);
 					$rowRegistrant = $db->loadObject();
 				}
+
 				if ($rowRegistrant)
 				{
 					$data = self::getRegistrantData($rowRegistrant, $rowFields);
@@ -2620,9 +2676,11 @@ class EventbookingHelper
 			->where('b.registrant_id=' . $rowRegistrant->id);
 		$db->setQuery($query);
 		$fieldValues = $db->loadObjectList('name');
+
 		for ($i = 0, $n = count($rowFields); $i < $n; $i++)
 		{
 			$rowField = $rowFields[$i];
+
 			if ($rowField->is_core)
 			{
 				$data[$rowField->name] = $rowRegistrant->{$rowField->name};
@@ -2649,10 +2707,12 @@ class EventbookingHelper
 	public static function showBillingStep($eventId)
 	{
 		$config = self::getConfig();
+
 		if (!$config->collect_member_information || $config->show_billing_step_for_free_events)
 		{
 			return true;
 		}
+
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('individual_price')
@@ -2660,11 +2720,11 @@ class EventbookingHelper
 			->where('id=' . $eventId);
 		$db->setQuery($query);
 		$individualPrice = $db->loadResult();
+
 		if ($individualPrice == 0)
 		{
-			$config = EventbookingHelper::getConfig();
-			$query->clear();
-			$query->select('COUNT(*)')
+			$query->clear()
+				->select('COUNT(*)')
 				->from('#__eb_fields')
 				->where('fee_field = 1')
 				->where('published = 1');
@@ -2735,10 +2795,12 @@ class EventbookingHelper
 	public static function getURL()
 	{
 		static $url;
+
 		if (!$url)
 		{
 			$ssl = self::getConfigValue('use_https');
 			$url = self::getSiteUrl();
+
 			if ($ssl)
 			{
 				$url = str_replace('http://', 'https://', $url);
@@ -2764,16 +2826,20 @@ class EventbookingHelper
 			->where('a.link LIKE "%index.php?option=com_eventbooking%"')
 			->where('a.published=1')
 			->where('a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
+
 		if ($app->isSite() && $app->getLanguageFilter())
 		{
 			$query->where('a.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
 		}
+
 		$query->order('a.access');
 		$db->setQuery($query);
 		$itemId = $db->loadResult();
+
 		if (!$itemId)
 		{
 			$Itemid = $app->input->getInt('Itemid', 0);
+
 			if ($Itemid == 1)
 			{
 				$itemId = 999999;
@@ -2798,6 +2864,7 @@ class EventbookingHelper
 	public static function calculateMemberDiscount($discount, $groupIds)
 	{
 		$user = JFactory::getUser();
+
 		if (!$discount)
 		{
 			return 0;
@@ -2819,9 +2886,11 @@ class EventbookingHelper
 			{
 				$discountRates = explode(',', $discount);
 				$maxDiscount   = 0;
+
 				foreach ($groups as $group)
 				{
 					$index = array_search($group, $userGroupIds);
+
 					if ($index !== false && isset($discountRates[$index]))
 					{
 						$maxDiscount = max($maxDiscount, $discountRates[$index]);
@@ -2889,15 +2958,19 @@ class EventbookingHelper
 	public static function loadLanguage()
 	{
 		static $loaded;
+
 		if (!$loaded)
 		{
 			$lang = JFactory::getLanguage();
 			$tag  = $lang->getTag();
+
 			if (!$tag)
 			{
 				$tag = 'en-GB';
 			}
+
 			$lang->load('com_eventbooking', JPATH_ROOT, $tag);
+
 			$loaded = true;
 		}
 	}
@@ -2988,6 +3061,7 @@ class EventbookingHelper
 				}
 			}
 		}
+
 		if (!$loadCss)
 		{
 			// Need to pass bootstrap helper
@@ -2995,6 +3069,7 @@ class EventbookingHelper
 		}
 
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+
 		if ($config->multiple_booking)
 		{
 			$data['row']    = $row;
@@ -3103,6 +3178,7 @@ class EventbookingHelper
 		if ($toAdmin && $row->payment_method == 'os_offline_creditcard')
 		{
 			$cardNumber = JFactory::getApplication()->input->getString('x_card_num', '');
+
 			if ($cardNumber)
 			{
 				$last4Digits         = substr($cardNumber, strlen($cardNumber) - 4);
@@ -3111,6 +3187,7 @@ class EventbookingHelper
 		}
 
 		$text = EventbookingHelperHtml::loadCommonLayout('emailtemplates/tmpl/' . $layout, $data);
+
 		if ($loadCss)
 		{
 			$text .= "
@@ -3140,6 +3217,7 @@ class EventbookingHelper
 		$db->setQuery($sql);
 		$rows     = $db->loadObjectList();
 		$children = array();
+
 		if ($rows)
 		{
 			// first pass - collect children
@@ -3151,15 +3229,18 @@ class EventbookingHelper
 				$children[$pt] = $list;
 			}
 		}
+
 		$list      = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
 		$options   = array();
 		$options[] = JHtml::_('select.option', '0', JText::_('Top'));
+
 		foreach ($list as $item)
 		{
 			$options[] = JHtml::_('select.option', $item->id, '&nbsp;&nbsp;&nbsp;' . $item->treename);
 		}
 
 		if ($onChange)
+		{
 			return JHtml::_('select.genericlist', $options, $name,
 				array(
 					'option.text.toHtml' => false,
@@ -3167,14 +3248,15 @@ class EventbookingHelper
 					'option.value'       => 'value',
 					'list.attr'          => 'class="inputbox" onchange="submit();"',
 					'list.select'        => $selected,));
-		else
-			return JHtml::_('select.genericlist', $options, $name,
-				array(
-					'option.text.toHtml' => false,
-					'option.text'        => 'text',
-					'option.value'       => 'value',
-					'list.attr'          => 'class="inputbox" ',
-					'list.select'        => $selected,));
+		}
+
+		return JHtml::_('select.genericlist', $options, $name,
+			array(
+				'option.text.toHtml' => false,
+				'option.text'        => 'text',
+				'option.value'       => 'value',
+				'list.attr'          => 'class="inputbox" ',
+				'list.select'        => $selected,));
 	}
 
 	/**
@@ -3193,6 +3275,7 @@ class EventbookingHelper
 		$query->select('id, parent AS parent_id')
 			->select('name' . $fieldSuffix . ' AS title')
 			->from('#__eb_categories');
+
 		if ($row->id)
 		{
 			$query->where('id != ' . $row->id);
@@ -3206,6 +3289,7 @@ class EventbookingHelper
 		$db->setQuery($query);
 		$rows     = $db->loadObjectList();
 		$children = array();
+
 		if ($rows)
 		{
 			// first pass - collect children
@@ -3217,10 +3301,12 @@ class EventbookingHelper
 				$children[$pt] = $list;
 			}
 		}
+
 		$list = JHtml::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
 
 		$options   = array();
 		$options[] = JHtml::_('select.option', '0', JText::_('Top'));
+
 		foreach ($list as $item)
 		{
 			$options[] = JHtml::_('select.option', $item->id, '&nbsp;&nbsp;&nbsp;' . $item->treename);
@@ -3246,11 +3332,13 @@ class EventbookingHelper
 	public static function attachmentList($attachment, $config)
 	{
 		jimport('joomla.filesystem.folder');
+
 		$path      = JPATH_ROOT . '/media/com_eventbooking';
 		$files     = JFolder::files($path,
 			strlen(trim($config->attachment_file_types)) ? $config->attachment_file_types : 'bmp|gif|jpg|png|swf|zip|doc|pdf|xls|zip');
 		$options   = array();
 		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_ATTACHMENT'));
+
 		for ($i = 0, $n = count($files); $i < $n; $i++)
 		{
 			$file      = $files[$i];
@@ -3347,12 +3435,13 @@ class EventbookingHelper
 			$masterFieldId = array_pop($queue);
 
 			//Get list of dependency fields of this master field
-			$query->clear();
-			$query->select('id')
+			$query->clear()
+				->select('id')
 				->from('#__eb_fields')
 				->where('depend_on_field_id=' . $masterFieldId);
 			$db->setQuery($query);
 			$rows = $db->loadObjectList();
+
 			if (count($rows))
 			{
 				foreach ($rows as $row)
@@ -3429,16 +3518,18 @@ class EventbookingHelper
 
 		//Check to see whether the current user has registered for the event
 		$preventDuplicateRegistration = $config->prevent_duplicate_registration;
+
 		if ($preventDuplicateRegistration && $user->id)
 		{
-			$query->clear();
-			$query->select('COUNT(id)')
+			$query->clear()
+				->select('COUNT(id)')
 				->from('#__eb_registrants')
 				->where('event_id = ' . $event->id)
 				->where('user_id = ' . $user->id)
 				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 			$db->setQuery($query);
 			$total = $db->loadResult();
+
 			if ($total)
 			{
 				return false;
@@ -3448,8 +3539,8 @@ class EventbookingHelper
 		if (!$config->multiple_booking)
 		{
 			// Check for quantity fields
-			$query->clear();
-			$query->select('*')
+			$query->clear()
+				->select('*')
 				->from('#__eb_fields')
 				->where('published=1')
 				->where('quantity_field = 1')
@@ -3489,14 +3580,18 @@ class EventbookingHelper
 				{
 					$values         = explode("\r\n", $field->values);
 					$quantityValues = explode("\r\n", $field->quantity_values);
+
 					if (count($values) && count($quantityValues))
 					{
 						$multilingualValues = array();
+
 						if (JLanguageMultilang::isEnabled())
 						{
 							$multilingualValues = RADFormField::getMultilingualOptions($field->id);
 						}
+
 						$values = EventbookingHelperHtml::getAvailableQuantityOptions($values, $quantityValues, $event->id, $field->id, ($field->fieldtype == 'Checkboxes') ? true : false, $multilingualValues);
+
 						if (!count($values))
 						{
 							return false;
@@ -3556,6 +3651,7 @@ class EventbookingHelper
 	{
 		$eventCapacity  = (int) $event->event_capacity;
 		$maxGroupNumber = (int) $event->max_group_number;
+
 		if ($eventCapacity)
 		{
 			$maxRegistrants = $eventCapacity - $event->total_registrants;
@@ -3564,6 +3660,7 @@ class EventbookingHelper
 		{
 			$maxRegistrants = -1;
 		}
+
 		if ($maxGroupNumber)
 		{
 			if ($maxRegistrants == -1)
@@ -3604,10 +3701,11 @@ class EventbookingHelper
 			->order('registrant_number DESC');
 		$db->setQuery($query, 0, 1);
 		$rate = $db->loadResult();
+
 		if (!$rate)
 		{
-			$query->clear();
-			$query->select('individual_price')
+			$query->clear()
+				->select('individual_price')
 				->from('#__eb_events')
 				->where('id = ' . $eventId);
 			$db->setQuery($query);
@@ -3635,9 +3733,11 @@ class EventbookingHelper
 			->order('id');
 		$db->setQuery($query);
 		$registrants = $db->loadObjectList();
+
 		if (count($registrants))
 		{
 			$mailer = JFactory::getMailer();
+
 			if ($config->from_name)
 			{
 				$fromName = $config->from_name;
@@ -3646,6 +3746,7 @@ class EventbookingHelper
 			{
 				$fromName = JFactory::getConfig()->get('fromname');
 			}
+
 			if ($config->from_email)
 			{
 				$fromEmail = $config->from_email;
@@ -3654,11 +3755,13 @@ class EventbookingHelper
 			{
 				$fromEmail = JFactory::getConfig()->get('mailfrom');
 			}
+
 			$message                           = EventbookingHelper::getMessages();
 			$fieldSuffix                       = EventbookingHelper::getFieldSuffix();
 			$replaces                          = array();
 			$replaces['registrant_first_name'] = $row->first_name;
 			$replaces['registrant_last_name']  = $row->last_name;
+
 			if (JFactory::getApplication()->isSite())
 			{
 				$replaces['event_link'] = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')) . JRoute::_(EventbookingHelperRoute::getEventRoute($row->event_id, 0, EventbookingHelper::getItemid()));
@@ -3667,8 +3770,9 @@ class EventbookingHelper
 			{
 				$replaces['event_link'] = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')) . '/' . EventbookingHelperRoute::getEventRoute($row->event_id, 0, EventbookingHelper::getItemid());
 			}
-			$query->clear();
-			$query->select('*, title' . $fieldSuffix . ' AS title')
+
+			$query->clear()
+				->select('*, title' . $fieldSuffix . ' AS title')
 				->from('#__eb_events')
 				->where('id = ' . (int) $row->event_id);
 			$db->setQuery($query);
@@ -3700,6 +3804,7 @@ class EventbookingHelper
 			{
 				$body = $message->registrant_waitinglist_notification_body;
 			}
+
 			foreach ($registrants as $registrant)
 			{
 				if (!JMailHelper::isEmailAddress($registrant->email))
@@ -3710,12 +3815,14 @@ class EventbookingHelper
 				$message                = $body;
 				$replaces['first_name'] = $registrant->first_name;
 				$replaces['last_name']  = $registrant->last_name;
+
 				foreach ($replaces as $key => $value)
 				{
 					$key     = strtoupper($key);
 					$subject = str_replace("[$key]", $value, $subject);
 					$message = str_replace("[$key]", $value, $message);
 				}
+
 				//Send email to waiting list users
 				$mailer->sendMail($fromEmail, $fromName, $registrant->email, $subject, $message, 1);
 				$mailer->clearAllRecipients();
@@ -3775,6 +3882,7 @@ class EventbookingHelper
 	public static function getColorCodeOfEvent($eventId)
 	{
 		static $colors;
+
 		if (!isset($colors[$eventId]))
 		{
 			$db    = JFactory::getDbo();
@@ -3813,10 +3921,8 @@ class EventbookingHelper
 
 			return $db->loadObjectList();
 		}
-		else
-		{
-			return array();
-		}
+
+		return array();
 	}
 
 	/**
@@ -3829,6 +3935,7 @@ class EventbookingHelper
 	public static function getPaymentMethodTitle($methodName)
 	{
 		static $titles;
+
 		if (!isset($titles[$methodName]))
 		{
 			$db    = JFactory::getDbo();
@@ -3838,6 +3945,7 @@ class EventbookingHelper
 				->where('name = ' . $db->quote($methodName));
 			$db->setQuery($query);
 			$methodTitle = $db->loadResult();
+
 			if ($methodTitle)
 			{
 				$titles[$methodName] = $methodTitle;
@@ -3992,6 +4100,7 @@ class EventbookingHelper
 		</script>
 		<?php
 		$table = JTable::getInstance('content');
+
 		if ($fieldValue)
 		{
 			$table->load($fieldValue);
@@ -4000,6 +4109,7 @@ class EventbookingHelper
 		{
 			$table->title = '';
 		}
+
 		$html[] = '<div class="input-prepend input-append">';
 		$html[] = '<div class="media-preview add-on"><span title="" class="hasTipPreview"><span class="icon-eye"></span></span></div>';
 		$html[] = '	<input type="text" disabled="disabled" class="input-small hasTipImgpath" id="article_name"' . ' value="' . htmlspecialchars($table->title, ENT_COMPAT, 'UTF-8') . '"' .
@@ -4074,10 +4184,12 @@ class EventbookingHelper
 		$db->setQuery($query);
 		$maxDateInfo  = $db->loadObject();
 		$maxEventDate = $maxDateInfo->max_event_date;
+
 		if ($maxDateInfo->max_cut_off_date != $nullDate)
 		{
 			$oMaxEventDate  = new DateTime($maxDateInfo->max_event_date);
 			$oMaxCutOffDate = new DateTime($maxDateInfo->max_cut_off_date);
+
 			if ($oMaxCutOffDate > $oMaxEventDate)
 			{
 				$maxEventDate = $maxDateInfo->max_cut_off_date;
@@ -4279,7 +4391,7 @@ class EventbookingHelper
 			$invoiceOutput = str_ireplace("[$key]", $value, $invoiceOutput);
 		}
 
-		$v = $pdf->writeHTML($invoiceOutput, true, false, false, false, '');
+		$pdf->writeHTML($invoiceOutput, true, false, false, false, '');
 
 		//Filename
 		$filePath = JPATH_ROOT . '/media/com_eventbooking/invoices/' . $replaces['invoice_number'] . '.pdf';
@@ -4532,6 +4644,7 @@ class EventbookingHelper
 		$row    = JTable::getInstance('EventBooking', 'Registrant');
 		$row->load($id);
 		$invoiceStorePath = JPATH_ROOT . '/media/com_eventbooking/invoices/';
+
 		if ($row)
 		{
 			if (!$row->invoice_number)
@@ -4574,9 +4687,11 @@ class EventbookingHelper
 		$link_exp     = "[^http:\/\/www\.|^www\.|^https:\/\/|^http:\/\/]";
 		$siteURL      = JUri::root();
 		preg_match_all($src_exp, $html_content, $out, PREG_SET_ORDER);
+
 		foreach ($out as $val)
 		{
 			$links = preg_match($link_exp, $val[1], $match, PREG_OFFSET_CAPTURE);
+
 			if ($links == '0')
 			{
 				$patterns[$i]     = $val[1];
@@ -4584,8 +4699,10 @@ class EventbookingHelper
 				$replacements[$i] = $siteURL . $val[1];
 				$replacements[$i] = "\"$replacements[$i]";
 			}
+
 			$i++;
 		}
+
 		$mod_html_content = str_replace($patterns, $replacements, $html_content);
 
 		return $mod_html_content;
@@ -4601,18 +4718,22 @@ class EventbookingHelper
 		$fsize    = @filesize($filePath);
 		$mod_date = date('r', filemtime($filePath));
 		$cont_dis = 'attachment';
+
 		if ($detectFilename)
 		{
 			$pos      = strpos($filename, '_');
 			$filename = substr($filename, $pos + 1);
 		}
+
 		$ext  = JFile::getExt($filename);
 		$mime = self::getMimeType($ext);
+
 		// required for IE, otherwise Content-disposition is ignored
 		if (ini_get('zlib.output_compression'))
 		{
 			ini_set('zlib.output_compression', 'Off');
 		}
+
 		header("Pragma: public");
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 		header("Expires: 0");
@@ -4639,6 +4760,7 @@ class EventbookingHelper
 	public static function getMimeType($ext)
 	{
 		require_once JPATH_ROOT . "/components/com_eventbooking/helper/mime.mapping.php";
+
 		foreach ($mime_extension_map as $key => $value)
 		{
 			if ($key == $ext)
@@ -4663,10 +4785,12 @@ class EventbookingHelper
 		$chunksize = 1 * (1024 * 1024); // how many bytes per chunk
 		$cnt       = 0;
 		$handle    = fopen($filename, 'rb');
+
 		if ($handle === false)
 		{
 			return false;
 		}
+
 		while (!feof($handle))
 		{
 			$buffer = fread($handle, $chunksize);
@@ -4678,7 +4802,9 @@ class EventbookingHelper
 				$cnt += strlen($buffer);
 			}
 		}
+
 		$status = fclose($handle);
+
 		if ($retbytes && $status)
 		{
 			return $cnt; // return num. bytes delivered like readfile() does.
@@ -4702,6 +4828,7 @@ class EventbookingHelper
 			->where('id=' . $eventId);
 		$db->setQuery($query);
 		$access = (int) $db->loadResult();
+
 		if (!in_array($access, $user->getAuthorisedViewLevels()))
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('NOT_AUTHORIZED'));
@@ -4715,6 +4842,7 @@ class EventbookingHelper
 	public static function checkAccessHistory()
 	{
 		$user = JFactory::getUser();
+
 		if (!$user->get('id'))
 		{
 			JFactory::getApplication()->redirect('index.php?option=com_eventbooking', JText::_('NOT_AUTHORIZED'));
@@ -4736,6 +4864,7 @@ class EventbookingHelper
 	{
 		$user      = JFactory::getUser();
 		$canAccess = false;
+
 		if ($user->id)
 		{
 			if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking')
@@ -4771,19 +4900,19 @@ class EventbookingHelper
 			->where('(DATEDIFF(cancel_before_date, NOW()) >=0)');
 		$db->setQuery($query);
 		$total = $db->loadResult();
+
 		if ($total)
 		{
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	public static function canExportRegistrants($eventId = 0)
 	{
 		$user = JFactory::getUser();
+
 		if ($eventId)
 		{
 			$config = EventbookingHelper::getConfig();
@@ -4794,6 +4923,7 @@ class EventbookingHelper
 				->where('id = ' . (int) $eventId);
 			$db->setQuery($query);
 			$createdBy = (int) $db->loadResult();
+
 			if ($config->only_show_registrants_of_event_owner)
 			{
 				return $createdBy > 0 && $createdBy == $user->id;
@@ -4878,13 +5008,14 @@ class EventbookingHelper
 
 		$db->setQuery($query);
 		$registrantId = $db->loadResult();
+
 		if (!$registrantId)
 		{
 			return false;
 		}
 
-		$query->clear();
-		$query->select('COUNT(*)')
+		$query->clear()
+			->select('COUNT(*)')
 			->from('#__eb_events')
 			->where('id = ' . $eventId)
 			->where('enable_cancel_registration = 1')
@@ -4945,10 +5076,12 @@ class EventbookingHelper
 	{
 		$db     = JFactory::getDbo();
 		$config = EventbookingHelper::getConfig();
+
 		if ($config->collect_member_information)
 		{
 			$row = JTable::getInstance('EventBooking', 'Registrant');
 			$row->load($groupId);
+
 			if ($row->id)
 			{
 				$query = $db->getQuery(true);
@@ -5015,7 +5148,7 @@ class EventbookingHelper
 
 			$model = new UsersModelRegistration();
 
-			$ret = $model->register($data);
+			$model->register($data);
 
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
@@ -5119,6 +5252,7 @@ class EventbookingHelper
 		$timeZone     = new DateTimeZone(JFactory::getConfig()->get('offset'));
 		$date         = new DateTime($startDate, $timeZone);
 		$dateInterval = new DateInterval('P' . $dailyFrequency . 'D');
+
 		if ($numberOccurencies)
 		{
 			for ($i = 1; $i < $numberOccurencies; $i++)
@@ -5130,9 +5264,11 @@ class EventbookingHelper
 		else
 		{
 			$recurringEndDate = new DateTime($endDate . ' 23:59:59', $timeZone);
+
 			while (true)
 			{
 				$date->add($dateInterval);
+
 				if ($date <= $recurringEndDate)
 				{
 					$eventDates[] = $date->format('Y-m-d H:i:s');
@@ -5168,51 +5304,61 @@ class EventbookingHelper
 		$minutes            = $recurringStartDate->format('i');
 		$dayOfWeek          = $recurringStartDate->format('w');
 		$startWeek          = clone $recurringStartDate;
+
 		if ($dayOfWeek > 0)
 		{
 			$startWeek->modify('- ' . $dayOfWeek . ' day');
 		}
+
 		$startWeek->setTime($hour, $minutes, 0);
 		$dateInterval = new DateInterval('P' . $weeklyFrequency . 'W');
 
 		if ($numberOccurrences)
 		{
 			$count = 0;
+
 			while ($count < $numberOccurrences)
 			{
 				foreach ($weekDays as $weekDay)
 				{
 					$date = clone $startWeek;
+
 					if ($weekDay > 0)
 					{
 						$date->add(new DateInterval('P' . $weekDay . 'D'));
 					}
+
 					if (($date >= $recurringStartDate) && ($count < $numberOccurrences))
 					{
 						$eventDates[] = $date->format('Y-m-d H:i:s');
 						$count++;
 					}
 				}
+
 				$startWeek->add($dateInterval);
 			}
 		}
 		else
 		{
 			$recurringEndDate = new DateTime($endDate . ' 23:59:59', $timeZone);
+
 			while (true)
 			{
 				foreach ($weekDays as $weekDay)
 				{
 					$date = clone $startWeek;
+
 					if ($weekDay > 0)
 					{
 						$date->add(new DateInterval('P' . $weekDay . 'D'));
 					}
+
 					if (($date >= $recurringStartDate) && ($date <= $recurringEndDate))
 					{
 						$eventDates[] = $date->format('Y-m-d H:i:s');
 					}
 				}
+
 				if ($date > $recurringEndDate)
 				{
 					break;
@@ -5244,44 +5390,54 @@ class EventbookingHelper
 		$date               = clone $recurringStartDate;
 		$dateInterval       = new DateInterval('P' . $monthlyFrequency . 'M');
 		$monthDays          = explode(',', $monthDays);
+
 		if ($numberOccurrences)
 		{
 			$count = 0;
+
 			while ($count < $numberOccurrences)
 			{
 				$currentMonth = $date->format('m');
 				$currentYear  = $date->format('Y');
+
 				foreach ($monthDays as $day)
 				{
 					$date->setDate($currentYear, $currentMonth, $day);
+
 					if (($date >= $recurringStartDate) && ($count < $numberOccurrences))
 					{
 						$eventDates[] = $date->format('Y-m-d H:i:s');
 						$count++;
 					}
 				}
+
 				$date->add($dateInterval);
 			}
 		}
 		else
 		{
 			$recurringEndDate = new DateTime($endDate . ' 23:59:59', $timeZone);
+
 			while (true)
 			{
 				$currentMonth = $date->format('m');
 				$currentYear  = $date->format('Y');
+
 				foreach ($monthDays as $day)
 				{
 					$date->setDate($currentYear, $currentMonth, $day);
+
 					if (($date >= $recurringStartDate) && ($date <= $recurringEndDate))
 					{
 						$eventDates[] = $date->format('Y-m-d H:i:s');
 					}
 				}
+
 				if ($date > $recurringEndDate)
 				{
 					break;
 				}
+
 				$date->add(new DateInterval('P' . $monthlyFrequency . 'M'));
 			}
 		}
@@ -5312,6 +5468,7 @@ class EventbookingHelper
 		if ($numberOccurrences)
 		{
 			$count = 0;
+
 			while ($count < $numberOccurrences)
 			{
 				$currentMonth = $date->format('M');
@@ -5320,6 +5477,7 @@ class EventbookingHelper
 				$timeString .= " of $currentMonth $currentYear";
 				$date->modify($timeString);
 				$date->setTime($recurringStartDate->format('H'), $recurringStartDate->format('i'), 0);
+
 				if (($date >= $recurringStartDate) && ($count < $numberOccurrences))
 				{
 					$eventDates[] = $date->format('Y-m-d H:i:s');
@@ -5332,6 +5490,7 @@ class EventbookingHelper
 		else
 		{
 			$recurringEndDate = new DateTime($endDate . ' 23:59:59', $timeZone);
+
 			while (true)
 			{
 				$currentMonth = $date->format('M');
@@ -5340,14 +5499,17 @@ class EventbookingHelper
 				$timeString .= " of $currentMonth $currentYear";
 				$date->modify($timeString);
 				$date->setTime($recurringStartDate->format('H'), $recurringStartDate->format('i'), 0);
+
 				if (($date >= $recurringStartDate) && ($date <= $recurringEndDate))
 				{
 					$eventDates[] = $date->format('Y-m-d H:i:s');
 				}
+
 				if ($date > $recurringEndDate)
 				{
 					break;
 				}
+
 				$date->add(new DateInterval('P' . $monthlyFrequency . 'M'));
 			}
 		}
