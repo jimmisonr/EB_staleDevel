@@ -3,11 +3,11 @@
 	<name>Events Booking - Events By Location</name>
 	<author>Tuan Pham Ngoc</author>
 	<creationDate>July 2011</creationDate>
-    <copyright>Copyright (C) 2010 - 2016 Ossolution Team</copyright>
+    <copyright>Copyright (C) 2010 - 2017 Ossolution Team</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>contact@joomdonation.com</authorEmail>
 	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>2.12.2</version>  
+	<version>2.13.0</version>  
 	<description>This module is used to display locations in Event Booking Extension so that users can browse events by location</description>
 	<files>		
 		<filename module="mod_eb_locations">mod_eb_locations.php</filename>		

@@ -3,11 +3,11 @@
 	<name>Events Booking - Events By State</name>
 	<author>Tuan Pham Ngoc</author>
 	<creationDate>August 2016</creationDate>
-    <copyright>Copyright (C) 2010 - 2016 Ossolution Team</copyright>
+    <copyright>Copyright (C) 2010 - 2017 Ossolution Team</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>tuanpn@joomdonation.com</authorEmail>
 	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>2.12.2</version>
+	<version>2.13.0</version>
 	<description>This module will display list of states in Events Booking. Users can click on a state to see all events from that state</description>
 	<files>		
 		<filename module="mod_eb_states">mod_eb_states.php</filename>		
