@@ -221,23 +221,10 @@ else
 						<?php
 						}
 						else
-						{
-							if (version_compare(JVERSION, '3.5.0', 'ge'))
-							{
-							?>
-								JoomlaInitReCaptcha2();
-							<?php
-							}
-							else
-							{
-								$theme = $params->get('theme2', 'light');
-								$langTag = JFactory::getLanguage()->getTag();
-								$file = 'https://www.google.com/recaptcha/api.js?hl=' . $langTag . '&onload=onloadCallback&render=explicit';
-								JHtml::_('script', $file, true, true);
-								?>
-									grecaptcha.render("dynamic_recaptcha_1", {sitekey: "' . <?php echo $pubkey;?> . '", theme: "' . <?php echo $theme; ?> . '"});
-								<?php
-							}
+						{							
+						?>
+							JoomlaInitReCaptcha2();
+						<?php							
 						}
 					}
 				?>

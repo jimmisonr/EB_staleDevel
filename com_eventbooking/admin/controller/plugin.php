@@ -22,15 +22,9 @@ class EventbookingControllerPlugin extends EventbookingController
 	 */
 	public function install()
 	{
-		if (version_compare(JVERSION, '3.4.0', 'ge'))
-		{
-			$plugin = $this->input->files->get('plugin_package', null, 'raw');
-		}
-		else
-		{
-			$plugin = $this->input->files->get('plugin_package', null, 'none');
-		}
+		$plugin = $this->input->files->get('plugin_package', null, 'raw');		
 		$model  = $this->getModel();
+		
 		try
 		{
 			$model->install($plugin);
