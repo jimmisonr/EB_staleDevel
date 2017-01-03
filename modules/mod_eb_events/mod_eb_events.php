@@ -31,20 +31,24 @@ EventbookingHelper::loadLanguage();
 $db      = JFactory::getDbo();
 $query   = $db->getQuery(true);
 $baseUrl = JUri::base(true);
-$itemId  = (int) $params->get('item_id', 0);
 
-if (!$itemId)
-{
-	$itemId = EventbookingHelper::getItemid();
-}
 
-$fieldSuffix  = EventbookingHelper::getFieldSuffix();
-$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d H:i:s'));
+$fieldSuffix = EventbookingHelper::getFieldSuffix();
+$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d H:i:s'));
+$nullDate    = $db->quote($db->getNullDate());
+
+
 $numberEvents = $params->get('number_events', 6);
 $categoryIds  = trim($params->get('category_ids', ''));
 $showCategory = $params->get('show_category', 1);
 $showLocation = $params->get('show_location', 0);
 $showThumb    = $params->get('show_thumb', 0);
+$itemId       = (int) $params->get('item_id', 0);
+
+if (!$itemId)
+{
+	$itemId = EventbookingHelper::getItemid();
+}
 
 $query->select('a.*, c.name AS location_name')
 	->from('#__eb_events AS a')
@@ -52,6 +56,8 @@ $query->select('a.*, c.name AS location_name')
 	->where('a.published = 1')
 	->where('a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
 	->where('(a.event_date >= ' . $currentDate . ' OR a.cut_off_date >= ' . $currentDate . ')')
+	->where('(a.publish_up = ' . $nullDate . ' OR a.publish_up <= ' . $currentDate . ')')
+	->where('(a.publish_down = ' . $nullDate . ' OR a.publish_down >= ' . $currentDate . ')')
 	->order('a.featured DESC, a.event_date');
 
 if ($params->get('only_show_featured_events', 0))

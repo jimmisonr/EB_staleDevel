@@ -287,7 +287,13 @@ class EventbookingModelList extends RADModelList
 			$query->where('tbl.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
 		}
 
+		$nullDate = $db->quote($db->getNullDate());
+		$nowDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d H:i:s'));
+		$query->where('(tbl.publish_up = ' . $nullDate . ' OR tbl.publish_up <= ' . $nowDate . ')')
+			->where('(tbl.publish_down = ' . $nullDate . ' OR tbl.publish_down >= ' . $nowDate . ')');
+
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+
 		if ($fieldSuffix)
 		{
 			$query->where($db->quoteName('tbl.title' . $fieldSuffix) . ' != ""')
