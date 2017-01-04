@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package            Joomla
  * @subpackage         Event Booking
@@ -82,12 +83,15 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 			$this->minNumberRegistrants = 2;
 		}
 
-		$this->numberRegistrants = $numberRegistrants;
-		$this->message           = EventbookingHelper::getMessages();
-		$this->fieldSuffix       = EventbookingHelper::getFieldSuffix();
-		$this->Itemid            = $input->getInt('Itemid', 0);
-		$this->event             = $event;
-		$this->config            = EventbookingHelper::getConfig();
+
+		$this->numberRegistrants         = $numberRegistrants;
+		$this->message                   = EventbookingHelper::getMessages();
+		$this->fieldSuffix               = EventbookingHelper::getFieldSuffix();
+		$this->Itemid                    = $input->getInt('Itemid', 0);
+		$this->event                     = $event;
+		$this->config                    = EventbookingHelper::getConfig();
+		$this->collectMembersInformation = EventbookingHelperRegistration::getCollectGroupMembersInformation($this->config, $event);
+
 		parent::display();
 	}
 
@@ -382,6 +386,8 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		{
 			$form->setEventId($eventId);
 		}
+
+		$this->collectMembersInformation = EventbookingHelperRegistration::getCollectGroupMembersInformation($config, $event);
 
 		// Assign these parameters
 		$this->paymentMethod        = $paymentMethod;

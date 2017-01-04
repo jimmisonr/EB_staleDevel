@@ -91,6 +91,14 @@ $format = 'Y-m-d';
 	</div>
 	<div class="control-group">
 		<label class="control-label">
+			<?php echo JText::_('EB_COLLECT_MEMBER_INFORMATION'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['collect_member_information']; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
 			<?php echo JText::_('ENABLE_COUPON'); ?>
 		</label>
 		<div class="controls">

@@ -503,7 +503,7 @@ class EventBookingModelRegister extends RADModel
 		$form->storeData($row->id, $data);
 
 		//Store group members data
-		if ($config->collect_member_information)
+		if (EventbookingHelperRegistration::getCollectGroupMembersInformation($config, $event))
 		{
 			for ($i = 0; $i < $numberRegistrants; $i++)
 			{

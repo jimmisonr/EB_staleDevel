@@ -311,9 +311,11 @@ class EventbookingControllerRegister extends EventbookingController
 	public function store_number_registrants()
 	{
 		$config = EventbookingHelper::getConfig();
+		$event  = EventbookingHelperDatabase::getEvent($this->input->getInt('event_id', 0));
+
 		JFactory::getSession()->set('eb_number_registrants', $this->input->getInt('number_registrants'));
 
-		if ($config->collect_member_information)
+		if (EventbookingHelperRegistration::getCollectGroupMembersInformation($config, $event))
 		{
 			$this->input->set('view', 'register');
 			$this->input->set('layout', 'group_members');

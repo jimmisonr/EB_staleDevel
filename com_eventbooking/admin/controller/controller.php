@@ -1137,6 +1137,14 @@ class EventbookingController extends RADControllerAdmin
 				$db->execute();
 			}
 		}
+
+		if (!in_array('collect_member_information', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `collect_member_information` TINYINT NOT NULL DEFAULT  '2' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		if (!in_array('alias', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `alias` VARCHAR( 255 ) NULL;";

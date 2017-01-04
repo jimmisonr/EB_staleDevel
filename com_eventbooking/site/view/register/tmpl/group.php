@@ -86,7 +86,7 @@ foreach ($replaces as $key => $value)
 	<?php
 	}
 
-	if ($this->config->collect_member_information)
+	if ($this->collectMembersInformation)
 	{
 	?>
 		<div id="eb-group-members-information">
@@ -128,7 +128,7 @@ foreach ($replaces as $key => $value)
 		}
 		elseif($this->bypassNumberMembersStep)
 		{
-			if ($this->config->collect_member_information)
+			if ($this->collectMembersInformation)
 			{
 				$defaultStep = 'group_members';
 			}

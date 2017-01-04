@@ -242,7 +242,7 @@ else
 						success: function(html) {
 							$('#eb-group-members-information .eb-form-content').html(html);
 							$('#eb-group-billing .eb-form-content').slideUp('slow');
-							<?php ($this->config->collect_member_information) ? $idAjax = 'eb-group-members-information' : $idAjax = 'eb-number-group-members';?>
+							<?php ($this->collectMembersInformation) ? $idAjax = 'eb-group-members-information' : $idAjax = 'eb-number-group-members';?>
 							$('#<?php echo $idAjax; ?> .eb-form-content').slideDown('slow');
 						},
 						error: function(xhr, ajaxOptions, thrownError) {
@@ -260,7 +260,7 @@ else
 					 opacity: 0.3
 				});
 				<?php
-					if ($this->config->collect_member_information)
+					if ($this->collectMembersInformation)
 					{
 					?>
 						$('html, body').animate({scrollTop:$('#eb-group-members-information').position().top}, 'slow');

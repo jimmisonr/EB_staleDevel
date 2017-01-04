@@ -131,6 +131,11 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			$lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id', ' class="inputbox validate[required]" ', 'id', 'title', $item->event_id);
 		}
 
+		if (!empty($event))
+		{
+
+		}
+
 		if ($config->collect_member_information && !$rowMembers && $item->number_registrants > 1)
 		{
 			$rowMembers = array();

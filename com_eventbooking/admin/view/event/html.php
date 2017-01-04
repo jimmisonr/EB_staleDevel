@@ -133,11 +133,23 @@ class EventbookingViewEventHtml extends RADViewItem
 		$this->lists['enable_coupon'] = JHtml::_('select.genericlist', $options, 'enable_coupon', ' class="inputbox" ', 'value', 'text', $item->enable_coupon);
 
 		$options   = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_USE_GLOBAL_CONFIGURATION'));
+		$options[] = JHtml::_('select.option', 1, JText::_('EB_INDIVIDUAL_ONLY'));
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_GROUP_ONLY'));
+
+		$options   = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('No'));
 		$options[] = JHtml::_('select.option', 1, JText::_('Yes'));
 		$options[] = JHtml::_('select.option', 2, JText::_('EB_USE_GLOBAL_CONFIGURATION'));
 
 		$this->lists['activate_waiting_list'] = JHtml::_('select.genericlist', $options, 'activate_waiting_list', ' class="inputbox" ', 'value', 'text', $item->activate_waiting_list);
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('No'));
+		$options[] = JHtml::_('select.option', 1, JText::_('Yes'));
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_USE_GLOBAL_CONFIGURATION'));
+
+		$this->lists['collect_member_information'] = JHtml::_('select.genericlist', $options, 'collect_member_information', ' class="inputbox" ', 'value', 'text', $item->collect_member_information);
 
 		$this->lists['access']              = JHtml::_('access.level', 'access', $item->access, 'class="inputbox"', false);
 		$this->lists['registration_access'] = JHtml::_('access.level', 'registration_access', $item->registration_access, 'class="inputbox"', false);

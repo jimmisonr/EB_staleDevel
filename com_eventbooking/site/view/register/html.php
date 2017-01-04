@@ -394,16 +394,20 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			$waitingList = false;
 		}
 
-		$this->bypassNumberMembersStep = false;
-
 		if ($event->max_group_number > 0 && ($event->max_group_number == $event->min_group_number))
 		{
 			$session = JFactory::getSession();
 			$session->set('eb_number_registrants', $event->max_group_number);
 			$this->bypassNumberMembersStep = true;
 		}
+		else
+		{
+			$this->bypassNumberMembersStep = false;
+		}
 
 		$this->waitingList = $waitingList;
+
+		$this->collectMembersInformation = EventbookingHelperRegistration::getCollectGroupMembersInformation($config, $event);
 
 		$this->loadCaptcha(true);
 

@@ -66,7 +66,7 @@ if (strlen($msg))
 					},
 					success: function(html) {
 						<?php
-							if ($this->config->collect_member_information)
+							if ($this->collectMembersInformation)
 							{
 							?>
 								$('#eb-group-members-information .eb-form-content').html(html);
