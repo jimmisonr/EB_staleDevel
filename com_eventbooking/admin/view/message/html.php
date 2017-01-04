@@ -79,9 +79,9 @@ class EventbookingViewMessageHtml extends RADViewHtml
 
 	protected function addToolbar()
 	{
-		JToolBarHelper::title(JText::_('Emails & Messages'), 'generic.png');
-		JToolBarHelper::apply('apply', 'JTOOLBAR_APPLY');
-		JToolBarHelper::save('save');
-		JToolBarHelper::cancel('cancel');
+		JToolbarHelper::title(JText::_('Emails & Messages'), 'generic.png');
+		JToolbarHelper::apply('apply', 'JTOOLBAR_APPLY');
+		JToolbarHelper::save('save');
+		JToolbarHelper::cancel('cancel');
 	}
 }
