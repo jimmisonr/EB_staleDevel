@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -30,19 +30,18 @@ class plgEventBookingTicketTypes extends JPlugin
 	{
 		ob_start();
 		$this->drawSettingForm($row);
-		$form = ob_get_clean();
 
 		return array(
 			'title' => JText::_('EB_TICKET_TYPES'),
-			'form'  => $form,
+			'form'  => ob_get_clean(),
 		);
 	}
 
 	/**
 	 * Store setting into database, in this case, use params field of plans table
 	 *
-	 * @param event   $row
-	 * @param Boolean $isNew true if create new plan, false if edit
+	 * @param EventbookingTableEvent $row
+	 * @param Boolean                $isNew true if create new plan, false if edit
 	 */
 	public function onAfterSaveEvent($row, $data, $isNew)
 	{
@@ -131,7 +130,7 @@ class plgEventBookingTicketTypes extends JPlugin
 			->where('id = ' . $row->id);
 		$db->setQuery($query);
 		$db->execute();
-		
+
 		$row->has_multiple_ticket_types = $hasMultipleTicketTypes;
 
 		if (count($ticketTypeIds))

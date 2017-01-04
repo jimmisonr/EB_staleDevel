@@ -3,11 +3,13 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
+
+use Joomla\Utilities\ArrayHelper;
 
 class EventbookingModelCalendar extends RADModel
 {
@@ -67,7 +69,7 @@ class EventbookingModelCalendar extends RADModel
 
 		// Exclude categories
 		$excludeCategoryIds = JFactory::getApplication()->getParams()->get('exclude_category_ids');
-		JArrayHelper::toInteger($excludeCategoryIds);
+		$excludeCategoryIds = ArrayHelper::toInteger($excludeCategoryIds);
 		$excludeCategoryIds = array_filter($excludeCategoryIds);
 
 		if (!$year)
@@ -201,7 +203,7 @@ class EventbookingModelCalendar extends RADModel
 				$catId = $this->state->id;
 				$query->where("a.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id = $catId)");
 			}
-			
+
 			$db->setQuery($query, 0, 1);
 			$rowNextEvent = $db->loadObject();
 

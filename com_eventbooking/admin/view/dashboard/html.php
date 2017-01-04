@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // Check to ensure this file is included in Joomla!
@@ -39,6 +39,10 @@ class EventbookingViewDashboardHtml extends RADViewHtml
 
 		$this->config = EventbookingHelper::getConfig();
 		$this->data   = EventbookingModelRegistrants::getStatisticsData();
+
+		// Render sub-menus
+		EventbookingHelperHtml::renderSubmenu('dashboard');
+
 		parent::display();
 	}
 

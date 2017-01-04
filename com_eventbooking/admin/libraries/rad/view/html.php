@@ -177,6 +177,7 @@ class RADViewHtml extends RADView
 		{
 			$file = JPath::clean($fileLayout . '.php');
 			$path = JPath::find($this->paths, $file);
+
 			if ($path)
 			{
 				break;
@@ -189,7 +190,7 @@ class RADViewHtml extends RADView
 	/**
 	 * Method to get the view paths.
 	 *
-	 * @return SplPriorityQueue The paths queue.
+	 * @return array The paths queue.
 	 */
 	public function getPaths()
 	{
@@ -221,9 +222,7 @@ class RADViewHtml extends RADView
 		include $path;
 
 		// Get the layout contents.
-		$output = ob_get_clean();
-
-		return $output;
+		return ob_get_clean();
 	}
 
 	/**
@@ -251,10 +250,9 @@ class RADViewHtml extends RADView
 		ob_start();
 		// Load the layout.
 		include $path;
-		// Get the layout contents.
-		$output = ob_get_clean();
 
-		return $output;
+		// Get the layout contents.
+		return ob_get_clean();
 	}
 
 	/**
@@ -329,7 +327,7 @@ class RADViewHtml extends RADView
 	/**
 	 * Method to set the view paths.
 	 *
-	 * @param $paths The paths queue.
+	 * @param array $paths The paths queue.
 	 *
 	 * @return RADViewHtml Method supports chaining.
 	 */

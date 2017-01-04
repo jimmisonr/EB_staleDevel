@@ -14,6 +14,8 @@ defined('_JEXEC') or die;
  * @package      RAD
  * @subpackage   View
  * @since        2.0
+ *
+ * @property RADModelList $model
  */
 class RADViewList extends RADViewHtml
 {

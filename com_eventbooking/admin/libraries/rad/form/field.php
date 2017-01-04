@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Abstract Form Field class for the RAD framework
  *
@@ -118,18 +119,22 @@ abstract class RADFormField
 		$this->row         = $row;
 		$this->value       = $value;
 		$cssClasses        = array();
+
 		if ($row->css_class)
 		{
 			$cssClasses[] = $row->css_class;
 		}
+
 		if ($row->validation_rules)
 		{
 			$cssClasses[] = $row->validation_rules;
 		}
+
 		if (count($cssClasses))
 		{
 			$this->attributes['class'] = implode(' ', $cssClasses);
 		}
+
 		if ($row->validation_error_message)
 		{
 			$this->attributes['data-errormessage'] = $row->validation_error_message;
@@ -217,6 +222,7 @@ abstract class RADFormField
 	public function removeFieldSuffix()
 	{
 		$pos = strrpos($this->name, '_');
+
 		if ($pos !== false)
 		{
 			$this->name = substr($this->name, 0, $pos);
@@ -313,6 +319,7 @@ abstract class RADFormField
 		$class = !empty($this->description) ? 'hasTooltip hasTip' : '';
 		// Add the opening label tag and main attributes attributes.
 		$label .= '<label id="' . $this->name . '-lbl" for="' . $this->name . '" class="' . $class . '"';
+
 		// If a description is specified, use it to build a tooltip.
 		if (!empty($this->description))
 		{
@@ -356,7 +363,9 @@ abstract class RADFormField
 			{
 				$controlGroupAttributes .= ' style="display:none;" ';
 			}
+
 			$classes = array();
+
 			if ($this->feeCalculation)
 			{
 				$classes[] = 'payment-calculation';
@@ -375,6 +384,7 @@ abstract class RADFormField
 			}
 
 			$class = implode(' ', $classes);
+
 			if (!empty($class))
 			{
 				$class = ' ' . $class;
@@ -409,11 +419,12 @@ abstract class RADFormField
 		if ($fieldValue && $this->type == 'Date')
 		{
 			$date = JFactory::getDate($fieldValue);
+
 			if ($date)
 			{
-				$config = EventbookingHelper::getConfig();
-				$dateFormat  = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
-				$dateFormat  = str_replace('%', '', $dateFormat);
+				$config     = EventbookingHelper::getConfig();
+				$dateFormat = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
+				$dateFormat = str_replace('%', '', $dateFormat);
 				$fieldValue = $date->format($dateFormat);
 			}
 		}
@@ -427,10 +438,8 @@ abstract class RADFormField
 			return '<div class="' . $controlGroupClass . '">' . '<div class="' . $controlLabelClass . '">' . $this->title . '</div>' . '<div class="' . $controlsClass . '">' .
 			$fieldValue . '</div>' . '</div>';
 		}
-		else
-		{
-			return '<tr><td class="title_cell">' . $this->title . '</td><td class="field_cell">' . $fieldValue . "</td></tr>\r\n";
-		}
+
+		return '<tr><td class="title_cell">' . $this->title . '</td><td class="field_cell">' . $fieldValue . "</td></tr>\r\n";
 	}
 
 	/**
@@ -441,6 +450,7 @@ abstract class RADFormField
 	public function buildAttributes()
 	{
 		$html = array();
+
 		foreach ((array) $this->attributes as $key => $value)
 		{
 			if (is_bool($value))
@@ -516,6 +526,7 @@ abstract class RADFormField
 		$languages          = EventbookingHelper::getLanguages();
 		$multilingualValues = array();
 		$languageValues     = array();
+
 		foreach ($languages as $language)
 		{
 			$sef                  = $language->sef;
@@ -523,13 +534,16 @@ abstract class RADFormField
 		}
 
 		$defaultValues = explode("\r\n", $row->values);
+
 		for ($i = 0, $n = count($defaultValues); $i < $n; $i++)
 		{
 			$multilingualValues[$i]   = array();
 			$multilingualValues[$i][] = $defaultValues[$i];
+
 			foreach ($languages as $language)
 			{
 				$sef = $language->sef;
+
 				if (isset($languageValues[$sef][$i]))
 				{
 					$multilingualValues[$i][] = $languageValues[$sef][$i];

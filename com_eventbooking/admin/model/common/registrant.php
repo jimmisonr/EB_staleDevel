@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -379,6 +379,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 
 		if ($state == 1 && count($cid))
 		{
+			$app = JFactory::getApplication();
 			JPluginHelper::importPlugin('eventbooking');
 			$config = EventbookingHelper::getConfig();
 			$row    = new RADTable('#__eb_registrants', 'id', $db);
@@ -395,8 +396,10 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 						$row->store();
 					}
 
+					$row->published = 1;
+
 					// Trigger event
-					JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));
+					$app->triggerEvent('onAfterPaymentSuccess', array($row));
 
 					// Re-generate invoice with Paid status
 					if ($config->activate_invoice_feature && $row->invoice_number)

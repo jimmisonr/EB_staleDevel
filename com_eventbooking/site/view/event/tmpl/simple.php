@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -197,7 +197,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			</div>
 		</div>
 		<?php
-		if (EventbookingHelper::canChangeEventStatus($this->item->id))
+		if (EventbookingHelperAcl::canChangeEventStatus($this->item->id))
 		{
 		?>
 			<div class="<?php echo $controlGroupClass;  ?>">

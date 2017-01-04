@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -361,7 +361,13 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		}
 		else
 		{
-			$query->where(' (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $event->id . '))');
+			$negEventId = -1 * $event->id;
+			$subQuery   = $db->getQuery(true);
+			$subQuery->select('field_id')
+				->from('#__eb_field_events')
+				->where("(event_id = $event->id OR (event_id < 0 AND event_id != $negEventId))");
+
+			$query->where(' (event_id = -1 OR id IN (' . (string) $subQuery . '))');
 		}
 
 		$db->setQuery($query);

@@ -3,9 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
+
 // no direct access
 defined('_JEXEC') or die;
 
@@ -33,11 +34,11 @@ class EventbookingControllerEvent extends EventbookingController
 
 		if ($id)
 		{
-			$ret = EventbookingHelper::checkEditEvent($id);
+			$ret = EventbookingHelperAcl::checkEditEvent($id);
 		}
 		else
 		{
-			$ret = EventbookingHelper::checkAddEvent();
+			$ret = EventbookingHelperAcl::checkAddEvent();
 		}
 
 		if (!$ret)
@@ -98,7 +99,7 @@ class EventbookingControllerEvent extends EventbookingController
 	{
 		$id = $this->input->getInt('id', 0);
 
-		if (!EventbookingHelper::canChangeEventStatus($id))
+		if (!EventbookingHelperAcl::canChangeEventStatus($id))
 		{
 			$msg = JText::_('EB_NO_PUBLISH_PERMISSION');
 			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', $this->input->getInt('Itemid', 0)), false), $msg);

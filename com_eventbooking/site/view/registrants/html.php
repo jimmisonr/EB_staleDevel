@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -25,7 +25,7 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 			}
 			else
 			{
-				JFactory::getApplication()->redirect('index.php', JText::_('NOT_AUTHORIZED'));
+				JFactory::getApplication()->redirect(JUri::root(), JText::_('NOT_AUTHORIZED'));
 			}
 		}
 
@@ -101,7 +101,7 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 	{
 		require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
 
-		if (!EventbookingHelper::canDeleteRegistrant())
+		if (!EventbookingHelperAcl::canDeleteRegistrant())
 		{
 			$this->hideButtons[] = 'delete';
 		}

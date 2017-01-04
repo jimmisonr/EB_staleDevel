@@ -13,9 +13,9 @@ class Pkg_EventbookingInstallerScript
 
 	public function preflight($type, $parent)
 	{
-		if (!version_compare(JVERSION, '3.4.0', 'ge'))
+		if (!version_compare(JVERSION, '3.5.0', 'ge'))
 		{
-			JError::raiseWarning(null, 'Cannot install Membership Pro in a Joomla release prior to 3.4.0');
+			JError::raiseWarning(null, 'Cannot install Events Booking in a Joomla release prior to 3.5.0');
 
 			return false;
 		}

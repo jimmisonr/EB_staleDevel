@@ -28,6 +28,7 @@ class plgEventbookingUserprofile extends JPlugin
 		{
 			$fields  = array('address1', 'address2', 'city', 'region', 'country', 'postal_code', 'phone', 'website', 'favoritebook', 'aboutme', 'dob');
 			$options = array();
+
 			foreach ($fields as $field)
 			{
 				$options[] = JHtml::_('select.option', $field, $field);
@@ -59,7 +60,7 @@ class plgEventbookingUserprofile extends JPlugin
 	/**
 	 * Run when a membership activated
 	 *
-	 * @param PlanOsMembership $row
+	 * @param EventbookingTableRegistrant $row
 	 */
 	public function onAfterStoreRegistrant($row)
 	{
@@ -86,7 +87,8 @@ class plgEventbookingUserprofile extends JPlugin
 				'profile.aboutme',
 				'profile.dob',
 			);
-			//Delete old profile data			
+
+			//Delete old profile data
 			$db->setQuery(
 				'DELETE FROM #__user_profiles WHERE user_id = ' . $userId .
 				' AND profile_key IN ("' . implode('","', $deleteFields) . '")'
@@ -133,19 +135,24 @@ class plgEventbookingUserprofile extends JPlugin
 
 			$tuples = array();
 			$order  = 1;
+
 			foreach ($fields as $field)
 			{
 				$value = '';
+
 				if (isset($fieldMappings[$field]))
 				{
 					$fieldMapping = $fieldMappings[$field];
+
 					if (isset($data[$fieldMapping]))
 					{
 						$value = $data[$fieldMapping];
 					}
 				}
+
 				$tuples[] = '(' . $userId . ', ' . $db->quote('profile.' . $field) . ', ' . $db->quote(json_encode($value)) . ', ' . $order++ . ')';
 			}
+
 			$db->setQuery('INSERT INTO #__user_profiles VALUES ' . implode(', ', $tuples));
 			$db->execute();
 		}

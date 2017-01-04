@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -21,8 +21,10 @@ class EventbookingModelCoupon extends RADModelAdmin
 	 */
 	protected function afterStore($row, $input, $isNew)
 	{
-		$eventIds = $input->get('event_id', array(), 'array');
-		if (count($eventIds) == 0 || $eventIds[0] == -1)
+		$assignment = $input->getInt('assignment', 0);
+		$eventIds   = $input->get('event_id', array(), 'array');
+
+		if ($assignment == 0 || count($eventIds) == 0)
 		{
 			$row->event_id = -1;
 		}
@@ -30,35 +32,44 @@ class EventbookingModelCoupon extends RADModelAdmin
 		{
 			$row->event_id = 1;
 		}
+
 		$row->store();
 		$couponId = $row->id;
 		$db       = $this->getDbo();
 		$query    = $db->getQuery(true);
+
 		if (!$isNew)
 		{
 			$query->delete('#__eb_coupon_events')->where('coupon_id = ' . $couponId);
 			$config = EventbookingHelper::getConfig();
+
 			if ($config->hide_past_events_from_events_dropdown)
 			{
 				$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
 				$query->where('event_id IN (SELECT id FROM #__eb_events AS a WHERE a.published = 1 AND (DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.event_end_date) >= ' . $currentDate . '))');
 			}
+
 			$db->setQuery($query);
 			$db->execute();
+
+			$query->clear();
 		}
 
 		if ($row->event_id != -1)
 		{
-			$query->clear();
 			$query->insert('#__eb_coupon_events')->columns('coupon_id, event_id');
+
 			for ($i = 0, $n = count($eventIds); $i < $n; $i++)
 			{
 				$eventId = (int) $eventIds[$i];
+
 				if ($eventId > 0)
 				{
+					$eventId *= $assignment;
 					$query->values("$couponId, $eventId");
 				}
 			}
+
 			$db->setQuery($query);
 			$db->execute();
 		}

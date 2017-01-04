@@ -156,6 +156,7 @@ class RADModelList extends RADModel
 
 			// Adjust the limitStart state property
 			$limit = $this->state->limit;
+
 			if ($limit)
 			{
 				$offset = $this->state->limitstart;

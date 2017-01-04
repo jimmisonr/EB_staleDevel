@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -24,9 +24,11 @@ class EventbookingControllerCart extends EventbookingController
 		{
 			// Check if this is event is password protected
 			$event = EventbookingHelperDatabase::getEvent((int) $data['id']);
+
 			if ($event->event_password)
 			{
 				$passwordPassed = JFactory::getSession()->get('eb_passowrd_' . $event->id, 0);
+
 				if (!$passwordPassed)
 				{
 					$return = base64_encode(JUri::getInstance()->toString());
@@ -55,6 +57,7 @@ class EventbookingControllerCart extends EventbookingController
 		$this->reloadCartModule();
 
 		$this->display();
+
 		$this->app->close();
 	}
 
@@ -116,8 +119,11 @@ class EventbookingControllerCart extends EventbookingController
 		{
 			$this->input->set('view', 'cart');
 			$this->input->set('layout', 'mini');
+
 			$this->reloadCartModule();
+
 			$this->display();
+
 			$this->app->close();
 		}
 	}
@@ -225,7 +231,9 @@ class EventbookingControllerCart extends EventbookingController
 		$response['amount']                 = EventbookingHelper::formatAmount($fees['amount'], $config);
 		$response['deposit_amount']         = EventbookingHelper::formatAmount($fees['deposit_amount'], $config);
 		$response['coupon_valid']           = $fees['coupon_valid'];
+
 		echo json_encode($response);
+
 		$this->app->close();
 	}
 
@@ -274,14 +282,15 @@ class EventbookingControllerCart extends EventbookingController
 
 		if ($config->prevent_duplicate_registration && !$config->multiple_booking)
 		{
-			$query->clear();
-			$query->select('COUNT(id)')
+			$query->clear()
+				->select('COUNT(id)')
 				->from('#__eb_registrants')
 				->where('event_id=' . $eventId)
 				->where('email = ' . $db->quote($email))
 				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 			$db->setQuery($query);
 			$total = $db->loadResult();
+
 			if ($total)
 			{
 				$result['success'] = false;
@@ -291,12 +300,13 @@ class EventbookingControllerCart extends EventbookingController
 
 		if ($result['success'] && $config->user_registration && !$user->id)
 		{
-			$query->clear();
-			$query->select('COUNT(*)')
+			$query->clear()
+				->select('COUNT(*)')
 				->from('#__users')
 				->where('email = ' . $db->quote($email));
 			$db->setQuery($query);
 			$total = $db->loadResult();
+
 			if ($total)
 			{
 				$result['success'] = false;
@@ -322,12 +332,15 @@ class EventbookingControllerCart extends EventbookingController
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 		{
 			$captchaPlugin = $this->app->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+
 			if (!$captchaPlugin)
 			{
 				// Hardcode to recaptcha, reduce support request
 				$captchaPlugin = 'recaptcha';
 			}
+
 			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+
 			if ($plugin)
 			{
 				$result = JCaptcha::getInstance($captchaPlugin)->checkAnswer($this->input->post->get('recaptcha_response_field', '', 'string'));
@@ -343,7 +356,9 @@ class EventbookingControllerCart extends EventbookingController
 	private function reloadCartModule()
 	{
 		jimport('joomla.application.module.helper');
+
 		$module = JModuleHelper::isEnabled('mod_eb_cart');
+
 		if (!$module)
 		{
 			return;

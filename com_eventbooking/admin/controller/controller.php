@@ -3,11 +3,12 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
+use Joomla\Registry\Registry;
 
 class EventbookingController extends RADControllerAdmin
 {
@@ -58,8 +59,8 @@ class EventbookingController extends RADControllerAdmin
 
 		// Create tables if not exists
 		$tableSql = JPATH_ADMINISTRATOR . '/components/com_eventbooking/sql/createifnotexists.eventbooking.sql';
-		$sql     = file_get_contents($tableSql);
-		$queries = $db->splitSql($sql);
+		$sql      = file_get_contents($tableSql);
+		$queries  = $db->splitSql($sql);
 		if (count($queries))
 		{
 			foreach ($queries as $query)
@@ -598,6 +599,20 @@ class EventbookingController extends RADControllerAdmin
 		if (!in_array('registration_start_date', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `registration_start_date` DATETIME NULL DEFAULT '0000-00-00 00:00:00';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('publish_up', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `publish_up` DATETIME NULL DEFAULT '0000-00-00 00:00:00';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('publish_down', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `publish_down` DATETIME NULL DEFAULT '0000-00-00 00:00:00';";
 			$db->setQuery($sql);
 			$db->execute();
 		}
@@ -1183,7 +1198,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		
+
 		if (!in_array('price_text', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `price_text` VARCHAR( 255 ) NULL;";
@@ -2149,7 +2164,7 @@ class EventbookingController extends RADControllerAdmin
 				6 => 'Radio',
 				7 => 'Date',
 				8 => 'Heading',
-				9 => 'Message', );
+				9 => 'Message',);
 
 			foreach ($typeMapping as $key => $value)
 			{
@@ -2195,7 +2210,7 @@ class EventbookingController extends RADControllerAdmin
 			$event = $db->loadObject();
 			if ($event)
 			{
-				$params = new JRegistry($event->params);
+				$params = new Registry($event->params);
 				$keys   = array(
 					's_lastname',
 					'r_lastname',
@@ -2230,7 +2245,7 @@ class EventbookingController extends RADControllerAdmin
 					'gs_phone',
 					'gs_fax',
 					'gs_email',
-					'gs_comment', );
+					'gs_comment',);
 				foreach ($keys as $key)
 				{
 					$config->$key = $params->get($key, 0);
@@ -2250,7 +2265,7 @@ class EventbookingController extends RADControllerAdmin
 				'phone'        => $config->s_phone,
 				'fax'          => $config->s_fax,
 				'comment'      => $config->s_comment,
-				'email'        => 1, );
+				'email'        => 1,);
 
 			foreach ($publishStatus as $key => $value)
 			{
@@ -2273,7 +2288,7 @@ class EventbookingController extends RADControllerAdmin
 				'phone'        => $config->r_phone,
 				'fax'          => $config->r_fax,
 				'comment'      => $config->r_comment,
-				'email'        => 1, );
+				'email'        => 1,);
 
 			foreach ($requiredStatus as $key => $value)
 			{
@@ -2294,7 +2309,7 @@ class EventbookingController extends RADControllerAdmin
 				'country'      => $config->gs_country,
 				'phone'        => $config->gs_phone,
 				'fax'          => $config->gs_fax,
-				'comment'      => $config->gs_comment, );
+				'comment'      => $config->gs_comment,);
 			foreach ($groupMemberFields as $fieldName => $showed)
 			{
 				$showed = (int) $showed;
@@ -2439,7 +2454,7 @@ class EventbookingController extends RADControllerAdmin
 				'watinglist_confirmation_subject',
 				'watinglist_confirmation_body',
 				'watinglist_notification_subject',
-				'watinglist_notification_body', );
+				'watinglist_notification_body',);
 			foreach ($keys as $key)
 			{
 				$row->id          = 0;
@@ -2757,17 +2772,17 @@ class EventbookingController extends RADControllerAdmin
 
 			if (isset($plugins['os_paypal']))
 			{
-				$params       = new JRegistry($plugins['os_paypal']->params);
+				$params       = new Registry($plugins['os_paypal']->params);
 				$currencyCode = $params->get('paypal_currency', 'USD');
 			}
 			elseif (isset($plugins['os_paypal_pro']))
 			{
-				$params       = new JRegistry($plugins['os_paypal_pro']->params);
+				$params       = new Registry($plugins['os_paypal_pro']->params);
 				$currencyCode = $params->get('paypal_pro_currency', 'USD');
 			}
 			elseif ($plugins['os_payflowpro'])
 			{
-				$params       = new JRegistry($plugins['os_payflowpro']->params);
+				$params       = new Registry($plugins['os_payflowpro']->params);
 				$currencyCode = $params->get('payflow_currency', 'USD');
 			}
 			else

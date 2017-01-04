@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -35,18 +35,17 @@ class plgEventBookingDates extends JPlugin
 
 		ob_start();
 		$this->drawSettingForm($row);
-		$form = ob_get_clean();
 
 		return array('title' => JText::_('EB_ADDITIONAL_DATES'),
-		             'form'  => $form,
+		             'form'  => ob_get_clean(),
 		);
 	}
 
 	/**
 	 * Store setting into database, in this case, use params field of plans table
 	 *
-	 * @param event   $row
-	 * @param Boolean $isNew true if create new plan, false if edit
+	 * @param EventbookingTableEvent $row
+	 * @param Boolean                $isNew true if create new plan, false if edit
 	 */
 	public function onAfterSaveEvent($row, $data, $isNew)
 	{

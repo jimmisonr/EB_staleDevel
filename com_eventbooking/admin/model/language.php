@@ -3,11 +3,12 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
+use Joomla\Registry\Registry;
 
 class EventbookingModelLanguage extends RADModel
 {
@@ -53,7 +54,7 @@ class EventbookingModelLanguage extends RADModel
 	 */
 	public function getData()
 	{
-		$registry     = new JRegistry();
+		$registry     = new Registry();
 		$search       = $this->state->filter_search;
 		$language     = $this->state->filter_language;
 		$languageFile = $this->state->filter_item;
@@ -71,7 +72,7 @@ class EventbookingModelLanguage extends RADModel
 		$enGbItems = $registry->toArray();
 		if ($language != 'en-GB')
 		{
-			$translatedRegistry = new JRegistry();
+			$translatedRegistry = new Registry();
 			$translatedPath     = $languageFolder . $language . '/' . $language . '.' . $languageFile . '.ini';
 			if (JFile::exists($translatedPath))
 			{
@@ -90,7 +91,7 @@ class EventbookingModelLanguage extends RADModel
 				}
 				if ($changed)
 				{
-					$translatedRegistry = new JRegistry();
+					$translatedRegistry = new Registry();
 					$translatedRegistry->loadArray($translatedLanguageItems);
 				}
 			}
@@ -213,7 +214,7 @@ class EventbookingModelLanguage extends RADModel
 		{
 			$languageFolder = JPATH_ROOT . '/language/';
 		}
-		$registry = new JRegistry();
+		$registry = new Registry();
 		$filePath = $languageFolder . $language . '/' . $language . '.' . $languageFile . '.ini';
 
 		if (JFile::exists($filePath))

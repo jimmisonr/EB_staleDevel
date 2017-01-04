@@ -1,12 +1,16 @@
 <?php
-
 /**
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
+
+defined('_JEXEC') or die;
+
+use Joomla\Registry\Registry;
+
 class EventbookingHelperData
 {
 	/**
@@ -625,7 +629,7 @@ class EventbookingHelperData
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
 			$item   = $items[$i];
-			$params = new JRegistry();
+			$params = new Registry();
 			$params->loadString($item->custom_fields, 'JSON');
 			$paramData = array();
 

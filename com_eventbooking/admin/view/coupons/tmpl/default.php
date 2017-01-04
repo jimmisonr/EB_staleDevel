@@ -3,14 +3,14 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
 // no direct access
 defined( '_JEXEC' ) or die ;
 JHtml::_('formbehavior.chosen', 'select');
-JToolBarHelper::custom('export', 'download', 'download', 'Export Coupons', false);
+JToolbarHelper::custom('export', 'download', 'download', 'EB_EXPORT_COUPONS', false);
 ?>
 <form action="index.php?option=com_eventbooking&view=coupons" method="post" name="adminForm" id="adminForm">
 	<div id="j-main-container">

@@ -8,6 +8,8 @@
  */
 defined('_JEXEC') or die;
 
+use Joomla\String\StringHelper;
+
 /**
  * Admin model class. It will handle tasks such as add, update, delete...items
  *
@@ -228,6 +230,7 @@ class RADModelAdmin extends RADModel
 			$isNew = false;
 			$row->load($id);
 		}
+
 		// Pre-process the input data
 		$this->beforeStore($row, $input, $isNew);
 		$data = $input->getData();
@@ -511,8 +514,8 @@ class RADModelAdmin extends RADModel
 
 			if ($found)
 			{
-				$title = JString::increment($title);
-				$alias = JString::increment($alias, 'dash');
+				$title = StringHelper::increment($title);
+				$alias = StringHelper::increment($alias, 'dash');
 				$query->clear('where');
 			}
 			else
@@ -590,7 +593,7 @@ class RADModelAdmin extends RADModel
 			}
 			else
 			{
-				$row->{$titleField} = JString::increment($row->{$titleField});
+				$row->{$titleField} = StringHelper::increment($row->{$titleField});
 			}
 		}
 

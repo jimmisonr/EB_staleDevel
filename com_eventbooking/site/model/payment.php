@@ -3,11 +3,13 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
+
+use Joomla\Registry\Registry;
 
 class EventBookingModelPayment extends RADModel
 {
@@ -70,7 +72,7 @@ class EventBookingModelPayment extends RADModel
 				->from('#__eb_payment_plugins')
 				->where('name=' . $db->quote($paymentMethod));
 			$db->setQuery($query);
-			$params       = new JRegistry($db->loadResult());
+			$params       = new Registry($db->loadResult());
 			$paymentClass = new $paymentMethod($params);
 
 			// Convert payment amount to USD if the currency is not supported by payment gateway

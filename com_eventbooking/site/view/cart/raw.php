@@ -3,11 +3,13 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
+
+use Joomla\Registry\Registry;
 
 class EventbookingViewCartRaw extends RADViewHtml
 {
@@ -17,6 +19,7 @@ class EventbookingViewCartRaw extends RADViewHtml
 	public function display()
 	{
 		$layout = $this->getLayout();
+
 		if ($layout == 'module')
 		{
 			$this->displayModule();
@@ -77,7 +80,7 @@ class EventbookingViewCartRaw extends RADViewHtml
 	{
 		jimport('joomla.application.module.helper');
 		$module = JModuleHelper::getModule('mod_eb_cart');
-		$params = new JRegistry($module->params);
+		$params = new Registry($module->params);
 		if ($params->get('item_id'))
 		{
 			$Itemid = $params->get('item_id');

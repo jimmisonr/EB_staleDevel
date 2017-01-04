@@ -3,12 +3,14 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
 // no direct access
 defined('_JEXEC') or die;
+
+use Joomla\Registry\Registry;
 
 class plgEventbookingJoomlagroups extends JPlugin
 {
@@ -30,11 +32,9 @@ class plgEventbookingJoomlagroups extends JPlugin
 	{
 		ob_start();
 		$this->drawSettingForm($row);
-		$form = ob_get_contents();
-		ob_end_clean();
 
 		return array('title' => JText::_('PLG_EVENTBOOKING_JOOMLA_GROUPS_SETTINGS'),
-		             'form'  => $form,
+		             'form'  => ob_get_clean(),
 		);
 	}
 
@@ -46,7 +46,7 @@ class plgEventbookingJoomlagroups extends JPlugin
 	 */
 	public function onAfterSaveEvent($row, $data, $isNew)
 	{
-		$params = new JRegistry($row->params);
+		$params = new Registry($row->params);
 		$params->set('joomla_group_ids', implode(',', $data['joomla_group_ids']));
 		$row->params = $params->toString();
 
@@ -56,7 +56,7 @@ class plgEventbookingJoomlagroups extends JPlugin
 	/**
 	 * Add registrants to selected Joomla groups when payment for registration completed
 	 *
-	 * @param PlanOsMembership $row
+	 * @param EventbookingTableRegistrant $row
 	 */
 	public function onAfterPaymentSuccess($row)
 	{
@@ -67,6 +67,7 @@ class plgEventbookingJoomlagroups extends JPlugin
 			$event         = JTable::getInstance('EventBooking', 'Event');
 			$eventIds      = array($row->event_id);
 			$config        = EventbookingHelper::getConfig();
+
 			if ($config->multiple_booking)
 			{
 				// Get all events which users register for in this cart registration
@@ -78,18 +79,21 @@ class plgEventbookingJoomlagroups extends JPlugin
 				$db->setQuery($query);
 				$eventIds = array_unique(array_merge($eventIds, $db->loadColumn()));
 			}
+
 			// Calculate the groups which registrant should be assigned to
 			foreach ($eventIds as $eventId)
 			{
 				$event->load($eventId);
-				$params   = new JRegistry($event->params);
+				$params   = new Registry($event->params);
 				$groupIds = $params->get('joomla_group_ids');
+
 				if ($groupIds)
 				{
 					$groups        = explode(',', $groupIds);
 					$currentGroups = array_unique(array_merge($currentGroups, $groups));
 				}
 			}
+
 			$user->set('groups', $currentGroups);
 			$user->save(true);
 		}
@@ -102,7 +106,7 @@ class plgEventbookingJoomlagroups extends JPlugin
 	 */
 	private function drawSettingForm($row)
 	{
-		$params           = new JRegistry($row->params);
+		$params           = new Registry($row->params);
 		$joomla_group_ids = explode(',', $params->get('joomla_group_ids', ''));
 		?>
 		<table class="admintable adminform" style="width: 90%;">
@@ -120,6 +124,6 @@ class plgEventbookingJoomlagroups extends JPlugin
 				</td>
 			</tr>
 		</table>
-	<?php
+		<?php
 	}
 }

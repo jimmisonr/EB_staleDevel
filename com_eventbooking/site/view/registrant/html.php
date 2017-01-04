@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -225,7 +225,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 
 		if ($this->item->id &&
 			$this->item->published != 2 &&
-			EventbookingHelper::canCancelRegistration($this->item->event_id)
+			EventbookingHelperAcl::canCancelRegistration($this->item->event_id)
 		)
 		{
 			JToolbarHelper::custom('registrant.cancel', 'delete', 'delete', JText::_('EB_CANCEL_REGISTRATION'), false);

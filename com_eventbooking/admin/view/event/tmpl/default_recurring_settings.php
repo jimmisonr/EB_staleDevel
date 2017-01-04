@@ -3,11 +3,12 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
+
 $format = 'Y-m-d';
 ?>
 <fieldset class="adminform">
@@ -73,7 +74,7 @@ $format = 'Y-m-d';
 				<tr>
 					<td>
 						<?php
-						$params     = new JRegistry($this->item->params);
+						$params     = new \Joomla\Registry\Registry($this->item->params);
 						$options    = array();
 						$options[]  = JHtml::_('select.option', 'first', JText::_('EB_FIRST'));
 						$options[]  = JHtml::_('select.option', 'second', JText::_('EB_SECOND'));

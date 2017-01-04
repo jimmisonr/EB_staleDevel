@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -19,10 +19,10 @@ if (!empty($this->registrants))
 	Joomla.submitbutton = function (pressbutton)
 	{
 		var form = document.adminForm;
+
 		if (pressbutton == 'cancel')
 		{
 			Joomla.submitform(pressbutton);
-			return;
 		}
 		else if (form.code.value == "")
 		{
@@ -38,7 +38,19 @@ if (!empty($this->registrants))
 		{
 			Joomla.submitform(pressbutton);
 		}
-	}
+	};
+
+	showHideEventsSelection = function(assignment)
+	{
+		if (assignment.value == 0)
+		{
+			jQuery('#events_selection_container').hide();
+		}
+		else
+		{
+			jQuery('#events_selection_container').show();
+		}
+	};
 </script>
 <form action="index.php?option=com_eventbooking&view=coupon" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
 	<?php
@@ -67,6 +79,14 @@ if (!empty($this->registrants))
 		</div>
 	</div>
 	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_COUPON_ASSIGNMENT'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['assignment'] ; ?>
+		</div>
+	</div>
+	<div class="control-group" id="events_selection_container"<?php if ($this->assignment == 0) echo 'style="display:none;"'; ?>>
 		<label class="control-label">
 			<?php echo JText::_('EB_EVENT'); ?>
 		</label>

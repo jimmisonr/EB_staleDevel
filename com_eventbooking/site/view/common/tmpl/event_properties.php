@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -139,7 +139,7 @@ defined('_JEXEC') or die;
 					<?php
 					echo $item->total_registrants . ' ';
 
-					if ($config->show_list_of_registrants && ($item->total_registrants > 0) && EventbookingHelper::canViewRegistrantList())
+					if ($config->show_list_of_registrants && ($item->total_registrants > 0) && EventbookingHelperAcl::canViewRegistrantList())
 					{
 					?>
 						<a href="index.php?option=com_eventbooking&view=registrantlist&id=<?php echo $item->id ?>&tmpl=component"

@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -65,20 +65,16 @@ class EventbookingModelPlugin extends RADModelAdmin
 		}
 
 		$tmpPath = JFactory::getConfig()->get('tmp_path');
+		
 		if (!JFolder::exists($tmpPath))
 		{
 			$tmpPath = JPATH_ROOT . '/tmp';
 		}
+		
 		$destinationDir = $tmpPath . '/' . $plugin['name'];
 
-		if (version_compare(JVERSION, '3.4.4', 'ge'))
-		{
-			$uploaded       = JFile::upload($plugin['tmp_name'], $destinationDir, false, true);
-		}
-		else
-		{
-			$uploaded       = JFile::upload($plugin['tmp_name'], $destinationDir);
-		}
+		$uploaded       = JFile::upload($plugin['tmp_name'], $destinationDir, false, true);		
+		
 		if (!$uploaded)
 		{
 			throw new Exception(JText::_('Upload plugin package'));

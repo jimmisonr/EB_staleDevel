@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -40,9 +40,8 @@ class EventbookingViewCouponHtml extends RADViewItem
 		$options[]                 = JHtml::_('select.option', 2, JText::_('EB_GROUP_REGISTRATION'));
 		$this->lists['enable_for'] = JHtml::_('select.genericlist', $options, 'enable_for', '', 'value', 'text', $this->item->enable_for);
 
-		$options   = array();
-		$options[] = JHtml::_('select.option', -1, JText::_('EB_ALL_EVENTS'), 'id', 'title');
-		$rows      = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
+		$options = array();
+		$rows    = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
 
 		if ($config->show_event_date)
 		{
@@ -61,6 +60,7 @@ class EventbookingViewCouponHtml extends RADViewItem
 		if (empty($this->item->id) || $this->item->event_id == -1)
 		{
 			$selectedEventIds[] = -1;
+			$assignment         = 0;
 		}
 		else
 		{
@@ -70,12 +70,36 @@ class EventbookingViewCouponHtml extends RADViewItem
 				->where('coupon_id=' . $this->item->id);
 			$db->setQuery($query);
 			$selectedEventIds = $db->loadColumn();
+
+			if (count($selectedEventIds) && $selectedEventIds[0] < 0)
+			{
+				$assignment = -1;
+			}
+			else
+			{
+				$assignment = 1;
+			}
+
+			$selectedEventIds = array_map('abs', $selectedEventIds);
 		}
 
 		$this->lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id[]', 'class="input-xlarge" multiple="multiple" ', 'id', 'title', $selectedEventIds);
-		$this->nullDate          = $db->getNullDate();
-		$this->config            = $config;
-		$this->registrants       = $this->model->getRegistrants();
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_ALL_EVENTS'));
+		$options[] = JHtml::_('select.option', 1, JText::_('EB_ALL_SELECTED_EVENTS'));
+
+		if (!$config->multiple_booking)
+		{
+			$options[] = JHtml::_('select.option', -1, JText::_('EB_ALL_EXCEPT_SELECTED_EVENTS'));
+		}
+
+		$this->lists['assignment'] = JHtml::_('select.genericlist', $options, 'assignment', ' onchange="showHideEventsSelection(this);"', 'value', 'text', $assignment);
+
+		$this->nullDate    = $db->getNullDate();
+		$this->config      = $config;
+		$this->registrants = $this->model->getRegistrants();
+		$this->assignment  = $assignment;
 	}
 
 	/**
@@ -84,6 +108,7 @@ class EventbookingViewCouponHtml extends RADViewItem
 	protected function addToolbar()
 	{
 		$layout = $this->getLayout();
+
 		if ($layout == 'default')
 		{
 			parent::addToolbar();

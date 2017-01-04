@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -26,6 +26,11 @@ JToolBarHelper::title(JText::_('EB_DASHBOARD'), 'generic.png');
 					$this->quickiconButton('index.php?option=com_eventbooking&view=language', 'icon-48-eventbooking-language.png', JText::_('EB_TRANSLATION'));
 					$this->quickiconButton('index.php?option=com_eventbooking&view=message', 'icon-48-mail.png', JText::_('EB_EMAIL_MESSAGES'));
 					$this->quickiconButton('index.php?option=com_eventbooking&task=registrant.export', 'icon-48-eventbooking-export.png', JText::_('EB_EXPORT_REGISTRANTS'));
+
+					//Permission settings
+					$return = urlencode(base64_encode(JUri::getInstance()->toString()));
+
+					$this->quickiconButton('index.php?option=com_config&amp;view=component&amp;component=com_eventbooking&amp;return=' . $return, 'icon-48-acl.png', JText::_('EB_PERMISSIONS'));
 					$this->quickiconButton('index.php?option=com_eventbooking&view=massmail', 'icon-48-eventbooking-massmail.png', JText::_('EB_MASS_MAIL'));
                     $this->quickiconButton('index.php?option=com_eventbooking&view=countries', 'icon-48-countries.png', JText::_('EB_COUNTRIES'));
 					$this->quickiconButton('index.php?option=com_eventbooking&view=states', 'icon-48-states.png', JText::_('EB_STATES'));

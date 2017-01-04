@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -15,6 +15,7 @@ class plgEventBookingCB extends JPlugin
 	public function __construct(& $subject, $config = array())
 	{
 		parent::__construct($subject, $config);
+
 		$this->canRun = file_exists(JPATH_ROOT . '/components/com_comprofiler/comprofiler.php');
 	}
 
@@ -71,8 +72,6 @@ class plgEventBookingCB extends JPlugin
 
 		if ($row->user_id)
 		{
-			$config = EventbookingHelper::getConfig();
-
 			$db  = JFactory::getDbo();
 			$sql = 'SELECT count(*) FROM `#__comprofiler` WHERE `user_id` = ' . $db->quote($row->user_id);
 			$db->setQuery($sql);
@@ -81,6 +80,7 @@ class plgEventBookingCB extends JPlugin
 			$db->setQuery($sql);
 			$fields    = $db->loadObjectList();
 			$fieldList = array();
+
 			for ($i = 0, $n = count($fields); $i < $n; $i++)
 			{
 				$field       = $fields[$i];
@@ -88,6 +88,7 @@ class plgEventBookingCB extends JPlugin
 			}
 
 			$config = EventbookingHelper::getConfig();
+
 			if ($config->multiple_booking)
 			{
 				$rowFields = EventbookingHelper::getFormFields($row->id, 4);
@@ -104,11 +105,13 @@ class plgEventBookingCB extends JPlugin
 			$data = EventbookingHelper::getRegistrantData($row, $rowFields);
 
 			$fieldValues = array();
+
 			foreach ($rowFields as $rowField)
 			{
 				if ($rowField->field_mapping && in_array($rowField->field_mapping, $fieldList) && isset($data[$rowField->name]))
 				{
 					$fieldValue = $data[$rowField->name];
+
 					if (is_string($fieldValue) && is_array(json_decode($fieldValue)))
 					{
 						$fieldValues[$rowField->field_mapping] = implode('|*|', json_decode($fieldValue));
@@ -120,12 +123,13 @@ class plgEventBookingCB extends JPlugin
 				}
 			}
 
-			$profile                 = new stdClass();
+			$profile = new stdClass();
 
-			$profile->id             = $row->user_id;
-			$profile->user_id        = $row->user_id;
-			$profile->firstname      = $row->first_name;
-			$profile->lastname       = $row->last_name;
+			$profile->id        = $row->user_id;
+			$profile->user_id   = $row->user_id;
+			$profile->firstname = $row->first_name;
+			$profile->lastname  = $row->last_name;
+
 			if (!$config->use_cb_api)
 			{
 				$profile->confirmed      = 1;

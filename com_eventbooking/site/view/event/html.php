@@ -3,11 +3,13 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
+
+use Joomla\Registry\Registry;
 
 class EventbookingViewEventHtml extends RADViewHtml
 {
@@ -185,11 +187,11 @@ class EventbookingViewEventHtml extends RADViewHtml
 
 		if ($item->id)
 		{
-			$ret = EventbookingHelper::checkEditEvent($item->id);
+			$ret = EventbookingHelperAcl::checkEditEvent($item->id);
 		}
 		else
 		{
-			$ret = EventbookingHelper::checkAddEvent();
+			$ret = EventbookingHelperAcl::checkAddEvent();
 		}
 
 		if (!$ret)
@@ -398,7 +400,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 		//Custom field handles
 		if ($config->event_custom_field)
 		{
-			$registry = new JRegistry();
+			$registry = new Registry();
 			$registry->loadString($item->custom_fields);
 			$data         = new stdClass();
 			$data->params = $registry->toArray();

@@ -15,6 +15,8 @@ defined('_JEXEC') or die;
  * @package     RAD
  * @subpackage  View
  * @since       2.0
+ *
+ * @property RADModelAdmin $model
  */
 class RADViewItem extends RADViewHtml
 {
@@ -35,7 +37,7 @@ class RADViewItem extends RADViewHtml
 	/**
 	 * The array which keeps list of "list" options which will be displayed on the form
 	 *
-	 * @var Array
+	 * @var array
 	 */
 	protected $lists;
 

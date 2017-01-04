@@ -3,11 +3,14 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
+
+use Joomla\Registry\Registry;
+use Joomla\Utilities\ArrayHelper;
 
 class EventbookingModelCart extends RADModel
 {
@@ -29,7 +32,7 @@ class EventbookingModelCart extends RADModel
 			$eventIds = array($data['id']);
 		}
 
-		JArrayHelper::toInteger($eventIds);
+		$eventIds = ArrayHelper::toInteger($eventIds);
 
 		$cart = new EventbookingHelperCart();
 		$cart->addEvents($eventIds);
@@ -47,8 +50,8 @@ class EventbookingModelCart extends RADModel
 	 */
 	public function processUpdateCart($eventIds, $quantities)
 	{
-		JArrayHelper::toInteger($eventIds);
-		JArrayHelper::toInteger($quantities);
+		$eventIds   = ArrayHelper::toInteger($eventIds);
+		$quantities = ArrayHelper::toInteger($quantities);
 
 		$cart = new EventbookingHelperCart();
 		$cart->updateCart($eventIds, $quantities);
@@ -211,8 +214,8 @@ class EventbookingModelCart extends RADModel
 			}
 			else
 			{
-				$row->cart_id = $cartId;
-				$row->coupon_discount_amount =  0;
+				$row->cart_id                = $cartId;
+				$row->coupon_discount_amount = 0;
 			}
 			$row->id       = 0;
 			$row->language = $language;
@@ -314,7 +317,7 @@ class EventbookingModelCart extends RADModel
 				->from('#__eb_payment_plugins')
 				->where('name=' . $db->quote($paymentMethod));
 			$db->setQuery($query);
-			$params       = new JRegistry($db->loadResult());
+			$params       = new Registry($db->loadResult());
 			$paymentClass = new $paymentMethod($params);
 
 			// Convert payment amount to USD if the currency is not supported by payment gateway

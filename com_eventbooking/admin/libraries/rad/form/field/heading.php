@@ -1,5 +1,4 @@
 <?php
-
 class RADFormFieldHeading extends RADFormField
 {
 	/**
@@ -17,6 +16,7 @@ class RADFormFieldHeading extends RADFormField
 	protected function getInput($bootstrapHelper = null)
 	{
 		$controlGroupAttributes = 'id="field_' . $this->name . '" ';
+
 		if ($this->hideOnDisplay)
 		{
 			$controlGroupAttributes .= ' style="display:none;" ';
@@ -46,9 +46,7 @@ class RADFormFieldHeading extends RADFormField
 		{
 			return $this->getInput($bootstrapHelper);
 		}
-		else
-		{
-			return '<tr>' . '<td class="eb-heading" colspan="2">' . $this->title . '</td></tr>';
-		}
+
+		return '<tr>' . '<td class="eb-heading" colspan="2">' . $this->title . '</td></tr>';
 	}
 }

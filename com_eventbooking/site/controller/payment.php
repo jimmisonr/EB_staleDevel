@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -27,6 +27,7 @@ class EventbookingControllerPayment extends EventbookingController
 			->where('id = ' . $registrantId);
 		$db->setQuery($query);
 		$rowRegistrant = $db->loadObject();
+
 		if (empty($rowRegistrant))
 		{
 			echo JText::_('EB_INVALID_REGISTRATION_RECORD');
@@ -66,6 +67,7 @@ class EventbookingControllerPayment extends EventbookingController
 			return;
 		}
 
+		/* @var EventBookingModelPayment $model */
 		$model = $this->getModel('payment');
 
 		$model->processPayment($data);
@@ -86,12 +88,15 @@ class EventbookingControllerPayment extends EventbookingController
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 		{
 			$captchaPlugin = $this->app->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+
 			if (!$captchaPlugin)
 			{
 				// Hardcode to recaptcha, reduce support request
 				$captchaPlugin = 'recaptcha';
 			}
+
 			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+
 			if ($plugin)
 			{
 				$result = JCaptcha::getInstance($captchaPlugin)->checkAnswer($this->input->post->get('recaptcha_response_field', '', 'string'));

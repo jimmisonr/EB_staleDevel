@@ -3,11 +3,13 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
+
+use Joomla\String\StringHelper;
 
 class EventbookingModelList extends RADModelList
 {
@@ -241,12 +243,12 @@ class EventbookingModelList extends RADModelList
 
 		if ($state->filter_city)
 		{
-			$query->where(' tbl.location_id IN (SELECT id FROM #__eb_locations WHERE LOWER(`city`) = ' . $db->quote(JString::strtolower($state->filter_city)) . ')');
+			$query->where(' tbl.location_id IN (SELECT id FROM #__eb_locations WHERE LOWER(`city`) = ' . $db->quote(StringHelper::strtolower($state->filter_city)) . ')');
 		}
 
 		if ($state->filter_state)
 		{
-			$query->where(' tbl.location_id IN (SELECT id FROM #__eb_locations WHERE LOWER(`state`) = ' . $db->quote(JString::strtolower($state->filter_state)) . ')');
+			$query->where(' tbl.location_id IN (SELECT id FROM #__eb_locations WHERE LOWER(`state`) = ' . $db->quote(StringHelper::strtolower($state->filter_state)) . ')');
 		}
 
 		if ($state->created_by)
@@ -285,7 +287,13 @@ class EventbookingModelList extends RADModelList
 			$query->where('tbl.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
 		}
 
+		$nullDate = $db->quote($db->getNullDate());
+		$nowDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d H:i:s'));
+		$query->where('(tbl.publish_up = ' . $nullDate . ' OR tbl.publish_up <= ' . $nowDate . ')')
+			->where('(tbl.publish_down = ' . $nullDate . ' OR tbl.publish_down >= ' . $nowDate . ')');
+
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+
 		if ($fieldSuffix)
 		{
 			$query->where($db->quoteName('tbl.title' . $fieldSuffix) . ' != ""')

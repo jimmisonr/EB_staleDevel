@@ -28,7 +28,7 @@ class RADModelState
 	 * Set data for a state
 	 *
 	 * @param string $name The name of state
-	 * @param fix    $value
+	 * @param mixed  $value
 	 *
 	 * @return $this
 	 */
@@ -45,9 +45,9 @@ class RADModelState
 	/**
 	 * Retrieve data for a state
 	 *
-	 * @param string Name of the state
+	 * @param string $name    Name of the state
 	 *
-	 * @param mixed  Default value if no data has been set for that state
+	 * @param mixed  $default Default value if no data has been set for that state
 	 *
 	 * @return mixed The state value
 	 */
@@ -66,11 +66,11 @@ class RADModelState
 	/**
 	 * Insert a new state
 	 *
-	 * @param string The name of the state
+	 * @param string $name    The name of the state
 	 *
-	 * @param mixed  Filter, the name of filter which will be used to sanitize the state value using JFilterInput
+	 * @param mixed  $filter  Filter, the name of filter which will be used to sanitize the state value using JFilterInput
 	 *
-	 * @param mixed  The default value of the state
+	 * @param mixed  $default The default value of the state
 	 *
 	 * @return RADModelState
 	 */
@@ -89,7 +89,7 @@ class RADModelState
 	/**
 	 * Remove an existing state
 	 *
-	 * @param string The name of the state which will be removed
+	 * @param string $name The name of the state which will be removed
 	 *
 	 * @return RADModelState
 	 */
@@ -103,7 +103,7 @@ class RADModelState
 	/**
 	 * Reset all state data and revert to the default state
 	 *
-	 * @param boolean If TRUE use defaults when resetting. If FALSE then null value will be used.Default is TRUE
+	 * @param boolean $default If TRUE use defaults when resetting. If FALSE then null value will be used.Default is TRUE
 	 *
 	 * @return RADModelState
 	 */
@@ -123,7 +123,7 @@ class RADModelState
 	 * This function will only filter values if we have a value. If the value
 	 * is an empty string it will be filtered to NULL.
 	 *
-	 * @param array An associative array of state values by name
+	 * @param array $data An associative array of state values by name
 	 *
 	 * @return RADModelState
 	 */
@@ -241,9 +241,9 @@ class RADModelState
 	/**
 	 * Set state value
 	 *
-	 * @param string The user-specified state name.
+	 * @param string $name  The user-specified state name.
 	 *
-	 * @param mixed  The user-specified state value.
+	 * @param mixed  $value The user-specified state value.
 	 *
 	 * @return void
 	 */
@@ -267,7 +267,7 @@ class RADModelState
 	/**
 	 * Unset a state value
 	 *
-	 * @param string The column key.
+	 * @param string $name The column key.
 	 *
 	 * @return void
 	 */

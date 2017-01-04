@@ -3,11 +3,14 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
+
+use Joomla\Registry\Registry;
+use Joomla\String\StringHelper;
 
 class EventbookingModelCommonEvent extends RADModelAdmin
 {
@@ -81,18 +84,18 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 		if ($thumbImage['name'])
 		{
-			$fileExt        = JString::strtoupper(JFile::getExt($thumbImage['name']));
+			$fileExt        = StringHelper::strtoupper(JFile::getExt($thumbImage['name']));
 			$supportedTypes = array('JPG', 'PNG', 'GIF', 'JPEG');
 
 			if (in_array($fileExt, $supportedTypes))
 			{
-				if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . JString::strtolower($thumbImage['name'])))
+				if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . StringHelper::strtolower($thumbImage['name'])))
 				{
-					$fileName = time() . '_' . JString::strtolower($thumbImage['name']);
+					$fileName = time() . '_' . StringHelper::strtolower($thumbImage['name']);
 				}
 				else
 				{
-					$fileName = JString::strtolower($thumbImage['name']);
+					$fileName = StringHelper::strtolower($thumbImage['name']);
 				}
 
 				$imagePath = JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName;
@@ -209,7 +212,8 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			if (in_array(strtolower($fileExt), $allowedExtensions))
 			{
 				$fileName = JFile::makeSafe($fileName);
-				if (version_compare(JVERSION, '3.4.4', 'ge') && JFactory::getApplication()->isAdmin())
+
+				if (JFactory::getApplication()->isAdmin())
 				{
 					JFile::upload($attachment['tmp_name'], $pathUpload . '/' . $fileName, false, true);
 				}
@@ -239,10 +243,13 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		//Init default data
 		$this->sanitizeData($data);
 
-		if ($input->getCmd('task') == 'save2copy')
+		$task = $input->getCmd('task');
+
+		if ($task == 'save2copy')
 		{
 			$sourceRow = $this->getTable();
 			$sourceRow->load($input->getInt('source_id'));
+
 			if ($sourceRow)
 			{
 				if (empty($data['attachment']))
@@ -356,6 +363,15 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			$this->storeEventGroupRegistrationRates($row->id, $data, $isNew);
 			$this->storeEventCategories($row->id, $data, $isNew);
 
+			if ($task == 'save2copy')
+			{
+				$sourceEventId = $input->getInt('source_id');
+
+				$sql = "INSERT INTO #__eb_field_events(field_id, event_id) SELECT field_id, $row->id FROM #__eb_field_events WHERE event_id = $sourceEventId";
+				$db->setQuery($sql);
+				$db->execute();
+			}
+
 			$input->set('id', $row->id);
 
 			//Trigger event which allows plugins to save it own data
@@ -441,7 +457,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			$eventDates               = EventbookingHelper::getMonthlyRecurringAtDayInWeekEventDates($row->event_date, $data['recurring_end_date'], (int) $data['weekly_number_months'], (int) $data['recurring_occurrencies'], $data['week_in_month'], $data['day_of_week']);
 			$row->recurring_frequency = $data['weekly_number_months'];
 
-			$params = new JRegistry($row->params);
+			$params = new Registry($row->params);
 			$params->set('weekly_number_months', $data['weekly_number_months']);
 			$params->set('week_in_month', $data['week_in_month']);
 			$params->set('day_of_week', $data['day_of_week']);

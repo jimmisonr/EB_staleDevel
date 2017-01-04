@@ -3,14 +3,14 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
 
 JToolbarHelper::title(JText::_('EB_IMPORT_REGISTRANTS_TITLE'));
-JToolbarHelper::custom('registrant.import', 'upload', 'upload', 'Import Registrants', false);
+JToolbarHelper::custom('registrant.import', 'upload', 'upload', 'EB_IMPORT_REGISTRANTS', false);
 JToolbarHelper::cancel('registrant.cancel');
 ?>
 <form action="index.php?option=com_eventbooking&view=registrant&layout=import" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data">

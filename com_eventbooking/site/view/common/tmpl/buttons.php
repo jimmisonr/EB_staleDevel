@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -136,7 +136,7 @@ if ($showInviteFriend && $config->show_invite_friend && $registrationOpen)
 <?php
 }
 
-$registrantId = EventbookingHelper::canCancelRegistration($item->id);
+$registrantId = EventbookingHelperAcl::canCancelRegistration($item->id);
 
 if ($registrantId !== false)
 {
@@ -148,7 +148,7 @@ if ($registrantId !== false)
 <?php
 }
 
-if (EventbookingHelper::checkEditEvent($item->id))
+if (EventbookingHelperAcl::checkEditEvent($item->id))
 {
 ?>
 	<li>
@@ -161,7 +161,7 @@ if (EventbookingHelper::checkEditEvent($item->id))
 <?php
 }
 
-if (EventbookingHelper::canChangeEventStatus($item->id))
+if (EventbookingHelperAcl::canChangeEventStatus($item->id))
 {
 	if ($item->published == 1)
 	{
@@ -185,7 +185,7 @@ if (EventbookingHelper::canChangeEventStatus($item->id))
 	<?php
 }
 
-if ($item->total_registrants && EventbookingHelper::canExportRegistrants($item->id))
+if ($item->total_registrants && EventbookingHelperAcl::canExportRegistrants($item->id))
 {
 ?>
 	<li>

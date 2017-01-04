@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // Check to ensure this file is included in Joomla!
@@ -31,7 +31,6 @@ class EventbookingViewMessageHtml extends RADViewHtml
 				'registration_form_message_group',
 				'number_members_form_message',
 				'member_information_form_message',
-				'confirmation_message',
 				'thanks_message',
 				'thanks_message_offline',
 				'cancel_message',
@@ -80,9 +79,9 @@ class EventbookingViewMessageHtml extends RADViewHtml
 
 	protected function addToolbar()
 	{
-		JToolBarHelper::title(JText::_('Emails & Messages'), 'generic.png');
-		JToolBarHelper::apply('apply', 'JTOOLBAR_APPLY');
-		JToolBarHelper::save('save');
-		JToolBarHelper::cancel('cancel');
+		JToolbarHelper::title(JText::_('Emails & Messages'), 'generic.png');
+		JToolbarHelper::apply('apply', 'JTOOLBAR_APPLY');
+		JToolbarHelper::save('save');
+		JToolbarHelper::cancel('cancel');
 	}
 }

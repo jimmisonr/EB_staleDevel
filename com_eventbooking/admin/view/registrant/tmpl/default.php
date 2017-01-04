@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -307,7 +307,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 
 		if ($this->item->payment_method == "os_offline_creditcard")
 		{
-			$params = new JRegistry($this->item->params);
+			$params = new \Joomla\Registry\Registry($this->item->params);
 		?>
 			<div class="control-group">
 				<label class="control-label">

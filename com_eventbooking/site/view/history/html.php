@@ -3,11 +3,13 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
+
+use Joomla\String\StringHelper;
 
 class EventbookingViewHistoryHtml extends RADViewHtml
 {
@@ -22,7 +24,7 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 		$model              = $this->getModel();
 		$state              = $model->getState();
 		$config             = EventbookingHelper::getConfig();
-		$lists['search']    = JString::strtolower($state->filter_search);
+		$lists['search']    = StringHelper::strtolower($state->filter_search);
 		$lists['order_Dir'] = $state->filter_order_Dir;
 		$lists['order']     = $state->filter_order;
 
@@ -75,13 +77,13 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 
 			if ($item->published == 1 && $item->activate_certificate_feature == 1 && $item->event_end_date_minutes >= 0)
 			{
-				$showDownloadCertificate = true;
+				$showDownloadCertificate         = true;
 				$item->show_download_certificate = true;
 			}
 
 			if ($item->ticket_number)
 			{
-				$showDownloadTicket = true;								
+				$showDownloadTicket = true;
 			}
 		}
 

@@ -1,5 +1,4 @@
 <?php
-
 class RADFormFieldDate extends RADFormField
 {
 	/**
@@ -19,6 +18,7 @@ class RADFormFieldDate extends RADFormField
 		$config     = EventbookingHelper::getConfig();
 		$dateFormat = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
 		$attributes = $this->buildAttributes();
+
 		try
 		{
 			return JHtml::_('calendar', $this->value, $this->name, $this->name, $dateFormat, ".$attributes.");

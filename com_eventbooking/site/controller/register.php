@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2016 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -68,6 +68,7 @@ class EventbookingControllerRegister extends EventbookingController
 		if ($event->event_password)
 		{
 			$passwordPassed = JFactory::getSession()->get('eb_passowrd_' . $event->id, 0);
+
 			if (!$passwordPassed)
 			{
 				$return = base64_encode(JUri::getInstance()->toString());
@@ -84,8 +85,9 @@ class EventbookingControllerRegister extends EventbookingController
 				->where('main_category=1');
 			$db->setQuery($query);
 			$categoryId = (int) $db->loadResult();
-			$query->clear();
-			$query->select('COUNT(id)')
+
+			$query->clear()
+				->select('COUNT(id)')
 				->from('#__eb_fields')
 				->where('published=1 AND fee_field=1 AND (category_id = -1 OR id IN (SELECT field_id FROM #__eb_field_categories WHERE category_id=' . $categoryId . '))');
 			$db->setQuery($query);
@@ -93,9 +95,15 @@ class EventbookingControllerRegister extends EventbookingController
 		}
 		else
 		{
+			$negEventId = -1 * $eventId;
+			$subQuery   = $db->getQuery(true);
+			$subQuery->select('field_id')
+				->from('#__eb_field_events')
+				->where("(event_id = $eventId OR (event_id < 0 AND event_id != $negEventId))");
+
 			$query->select('COUNT(id)')
 				->from('#__eb_fields')
-				->where('published=1 AND fee_field=1 AND (event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id=' . $eventId . '))');
+				->where('published=1 AND fee_field=1 AND (event_id = -1 OR id IN (' . (string) $subQuery . '))');
 			$db->setQuery($query);
 			$total = (int) $db->loadResult();
 		}
@@ -106,6 +114,7 @@ class EventbookingControllerRegister extends EventbookingController
 			$data      = EventbookingHelper::getFormData($rowFields, $eventId, $user->id, $config);
 			$name      = $user->name;
 			$pos       = strpos($name, ' ');
+
 			if ($pos !== false)
 			{
 				$data['first_name'] = substr($name, 0, $pos);
@@ -115,10 +124,14 @@ class EventbookingControllerRegister extends EventbookingController
 			{
 				$data['first_name'] = $name;
 			}
+
 			$data['email']    = $user->email;
 			$data['event_id'] = $eventId;
-			$model            = $this->getModel('Register');
-			$return           = $model->processIndividualRegistration($data);
+
+			/* @var EventbookingModelRegister $model */
+			$model  = $this->getModel('Register');
+			$return = $model->processIndividualRegistration($data);
+
 			if ($return === 1)
 			{
 				// Redirect registrants to registration complete page
@@ -297,9 +310,8 @@ class EventbookingControllerRegister extends EventbookingController
 	 */
 	public function store_number_registrants()
 	{
-		$config  = EventbookingHelper::getConfig();
-		$session = JFactory::getSession();
-		$session->set('eb_number_registrants', $this->input->getInt('number_registrants'));
+		$config = EventbookingHelper::getConfig();
+		JFactory::getSession()->set('eb_number_registrants', $this->input->getInt('number_registrants'));
 
 		if ($config->collect_member_information)
 		{
@@ -321,8 +333,7 @@ class EventbookingControllerRegister extends EventbookingController
 	public function store_group_members_data()
 	{
 		$membersData = $this->input->post->getData();
-		$session     = JFactory::getSession();
-		$session->set('eb_group_members_data', serialize($membersData));
+		JFactory::getSession()->set('eb_group_members_data', serialize($membersData));
 		$eventId         = $this->input->getInt('event_id', 0);
 		$showBillingStep = EventbookingHelper::showBillingStep($eventId);
 
@@ -366,7 +377,7 @@ class EventbookingControllerRegister extends EventbookingController
 
 		if ($bypassBilling)
 		{
-			$membersData       = $session->get('eb_group_members_data', null);
+			$membersData = $session->get('eb_group_members_data', null);
 
 			if ($membersData)
 			{
@@ -404,6 +415,7 @@ class EventbookingControllerRegister extends EventbookingController
 
 		// Check to see if there is a valid number registrants
 		$numberRegistrants = (int) $session->get('eb_number_registrants', '');
+
 		if (!$numberRegistrants)
 		{
 			$errors[] = JText::_('Sorry, your session was expired. Please try again!');
@@ -501,6 +513,7 @@ class EventbookingControllerRegister extends EventbookingController
 		$response['coupon_valid']           = $fees['coupon_valid'];
 
 		echo json_encode($response);
+
 		$this->app->close();
 	}
 
@@ -537,7 +550,9 @@ class EventbookingControllerRegister extends EventbookingController
 		$response['amount']                 = EventbookingHelper::formatAmount($fees['amount'], $config);
 		$response['deposit_amount']         = EventbookingHelper::formatAmount($fees['deposit_amount'], $config);
 		$response['coupon_valid']           = $fees['coupon_valid'];
+
 		echo json_encode($response);
+
 		$this->app->close();
 	}
 
@@ -582,12 +597,15 @@ class EventbookingControllerRegister extends EventbookingController
 		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
 		{
 			$captchaPlugin = $this->app->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+
 			if (!$captchaPlugin)
 			{
 				// Hardcode to recaptcha, reduce support request
 				$captchaPlugin = 'recaptcha';
 			}
+
 			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+
 			if ($plugin)
 			{
 				$result = JCaptcha::getInstance($captchaPlugin)->checkAnswer($this->input->post->get('recaptcha_response_field', '', 'string'));
@@ -618,7 +636,6 @@ class EventbookingControllerRegister extends EventbookingController
 
 		if ($config->prevent_duplicate_registration && !$config->multiple_booking)
 		{
-			$query->clear();
 			$query->select('COUNT(id)')
 				->from('#__eb_registrants')
 				->where('event_id=' . $eventId)
@@ -626,6 +643,7 @@ class EventbookingControllerRegister extends EventbookingController
 				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 			$db->setQuery($query);
 			$total = $db->loadResult();
+
 			if ($total)
 			{
 				$result['success'] = false;
@@ -635,12 +653,13 @@ class EventbookingControllerRegister extends EventbookingController
 
 		if ($result['success'] && $config->user_registration && !$user->id)
 		{
-			$query->clear();
-			$query->select('COUNT(*)')
+			$query->clear()
+				->select('COUNT(*)')
 				->from('#__users')
 				->where('email="' . $email . '"');
 			$db->setQuery($query);
 			$total = $db->loadResult();
+
 			if ($total)
 			{
 				$result['success'] = false;
