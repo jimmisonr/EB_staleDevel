@@ -4850,7 +4850,7 @@ class EventbookingHelper
 	{
 		if (!EventbookingHelperAcl::canEditRegistrant($rowRegistrant))
 		{
-			JFactory::getApplication()->redirect('index.php', JText::_('NOT_AUTHORIZED'));
+			JFactory::getApplication()->redirect(JUri::root(), JText::_('NOT_AUTHORIZED'));
 		}
 	}
 

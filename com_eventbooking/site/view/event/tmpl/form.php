@@ -268,7 +268,7 @@ $format = 'Y-m-d' ;
 					</td>
 				</tr>
 				<?php
-					if (EventbookingHelper::canChangeEventStatus($this->item->id))
+					if (EventbookingHelperAcl::canChangeEventStatus($this->item->id))
 					{
 					?>
 						<tr>

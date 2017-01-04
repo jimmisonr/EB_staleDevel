@@ -201,6 +201,14 @@ class EventbookingHelperAcl
 	}
 
 	/**
+	 * Check to see whether the current users can add events from front-end
+	 */
+	public static function checkAddEvent()
+	{
+		return JFactory::getUser()->authorise('eventbooking.addevent', 'com_eventbooking');
+	}
+
+	/**
 	 * Check to see whether the current user can edit registrant
 	 *
 	 * @param int $eventId

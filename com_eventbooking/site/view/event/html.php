@@ -187,11 +187,11 @@ class EventbookingViewEventHtml extends RADViewHtml
 
 		if ($item->id)
 		{
-			$ret = EventbookingHelper::checkEditEvent($item->id);
+			$ret = EventbookingHelperAcl::checkEditEvent($item->id);
 		}
 		else
 		{
-			$ret = EventbookingHelper::checkAddEvent();
+			$ret = EventbookingHelperAcl::checkAddEvent();
 		}
 
 		if (!$ret)

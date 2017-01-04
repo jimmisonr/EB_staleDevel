@@ -25,7 +25,7 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 			}
 			else
 			{
-				JFactory::getApplication()->redirect('index.php', JText::_('NOT_AUTHORIZED'));
+				JFactory::getApplication()->redirect(JUri::root(), JText::_('NOT_AUTHORIZED'));
 			}
 		}
 
@@ -101,7 +101,7 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 	{
 		require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
 
-		if (!EventbookingHelper::canDeleteRegistrant())
+		if (!EventbookingHelperAcl::canDeleteRegistrant())
 		{
 			$this->hideButtons[] = 'delete';
 		}

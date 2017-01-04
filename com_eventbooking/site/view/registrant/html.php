@@ -225,7 +225,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 
 		if ($this->item->id &&
 			$this->item->published != 2 &&
-			EventbookingHelper::canCancelRegistration($this->item->event_id)
+			EventbookingHelperAcl::canCancelRegistration($this->item->event_id)
 		)
 		{
 			JToolbarHelper::custom('registrant.cancel', 'delete', 'delete', JText::_('EB_CANCEL_REGISTRATION'), false);

@@ -16,7 +16,7 @@ class EventbookingViewRegistrantlistHtml extends RADViewHtml
 {
 	public function display()
 	{
-		if (!EventbookingHelper::canViewRegistrantList())
+		if (!EventbookingHelperAcl::canViewRegistrantList())
 		{
 			return;
 		}

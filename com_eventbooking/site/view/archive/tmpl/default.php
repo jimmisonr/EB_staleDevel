@@ -150,7 +150,7 @@ if(count($this->items))
 										<td class="eb-event-property-value">
 											<?php echo (int) $event->total_registrants ; ?>
 											<?php
-											if ($config->show_list_of_registrants && ($event->total_registrants > 0) && EventbookingHelper::canViewRegistrantList()) {
+											if ($config->show_list_of_registrants && ($event->total_registrants > 0) && EventbookingHelperAcl::canViewRegistrantList()) {
 											?>
 												&nbsp;&nbsp;&nbsp;<a href="index.php?option=com_eventbooking&view=registrantlist&id=<?php echo $event->id ?>&tmpl=component" class="eb-colorbox-register-lists"><span class="view_list"><?php echo JText::_("EB_VIEW_LIST"); ?></span></a>
 											<?php

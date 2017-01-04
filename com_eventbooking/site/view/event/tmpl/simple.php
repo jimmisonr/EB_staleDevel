@@ -197,7 +197,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			</div>
 		</div>
 		<?php
-		if (EventbookingHelper::canChangeEventStatus($this->item->id))
+		if (EventbookingHelperAcl::canChangeEventStatus($this->item->id))
 		{
 		?>
 			<div class="<?php echo $controlGroupClass;  ?>">

@@ -344,7 +344,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 	{
 		$eventId = $this->input->getInt('event_id', $this->input->getInt('filter_event_id'));
 
-		if (!EventbookingHelper::canExportRegistrants($eventId))
+		if (!EventbookingHelperAcl::canExportRegistrants($eventId))
 		{
 			JFactory::getApplication()->redirect('index.php', JText::_('EB_NOT_ALLOWED_TO_EXPORT'));
 		}
@@ -613,7 +613,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 	 */
 	protected function allowDelete($id)
 	{
-		return EventbookingHelper::canDeleteRegistrant($id);
+		return EventbookingHelperAcl::canDeleteRegistrant($id);
 	}
 
 	/**
