@@ -45,13 +45,14 @@ else
 	<?php
 	}
 	?>
-	<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=calendar&Itemid='.$this->Itemid);?>">
+	<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=calendar' . $this->layoutQuery . '&Itemid=' . $this->Itemid); ?>">
 			<div id="eb-calendarwrap">
 				<?php
 						if ($this->showCalendarMenu)
 						{
 								echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/calendar_navigation.php', array('Itemid' => $this->Itemid, 'config' => $this->config, 'layout' => 'default', 'currentDateData' => $this->currentDateData));
 						}
+
 						echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/calendar.php',
 							array(
 									'Itemid' => $this->Itemid,
@@ -59,8 +60,8 @@ else
 									'month' => $this->month,
 									'previousMonth' => $previousMonth,
 									'nextMonth' => $nextMonth,
-									'previousMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$previousMonth.'&year='.$previousYear.'&Itemid='.$this->Itemid),
-									'nextMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$nextMonth.'&year='.$nextYear.'&Itemid='.$this->Itemid),
+									'previousMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar' . $this->layoutQuery . '&month=' . $previousMonth . '&year=' . $previousYear . '&Itemid=' . $this->Itemid),
+									'nextMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar' . $this->layoutQuery . '&month=' . $nextMonth . '&year=' . $nextYear . '&Itemid=' . $this->Itemid),
 									'listMonth' => $this->listMonth,
 									'searchMonth' => $this->searchMonth,
 									'searchYear' => $this->searchYear,
