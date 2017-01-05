@@ -141,7 +141,7 @@ $format = 'Y-m-d';
 			<?php echo JText::_('EB_PUBLISH_UP'); ?>
 		</label>
 		<div class="controls">
-			<?php echo JHtml::_('calendar', $this->item->publish_up != $this->nullDate ? JHtml::_('date', $this->item->publish_up, 'Y-m-d H:i:s', null) : '', 'publish_up', 'publish_up', '%Y-%m-%d %H:%M:%S', array('class' => 'input-medium')); ?>
+			<?php echo JHtml::_('calendar', ($this->item->publish_up && $this->item->publish_up != $this->nullDate) ? JHtml::_('date', $this->item->publish_up, 'Y-m-d H:i:s', null) : '', 'publish_up', 'publish_up', '%Y-%m-%d %H:%M:%S', array('class' => 'input-medium')); ?>
 		</div>
 	</div>
 	<div class="control-group">
@@ -149,7 +149,7 @@ $format = 'Y-m-d';
 			<?php echo JText::_('EB_PUBLISH_DOWN'); ?>
 		</label>
 		<div class="controls">
-			<?php echo JHtml::_('calendar', $this->item->publish_down != $this->nullDate ? JHtml::_('date', $this->item->publish_up, 'Y-m-d H:i:s', null) : '', 'publish_down', 'publish_down', '%Y-%m-%d %H:%M:%S', array('class' => 'input-medium')); ?>
+			<?php echo JHtml::_('calendar', ($this->item->publish_down && $this->item->publish_down != $this->nullDate) ? JHtml::_('date', $this->item->publish_up, 'Y-m-d H:i:s', null) : '', 'publish_down', 'publish_down', '%Y-%m-%d %H:%M:%S', array('class' => 'input-medium')); ?>
 		</div>
 	</div>
 	<div class="control-group">

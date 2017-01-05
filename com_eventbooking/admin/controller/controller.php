@@ -605,23 +605,23 @@ class EventbookingController extends RADControllerAdmin
 
 		if (!in_array('publish_up', $fields))
 		{
-			$sql = "ALTER TABLE  `#__eb_events` ADD  `publish_up` DATETIME NULL;";						
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `publish_up` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00';";						
 		}
 		else 
 		{
-			$sql = "ALTER TABLE  `#__eb_events` CHANGE  `publish_up` `publish_up` DATETIME NULL;";						
+			$sql = "ALTER TABLE  `#__eb_events` CHANGE  `publish_up` `publish_up` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00';";						
 		}		
 
 		$db->setQuery($sql);
 		$db->execute();
 		
 		if (!in_array('publish_down', $fields))
-		{
-			$sql = "ALTER TABLE  `#__eb_events` ADD  `publish_down` DATETIME NULL";			
+		{	
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `publish_down` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'";			
 		}
 		else 
 		{
-			$sql = "ALTER TABLE  `#__eb_events` CHANGE  `publish_down` `publish_down` DATETIME NULL;";						
+			$sql = "ALTER TABLE  `#__eb_events` CHANGE  `publish_down` `publish_down` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00';";						
 		}
 		
 		$db->setQuery($sql);
