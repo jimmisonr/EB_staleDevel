@@ -148,3 +148,11 @@ defined('_JEXEC') or die;
 		<?php echo $editor->display( 'registration_approved_email_body',  $this->item->registration_approved_email_body , '100%', '180', '90', '6' ) ; ?>
 	</div>
 </div>
+<div class="control-group">
+	<label class="control-label">
+		<?php echo  JText::_('EB_REMINDER_EMAIL_BODY'); ?>
+	</label>
+	<div class="controls">
+		<?php echo $editor->display( 'reminder_email_body',  $this->item->reminder_email_body , '100%', '180', '90', '6' ) ; ?>
+	</div>
+</div>

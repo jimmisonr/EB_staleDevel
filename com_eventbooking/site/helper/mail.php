@@ -1064,7 +1064,7 @@ class EventbookingHelperMail
 			$numberEmailSendEachTime = 15;
 		}
 
-		$eventFields = array('b.id as event_id', 'b.event_date', 'b.title');
+		$eventFields = array('b.id as event_id', 'b.event_date', 'b.title', 'b.reminder_email_body');
 
 		if (JLanguageMultilang::isEnabled())
 		{
@@ -1125,7 +1125,11 @@ class EventbookingHelperMail
 
 			$emailSubject = str_ireplace('[EVENT_TITLE]', $eventTitle, $emailSubject);
 
-			if ($fieldSuffix && strlen($message->{'reminder_email_body' . $fieldSuffix}))
+			if (EventbookingHelper::isValidMessage($row->reminder_email_body))
+			{
+				$emailBody = $row->reminder_email_body;
+			}
+			elseif ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'reminder_email_body' . $fieldSuffix}))
 			{
 				$emailBody = $message->{'reminder_email_body' . $fieldSuffix};
 			}

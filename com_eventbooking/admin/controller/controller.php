@@ -1133,6 +1133,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('reminder_email_body', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `reminder_email_body` TEXT NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		if (!in_array('enable_coupon', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_events` ADD  `enable_coupon` TINYINT NOT NULL DEFAULT  '0' ;";
