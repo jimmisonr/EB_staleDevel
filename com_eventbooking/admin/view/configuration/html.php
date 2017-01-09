@@ -13,6 +13,11 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 {
 	public function display()
 	{
+		if (!JFactory::getUser()->authorise('core.admin', 'com_eventbooking'))
+		{
+			return JError::raiseWarning(403, JText::_('JERROR_ALERTNOAUTHOR'));
+		}
+		
 		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
 		$config = EventbookingHelper::getConfig();

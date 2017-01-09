@@ -127,6 +127,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				}
 
 				$data['thumb'] = $fileName;
+				$data['image'] = 'images/com_eventbooking/' . $fileName;
 			}
 		}
 

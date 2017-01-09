@@ -3300,4 +3300,14 @@ class EventbookingController extends RADControllerAdmin
 
 		$this->setRedirect('index.php?option=com_eventbooking&view=dashboard', $msg);
 	}
+
+	/**
+	 * Fix "Row size too large" issue
+	 */
+	public function fix_row_size()
+	{
+		$db = JFactory::getDbo();
+		$db->setQuery('ALTER TABLE `#__eb_events` ENGINE = MYISAM ROW_FORMAT = DYNAMIC');
+		$db->execute();
+	}
 }
