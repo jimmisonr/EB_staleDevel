@@ -114,7 +114,7 @@ abstract class RADFormField
 	public function __construct($row, $value = null)
 	{
 		$this->name        = $row->name;
-		$this->title       = JText::_($row->title);
+		$this->title       = $row->title;
 		$this->description = $row->description;
 		$this->row         = $row;
 		$this->value       = $value;

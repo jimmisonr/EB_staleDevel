@@ -227,7 +227,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 
 			$this->storeRegistrantTickets($row, $data);
 
-			if ($row->published == 1 && $published == 0)
+			if ($row->published == 1 && ($published == 0 || $published == 3))
 			{
 				if (empty($row->payment_date) || ($row->payment_date == $db->getNullDate()))
 				{

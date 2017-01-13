@@ -44,7 +44,7 @@ class plgContentEbCategory extends JPlugin
 		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
 		EventbookingHelper::loadLanguage();
 		$categoryId = (int) $matches[1];
-		$request    = array('option' => 'com_eventbooking', 'view' => 'category', 'id' => $categoryId, 'limit' => 0, 'hmvc_call' => 1, 'Itemid' => EventbookingHelper::getItemid());
+		$request    = array('option' => 'com_eventbooking', 'view' => 'category', 'id' => $categoryId, 'hmvc_call' => 1, 'Itemid' => EventbookingHelper::getItemid());
 
 		$appInput   = JFactory::getApplication()->input;
 		$start      = $appInput->get->getInt('start', 0);

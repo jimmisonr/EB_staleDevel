@@ -39,6 +39,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$eventId = $input->getInt('event_id', 0);
 		$event   = EventbookingHelperDatabase::getEvent($eventId);
 
+		$user = JFactory::getUser();
 		$accessLevels = JFactory::getUser()->getAuthorisedViewLevels();
 
 		if (empty($event)
@@ -47,7 +48,14 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			|| !in_array($event->registration_access, $accessLevels)
 		)
 		{
-			JFactory::getApplication()->redirect('index.php', JText::_('EB_ERROR_REGISTRATION'));
+			if (!$user->id && $event && $event->published)
+			{
+				JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString())), JText::_('EB_LOGIN_TO_REGISTER'));
+			}
+			else
+			{
+				JFactory::getApplication()->redirect('index.php', JText::_('EB_ERROR_REGISTRATION'));
+			}
 		}
 
 		if (!EventbookingHelper::acceptRegistration($event))
