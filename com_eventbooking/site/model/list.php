@@ -147,6 +147,7 @@ class EventbookingModelList extends RADModelList
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
 		$fieldsToSelect = static::$fields;
+
 		if ($fieldSuffix)
 		{
 			$fieldsToSelect = array_diff($fieldsToSelect, static::$translatableFields);
@@ -206,6 +207,8 @@ class EventbookingModelList extends RADModelList
 	 */
 	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
+		/* @var JApplicationSite $app */
+		$app    = JFactory::getApplication();
 		$db     = $this->getDbo();
 		$user   = JFactory::getUser();
 		$state  = $this->getState();
@@ -264,14 +267,26 @@ class EventbookingModelList extends RADModelList
 
 		$name = strtolower($this->getName());
 
+		$hidePastEventsCategory = false;
+
+		if ($name == 'category')
+		{
+			$hidePastEventsParam = $app->getParams()->get('hide_past_events', 2);
+
+			if ($hidePastEventsParam == 0 || ($hidePastEventsParam == 2 && $config->hide_past_events))
+			{
+				$hidePastEventsCategory = true;
+			}
+		}
+
+		$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+
 		if ($name == 'archive')
 		{
 			$query->where('DATE(tbl.event_date) < CURDATE()');
 		}
-		elseif ($config->hide_past_events || ($name == 'upcomingevents'))
+		elseif ($config->hide_past_events || ($name == 'upcomingevents') || $hidePastEventsCategory)
 		{
-			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
-
 			if ($config->show_children_events_under_parent_event)
 			{
 				$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.cut_off_date) >= ' . $currentDate . ' OR DATE(tbl.max_end_date) >= ' . $currentDate . ')');
@@ -282,7 +297,7 @@ class EventbookingModelList extends RADModelList
 			}
 		}
 
-		if (JFactory::getApplication()->getLanguageFilter())
+		if ($app->getLanguageFilter())
 		{
 			$query->where('tbl.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
 		}

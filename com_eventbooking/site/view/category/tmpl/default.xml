@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="Category Default Layout">
-		<message>
-			Displays a list of events from a category using default layout
-		</message>
-	</layout>
-	<state>
-		<name>Category Layout</name>
-		<description>Displays a list of events from a category using default layout</description>		
-		<fields name="request">			
-			<fieldset name="request"
-				addfieldpath="/administrator/components/com_eventbooking/elements">
-				<field name="id" type="ebcategory" size="3" default="0" label="Select Category" description="Choose the category which you want to display events" />
-			</fieldset>	
-		</fields>			
-	</state>
+    <layout title="Category Default Layout">
+        <message>
+            Displays a list of events from a category using default layout
+        </message>
+    </layout>
+    <state>
+        <name>Category Layout</name>
+        <description>Displays a list of events from a category using default layout</description>
+        <fields name="request">
+            <fieldset name="request"
+                      addfieldpath="/administrator/components/com_eventbooking/elements">
+                <field name="id" type="ebcategory" size="3" default="0" label="Select Category"
+                       description="Choose the category which you want to display events"/>
+            </fieldset>
+        </fields>
+        <fields name="params">
+            <fieldset name="basic">
+                <field name="hide_past_events" type="list" default="2" label="Hide Past Events"
+                       description="Choose to show/hide past events for this menu item">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                    <option value="2">Use Configuration</option>
+                </field>
+            </fieldset>
+        </fields>
+    </state>
 </metadata>
