@@ -39,8 +39,8 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$eventId = $input->getInt('event_id', 0);
 		$event   = EventbookingHelperDatabase::getEvent($eventId);
 
-		$user = JFactory::getUser();
-		$accessLevels = JFactory::getUser()->getAuthorisedViewLevels();
+		$user         = JFactory::getUser();
+		$accessLevels = $user->getAuthorisedViewLevels();
 
 		if (empty($event)
 			|| !$event->published
