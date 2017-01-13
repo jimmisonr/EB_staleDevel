@@ -273,7 +273,7 @@ class EventbookingModelList extends RADModelList
 		{
 			$hidePastEventsParam = $app->getParams()->get('hide_past_events', 2);
 
-			if ($hidePastEventsParam == 0 || ($hidePastEventsParam == 2 && $config->hide_past_events))
+			if ($hidePastEventsParam == 1 || ($hidePastEventsParam == 2 && $config->hide_past_events))
 			{
 				$hidePastEventsCategory = true;
 			}
