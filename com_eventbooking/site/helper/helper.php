@@ -1338,13 +1338,13 @@ class EventbookingHelper
 			$depositAmount = 0;
 		}
 
-		$fees['total_amount']           = $totalAmount;
-		$fees['discount_amount']        = $discountAmount;
-		$fees['tax_amount']             = $taxAmount;
-		$fees['amount']                 = $amount;
-		$fees['deposit_amount']         = $depositAmount;
-		$fees['late_fee']               = $lateFee;
-		$fees['coupon_discount_amount'] = $couponDiscountAmount;
+		$fees['total_amount']           = round($totalAmount, 2);
+		$fees['discount_amount']        = round($discountAmount, 2);
+		$fees['tax_amount']             = round($taxAmount, 2);
+		$fees['amount']                 = round($amount, 2);
+		$fees['deposit_amount']         = round($depositAmount, 2);
+		$fees['late_fee']               = round($lateFee, 2);
+		$fees['coupon_discount_amount'] = round($couponDiscountAmount, 2);
 
 		return $fees;
 	}
@@ -1809,12 +1809,12 @@ class EventbookingHelper
 			$depositAmount = 0;
 		}
 
-		$fees['total_amount']            = $totalAmount;
-		$fees['discount_amount']         = $discountAmount;
-		$fees['late_fee']                = $lateFee;
-		$fees['tax_amount']              = $taxAmount;
-		$fees['amount']                  = $amount;
-		$fees['deposit_amount']          = $depositAmount;
+		$fees['total_amount']            = round($totalAmount, 2);
+		$fees['discount_amount']         = round($discountAmount, 2);
+		$fees['late_fee']                = round($lateFee, 2);
+		$fees['tax_amount']              = round($taxAmount, 2);
+		$fees['amount']                  = round($amount, 2);
+		$fees['deposit_amount']          = round($depositAmount, 2);
 		$fees['members_form']            = $membersForm;
 		$fees['members_total_amount']    = $membersTotalAmount;
 		$fees['members_discount_amount'] = $membersDiscountAmount;
@@ -2281,14 +2281,14 @@ class EventbookingHelper
 			}
 		}
 
-		$fees['total_amount']           = $totalAmount;
-		$fees['discount_amount']        = $discountAmount;
-		$fees['late_fee']               = $lateFee;
-		$fees['tax_amount']             = $taxAmount;
-		$fees['amount']                 = $amount;
-		$fees['deposit_amount']         = $depositAmount;
-		$fees['payment_processing_fee'] = $paymentProcessingFee;
-		$fees['coupon_discount_amount'] = $couponDiscountAmount;
+		$fees['total_amount']           = round($totalAmount, 2);
+		$fees['discount_amount']        = round($discountAmount, 2);
+		$fees['late_fee']               = round($lateFee, 2);
+		$fees['tax_amount']             = round($taxAmount, 2);
+		$fees['amount']                 = round($amount, 2);
+		$fees['deposit_amount']         = round($depositAmount, 2);
+		$fees['payment_processing_fee'] = round($paymentProcessingFee, 2);
+		$fees['coupon_discount_amount'] = round($couponDiscountAmount, 2);
 
 		if ($collectRecordsData)
 		{
