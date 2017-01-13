@@ -16,6 +16,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 	public function display()
 	{
 		$layout = $this->getLayout();
+
 		if ($layout == 'form')
 		{
 			$this->displayForm();
@@ -196,9 +197,6 @@ class EventbookingViewEventHtml extends RADViewHtml
 
 		if (!$ret)
 		{
-			//Redirect users to login page if they are not logged in
-			$user = JFactory::getUser();
-
 			if (!$user->id)
 			{
 				$currentUrl = JUri::current();
@@ -206,8 +204,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 			}
 			else
 			{
-				$url = JRoute::_('index.php');
-				JFactory::getApplication()->redirect($url, JText::_('EB_NO_ADDING_EVENT_PERMISSION'));
+				JFactory::getApplication()->redirect(JUri::root(), JText::_('EB_NO_ADDING_EVENT_PERMISSION'));
 			}
 		}
 
@@ -215,6 +212,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 
 		//Get list of location
 		$options = array();
+
 		$query->select('id, name')
 			->from('#__eb_locations')
 			->where('published = 1')
@@ -226,18 +224,18 @@ class EventbookingViewEventHtml extends RADViewHtml
 		}
 
 		$db->setQuery($query);
+
 		$options[]            = JHtml::_('select.option', '', JText::_('EB_SELECT_LOCATION'), 'id', 'name');
 		$options              = array_merge($options, $db->loadObjectList());
 		$lists['location_id'] = JHtml::_('select.genericlist', $options, 'location_id', '', 'id', 'name', $item->location_id);
 
 		// Categories dropdown
 		$query->clear()
-			->select("id, parent AS parent_id, show_on_submit_event_form, name" . $fieldSuffix . " AS title")
+			->select("id, parent AS parent_id, name" . $fieldSuffix . " AS title")
 			->from('#__eb_categories')
 			->where('published = 1')
+			->where('submit_event_access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
 			->order('name' . $fieldSuffix);
-
-		$isAdmin = $user->authorise('core.admin', 'com_eventbooking');
 
 		$db->setQuery($query);
 		$rows     = $db->loadObjectList();
@@ -260,10 +258,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 
 		foreach ($list as $listItem)
 		{
-			if ($isAdmin || $listItem->show_on_submit_event_form)
-			{
-				$options[] = JHtml::_('select.option', $listItem->id, '&nbsp;&nbsp;&nbsp;' . $listItem->treename, 'value', 'text');
-			}
+			$options[] = JHtml::_('select.option', $listItem->id, '&nbsp;&nbsp;&nbsp;' . $listItem->treename, 'value', 'text');
 		}
 
 		if ($item->id)
@@ -290,41 +285,47 @@ class EventbookingViewEventHtml extends RADViewHtml
 			$additionalCategories = array();
 		}
 
-		$lists['main_category_id']           = JHtml::_('select.genericlist', $options, 'main_category_id',
+		$lists['main_category_id'] = JHtml::_('select.genericlist', $options, 'main_category_id',
 			array(
 				'option.text.toHtml' => false,
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => '',
 				'list.select'        => $mainCategoryId,));
-		$lists['category_id']                = JHtml::_('select.genericlist', $options, 'category_id[]',
+
+		$lists['category_id'] = JHtml::_('select.genericlist', $options, 'category_id[]',
 			array(
 				'option.text.toHtml' => false,
 				'option.text'        => 'text',
 				'option.value'       => 'value',
 				'list.attr'          => 'class="inputbox"  size="5" multiple="multiple"',
 				'list.select'        => $additionalCategories,));
-		$options                             = array();
-		$options[]                           = JHtml::_('select.option', 1, JText::_('%'));
-		$options[]                           = JHtml::_('select.option', 2, $config->currency_symbol);
-		$lists['discount_type']              = JHtml::_('select.genericlist', $options, 'discount_type', ' class="input-mini" ', 'value', 'text',
+
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', 1, JText::_('%'));
+		$options[] = JHtml::_('select.option', 2, $config->currency_symbol);
+
+		$lists['discount_type']            = JHtml::_('select.genericlist', $options, 'discount_type', ' class="input-mini" ', 'value', 'text',
 			$item->discount_type);
-		$lists['early_bird_discount_type']   = JHtml::_('select.genericlist', $options, 'early_bird_discount_type', ' class="input-mini" ', 'value',
+		$lists['early_bird_discount_type'] = JHtml::_('select.genericlist', $options, 'early_bird_discount_type', ' class="input-mini" ', 'value',
 			'text', $item->early_bird_discount_type);
-		$options                             = array();
-		$options[]                           = JHtml::_('select.option', 0, JText::_('EB_INDIVIDUAL_GROUP'));
-		$options[]                           = JHtml::_('select.option', 1, JText::_('EB_INDIVIDUAL_ONLY'));
-		$options[]                           = JHtml::_('select.option', 2, JText::_('EB_GROUP_ONLY'));
-		$options[]                           = JHtml::_('select.option', 3, JText::_('EB_DISABLE_REGISTRATION'));
-		$lists['registration_type']          = JHtml::_('select.genericlist', $options, 'registration_type', ' class="inputbox" ', 'value', 'text',
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_INDIVIDUAL_GROUP'));
+		$options[] = JHtml::_('select.option', 1, JText::_('EB_INDIVIDUAL_ONLY'));
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_GROUP_ONLY'));
+		$options[] = JHtml::_('select.option', 3, JText::_('EB_DISABLE_REGISTRATION'));
+
+		$lists['registration_type'] = JHtml::_('select.genericlist', $options, 'registration_type', ' class="inputbox" ', 'value', 'text',
 			$item->registration_type);
+
 		$lists['access']                     = JHtml::_('access.level', 'access', $item->access, 'class="inputbox"', false);
 		$lists['registration_access']        = JHtml::_('access.level', 'registration_access', $item->registration_access, 'class="inputbox"', false);
 		$lists['enable_cancel_registration'] = JHtml::_('select.booleanlist', 'enable_cancel_registration', ' class="inputbox" ',
 			$item->enable_cancel_registration);
 		$lists['enable_auto_reminder']       = JHtml::_('select.booleanlist', 'enable_auto_reminder', ' class="inputbox" ', $item->enable_auto_reminder);
-
-		$lists['published'] = JHtml::_('select.booleanlist', 'published', ' class="inputbox" ', $item->published);
+		$lists['published']                  = JHtml::_('select.booleanlist', 'published', ' class="inputbox" ', $item->published);
 
 		if ($item->event_date != $db->getNullDate())
 		{

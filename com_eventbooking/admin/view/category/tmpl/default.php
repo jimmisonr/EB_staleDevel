@@ -87,10 +87,10 @@ if ($translatable)
 	</div>
 	<div class="control-group">
 		<label class="control-label">
-			<?php echo EventbookingHelperHtml::getFieldLabel('show_on_submit_event_form', JText::_('EB_SHOW_ON_SUBMIT_EVENT_FORM'), JText::_('EB_SHOW_ON_SUBMIT_EVENT_FORM_EXPLAIN')); ?>
+			<?php echo  JText::_('EB_SUBMIT_EVENT_ACCESS_LEVEL'); ?>
 		</label>
 		<div class="controls">
-			<?php echo EventbookingHelperHtml::getBooleanInput('show_on_submit_event_form', $this->item->show_on_submit_event_form); ?>
+			<?php echo $this->lists['submit_event_access']; ?>
 		</div>
 	</div>
 	<?php

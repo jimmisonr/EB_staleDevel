@@ -1405,14 +1405,14 @@ class EventbookingController extends RADControllerAdmin
 		$fields = array_keys($db->getTableColumns('#__eb_categories'));
 		if (!in_array('access', $fields))
 		{
-			$sql = "ALTER TABLE  `#__eb_categories` ADD  `access` TINYINT NOT NULL DEFAULT  '0' ;";
+			$sql = "ALTER TABLE  `#__eb_categories` ADD  `access` TINYINT NOT NULL DEFAULT  '1' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}
 
-		if (!in_array('show_on_submit_event_form', $fields))
+		if (!in_array('submit_event_access', $fields))
 		{
-			$sql = "ALTER TABLE  `#__eb_categories` ADD  `show_on_submit_event_form` TINYINT NOT NULL DEFAULT  '1' ;";
+			$sql = "ALTER TABLE  `#__eb_categories` ADD  `submit_event_access` TINYINT NOT NULL DEFAULT  '1' ;";
 			$db->setQuery($sql);
 			$db->execute();
 		}

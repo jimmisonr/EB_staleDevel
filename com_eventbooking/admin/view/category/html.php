@@ -23,6 +23,7 @@ class EventbookingViewCategoryHtml extends RADViewItem
 		$options[] = JHtml::_('select.option', 'timeline', JText::_('Timeline Layout'));
 		$options[] = JHtml::_('select.option', 'columns', JText::_('Columns Layout'));
 
+		$this->lists['submit_event_access']       = JHtml::_('access.level', 'submit_event_access', $this->item->submit_event_access, ' ', false);
 		$this->lists['show_on_submit_event_form'] = JHtml::_('select.booleanlist', 'show_on_submit_event_form', ' ', $this->item->show_on_submit_event_form);
 		$this->lists['layout']                    = JHtml::_('select.genericlist', $options, 'layout', ' class="inputbox" ', 'value', 'text', $this->item->layout);
 		$this->lists['parent']                    = EventbookingHelperHtml::buildCategoryDropdown($this->item->parent, 'parent');
