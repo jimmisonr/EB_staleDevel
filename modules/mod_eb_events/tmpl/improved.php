@@ -11,19 +11,25 @@
 defined('_JEXEC') or die;
 
 JHtml::_('script', JUri::root().'media/com_eventbooking/assets/js/noconflict.js', false, false);	
+
 if ($showLocation)
 {
 	$width = (int) $config->map_width ;
+
 	if (!$width)
 	{
 		$width = 800 ;
 	}
+
 	$height = (int) $config->map_height ;
+
 	if (!$height)
 	{
 		$height = 600 ;
 	}
+
 	$deviceType = EventbookingHelper::getDeviceType();
+
 	if ($deviceType == 'mobile')
 	{
 		EventbookingHelperJquery::colorbox('eb-colorbox-map', '100%', $height . 'px', 'true', 'false');
@@ -33,8 +39,16 @@ if ($showLocation)
 		EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
 	}
 }
+
 if (count($rows))
 {
+	$bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+
+	$span3Class         = $bootstrapHelper->getClassMapping('span3');
+	$span9Class         = $bootstrapHelper->getClassMapping('span9');
+	$iconFolderClass    = $bootstrapHelper->getClassMapping('icon-folder-open');
+	$iconMapMarkerClass = $bootstrapHelper->getClassMapping('icon-map-marker');
+
     $monthNames = array(
         1 => JText::_('EB_JAN_SHORT'),
         2 => JText::_('EB_FEB_SHORT'),
@@ -61,8 +75,8 @@ if (count($rows))
                 $date = JHtml::_('date', $row->event_date, 'd', null);
                 $month = JHtml::_('date', $row->event_date, 'n', null);
             ?>
-                <li class="vevent clearfix row-fluid">
-                    <div class="span3">
+                <li class="clearfix row-fluid">
+                    <div class="<?php echo $span3Class; ?>">
                         <span class="event-date">
 	                        <?php
 	                            if ($row->event_date == '2099-12-31 00:00:00')
@@ -81,7 +95,7 @@ if (count($rows))
 	                        ?>
                         </span>
                     </div>
-                    <div class="span9">
+                    <div class="<?php echo $span9Class; ?>">
                     	<p>
                         <a class="url eb-event-link" href="<?php echo JRoute::_(EventbookingHelperRoute::getEventRoute($row->id, 0, $itemId), false); ?>">
                             <?php
@@ -100,7 +114,7 @@ if (count($rows))
                             {
                             ?>
                                 <p><small title="<?php echo JText::_('EB_CATEGORY'); ?>" class="category"><span>
-									<i class="icon-folder-open"></i>
+									<i class="<?php echo $iconFolderClass; ?>"></i>
 									<?php echo $row->categories ; ?></span></small></p>
                             <?php
                             }
@@ -108,7 +122,7 @@ if (count($rows))
                             {
                             ?>
                                 <p><small title="<?php echo JText::_('EB_LOCATION'); ?>" class="location">
-								<i class="icon-map-marker"></i>
+								<i class="<?php echo $iconMapMarkerClass; ?>"></i>
 								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$row->location_id.'&tmpl=component&format=html&Itemid='.$itemId); ?>" class="eb-colorbox-map"								
 								<strong><?php echo $row->location_name ; ?></strong>
                                 </a></small></p>

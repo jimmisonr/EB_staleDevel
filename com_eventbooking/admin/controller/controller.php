@@ -2962,6 +2962,7 @@ class EventbookingController extends RADControllerAdmin
 			JPATH_ROOT . '/components/com_eventbooking/views/waitinglist/tmpl/complete.php',
 			JPATH_ROOT . '/components/com_eventbooking/models/waitinglist.php',
 			JPATH_ROOT . '/components/com_eventbooking/ipn_logs.txt',
+			JPATH_ROOT . '/modules/mod_eb_events/css/font.css',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waitings.php',
 			JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/waiting.php',
 			JPATH_ROOT . '/media/com_eventbooking/.htaccess',
@@ -2990,6 +2991,7 @@ class EventbookingController extends RADControllerAdmin
 			JPATH_ROOT . '/components/com_eventbooking/models',
 			JPATH_ROOT . '/components/com_eventbooking/assets',
 			JPATH_ROOT . '/components/com_eventbooking/views',
+			JPATH_ROOT . '/modules/mod_eb_events/css/font',
 		);
 
 		foreach ($deleteFiles as $file)
