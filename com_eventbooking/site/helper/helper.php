@@ -781,8 +781,10 @@ class EventbookingHelper
 		$replaces['date']                = date($config->date_format);
 		$replaces['event_title']         = $eventTitle;
 		$replaces['event_date']          = JHtml::_('date', $event->event_date, $config->event_date_format, null);
+		$replaces['event_date_date']     = JHtml::_('date', $event->event_date, $config->date_format, null);
 		$replaces['event_date_time']     = JHtml::_('date', $event->event_date, $timeFormat, null);
 		$replaces['event_end_date']      = JHtml::_('date', $event->event_end_date, $config->event_date_format, null);
+		$replaces['event_end_date_date'] = JHtml::_('date', $event->event_end_date, $config->date_format, null);
 		$replaces['event_end_date_time'] = JHtml::_('date', $event->event_end_date, $timeFormat, null);
 		$replaces['short_description']   = $event->short_description;
 		$replaces['description']         = $event->description;
