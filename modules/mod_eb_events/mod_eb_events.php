@@ -11,6 +11,7 @@
 defined('_JEXEC') or die;
 
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
+require_once JPATH_ROOT . '/components/com_eventbooking/helper/bootstrap.php';
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/route.php';
 require_once JPATH_ROOT . '/components/com_eventbooking/helper/jquery.php';
 

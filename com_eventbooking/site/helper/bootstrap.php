@@ -70,7 +70,7 @@ class EventbookingHelperBootstrap
 				'control-label'   => 'control-label',
 				'controls'        => 'controls',
 				'icon-location'	  => 'icon-location',
-				'icon-map-marker'	  => 'icon-map-marker',
+				'icon-map-marker'	  => 'icon-location icon-map-marker',
 			);
 		}
 		else
