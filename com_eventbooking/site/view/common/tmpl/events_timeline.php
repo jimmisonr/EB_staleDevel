@@ -73,6 +73,26 @@ $baseUri = JUri::base(true);
 			{
 				$isMultipleDate = true;
 			}
+
+			$layoutData = array(
+				'item'              => $event,
+				'config'            => $config,
+				'isMultipleDate'    => $isMultipleDate,
+				'canRegister'       => $canRegister,
+				'Itemid'            => $Itemid,
+				'waitingList'       => $waitingList,
+				'ssl'               => $ssl,
+				'btnClass'          => $btnClass,
+				'iconOkClass'       => $iconOkClass,
+				'iconRemoveClass'   => $iconRemoveClass,
+				'iconDownloadClass' => $iconDownloadClass,
+				'registrationOpen'  => $registrationOpen,
+				'return'            => $return,
+				'iconPencilClass'   => $iconPencilClass,
+				'showInviteFriend'  => false,
+			);
+
+			$registerButtons = EventbookingHelperHtml::loadCommonLayout('common/tmpl/buttons.php', $layoutData);
 		?>
 		<div class="eb-category-<?php echo $event->category_id; ?> eb-event-container<?php if ($event->featured) echo ' eb-featured-event'; ?>" itemscope itemtype="http://schema.org/Event">
 			<div class="eb-event-date-container">
@@ -274,7 +294,31 @@ $baseUri = JUri::base(true);
 					</div>
 				</div>
 			</div>
+			<?php
+				if (in_array($config->get('register_buttons_position', 0), array(1,2)))
+				{
+				?>
+					<div class="eb-taskbar eb-register-buttons-top clearfix">
+						<ul>
+							<?php
+								echo $registerButtons;
 
+								if ($config->hide_detail_button !== '1' || $isMultipleDate)
+								{
+								?>
+									<li>
+										<a class="<?php echo $btnClass; ?> btn-primary" href="<?php echo $detailUrl; ?>">
+											<?php echo $isMultipleDate ? JText::_('EB_CHOOSE_DATE_LOCATION') : JText::_('EB_DETAILS'); ?>
+										</a>
+									</li>
+								<?php
+								}
+							?>
+						</ul>
+					</div>
+				<?php
+				}
+			?>
 			<div class="eb-description-details" itemprop="description">
 				<?php
 					if ($event->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$event->thumb))
@@ -320,43 +364,31 @@ $baseUri = JUri::base(true);
 					<div class="clearfix"></div>
 				<?php
 				}
+
+				if (in_array($config->get('register_buttons_position', 0), array(0,2)))
+				{
+				?>
+					<div class="eb-taskbar eb-register-buttons-bottom clearfix">
+						<ul>
+							<?php
+							echo $registerButtons;
+
+							if ($config->hide_detail_button !== '1' || $isMultipleDate)
+							{
+							?>
+								<li>
+									<a class="<?php echo $btnClass; ?> btn-primary" href="<?php echo $detailUrl; ?>">
+										<?php echo $isMultipleDate ? JText::_('EB_CHOOSE_DATE_LOCATION') : JText::_('EB_DETAILS'); ?>
+									</a>
+								</li>
+							<?php
+							}
+							?>
+						</ul>
+					</div>
+				<?php
+				}
 			?>
-			<div class="eb-taskbar clearfix">
-				<ul>
-					<?php
-					$layoutData = array(
-						'item'              => $event,
-						'config'            => $config,
-						'isMultipleDate'    => $isMultipleDate,
-						'canRegister'       => $canRegister,
-						'Itemid'            => $Itemid,
-						'waitingList'       => $waitingList,
-						'ssl'               => $ssl,
-						'btnClass'          => $btnClass,
-						'iconOkClass'       => $iconOkClass,
-						'iconRemoveClass'   => $iconRemoveClass,
-						'iconDownloadClass' => $iconDownloadClass,
-						'registrationOpen'  => $registrationOpen,
-						'return'            => $return,
-						'iconPencilClass'   => $iconPencilClass,
-						'showInviteFriend'  => false,
-					);
-
-					echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/buttons.php', $layoutData);
-
-					if ($config->hide_detail_button !== '1' || $isMultipleDate)
-					{
-					?>
-						<li>
-							<a class="<?php echo $btnClass; ?> btn-primary" href="<?php echo $detailUrl; ?>">
-								<?php echo $isMultipleDate ? JText::_('EB_CHOOSE_DATE_LOCATION') : JText::_('EB_DETAILS'); ?>
-							</a>
-						</li>
-					<?php
-					}
-					?>
-				</ul>
-			</div>
 		</div>
 		<?php
 		}

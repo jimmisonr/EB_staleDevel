@@ -1247,3 +1247,16 @@ img.eb-payment-method-icon
 {
 	padding-top: 15px;
 }
+
+.eb-register-buttons-top
+{
+	margin-bottom: 5px;
+}
+
+.eb-events-timeline	.eb-register-buttons-top
+{
+	border-bottom: none;
+	padding-top: 0;
+	margin-top: -20px;
+	padding-bottom: 10px;
+}

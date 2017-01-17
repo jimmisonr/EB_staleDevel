@@ -35,6 +35,14 @@ defined( '_JEXEC' ) or die ;
 </div>
 <div class="control-group">
 	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('register_buttons_position', JText::_('EB_REGISTER_BUTTONS_POSITION')); ?>
+	</div>
+	<div class="controls">
+		<?php echo $this->lists['register_buttons_position']; ?>
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
 		<?php echo EventbookingHelperHtml::getFieldLabel('show_multiple_days_event_in_calendar', JText::_('EB_SHOW_MULTIPLE_DAYS_EVENT_IN_CALENDAR')); ?>
 	</div>
 	<div class="controls">

@@ -52,6 +52,29 @@ if ($this->config->show_children_events_under_parent_event && $item->event_type 
 }
 
 $offset = JFactory::getConfig()->get('offset');
+
+if ($this->showTaskBar)
+{
+	$layoutData = array(
+		'item'              => $this->item,
+		'config'            => $this->config,
+		'isMultipleDate'    => $isMultipleDate,
+		'canRegister'       => $canRegister,
+		'registrationOpen'  => $registrationOpen,
+		'waitingList'       => $waitingList,
+		'return'            => $return,
+		'showInviteFriend'  => true,
+		'ssl'               => $ssl,
+		'Itemid'            => $this->Itemid,
+		'btnClass'          => $btnClass,
+		'iconOkClass'       => $iconOkClass,
+		'iconRemoveClass'   => $iconRemoveClass,
+		'iconDownloadClass' => $iconDownloadClass,
+		'iconPencilClass'   => $iconPencilClass,
+	);
+
+	$registerButtons = EventbookingHelperHtml::loadCommonLayout('common/tmpl/buttons.php', $layoutData);
+}
 ?>
 <div id="eb-event-page" class="eb-container eb-category-<?php echo $item->category_id; ?>eb-event<?php if ($item->featured) echo ' eb-featured-event'; ?>" itemscope itemtype="http://schema.org/Event">
 	<div class="eb-box-heading clearfix">
@@ -65,6 +88,17 @@ $offset = JFactory::getConfig()->get('offset');
 			if ($this->config->show_fb_like_button)
 			{
 				echo $this->loadTemplate('share');
+			}
+
+			if ($this->showTaskBar && in_array($this->config->get('register_buttons_position', 0), array(1,2)))
+			{
+			?>
+			<div class="eb-taskbar eb-register-buttons-top clearfix">
+				<ul>
+					<?php echo $registerButtons; ?>
+				</ul>
+			</div>
+			<?php
 			}
 		?>
 
@@ -208,32 +242,12 @@ $offset = JFactory::getConfig()->get('offset');
 	<?php
 	}
 
-	if ($this->showTaskBar)
+	if ($this->showTaskBar && in_array($this->config->get('register_buttons_position', 0), array(0,2)))
 	{
 	?>
-		<div class="eb-taskbar clearfix">
+		<div class="eb-taskbar eb-register-buttons-bottom clearfix">
 			<ul>
-				<?php
-					$layoutData = array(
-						'item'              => $this->item,
-						'config'            => $this->config,
-						'isMultipleDate'    => $isMultipleDate,
-						'canRegister'       => $canRegister,
-						'registrationOpen'  => $registrationOpen,
-						'waitingList'       => $waitingList,
-						'return'            => $return,
-						'showInviteFriend'  => true,
-						'ssl'               => $ssl,
-						'Itemid'            => $this->Itemid,
-						'btnClass'          => $btnClass,
-						'iconOkClass'       => $iconOkClass,
-						'iconRemoveClass'   => $iconRemoveClass,
-						'iconDownloadClass' => $iconDownloadClass,
-						'iconPencilClass'   => $iconPencilClass,
-					);
-
-					echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/buttons.php', $layoutData);
-				?>
+				<?php echo $registerButtons; ?>
 			</ul>
 		</div>
 	<?php

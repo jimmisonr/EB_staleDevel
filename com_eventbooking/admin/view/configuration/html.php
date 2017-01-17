@@ -17,7 +17,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		{
 			return JError::raiseWarning(403, JText::_('JERROR_ALERTNOAUTHOR'));
 		}
-		
+
 		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
 		$config = EventbookingHelper::getConfig();
@@ -104,6 +104,13 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 
 		$lists['calendar_theme'] = JHtml::_('select.genericlist', $options, 'calendar_theme', ' class="inputbox" ', 'value', 'text',
 			$config->calendar_theme);
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_BOTTOM'));
+		$options[] = JHtml::_('select.option', 1, JText::_('EB_TOP'));
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_BOTH'));
+
+		$lists['register_buttons_position'] = JHtml::_('select.genericlist', $options, 'register_buttons_position', '', 'value', 'text', $config->get('register_buttons_position'));
 
 		$options   = array();
 		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_POSITION'));
