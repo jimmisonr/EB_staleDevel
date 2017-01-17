@@ -341,9 +341,13 @@ class RADModelAdmin extends RADModel
 		$this->beforePublish($pks, $value);
 
 		// Attempt to change the state of the records.
-		if (!$row->publish($pks, $value, JFactory::getUser()->get('id')))
+		foreach ($pks as $pk)
 		{
-			throw new Exception($row->getError());
+			if ($row->load($pk))
+			{
+				$row->published = $value;
+				$row->store();
+			}
 		}
 
 		$this->afterPublish($pks, $value);
