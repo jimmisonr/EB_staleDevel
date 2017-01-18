@@ -933,12 +933,29 @@ class EventbookingHelper
 
 			$amount = $totalAmount - $discountAmount + $paymentProcessingFee + $taxAmount + $lateFee;
 
+			if ($row->payment_status == 1)
+			{
+				$depositAmount = 0;
+				$dueAmount     = 0;
+			}
+			else
+			{
+				$query->clear('select')
+					->select('SUM(deposit_amount)');
+				$db->setQuery($query);
+				$depositAmount = $db->loadResult();
+
+				$dueAmount = $amount - $depositAmount;
+			}
+
 			$replaces['total_amount']           = EventbookingHelper::formatCurrency($totalAmount, $config, $event->currency_symbol);
 			$replaces['tax_amount']             = EventbookingHelper::formatCurrency($taxAmount, $config, $event->currency_symbol);
 			$replaces['discount_amount']        = EventbookingHelper::formatCurrency($discountAmount, $config, $event->currency_symbol);
 			$replaces['late_fee']               = EventbookingHelper::formatCurrency($lateFee, $config, $event->currency_symbol);
 			$replaces['payment_processing_fee'] = EventbookingHelper::formatCurrency($paymentProcessingFee, $config, $event->currency_symbol);
 			$replaces['amount']                 = EventbookingHelper::formatCurrency($amount, $config, $event->currency_symbol);
+			$replaces['deposit_amount']         = EventbookingHelper::formatCurrency($depositAmount, $config, $event->currency_symbol);
+			$replaces['due_amount']             = EventbookingHelper::formatCurrency($dueAmount, $config, $event->currency_symbol);
 
 			$replaces['amt_total_amount']           = $totalAmount;
 			$replaces['amt_tax_amount']             = $taxAmount;
@@ -946,6 +963,8 @@ class EventbookingHelper
 			$replaces['amt_late_fee']               = $lateFee;
 			$replaces['amt_amount']                 = $amount;
 			$replaces['amt_payment_processing_fee'] = $paymentProcessingFee;
+			$replaces['amt_deposit_amount']         = $depositAmount;
+			$replaces['amt_due_amount']             = $dueAmount;
 		}
 		else
 		{
@@ -955,6 +974,20 @@ class EventbookingHelper
 			$replaces['late_fee']               = EventbookingHelper::formatCurrency($row->late_fee, $config, $event->currency_symbol);
 			$replaces['payment_processing_fee'] = EventbookingHelper::formatCurrency($row->payment_processing_fee, $config, $event->currency_symbol);
 			$replaces['amount']                 = EventbookingHelper::formatCurrency($row->amount, $config, $event->currency_symbol);
+
+			if ($row->payment_status)
+			{
+				$depositAmount = 0;
+				$dueAmount     = 0;
+			}
+			else
+			{
+				$depositAmount = $row->deposit_amount;
+				$dueAmount     = $row->amount - $row->deposit_amount;
+			}
+
+			$replaces['deposit_amount'] = EventbookingHelper::formatCurrency($depositAmount, $config, $event->currency_symbol);
+			$replaces['due_amount']     = EventbookingHelper::formatCurrency($dueAmount, $config, $event->currency_symbol);
 		}
 
 		$replaces['individual_price'] = EventbookingHelper::formatCurrency($event->individual_price, $config, $event->currency_symbol);
@@ -4231,8 +4264,8 @@ class EventbookingHelper
 		$pdf->setPrintHeader(false);
 		$pdf->setPrintFooter(false);
 		$pdf->SetMargins(PDF_MARGIN_LEFT, 0, PDF_MARGIN_RIGHT);
-		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+		$pdf->setHeaderMargin(PDF_MARGIN_HEADER);
+		$pdf->setFooterMargin(PDF_MARGIN_FOOTER);
 		//set auto page breaks
 		$pdf->SetAutoPageBreak(true, PDF_MARGIN_BOTTOM);
 		//set image scale factor
@@ -4357,6 +4390,8 @@ class EventbookingHelper
 			$replaces['TAX_AMOUNT']             = EventbookingHelper::formatCurrency($taxAmount, $config);
 			$replaces['TOTAL_AMOUNT']           = EventbookingHelper::formatCurrency($total, $config);
 			$replaces['PAYMENT_PROCESSING_FEE'] = EventbookingHelper::formatCurrency($paymentProcessingFee, $config);
+			$replaces['DEPOSIT_AMOUNT']         = EventbookingHelper::formatCurrency($replaces['amt_deposit_amount'], $config);
+			$replaces['DUE_AMOUNT']             = EventbookingHelper::formatCurrency($replaces['amt_due_amount'], $config);
 		}
 		else
 		{
