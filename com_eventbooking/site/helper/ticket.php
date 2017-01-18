@@ -35,7 +35,7 @@ class EventbookingHelperTicket
 	{
 		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideHelperTicket', 'generateTicketsPDF'))
 		{
-			EventbookingHelperOverrideHelperTicket::generateTicketsPDF($row, $config);
+			EventbookingHelperOverrideTicket::generateTicketsPDF($row, $config);
 
 			return;
 		}
@@ -54,8 +54,8 @@ class EventbookingHelperTicket
 		$pdf->setPrintHeader(false);
 		$pdf->setPrintFooter(false);
 		$pdf->SetMargins(PDF_MARGIN_LEFT, 0, PDF_MARGIN_RIGHT);
-		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+		$pdf->setHeaderMargin(PDF_MARGIN_HEADER);
+		$pdf->setFooterMargin(PDF_MARGIN_FOOTER);
 		//set auto page breaks
 		$pdf->SetAutoPageBreak(true, PDF_MARGIN_BOTTOM);
 		//set image scale factor
