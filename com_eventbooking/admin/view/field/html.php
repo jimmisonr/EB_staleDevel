@@ -19,6 +19,12 @@ class EventbookingViewFieldHtml extends RADViewItem
 		$query  = $db->getQuery(true);
 		$config = EventbookingHelper::getConfig();
 
+		// Set default display_in property for new field
+		if (!$this->item->id)
+		{
+			$this->item->display_in = 5;
+		}
+
 		$options    = array();
 		$fieldTypes = array('Text', 'Textarea', 'List', 'Checkboxes', 'Radio', 'Date', 'Heading', 'Message', 'File', 'Countries', 'State', 'SQL');
 

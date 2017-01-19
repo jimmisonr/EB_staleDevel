@@ -24,6 +24,18 @@
                     <option value="1">Yes</option>
                     <option value="2">Use Configuration</option>
                 </field>
+                <field name="menu_filter_order" type="list" default="2" label="Order By"
+                       description="Choose how to sort/order events for this menu item">
+                    <option value="">Use Configuration</option>
+                    <option value="tbl.event_date">Event Date</option>
+                    <option value="tbl.ordering">Ordering</option>
+                </field>
+                <field name="menu_filter_order_dir" type="list" default="2" label="Order Direction"
+                       description="Choose how to sort/order events for this menu item">
+                    <option value="">Use Configuration</option>
+                    <option value="ASC">ASC</option>
+                    <option value="DESC">DESC</option>
+                </field>
             </fieldset>
         </fields>
     </state>
