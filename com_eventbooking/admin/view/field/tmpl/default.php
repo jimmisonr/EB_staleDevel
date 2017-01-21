@@ -291,7 +291,7 @@ if ($translatable)
 
 			<div class="control-group eb-field eb-list eb-radio eb-checkboxes">
 				<label class="control-label">
-					<?php echo EventbookingHelperHtml::getFieldLabel('quantity_field', JText::_('EB_QUANTITY_FIELD'), JText::_('EB_QUANTITY_FIELD_EXPLAIN')); ?>
+					<?php echo EventbookingHelperHtml::getFieldLabel('quantity_field', JText::_('EB_QUANTITY_FIELD')); ?>
 				</label>
 				<div class="controls">
 					<?php echo EventbookingHelperHtml::getBooleanInput('quantity_field', $this->item->quantity_field); ?>
@@ -299,7 +299,7 @@ if ($translatable)
 			</div>
 			<div class="control-group eb-field eb-list eb-radio eb-checkboxes">
 				<label class="control-label">
-					<?php echo EventbookingHelperHtml::getFieldLabel('quantity_values', JText::_('EB_QUANITY_VALUES'), JText::_('EB_FEE_FORMULA_EXPLAIN')); ?>
+					<?php echo EventbookingHelperHtml::getFieldLabel('quantity_values', JText::_('EB_QUANITY_VALUES'))); ?>
 				</label>
 				<div class="controls">
 					<textarea rows="5" cols="50" name="quantity_values" class="input-xlarge"><?php echo $this->item->quantity_values; ?></textarea>

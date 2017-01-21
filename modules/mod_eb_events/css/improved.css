@@ -54,10 +54,3 @@ span.event-date span.day {
 small.category, small.location {
 	padding: 4px;
 }
-
-small.category [class^="icon-"], [class*=" icon-"],
-small.location [class^="icon-"], [class*=" icon-"]{
-	font-size: 18px;
-    position: relative;
-    top: 3px;
-}
