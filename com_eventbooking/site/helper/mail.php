@@ -434,6 +434,11 @@ class EventbookingHelperMail
 				$emails[] = $eventCreator->email;
 			}
 
+			if (JMailHelper::isEmailAddress($row->email))
+			{
+				$mailer->addReplyTo($row->email);
+			}
+
 			static::send($mailer, $emails, $subject, $body);
 		}
 	}

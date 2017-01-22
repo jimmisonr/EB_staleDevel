@@ -299,7 +299,7 @@ if ($translatable)
 			</div>
 			<div class="control-group eb-field eb-list eb-radio eb-checkboxes">
 				<label class="control-label">
-					<?php echo EventbookingHelperHtml::getFieldLabel('quantity_values', JText::_('EB_QUANITY_VALUES'))); ?>
+					<?php echo EventbookingHelperHtml::getFieldLabel('quantity_values', JText::_('EB_QUANITY_VALUES')); ?>
 				</label>
 				<div class="controls">
 					<textarea rows="5" cols="50" name="quantity_values" class="input-xlarge"><?php echo $this->item->quantity_values; ?></textarea>
