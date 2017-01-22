@@ -288,3 +288,7 @@ span.eb-uploaded-file
 	padding-left:10px;
 	font-weight: bold;
 } 
+body.com_eventbooking.view-message div.controls
+{
+	margin-left:28% !important;
+}
