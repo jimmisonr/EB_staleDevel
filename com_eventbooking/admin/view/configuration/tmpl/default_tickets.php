@@ -54,7 +54,7 @@ defined( '_JEXEC' ) or die ;
 		<?php echo EventbookingHelperHtml::getFieldLabel('default_ticket_bg_image', JText::_('EB_DEFAULT_TICKET_BG_IMAGE'), JText::_('EB_DEFAULT_TICKET_BG_IMAGE_EXPLAIN')); ?>
 	</div>
 	<div class="controls">
-		<?php echo EventbookingHelperHtml::getMediaInput($config->get('ticket_bg_image'), 'default_ticket_bg_image'); ?>
+		<?php echo EventbookingHelperHtml::getMediaInput($config->get('default_ticket_bg_image'), 'default_ticket_bg_image'); ?>
 	</div>
 </div>
 <div class="control-group">
