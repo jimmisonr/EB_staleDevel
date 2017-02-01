@@ -43,7 +43,7 @@ class modEventBookingGoogleMapHelper
 		$categoryIds    = $this->params->get('category_ids');
 		$numberEvents   = $this->params->get('number_events', 15);
 		$hidePastEvents = $this->params->get('hide_past_events', 1);
-		$currentDate    = JHtml::_('date', 'Now', 'Y-m-d');
+		$currentDate    = JHtml::_('date', 'Now', 'Y-m-d', false);
 
 		$nullDate = $db->quote($db->getNullDate());
 		$nowDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d H:i:s'));

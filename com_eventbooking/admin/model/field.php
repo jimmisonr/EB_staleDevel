@@ -70,7 +70,7 @@ class EventbookingModelField extends RADModelAdmin
 
 				if ($config->hide_past_events_from_events_dropdown)
 				{
-					$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+					$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d', false));
 					$query->where('event_id IN (SELECT id FROM #__eb_events AS a WHERE a.published = 1 AND (DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.event_end_date) >= ' . $currentDate . '))');
 				}
 

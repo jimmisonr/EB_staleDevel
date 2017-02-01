@@ -1242,7 +1242,7 @@ class EventbookingHelper
 		if ($user->id > 0)
 		{
 			$nullDate    = $db->quote($db->getNullDate());
-			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d', false));
 			$query->clear()
 				->select('id, event_ids, discount_amount')
 				->from('#__eb_discounts')
@@ -1970,7 +1970,7 @@ class EventbookingHelper
 		$fees['bundle_discount_ids']    = array();
 
 		$nullDate    = $db->quote($db->getNullDate());
-		$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+		$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d', false));
 		$query->clear()
 			->select('id, event_ids, discount_amount')
 			->from('#__eb_discounts')
@@ -3417,7 +3417,7 @@ class EventbookingHelper
 
 		if ($config->hide_past_events)
 		{
-			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d', false));
 
 			if ($config->show_children_events_under_parent_event)
 			{

@@ -126,7 +126,7 @@ class EventbookingModelCalendar extends RADModel
 
 		if ($config->hide_past_events)
 		{
-			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d', false));
 			$query->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')');
 		}
 
@@ -189,7 +189,7 @@ class EventbookingModelCalendar extends RADModel
 
 		if (empty($rows) && $app->input->getMethod() == 'GET' && !$this->state->mini_calendar)
 		{
-			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d', false));
 			$query->clear()
 				->select('MONTH(event_date) AS next_event_month')
 				->select('YEAR(event_date) AS next_event_year')
@@ -339,7 +339,7 @@ class EventbookingModelCalendar extends RADModel
 
 		if ($config->hide_past_events)
 		{
-			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d', false));
 			$query->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')');
 		}
 

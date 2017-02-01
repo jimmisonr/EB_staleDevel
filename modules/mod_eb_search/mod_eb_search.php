@@ -120,7 +120,7 @@ if ($showLocation)
 
 	if ($config->hide_past_events)
 	{
-		$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+		$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d', false));
 
 		if ($config->show_children_events_under_parent_event)
 		{

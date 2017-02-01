@@ -42,7 +42,7 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 
 		if ($config->hide_past_events_from_events_dropdown)
 		{
-			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d', false));
 			$query->where('(DATE(event_date) >= ' . $currentDate . ' OR DATE(event_end_date) >= ' . $currentDate . ')');
 		}
 

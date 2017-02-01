@@ -35,7 +35,7 @@ $baseUrl = JUri::base(true);
 
 
 $fieldSuffix = EventbookingHelper::getFieldSuffix();
-$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d H:i:s'));
+$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d H:i:s', false));
 $nullDate    = $db->quote($db->getNullDate());
 
 

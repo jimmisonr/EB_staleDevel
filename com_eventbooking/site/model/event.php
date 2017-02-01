@@ -36,7 +36,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 		$db          = $this->getDbo();
 		$query       = $db->getQuery(true);
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s', false);
 		$query->select('a.*')
 			->select("DATEDIFF(event_date, '$currentDate') AS number_event_dates")
 			->select("DATEDIFF('$currentDate', a.late_fee_date) AS late_fee_date_diff")
@@ -86,7 +86,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
 
-		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s', false);
 		$query->select(EventbookingModelList::$fields)
 			->select("DATEDIFF(tbl.early_bird_discount_date, '$currentDate') AS date_diff")
 			->select("DATEDIFF('$currentDate', tbl.late_fee_date) AS late_fee_date_diff")
@@ -104,7 +104,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 
 		if ($config->hide_past_events)
 		{
-			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d', false));
 			$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.cut_off_date) >= ' . $currentDate . ')');
 		}
 

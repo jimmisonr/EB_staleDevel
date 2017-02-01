@@ -51,7 +51,7 @@ class EventbookingHelperDatabase
 
 		if (empty($currentDate))
 		{
-			$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+			$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s', false);
 		}
 
 		$query->select('a.*, IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
@@ -151,7 +151,7 @@ class EventbookingHelperDatabase
 			->order($order);
 		if ($hidePastEvents)
 		{
-			$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d', false));
 			$query->where('(DATE(event_date) >= ' . $currentDate . ' OR DATE(event_end_date) >= ' . $currentDate . ')');
 		}
 		$db->setQuery($query);

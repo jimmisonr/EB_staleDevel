@@ -254,7 +254,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 		}
 
 		// Compare current date with event end date
-		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s', false);
 		$query->clear()
 			->select('*')
 			->select("TIMESTAMPDIFF(MINUTE, event_end_date, '$currentDate') AS event_end_date_minutes")

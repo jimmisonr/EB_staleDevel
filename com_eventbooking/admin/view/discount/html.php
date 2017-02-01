@@ -27,7 +27,7 @@ class EventbookingViewDiscountHtml extends RADViewItem
 
 		if ($config->hide_past_events_from_events_dropdown)
 		{
-			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d', false));
 			if ($this->item->event_ids)
 			{
 				$query->where('(id IN(' . $this->item->event_ids . ') OR DATE(event_date) >= ' . $currentDate . ' OR DATE(event_end_date) >= ' . $currentDate . ')');

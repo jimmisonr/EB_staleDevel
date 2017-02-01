@@ -28,7 +28,7 @@ class EventbookingModelHistory extends EventbookingModelRegistrants
 	 */
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
-		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s', false);
 
 		$query->select('ev.activate_certificate_feature')
 			->select("TIMESTAMPDIFF(MINUTE, ev.event_end_date, '$currentDate') AS event_end_date_minutes");

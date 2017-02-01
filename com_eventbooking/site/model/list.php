@@ -143,7 +143,7 @@ class EventbookingModelList extends RADModelList
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
 		$config      = EventbookingHelper::getConfig();
-		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s', false);
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
 		$fieldsToSelect = static::$fields;
@@ -285,7 +285,7 @@ class EventbookingModelList extends RADModelList
 		}
 		elseif ($config->hide_past_events || ($name == 'upcomingevents') || $hidePastEventsCategory)
 		{
-			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d', false));
 
 			if ($config->show_children_events_under_parent_event)
 			{

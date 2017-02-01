@@ -33,7 +33,7 @@ $query->select('a.id, a.name, COUNT(b.id) AS total_events')
 
 if ($config->hide_past_events)
 {
-	$currentDate = JHtml::_('date', 'Now', 'Y-m-d');
+	$currentDate = JHtml::_('date', 'Now', 'Y-m-d', false);
 	$query->where('DATE(b.event_date) >= "' . $currentDate . '"');
 }
 
