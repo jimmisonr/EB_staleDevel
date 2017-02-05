@@ -44,7 +44,7 @@ class plgSearchEventBooking extends JPlugin
 		require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
 		require_once JPATH_ROOT . '/components/com_eventbooking/helper/route.php';
 		$db     = JFactory::getDbo();
-		$Itemid = EventbookingHelper::getItemid();
+		$Itemid = $this->params->def('item_id', EventbookingHelper::getItemid());
 		$config = EventbookingHelper::getConfig();
 		if (is_array($areas))
 		{

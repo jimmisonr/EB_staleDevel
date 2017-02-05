@@ -1326,7 +1326,7 @@ class EventbookingHelper
 			$paymentFeePercent = (float) $params->get('payment_fee_percent');
 		}
 
-		if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $amount > 0)
+		if (($paymentFeeAmount != 0 || $paymentFeePercent != 0) && $amount > 0)
 		{
 			$fees['payment_processing_fee'] = round($paymentFeeAmount + $amount * $paymentFeePercent / 100, 2);
 			$amount += $fees['payment_processing_fee'];
@@ -1772,7 +1772,7 @@ class EventbookingHelper
 			$paymentFeePercent = (float) $params->get('payment_fee_percent');
 		}
 
-		if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $amount > 0)
+		if (($paymentFeeAmount != 0 || $paymentFeePercent != 0) && $amount > 0)
 		{
 			$fees['payment_processing_fee'] = round($paymentFeeAmount + $amount * $paymentFeePercent / 100, 2);
 			$amount += $fees['payment_processing_fee'];
@@ -2223,7 +2223,7 @@ class EventbookingHelper
 				}
 			}
 
-			if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $registrantAmount > 0)
+			if (($paymentFeeAmount != 0 || $paymentFeePercent != 0) && $registrantAmount > 0)
 			{
 				$registrantPaymentProcessingFee = round($paymentFeeAmount + $registrantAmount * $paymentFeePercent / 100, 2);
 				$registrantAmount += $registrantPaymentProcessingFee;

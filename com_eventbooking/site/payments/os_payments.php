@@ -60,7 +60,10 @@ class os_payments
 					$method = new $row->name($params);
 					$method->setTItle($row->title);
 
-					if ($params->get('payment_fee_amount') > 0 || $params->get('payment_fee_percent'))
+					$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
+					$paymentFeePercent = (float) $params->get('payment_fee_percent');	
+					
+					if ($paymentFeeAmount != 0 || $paymentFeePercent != 0)
 					{
 						$method->paymentFee = true;
 					}

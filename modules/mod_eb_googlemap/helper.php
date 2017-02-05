@@ -43,7 +43,7 @@ class modEventBookingGoogleMapHelper
 		$categoryIds    = $this->params->get('category_ids');
 		$numberEvents   = $this->params->get('number_events', 15);
 		$hidePastEvents = $this->params->get('hide_past_events', 1);
-		$currentDate    = JHtml::_('date', 'Now', 'Y-m-d', false);
+		$currentDate    = JHtml::_('date', 'Now', 'Y-m-d');
 
 		$nullDate = $db->quote($db->getNullDate());
 		$nowDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d H:i:s'));
@@ -122,16 +122,17 @@ class modEventBookingGoogleMapHelper
 				<?php
 				for($i = 0; $i < count($locations); $i++)
 				{
-				$location = $locations[$i];
-				if (!count($location->events))
-				{
-					continue;
-				}
+					$location = $locations[$i];
+					if (!count($location->events))
+					{
+						continue;
+					}
 				?>
-				var eventListing<?php echo $location->id?> = new google.maps.LatLng(<?php echo $location->lat; ?>, <?php echo $location->long; ?>);
+					var eventListing<?php echo $location->id?> = new google.maps.LatLng(<?php echo $location->lat; ?>, <?php echo $location->long; ?>);
 				<?php
 				}
 				?>
+
 				var mapOptions = {
 					zoom: <?php echo $zoomLevel; ?>,
 					streetViewControl: true,
@@ -141,6 +142,7 @@ class modEventBookingGoogleMapHelper
 					mapTypeId: google.maps.MapTypeId.ROADMAP,
 					center: myHome,
 				};
+
 				var map = new google.maps.Map(document.getElementById("map<?php echo $this->module->id; ?>"), mapOptions);
 				var infoWindow = new google.maps.InfoWindow();
 
@@ -158,25 +160,27 @@ class modEventBookingGoogleMapHelper
 				google.maps.event.addListener(map, 'click', function () {
 					infoWindow.close();
 				});
+
 				<?php
 				foreach($locations as $location)
 				{
-				$events = $location->events;
-				if (!count($events))
-				{
-					continue;
-				}
-				?>
-				makeMarker({
-					position: eventListing<?php echo $location->id?>,
-					title: "<?php echo addslashes($location->title);?>",
-					content: '<div class="row-fluid"><ul><?php foreach ($events as $event)
+					$events = $location->events;
+
+					if (!count($events))
 					{
-						echo '<li><h4>' . JHtml::link(EventbookingHelperRoute::getEventRoute($event->id, $event->catid, $this->Itemid), addslashes($event->title)) . '</h4></li>';
-					}?></ul></div>',
-					icon: new google.maps.MarkerImage('<?php echo $rootUri; ?>modules/mod_eb_googlemap/asset/marker/marker.png')
-				});
-				<?php
+						continue;
+					}
+					?>
+					makeMarker({
+						position: eventListing<?php echo $location->id?>,
+						title: "<?php echo addslashes($location->name);?>",
+						content: '<div class="row-fluid"><ul><?php foreach ($events as $event)
+						{
+							echo '<li><h4>' . JHtml::link(EventbookingHelperRoute::getEventRoute($event->id, $event->catid, $this->Itemid), addslashes($event->title)) . '</h4></li>';
+						}?></ul></div>',
+						icon: new google.maps.MarkerImage('<?php echo $rootUri; ?>modules/mod_eb_googlemap/asset/marker/marker.png')
+					});
+					<?php
 				}
 				?>
 			});
@@ -184,5 +188,3 @@ class modEventBookingGoogleMapHelper
 		<?php
 	}
 }
-
-?>
