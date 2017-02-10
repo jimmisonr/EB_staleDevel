@@ -61,5 +61,6 @@ class EventbookingModelCategory extends RADModelAdmin
 		parent::initData();
 
 		$this->data->show_on_submit_event_form = 1;
+		$this->data->submit_event_access = 1;
 	}
 }

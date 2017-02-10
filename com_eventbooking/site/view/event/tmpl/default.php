@@ -53,6 +53,24 @@ if ($this->config->show_children_events_under_parent_event && $item->event_type 
 
 $offset = JFactory::getConfig()->get('offset');
 
+if ($item->activate_waiting_list == 2)
+{
+	$activateWaitingList = $this->config->activate_waitinglist_feature;
+}
+else
+{
+	$activateWaitingList = $item->activate_waiting_list;
+}
+
+if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !@$item->user_registered && $registrationOpen)
+{
+	$waitingList = true;
+}
+else
+{
+	$waitingList = false;
+}
+
 if ($this->showTaskBar)
 {
 	$layoutData = array(
@@ -152,24 +170,6 @@ if ($this->showTaskBar)
 
 					echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/event_properties.php', $layoutData);
 
-					if ($item->activate_waiting_list == 2)
-					{
-						$activateWaitingList = $this->config->activate_waitinglist_feature;
-					}
-					else
-					{
-						$activateWaitingList = $item->activate_waiting_list;
-					}
-
-					if (($item->event_capacity > 0) && ($item->event_capacity <= $item->total_registrants) && $activateWaitingList && !@$item->user_registered && $registrationOpen)
-					{
-						$waitingList = true;
-					}
-					else
-					{
-						$waitingList = false;
-					}
-
 					if (!$canRegister && $item->registration_type != 3 && $this->config->display_message_for_full_event && !$waitingList && $item->registration_start_minutes >= 0)
 					{
 						if (@$item->user_registered)
@@ -186,7 +186,7 @@ if ($this->showTaskBar)
 							$msg = JText::_('EB_NO_LONGER_ACCEPT_REGISTRATION');
 						}
 						?>
-							<div class="text-info eb-notice-message"><?php echo $msg; ?></div>
+						<div class="text-info eb-notice-message"><?php echo $msg; ?></div>
 						<?php
 					}
 					?>

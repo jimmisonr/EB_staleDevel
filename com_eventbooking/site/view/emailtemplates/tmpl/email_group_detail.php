@@ -293,7 +293,7 @@ $nullDate = JFactory::getDbo()->getNullDate();
 							$fields = $memberForm->getFields();
 							foreach ($fields as $field)
 							{
-								if ($field->hideOnDisplay)
+								if ($field->hideOnDisplay || $field->row->hide_on_email)
 								{
 									unset($fields[$field->name]);
 								}
