@@ -21,7 +21,7 @@ if (!$zoomLevel) {
 }
 $doc = JFactory::getDocument();
 $protocol = JUri::getInstance()->getScheme();
-$doc->addScript($protocol . '://maps.google.com/maps/api/js?sensor=true');
+$doc->addScript('https://maps.google.com/maps/api/js?key=AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4');
 $doc->addScriptDeclaration('
 	var geocoder, map;
 	function initialize() {
