@@ -742,6 +742,16 @@ class EventBookingModelRegister extends RADModel
 		$form = new RADForm($rowFields);
 		$data = EventbookingHelper::getRegistrantData($row, $rowFields);
 		$form->bind($data);
+		$form->buildFieldsDependency();
+		
+		if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
+		{
+			$replaces = EventbookingHelperOverrideHelper::buildTags($row, $form, $event, $config);
+		}
+		else
+		{
+			$replaces = EventbookingHelper::buildTags($row, $form, $event, $config);
+		}
 
 		// Need to over-ridde some config options
 		$emailContent = EventbookingHelper::getEmailContent($config, $row, true, $form);
@@ -751,8 +761,7 @@ class EventBookingModelRegister extends RADModel
 			->from('#__eb_events')
 			->where('id=' . $row->event_id);
 		$db->setQuery($query);
-		$eventTitle              = $db->loadResult();
-		$replaces                = array();
+		$eventTitle              = $db->loadResult();		
 		$replaces['event_title'] = $db->loadResult();
 		//Replace the custom fields
 		$fields = $form->getFields();
