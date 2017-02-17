@@ -2008,6 +2008,7 @@ class EventbookingHelper
 		}
 
 		$count = 0;
+		$paymentFeeAmountAdded = false;
 
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
@@ -2226,7 +2227,16 @@ class EventbookingHelper
 
 			if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $registrantAmount > 0)
 			{
-				$registrantPaymentProcessingFee = round($paymentFeeAmount + $registrantAmount * $paymentFeePercent / 100, 2);
+				if ($paymentFeeAmountAdded)
+				{
+					$registrantPaymentProcessingFee = round($registrantAmount * $paymentFeePercent / 100, 2);
+				}
+				else
+				{
+					$paymentFeeAmountAdded = true;
+					$registrantPaymentProcessingFee = round($paymentFeeAmount + $registrantAmount * $paymentFeePercent / 100, 2);
+				}
+
 				$registrantAmount += $registrantPaymentProcessingFee;
 			}
 			else
