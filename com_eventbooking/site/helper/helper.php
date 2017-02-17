@@ -788,6 +788,7 @@ class EventbookingHelper
 		$replaces['event_end_date_time'] = JHtml::_('date', $event->event_end_date, $timeFormat, null);
 		$replaces['short_description']   = $event->short_description;
 		$replaces['description']         = $event->description;
+		$replaces['alias']               = $event->alias;
 		$replaces['event_link']          = $siteUrl . 'index.php?option=com_eventbooking&view=event&id=' . $event->id . '&Itemid=' . $Itemid;
 
 		// Add support for group members name tags
