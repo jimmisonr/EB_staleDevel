@@ -99,7 +99,7 @@ else
 		<?php echo JText::_('AUTH_CARD_NUMBER'); ?><span class="required">*</span>
 	</label>
 
-	<div class="<?php echo $controlsClass; ?>">
+	<div class="<?php echo $controlsClass; ?>" id="sq-card-number">
 		<input type="text" id="x_card_num" name="x_card_num"
 			   class="input-large validate[required,creditCard]"
 			   value="<?php echo $this->escape($this->input->getAlnum('x_card_num')); ?>" onchange="removeSpace(this);"/>
@@ -110,7 +110,7 @@ else
 		<?php echo JText::_('AUTH_CARD_EXPIRY_DATE'); ?><span class="required">*</span>
 	</label>
 
-	<div class="<?php echo $controlsClass; ?>">
+	<div class="<?php echo $controlsClass; ?>" id="sq-expiration-date">
 		<?php echo $this->lists['exp_month'] . '  /  ' . $this->lists['exp_year']; ?>
 	</div>
 </div>
@@ -119,7 +119,7 @@ else
 		<?php echo JText::_('AUTH_CVV_CODE'); ?><span class="required">*</span>
 	</label>
 
-	<div class="<?php echo $controlsClass; ?>">
+	<div class="<?php echo $controlsClass; ?>" id="sq-cvv">
 		<input type="text" id="x_card_code" name="x_card_code"
 			   class="input-large validate[required,custom[number]]"
 			   value="<?php echo $this->escape($this->input->getString('x_card_code')); ?>"/>

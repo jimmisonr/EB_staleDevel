@@ -65,7 +65,14 @@ else
 
 	foreach ($fields as $field)
 	{
-		echo $field->getControlGroup($bootstrapHelper);
+		if ($field->name == 'zip')
+		{
+			echo $field->getControlGroup($bootstrapHelper, 'field_zip_input');
+		}
+		else
+		{
+			echo $field->getControlGroup($bootstrapHelper);
+		}
 
 		if ($field->type == "Date")
 		{
@@ -143,6 +150,7 @@ else
 	?>
 	<input type="hidden" name="event_id" value="<?php echo $this->event->id; ?>" />
 	<input type="hidden" name="show_payment_fee" value="<?php echo (int)$this->showPaymentFee ; ?>" />
+	<input type="hidden" id="card-nonce" name="nonce" />
 	<script type="text/javascript">
 		var eb_current_page = 'group_billing';
 		<?php echo os_payments::writeJavascriptObjects();?>
@@ -166,28 +174,36 @@ else
 								e.preventDefault();
 							});
 
-							if (typeof stripePublicKey !== 'undefined' && $('#x_card_num').is(":visible"))
+							if($('input:radio[name^=payment_method]').length)
 							{
-								if($('input:radio[name^=payment_method]').length)
-								{
-									var paymentMethod = $('input:radio[name^=payment_method]:checked').val();
-								}
-								else
-								{
-									var paymentMethod = $('input[name^=payment_method]').val();
-								}
+								var paymentMethod = $('input:radio[name^=payment_method]:checked').val();
+							}
+							else
+							{
+								var paymentMethod = $('input[name^=payment_method]').val();
+							}
 
+							if (typeof stripePublicKey !== 'undefined' && $('#tr_card_number').is(":visible"))
+							{
 								if (paymentMethod.indexOf('os_stripe') == 0)
 								{
 									Stripe.card.createToken({
 										number: $('#x_card_num').val(),
 										cvc: $('#x_card_code').val(),
 										exp_month: $('select[name^=exp_month]').val(),
-										exp_year: $('select[name^=exp_year]').val()
+										exp_year: $('select[name^=exp_year]').val(),
+										name: $('#card_holder_name').val()
 									}, stripeResponseHandler);
 
 									return false;
 								}
+							}
+
+							if (paymentMethod == 'os_squareup' && $('#tr_card_number').is(':visible'))
+							{
+								sqPaymentForm.requestCardNonce();
+
+								return false;
 							}
 
 							return true;
