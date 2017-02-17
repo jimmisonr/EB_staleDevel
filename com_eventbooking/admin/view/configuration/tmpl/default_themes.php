@@ -321,7 +321,7 @@ if (JPluginHelper::isEnabled('eventbooking', 'tickettypes'))
 		<?php echo EventbookingHelperHtml::getBooleanInput('display_large_image', $config->display_large_image); ?>
 	</div>
 </div>
-<div class="control-group" data-showon='[{"field":"display_large_image","values":["1"],"op":""}]'>
+<div class="control-group" data-showon='<?php echo EventbookingHelperHtml::renderShowOn(array('display_large_image' => '1')); ?>'>
 	<div class="control-label">
 		<?php echo EventbookingHelperHtml::getFieldLabel('large_image_width', JText::_('EB_LARGE_IMAGE_WIDTH'), JText::_('EB_LARGE_IMAGE_WIDTH_EXPLAIN')); ?>
 	</div>
@@ -329,7 +329,7 @@ if (JPluginHelper::isEnabled('eventbooking', 'tickettypes'))
 		<input type="text" name="large_image_width" class="input-small" value="<?php echo $config->large_image_width ; ?>" />
 	</div>
 </div>
-<div class="control-group" data-showon='[{"field":"display_large_image","values":["1"],"op":""}]'>
+<div class="control-group" data-showon='<?php echo EventbookingHelperHtml::renderShowOn(array('display_large_image' => '1')); ?>'>
 	<div class="control-label">
 		<?php echo EventbookingHelperHtml::getFieldLabel('large_image_height', JText::_('EB_LARGE_IMAGE_HEIGHT'), JText::_('EB_LARGE_IMAGE_HEIGHT_EXPLAIN')); ?>
 	</div>
