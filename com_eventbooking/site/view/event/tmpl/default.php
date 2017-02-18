@@ -178,8 +178,15 @@ if ($this->showTaskBar)
 						}
 						elseif (!in_array($item->registration_access, $this->viewLevels))
 						{
-							$loginLink = 'index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString());
-							$msg       = str_replace('[LOGIN_LINK]', $loginLink, JText::_('EB_LOGIN_TO_REGISTER'));
+							if (JFactory::getUser()->id)
+							{
+								$msg = JText::_('EB_REGISTRATION_NOT_AVAILABLE_FOR_ACCOUNT');
+							}
+							else
+							{
+								$loginLink = 'index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString());
+								$msg       = str_replace('[LOGIN_LINK]', $loginLink, JText::_('EB_LOGIN_TO_REGISTER'));
+							}
 						}
 						else
 						{
