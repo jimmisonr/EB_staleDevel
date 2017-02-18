@@ -69,8 +69,18 @@ class EventbookingViewMessageHtml extends RADViewHtml
 			}
 		}
 
-		$this->languages = $languages;
-		$this->message   = $message;
+		// Extra offline payment plugin messages
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('*')
+			->from('#__eb_payment_plugins')
+			->where('name LIKE "os_offline_%"')
+			->where('published = 1');
+		$db->setQuery($query);
+
+		$this->extraOfflinePlugins = $db->loadObjectList();
+		$this->languages           = $languages;
+		$this->message             = $message;
 
 		$this->addToolbar();
 
