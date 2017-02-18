@@ -3722,6 +3722,11 @@ class EventbookingHelper
 	 */
 	public static function getRegistrationRate($eventId, $numberRegistrants)
 	{
+		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideHelper', 'getRegistrationRate'))
+		{
+			return EventbookingHelperOverrideHelper::downloadCertificates($eventId, $numberRegistrants);
+		}
+
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('price')

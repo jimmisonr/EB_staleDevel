@@ -108,7 +108,7 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 
 		parent::addToolbar();
 
-		JToolbarHelper::custom('resend_email', 'envelope', 'envelope', 'Resend Email', true);
-		JToolbarHelper::custom('export', 'download', 'download', 'Export Registration', false);
+		JToolbarHelper::custom('resend_email', 'envelope', 'envelope', 'EB_RESEND_EMAIL', true);
+		JToolbarHelper::custom('export', 'download', 'download', 'EB_EXPORT_REGISTRANTS', false);
 	}
 }
