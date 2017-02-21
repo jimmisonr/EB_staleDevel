@@ -14,7 +14,17 @@ class EventbookingController extends RADControllerAdmin
 {
 	public function display($cachable = false, array $urlparams = array())
 	{
-		JFactory::getDocument()->addStyleSheet(JUri::base(true) . '/components/com_eventbooking/assets/css/style.css');
+		$document = JFactory::getDocument();
+		$baseUri  = JUri::base(true);
+
+		$document->addStyleSheet($baseUri . '/components/com_eventbooking/assets/css/style.css');
+
+		$customCssFile = JPATH_ADMINISTRATOR . '/components/com_eventbooking/assets/css/custom.css';
+
+		if (file_exists($customCssFile) && filesize($customCssFile) > 0)
+		{
+			$document->addStyleSheet($baseUri . '/components/com_eventbooking/assets/css/custom.css');
+		}
 
 		parent::display($cachable, $urlparams);
 
