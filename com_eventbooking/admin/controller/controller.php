@@ -544,6 +544,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
+		if (!in_array('receive_confirmation_email', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_fields` ADD  `receive_confirmation_email` TINYINT NOT NULL DEFAULT  '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		//Events table
 		$fields = array_keys($db->getTableColumns('#__eb_events'));
 
