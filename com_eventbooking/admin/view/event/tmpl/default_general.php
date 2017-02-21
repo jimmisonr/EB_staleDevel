@@ -29,16 +29,15 @@ $format = 'Y-m-d';
 	<div class="control-group">
 		<label class="control-label"><?php echo JText::_('EB_MAIN_EVENT_CATEGORY'); ?></label>
 		<div class="controls">
-			<div style="float: left;"><?php echo $this->lists['main_category_id']; ?></div>
+			<?php echo $this->lists['main_category_id']; ?>
 		</div>
 	</div>
 	<div class="control-group">
 		<label class="control-label">
-			<span class="editlinktip hasTip" title="Press <strong>Ctrl</strong> to select multiple categories"><?php echo JText::_('EB_ADDITIONAL_CATEGORIES'); ?></span>
+			<?php echo JText::_('EB_ADDITIONAL_CATEGORIES'); ?>
 		</label>
 		<div class="controls">
-			<div style="float: left;"><?php echo $this->lists['category_id']; ?></div>
-			<div style="float: left; padding-top: 25px; padding-left: 10px;"></div>
+			<?php echo $this->lists['category_id']; ?>
 		</div>
 	</div>
 	<div class="control-group">
@@ -57,7 +56,7 @@ $format = 'Y-m-d';
 		<label class="control-label">
 			<?php echo JText::_('EB_EVENT_START_DATE'); ?>
 		</label>
-		<div class="controls">
+		<div class="controls eb-date-time-container">
 			<?php echo JHtml::_('calendar', ($this->item->event_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_date, $format, null), 'event_date', 'event_date', '%Y-%m-%d', array('class' => 'input-small')); ?>
 			<?php echo $this->lists['event_date_hour'] . ' ' . $this->lists['event_date_minute']; ?>
 		</div>
@@ -66,7 +65,7 @@ $format = 'Y-m-d';
 		<label class="control-label">
 			<?php echo JText::_('EB_EVENT_END_DATE'); ?>
 		</label>
-		<div class="controls">
+		<div class="controls eb-date-time-container">
 			<?php echo JHtml::_('calendar', ($this->item->event_end_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_end_date, $format, null), 'event_end_date', 'event_end_date', '%Y-%m-%d', array('class' => 'input-small')); ?>
 			<?php echo $this->lists['event_end_date_hour'] . ' ' . $this->lists['event_end_date_minute']; ?>
 		</div>
@@ -75,7 +74,7 @@ $format = 'Y-m-d';
 		<label class="control-label">
 			<?php echo JText::_('EB_REGISTRATION_START_DATE'); ?>
 		</label>
-		<div class="controls">
+		<div class="controls eb-date-time-container">
 			<?php echo JHtml::_('calendar', ($this->item->registration_start_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->registration_start_date, $format, null), 'registration_start_date', 'registration_start_date', '%Y-%m-%d', array('class' => 'input-small')); ?>
 			<?php echo $this->lists['registration_start_hour'] . ' ' . $this->lists['registration_start_minute']; ?>
 		</div>
@@ -84,7 +83,7 @@ $format = 'Y-m-d';
 		<label class="control-label">
 			<span class="editlinktip hasTip" title="<?php echo JText::_('EB_CUT_OFF_DATE'); ?>::<?php echo JText::_('EB_CUT_OFF_DATE_EXPLAIN'); ?>"><?php echo JText::_('EB_CUT_OFF_DATE'); ?></span>
 		</label>
-		<div class="controls">
+		<div class="controls eb-date-time-container">
 			<?php echo JHtml::_('calendar', ($this->item->cut_off_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->cut_off_date, $format, null), 'cut_off_date', 'cut_off_date', '%Y-%m-%d', array('class' => 'input-small')); ?>
 			<?php echo $this->lists['cut_off_hour'] . ' ' . $this->lists['cut_off_minute']; ?>
 		</div>
