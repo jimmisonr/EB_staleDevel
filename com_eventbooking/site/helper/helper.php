@@ -4015,12 +4015,12 @@ class EventbookingHelper
 	{
 		$string = strip_tags($string, '<img>');
 
-		// Remove none printable characters
-		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x80-\x9F]/u', '', $string);
+		// Remove all scpecial characters
+		$string = preg_replace("/[^a-zA-Z]+/", "", $string);
 
 		$string = trim($string);
 
-		if (strlen($string))
+		if (strlen($string) > 10)
 		{
 			return true;
 		}
