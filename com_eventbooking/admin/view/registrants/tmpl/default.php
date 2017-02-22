@@ -91,6 +91,26 @@ else
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_AMOUNT'), 'tbl.amount', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
 				<?php
+				foreach ($this->fields as $field)
+				{
+					$colSpan++;
+
+					if ($field->is_core)
+					{
+					?>
+						<th class="title" nowrap="nowrap">
+							<?php echo JHtml::_('grid.sort', JText::_($field->title), 'tbl.' . $field->name, $this->state->filter_order_Dir, $this->state->filter_order); ?>
+						</th>
+					<?php
+					}
+					else
+					{
+					?>
+						<th class="title" nowrap="nowrap"><?php echo $field->title; ?></th>
+					<?php
+					}
+				}
+
 				if ($this->config->activate_deposit_feature)
 				{
 					$colSpan++;
@@ -260,6 +280,16 @@ else
 						<?php echo EventbookingHelper::formatAmount($row->amount, $this->config) ; ?>
 					</td>
 					<?php
+					foreach ($this->fields as $field)
+					{
+						$fieldValue = isset($this->fieldsData[$row->id][$field->id]) ? $this->fieldsData[$row->id][$field->id] : '';
+					?>
+						<td>
+							<?php echo $fieldValue; ?>
+						</td>
+					<?php
+					}
+
 					if ($this->config->activate_deposit_feature)
 					{
 						?>
