@@ -2552,12 +2552,8 @@ class EventbookingHelper
 				else
 				{
 					$negEventId = -1 * $eventId;
-					$subQuery   = $db->getQuery(true);
-					$subQuery->select('field_id')
-						->from('#__eb_field_events')
-						->where("(event_id = $eventId OR (event_id < 0 AND event_id != $negEventId))");
-
-					$query->where('(event_id = -1 OR id IN (' . (string) $subQuery . '))');
+					$query->where('(event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id = ' . $eventId . ' OR event_id < 0))')
+						->where('id NOT IN (SELECT field_id FROM #__eb_field_events WHERE event_id = ' . $negEventId . ')');
 				}
 			}
 
@@ -5067,6 +5063,16 @@ class EventbookingHelper
 	 */
 	public static function userRegistrationCB($firstName, $lastName, $email, $username, $password)
 	{
+		if ((!file_exists(JPATH_SITE . '/libraries/CBLib/CBLib/Core/CBLib.php')) || (!file_exists(JPATH_ADMINISTRATOR . '/components/com_comprofiler/plugin.foundation.php')))
+		{
+			echo 'CB not installed';
+
+			return;
+		}
+
+		include_once(JPATH_ADMINISTRATOR . '/components/com_comprofiler/plugin.foundation.php');
+
+		cbimport('cb.html');
 
 		global $_CB_framework, $_PLUGINS, $ueConfig;
 
