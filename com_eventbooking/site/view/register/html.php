@@ -68,10 +68,19 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			{
 				$waitingList = $event->activate_waiting_list;
 			}
-
-			if (!$waitingList || !$event->number_event_dates)
+			
+			if ($event->cut_off_date != JFactory::getDbo()->getNullDate())
 			{
-				JFactory::getApplication()->redirect('index.php', JText::_('EB_ERROR_REGISTRATION'));
+				$registrationOpen = ($event->cut_off_minutes < 0);
+			}
+			else
+			{
+				$registrationOpen = ($event->number_event_dates > 0);
+			}
+
+			if (!$waitingList || !$registrationOpen)
+			{
+				JFactory::getApplication()->redirect(JUri::root(), JText::_('EB_ERROR_REGISTRATION'));
 			}
 		}
 
