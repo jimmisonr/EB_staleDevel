@@ -1189,11 +1189,6 @@ class EventbookingHelper
 		if ($couponCode)
 		{
 			$negEventId = -1 * $event->id;
-			$subQuery   = $db->getQuery(true);
-			$subQuery->select('coupon_id')
-				->from('#__eb_coupon_events')
-				->where("(event_id = $event->id OR (event_id < 0 AND event_id != $negEventId))");
-
 			//Validate the coupon
 			$query->clear()
 				->select('*')
@@ -1207,7 +1202,8 @@ class EventbookingHelper
 				->where('discount > used_amount')
 				->where('enable_for IN (0, 1)')
 				->where('user_id IN (0, ' . $user->id . ')')
-				->where('(event_id = -1 OR id IN (' . (string) $subQuery . '))')
+				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id = ' . $event->id . ' OR event_id < 0))')
+				->where('id NOT IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id = ' . $negEventId . ')')
 				->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
@@ -1533,11 +1529,6 @@ class EventbookingHelper
 		if ($couponCode)
 		{
 			$negEventId = -1 * $event->id;
-			$subQuery   = $db->getQuery(true);
-			$subQuery->select('coupon_id')
-				->from('#__eb_coupon_events')
-				->where("(event_id = $event->id OR (event_id < 0 AND event_id != $negEventId))");
-
 			$query->clear()
 				->select('*')
 				->from('#__eb_coupons')
@@ -1550,7 +1541,8 @@ class EventbookingHelper
 				->where('discount > used_amount')
 				->where('enable_for IN (0, 2)')
 				->where('user_id IN (0, ' . $user->id . ')')
-				->where('(event_id = -1 OR id IN (' . (string) $subQuery . '))')
+				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id = ' . $event->id . ' OR event_id < 0))')
+				->where('id NOT IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id = ' . $negEventId . ')')
 				->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
