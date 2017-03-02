@@ -8,7 +8,16 @@
  */
 // no direct access
 defined( '_JEXEC' ) or die ;
-JHtml::_('behavior.calendar');
+
+if (version_compare(JVERSION, '3.6.9', 'ge'))
+{
+	JHtml::_('calendar');
+}
+else
+{
+	JHtml::_('behavior.calendar');
+}
+
 EventbookingHelperJquery::validateForm();
 if ($this->config->accept_term ==1 && !$this->config->fix_term_and_condition_popup)
 {

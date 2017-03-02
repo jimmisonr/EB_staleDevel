@@ -54,14 +54,20 @@ abstract class EventbookingHelperHtml
 	 */
 	public static function getCalendarSetupJs($fields)
 	{
-		$firstDay   = JFactory::getLanguage()->getFirstDay();
-		$config     = EventbookingHelper::getConfig();
-		$dateFormat = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
-		$output     = array();
-
-		foreach ($fields as $field)
+		if (version_compare(JVERSION, '3.6.9', 'ge'))
 		{
-			$output[] = 'Calendar.setup({
+			return 'JoomlaCalendar.init(".field-calendar");';
+		}
+		else
+		{
+			$firstDay   = JFactory::getLanguage()->getFirstDay();
+			$config     = EventbookingHelper::getConfig();
+			$dateFormat = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
+			$output     = array();
+
+			foreach ($fields as $field)
+			{
+				$output[] = 'Calendar.setup({
 			// Id of the input field
 			inputField: "' . $field . '",
 			// Format of the input field
@@ -73,9 +79,10 @@ abstract class EventbookingHelperHtml
 			singleClick: true,
 			firstDay: ' . $firstDay . '
 			});';
-		}
+			}
 
-		return implode("\n", $output);
+			return implode("\n", $output);
+		}
 	}
 
 	/**
