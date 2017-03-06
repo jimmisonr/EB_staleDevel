@@ -250,7 +250,12 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 
 		if ($row->published == 0)
 		{
-			throw new Exception(JText::_('Certificate is only allowed for confirmed/page registrants'), 403);
+			throw new Exception(JText::_('EB_CERTIFICATE_PAID_REGISTRANTS_ONLY'), 403);
+		}
+
+		if ($config->download_certificate_if_checked_in && !$row->checked_id)
+		{
+			throw new Exception(JText::_('EB_CERTIFICATE_CHECKED_IN_REGISTRANTS_ONLY'), 403);
 		}
 
 		// Compare current date with event end date
@@ -270,7 +275,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 
 		if ($rowEvent->event_end_date_minutes < 0)
 		{
-			throw new Exception(JText::_('Certificate can only be downloaded after event end date'), 403);
+			throw new Exception(JText::_('EB_CERTIFICATE_AFTER_EVENT_END_DATE'), 403);
 		}
 
 		EventbookingHelper::downloadCertificates(array($row), $config);

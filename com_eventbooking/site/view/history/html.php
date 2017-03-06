@@ -75,7 +75,10 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 		{
 			$item->show_download_certificate = false;
 
-			if ($item->published == 1 && $item->activate_certificate_feature == 1 && $item->event_end_date_minutes >= 0)
+			if ($item->published == 1 && $item->activate_certificate_feature == 1
+				&& $item->event_end_date_minutes >= 0
+				&& (!$config->download_certificate_if_checked_in || $item->checked_in)
+			)
 			{
 				$showDownloadCertificate         = true;
 				$item->show_download_certificate = true;
