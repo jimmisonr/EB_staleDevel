@@ -132,6 +132,11 @@ class EventbookingHelperAcl
 
 		if ($user->authorise('core.edit.state', 'com_eventbooking'))
 		{
+			if (empty($eventId))
+			{
+				return true;
+			}
+			
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('created_by')
