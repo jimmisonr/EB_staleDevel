@@ -383,6 +383,14 @@ defined( '_JEXEC' ) or die ;
 				<?php echo EventbookingHelperHtml::getBooleanInput('collect_member_information', $config->collect_member_information); ?>
 			</div>
 		</div>
+		<div class="control-group" data-showon='<?php echo EventbookingHelperHtml::renderShowOn(array('multiple_booking' => '0')); ?>'>
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('auto_populate_billing_data', JText::_('EB_AUTO_POPULATE_BILLING_DATA')); ?>
+			</div>
+			<div class="controls">
+				<?php echo $this->lists['auto_populate_billing_data']; ?>
+			</div>
+		</div>
 		<div class="control-group">
 			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('prevent_duplicate_registration', JText::_('EB_PREVENT_DUPLICATE'), JText::_('EB_PREVENT_DUPLICATE_EXPLAIN')); ?>

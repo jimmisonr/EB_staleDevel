@@ -204,7 +204,41 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		else
 		{
 			$captchaInvalid = 0;
-			$data           = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);
+
+			if ($config->auto_populate_billing_data)
+			{
+				// Get group members data
+				$membersData = $session->get('eb_group_members_data', null);
+
+				if ($membersData)
+				{
+					$membersData = unserialize($membersData);
+
+					if ($config->auto_populate_billing_data == 'first_group_member')
+					{
+						$memberIndex = 1;
+					}
+					else
+					{
+						$memberIndex = (int) $session->get('eb_number_registrants', '');
+					}
+
+					foreach ($membersData as $key => $value)
+					{
+						$pos = strrpos($key, '_' . $memberIndex);
+
+						if ($pos !== false)
+						{
+							$fieldName        = substr($key, 0, $pos);
+							$data[$fieldName] = $membersData[$key];
+						}
+					}
+				}
+			}
+			else
+			{
+				$data = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);
+			}
 
 			// IN case there is no data, get it from URL (get for example)
 			if (empty($data))
