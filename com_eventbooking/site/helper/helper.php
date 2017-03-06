@@ -5411,72 +5411,79 @@ class EventbookingHelper
 	public static function getDeliciousButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/delicious.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'Delicious');
 
-		return '<a href="http://del.icio.us/post?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="Submit ' . $title . ' in Delicious" target="blank" >
-		<img src="' . $img_url . '" alt="Submit ' . $title . ' in Delicious" />
+		return '<a href="http://del.icio.us/post?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="' . $alt . '" target="blank" >
+		<img src="' . $img_url . '" alt="' . $alt . '" />
 		</a>';
 	}
 
 	public static function getDiggButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/digg.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'Digg');
 
-		return '<a href="http://digg.com/submit?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="Submit ' . $title . ' in Digg" target="blank" >
-        <img src="' . $img_url . '" alt="Submit ' . $title . ' in Digg" />
+		return '<a href="http://digg.com/submit?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="' . $alt . '" target="blank" >
+        <img src="' . $img_url . '" alt="' . $alt . '" />
         </a>';
 	}
 
 	public static function getFacebookButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/facebook.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'FaceBook');
 
-		return '<a href="http://www.facebook.com/sharer.php?u=' . rawurlencode($link) . '&amp;t=' . rawurlencode($title) . '" title="Submit ' . $title . ' in FaceBook" target="blank" >
-        <img src="' . $img_url . '" alt="Submit ' . $title . ' in FaceBook" />
+		return '<a href="http://www.facebook.com/sharer.php?u=' . rawurlencode($link) . '&amp;t=' . rawurlencode($title) . '" title="' . $alt . '" target="blank" >
+        <img src="' . $img_url . '" alt="' . $alt . '" />
         </a>';
 	}
 
 	public static function getGoogleButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/google.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'Google Bookmarks');
 
-		return '<a href="http://www.google.com/bookmarks/mark?op=edit&bkmk=' . rawurlencode($link) . '" title="Submit ' . $title . ' in Google Bookmarks" target="blank" >
-        <img src="' . $img_url . '" alt="Submit ' . $title . ' in Google Bookmarks" />
+		return '<a href="http://www.google.com/bookmarks/mark?op=edit&bkmk=' . rawurlencode($link) . '" title="' . $alt . '" target="blank" >
+        <img src="' . $img_url . '" alt="' . $alt . '" />
         </a>';
 	}
 
 	public static function getStumbleuponButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/stumbleupon.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'Stumbleupon');
 
-		return '<a href="http://www.stumbleupon.com/submit?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="Submit ' .
-		$title . ' in Stumbleupon" target="blank" >
-        <img src="' . $img_url . '" alt="Submit ' . $title . ' in Stumbleupon" />
+		return '<a href="http://www.stumbleupon.com/submit?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="' . $alt . '" target="blank" >
+        <img src="' . $img_url . '" alt="' . $alt . '" />
         </a>';
 	}
 
 	public static function getTechnoratiButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/technorati.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'Technorati');
 
-		return '<a href="http://technorati.com/faves?add=' . rawurlencode($link) . '" title="Submit ' . $title . ' in Technorati" target="blank" >
-        <img src="' . $img_url . '" alt="Submit ' . $title . ' in Technorati" />
+		return '<a href="http://technorati.com/faves?add=' . rawurlencode($link) . '" title="' . $alt . '" target="blank" >
+        <img src="' . $img_url . '" alt="' . $alt . '" />
         </a>';
 	}
 
 	public static function getTwitterButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/twitter.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'Twitter');
 
-		return '<a href="http://twitter.com/?status=' . rawurlencode($title . " " . $link) . '" title="Submit ' . $title . ' in Twitter" target="blank" >
-        <img src="' . $img_url . '" alt="Submit ' . $title . ' in Twitter" />
+		return '<a href="http://twitter.com/?status=' . rawurlencode($title . " " . $link) . '" title="' . $alt . '" target="blank" >
+        <img src="' . $img_url . '" alt="' . $alt . '" />
         </a>';
 	}
 
 	public static function getLinkedInButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/linkedin.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'LinkedIn');
 
-		return '<a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=' . $link . '&amp;title=' . $title . '" title="Submit ' . $title . ' in LinkedIn" target="_blank" ><img src="' . $img_url . '" alt="Submit ' . $title . ' in LinkedIn" /></a>';
+		return '<a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=' . $link . '&amp;title=' . $title . '" title="' . $alt . '" target="_blank" ><img src="' . $img_url . '" alt="' . $alt . '" /></a>';
 	}
 
 	/**
