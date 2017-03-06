@@ -39,7 +39,7 @@ defined('_JEXEC') or die;
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_STATE_NAME'), 'tbl.state_name', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
 				<th class="title" style="text-align: left;">
-					<?php echo JHtml::_('grid.sort',  JText::_('EB_COUNTRY_NAME'), 'cou.name', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
+					<?php echo JHtml::_('grid.sort',  JText::_('EB_COUNTRY_NAME'), 'b.name', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
 				<th class="center title" width="15%">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_STATE_CODE_3'), 'tbl.state_3_code', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
