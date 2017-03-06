@@ -227,7 +227,16 @@ else
 					</td>
 					<td>
 						<a href="<?php echo $link; ?>">
-							<?php echo $row->first_name ?>
+							<?php
+								echo $row->first_name;
+
+								if ($row->username)
+								{
+								?>
+									<a href="<?php echo JRoute::_('index.php?option=com_users&task=user.edit&id=' . $row->user_id); ?>" title="View Profile" target="_blank">&nbsp;<strong>[<?php echo $row->username ; ?>]</strong></a>
+								<?php
+								}
+							?>
 						</a>
 						<?php
 						if ($row->is_group_billing)
