@@ -88,6 +88,43 @@ JHtml::_('behavior.tabstate');
 				<?php echo $editor->display( 'thanks_message_offline',  $this->message->thanks_message_offline , '100%', '250', '75', '8' ) ;?>
 			</div>
 		</div>
+		<?php
+		if (count($this->extraOfflinePlugins))
+		{
+			foreach ($this->extraOfflinePlugins as $offlinePaymentPlugin)
+			{
+				$name   = $offlinePaymentPlugin->name;
+				$title  = $offlinePaymentPlugin->title;
+				$prefix = str_replace('os_offline', '', $name);
+				?>
+				<div class="control-group">
+					<div class="control-label">
+						<?php echo JText::_('User email body (' . $title . ')'); ?>
+						<p class="eb-available-tags">
+							<?php echo JText::_('EB_AVAILABLE_TAGS'); ?>: <strong><?php echo $fields; ?></strong>
+						</p>
+					</div>
+					<div class="controls">
+						<?php echo $editor->display('user_email_body_offline' . $prefix, $this->message->{'user_email_body_offline' . $prefix}, '100%', '250', '75', '8'); ?>
+					</div>
+				</div>
+
+				<div class="control-group">
+					<div class="control-label">
+						<?php echo JText::_('Thank you message (' . $title . ')'); ?>
+						<p>
+							<strong>This message will be displayed on the thank you page after users complete an offline
+								payment</strong>
+						</p>
+					</div>
+					<div class="controls">
+						<?php echo $editor->display('thanks_message_offline' . $prefix, $this->message->{'thanks_message_offline' . $prefix}, '100%', '250', '75', '8'); ?>
+					</div>
+				</div>
+				<?php
+			}
+		}
+		?>
 		<div class="control-group">
 			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('cancel_message', JText::_('EB_CANCEL_MESSAGE'), JText::_('EB_CANCEL_MESSAGE_EXPLAIN')); ?>

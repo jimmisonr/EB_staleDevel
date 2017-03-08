@@ -35,6 +35,7 @@ class EventbookingModelList extends RADModelList
 		'tbl.created_by',
 		'tbl.cut_off_date',
 		'tbl.registration_type',
+		'tbl.min_group_number',
 		'tbl.discount_type',
 		'tbl.discount',
 		'tbl.early_bird_discount_type',

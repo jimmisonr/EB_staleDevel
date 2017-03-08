@@ -14,7 +14,17 @@ class EventbookingController extends RADControllerAdmin
 {
 	public function display($cachable = false, array $urlparams = array())
 	{
-		JFactory::getDocument()->addStyleSheet(JUri::base(true) . '/components/com_eventbooking/assets/css/style.css');
+		$document = JFactory::getDocument();
+		$baseUri  = JUri::base(true);
+
+		$document->addStyleSheet($baseUri . '/components/com_eventbooking/assets/css/style.css');
+
+		$customCssFile = JPATH_ADMINISTRATOR . '/components/com_eventbooking/assets/css/custom.css';
+
+		if (file_exists($customCssFile) && filesize($customCssFile) > 0)
+		{
+			$document->addStyleSheet($baseUri . '/components/com_eventbooking/assets/css/custom.css');
+		}
 
 		parent::display($cachable, $urlparams);
 
@@ -530,6 +540,20 @@ class EventbookingController extends RADControllerAdmin
 		if (!in_array('hide_on_export', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_fields` ADD  `hide_on_export` TINYINT NOT NULL DEFAULT  '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('show_on_registrants', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_fields` ADD  `show_on_registrants` TINYINT NOT NULL DEFAULT  '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('receive_confirmation_email', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_fields` ADD  `receive_confirmation_email` TINYINT NOT NULL DEFAULT  '0';";
 			$db->setQuery($sql);
 			$db->execute();
 		}

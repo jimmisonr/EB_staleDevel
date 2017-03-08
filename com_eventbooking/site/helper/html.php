@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package            Joomla
  * @subpackage         Event Booking
@@ -9,15 +8,66 @@
  */
 abstract class EventbookingHelperHtml
 {
+	/**
+	 * Render ShowOn string
+	 *
+	 * @param array $fields
+	 *
+	 * @return string
+	 */
+	public static function renderShowOn($fields)
+	{
+		$output = array();
+
+		$i = 0;
+
+		foreach ($fields as $name => $values)
+		{
+			$i++;
+
+			$values = (array) $values;
+
+			$data = array(
+				'field'  => $name,
+				'values' => $values
+			);
+
+			if (version_compare(JVERSION, '3.6.99', 'ge'))
+			{
+				$data['sign'] = '=';
+			}
+
+			$data['op'] = $i > 1 ? 'AND' : '';
+
+			$output[] = json_encode($data);
+		}
+
+		return '[' . implode(',', $output) . ']';
+	}
+
+	/***
+	 * Get javascript code for showing calendar form field on ajax request result
+	 *
+	 * @param $fields
+	 *
+	 * @return string
+	 */
 	public static function getCalendarSetupJs($fields)
 	{
-		$firstDay   = JFactory::getLanguage()->getFirstDay();
-		$config     = EventbookingHelper::getConfig();
-		$dateFormat = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
-		$output     = array();
-		foreach ($fields as $field)
+		if (version_compare(JVERSION, '3.6.9', 'ge'))
 		{
-			$output[] = 'Calendar.setup({
+			return 'JoomlaCalendar.init(".field-calendar");';
+		}
+		else
+		{
+			$firstDay   = JFactory::getLanguage()->getFirstDay();
+			$config     = EventbookingHelper::getConfig();
+			$dateFormat = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';
+			$output     = array();
+
+			foreach ($fields as $field)
+			{
+				$output[] = 'Calendar.setup({
 			// Id of the input field
 			inputField: "' . $field . '",
 			// Format of the input field
@@ -29,9 +79,10 @@ abstract class EventbookingHelperHtml
 			singleClick: true,
 			firstDay: ' . $firstDay . '
 			});';
-		}
+			}
 
-		return implode("\n", $output);
+			return implode("\n", $output);
+		}
 	}
 
 	/**

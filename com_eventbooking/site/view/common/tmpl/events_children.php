@@ -333,7 +333,25 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 										<?php
 										}
 
-										if (($item->registration_type == 0 || $item->registration_type == 2) && !$config->multiple_booking)
+										if ($item->min_group_number > 0)
+										{
+											$minGroupNumber = $item->min_group_number;
+										}
+										else
+										{
+											$minGroupNumber = 2;
+										}
+
+										if ($item->event_capacity > 0 && (($item->event_capacity - $item->total_registrants) < $minGroupNumber))
+										{
+											$groupRegistrationAvailable = false;
+										}
+										else
+										{
+											$groupRegistrationAvailable = true;
+										}
+
+										if ($groupRegistrationAvailable && ($item->registration_type == 0 || $item->registration_type == 2) && !$config->multiple_booking)
 										{
 										?>
 											<li>

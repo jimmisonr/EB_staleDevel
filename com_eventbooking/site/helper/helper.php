@@ -788,6 +788,7 @@ class EventbookingHelper
 		$replaces['event_end_date_time'] = JHtml::_('date', $event->event_end_date, $timeFormat, null);
 		$replaces['short_description']   = $event->short_description;
 		$replaces['description']         = $event->description;
+		$replaces['alias']               = $event->alias;
 		$replaces['event_link']          = $siteUrl . 'index.php?option=com_eventbooking&view=event&id=' . $event->id . '&Itemid=' . $Itemid;
 
 		// Add support for group members name tags
@@ -1188,11 +1189,6 @@ class EventbookingHelper
 		if ($couponCode)
 		{
 			$negEventId = -1 * $event->id;
-			$subQuery   = $db->getQuery(true);
-			$subQuery->select('coupon_id')
-				->from('#__eb_coupon_events')
-				->where("(event_id = $event->id OR (event_id < 0 AND event_id != $negEventId))");
-
 			//Validate the coupon
 			$query->clear()
 				->select('*')
@@ -1206,7 +1202,8 @@ class EventbookingHelper
 				->where('discount > used_amount')
 				->where('enable_for IN (0, 1)')
 				->where('user_id IN (0, ' . $user->id . ')')
-				->where('(event_id = -1 OR id IN (' . (string) $subQuery . '))')
+				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id = ' . $event->id . ' OR event_id < 0))')
+				->where('id NOT IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id = ' . $negEventId . ')')
 				->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
@@ -1532,11 +1529,6 @@ class EventbookingHelper
 		if ($couponCode)
 		{
 			$negEventId = -1 * $event->id;
-			$subQuery   = $db->getQuery(true);
-			$subQuery->select('coupon_id')
-				->from('#__eb_coupon_events')
-				->where("(event_id = $event->id OR (event_id < 0 AND event_id != $negEventId))");
-
 			$query->clear()
 				->select('*')
 				->from('#__eb_coupons')
@@ -1549,7 +1541,8 @@ class EventbookingHelper
 				->where('discount > used_amount')
 				->where('enable_for IN (0, 2)')
 				->where('user_id IN (0, ' . $user->id . ')')
-				->where('(event_id = -1 OR id IN (' . (string) $subQuery . '))')
+				->where('(event_id = -1 OR id IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id = ' . $event->id . ' OR event_id < 0))')
+				->where('id NOT IN (SELECT coupon_id FROM #__eb_coupon_events WHERE event_id = ' . $negEventId . ')')
 				->order('id DESC');
 			$db->setQuery($query);
 			$coupon = $db->loadObject();
@@ -2007,6 +2000,7 @@ class EventbookingHelper
 		}
 
 		$count = 0;
+		$paymentFeeAmountAdded = false;
 
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
@@ -2225,7 +2219,16 @@ class EventbookingHelper
 
 			if (($paymentFeeAmount > 0 || $paymentFeePercent > 0) && $registrantAmount > 0)
 			{
-				$registrantPaymentProcessingFee = round($paymentFeeAmount + $registrantAmount * $paymentFeePercent / 100, 2);
+				if ($paymentFeeAmountAdded)
+				{
+					$registrantPaymentProcessingFee = round($registrantAmount * $paymentFeePercent / 100, 2);
+				}
+				else
+				{
+					$paymentFeeAmountAdded = true;
+					$registrantPaymentProcessingFee = round($paymentFeeAmount + $registrantAmount * $paymentFeePercent / 100, 2);
+				}
+
 				$registrantAmount += $registrantPaymentProcessingFee;
 			}
 			else
@@ -2541,12 +2544,8 @@ class EventbookingHelper
 				else
 				{
 					$negEventId = -1 * $eventId;
-					$subQuery   = $db->getQuery(true);
-					$subQuery->select('field_id')
-						->from('#__eb_field_events')
-						->where("(event_id = $eventId OR (event_id < 0 AND event_id != $negEventId))");
-
-					$query->where('(event_id = -1 OR id IN (' . (string) $subQuery . '))');
+					$query->where('(event_id = -1 OR id IN (SELECT field_id FROM #__eb_field_events WHERE event_id = ' . $eventId . ' OR event_id < 0))')
+						->where('id NOT IN (SELECT field_id FROM #__eb_field_events WHERE event_id = ' . $negEventId . ')');
 				}
 			}
 
@@ -3711,6 +3710,11 @@ class EventbookingHelper
 	 */
 	public static function getRegistrationRate($eventId, $numberRegistrants)
 	{
+		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideHelper', 'getRegistrationRate'))
+		{
+			return EventbookingHelperOverrideHelper::downloadCertificates($eventId, $numberRegistrants);
+		}
+
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('price')
@@ -3999,12 +4003,12 @@ class EventbookingHelper
 	{
 		$string = strip_tags($string, '<img>');
 
-		// Remove none printable characters
-		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x80-\x9F]/u', '', $string);
+		// Remove all scpecial characters
+		$string = preg_replace("/[^a-zA-Z]+/", "", $string);
 
 		$string = trim($string);
 
-		if (strlen($string))
+		if (strlen($string) > 10)
 		{
 			return true;
 		}
@@ -5051,6 +5055,16 @@ class EventbookingHelper
 	 */
 	public static function userRegistrationCB($firstName, $lastName, $email, $username, $password)
 	{
+		if ((!file_exists(JPATH_SITE . '/libraries/CBLib/CBLib/Core/CBLib.php')) || (!file_exists(JPATH_ADMINISTRATOR . '/components/com_comprofiler/plugin.foundation.php')))
+		{
+			echo 'CB not installed';
+
+			return;
+		}
+
+		include_once(JPATH_ADMINISTRATOR . '/components/com_comprofiler/plugin.foundation.php');
+
+		cbimport('cb.html');
 
 		global $_CB_framework, $_PLUGINS, $ueConfig;
 
@@ -5397,72 +5411,79 @@ class EventbookingHelper
 	public static function getDeliciousButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/delicious.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'Delicious');
 
-		return '<a href="http://del.icio.us/post?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="Submit ' . $title . ' in Delicious" target="blank" >
-		<img src="' . $img_url . '" alt="Submit ' . $title . ' in Delicious" />
+		return '<a href="http://del.icio.us/post?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="' . $alt . '" target="blank" >
+		<img src="' . $img_url . '" alt="' . $alt . '" />
 		</a>';
 	}
 
 	public static function getDiggButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/digg.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'Digg');
 
-		return '<a href="http://digg.com/submit?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="Submit ' . $title . ' in Digg" target="blank" >
-        <img src="' . $img_url . '" alt="Submit ' . $title . ' in Digg" />
+		return '<a href="http://digg.com/submit?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="' . $alt . '" target="blank" >
+        <img src="' . $img_url . '" alt="' . $alt . '" />
         </a>';
 	}
 
 	public static function getFacebookButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/facebook.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'FaceBook');
 
-		return '<a href="http://www.facebook.com/sharer.php?u=' . rawurlencode($link) . '&amp;t=' . rawurlencode($title) . '" title="Submit ' . $title . ' in FaceBook" target="blank" >
-        <img src="' . $img_url . '" alt="Submit ' . $title . ' in FaceBook" />
+		return '<a href="http://www.facebook.com/sharer.php?u=' . rawurlencode($link) . '&amp;t=' . rawurlencode($title) . '" title="' . $alt . '" target="blank" >
+        <img src="' . $img_url . '" alt="' . $alt . '" />
         </a>';
 	}
 
 	public static function getGoogleButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/google.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'Google Bookmarks');
 
-		return '<a href="http://www.google.com/bookmarks/mark?op=edit&bkmk=' . rawurlencode($link) . '" title="Submit ' . $title . ' in Google Bookmarks" target="blank" >
-        <img src="' . $img_url . '" alt="Submit ' . $title . ' in Google Bookmarks" />
+		return '<a href="http://www.google.com/bookmarks/mark?op=edit&bkmk=' . rawurlencode($link) . '" title="' . $alt . '" target="blank" >
+        <img src="' . $img_url . '" alt="' . $alt . '" />
         </a>';
 	}
 
 	public static function getStumbleuponButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/stumbleupon.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'Stumbleupon');
 
-		return '<a href="http://www.stumbleupon.com/submit?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="Submit ' .
-		$title . ' in Stumbleupon" target="blank" >
-        <img src="' . $img_url . '" alt="Submit ' . $title . ' in Stumbleupon" />
+		return '<a href="http://www.stumbleupon.com/submit?url=' . rawurlencode($link) . '&amp;title=' . rawurlencode($title) . '" title="' . $alt . '" target="blank" >
+        <img src="' . $img_url . '" alt="' . $alt . '" />
         </a>';
 	}
 
 	public static function getTechnoratiButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/technorati.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'Technorati');
 
-		return '<a href="http://technorati.com/faves?add=' . rawurlencode($link) . '" title="Submit ' . $title . ' in Technorati" target="blank" >
-        <img src="' . $img_url . '" alt="Submit ' . $title . ' in Technorati" />
+		return '<a href="http://technorati.com/faves?add=' . rawurlencode($link) . '" title="' . $alt . '" target="blank" >
+        <img src="' . $img_url . '" alt="' . $alt . '" />
         </a>';
 	}
 
 	public static function getTwitterButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/twitter.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'Twitter');
 
-		return '<a href="http://twitter.com/?status=' . rawurlencode($title . " " . $link) . '" title="Submit ' . $title . ' in Twitter" target="blank" >
-        <img src="' . $img_url . '" alt="Submit ' . $title . ' in Twitter" />
+		return '<a href="http://twitter.com/?status=' . rawurlencode($title . " " . $link) . '" title="' . $alt . '" target="blank" >
+        <img src="' . $img_url . '" alt="' . $alt . '" />
         </a>';
 	}
 
 	public static function getLinkedInButton($title, $link)
 	{
 		$img_url = JUri::root(true) . "/media/com_eventbooking/assets/images/socials/linkedin.png";
+		$alt     = JText::sprintf('EB_SUBMIT_ITEM_IN_SOCIAL_NETWORK', $title, 'LinkedIn');
 
-		return '<a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=' . $link . '&amp;title=' . $title . '" title="Submit ' . $title . ' in LinkedIn" target="_blank" ><img src="' . $img_url . '" alt="Submit ' . $title . ' in LinkedIn" /></a>';
+		return '<a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=' . $link . '&amp;title=' . $title . '" title="' . $alt . '" target="_blank" ><img src="' . $img_url . '" alt="' . $alt . '" /></a>';
 	}
 
 	/**

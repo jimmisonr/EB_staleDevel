@@ -212,6 +212,13 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['send_emails'] = JHtml::_('select.genericlist', $options, 'send_emails', ' class="inputbox"', 'value', 'text',
 			$config->send_emails);
 
+		$options   = array();
+		$options[] = JHtml::_('select.option', '', JText::_('JNO'));
+		$options[] = JHtml::_('select.option', 'first_group_member', JText::_('EB_FIRST_GROUP_MEMBER'));
+		$options[] = JHtml::_('select.option', 'last_group_member', JText::_('EB_LAST_GROUP_MEMBER'));
+		$lists['auto_populate_billing_data'] = JHtml::_('select.genericlist', $options, 'auto_populate_billing_data', '', 'value', 'text',
+			$config->auto_populate_billing_data);
+
 		$fontsPath = JPATH_ROOT . '/components/com_eventbooking/tcpdf/fonts/';
 		$options   = array();
 		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_FONT'));

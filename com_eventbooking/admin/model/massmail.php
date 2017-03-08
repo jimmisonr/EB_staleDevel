@@ -53,6 +53,7 @@ class EventbookingModelMassmail extends RADModel
 			$replaces['event_date']        = JHtml::_('date', $event->event_date, $config->event_date_format, null);
 			$replaces['short_description'] = $event->short_description;
 			$replaces['description']       = $event->description;
+
 			if ($event->location_id)
 			{
 				$location                   = EventbookingHelperDatabase::getLocation($event->location_id);
@@ -75,11 +76,49 @@ class EventbookingModelMassmail extends RADModel
 			$emails  = array();
 			$subject = $data['subject'];
 			$body    = EventbookingHelper::convertImgTags($data['description']);
+
 			foreach ($replaces as $key => $value)
 			{
 				$key     = strtoupper($key);
 				$subject = str_replace("[$key]", $value, $subject);
 				$body    = str_replace("[$key]", $value, $body);
+			}
+
+			// Attach ICS file
+			if ($config->send_ics_file)
+			{
+				if ($config->from_name)
+				{
+					$fromName = $config->from_name;
+				}
+				else
+				{
+					$fromName = JFactory::getConfig()->get('fromname');
+				}
+
+				if ($config->from_email)
+				{
+					$fromEmail = $config->from_email;
+				}
+				else
+				{
+					$fromEmail = JFactory::getConfig()->get('mailfrom');
+				}
+
+				$ics = new EventbookingHelperIcs();
+				$ics->setName($event->title)
+					->setDescription($event->short_description)
+					->setOrganizer($fromEmail, $fromName)
+					->setStart($event->event_date)
+					->setEnd($event->event_end_date);
+
+				if (!empty($location))
+				{
+					$ics->setLocation($location->name);
+				}
+
+				$fileName = JApplicationHelper::stringURLSafe($event->title) . '.ics';
+				$mailer->addAttachment($ics->save(JPATH_ROOT . '/media/com_eventbooking/icsfiles/', $fileName));
 			}
 
 			foreach ($rows as $row)
@@ -130,7 +169,7 @@ class EventbookingModelMassmail extends RADModel
 					{
 						$emails[] = $email;
 						$mailer->sendMail($fromEmail, $fromName, $email, $subject, $message, 1);
-						$mailer->ClearAllRecipients();
+						$mailer->clearAllRecipients();
 					}
 				}
 			}

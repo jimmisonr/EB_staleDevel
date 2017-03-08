@@ -60,7 +60,22 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 				$this->state->filter_checked_in);
 		}
 
-		$query->select('COUNT(*)')
+		$query->select('id, name, title, is_core')
+			->from('#__eb_fields')
+			->where('published = 1')
+			->where('show_on_registrants = 1')
+			->where('name != "first_name"')
+			->order('ordering');
+		$db->setQuery($query);
+		$fields = $db->loadObjectList('id');
+
+		if (count($fields))
+		{
+			$this->fieldsData = $this->model->getFieldsData(array_keys($fields));
+		}
+
+		$query->clear()
+			->select('COUNT(*)')
 			->from('#__eb_payment_plugins')
 			->where('published=1');
 		$db->setQuery($query);
@@ -68,6 +83,7 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 		$this->config       = $config;
 		$this->totalPlugins = (int) $db->loadResult();
 		$this->coreFields   = EventbookingHelper::getPublishedCoreFields();
+		$this->fields       = $fields;
 	}
 
 	/**

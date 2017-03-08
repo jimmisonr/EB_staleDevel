@@ -344,9 +344,13 @@ abstract class RADFormField
 	/**
 	 * Method to get a control group with label and input.
 	 *
+	 * @param EventbookingHelperBootstrap $bootstrapHelper
+	 * @param string $controlId
+	 *
+	 *
 	 * @return  string  A string containing the html for the control goup
 	 */
-	public function getControlGroup($bootstrapHelper = null)
+	public function getControlGroup($bootstrapHelper = null, $controlId = null)
 	{
 		if ($this->type == 'hidden')
 		{
@@ -390,7 +394,7 @@ abstract class RADFormField
 				$class = ' ' . $class;
 			}
 
-			return '<div class="' . $controlGroupClass . $class . '" ' . $controlGroupAttributes . '>' . '<div class="' . $controlLabelClass . '">' . $this->getLabel() . '</div>' . '<div class="' . $controlsClass . '">' .
+			return '<div class="' . $controlGroupClass . $class . '" ' . $controlGroupAttributes . '>' . '<div class="' . $controlLabelClass . '">' . $this->getLabel() . '</div>' . '<div ' . ($controlId ? 'id="' . $controlId . '"' : '') . 'class="' . $controlsClass . '">' .
 			$this->getInput($bootstrapHelper) . '</div>' . '</div>';
 		}
 	}

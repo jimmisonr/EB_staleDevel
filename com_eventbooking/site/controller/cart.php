@@ -142,8 +142,16 @@ class EventbookingControllerCart extends EventbookingController
 			$errors[] = JText::_('EB_INVALID_CAPTCHA_ENTERED');
 		}
 
+		$cart  = new EventbookingHelperCart();
+		$items = $cart->getItems();
+
+		if (!count($items))
+		{
+			$this->app->redirect('index.php', JText::_('Sorry, your session was expired. Please try again!'));
+		}
+
 		// Check email
-		$result = $this->validateRegistrantEmail(0, $this->input->get('email', '', 'none'));
+		$result = $this->validateRegistrantEmail($items, $this->input->get('email', '', 'none'));
 
 		if (!$result['success'])
 		{
@@ -171,14 +179,6 @@ class EventbookingControllerCart extends EventbookingController
 			$this->display();
 
 			return;
-		}
-
-		$cart  = new EventbookingHelperCart();
-		$items = $cart->getItems();
-
-		if (!count($items))
-		{
-			$this->app->redirect('index.php', JText::_('Sorry, your session was expired. Please try again!'));
 		}
 
 		/* @var EventbookingModelCart $model */
@@ -264,12 +264,12 @@ class EventbookingControllerCart extends EventbookingController
 	/**
 	 * Validate to see whether this email can be used to register for this event or not
 	 *
-	 * @param $eventId
-	 * @param $email
+	 * @param array $eventIds
+	 * @param       $email
 	 *
 	 * @return array
 	 */
-	private function validateRegistrantEmail($eventId, $email)
+	private function validateRegistrantEmail($eventIds, $email)
 	{
 		$user   = JFactory::getUser();
 		$db     = JFactory::getDbo();
@@ -280,21 +280,37 @@ class EventbookingControllerCart extends EventbookingController
 			'message' => '',
 		);
 
-		if ($config->prevent_duplicate_registration && !$config->multiple_booking)
+		if ($config->prevent_duplicate_registration)
 		{
 			$query->clear()
-				->select('COUNT(id)')
+				->select('event_id')
 				->from('#__eb_registrants')
-				->where('event_id=' . $eventId)
-				->where('email = ' . $db->quote($email))
+				->where('event_id IN (' . implode(',', $eventIds))
 				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
-			$db->setQuery($query);
-			$total = $db->loadResult();
 
-			if ($total)
+			if ($user->id)
+			{
+				$query->where('(user_id = ' . $user->id . ' OR email = ' . $db->quote($email) . ')');
+			}
+			else
+			{
+				$query->where('email = ' . $db->quote($email));
+			}
+
+			$db->setQuery($query);
+			$registeredEventIds = $db->loadColumn();
+
+			if (count($eventIds))
 			{
 				$result['success'] = false;
-				$result['message'] = JText::_('EB_EMAIL_REGISTER_FOR_EVENT_ALREADY');
+
+				$query->clear()
+					->select('title')
+					->from('#__eb_events')
+					->where('id IN (' . implode(',', $registeredEventIds) . ')');
+				$db->setQuery($query);
+
+				$result['message'] = JText::sprintf('EB_YOU_REGISTERED_FOR_EVENTS', implode(' | ', $db->loadColumn()));
 			}
 		}
 
@@ -310,7 +326,7 @@ class EventbookingControllerCart extends EventbookingController
 			if ($total)
 			{
 				$result['success'] = false;
-				$result['message'] = JText::_('EB_EMAIL_REGISTER_FOR_EVENT_ALREADY');
+				$result['message'] = JText::_('EB_EMAIL_USED_BY_DIFFERENT_USER');
 			}
 		}
 

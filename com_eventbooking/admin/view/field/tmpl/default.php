@@ -206,6 +206,22 @@ if ($translatable)
 					<?php echo EventbookingHelperHtml::getBooleanInput('hide_on_export', $this->item->hide_on_export); ?>
 				</div>
 			</div>
+
+			<?php
+				if ($this->item->id && in_array($this->item->display_in, array(0, 1, 2, 3)))
+				{
+				?>
+					<div class="control-group">
+						<label class="control-label">
+							<?php echo EventbookingHelperHtml::getFieldLabel('receive_confirmation_email', JText::_('EB_RECEIVE_CONFIRMATION_EMAIL'), JText::_('EB_RECEIVE_CONFIRMATION_EMAIL_EXPLAIN')); ?>
+						</label>
+						<div class="controls">
+							<?php echo EventbookingHelperHtml::getBooleanInput('receive_confirmation_email', $this->item->receive_confirmation_email); ?>
+						</div>
+					</div>
+				<?php
+				}
+			?>
 			<div class="control-group">
 				<label class="control-label">
 					<?php echo  JText::_('EB_DESCRIPTION'); ?>

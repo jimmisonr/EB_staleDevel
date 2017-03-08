@@ -127,6 +127,8 @@ class EventbookingHelperMail
 
 			if (!$row->published && strpos($row->payment_method, 'os_offline') !== false)
 			{
+				$offlineSuffix = str_replace('os_offline', '', $row->payment_method);
+
 				if ($fieldSuffix && EventbookingHelper::isValidMessage($event->{'user_email_body_offline' . $fieldSuffix}))
 				{
 					$body = $event->{'user_email_body_offline' . $fieldSuffix};
@@ -138,6 +140,10 @@ class EventbookingHelperMail
 				elseif (EventbookingHelper::isValidMessage($event->user_email_body_offline))
 				{
 					$body = $event->user_email_body_offline;
+				}
+				elseif ($offlineSuffix && EventbookingHelper::isValidMessage($message->{'user_email_body_offline' . $offlineSuffix}))
+				{
+					$body = $message->{'user_email_body_offline' . $offlineSuffix};
 				}
 				else
 				{
@@ -250,7 +256,17 @@ class EventbookingHelperMail
 
 			if (JMailHelper::isEmailAddress($row->email))
 			{
-				static::send($mailer, array($row->email), $subject, $body);
+				$sendTos = array($row->email);
+
+				foreach ($rowFields as $rowField)
+				{
+					if ($rowField->receive_confirmation_email && !empty($replaces[$rowField->name]) && JMailHelper::isEmailAddress($replaces[$rowField->name]))
+					{
+						$sendTos[] = $replaces[$rowField->name];
+					}
+				}
+
+				static::send($mailer, $sendTos, $subject, $body);
 				$mailer->clearAllRecipients();
 			}
 

@@ -60,6 +60,8 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 		$message = EventbookingHelper::getMessages();
 		if (strpos($rowEvent->payment_method, 'os_offline') !== false)
 		{
+			$offlineSuffix = str_replace('os_offline', '', $rowEvent->payment_method);
+
 			if ($fieldSuffix && EventbookingHelper::isValidMessage($rowEvent->{'thanks_message_offline' . $fieldSuffix}))
 			{
 				$thankMessage = $rowEvent->{'thanks_message_offline' . $fieldSuffix};
@@ -71,6 +73,10 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 			elseif (EventbookingHelper::isValidMessage($rowEvent->thanks_message_offline))
 			{
 				$thankMessage = $rowEvent->thanks_message_offline;
+			}
+			elseif (EventbookingHelper::isValidMessage($rowEvent->thanks_message_offline))
+			{
+
 			}
 			else
 			{

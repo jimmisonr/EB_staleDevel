@@ -248,7 +248,14 @@ $count = 0;
 						}
 						elseif (!in_array($event->registration_access, $viewLevels))
 						{
-							$msg  = $loginToRegisterMsg;
+							if (JFactory::getUser()->id)
+							{
+								$msg = JText::_('EB_REGISTRATION_NOT_AVAILABLE_FOR_ACCOUNT');
+							}
+							else
+							{
+								$msg = $loginToRegisterMsg;
+							}
 						}
 						else
 						{

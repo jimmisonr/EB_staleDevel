@@ -663,7 +663,7 @@ class EventbookingControllerRegister extends EventbookingController
 			if ($total)
 			{
 				$result['success'] = false;
-				$result['message'] = JText::_('EB_EMAIL_REGISTER_FOR_EVENT_ALREADY');
+				$result['message'] = JText::_('EB_EMAIL_USED_BY_DIFFERENT_USER');
 			}
 		}
 

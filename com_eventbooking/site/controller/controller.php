@@ -50,7 +50,9 @@ class EventbookingController extends RADController
 
 		$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/css/themes/' . $theme . '.css');
 
-		if (file_exists(JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css') && filesize(JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css') > 0)
+		$customCssFile = JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css';
+
+		if (file_exists($customCssFile) && filesize($customCssFile) > 0)
 		{
 			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/css/custom.css');
 		}

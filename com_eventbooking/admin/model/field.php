@@ -73,6 +73,9 @@ class EventbookingModelField extends RADModelAdmin
 					$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
 					$query->where('event_id IN (SELECT id FROM #__eb_events AS a WHERE a.published = 1 AND (DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.event_end_date) >= ' . $currentDate . '))');
 				}
+				
+				// Prevent deleting data of un-published events
+				$query->where('event_id NOT IN (SELECT id FROM #__eb_events WHERE published != 1)');
 
 				$db->setQuery($query);
 				$db->execute();

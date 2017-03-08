@@ -109,6 +109,10 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 			$field->makeFieldOptional();
 		}
 
+		$cssClass = $field->getAttribute('class');
+		$cssClass = str_replace('equals[email]', 'equals[email_' . $i . ']', $cssClass);
+		$field->setAttribute('class', $cssClass);
+
 		echo $field->getControlGroup($bootstrapHelper);
 
 		if ($field->type == 'Date')

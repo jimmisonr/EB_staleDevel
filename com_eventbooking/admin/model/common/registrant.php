@@ -360,7 +360,15 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 		$lang->load('com_eventbooking', JPATH_ROOT, $tag);
 
 		$config = EventbookingHelper::getConfig();
-		EventbookingHelper::sendEmails($row, $config);
+
+		if ($row->published == 3)
+		{
+			EventbookingHelperMail::sendWaitinglistEmail($row, $config);
+		}
+		else
+		{
+			EventbookingHelperMail::sendEmails($row, $config);
+		}
 
 		return true;
 	}

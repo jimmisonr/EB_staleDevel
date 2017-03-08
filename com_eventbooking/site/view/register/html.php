@@ -68,10 +68,19 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			{
 				$waitingList = $event->activate_waiting_list;
 			}
-
-			if (!$waitingList || !$event->number_event_dates)
+			
+			if ($event->cut_off_date != JFactory::getDbo()->getNullDate())
 			{
-				JFactory::getApplication()->redirect('index.php', JText::_('EB_ERROR_REGISTRATION'));
+				$registrationOpen = ($event->cut_off_minutes < 0);
+			}
+			else
+			{
+				$registrationOpen = ($event->number_event_dates > 0);
+			}
+
+			if (!$waitingList || !$registrationOpen)
+			{
+				JFactory::getApplication()->redirect(JUri::root(), JText::_('EB_ERROR_REGISTRATION'));
 			}
 		}
 
@@ -541,8 +550,9 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			$fees = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
 		}
 
-		$events             = $cart->getEvents();
-		$methods            = os_payments::getPaymentMethods();
+		$events  = $cart->getEvents();
+		$methods = os_payments::getPaymentMethods();
+
 		$options            = array();
 		$options[]          = JHtml::_('select.option', 'Visa', 'Visa');
 		$options[]          = JHtml::_('select.option', 'MasterCard', 'MasterCard');
@@ -550,28 +560,30 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$options[]          = JHtml::_('select.option', 'Amex', 'American Express');
 		$lists['card_type'] = JHtml::_('select.genericlist', $options, 'card_type', ' class="inputbox" ', 'value', 'text');
 
-		//Coupon will be enabled if there is atleast one event has coupon
-		$query->clear();
-		$query->select('enable_coupon')
-			->from('#__eb_events')
-			->where('id IN (' . implode(',', $items) . ')');
-		$db->setQuery($query);
-		$enableCoupons = $db->loadColumn();
+		//Coupon will be enabled if there is at least one event has coupon enabled, same for deposit payment
 		$enableCoupon  = 0;
+		$enableDeposit = 0;
+		$eventTitles   = array();
 
-		for ($i = 0, $n = count($enableCoupons); $i < $n; $i++)
+		foreach ($events as $event)
 		{
-			if ($enableCoupons[$i] > 0 || ($enableCoupons[$i] == 0 && $config->enable_coupon))
+			if ($event->enable_coupon > 0 || ($event->enable_coupon == 0 && $config->enable_coupon))
 			{
 				$enableCoupon = 1;
-				break;
 			}
+
+			if ($event->deposit_amount > 0)
+			{
+				$enableDeposit = 1;
+			}
+
+			$eventTitles[] = $event->title;
 		}
 
 		##Add support for deposit payment
 		$paymentType = $input->post->getInt('payment_type', $config->get('default_payment_type', 0));
 
-		if ($config->activate_deposit_feature)
+		if ($config->activate_deposit_feature && $enableDeposit)
 		{
 			$options               = array();
 			$options[]             = JHtml::_('select.option', 0, JText::_('EB_FULL_PAYMENT'));
@@ -585,19 +597,9 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 			$depositPayment = 0;
 		}
 
-		$message     = EventbookingHelper::getMessages();
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-
-		$query->clear();
-		$query->select('title' . $fieldSuffix . ' AS title')
-			->from('#__eb_events')
-			->where('id IN (' . implode(',', $items) . ')')
-			->order('FIND_IN_SET(id, "' . implode(',', $items) . '")');
-		$db->setQuery($query);
-		$eventTitle = implode(', ', $db->loadColumn());
-
 		// Check to see if there is payment processing fee or not
 		$showPaymentFee = false;
+
 		foreach ($methods as $method)
 		{
 			if ($method->paymentFee)
@@ -619,8 +621,8 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$this->userId               = $userId;
 		$this->lists                = $lists;
 		$this->depositPayment       = $depositPayment;
-		$this->message              = $message;
-		$this->fieldSuffix          = $fieldSuffix;
+		$this->message              = EventbookingHelper::getMessages();
+		$this->fieldSuffix          = EventbookingHelper::getFieldSuffix();
 		$this->form                 = $form;
 		$this->totalAmount          = $fees['total_amount'];
 		$this->taxAmount            = $fees['tax_amount'];
@@ -631,7 +633,7 @@ class EventbookingViewRegisterHtml extends RADViewHtml
 		$this->paymentProcessingFee = $fees['payment_processing_fee'];
 		$this->amount               = $fees['amount'];
 		$this->items                = $events;
-		$this->eventTitle           = $eventTitle;
+		$this->eventTitle           = implode(', ', $eventTitles);
 		$this->form                 = $form;
 		$this->showPaymentFee       = $showPaymentFee;
 		$this->paymentType          = $paymentType;

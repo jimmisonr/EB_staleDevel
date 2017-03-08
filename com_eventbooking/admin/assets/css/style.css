@@ -292,3 +292,7 @@ body.com_eventbooking.view-message div.controls
 {
 	margin-left:28% !important;
 }
+.eb-date-time-container div.field-calendar
+{
+	display: inline !important;
+}

@@ -19,6 +19,14 @@ defined( '_JEXEC' ) or die ;
 </div>
 <div class="control-group">
 	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('download_certificate_if_checked_in', JText::_('EB_DOWNLOAD_CERTIFICATE_IF_CHECKED_IN'), JText::_('EB_DOWNLOAD_CERTIFICATE_IF_CHECKED_IN_EXPLAIN')); ?>
+	</div>
+	<div class="controls">
+		<?php echo EventbookingHelperHtml::getBooleanInput('download_certificate_if_checked_in', $config->download_certificate_if_checked_in); ?>
+	</div>
+</div>
+<div class="control-group">
+	<div class="control-label">
 		<?php echo EventbookingHelperHtml::getFieldLabel('certificate_prefix', JText::_('EB_CERTIFICATE_PREFIX'), JText::_('EB_CERTIFICATE_PREFIX_EXPLAIN')); ?>
 	</div>
 	<div class="controls">
