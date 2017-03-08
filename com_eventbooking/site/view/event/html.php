@@ -161,6 +161,7 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$this->nullDate        = JFactory::getDbo()->getNullDate();
 		$this->rowGroupRates   = EventbookingHelperDatabase::getGroupRegistrationRates($item->id);
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+		$this->print           = $this->input->getInt('print', 0);
 
 		parent::display();
 	}

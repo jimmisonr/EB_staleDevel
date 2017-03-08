@@ -98,6 +98,21 @@ if ($this->showTaskBar)
 	<div class="eb-box-heading clearfix">
 		<h1 class="eb-page-heading">
 			<span itemprop="name"><?php echo $item->title; ?></span>
+			<?php
+			if ($this->config->get('show_print_button', '1') === '1' && !$this->print)
+			{
+				$uri = JUri::getInstance();
+				$uri->setVar('tmpl', 'component');
+				$uri->setVar('print', '1');
+			?>
+				<div id="pop-print" class="btn hidden-print">
+					<a href="<?php echo $uri->toString();?> " rel="nofollow" target="_blank">
+						<span class="icon-print"></span>
+					</a>
+				</div>
+			<?php
+			}
+			?>
 		</h1>
 	</div>
 	<div id="eb-event-details" class="eb-description">
@@ -111,11 +126,11 @@ if ($this->showTaskBar)
 			if ($this->showTaskBar && in_array($this->config->get('register_buttons_position', 0), array(1,2)))
 			{
 			?>
-			<div class="eb-taskbar eb-register-buttons-top clearfix">
-				<ul>
-					<?php echo $registerButtons; ?>
-				</ul>
-			</div>
+				<div class="eb-taskbar eb-register-buttons-top clearfix">
+					<ul>
+						<?php echo $registerButtons; ?>
+					</ul>
+				</div>
 			<?php
 			}
 		?>
@@ -265,7 +280,7 @@ if ($this->showTaskBar)
 		echo $this->loadTemplate('plugins');
 	}
 
-	if ($this->config->show_social_bookmark)
+	if ($this->config->show_social_bookmark && !$this->print)
 	{
 		echo $this->loadTemplate('social_buttons', array('socialUrl' => $socialUrl));
 	}
@@ -290,4 +305,14 @@ if ($this->showTaskBar)
 			form.submit() ;
 		}
 	}
+	<?php
+	if ($this->print)
+	{
+	?>
+		window.print();
+	<?php
+	}
+
+	echo $this->conversionTrackingCode;
+?>
 </script>

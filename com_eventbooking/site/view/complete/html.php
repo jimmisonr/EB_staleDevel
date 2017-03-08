@@ -169,8 +169,9 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 
 		$this->message                = $thankMessage;
 		$this->registrationCode       = $registrationCode;
-		$this->tmpl                   = $this->input->getString('tmpl');
+		$this->print                  = $this->input->getInt('print', 0);
 		$this->conversionTrackingCode = $trackingCode;
+		$this->showPrintButton        = $config->get('show_print_button', '1');
 
 		// Reset cart
 		$cart = new EventbookingHelperCart();

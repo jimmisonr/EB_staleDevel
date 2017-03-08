@@ -409,3 +409,11 @@ if (JPluginHelper::isEnabled('eventbooking', 'tickettypes'))
 		<?php echo $this->lists['social_sharing_buttons']; ?>
 	</div>
 </div>
+<div class="control-group">
+	<div class="control-label">
+		<?php echo EventbookingHelperHtml::getFieldLabel('show_print_button', JText::_('EB_SHOW_PRINT_BUTTON'), JText::_('EB_SHOW_PRINT_BUTTON_EXPLAIN')); ?>
+	</div>
+	<div class="controls">
+		<?php echo EventbookingHelperHtml::getBooleanInput('show_print_button', $config->get('show_print_button', 1)); ?>
+	</div>
+</div>
