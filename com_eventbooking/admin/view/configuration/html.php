@@ -212,12 +212,18 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['send_emails'] = JHtml::_('select.genericlist', $options, 'send_emails', ' class="inputbox"', 'value', 'text',
 			$config->send_emails);
 
-		$options   = array();
-		$options[] = JHtml::_('select.option', '', JText::_('JNO'));
-		$options[] = JHtml::_('select.option', 'first_group_member', JText::_('EB_FIRST_GROUP_MEMBER'));
-		$options[] = JHtml::_('select.option', 'last_group_member', JText::_('EB_LAST_GROUP_MEMBER'));
+		$options                             = array();
+		$options[]                           = JHtml::_('select.option', '', JText::_('JNO'));
+		$options[]                           = JHtml::_('select.option', 'first_group_member', JText::_('EB_FIRST_GROUP_MEMBER'));
+		$options[]                           = JHtml::_('select.option', 'last_group_member', JText::_('EB_LAST_GROUP_MEMBER'));
 		$lists['auto_populate_billing_data'] = JHtml::_('select.genericlist', $options, 'auto_populate_billing_data', '', 'value', 'text',
 			$config->auto_populate_billing_data);
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', 'new_registration_emails', JText::_('EB_NEW_REGISTRATION_EMAILS'));
+		$options[] = JHtml::_('select.option', 'reminder_emails', JText::_('EB_REMINDER_EMAILS'));
+
+		$lists['log_email_types'] = JHtml::_('select.genericlist', $options, 'log_email_types[]', ' multiple="multiple" ', 'value', 'text', explode(',', $config->get('log_email_types')));
 
 		$fontsPath = JPATH_ROOT . '/components/com_eventbooking/tcpdf/fonts/';
 		$options   = array();

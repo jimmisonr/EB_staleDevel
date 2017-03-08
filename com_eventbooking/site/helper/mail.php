@@ -46,6 +46,15 @@ class EventbookingHelperMail
 			return;
 		}
 
+		if (!empty($config->log_email_types) && in_array('new_registration_emails', explode(',', $config->log_email_types)))
+		{
+			$logEmails = true;
+		}
+		else
+		{
+			$logEmails = false;
+		}
+
 		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 
@@ -55,10 +64,12 @@ class EventbookingHelperMail
 			->from('#__eb_events')
 			->where('id = ' . $row->event_id);
 		$db->setQuery($query);
+
 		if ($fieldSuffix)
 		{
 			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
 		}
+
 		$event = $db->loadObject();
 
 		if (strlen(trim($event->notification_emails)) > 0)
@@ -266,7 +277,7 @@ class EventbookingHelperMail
 					}
 				}
 
-				static::send($mailer, $sendTos, $subject, $body);
+				static::send($mailer, $sendTos, $subject, $body, $logEmails, 2, 'new_registration_emails');
 				$mailer->clearAllRecipients();
 			}
 
@@ -375,7 +386,7 @@ class EventbookingHelperMail
 						}
 						$body = EventbookingHelper::convertImgTags($body);
 
-						static::send($mailer, array($rowMember->email), $subject, $body);
+						static::send($mailer, array($rowMember->email), $subject, $body, $logEmails, 2, 'new_registration_emails');
 						$mailer->clearAllRecipients();
 					}
 				}
@@ -455,7 +466,7 @@ class EventbookingHelperMail
 				$mailer->addReplyTo($row->email);
 			}
 
-			static::send($mailer, $emails, $subject, $body);
+			static::send($mailer, $emails, $subject, $body, $logEmails, 1, 'new_registration_emails');
 		}
 	}
 
@@ -1123,6 +1134,15 @@ class EventbookingHelperMail
 			$rows = array();
 		}
 
+		if (!empty($config->log_email_types) && in_array('reminder_emails', explode(',', $config->log_email_types)))
+		{
+			$logEmails = true;
+		}
+		else
+		{
+			$logEmails = false;
+		}
+
 		for ($i = 0, $n = count($rows); $i < $n; $i++)
 		{
 			$row = $rows[$i];
@@ -1204,7 +1224,7 @@ class EventbookingHelperMail
 			}
 
 			$emailBody = EventbookingHelper::convertImgTags($emailBody);
-			static::send($mailer, array($row->email), $emailSubject, $emailBody);
+			static::send($mailer, array($row->email), $emailSubject, $emailBody, $logEmails, 2, 'reminder_emails');
 			$mailer->clearAddresses();
 
 			$query->clear()
@@ -1449,8 +1469,11 @@ class EventbookingHelperMail
 	 * @param array  $emails
 	 * @param string $subject
 	 * @param string $body
+	 * @param bool   $logEmails
+	 * @param int    $sentTo
+	 * @param string $emailType
 	 */
-	public static function send($mailer, $emails, $subject, $body)
+	public static function send($mailer, $emails, $subject, $body, $logEmails = false, $sentTo = 0, $emailType = '')
 	{
 		if (empty($subject))
 		{
@@ -1472,16 +1495,43 @@ class EventbookingHelperMail
 			return;
 		}
 
-		$mailer->addRecipient($emails[0]);
+		$email     = $emails[0];
+		$bccEmails = array();
+		$mailer->addRecipient($email);
 
 		if (count($emails) > 1)
 		{
 			unset($emails[0]);
-			$mailer->addBcc($emails);
+			$bccEmails = $emails;
+			$mailer->addBcc($bccEmails);
 		}
 
 		$mailer->setSubject($subject)
 			->setBody($body)
 			->Send();
+
+		if ($logEmails)
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/table/email.php';
+
+			$row             = JTable::getInstance('Email', 'EventbookingTable');
+			$row->sent_at    = JFactory::getDate()->toSql();
+			$row->email      = $email;
+			$row->subject    = $subject;
+			$row->body       = $body;
+			$row->sent_to    = $sentTo;
+			$row->email_type = $emailType;
+			$row->store();
+
+			if (count($bccEmails))
+			{
+				foreach ($bccEmails as $email)
+				{
+					$row->id    = 0;
+					$row->email = $email;
+					$row->store();
+				}
+			}
+		}
 	}
 }

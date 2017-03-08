@@ -315,6 +315,14 @@ defined( '_JEXEC' ) or die ;
 				<?php echo EventbookingHelperHtml::getBooleanInput('send_attachments_to_admin', $config->send_attachments_to_admin); ?>
 			</div>
 		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('log_email_types', JText::_('EB_LOG_EMAIL_TYPES'), JText::_('EB_LOG_EMAIL_TYPES_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<?php echo $this->lists['log_email_types']; ?>
+			</div>
+		</div>
 	</fieldset>
 </div>
 <div class="span6">

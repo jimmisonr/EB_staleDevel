@@ -23,6 +23,7 @@ class EventbookingModelConfiguration extends RADModel
 		$db = $this->getDbo();
 		$db->truncateTable('#__eb_configs');
 		$row = $this->getTable('Config');
+
 		foreach ($data as $key => $value)
 		{
 			if (is_array($value))
