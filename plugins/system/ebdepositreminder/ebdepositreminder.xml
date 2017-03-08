@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>tuanpn@joomdonation.com</authorEmail>
 	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>2.13.2</version>
+	<version>2.14.0</version>
 	<description>This plugin check and send deposit payment reminder emails to registrants automatically</description>
 	<files>
 		<filename plugin="ebdepositreminder">ebdepositreminder.php</filename>		
