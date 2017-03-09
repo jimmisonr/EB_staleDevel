@@ -62,7 +62,7 @@ else
 					'previousMonth' => $previousMonth,
 					'nextMonth' => $nextMonth,
 					'previousMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=category&layout=calendar&id='.$this->category->id.'&month='.$previousMonth.'&year='.$previousYear.'&Itemid='.$this->Itemid),
-					'nextMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=category&layout=calendar&id='.$this->category->id.'&month='.$nextMonth.'&year='.$nextYear.'&Itemid='.$this->Itemid),
+					'nextMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=category&layout=calendar&id='.$this->category->id.'&month='.$nextMonth.'&year='.$nextYear.'&next=1&Itemid='.$this->Itemid),
 					'listMonth' => $this->listMonth,
 					'searchMonth' => $this->searchMonth,
 					'searchYear' => $this->searchYear,

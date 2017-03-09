@@ -189,14 +189,14 @@ class EventbookingModelCalendar extends RADModel
 
 		if (empty($rows) && $app->input->getMethod() == 'GET' && !$this->state->mini_calendar)
 		{
-			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
 			$query->clear()
 				->select('MONTH(event_date) AS next_event_month')
 				->select('YEAR(event_date) AS next_event_year')
 				->from('#__eb_events AS a')
 				->where('published = 1')
 				->where('access in (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
-				->where('DATE(a.event_date) >= ' . $currentDate)
+				->where('MONTH(a.event_date) > ' . (int) $this->state->get('month'))
+				->where('YEAR(a.event_date) >= ' . (int) $this->state->get('year'))
 				->order('event_date');
 
 			if ($this->state->id)
@@ -215,7 +215,7 @@ class EventbookingModelCalendar extends RADModel
 
 				$rows = $this->getData();
 			}
-			else
+			elseif ($app->input->get->getInt('next'))
 			{
 				$app->enqueueMessage(JText::_('EB_NO_UPCOMING_EVENTS'));
 			}
