@@ -1260,3 +1260,13 @@ img.eb-payment-method-icon
 	margin-top: -20px;
 	padding-bottom: 10px;
 }
+
+.eb-container .field-calendar
+{
+	display: inline !important;
+}
+
+.eb-container .field-calendar .nav
+{
+	width: auto;
+}

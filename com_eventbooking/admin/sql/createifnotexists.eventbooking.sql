@@ -16,3 +16,13 @@ CREATE TABLE IF NOT EXISTS `#__eb_discount_events` (
   `event_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 )CHARACTER SET `utf8`;
+CREATE TABLE IF NOT EXISTS `#__eb_emails` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `email_type` varchar(50) DEFAULT NULL,
+  `sent_at` datetime DEFAULT NULL,
+  `sent_to` tinyint(4) NOT NULL DEFAULT '0',
+  `email` varchar(100) DEFAULT '0',
+  `subject` varchar(255) DEFAULT NULL,
+  `body` text,
+  PRIMARY KEY (`id`)
+) CHARACTER SET `utf8`;

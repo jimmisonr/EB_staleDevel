@@ -192,6 +192,14 @@ if ($translatable)
 			</div>
 			<div class="control-group">
 				<label class="control-label">
+					<?php echo EventbookingHelperHtml::getFieldLabel('show_on_registrants', JText::_('EB_SHOW_ON_REGISTRANTS'), JText::_('EB_SHOW_ON_REGISTRANTS_EXPLAIN')); ?>
+				</label>
+				<div class="controls">
+					<?php echo EventbookingHelperHtml::getBooleanInput('show_on_registrants', $this->item->show_on_registrants); ?>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
 					<?php echo EventbookingHelperHtml::getFieldLabel('hide_on_email', JText::_('EB_HIDE_ON_EMAIL'), JText::_('EB_HIDE_ON_EMAIL_EXPLAIN')); ?>
 				</label>
 				<div class="controls">
