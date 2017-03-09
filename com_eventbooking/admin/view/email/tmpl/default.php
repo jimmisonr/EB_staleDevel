@@ -9,7 +9,7 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die;
 
-$config = OSMembershipHelper::getConfig();
+$config = EventbookingHelper::getConfig();
 ?>
 <form action="index.php?option=com_eventbooking&view=email" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
 	<div class="control-group">

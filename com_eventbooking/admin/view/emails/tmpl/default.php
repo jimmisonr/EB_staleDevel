@@ -12,7 +12,7 @@ defined( '_JEXEC' ) or die ;
 JHtml::_('bootstrap.tooltip');
 JHtml::_('formbehavior.chosen', 'select');
 
-$config = OSMembershipHelper::getConfig();
+$config = EventbookingHelper::getConfig();
 ?>
 <form action="index.php?option=com_eventbooking&view=emails" method="post" name="adminForm" id="adminForm">
 	<div id="j-main-container">
