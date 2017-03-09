@@ -155,7 +155,7 @@ class EventbookingControllerCart extends EventbookingController
 
 		if (!$result['success'])
 		{
-			$result[] = $result['message'];
+			$errors[] = $result['message'];
 		}
 
 		$data = $this->input->post->getData();
@@ -285,7 +285,7 @@ class EventbookingControllerCart extends EventbookingController
 			$query->clear()
 				->select('event_id')
 				->from('#__eb_registrants')
-				->where('event_id IN (' . implode(',', $eventIds))
+				->where('event_id IN (' . implode(',', $eventIds) . ')')
 				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
 
 			if ($user->id)
@@ -300,7 +300,7 @@ class EventbookingControllerCart extends EventbookingController
 			$db->setQuery($query);
 			$registeredEventIds = $db->loadColumn();
 
-			if (count($eventIds))
+			if (count($registeredEventIds))
 			{
 				$result['success'] = false;
 
