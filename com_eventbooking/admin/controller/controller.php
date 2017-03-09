@@ -2543,8 +2543,6 @@ class EventbookingController extends RADControllerAdmin
 		$db->setQuery($sql);
 		$db->execute();
 
-		$db->truncateTable('#__eb_urls');
-
 		// Migrate waiting list data
 		$sql = 'SELECT COUNT(*) FROM #__eb_waiting_lists';
 		$db->setQuery($sql);
