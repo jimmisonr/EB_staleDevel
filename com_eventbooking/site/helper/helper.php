@@ -246,6 +246,13 @@ class EventbookingHelper
 		{
 			$_REQUEST['limitstart'] = 0;
 		}
+
+		// Fix PayPal IPN sending to wrong URL
+		if (!empty($_POST['txn_type'] && empty($_REQUEST['task'])))
+		{
+			$_REQUEST['task']           = 'payment_confirm';
+			$_REQUEST['payment_method'] = 'os_paypal';
+		}
 	}
 
 	/**
