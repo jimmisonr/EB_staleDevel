@@ -7,7 +7,7 @@
     <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
     <authorEmail>services@joomdonation.com</authorEmail>
     <authorUrl>www.joomdonation.com</authorUrl>
-    <version>2.14.0</version>  
+    <version>2.14.1</version>  
     <description>This plugin is used to display all events from a category within an article. Using syntax {ebcategory
         ID_OF_CATEGORY}.
     </description>
