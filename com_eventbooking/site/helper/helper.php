@@ -18,7 +18,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '2.14.1';
+		return '2.14.0';
 	}
 
 	/**
@@ -248,7 +248,7 @@ class EventbookingHelper
 		}
 
 		// Fix PayPal IPN sending to wrong URL
-		if (!empty($_POST['txn_type'] && empty($_REQUEST['task'])))
+		if (!empty($_POST['txn_type']) && empty($_REQUEST['task']))
 		{
 			$_REQUEST['task']           = 'payment_confirm';
 			$_REQUEST['payment_method'] = 'os_paypal';
