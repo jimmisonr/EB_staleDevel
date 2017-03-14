@@ -647,6 +647,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					'access',
 					'registration_access',
 					'individual_price',
+					'price_text',
 					'event_capacity',
 					'registration_type',
 					'max_group_number',
