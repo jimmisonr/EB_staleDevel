@@ -15,7 +15,7 @@
 	</files>
 	<config>
 		<fields name="params">
-			<fieldset name="basic">
+			<fieldset name="basic" addfieldpath="/administrator/components/com_eventbooking/elements">
 				<field name="moduleclass_sfx" type="text"
 					label="Module Class Suffix" description="PARAMMODULECLASSSUFFIX">
 				</field>	
@@ -33,7 +33,9 @@
 						<option value="10">October</option>
 						<option value="11">November</option>
 						<option value="12">December</option>
-				</field>	
+				</field>
+				<field name="id" type="ebcategory" size="3" default="0" label="Select Category"
+					   description="Choose the category which you want to display events from"/>
 				<field name="item_id" type="text"
 					label="Itemid" description="Itemid">
 				</field>						

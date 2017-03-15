@@ -9,7 +9,7 @@
 // no direct access
 defined('_JEXEC') or die;
 $data = $this->data;
-$link = JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$this->month.'&Itemid='.$this->Itemid) ;
+$link = JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$this->month.'&Itemid='.$this->Itemid);
 ?>
 <script type="text/javascript" src="<?php echo JUri::root().'media/com_eventbooking/assets/js/minicalendar.js'; ?>"></script>
 <table class="extcal_navbar" border="0" width="100%">
@@ -33,11 +33,11 @@ $link = JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$this
 		<?php 
 			foreach ($this->days as $dayname) 
 			{ 
-		?>
+			?>
              <td class="mod_eb_mincalendar_td_dayname">
                  <?php echo $dayname; ?>
              </td>
-        <?php
+            <?php
          	} 
          ?>
 	</tr>
