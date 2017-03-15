@@ -3001,6 +3001,27 @@ class EventbookingHelper
 	}
 
 	/**
+	 * Method to load component frontend component language
+	 *
+	 * @param $tag
+	 * @param $force
+	 */
+	public static function loadComponentLanguage($tag, $force = false)
+	{
+		$language = JFactory::getLanguage();
+
+		if ($force && (!$tag || $tag == '*'))
+		{
+			$tag = self::getDefaultLanguage();
+		}
+
+		if ($tag && $tag != '*' && ($tag != $language->getTag() || $force))
+		{
+			$language->load('com_eventbooking', JPATH_ROOT, $tag);
+		}
+	}
+
+	/**
 	 * Get group member detail, using for [MEMBER_DETAIL] tag in the email message
 	 *
 	 * @param      $config
