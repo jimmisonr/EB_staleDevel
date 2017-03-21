@@ -171,7 +171,7 @@ $format = 'Y-m-d' ;
 						<?php
 							if ($this->item->thumb) {
 							?>
-								<a href="<?php echo JURI::root().'media/com_eventbooking/images/'.$this->item->thumb; ?>" class="modal"><img src="<?php echo JURI::root().'media/com_eventbooking/images/thumbs/'.$this->item->thumb; ?>" class="img_preview" /></a>
+								<a href="<?php echo JUri::root().'media/com_eventbooking/images/'.$this->item->thumb; ?>" class="modal"><img src="<?php echo JURI::root().'media/com_eventbooking/images/thumbs/'.$this->item->thumb; ?>" class="img_preview" /></a>
 								<input type="checkbox" name="del_thumb" value="1" /><?php echo JText::_('EB_DELETE_CURRENT_THUMB'); ?>
 							<?php
 							}
@@ -238,6 +238,14 @@ $format = 'Y-m-d' ;
 				</tr>
 				<tr>
 					<td class="key">
+						<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_PRICE_TEXT' );?>::<?php echo JText::_('EB_PRICE_TEXT_EXPLAIN'); ?>"><?php echo JText::_('EB_PRICE_TEXT'); ?></span>
+					</td>
+					<td>
+						<input type="text" name="price_text" id="price_text" class="input-xlarge" value="<?php echo $this->item->price_text; ?>" />
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
 						<?php echo JText::_('EB_TAX_RATE'); ?>
 					</td>
 					<td>
@@ -258,7 +266,15 @@ $format = 'Y-m-d' ;
 						<?php echo $this->lists['registration_type'] ; ?>
 					</td>
 				</tr>
-
+				<tr>
+					<td class="key">
+						<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_CUSTOM_REGISTRATION_HANDLE_URL' );?>::<?php echo JText::_('EB_CUSTOM_REGISTRATION_HANDLE_URL_EXPLAIN'); ?>"><?php echo JText::_('EB_CUSTOM_REGISTRATION_HANDLE_URL'); ?></span>
+					</td>
+					<td>
+						<input type="text" name="registration_handle_url" id="registration_handle_url"
+						       class="input-xxlarge" size="10" value="<?php echo $this->item->registration_handle_url; ?>" />
+					</td>
+				</tr>
 				<tr>
 					<td class="key">
 						<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_MAX_NUMBER_REGISTRANTS' );?>::<?php echo JText::_('EB_MAX_NUMBER_REGISTRANTS_EXPLAIN'); ?>"><?php echo JText::_('EB_MAX_NUMBER_REGISTRANTS'); ?></span>

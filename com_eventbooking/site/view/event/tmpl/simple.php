@@ -126,6 +126,14 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 		</div>
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>">
+				<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_PRICE_TEXT' );?>::<?php echo JText::_('EB_PRICE_TEXT_EXPLAIN'); ?>"><?php echo JText::_('EB_PRICE_TEXT') ; ?></span>
+			</label>
+			<div class="<?php echo $controlsClass; ?>">
+				<input type="text" name="price_text" id="price_text" class="input-xlarge" value="<?php echo $this->item->price_text; ?>" />
+			</div>
+		</div>
+		<div class="<?php echo $controlGroupClass;  ?>">
+			<label class="<?php echo $controlLabelClass; ?>">
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_EVENT_CAPACITY' );?>::<?php echo JText::_('EB_CAPACITY_EXPLAIN'); ?>"><?php echo JText::_('EB_CAPACITY'); ?></span>
 			</label>
 			<div class="<?php echo $controlsClass; ?>">
@@ -144,6 +152,15 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			</label>
 			<div class="<?php echo $controlsClass; ?>">
 				<?php echo JHtml::_('calendar', ($this->item->cut_off_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->cut_off_date, $format, null), 'cut_off_date', 'cut_off_date') ; ?>
+			</div>
+		</div>
+		<div class="<?php echo $controlGroupClass;  ?>">
+			<label class="<?php echo $controlLabelClass; ?>">
+				<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_CUSTOM_REGISTRATION_HANDLE_URL' );?>::<?php echo JText::_('EB_CUSTOM_REGISTRATION_HANDLE_URL_EXPLAIN'); ?>"><?php echo JText::_('EB_CUSTOM_REGISTRATION_HANDLE_URL') ; ?></span>
+			</label>
+			<div class="<?php echo $controlsClass; ?>">
+				<input type="text" name="registration_handle_url" id="registration_handle_url"
+				       class="input-xxlarge" size="10" value="<?php echo $this->item->registration_handle_url; ?>" />
 			</div>
 		</div>
 		<div class="<?php echo $controlGroupClass;  ?>">
