@@ -294,7 +294,14 @@ class EventbookingModelList extends RADModelList
 			}
 			else
 			{
-				$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.cut_off_date) >= ' . $currentDate . ')');
+				if ($config->show_until_end_date)
+				{
+					$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.event_end_date) >= ' . $currentDate . ')');
+				}
+				else
+				{
+					$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.cut_off_date) >= ' . $currentDate . ')');
+				}
 			}
 		}
 
