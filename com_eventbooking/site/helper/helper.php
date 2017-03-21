@@ -248,7 +248,7 @@ class EventbookingHelper
 		}
 
 		// Fix PayPal IPN sending to wrong URL
-		if (!empty($_POST['txn_type']) && empty($_REQUEST['task']))
+		if (!empty($_POST['txn_type']) && empty($_REQUEST['task']) && empty($_REQUEST['view']))
 		{
 			$_REQUEST['task']           = 'payment_confirm';
 			$_REQUEST['payment_method'] = 'os_paypal';
