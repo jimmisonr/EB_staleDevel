@@ -116,9 +116,8 @@ class os_paypal extends RADPayment
 			}
 
 			$row = JTable::getInstance('EventBooking', 'Registrant');
-			$row->load($id);
 
-			if (!$row->id)
+			if (!$row->load($id))
 			{
 				return false;
 			}
@@ -159,7 +158,8 @@ class os_paypal extends RADPayment
 			// Validate payment amount
 			$receivedAmount = floatval($this->notificationData['mc_gross']);
 
-			if ($row->payment_amount > $receivedAmount)
+			// Accept 0.05$ difference
+			if (($row->payment_amount - $receivedAmount) > 0.05)
 			{
 				return false;
 			}
@@ -168,10 +168,8 @@ class os_paypal extends RADPayment
 
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
