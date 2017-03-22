@@ -1525,6 +1525,21 @@ class EventbookingController extends RADControllerAdmin
 
 		//Registrants table
 		$fields = array_keys($db->getTableColumns('#__eb_registrants'));
+
+		if (!in_array('payment_amount', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `payment_amount` DECIMAL( 10, 6 ) NULL DEFAULT '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
+		if (!in_array('payment_currency', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `payment_currency` VARCHAR( 15 ) NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+		
 		if (!in_array('total_amount', $fields))
 		{
 			$sql = "ALTER TABLE  `#__eb_registrants` ADD  `total_amount` DECIMAL( 10, 6 ) NULL DEFAULT '0';";

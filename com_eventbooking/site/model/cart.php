@@ -302,6 +302,8 @@ class EventbookingModelCart extends RADModel
 		$session->set('eb_registration_code', $row->registration_code);
 		if ($fees['amount'] > 0)
 		{
+			require_once JPATH_COMPONENT . '/payments/' . $paymentMethod . '.php';
+
 			if ($fees['deposit_amount'] > 0)
 			{
 				$data['amount'] = $fees['deposit_amount'];
@@ -310,31 +312,40 @@ class EventbookingModelCart extends RADModel
 			{
 				$data['amount'] = $fees['amount'];
 			}
+
 			$row->load($cartId);
-			require_once JPATH_COMPONENT . '/payments/' . $paymentMethod . '.php';
-			$query->clear();
-			$query->select('params')
+
+			$query->clear()
+				->select('params')
 				->from('#__eb_payment_plugins')
-				->where('name=' . $db->quote($paymentMethod));
+				->where('name = ' . $db->quote($paymentMethod));
 			$db->setQuery($query);
 			$params       = new Registry($db->loadResult());
 			$paymentClass = new $paymentMethod($params);
 
 			// Convert payment amount to USD if the currency is not supported by payment gateway
 			$currency = $config->currency_code;
+
 			if (method_exists($paymentClass, 'getSupportedCurrencies'))
 			{
 				$currencies = $paymentClass->getSupportedCurrencies();
+
 				if (!in_array($currency, $currencies))
 				{
 					$data['amount'] = EventbookingHelper::convertAmountToUSD($data['amount'], $currency);
 					$currency       = 'USD';
 				}
 			}
+
 			$data['currency'] = $currency;
 
 			$country         = empty($data['country']) ? $config->default_country : $data['country'];
 			$data['country'] = EventbookingHelper::getCountryCode($country);
+
+			// Store payment amount and payment currency for future validation
+			$row->payment_currency = $currency;
+			$row->payment_amount   = $data['amount'];
+			$row->store();
 
 			$paymentClass->processPayment($row, $data);
 		}

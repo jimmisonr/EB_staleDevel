@@ -282,6 +282,11 @@ class EventBookingModelRegister extends RADModel
 			$country         = empty($data['country']) ? $config->default_country : $data['country'];
 			$data['country'] = EventbookingHelper::getCountryCode($country);
 
+			// Store payment amount and payment currency for future validation
+			$row->payment_currency = $currency;
+			$row->payment_amount   = $data['amount'];
+			$row->store();
+
 			$paymentClass->processPayment($row, $data);
 		}
 		else
@@ -571,8 +576,8 @@ class EventBookingModelRegister extends RADModel
 				$data['card_type'] = EventbookingHelperCreditcard::getCardType($data['x_card_num']);
 			}
 
-			$query->clear();
-			$query->select('params')
+			$query->clear()
+				->select('params')
 				->from('#__eb_payment_plugins')
 				->where('name=' . $db->quote($paymentMethod));
 			$db->setQuery($query);
@@ -597,6 +602,10 @@ class EventBookingModelRegister extends RADModel
 
 			$country         = empty($data['country']) ? $config->default_country : $data['country'];
 			$data['country'] = EventbookingHelper::getCountryCode($country);
+
+			// Store payment amount and payment currency for future validation
+			$row->payment_currency = $currency;
+			$row->payment_amount   = $data['amount'];
 
 			$paymentClass->processPayment($row, $data);
 		}

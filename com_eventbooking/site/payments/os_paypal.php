@@ -53,6 +53,7 @@ class os_paypal extends RADPayment
 		$siteUrl = JUri::base();
 
 		$event = EventbookingHelperDatabase::getEvent($row->event_id);
+
 		if (strlen(trim($event->paypal_email)))
 		{
 			$this->setParameter('business', $event->paypal_email);
@@ -102,22 +103,63 @@ class os_paypal extends RADPayment
 	public function verifyPayment()
 	{
 		$ret = $this->validate();
+
 		if ($ret)
 		{
 			$id            = $this->notificationData['custom'];
 			$transactionId = $this->notificationData['txn_id'];
 			$amount        = $this->notificationData['mc_gross'];
+
 			if ($amount < 0)
 			{
 				return false;
 			}
+
 			$row = JTable::getInstance('EventBooking', 'Registrant');
 			$row->load($id);
+
 			if (!$row->id)
 			{
 				return false;
 			}
+
 			if ($row->published && $row->payment_status)
+			{
+				return false;
+			}
+
+			// Validate receiver account
+			$event = EventbookingHelperDatabase::getEvent($row->event_id);
+
+			if (strlen(trim($event->paypal_email)))
+			{
+				$payPalId = $event->paypal_email;
+			}
+			else
+			{
+				$payPalId = $this->params->get('paypal_id');
+			}
+
+			$receiverEmail = $this->notificationData['receiver_email'];
+			$receiverId    = $this->notificationData['receiver_id'];
+
+			if ($receiverEmail != $payPalId && $receiverEmail != $receiverId)
+			{
+				return false;
+			}
+
+			// Validate currency
+			$receivedPaymentCurrency = strtoupper($this->notificationData['mc_currency']);
+
+			if (strtoupper($receivedPaymentCurrency) != strtoupper($row->payment_currency))
+			{
+				return false;
+			}
+
+			// Validate payment amount
+			$receivedAmount = floatval($this->notificationData['mc_gross']);
+
+			if ($row->payment_amount > $receivedAmount)
 			{
 				return false;
 			}
