@@ -55,6 +55,9 @@ class EventbookingHelperMail
 			$logEmails = false;
 		}
 
+		// Load frontend component language if needed
+		EventbookingHelper::loadComponentLanguage($row->language);
+
 		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
 
@@ -63,13 +66,13 @@ class EventbookingHelperMail
 		$query->select('*')
 			->from('#__eb_events')
 			->where('id = ' . $row->event_id);
-		$db->setQuery($query);
 
 		if ($fieldSuffix)
 		{
 			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
 		}
 
+		$db->setQuery($query);
 		$event = $db->loadObject();
 
 		if (strlen(trim($event->notification_emails)) > 0)
@@ -91,16 +94,17 @@ class EventbookingHelperMail
 
 		if ($config->multiple_booking)
 		{
-			$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+			$rowFields = EventbookingHelper::getFormFields($row->id, 4, $row->language);
 		}
 		elseif ($row->is_group_billing)
 		{
-			$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+			$rowFields = EventbookingHelper::getFormFields($row->event_id, 1, $row->language);
 		}
 		else
 		{
-			$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+			$rowFields = EventbookingHelper::getFormFields($row->event_id, 0, $row->language);
 		}
+
 		$form = new RADForm($rowFields);
 		$data = EventbookingHelper::getRegistrantData($row, $rowFields);
 		$form->bind($data);
@@ -187,6 +191,7 @@ class EventbookingHelperMail
 				$subject = str_ireplace("[$key]", $value, $subject);
 				$body    = str_ireplace("[$key]", $value, $body);
 			}
+
 			$body = EventbookingHelper::convertImgTags($body);
 
 			if (strpos($body, '[QRCODE]') !== false)
@@ -261,6 +266,7 @@ class EventbookingHelperMail
 				{
 					$ics->setLocation($rowLocation->name);
 				}
+
 				$fileName = JApplicationHelper::stringURLSafe($event->title) . '.ics';
 				$mailer->addAttachment($ics->save(JPATH_ROOT . '/media/com_eventbooking/icsfiles/', $fileName));
 			}
@@ -296,6 +302,7 @@ class EventbookingHelperMail
 					->order('id');
 				$db->setQuery($query);
 				$rowMembers = $db->loadObjectList();
+
 				if (count($rowMembers))
 				{
 					$memberReplaces = array();
@@ -316,7 +323,8 @@ class EventbookingHelperMail
 
 					$memberReplaces['download_certificate_link'] = $replaces['download_certificate_link'];
 
-					$memberFormFields = EventbookingHelper::getFormFields($row->event_id, 2);
+					$memberFormFields = EventbookingHelper::getFormFields($row->event_id, 2, $row->language);
+
 					foreach ($rowMembers as $rowMember)
 					{
 						if (!JMailHelper::isEmailAddress($rowMember->email))
@@ -358,6 +366,7 @@ class EventbookingHelperMail
 						$memberForm->bind($memberData);
 						$memberForm->buildFieldsDependency();
 						$fields = $memberForm->getFields();
+
 						foreach ($fields as $field)
 						{
 							if ($field->hideOnDisplay)
@@ -375,15 +384,19 @@ class EventbookingHelperMail
 									$fieldValue = $field->value;
 								}
 							}
+
 							$memberReplaces[$field->name] = $fieldValue;
 						}
+
 						$memberReplaces['member_detail'] = EventbookingHelper::getMemberDetails($config, $rowMember, $event, $rowLocation, true, $memberForm);
+
 						foreach ($memberReplaces as $key => $value)
 						{
 							$key     = strtoupper($key);
 							$body    = str_ireplace("[$key]", $value, $body);
 							$subject = str_ireplace("[$key]", $value, $subject);
 						}
+
 						$body = EventbookingHelper::convertImgTags($body);
 
 						static::send($mailer, array($rowMember->email), $subject, $body, $logEmails, 2, 'new_registration_emails');
@@ -442,6 +455,7 @@ class EventbookingHelperMail
 				$subject = str_ireplace("[$key]", $value, $subject);
 				$body    = str_ireplace("[$key]", $value, $body);
 			}
+
 			$body = EventbookingHelper::convertImgTags($body);
 
 			if (strpos($body, '[QRCODE]') !== false)
@@ -493,7 +507,7 @@ class EventbookingHelperMail
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
 
-		EventbookingHelper::loadLanguage();
+		EventbookingHelper::loadComponentLanguage($row->language, true);
 
 		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix($row->language);
@@ -501,16 +515,17 @@ class EventbookingHelperMail
 
 		if ($config->multiple_booking)
 		{
-			$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+			$rowFields = EventbookingHelper::getFormFields($row->id, 4, $row->language);
 		}
 		elseif ($row->is_group_billing)
 		{
-			$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+			$rowFields = EventbookingHelper::getFormFields($row->event_id, 1, $row->language);
 		}
 		else
 		{
-			$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+			$rowFields = EventbookingHelper::getFormFields($row->event_id, 0, $row->language);
 		}
+
 		$form = new RADForm($rowFields);
 		$data = EventbookingHelper::getRegistrantData($row, $rowFields);
 		$form->bind($data);
@@ -519,13 +534,13 @@ class EventbookingHelperMail
 		$query->select('*')
 			->from('#__eb_events')
 			->where('id = ' . $row->event_id);
-		$db->setQuery($query);
 
 		if ($fieldSuffix)
 		{
 			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
 		}
 
+		$db->setQuery($query);
 		$event = $db->loadObject();
 
 		if (is_callable('EventbookingHelperOverrideHelper::buildTags'))

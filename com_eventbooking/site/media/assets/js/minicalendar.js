@@ -4,13 +4,14 @@
 		   		var itemId = $('[name^=itemId]').val();
 			   	var month = $('.month_ajax').val();
 			   	var year  = $('.year_ajax').val();
+				var categoryId  = $('.category_id_ajax').val();
 		   		if(month == 1){
 		   			 month = 13;
 		   			 year --;
 		   		}
 			   	month --;
 				$.ajax({
-					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&Itemid=' + itemId + langLinkForAjax,
+					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&id=' + categoryId + '&Itemid=' + itemId + langLinkForAjax,
 					dataType: 'html',
 					success: function(html) {
 						$('#calendar_result').html(html);
@@ -28,13 +29,14 @@
 		   		var itemId = $('[name^=itemId]').val();
 		   		var month = $('.month_ajax').val();
 		   		var year  = $('.year_ajax').val();
+				var categoryId  = $('.category_id_ajax').val();
 		   		if(month == 12){
 		   			 month = 0;
 		   			 year ++;
 		   		}
 		   		month ++;
 				$.ajax({
-					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&Itemid=' + itemId + langLinkForAjax,
+					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&id=' + categoryId + '&Itemid=' + itemId + langLinkForAjax,
 					dataType: 'html',
 					success: function(html) {
 						$('#calendar_result').html(html);
@@ -52,9 +54,10 @@
 		   		var itemId = $('[name^=itemId]').val();
 		   		var month = $('.month_ajax').val();
 		   		var year  = $('.year_ajax').val();
+				var categoryId  = $('.category_id_ajax').val();
 		   		year ++;
 				$.ajax({
-					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&Itemid=' + itemId + langLinkForAjax,
+					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&id=' + categoryId + '&Itemid=' + itemId + langLinkForAjax,
 					dataType: 'html',
 					success: function(html) {
 						$('#calendar_result').html(html);
@@ -72,9 +75,10 @@
 		   		var itemId = $('[name^=itemId]').val();
 			   	var month = $('.month_ajax').val();
 			   	var year  = $('.year_ajax').val();
+				var categoryId  = $('.category_id_ajax').val();
 			   	year --;
 				$.ajax({
-					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&Itemid=' + itemId,
+					url : 'index.php?option=com_eventbooking&view=calendar&layout=mini&format=raw&month='+ month +'&year='+ year + '&id=' + categoryId + '&Itemid=' + itemId,
 					dataType: 'html',
 					success: function(html) {
 						

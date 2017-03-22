@@ -67,6 +67,8 @@ class EventbookingControllerEvent extends EventbookingController
 			return;
 		}
 
+		$config = EventbookingHelper::getConfig();
+
 		$fields = array(
 			'id',
 			'title',
@@ -111,6 +113,12 @@ class EventbookingControllerEvent extends EventbookingController
 			'early_bird_discount_type',
 			'early_bird_discount_date',
 		);
+
+		if ($config->event_custom_field)
+		{
+			EventbookingHelperData::prepareCustomFieldsData($rowEvents);
+			$fields = array_merge($fields, array_keys($rowEvents[0]->paramData));
+		}
 
 		EventbookingHelperData::excelExport($fields, $rowEvents, 'events_list');
 	}

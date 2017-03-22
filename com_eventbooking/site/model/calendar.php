@@ -127,7 +127,15 @@ class EventbookingModelCalendar extends RADModel
 		if ($config->hide_past_events)
 		{
 			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
-			$query->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')');
+
+			if ($config->show_until_end_date)
+			{
+				$query->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.event_end_date) >= ' . $currentDate . ')');
+			}
+			else
+			{
+				$query->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')');
+			}
 		}
 
 		if (!empty($excludeCategoryIds))
@@ -278,7 +286,15 @@ class EventbookingModelCalendar extends RADModel
 		if ($config->hide_past_events)
 		{
 			$currentDate = $db->quote($currentDateData['current_date']);
-			$query->where('(DATE(a.event_date) >=' . $currentDate . ' OR DATE(a.cut_off_date) >=' . $currentDate . ')');
+
+			if ($config->show_until_end_date)
+			{
+				$query->where('(DATE(a.event_date) >=' . $currentDate . ' OR DATE(a.event_end_date) >=' . $currentDate . ')');
+			}
+			else
+			{
+				$query->where('(DATE(a.event_date) >=' . $currentDate . ' OR DATE(a.cut_off_date) >=' . $currentDate . ')');
+			}
 		}
 
 		$query->order('a.event_date ASC, a.ordering ASC');
@@ -340,7 +356,15 @@ class EventbookingModelCalendar extends RADModel
 		if ($config->hide_past_events)
 		{
 			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
-			$query->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')');
+
+			if ($config->show_until_end_date)
+			{
+				$query->where('(DATE(a.event_date) >=' . $currentDate . ' OR DATE(a.event_end_date) >=' . $currentDate . ')');
+			}
+			else
+			{
+				$query->where('(DATE(a.event_date) >=' . $currentDate . ' OR DATE(a.cut_off_date) >=' . $currentDate . ')');
+			}
 		}
 
 		$query->order('a.event_date ASC, a.ordering ASC');

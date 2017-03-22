@@ -18,7 +18,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '2.14.1';
+		return '2.14.2';
 	}
 
 	/**
@@ -248,7 +248,7 @@ class EventbookingHelper
 		}
 
 		// Fix PayPal IPN sending to wrong URL
-		if (!empty($_POST['txn_type']) && empty($_REQUEST['task']))
+		if (!empty($_POST['txn_type']) && empty($_REQUEST['task']) && empty($_REQUEST['view']))
 		{
 			$_REQUEST['task']           = 'payment_confirm';
 			$_REQUEST['payment_method'] = 'os_paypal';
@@ -2997,6 +2997,27 @@ class EventbookingHelper
 			$lang->load('com_eventbooking', JPATH_ROOT, $tag);
 
 			$loaded = true;
+		}
+	}
+
+	/**
+	 * Method to load component frontend component language
+	 *
+	 * @param $tag
+	 * @param $force
+	 */
+	public static function loadComponentLanguage($tag, $force = false)
+	{
+		$language = JFactory::getLanguage();
+
+		if ($force && (!$tag || $tag == '*'))
+		{
+			$tag = self::getDefaultLanguage();
+		}
+
+		if ($tag && $tag != '*' && ($tag != $language->getTag() || $force))
+		{
+			$language->load('com_eventbooking', JPATH_ROOT, $tag);
 		}
 	}
 

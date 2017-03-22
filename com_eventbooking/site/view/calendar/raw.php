@@ -18,6 +18,8 @@ class EventbookingViewCalendarRaw extends RADViewHtml
 		//Initialize default month and year
 		$month = $this->input->getInt('month', 0);
 		$year  = $this->input->getInt('year', 0);
+		$id    = $this->input->getInt('id', 0);
+
 		if (!$month)
 		{
 			$month = $currentDateData['month'];
@@ -28,9 +30,10 @@ class EventbookingViewCalendarRaw extends RADViewHtml
 			$year = $currentDateData['year'];
 		}
 
-		$model    = new EventbookingModelCalendar(array('remember_states' => false, 'ignore_request' => true));
+		$model = new EventbookingModelCalendar(array('remember_states' => false, 'ignore_request' => true));
 		$model->setState('month', $month)
 			->setState('year', $year)
+			->setState('id', $id)
 			->setState('mini_calendar', 1);
 
 		$rows        = $model->getData();
@@ -39,7 +42,8 @@ class EventbookingViewCalendarRaw extends RADViewHtml
 		$this->year  = $year;
 
 		$days     = array();
-		$startDay = EventBookingHelper::getConfigValue('calendar_start_date');
+		$startDay = EventbookingHelper::getConfigValue('calendar_start_date');
+
 		for ($i = 0; $i < 7; $i++)
 		{
 			$days[$i] = EventbookingHelperData::getDayNameHtmlMini(($i + $startDay) % 7, true);
@@ -57,7 +61,7 @@ class EventbookingViewCalendarRaw extends RADViewHtml
 			JText::_('EB_SEP'),
 			JText::_('EB_OCT'),
 			JText::_('EB_NOV'),
-			JText::_('EB_DEC'), );
+			JText::_('EB_DEC'),);
 
 		$this->days      = $days;
 		$this->listMonth = $listMonth;

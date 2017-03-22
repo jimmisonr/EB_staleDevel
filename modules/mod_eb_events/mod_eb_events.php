@@ -56,10 +56,18 @@ $query->select('a.*, c.name AS location_name')
 	->leftJoin('#__eb_locations AS c ON a.location_id = c.id')
 	->where('a.published = 1')
 	->where('a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
-	->where('(a.event_date >= ' . $currentDate . ' OR a.cut_off_date >= ' . $currentDate . ')')
 	->where('(a.publish_up = ' . $nullDate . ' OR a.publish_up <= ' . $currentDate . ')')
 	->where('(a.publish_down = ' . $nullDate . ' OR a.publish_down >= ' . $currentDate . ')')
 	->order('a.featured DESC, a.event_date');
+
+if ($config->show_until_end_date)
+{
+	$query->where('(a.event_date >= ' . $currentDate . ' OR a.event_end_date >= ' . $currentDate . ')');
+}
+else
+{
+	$query->where('(a.event_date >= ' . $currentDate . ' OR a.cut_off_date >= ' . $currentDate . ')');
+}
 
 if ($params->get('only_show_featured_events', 0))
 {

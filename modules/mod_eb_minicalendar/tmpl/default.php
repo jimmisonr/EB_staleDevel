@@ -18,15 +18,18 @@ defined('_JEXEC') or die;
 <td valign="top">
 <?php
 	$Itemid = $itemId;
-	if ($Itemid <= 1) 
+
+	if ($Itemid <= 1)
 	{
-	    $Itemid = EventBookingHelper::getItemid();
-	}	
-	$link = JRoute::_('index.php?option=com_eventbooking&view=calendar&month='.$month.'&Itemid='.$Itemid) ;	
+	    $Itemid = EventbookingHelper::getItemid();
+	}
+
+	$link = JRoute::_('index.php?option=com_eventbooking&view=calendar&month=' . $month . ($categoryId > 0 ? '&id=' . $categoryId : '') . '&Itemid=' . $Itemid);
 ?>
-<input type="hidden" name="itemId" value="<?php echo $Itemid; ?>">
-<input type="hidden" name="month_ajax" class="month_ajax" value="<?php echo $month; ?>">
-<input type="hidden" name="year_ajax" class="year_ajax" value="<?php echo $year; ?>">
+<input type="hidden" name="itemId" value="<?php echo $Itemid; ?>" />
+<input type="hidden" name="month_ajax" class="month_ajax" value="<?php echo $month; ?>" />
+<input type="hidden" name="year_ajax" class="year_ajax" value="<?php echo $year; ?>" />
+<input type="hidden" name="category_id_ajax" class="category_id_ajax" value="<?php echo $categoryId; ?>" />
 <div id="calendar_result">
 	<table class="extcal_navbar" border="0" width="100%">
 		<tr>			

@@ -106,6 +106,14 @@ defined( '_JEXEC' ) or die ;
 		</div>
 		<div class="control-group">
 			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('show_until_end_date', JText::_('EB_SHOW_UNTIL_END_DATE'), JText::_('EB_SHOW_UNTIL_END_DATE_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<?php echo EventbookingHelperHtml::getBooleanInput('show_until_end_date', $config->show_until_end_date); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('hide_past_events_from_events_dropdown', JText::_('EB_HIDE_PAST_EVENTS_FROM_DROPDOWN'), JText::_('EB_HIDE_PAST_EVENTS_FROM_DROPDOWN_EXPLAIN')); ?>
 			</div>
 			<div class="controls">

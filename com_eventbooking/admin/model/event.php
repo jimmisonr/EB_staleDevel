@@ -9,6 +9,8 @@
 // no direct access
 defined('_JEXEC') or die;
 
+use Joomla\Registry\Registry;
+
 class EventbookingModelEvent extends EventbookingModelCommonEvent
 {
 	/**
@@ -49,7 +51,21 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 			$db->setQuery($query);
 			$locations = $db->loadObjectList('name');
 
-			$imported = 0;
+			$imported    = 0;
+			$eventFields = array();
+
+			if ($config->event_custom_field)
+			{
+				$xml    = JFactory::getXML(JPATH_ROOT . '/components/com_eventbooking/fields.xml');
+				$fields = $xml->fields->fieldset->children();
+
+				foreach ($fields as $field)
+				{
+					$eventFields[] = (string) $field->attributes()->name;
+				}
+			}
+
+
 			foreach ($events as $event)
 			{
 				if (empty($event['title']) || empty($event['category']) || empty($event['event_date']))
@@ -59,6 +75,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 
 				/* @var EventbookingTableEvent $row */
 				$row = $this->getTable();
+
 				if (!empty($event['id']))
 				{
 					$row->load($event['id']);
@@ -99,8 +116,21 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 						}
 					}
 				}
-				
+
 				$row->bind($event, array('id'));
+
+				if (!empty($eventFields))
+				{
+					$params = new Registry();
+					$params->loadString($row->custom_fields, 'JSON');
+
+					foreach ($eventFields as $fieldName)
+					{
+						$params->set($fieldName, isset($event[$fieldName]) ? $event[$fieldName] : '');
+					}
+
+					$row->custom_fields = $params->toString();
+				}
 
 				$this->prepareTable($row, 'save');
 				$row->store();

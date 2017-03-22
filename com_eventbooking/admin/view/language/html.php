@@ -49,10 +49,10 @@ class EventbookingViewLanguageHtml extends RADViewHtml
 
 	protected function addToolbar()
 	{
-		JToolBarHelper::title(JText::_('Translation management'), 'generic.png');
-		JToolBarHelper::addNew('new_item', 'New Item');
-		JToolBarHelper::apply('apply', 'JTOOLBAR_APPLY');
-		JToolBarHelper::save('save');
-		JToolBarHelper::cancel('cancel');
+		JToolbarHelper::title(JText::_('Translation management'), 'generic.png');
+		JToolbarHelper::addNew('new_item', 'New Item');
+		JToolbarHelper::apply('apply', 'JTOOLBAR_APPLY');
+		JToolbarHelper::save('save');
+		JToolbarHelper::cancel('cancel');
 	}
 }

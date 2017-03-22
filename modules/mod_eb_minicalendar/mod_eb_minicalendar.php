@@ -52,6 +52,7 @@ EventbookingHelper::addLangLinkForAjax();
 $currentDateData = EventbookingModelCalendar::getCurrentDateData();
 $year            = $currentDateData['year'];
 $month           = (int) $params->get('default_month', 0);
+$categoryId      = (int) $params->get('id', 0);
 
 if (!$month)
 {
@@ -62,6 +63,7 @@ if (!$month)
 $model = new EventbookingModelCalendar(array('remember_states' => false, 'ignore_request' => true));
 $model->setState('month', $month)
 	->setState('year', $year)
+	->setState('id', $categoryId)
 	->setState('mini_calendar', 1);
 $rows = $model->getData();
 $data = EventbookingHelperData::getCalendarData($rows, $year, $month, true);
@@ -87,4 +89,3 @@ if (!$itemId)
 }
 
 require JModuleHelper::getLayoutPath('mod_eb_minicalendar', 'default');
-?>
