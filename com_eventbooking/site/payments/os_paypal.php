@@ -150,7 +150,7 @@ class os_paypal extends RADPayment
 			// Validate currency
 			$receivedPaymentCurrency = strtoupper($this->notificationData['mc_currency']);
 
-			if (strtoupper($receivedPaymentCurrency) != strtoupper($row->payment_currency))
+			if ($receivedPaymentCurrency != strtoupper($row->payment_currency))
 			{
 				return false;
 			}

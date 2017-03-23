@@ -123,7 +123,7 @@ if (count($rows))
                             ?>
                                 <p><small title="<?php echo JText::_('EB_LOCATION'); ?>" class="location">
 								<i class="<?php echo $iconMapMarkerClass; ?>"></i>
-								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$row->location_id.'&tmpl=component&format=html&Itemid='.$itemId); ?>" class="eb-colorbox-map"								
+								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=map&location_id='.$row->location_id.'&tmpl=component&format=html&Itemid='.$itemId); ?>" class="eb-colorbox-map">								
 								<strong><?php echo $row->location_name ; ?></strong>
                                 </a></small></p>
                             <?php
