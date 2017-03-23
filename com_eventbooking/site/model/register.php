@@ -606,6 +606,7 @@ class EventBookingModelRegister extends RADModel
 			// Store payment amount and payment currency for future validation
 			$row->payment_currency = $currency;
 			$row->payment_amount   = $data['amount'];
+			$row->store();
 
 			$paymentClass->processPayment($row, $data);
 		}
