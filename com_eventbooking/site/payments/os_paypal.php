@@ -139,8 +139,9 @@ class os_paypal extends RADPayment
 				$payPalId = $this->params->get('paypal_id');
 			}
 
-			$receiverEmail = $this->notificationData['receiver_email'];
-			$receiverId    = $this->notificationData['receiver_id'];
+			$receiverEmail = strtoupper($this->notificationData['receiver_email']);
+			$receiverId    = strtoupper($this->notificationData['receiver_id']);
+			$payPalId      = strtoupper($payPalId);
 
 			if ($receiverEmail != $payPalId && $receiverId != $payPalId)
 			{
