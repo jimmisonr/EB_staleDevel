@@ -80,7 +80,7 @@ class os_paypal extends RADPayment
 			$this->setParameter('return', $siteUrl . 'index.php?option=com_eventbooking&view=complete&Itemid=' . $Itemid);
 		}
 
-		$this->setParameter('cancel_return', $siteUrl . 'index.php?option=com_eventbooking&task=cancel&id=' . $row->id . '&Itemid=' . $Itemid);
+		$this->setParameter('cancel_return', $siteUrl . 'index.php?option=com_eventbooking&view=cancel&layout=default&id=' . $row->id . '&Itemid=' . $Itemid);
 		$this->setParameter('notify_url', $siteUrl . 'index.php?option=com_eventbooking&task=payment_confirm&payment_method=os_paypal');
 		$this->setParameter('address1', $row->address);
 		$this->setParameter('address2', $row->address2);
