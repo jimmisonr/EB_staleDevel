@@ -249,6 +249,8 @@ class plgEventBookingTicketTypes extends JPlugin
 							$ticketType->price       = '';
 							$ticketType->description = '';
 							$ticketType->registered  = 0;
+							$ticketType->capacity    = '';
+							$ticketType->max_tickets_per_booking = '';		
 						}
 						?>
 						<tr id="option_<?php echo $i; ?>">
