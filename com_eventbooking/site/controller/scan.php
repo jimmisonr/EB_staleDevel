@@ -22,16 +22,18 @@ class EventbookingControllerScan extends EventbookingController
 		{
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
-			$query->select('id')
-				->from('#__eb_registrants')
-				->where('ticket_code = ' . $db->quote($ticketCode));
+			$query->select('a.*, b.title AS event_title')
+				->from('#__eb_registrants AS a')
+				->innerJoin('#__eb_events AS b ON a.event_id = b.id')
+				->where('a.ticket_code = ' . $db->quote($ticketCode));
 			$db->setQuery($query);
-			$id = (int) $db->loadResult();
-			if ($id)
+			$rowRegistrant = $db->loadObject();
+
+			if ($rowRegistrant->id)
 			{
 				/* @var EventbookingModelRegistrant $model */
 				$model  = $this->getModel('Registrant');
-				$result = $model->checkin($id);
+				$result = $model->checkin($rowRegistrant->id);
 
 				switch ($result)
 				{
@@ -66,6 +68,21 @@ class EventbookingControllerScan extends EventbookingController
 			$title = JText::_('EB_CHECKIN_FAILURE');
 		}
 
+		if (!empty($rowRegistrant))
+		{
+			$replaces = array(
+				'FIRST_NAME'    => $rowRegistrant->first_name,
+				'LAST_NAME'     => $rowRegistrant->last_name,
+				'EVENT_TITLE'   => $rowRegistrant->event_title,
+				'REGISTRANT_ID' => $rowRegistrant->id,
+			);
+
+			foreach ($replaces as $key => $value)
+			{
+				$message = str_replace('[' . $key . ']', $value, $message);
+				$title   = str_replace('[' . $key . ']', $value, $title);
+			}
+		}
 
 		echo static::getIcodyMessage($title, $message);
 
