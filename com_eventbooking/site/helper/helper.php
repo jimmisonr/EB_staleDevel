@@ -2189,7 +2189,7 @@ class EventbookingHelper
 					{
 						for ($j = 0; $j < $quantity; $j++)
 						{
-							$membersLateFee[$eventId][$j] = $event->late_fee_amount / 100;
+							$membersLateFee[$eventId][$j] = $event->late_fee_amount;
 						}
 					}
 				}
