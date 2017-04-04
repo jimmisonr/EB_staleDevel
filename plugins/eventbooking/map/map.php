@@ -58,7 +58,6 @@ class plgEventBookingMap extends JPlugin
 	 */
 	private function drawMap($location)
 	{
-		$uri = JUri::getInstance();
 		$config     = EventbookingHelper::getConfig();
 		$zoomLevel  = $config->zoom_level ? (int) $config->zoom_level : 10;
 		$disableZoom    = $this->params->get('disable_zoom', 1) == 1 ? 'false' : 'true';
