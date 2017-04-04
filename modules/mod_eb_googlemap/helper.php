@@ -114,11 +114,20 @@ class modEventBookingGoogleMapHelper
 		$zoomLevel   = $this->params->get('zoom_level', 10);
 		$disableZoom = $this->params->get('disable_zoom', 1) == 1 ? 'false' : 'true';
 		JFactory::getDocument()->addScript('https://maps.googleapis.com/maps/api/js?key=' . $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4'));
+
+		if (trim($this->params->get('center_coordinates')))
+		{
+			$homeCoordinates = trim($this->params->get('center_coordinates'));
+		}
+		else
+		{
+			$homeCoordinates = $this->location->lat . ',' . $this->location->long;
+		}
 		?>
 		<script type="text/javascript">
 			Eb.jQuery(document).ready(function ($) {
 				var markerArray = [];
-				var myHome = new google.maps.LatLng(<?php echo $this->location->lat; ?>, <?php echo $this->location->long; ?>);
+				var myHome = new google.maps.LatLng(<?php echo $homeCoordinates; ?>);
 				<?php
 				for($i = 0; $i < count($locations); $i++)
 				{
