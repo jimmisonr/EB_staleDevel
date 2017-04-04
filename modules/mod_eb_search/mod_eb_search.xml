@@ -32,6 +32,8 @@
                 <field name="layout_type" type="list" label="Search Result Layout" description="Choose the layout you want to use to display search result" default="default">
                     <option value="default">Default Layout</option>
                     <option value="table">Table Layout</option>
+					<option value="timeline">Timeline Layout</option>
+					<option value="columns">Columns Layout</option>
                 </field>
                 <field name="module_layout" type="list" label="Module Layout" description="Choose the layout you want to use to display the module" default="default">
                     <option value="default">Default Layout</option>
