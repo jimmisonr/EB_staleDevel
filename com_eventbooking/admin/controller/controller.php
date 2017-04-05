@@ -2592,21 +2592,11 @@ class EventbookingController extends RADControllerAdmin
 			->where($db->quoteName('link') . '=' . $db->quote('index.php?option=com_eventbooking&view=addlocation'));
 		$db->setQuery($query);
 		$db->execute();
-
-		// Field categories table
-		$sql = "CREATE TABLE IF NOT EXISTS `#__eb_field_categories` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `field_id` int(11) DEFAULT NULL,
-		  `category_id` int(11) DEFAULT NULL,
-		  PRIMARY KEY (`id`)
-		) CHARACTER SET `utf8`;";
-
-		$db->setQuery($sql);
-		$db->execute();
-
+		
 		$sql = 'SELECT COUNT(*) FROM #__eb_field_categories';
 		$db->setQuery($sql);
 		$total = $db->loadResult();
+
 		if (!$total)
 		{
 			$sql = 'UPDATE #__eb_fields SET category_id = -1 WHERE category_id = 0';
@@ -2617,19 +2607,10 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}
 
-		// Coupon events
-		$sql = "CREATE TABLE IF NOT EXISTS `#__eb_coupon_events` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `coupon_id` int(11) DEFAULT NULL,
-		  `event_id` int(11) DEFAULT NULL,
-		  PRIMARY KEY (`id`)
-		) CHARACTER SET `utf8`;";
-		$db->setQuery($sql);
-		$db->execute();
-
 		$sql = 'SELECT COUNT(*) FROM #__eb_coupon_events';
 		$db->setQuery($sql);
 		$total = $db->loadResult();
+
 		if (!$total)
 		{
 			$sql = 'UPDATE #__eb_coupons SET event_id = -1 WHERE event_id = 0';
@@ -2681,30 +2662,6 @@ class EventbookingController extends RADControllerAdmin
 				$db->execute();
 			}
 		}
-
-		// Ticket types db structure
-		$sql = "CREATE TABLE IF NOT EXISTS `#__eb_ticket_types` (
-			  `id` int(11) NOT NULL AUTO_INCREMENT,
-			  `event_id` int(11) DEFAULT NULL,
-			  `title` varchar(255) DEFAULT NULL,
-			  `description` text,
-			  `price` decimal(10,2) DEFAULT NULL,
-			  `capacity` int(11) DEFAULT NULL,
-			  `max_tickets_per_booking` int(11) NOT NULL DEFAULT '0',
-			  PRIMARY KEY (`id`)
-		  ) DEFAULT CHARSET=utf8;";
-		$db->setQuery($sql);
-		$db->execute();
-
-		$sql = "CREATE TABLE IF NOT EXISTS `#__eb_registrant_tickets` (
-			  `id` int(11) NOT NULL AUTO_INCREMENT,
-			  `registrant_id` int(11) DEFAULT NULL,
-			  `ticket_type_id` int(11) DEFAULT NULL,
-			  `quantity` int(11) DEFAULT NULL,
-			  PRIMARY KEY (`id`)
-			)DEFAULT CHARSET=utf8;";
-		$db->setQuery($sql);
-		$db->execute();
 
 		// Uninstall the old plugins which is not needed from version 2.9.0
 		$installer = new JInstaller();
