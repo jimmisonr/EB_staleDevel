@@ -1523,6 +1523,15 @@ class EventbookingController extends RADControllerAdmin
 			}
 		}
 
+		$fields = array_keys($db->getTableColumns('#__eb_ticket_types'));
+
+		if (!in_array('parent_ticket_type_id', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_ticket_types` ADD  `parent_ticket_type_id` INT(11) NULL DEFAULT '0';";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		//Registrants table
 		$fields = array_keys($db->getTableColumns('#__eb_registrants'));
 
