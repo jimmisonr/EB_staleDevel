@@ -56,3 +56,15 @@ CREATE TABLE IF NOT EXISTS `#__eb_coupon_events` (
   `event_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) CHARACTER SET `utf8`;
+CREATE TABLE IF NOT EXISTS `#__eb_messages` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `message_key` VARCHAR(50) NULL,
+  `message` TEXT NULL,
+  PRIMARY KEY(`id`)
+) CHARACTER SET `utf8`;
+CREATE TABLE IF NOT EXISTS `#__eb_urls` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `md5_key` text,
+  `query` text,
+  PRIMARY KEY (`id`)
+) CHARACTER SET `utf8`;

@@ -2453,22 +2453,13 @@ class EventbookingController extends RADControllerAdmin
 		$sql = 'SELECT COUNT(id) FROM #__eb_configs WHERE config_key="show_price_for_free_event"';
 		$db->setQuery($sql);
 		$total = $db->loadResult();
+
 		if (!$total)
 		{
 			$sql = 'INSERT INTO #__eb_configs(config_key, config_value) VALUES("show_price_for_free_event", 1)';
 			$db->setQuery($sql);
 			$db->execute();
 		}
-
-		$sql = 'CREATE TABLE IF NOT EXISTS `#__eb_messages` (
-					`id` INT NOT NULL AUTO_INCREMENT,
-		  `message_key` VARCHAR(50) NULL,
-		  `message` TEXT NULL,
-		  PRIMARY KEY(`id`)
-				  ) CHARACTER SET `utf8`;';
-
-		$db->setQuery($sql);
-		$db->execute();
 
 		$sql = 'SELECT COUNT(*) FROM #__eb_messages';
 		$db->setQuery($sql);
@@ -2547,21 +2538,12 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
-		//SEF urls table
-		$sql = "CREATE TABLE IF NOT EXISTS `#__eb_urls` (
-					`id` int(11) NOT NULL AUTO_INCREMENT,
-          `md5_key` text,
-          `query` text,
-          PRIMARY KEY (`id`)
-				  	) DEFAULT CHARSET=utf8;
-				  	";
-		$db->setQuery($sql);
-		$db->execute();
 
 		// Migrate waiting list data
 		$sql = 'SELECT COUNT(*) FROM #__eb_waiting_lists';
 		$db->setQuery($sql);
 		$total = $db->loadResult();
+
 		if ($total)
 		{
 			$sql = "INSERT INTO #__eb_registrants(
@@ -2575,6 +2557,7 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
+
 		$db->truncateTable('#__eb_waiting_lists');
 
 		// Update old links from older version to 2.0.x
