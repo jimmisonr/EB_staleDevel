@@ -75,6 +75,23 @@ $format = 'Y-m-d';
 	</div>
 	<div class="control-group">
 		<label class="control-label">
+			<span class="editlinktip hasTip" title="<?php echo JText::_('EB_ALT_INDIVIDUAL_BUTTON_TEXT'); ?>::<?php echo JText::_('EB_ALT_INDIVIDUAL_BUTTON_TEXT_EXPLAIN'); ?>"><?php echo JText::_('EB_ALT_INDIVIDUAL_BUTTON_TEXT'); ?></span>
+		</label>
+		<div class="controls">
+			<input type="text" name="alt_individual_button_text" id="alt_individual_button_text" class=""  value="<?php echo $this->item->alt_individual_button_text; ?>"/>
+		</div>
+	</div>					
+	<div class="control-group">
+		<label class="control-label">
+			<span class="editlinktip hasTip" title="<?php echo JText::_('EB_ALT_GROUP_BUTTON_TEXT'); ?>::<?php echo JText::_('EB_ALT_GROUP_BUTTON_TEXT_EXPLAIN'); ?>"><?php echo JText::_('EB_ALT_GROUP_BUTTON_TEXT'); ?></span>
+		</label>
+		<div class="controls">
+			<input type="text" name="alt_group_button_text" id="alt_group_button_text" class=""  value="<?php echo $this->item->alt_group_button_text; ?>"/>
+		</div>
+	</div>					
+
+	<div class="control-group">
+		<label class="control-label">
 			<span class="editlinktip hasTip" title="<?php echo JText::_('EB_MIN_NUMBER_REGISTRANTS'); ?>::<?php echo JText::_('EB_MIN_NUMBER_REGISTRANTS_EXPLAIN'); ?>"><?php echo JText::_('EB_MIN_NUMBER_REGISTRANTS'); ?></span>
 		</label>
 		<div class="controls">
