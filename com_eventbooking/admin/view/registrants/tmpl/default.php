@@ -51,20 +51,20 @@ else
 				<th width="2%" class="text_center">
 					<input type="checkbox" name="toggle" value="" onclick="Joomla.checkAll(this)" />
 				</th>
-				<th class="title" style="text-align: left;" width="10%">
+				<th class="title col-firstname" style="text-align: left;" width="10%">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_FIRST_NAME'), 'tbl.first_name', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
 				<?php
 					if ($showLastName)
 					{
 					?>
-						<th class="title" style="text-align: left;" width="10%">
+						<th class="title col-lastname" style="text-align: left;" width="10%">
 							<?php echo JHtml::_('grid.sort',  JText::_('EB_LAST_NAME'), 'tbl.last_name', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 						</th>
 					<?php
 					}
 				?>
-				<th class="title" style="text-align: left;" width="15%">
+				<th class="title col-eventtitle" style="text-align: left;" width="15%">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT'), 'ev.title', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
 				<?php
@@ -72,22 +72,22 @@ else
 				{
 					$colSpan++;
 				?>
-					<th width="7%" class="title" nowrap="nowrap">
+					<th width="7%" class="title col-eventdate" nowrap="nowrap">
 						<?php echo JHtml::_('grid.sort',  JText::_('EB_EVENT_DATE'), 'ev.event_date', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 					</th>
 				<?php
 				}
 				?>
-				<th width="10%" class="title" nowrap="nowrap">
+				<th width="10%" class="title col-email" nowrap="nowrap">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_EMAIL'), 'tbl.email', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
-				<th width="8%" class="title" nowrap="nowrap">
+				<th class="title col_number_registrants">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_NUMBER_REGISTRANTS'), 'tbl.number_registrants', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
-				<th width="10%" class="title" nowrap="nowrap">
+				<th width="10%" class="title col-regdate" nowrap="nowrap">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_REGISTRATION_DATE'), 'tbl.register_date', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
-				<th width="5%" class="title" nowrap="nowrap">
+				<th width="5%" class="title col-amount" nowrap="nowrap">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_AMOUNT'), 'tbl.amount', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
 				<?php
@@ -98,7 +98,7 @@ else
 					if ($field->is_core)
 					{
 					?>
-						<th class="title" nowrap="nowrap">
+						<th class="title col-fields" nowrap="nowrap">
 							<?php echo JHtml::_('grid.sort', JText::_($field->title), 'tbl.' . $field->name, $this->state->filter_order_Dir, $this->state->filter_order); ?>
 						</th>
 					<?php
@@ -106,7 +106,7 @@ else
 					else
 					{
 					?>
-						<th class="title" nowrap="nowrap"><?php echo $field->title; ?></th>
+						<th class="title col-fields" nowrap="nowrap"><?php echo $field->title; ?></th>
 					<?php
 					}
 				}
@@ -115,7 +115,7 @@ else
 				{
 					$colSpan++;
 				?>
-					<th width="5%" class="title" nowrap="nowrap">
+					<th width="5%" class="title col-deposit" nowrap="nowrap">
 						<?php echo JHtml::_('grid.sort',  JText::_('EB_PAYMENT_STATUS'), 'tbl.payment_status', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 					</th>
 				<?php
@@ -124,7 +124,7 @@ else
 				{
 					$colSpan++;
 				?>
-					<th width="7%" class="title" nowrap="nowrap">
+					<th width="7%" class="title col-coupon" nowrap="nowrap">
 						<?php echo JHtml::_('grid.sort',  JText::_('EB_COUPON'), 'cp.code', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 					</th>
 				<?php
@@ -133,7 +133,7 @@ else
 				{
 					$colSpan++;
 				?>
-					<th width="5%" class="title" nowrap="nowrap">
+					<th width="5%" class="title col-paymentmethod">
 						<?php echo JHtml::_('grid.sort',  JText::_('EB_PAYMENT_METHOD'), 'tbl.payment_method', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 					</th>
 				<?php
@@ -142,13 +142,13 @@ else
 				{
 					$colSpan++;
 				?>
-					<th width="8%" class="center">
+					<th width="8%" class="center col-tickets">
 						<?php echo JHtml::_('grid.sort',  JText::_('EB_TICKET_NUMBER'), 'tbl.ticket_number', $this->state->filter_order_Dir, $this->state->filter_order); ?>
 					</th>
 				<?php
 				}
 				?>
-				<th width="5%" class="title">
+				<th width="5%" class="title col-regstatus">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_REGISTRATION_STATUS'), 'tbl.published', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
 				<?php
@@ -156,7 +156,7 @@ else
 				{
 					$colSpan++;
 				?>
-					<th width="8%" class="title">
+					<th width="8%" class="title col-checkin">
 						<?php echo JHtml::_('grid.sort',  JText::_('EB_CHECKED_IN'), 'tbl.checked_in', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 					</th>
 				<?php
@@ -165,13 +165,13 @@ else
 				{
 					$colSpan++;
 				?>
-					<th width="8%" class="center">
+					<th width="8%" class="center col-invoicenumber">
 						<?php echo JHtml::_('grid.sort',  JText::_('EB_INVOICE_NUMBER'), 'tbl.invoice_number', $this->state->filter_order_Dir, $this->state->filter_order); ?>
 					</th>
 				<?php
 				}
 				?>
-				<th width="3%" class="title" nowrap="nowrap">
+				<th width="3%" class="title col-id" nowrap="nowrap">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_ID'), 'tbl.id', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
 			</tr>
@@ -225,7 +225,7 @@ else
 					<td class="text_center">
 						<?php echo $checked; ?>
 					</td>
-					<td>
+					<td class="col-firstname">
 						<a href="<?php echo $link; ?>">
 							<?php
 								echo $row->first_name;
@@ -257,35 +257,35 @@ else
 						if ($showLastName)
 						{
 						?>
-							<td>
+							<td class="col-lastname">
 								<?php echo $row->last_name ; ?>
 							</td>
 						<?php
 						}
 					?>
-					<td>
+					<td class="col-eventtitle">
 						<a href="index.php?option=com_eventbooking&view=event&id=<?php echo $row->event_id; ?>"><?php echo $row->title ; ?></a>
 					</td>
 					<?php
 					if ($this->config->show_event_date)
 					{
 						?>
-						<td class="text_center">
+						<td class="text_center col-eventdate">
 							<?php echo JHtml::_('date', $row->event_date, $this->config->date_format, null) ; ?>
 						</td>
 					<?php
 					}
 					?>
-					<td>
+					<td class="col-email">
 						<a href="mailto:<?php echo $row->email;?>"><?php echo $row->email;?></a>
 					</td>
-					<td class="center" style="font-weight: bold;">
+					<td class="center col-number-registrants" style="font-weight: bold;">
 						<?php echo $row->number_registrants; ?>
 					</td>
-					<td class="center">
+					<td class="center col-regdate">
 						<?php echo JHtml::_('date', $row->register_date, $this->config->date_format); ?>
 					</td>
-					<td>
+					<td class="col-amount">
 						<?php echo EventbookingHelper::formatAmount($row->amount, $this->config) ; ?>
 					</td>
 					<?php
@@ -293,7 +293,7 @@ else
 					{
 						$fieldValue = isset($this->fieldsData[$row->id][$field->id]) ? $this->fieldsData[$row->id][$field->id] : '';
 					?>
-						<td>
+						<td class="col-fields">
 							<?php echo $fieldValue; ?>
 						</td>
 					<?php
@@ -302,7 +302,7 @@ else
 					if ($this->config->activate_deposit_feature)
 					{
 						?>
-						<td>
+						<td class="col-deposit">
 							<?php
 							if($row->payment_status == 1)
 							{
@@ -313,13 +313,14 @@ else
 								echo JText::_('EB_PARTIAL_PAYMENT');
 							}
 							?>
+							<?php echo '<br /><br />Success?: '.$published.''; ?>
 						</td>
 					<?php
 					}
 					if ($this->config->show_coupon_code_in_registrant_list)
 					{
 					?>
-						<td>
+						<td class="col-coupon">
 							<a href="index.php?option=com_eventbooking&view=coupon&id=<?php echo $row->coupon_id; ?>" target="_blank"><?php echo $row->coupon_code ; ?></a>
 						</td>
 					<?php
@@ -328,7 +329,7 @@ else
 					{
 						$method = os_payments::getPaymentMethod($row->payment_method) ;
 						?>
-						<td>
+						<td class="col-paymentmethod">
 							<?php if ($method) echo JText::_($method->getTitle()); ?>
 						</td>
 					<?php
@@ -337,7 +338,7 @@ else
 					if ($this->config->activate_tickets_pdf)
 					{
 					?>
-						<td class="center">
+						<td class="center col-tickets">
 							<?php
 							if ($row->ticket_code)
 							{
@@ -351,7 +352,7 @@ else
 					}
 
 					?>
-					<td class="center">
+					<td class="center col-regstatus">
 						<?php
 							echo $published ;
 						?>
@@ -360,13 +361,13 @@ else
 					if ($this->config->activate_checkin_registrants)
 					{
 					?>
-						<td class="center"><?php echo $href; ?></td>
+						<td class="center col-checkin"><?php echo $href; ?></td>
 					<?php
 					}
 					if ($this->config->activate_invoice_feature)
 					{
 						?>
-						<td class="center">
+						<td class="center col-invoicenumber">
 							<?php
 							if ($row->invoice_number)
 							{
@@ -379,7 +380,7 @@ else
 					<?php
 					}
 					?>
-					<td class="center">
+					<td class="center col-id">
 						<?php echo $row->id; ?>
 					</td>
 				</tr>
