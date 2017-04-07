@@ -66,6 +66,8 @@ class EventbookingModelList extends RADModelList
 		'tbl.featured',
 		'tbl.has_multiple_ticket_types',
 		'tbl.activate_waiting_list',
+		'tbl.alt_group_button_text',
+		'tbl.alt_individual_button_text',
 	);
 
 	/**
