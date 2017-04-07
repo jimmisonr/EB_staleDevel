@@ -173,6 +173,14 @@ $format = 'Y-m-d';
 	{
 	?>
 		<div class="control-group">
+				<label class="control-label">
+				<?php echo JText::_('EB_ENABLE_TERMS_CONDITIONS'); ?>
+			</label>
+			<div class="controls">
+				<?php echo EventbookingHelperHtml::getBooleanInput('enable_terms_conditions', $this->item->enable_terms_conditions); ?>
+			</div>
+		</div>
+		<div class="control-group">
 			<label class="control-label">
 				<?php echo JText::_('EB_TERMS_CONDITIONS'); ?>
 			</label>
