@@ -1424,6 +1424,18 @@ class EventbookingController extends RADControllerAdmin
 			$db->setQuery($sql);
 			$db->execute();
 		}
+		if (!in_array('alt_group_button_text', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `alt_group_button_text` VARCHAR( 255 ) NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+		if (!in_array('alt_individual_button_text', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `alt_individual_button_text` VARCHAR( 255 ) NULL;";
+			$db->setQuery($sql);
+			$db->execute();
+		}		
 
 		//The Categories table
 		$fields = array_keys($db->getTableColumns('#__eb_categories'));
