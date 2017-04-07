@@ -58,15 +58,6 @@ class plgEventBookingMap extends JPlugin
 	 */
 	private function drawMap($location)
 	{
-		$uri = JUri::getInstance();
-		if ($uri->getScheme() == 'https')
-		{
-			$https = true;
-		}
-		else
-		{
-			$https = false;
-		}
 		$config     = EventbookingHelper::getConfig();
 		$zoomLevel  = $config->zoom_level ? (int) $config->zoom_level : 10;
 		$disableZoom    = $this->params->get('disable_zoom', 1) == 1 ? 'false' : 'true';
@@ -77,13 +68,12 @@ class plgEventBookingMap extends JPlugin
 		$bubbleText .= addslashes($location->name);
 		$bubbleText .= "</h4></li>";
 		$bubbleText .= "<li class=\"address\">" . addslashes($location->address . ', ' . $location->city . ', ' . $location->state . ', ' . $location->zip . ', ' . $location->country) . "</li>";
-		$getDirectionLink = 'http://maps.google.com/maps?f=d&daddr=' . $location->lat . ',' . $location->long . '(' . addslashes($location->address . ', ' . $location->city . ', ' . $location->state . ', ' . $location->zip . ', ' . $location->country) . ')';
+		$getDirectionLink = 'https://maps.google.com/maps?f=d&daddr=' . $location->lat . ',' . $location->long . '(' . addslashes($location->address . ', ' . $location->city . ', ' . $location->state . ', ' . $location->zip . ', ' . $location->country) . ')';
 		$bubbleText .= "<li class=\"address getdirection\"><a href=\"" . $getDirectionLink . "\" target=\"_blank\">" . JText::_('EB_GET_DIRECTION') . "</li>";
 		$bubbleText .= "</ul>";
 		$session = JFactory::getSession();
+		JFactory::getDocument()->addScript('https://maps.googleapis.com/maps/api/js?key=' . $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4'));
 		?>
-		<script type="text/javascript"
-		        src="<?php echo ($https) ? 'https' : 'http'?>://maps.google.com/maps/api/js?key=<?php echo $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4');?>"></script>
 		<script type="text/javascript">
 			(function ($) {
 				$(document).ready(function () {

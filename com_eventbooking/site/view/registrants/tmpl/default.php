@@ -187,7 +187,7 @@ $rootUri = JUri::root(true);
 					}
 					if ($isMember)
 					{
-						$groupLink = JRoute::_('index.php?option=com_eventbooking&view=registrant&id=' . $row->group_id . '&Itemid=' . $this->Itemid);
+						$groupLink = JRoute::_('index.php?option=com_eventbooking&view=registrant&id=' . $row->group_id . '&Itemid=' . $this->Itemid. '&return=' . $return);
 					?>
 						<br />
 						<?php echo JText::_('EB_GROUP'); ?><a href="<?php echo $groupLink; ?>"><?php echo $row->group_name ;  ?></a>

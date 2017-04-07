@@ -79,7 +79,19 @@ else
 		</label>
 
 		<div class="<?php echo $controlsClass; ?>">
-			<?php echo JText::_($method->getTitle()); ?>
+			<?php
+			if ($method->iconUri)
+			{
+			?>
+				<img class="eb-payment-method-icon clearfix" src="<?php echo $method->iconUri; ?>"
+				     title="<?php echo JText::_($method->getTitle()); ?>"/>
+			<?php
+			}
+			else
+			{
+				echo JText::_($method->getTitle());
+			}
+			?>
 		</div>
 	</div>
 <?php

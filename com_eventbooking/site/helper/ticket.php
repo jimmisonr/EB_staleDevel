@@ -243,14 +243,14 @@ class EventbookingHelperTicket
 		if (strpos($output, '[QRCODE]') !== false)
 		{
 			EventbookingHelper::generateQrcode($row->id);
-			$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
+			$imgTag = '<img src="media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
 			$output = str_ireplace("[QRCODE]", $imgTag, $output);
 		}
 
 		if ($row->ticket_code && strpos($output, '[TICKET_QRCODE]') !== false)
 		{
 			static::generateTicketQrcode($row);
-			$imgTag = '<img src="' . EventbookingHelper::getSiteUrl() . 'media/com_eventbooking/qrcodes/' . $row->ticket_code . '.png" border="0" />';
+			$imgTag = '<img src="media/com_eventbooking/qrcodes/' . $row->ticket_code . '.png" border="0" />';
 			$output = str_ireplace("[TICKET_QRCODE]", $imgTag, $output);
 		}
 
