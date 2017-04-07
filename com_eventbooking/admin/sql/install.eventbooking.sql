@@ -331,7 +331,6 @@ CREATE TABLE IF NOT EXISTS `#__eb_events` (
   `cancel_before_date` datetime DEFAULT NULL,
   `enable_auto_reminder` tinyint(3) unsigned DEFAULT NULL,
   `remind_before_x_days` tinyint(3) unsigned DEFAULT NULL,
-  `enable_terms_conditions` tinyint(3) unsigned DEFAULT NULL,
   `recurring_type` tinyint(3) unsigned DEFAULT NULL,
   `recurring_frequency` int(11) DEFAULT NULL,
   `weekdays` varchar(50) DEFAULT NULL,
