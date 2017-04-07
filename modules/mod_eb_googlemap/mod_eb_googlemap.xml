@@ -19,7 +19,13 @@
 		<fields name="params">
 			<fieldset name="basic" addfieldpath="/administrator/components/com_eventbooking/elements">
 				<field name="moduleclass_sfx" type="text"
-					label="Module Class Suffix" description="PARAMMODULECLASSSUFFIX" />				
+					label="Module Class Suffix" description="PARAMMODULECLASSSUFFIX" />
+				<field
+						name="center_coordinates"
+						type="text"
+						default="100"
+						label="Center Coordinates"
+						description="Center Coordinates of the map, for example 37.09024,-95.712891. Default to the coordinates of the location of first event" />
 				<field
 					name="width"
 					type="text"

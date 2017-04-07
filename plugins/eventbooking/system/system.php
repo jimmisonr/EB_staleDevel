@@ -142,7 +142,7 @@ class plgEventbookingSystem extends JPlugin
 		if ($capacity > 0)
 		{
 			$query->clear()
-				->select('COUNT(*)')
+				->select('SUM(b.number_registrants)')
 				->from('#__eb_registrants AS b')
 				->where('event_id = ' . (int) $eventId)
 				->where('b.group_id = 0')

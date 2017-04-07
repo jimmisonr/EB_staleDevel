@@ -131,7 +131,95 @@ class plgEventBookingTicketTypes extends JPlugin
 		$db->setQuery($query);
 		$db->execute();
 
+		if ($row->event_type == 1)
+		{
+			// Insert Ticket Type Data for children event
+			$query->clear()
+				->select('id')
+				->from('#__eb_events')
+				->where('parent_id = ' . $row->id);
+			$db->setQuery($query);
+			$childEventIds = $db->loadColumn();
+
+			if ($isNew)
+			{
+				foreach ($childEventIds as $childEventId)
+				{
+					$sql = 'INSERT INTO #__eb_ticket_types (event_id, title, description, price, capacity, max_tickets_per_booking, parent_ticket_type_id)'
+						. " SELECT $childEventId, title, description, price, capacity, max_tickets_per_booking, id FROM #__eb_ticket_types WHERE event_id = $row->id";
+					$db->setQuery($sql);
+					$db->execute();
+				}
+			}
+			else
+			{
+				foreach ($childEventIds as $childEventId)
+				{
+					foreach ($ticketTypeIds as $ticketTypeId)
+					{
+						$query->clear()
+							->select('*')
+							->from('#__eb_ticket_types')
+							->where('id = ' . $ticketTypeId);
+						$db->setQuery($query);
+						$rowParentTicketType = $db->loadObject();
+
+						$query->clear()
+							->select('id')
+							->from('#__eb_ticket_types')
+							->where('event_id = '. $childEventId)
+							->where('parent_ticket_type_id = ' . $rowParentTicketType->id);
+						$db->setQuery($query);
+						$childEventTicketTypeId = (int) $db->loadResult();
+
+						if ($childEventTicketTypeId)
+						{
+							// Update data of existing ticket type
+							$query->clear()
+								->update('#__eb_ticket_types')
+								->set('title = ' . $db->quote($rowParentTicketType->title))
+								->set('description = ' . $db->quote($rowParentTicketType->description))
+								->set('price = ' . $db->quote($rowParentTicketType->price))
+								->set('capacity = ' . $db->quote($rowParentTicketType->capacity))
+								->set('max_tickets_per_booking = ' . $db->quote($rowParentTicketType->max_tickets_per_booking))
+								->where('id = ' . $childEventTicketTypeId);
+							$db->setQuery($query);
+							$db->execute();
+						}
+						else
+						{
+							$title                = $db->quote($rowParentTicketType->title);
+							$description          = $db->quote($rowParentTicketType->description);
+							$price                = $db->quote($rowParentTicketType->price);
+							$capacity             = $db->quote($rowParentTicketType->capacity);
+							$maxTicketsPerBooking = $db->quote($rowParentTicketType->max_tickets_per_booking);
+
+							// Insert new Ticket type data
+							$query->clear()
+								->insert('#__eb_ticket_types')
+								->columns('event_id, title, description, price, capacity, max_tickets_per_booking, parent_ticket_type_id')
+								->values("$childEventId, $title, $description ,$price, $capacity, $maxTicketsPerBooking, $rowParentTicketType->id");
+							$db->setQuery($query);
+							$db->execute();
+						}
+
+						echo $db->getQuery();
+					}
+				}
+			}
+		}
+
 		$row->has_multiple_ticket_types = $hasMultipleTicketTypes;
+
+		if ($row->event_type == 1)
+		{
+			$query->clear()
+				->update('#__eb_events')
+				->set('has_multiple_ticket_types = ' . $hasMultipleTicketTypes)
+				->where('parent_id = ' . $row->id);
+			$db->setQuery($query);
+			$db->execute();
+		}
 
 		if (count($ticketTypeIds))
 		{
@@ -141,13 +229,33 @@ class plgEventBookingTicketTypes extends JPlugin
 				->where('id NOT IN (' . implode(',', $ticketTypeIds) . ')');
 			$db->setQuery($query)
 				->execute();
+
+			if (!empty($childEventIds))
+			{
+				$query->clear()
+					->delete('#__eb_ticket_types')
+					->where('event_id IN (' . implode(',', $childEventIds) . ')')
+					->where('parent_ticket_type_id NOT IN (' . implode(',', $ticketTypeIds) . ')');
+				$db->setQuery($query)
+					->execute();
+			}
 		}
 
 		if (!$hasMultipleTicketTypes)
 		{
+			if (empty($childEventIds))
+			{
+				$eventIds = array($row->id);
+			}
+			else
+			{
+				$eventIds   = $childEventIds;
+				$eventIds[] = $row->id;
+			}
+
 			$query->clear()
 				->delete('#__eb_ticket_types')
-				->where('event_id = ' . $row->id);
+				->where('event_id IN (' . implode(', ', $eventIds) . ')');
 			$db->setQuery($query)
 				->execute();
 		}
@@ -156,7 +264,7 @@ class plgEventBookingTicketTypes extends JPlugin
 	/**
 	 * Generate invoice number after registrant complete payment for registration
 	 *
-	 * @param $row
+	 * @param EventbookingTableRegistrant $row
 	 *
 	 * @return bool
 	 */
@@ -171,7 +279,7 @@ class plgEventBookingTicketTypes extends JPlugin
 	/**
 	 * Generate invoice number after registrant complete registration in case he uses offline payment
 	 *
-	 * @param $row
+	 * @param EventbookingTableRegistrant $row
 	 */
 	public function onAfterStoreRegistrant($row)
 	{
@@ -184,12 +292,13 @@ class plgEventBookingTicketTypes extends JPlugin
 	/**
 	 * Process ticket types data after registration is completed:
 	 *
-	 * @param $row
+	 * @param EventbookingTableRegistrant $row
 	 */
 	private function processTicketTypes($row)
 	{
 		$config = EventbookingHelper::getConfig();
 		$event  = EventbookingHelperDatabase::getEvent($row->event_id);
+
 		if ($event->has_multiple_ticket_types && $config->calculate_number_registrants_base_on_tickets_quantity)
 		{
 			$db    = JFactory::getDbo();
@@ -213,6 +322,7 @@ class plgEventBookingTicketTypes extends JPlugin
 	private function drawSettingForm($row)
 	{
 		$ticketTypes = array();
+
 		if ($row->id)
 		{
 			$ticketTypes = EventbookingHelperData::getTicketTypes($row->id);
@@ -249,6 +359,8 @@ class plgEventBookingTicketTypes extends JPlugin
 							$ticketType->price       = '';
 							$ticketType->description = '';
 							$ticketType->registered  = 0;
+							$ticketType->capacity    = '';
+							$ticketType->max_tickets_per_booking = '';		
 						}
 						?>
 						<tr id="option_<?php echo $i; ?>">

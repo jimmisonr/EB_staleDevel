@@ -264,7 +264,7 @@ div.moduleS2 h3, div.moduletableS2 h3 {
 
 
 #eb-categories .eb-box-heading, #eb-events .eb-box-heading, #eb-event-page .eb-box-heading {
-    background: #f2f2f2 url(../../../images/background.png) repeat-x 0 0;
+    background: #f2f2f2;
     border: 1px solid #DBDEE1;
 }
 #eb-categories .eb-description, #eb-events .eb-description, #eb-event-page .eb-description {

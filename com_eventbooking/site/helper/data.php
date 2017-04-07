@@ -855,6 +855,12 @@ class EventbookingHelperData
 		$fields[]  = 'transaction_id';
 		$fields[]  = 'payment_status';
 
+		if ($config->activate_checkin_registrants)
+		{
+			$headers[] = JText::_('EB_CHECKED_IN');
+			$fields[]  = 'checked_in';
+		}
+
 		if ($config->activate_invoice_feature)
 		{
 			$headers[] = JText::_('EB_INVOICE_NUMBER');
@@ -980,6 +986,15 @@ class EventbookingHelperData
 					break;
 				default:
 					break;
+			}
+
+			if ($row->checked_in)
+			{
+				$row->checked_in = JText::_('JYES');
+			}
+			else
+			{
+				$row->checked_in = JText::_('JNO');
 			}
 
 			if ($config->activate_invoice_feature)

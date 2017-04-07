@@ -37,7 +37,7 @@ class EventbookingController extends RADController
 			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/css/font-awesome.css');
 		}
 
-		JHtml::_('script', EventbookingHelper::getURL() . 'media/com_eventbooking/assets/js/noconflict.js', false, false);
+		JHtml::_('script', 'media/com_eventbooking/assets/js/noconflict.js', false, false);
 
 		if ($config->calendar_theme)
 		{

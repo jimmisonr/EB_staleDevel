@@ -253,7 +253,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 			throw new Exception(JText::_('EB_CERTIFICATE_PAID_REGISTRANTS_ONLY'), 403);
 		}
 
-		if ($config->download_certificate_if_checked_in && !$row->checked_id)
+		if ($config->download_certificate_if_checked_in && !$row->checked_in)
 		{
 			throw new Exception(JText::_('EB_CERTIFICATE_CHECKED_IN_REGISTRANTS_ONLY'), 403);
 		}
