@@ -393,7 +393,9 @@ abstract class RADFormField
 			{
 				$class = ' ' . $class;
 			}
-
+			
+			if ($this->depend_on_field_id > 0)$class .= ' dependent_field';
+			
 			return '<div class="' . $controlGroupClass . $class . '" ' . $controlGroupAttributes . '>' . '<div class="' . $controlLabelClass . '">' . $this->getLabel() . '</div>' . '<div ' . ($controlId ? 'id="' . $controlId . '"' : '') . 'class="' . $controlsClass . '">' .
 			$this->getInput($bootstrapHelper) . '</div>' . '</div>';
 		}
