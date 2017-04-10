@@ -124,7 +124,7 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 
 $articleId  = $this->event->article_id ? $this->event->article_id : $this->config->article_id ;
 
-if (!$this->showBillingStep && $this->config->accept_term ==1 && $articleId)
+if (!$this->showBillingStep && $this->config->accept_term ==1 && $articleId && $this->event->enable_terms_conditions)
 {
 	if (JLanguageMultilang::isEnabled())
 	{
