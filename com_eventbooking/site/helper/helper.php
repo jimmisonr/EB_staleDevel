@@ -3653,7 +3653,7 @@ class EventbookingHelper
 
 			foreach ($ticketTypes as $ticketType)
 			{
-				if ($ticketType->capacity > $ticketType->registered)
+				if (!$ticketType->capacity || ($ticketType->capacity > $ticketType->registered))
 				{
 					return true;
 				}
