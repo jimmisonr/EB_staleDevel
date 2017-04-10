@@ -445,7 +445,7 @@ function buildStateField(stateFieldId, countryFieldId, defaultState)
 				var countryName = '';
 			}
 			$.ajax({
-				type: 'POST',
+				type: 'GET',
 				url: siteUrl + 'index.php?option=com_eventbooking&task=get_states&country_name='+ countryName+'&field_name='+stateFieldId + '&state_name=' + defaultState + langLinkForAjax,
 				success: function(data) {
                     if ($('#field_' + stateFieldId + ' .controls').length)
@@ -466,7 +466,7 @@ function buildStateField(stateFieldId, countryFieldId, defaultState)
 			{
 				$('#' + countryFieldId).change(function(){
 					$.ajax({
-						type: 'POST',
+						type: 'GET',
 						url: siteUrl + 'index.php?option=com_eventbooking&task=get_states&country_name='+ $(this).val()+'&field_name=' + stateFieldId + '&state_name=' + defaultState + langLinkForAjax,
 						success: function(data) {
                             if ($('#field_' + stateFieldId + ' .controls').length)
