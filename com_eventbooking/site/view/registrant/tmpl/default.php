@@ -522,7 +522,7 @@ $selectedState = '';
 					var userId = $('#user_id').val();
 					var eventId = $('#event_id').val();
 					$.ajax({
-						type : 'POST',
+						type : 'GET',
 						url : 'index.php?option=com_eventbooking&task=get_profile_data&user_id=' + userId + '&event_id=' +eventId,
 						dataType: 'json',
 						success : function(json){

@@ -55,7 +55,14 @@ defined('_JEXEC') or die;
 		<?php
 		if ($config->show_available_place)
 		{
-			$available = $ticketType->capacity - $ticketType->registered;
+			if ($ticketType->capacity)
+			{
+				$available = $ticketType->capacity - $ticketType->registered;
+			}
+			else
+			{
+				$available = JText::_('EB_UNLIMITED');
+			}
 		?>
 			<td class="center">
 				<?php echo $available; ?>

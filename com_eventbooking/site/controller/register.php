@@ -255,7 +255,7 @@ class EventbookingControllerRegister extends EventbookingController
 
 			foreach ($ticketTypes as $ticketType)
 			{
-				if (!empty($data['ticket_type_' . $ticketType->id]))
+				if (!empty($data['ticket_type_' . $ticketType->id]) && $ticketType->capacity > 0)
 				{
 					$quantity          = $data['ticket_type_' . $ticketType->id];
 					$availableQuantity = $ticketType->capacity - $ticketType->registered;
