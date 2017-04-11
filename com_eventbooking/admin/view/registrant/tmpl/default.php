@@ -574,7 +574,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 						var countryName = '';
 					}			
 					$.ajax({
-						type: 'POST',
+						type: 'GET',
 						url: siteUrl + 'index.php?option=com_eventbooking&task=get_states&country_name='+ countryName+'&field_name='+stateFieldId + '&state_name=' + defaultState,
 						success: function(data) {
 							$('#field_' + stateFieldId + ' .controls').html(data);
@@ -588,7 +588,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 					{
 						$('#' + countryFieldId).change(function(){
 							$.ajax({
-								type: 'POST',
+								type: 'GET',
 								url: siteUrl + 'index.php?option=com_eventbooking&task=get_states&country_name='+ $(this).val()+'&field_name=' + stateFieldId + '&state_name=' + defaultState,
 								success: function(data) {
 									$('#field_' + stateFieldId + ' .controls').html(data);
@@ -610,7 +610,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 				var userId = $('#user_id_id').val();
 				var eventId = $('#event_id').val();
 				$.ajax({
-					type : 'POST',
+					type : 'GET',
 					url : 'index.php?option=com_eventbooking&task=get_profile_data&user_id=' + userId + '&event_id=' +eventId,
 					dataType: 'json',
 					success : function(json){

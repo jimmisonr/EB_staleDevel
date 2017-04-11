@@ -56,13 +56,26 @@ defined('_JEXEC') or die;
 				<?php echo EventbookingHelper::formatCurrency($ticketType->price, $this->config); ?>
 			</td>
 			<?php
-			$available = $ticketType->capacity - $ticketType->registered;
+
+			if ($ticketType->capacity)
+			{
+				$available = $ticketType->capacity - $ticketType->registered;
+			}
+			elseif($ticketType->max_tickets_per_booking)
+			{
+				$available = $ticketType->max_tickets_per_booking;
+			}
+			else
+			{
+				// Hard code to max 10 tickets
+				$available = 10;
+			}
 
 			if ($this->config->show_available_place)
 			{
 			?>
 				<td class="center">
-					<?php echo $available; ?>
+					<?php echo ($ticketType->capacity ? $available : JText::_('EB_UNLIMITED')); ?>
 				</td>
 			<?php
 			}
@@ -77,6 +90,7 @@ defined('_JEXEC') or die;
 						{
 							$available = min($available, $ticketType->max_tickets_per_booking);
 						}
+
 						echo JHtml::_('select.integerlist', 0, $available, 1, $fieldName, 'class="ticket_type_quantity input-small" onchange="calculateIndividualRegistrationFee();"', $this->input->getInt($fieldName, 0));
 					}
 					else
