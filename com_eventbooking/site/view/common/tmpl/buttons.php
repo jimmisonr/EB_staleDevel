@@ -28,6 +28,9 @@ defined('_JEXEC') or die;
  * @var   string                 $iconPencilClass
  */
 
+$EB_REGISTER_text = ($item->alt_individual_button_text) ? $item->alt_individual_button_text : JText::_('EB_REGISTER');
+$EB_REGISTER_INDIVIDUAL_text = ($item->alt_individual_button_text) ? $item->alt_individual_button_text : JText::_('EB_REGISTER_INDIVIDUAL');
+$EB_REGISTER_GROUP_text = ($item->alt_group_button_text) ? JText::sprintf($item->alt_group_button_text, $item->min_group_number) : JText::_('EB_REGISTER_GROUP');
 
 if (!$isMultipleDate)
 {
@@ -39,7 +42,7 @@ if (!$isMultipleDate)
 		{
 		?>
 			<li>
-				<a class="<?php echo $btnClass; ?>" href="<?php echo $registrationUrl; ?>" target="_blank"><?php echo JText::_('EB_REGISTER');; ?></a>
+				<a class="<?php echo $btnClass; ?>" href="<?php echo $registrationUrl; ?>" target="_blank"><?php echo $EB_REGISTER_text; ?></a>
 			</li>
 		<?php
 		}
@@ -60,7 +63,7 @@ if (!$isMultipleDate)
 						$extraClass = 'eb-colorbox-addcart';
 					}
 
-					$text = JText::_('EB_REGISTER');
+					$text = $EB_REGISTER_text;
 				}
 				else
 				{
@@ -68,11 +71,11 @@ if (!$isMultipleDate)
 
 					if ($item->has_multiple_ticket_types)
 					{
-						$text = JText::_('EB_REGISTER');
+						$text = $EB_REGISTER_text;
 					}
 					else
 					{
-						$text = JText::_('EB_REGISTER_INDIVIDUAL');
+						$text = $EB_REGISTER_INDIVIDUAL_text;
 					}
 
 					$extraClass = '';
@@ -107,7 +110,7 @@ if (!$isMultipleDate)
 			?>
 				<li>
 					<a class="<?php echo $btnClass; ?>"
-					   href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id=' . $item->id . '&Itemid=' . $Itemid, false, $ssl); ?>"><?php echo JText::_('EB_REGISTER_GROUP');; ?></a>
+					   href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=register.group_registration&event_id=' . $item->id . '&Itemid=' . $Itemid, false, $ssl); ?>"><?php echo $EB_REGISTER_GROUP_text; ?></a>
 				</li>
 			<?php
 			}
