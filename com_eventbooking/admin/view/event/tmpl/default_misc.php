@@ -168,27 +168,20 @@ $format = 'Y-m-d';
 			<input type="text" name="remind_before_x_days" class="input-mini" size="5" value="<?php echo $this->item->remind_before_x_days; ?>"/> days
 		</div>
 	</div>
-	<?php
-	if ($this->config->term_condition_by_event)
-	{
-	?>
-		<div class="control-group">
-				<label class="control-label">
-				<?php echo JText::_('EB_ENABLE_TERMS_CONDITIONS'); ?>
-			</label>
-			<div class="controls">
-				<?php echo EventbookingHelperHtml::getBooleanInput('enable_terms_conditions', $this->item->enable_terms_conditions); ?>
-			</div>
-		</div>
-		<div class="control-group">
+	<div class="control-group">
 			<label class="control-label">
-				<?php echo JText::_('EB_TERMS_CONDITIONS'); ?>
-			</label>
-			<div class="controls">
-				<?php echo EventbookingHelper::getArticleInput($this->item->article_id); ?>
-			</div>
+			<?php echo JText::_('EB_ENABLE_TERMS_CONDITIONS'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['enable_terms_and_conditions']; ?>
 		</div>
-	<?php
-	}
-	?>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_TERMS_CONDITIONS'); ?>
+		</label>
+		<div class="controls">
+			<?php echo EventbookingHelper::getArticleInput($this->item->article_id); ?>
+		</div>
+	</div>
 </fieldset>

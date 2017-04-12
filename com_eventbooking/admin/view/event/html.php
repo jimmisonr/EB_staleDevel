@@ -240,7 +240,12 @@ class EventbookingViewEventHtml extends RADViewItem
 
 		$this->lists['available_attachment'] = EventbookingHelper::attachmentList(explode('|', $item->attachment), $config);
 
-		$this->lists['enable_term_condition']     = JHtml::_('select.booleanlist', 'enable_term_condition', ' class="inputbox" ', $item->enable_term_condition);
+		$options   = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('JNO'));
+		$options[] = JHtml::_('select.option', 1, JText::_('JYES'));
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_USE_GLOBAL_CONFIGURATION'));
+
+		$this->lists['enable_terms_and_conditions'] = JHtml::_('select.booleanlist', 'enable_terms_and_conditions', ' class="inputbox" ', $item->enable_terms_and_conditions);
 		
 		#Plugin support
 		JPluginHelper::importPlugin('eventbooking');

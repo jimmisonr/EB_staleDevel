@@ -112,7 +112,7 @@ class EventbookingControllerEvent extends EventbookingController
 			'early_bird_discount_amount',
 			'early_bird_discount_type',
 			'early_bird_discount_date',
-			'tbl.enable_terms_conditions',
+			'tbl.enable_terms_and_conditions',
 		);
 
 		if ($config->event_custom_field)
