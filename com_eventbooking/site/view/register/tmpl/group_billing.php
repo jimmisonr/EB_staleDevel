@@ -105,7 +105,7 @@ else
 
 	$articleId = $this->event->article_id ? $this->event->article_id : $this->config->article_id;
 
-	if ($this->config->accept_term == 1 && $articleId)
+	if ($this->config->accept_term == 1 && $articleId && $this->event->enable_terms_conditions )
 	{
 		$layoutData['articleId'] = $articleId;
 
