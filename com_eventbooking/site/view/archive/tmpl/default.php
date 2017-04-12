@@ -39,14 +39,14 @@ if(count($this->items))
 	$span5Class    = $this->bootstrapHelper->getClassMapping('span5');
 	$btnClass      = $this->bootstrapHelper->getClassMapping('btn');
 ?>
-	<div id="eb-events <?php echo 'eb-eventId-'.$event->id;?>">
+	<div id="eb-events">
 	<?php
 		for ($i = 0 , $n = count($this->items) ;  $i < $n ; $i++)
 		{
 			$event = $this->items[$i] ;
 			$url = JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, 0, $this->Itemid));
 		?>
-			<div class="eb-event">
+			<div id="<?php echo 'eb-event-id-'.$event->id;?>" class="eb-event">
 				<div class="eb-box-heading clearfix">
 					<h3 class="eb-event-title pull-left">
 						<a href="<?php echo $url; ?>" title="<?php echo $event->title; ?>" class="eb-event-title-link">
