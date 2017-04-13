@@ -39,7 +39,7 @@ if(count($this->items))
 	$span5Class    = $this->bootstrapHelper->getClassMapping('span5');
 	$btnClass      = $this->bootstrapHelper->getClassMapping('btn');
 ?>
-	<div id="eb-events">
+	<div id="eb-events <?php echo 'eb-eventId-'.$event->id;?>">
 	<?php
 		for ($i = 0 , $n = count($this->items) ;  $i < $n ; $i++)
 		{
