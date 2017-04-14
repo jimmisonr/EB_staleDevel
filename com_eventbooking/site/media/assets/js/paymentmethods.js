@@ -135,6 +135,15 @@ function updatePaymentMethod()
             $('#tr_card_type').hide();
             $('#tr_card_holder_name').hide();
         }
+
+        if (paymentMethod == 'os_squareup')
+        {
+            $('#sq_field_zipcode').show();
+        }
+        else
+        {
+            $('#sq_field_zipcode').hide();
+        }
     });
 }
 

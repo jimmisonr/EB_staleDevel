@@ -97,6 +97,27 @@ else
 <?php
 }
 
+if ($method->getName() == 'os_squareup')
+{
+	$style = '';
+}
+else
+{
+	$style = 'style = "display:none"';
+}
+?>
+<div class="<?php echo $controlGroupClass;  ?> payment_information" id="sq_field_zipcode" <?php echo $style; ?>>
+	<label class="<?php echo $controlLabelClass; ?>" for="sq_billing_zipcode">
+		<?php echo JText::_('EB_SQUAREUP_ZIPCODE'); ?><span class="required">*</span>
+	</label>
+
+	<div class="<?php echo $controlsClass; ?>" id="field_zip_input">
+		<input type="text" id="sq_billing_zipcode" name="sq_billing_zipcode"
+		       class="input-large"
+		       value="<?php echo $this->escape($this->input->getString('sq_billing_zipcode')); ?>" />
+	</div>
+</div>
+<?php
 if ($method->getCreditCard())
 {
 	$style = '';
