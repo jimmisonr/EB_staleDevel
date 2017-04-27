@@ -19,7 +19,7 @@ class EventbookingControllerConfiguration extends EventbookingController
 		$data = $this->input->getData(RAD_INPUT_ALLOWRAW);
 
 		/* @var EventbookingModelConfiguration $model */
-		$model = $this->getModel();
+		$model = $this->getModel('Configuration', array('ignore_request' => true));
 		$model->store($data);
 
 		$task = $this->getTask();
