@@ -25,13 +25,14 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 	 * @return void
 	 */
 	public function store($input, $ignore = array())
-	{
+	{		
 		$app    = JFactory::getApplication();
+		$user 	= JFactory::getUser();	
 		$config = EventbookingHelper::getConfig();
 		$db     = $this->getDbo();
 		$query  = $db->getQuery(true);
 
-		if ($app->isAdmin())
+		if ($app->isAdmin() || $user->authorise('core.admin'))
 		{
 			$data = $input->getData(RAD_INPUT_ALLOWRAW);
 		}

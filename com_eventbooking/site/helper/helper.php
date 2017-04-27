@@ -3017,7 +3017,7 @@ class EventbookingHelper
 
 		if ($tag && $tag != '*' && ($tag != $language->getTag() || $force))
 		{
-			$language->load('com_eventbooking', JPATH_ROOT, $tag);
+			$language->load('com_eventbooking', JPATH_ROOT, $tag, true);
 		}
 	}
 

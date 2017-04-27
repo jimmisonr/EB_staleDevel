@@ -204,7 +204,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		$this->canChangeStatus    = $canChangeStatus;
 		$this->form               = $form;
 		$this->rowMembers         = $rowMembers;
-		$this->return             = $this->input->->get->get('return', '', 'string');
+		$this->return             = $this->input->get->get('return', '', 'string');
 		$this->canChangeFeeFields = $canChangeFeeFields;
 
 		$this->addToolbar();
