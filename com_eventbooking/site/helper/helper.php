@@ -4136,11 +4136,11 @@ class EventbookingHelper
 	{
 		// Initialize variables.
 		JHtml::_('behavior.modal');
-		$link = 'index.php?option=com_content&amp;view=articles&amp;layout=modal&amp;tmpl=component&amp;' . JSession::getFormToken() . '=1';
+		$link = 'index.php?option=com_content&amp;view=articles&amp;layout=modal&amp;tmpl=component&amp;' . JSession::getFormToken() . '=1&function=js_select_article';
 		$html = array();
 		?>
 		<script type="text/javascript">
-			function jSelectArticle(id, title, catid, object, link, lang) {
+			function js_select_article(id, title, catid, object, link, lang) {
 				var old_id = document.getElementById('<?php echo $fieldName; ?>').value;
 				if (old_id != id) {
 					document.id('article_name').value = title;
