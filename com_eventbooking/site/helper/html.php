@@ -56,7 +56,10 @@ abstract class EventbookingHelperHtml
 	{
 		if (version_compare(JVERSION, '3.6.9', 'ge'))
 		{
-			return 'JoomlaCalendar.init(".field-calendar");';
+			return 'elements = document.querySelectorAll(".field-calendar");
+                    for (i = 0; i < elements.length; i++) {
+                    JoomlaCalendar.init(elements[i]);
+                    }';
 		}
 		else
 		{
