@@ -253,7 +253,12 @@ class RADModel
 			{
 				foreach ($properties as $property)
 				{
-					$stateData[$property] = $input->get($property, null, 'none');
+					$newState = $input->get($property, null, 'none');
+
+					if ($newState != null)
+					{
+						$stateData[$property] = $newState;
+					}
 				}
 			}
 
