@@ -14,7 +14,7 @@ class EventbookingControllerMessage extends EventbookingController
 	public function save()
 	{
 		$data = $this->input->getData(RAD_INPUT_ALLOWRAW);
-		$model = $this->getModel();
+		$model = $this->getModel('Message', array('ignore_request' => true));
 		$model->store($data);
 
 		$task = $this->getTask();

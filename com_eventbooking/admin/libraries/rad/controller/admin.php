@@ -141,7 +141,7 @@ class RADControllerAdmin extends RADController
 			try
 			{
 				/* @var RADModelAdmin $model */
-				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin'));
+				$model = $this->getModel($this->name, array('default_model_class' => 'RADModelAdmin', 'ignore_request' => true));
 				$model->store($this->input);
 
 				if ($this->app->isSite() && $id == 0)

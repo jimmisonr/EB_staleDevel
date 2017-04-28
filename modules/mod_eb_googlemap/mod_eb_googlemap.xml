@@ -23,7 +23,7 @@
 				<field
 						name="center_coordinates"
 						type="text"
-						default="100"
+						default=""
 						label="Center Coordinates"
 						description="Center Coordinates of the map, for example 37.09024,-95.712891. Default to the coordinates of the location of first event" />
 				<field
