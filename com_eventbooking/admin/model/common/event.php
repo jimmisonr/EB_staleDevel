@@ -179,13 +179,16 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			}
 		}
 
-		if (isset($data['discount_groups']))
+		if (JFactory::getApplication()->isAdmin())
 		{
-			$data['discount_groups'] = implode(',', $data['discount_groups']);
-		}
-		else
-		{
-			$data['discount_groups'] = '';
+			if (isset($data['discount_groups']))
+			{
+				$data['discount_groups'] = implode(',', $data['discount_groups']);
+			}
+			else
+			{
+				$data['discount_groups'] = '';
+			}
 		}
 
 		//Process attachment

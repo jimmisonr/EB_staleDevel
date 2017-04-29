@@ -74,9 +74,9 @@ class EventbookingViewCompleteHtml extends RADViewHtml
 			{
 				$thankMessage = $rowEvent->thanks_message_offline;
 			}
-			elseif (EventbookingHelper::isValidMessage($rowEvent->thanks_message_offline))
+			elseif ($offlineSuffix && EventbookingHelper::isValidMessage($message->{'thanks_message_offline' . $offlineSuffix}))
 			{
-
+				$thankMessage = $message->{'thanks_message_offline' . $offlineSuffix};
 			}
 			else
 			{
