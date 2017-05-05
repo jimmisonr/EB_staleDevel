@@ -15,7 +15,9 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 {
 	public function display()
 	{
-		if (!JFactory::getUser()->id)
+		$user = JFactory::getUser();
+
+		if (!$user->id)
 		{
 			$redirectUrl = JRoute::_('index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString()));
 			JFactory::getApplication()->redirect($redirectUrl);
@@ -29,9 +31,18 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 		$lists['order']     = $state->filter_order;
 
 		//Get list of events
-		$rows      = EventbookingHelperDatabase::getAllEvents();
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('a.id, a.title, a.event_date')
+			->from('#__eb_events AS a')
+			->where('a.id IN (SELECT event_id FROM #__eb_registrants AS b WHERE b.published = 1 OR b.payment_method LIKE "os_offline%")')
+			->order('a.title');
+		$db->setQuery($query);
+		$rows = $db->loadObjectList();
+
 		$options   = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_SELECT_EVENT'), 'id', 'title');
+
 		if ($config->show_event_date)
 		{
 			for ($i = 0, $n = count($rows); $i < $n; $i++)
