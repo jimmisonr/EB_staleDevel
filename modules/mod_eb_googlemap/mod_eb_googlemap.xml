@@ -77,6 +77,8 @@
 					<option value="1">JYES</option>
 					<option value="0">JNO</option>
 				</field>
+				<field name="Itemid" type="text"
+					   label="Menu Item ID" description="Menu Item ID" default="" />
 			</fieldset>
 		</fields>
 	</config>
