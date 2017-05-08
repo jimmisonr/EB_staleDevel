@@ -18,7 +18,17 @@ JHtml::_('formbehavior.chosen', 'select');
 $editor = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 
-if ($translatable)
+// Add support for custom settings layout
+if (file_exists(__DIR__ . '/default_custom_settings.php'))
+{
+	$hasCustomSettings = true;
+}
+else
+{
+	$hasCustomSettings = false;
+}
+
+if ($translatable || $hasCustomSettings)
 {
 	JHtml::_('behavior.tabstate');
 }
@@ -39,7 +49,7 @@ if ($translatable)
 </script>
 <form action="index.php?option=com_eventbooking&view=category" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
 <?php
-if ($translatable)
+if ($translatable || $hasCustomSettings)
 {
 	echo JHtml::_('bootstrap.startTabSet', 'category', array('active' => 'general-page'));
 	echo JHtml::_('bootstrap.addTab', 'category', 'general-page', JText::_('EB_GENERAL', true));
@@ -149,9 +159,22 @@ if ($translatable)
 		</div>
 	</div>
 <?php
-if ($translatable)
+
+if ($translatable || $hasCustomSettings)
 {
 	echo JHtml::_('bootstrap.endTab');
+}
+
+// Add support for custom settings layout
+if ($hasCustomSettings)
+{
+	echo JHtml::_('bootstrap.addTab', 'category', 'custom-settings-page', JText::_('EB_CATEGORY_CUSTOM_SETTINGS', true));
+	echo $this->loadTemplate('custom_settings', array('editor' => $editor));
+	echo JHtml::_('bootstrap.endTab');
+}
+
+if ($translatable)
+{
 	echo JHtml::_('bootstrap.addTab', 'category', 'translation-page', JText::_('EB_TRANSLATION', true));
 	echo JHtml::_('bootstrap.startTabSet', 'category-translation', array('active' => 'translation-page-'.$this->languages[0]->sef));
 	foreach ($this->languages as $language)
@@ -188,6 +211,10 @@ if ($translatable)
 	}
 	echo JHtml::_('bootstrap.endTabSet');
 	echo JHtml::_('bootstrap.endTab');
+}
+
+if ($translatable || $hasCustomSettings)
+{
 	echo JHtml::_('bootstrap.endTabSet');
 }
 ?>

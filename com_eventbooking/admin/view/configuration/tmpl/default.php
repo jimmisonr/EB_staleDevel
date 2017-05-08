@@ -58,6 +58,14 @@ JHtml::_('script', 'jui/cms.js', false, true);
 
 		echo $this->loadTemplate('custom_css');
 
+		// Add support for custom settings layout
+		if (file_exists(__DIR__ . '/default_custom_settings.php'))
+		{
+			echo JHtml::_('bootstrap.addTab', 'configuration', 'custom-settings-page', JText::_('EB_CUSTOM_SETTINGS', true));
+			echo $this->loadTemplate('custom_settings', array('config' => $config, 'editor' => $editor));
+			echo JHtml::_('bootstrap.endTab');
+		}
+
 		echo JHtml::_('bootstrap.endTabSet');
 		?>
 		<div class="clearfix"></div>

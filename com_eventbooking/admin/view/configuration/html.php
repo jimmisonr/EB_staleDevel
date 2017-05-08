@@ -246,6 +246,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 			'kozgopromedium',
 			'kozminproregular',
 			'msungstdlight',
+			'opensans',
 		);
 
 		foreach ($additionalFonts as $fontName)

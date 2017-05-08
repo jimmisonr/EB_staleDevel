@@ -132,6 +132,14 @@ $editor       = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 		}
 	}
 
+	// Add support for custom settings layout
+	if (file_exists(__DIR__ . '/default_custom_settings.php'))
+	{
+		echo JHtml::_('bootstrap.addTab', 'event', 'custom-settings-page', JText::_('EB_EVENT_CUSTOM_SETTINGS', true));
+		echo $this->loadTemplate('custom_settings', array('editor' => $editor));
+		echo JHtml::_('bootstrap.endTab');
+	}
+
 	echo JHtml::_('bootstrap.endTabSet');
 	?>
 	<input type="hidden" name="option" value="com_eventbooking"/>

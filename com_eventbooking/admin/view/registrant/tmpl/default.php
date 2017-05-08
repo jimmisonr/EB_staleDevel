@@ -14,9 +14,26 @@ $selectedState = '';
 JHtml::_('bootstrap.tooltip');
 $document = JFactory::getDocument();
 $document->addStyleDeclaration(".hasTip{display:block !important}");
+
+// Add support for custom settings layout
+if (file_exists(__DIR__ . '/default_custom_settings.php'))
+{
+	$hasCustomSettings = true;
+	JHtml::_('behavior.tabstate');
+}
+else
+{
+	$hasCustomSettings = false;
+}
 ?>
 <form action="index.php?option=com_eventbooking&view=registrant" method="post" name="adminForm" id="adminForm" class="form form-horizontal" enctype="multipart/form-data">
-<div class="row-fluid">
+	<?php
+	if ($hasCustomSettings)
+	{
+		echo JHtml::_('bootstrap.startTabSet', 'registrant', array('active' => 'general-page'));
+		echo JHtml::_('bootstrap.addTab', 'registrant', 'general-page', JText::_('EB_GENERAL', true));
+	}
+	?>
 	<div class="control-group">
 		<label class="control-label">
 			<?php echo  JText::_('EB_EVENT'); ?>
@@ -475,9 +492,18 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 	</table>	
 	<?php	
 	}
-	?>				
-</div>		
-<div class="clearfix"></div>	
+
+	// Add support for custom settings layout
+	if ($hasCustomSettings)
+	{
+		echo JHtml::_('bootstrap.endTab');
+		echo JHtml::_('bootstrap.addTab', 'registrant', 'custom-settings-page', JText::_('EB_REGISTRANT_CUSTOM_SETTINGS', true));
+		echo $this->loadTemplate('custom_settings');
+		echo JHtml::_('bootstrap.endTab');
+		echo JHtml::_('bootstrap.endTabSet');
+	}
+	?>
+	<div class="clearfix"></div>
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="group_member_id" value="0" />
