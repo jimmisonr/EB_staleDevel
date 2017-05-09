@@ -11,7 +11,7 @@ defined( '_JEXEC' ) or die ;
 
 if (version_compare(JVERSION, '3.6.9', 'ge'))
 {
-	JHtml::_('calendar');
+	JHtml::_('calendar', '', 'id', 'name');
 }
 else
 {

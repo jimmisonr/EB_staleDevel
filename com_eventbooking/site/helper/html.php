@@ -52,7 +52,7 @@ abstract class EventbookingHelperHtml
 	 *
 	 * @return string
 	 */
-	public static function getCalendarSetupJs($fields)
+	public static function getCalendarSetupJs($fields = array())
 	{
 		if (version_compare(JVERSION, '3.6.9', 'ge'))
 		{
