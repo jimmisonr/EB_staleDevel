@@ -678,7 +678,7 @@ body .eb-calendar li {
     margin-bottom: 5px;
 }
 
-[class^="icon-"], [class*=" icon-"] {
+.eb-container [class^="icon-"], .eb-container [class*=" icon-"] {
     display: inline-block !important;
 }
 

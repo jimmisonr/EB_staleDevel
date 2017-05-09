@@ -101,7 +101,7 @@ if ($this->showTaskBar)
 			<?php
 			if ($this->config->get('show_print_button', '1') === '1' && !$this->print)
 			{
-				$uri = JUri::getInstance();
+				$uri = clone JUri::getInstance();
 				$uri->setVar('tmpl', 'component');
 				$uri->setVar('print', '1');
 			?>

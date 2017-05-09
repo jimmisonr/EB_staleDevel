@@ -18,7 +18,7 @@ class EventbookingHelper
 	 */
 	public static function getInstalledVersion()
 	{
-		return '2.14.2';
+		return '2.14.5';
 	}
 
 	/**
@@ -1196,6 +1196,8 @@ class EventbookingHelper
 		if ($couponCode)
 		{
 			$negEventId = -1 * $event->id;
+			$nullDateQuoted = $db->quote($db->getNullDate());
+
 			//Validate the coupon
 			$query->clear()
 				->select('*')
@@ -1203,8 +1205,8 @@ class EventbookingHelper
 				->where('published = 1')
 				->where('`access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
 				->where('code = ' . $db->quote($couponCode))
-				->where('(valid_from = "0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to = "0000-00-00" OR valid_to >= NOW())')
+				->where('(valid_from = ' . $nullDateQuoted . ' OR valid_from <= NOW())')
+				->where('(valid_to = ' . $nullDateQuoted . ' OR valid_to >= NOW())')
 				->where('(times = 0 OR times > used)')
 				->where('discount > used_amount')
 				->where('enable_for IN (0, 1)')
@@ -1536,14 +1538,15 @@ class EventbookingHelper
 		if ($couponCode)
 		{
 			$negEventId = -1 * $event->id;
+			$nullDateQuoted = $db->quote($db->getNullDate());
 			$query->clear()
 				->select('*')
 				->from('#__eb_coupons')
 				->where('published = 1')
 				->where('`access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
 				->where('code = ' . $db->quote($couponCode))
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
+				->where('(valid_from = ' . $nullDateQuoted . ' OR valid_from <= NOW())')
+				->where('(valid_to = ' . $nullDateQuoted . ' OR valid_to >= NOW())')
 				->where('(times = 0 OR times > used)')
 				->where('discount > used_amount')
 				->where('enable_for IN (0, 2)')
@@ -1909,14 +1912,16 @@ class EventbookingHelper
 
 		if ($couponCode)
 		{
+			$nullDateQuoted = $db->quote($db->getNullDate());
+
 			$query->clear()
 				->select('*')
 				->from('#__eb_coupons')
 				->where('published = 1')
 				->where('`access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
 				->where('code = ' . $db->quote($couponCode))
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
+				->where('(valid_from = ' . $nullDateQuoted . ' OR valid_from <= NOW())')
+				->where('(valid_to = ' . $nullDateQuoted . ' OR valid_to >= NOW())')
 				->where('user_id IN (0, ' . $user->id . ')')
 				->where('(times = 0 OR times > used)')
 				->where('discount > used_amount')
@@ -3017,7 +3022,7 @@ class EventbookingHelper
 
 		if ($tag && $tag != '*' && ($tag != $language->getTag() || $force))
 		{
-			$language->load('com_eventbooking', JPATH_ROOT, $tag);
+			$language->load('com_eventbooking', JPATH_ROOT, $tag, true);
 		}
 	}
 
@@ -4136,11 +4141,11 @@ class EventbookingHelper
 	{
 		// Initialize variables.
 		JHtml::_('behavior.modal');
-		$link = 'index.php?option=com_content&amp;view=articles&amp;layout=modal&amp;tmpl=component&amp;' . JSession::getFormToken() . '=1';
+		$link = 'index.php?option=com_content&amp;view=articles&amp;layout=modal&amp;tmpl=component&amp;' . JSession::getFormToken() . '=1&function=js_select_article';
 		$html = array();
 		?>
 		<script type="text/javascript">
-			function jSelectArticle(id, title, catid, object, link, lang) {
+			function js_select_article(id, title, catid, object, link, lang) {
 				var old_id = document.getElementById('<?php echo $fieldName; ?>').value;
 				if (old_id != id) {
 					document.id('article_name').value = title;

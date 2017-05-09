@@ -44,9 +44,9 @@ form#adminForm fieldset.adminform {
 	margin: 0;
 }
 
-.form-horizontal .tab-content .controls {
+/*.form-horizontal .tab-content .controls {
 	margin: 0;
-}
+}*/
 
 table.admintable {
 	background-color: white ;	

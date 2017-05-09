@@ -25,6 +25,14 @@ class RADModelState
 	protected $data;
 
 	/**
+	 * RADModelState constructor.
+	 */
+	public function __construct()
+	{
+		$this->data = array();
+	}
+
+	/**
 	 * Set data for a state
 	 *
 	 * @param string $name The name of state

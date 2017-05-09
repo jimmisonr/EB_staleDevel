@@ -1437,6 +1437,13 @@ class EventbookingController extends RADControllerAdmin
 			$db->execute();
 		}		
 
+		if (!in_array('enable_terms_and_conditions', $fields))
+		{
+			$sql = "ALTER TABLE  `#__eb_events` ADD  `enable_terms_and_conditions` TINYINT NOT NULL DEFAULT  '2' ;";
+			$db->setQuery($sql);
+			$db->execute();
+		}
+
 		//The Categories table
 		$fields = array_keys($db->getTableColumns('#__eb_categories'));
 		if (!in_array('access', $fields))

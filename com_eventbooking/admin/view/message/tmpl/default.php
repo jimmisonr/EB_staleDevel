@@ -563,6 +563,15 @@ JHtml::_('behavior.tabstate');
 	</div>
 	<?php
 	echo JHtml::_('bootstrap.endTab');
+
+	// Add support for custom settings layout
+	if (file_exists(__DIR__ . '/default_custom_settings.php'))
+	{
+		echo JHtml::_('bootstrap.addTab', 'message', 'custom-settings-page', JText::_('EB_MESSAGE_CUSTOM_SETTINGS', true));
+		echo $this->loadTemplate('custom_settings', array('editor' => $editor));
+		echo JHtml::_('bootstrap.endTab');
+	}
+
 	if ($translatable)
 	{
 		echo JHtml::_('bootstrap.addTab', 'message', 'translation-page', JText::_('EB_TRANSLATION', true));

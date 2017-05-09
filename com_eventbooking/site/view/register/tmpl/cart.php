@@ -147,14 +147,7 @@ $layoutData = array(
 
 		foreach ($fields as $field)
 		{
-			if ($field->name == 'zip')
-			{
-				echo $field->getControlGroup($bootstrapHelper, 'field_zip_input');
-			}
-			else
-			{
-				echo $field->getControlGroup($bootstrapHelper);
-			}
+			echo $field->getControlGroup($bootstrapHelper);
 		}
 
 		if ($this->totalAmount > 0 || $this->form->containFeeFields())

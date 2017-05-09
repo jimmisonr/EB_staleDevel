@@ -122,9 +122,18 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 	}
 }
 
-$articleId  = $this->event->article_id ? $this->event->article_id : $this->config->article_id ;
+$articleId  = $this->event->article_id ? $this->event->article_id : $this->config->article_id;
 
-if (!$this->showBillingStep && $this->config->accept_term ==1 && $articleId)
+if ($this->event->enable_terms_and_conditions != 2)
+{
+	$enableTermsAndConditions =  $this->event->enable_terms_and_conditions;
+}
+else
+{
+	$enableTermsAndConditions = $this->config->accept_term;
+}
+
+if (!$this->showBillingStep && $enableTermsAndConditions && $articleId)
 {
 	if (JLanguageMultilang::isEnabled())
 	{

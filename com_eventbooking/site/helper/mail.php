@@ -144,7 +144,11 @@ class EventbookingHelperMail
 			{
 				$offlineSuffix = str_replace('os_offline', '', $row->payment_method);
 
-				if ($fieldSuffix && EventbookingHelper::isValidMessage($event->{'user_email_body_offline' . $fieldSuffix}))
+				if ($offlineSuffix && EventbookingHelper::isValidMessage($message->{'user_email_body_offline' . $offlineSuffix}))
+				{
+					$body = $message->{'user_email_body_offline' . $offlineSuffix};
+				}
+				elseif ($fieldSuffix && EventbookingHelper::isValidMessage($event->{'user_email_body_offline' . $fieldSuffix}))
 				{
 					$body = $event->{'user_email_body_offline' . $fieldSuffix};
 				}
@@ -155,10 +159,6 @@ class EventbookingHelperMail
 				elseif (EventbookingHelper::isValidMessage($event->user_email_body_offline))
 				{
 					$body = $event->user_email_body_offline;
-				}
-				elseif ($offlineSuffix && EventbookingHelper::isValidMessage($message->{'user_email_body_offline' . $offlineSuffix}))
-				{
-					$body = $message->{'user_email_body_offline' . $offlineSuffix};
 				}
 				else
 				{

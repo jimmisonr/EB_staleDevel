@@ -65,14 +65,7 @@ else
 
 	foreach ($fields as $field)
 	{
-		if ($field->name == 'zip')
-		{
-			echo $field->getControlGroup($bootstrapHelper, 'field_zip_input');
-		}
-		else
-		{
-			echo $field->getControlGroup($bootstrapHelper);
-		}
+		echo $field->getControlGroup($bootstrapHelper);
 
 		if ($field->type == "Date")
 		{
@@ -105,7 +98,16 @@ else
 
 	$articleId = $this->event->article_id ? $this->event->article_id : $this->config->article_id;
 
-	if ($this->config->accept_term == 1 && $articleId)
+	if ($this->event->enable_terms_and_conditions != 2)
+	{
+		$enableTermsAndConditions =  $this->event->enable_terms_and_conditions;
+	}
+	else
+	{
+		$enableTermsAndConditions = $this->config->accept_term;
+	}
+
+	if ($enableTermsAndConditions && $articleId)
 	{
 		$layoutData['articleId'] = $articleId;
 

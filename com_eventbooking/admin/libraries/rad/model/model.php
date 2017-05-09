@@ -229,29 +229,41 @@ class RADModel
 	 */
 	public function populateState($input)
 	{
-		$data = $input->getData();
+		$properties = $this->state->getProperties();
 
-		// Try to get the state properties data from user session
-		if ($this->rememberStates)
+		if (count($properties))
 		{
-			$properties = $this->state->getProperties();
+			$stateData = array();
 
-			if (count($properties))
+			if ($this->rememberStates)
 			{
 				$context = $this->option . '.' . $input->get('view', $this->config['default_view']) . '.';
+
 				foreach ($properties as $property)
 				{
 					$newState = $this->getUserStateFromRequest($input, $context . $property, $property);
 
 					if ($newState != null)
 					{
-						$data[$property] = $newState;
+						$stateData[$property] = $newState;
 					}
 				}
 			}
-		}
+			else
+			{
+				foreach ($properties as $property)
+				{
+					$newState = $input->get($property, null, 'none');
 
-		$this->setState($data);
+					if ($newState != null)
+					{
+						$stateData[$property] = $newState;
+					}
+				}
+			}
+
+			$this->setState($stateData);
+		}
 	}
 
 	/**

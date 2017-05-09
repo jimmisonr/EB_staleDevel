@@ -350,7 +350,7 @@ class plgEventBookingDates extends JPlugin
 					<legend><?php echo JText::sprintf('EB_EVENT_DATE_COUNT', ($i + 1)); ?></legend>
 					<input type="hidden" name="event_id_<?php echo $i; ?>" value="<?php echo $eventId; ?>"/>
 					<input type="hidden" name="count_additional_date[]" value=""/>
-					<div class="control-group">
+					<div class="control-group eb-date-time-container">
 						<label class="control-label">
 							<?php echo JText::_('EB_EVENT_START_DATE'); ?>
 						</label>
@@ -360,7 +360,7 @@ class plgEventBookingDates extends JPlugin
 							<?php echo JHtml::_('select.integerlist', 0, 55, 5, 'event_date_minute_' . $i, ' class="input-mini" ', $eventDateMinute, '%02d'); ?>
 						</div>
 					</div>
-					<div class="control-group">
+					<div class="control-group eb-date-time-container">
 						<label class="control-label">
 							<?php echo JText::_('EB_EVENT_END_DATE'); ?>
 						</label>
@@ -370,7 +370,7 @@ class plgEventBookingDates extends JPlugin
 							<?php echo JHtml::_('select.integerlist', 0, 55, 5, 'event_end_date_minute_' . $i, ' class="input-mini" ', $eventEndDateMinute, '%02d'); ?>
 						</div>
 					</div>
-					<div class="control-group">
+					<div class="control-group eb-date-time-container">
 						<label class="control-label">
 							<?php echo JText::_('EB_REGISTRATION_START_DATE'); ?>
 						</label>
@@ -380,7 +380,7 @@ class plgEventBookingDates extends JPlugin
 							<?php echo JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_date_minute_' . $i, ' class="input-mini" ', $registrationStartDateMinute, '%02d'); ?>
 						</div>
 					</div>
-					<div class="control-group">
+					<div class="control-group eb-date-time-container">
 						<label class="control-label">
 							<?php echo JText::_('EB_CUT_OFF_DATE'); ?>
 						</label>
@@ -412,6 +412,9 @@ class plgEventBookingDates extends JPlugin
 					class="icon-new icon-white"></i><?php echo JText::_('EB_ADD'); ?></button>
 			<input type="hidden" id="count_event_dates" name="count_event_dates"
 			       value="<?php echo $maxNumberDates; ?>"/>
+			<div id="date_picker_html_container" style="display: none;">
+				<?php echo JHtml::_('calendar', '', 'NEW_DATE_PICKER', 'NEW_DATE_PICKER', '%Y-%m-%d', array('class' => 'input-small')); ?>
+			</div>
 		</div>
 		<script language="JavaScript">
 			function removeEventContainer(id) {
@@ -426,47 +429,115 @@ class plgEventBookingDates extends JPlugin
 					var html = '<fieldset id="date_' + countDate + '" class="form-inline form-inline-header">'
 					html += '<legend class="item_date_' + countDate + '"></legend>';
 					html += '<input type="hidden" name="event_id_' + countDate + '" value="0" />';
-					//event start date
+
+					// Event Date
 					html += '<div class="control-group">';
 					html += '<label class="control-label"><?php echo JText::_('EB_EVENT_START_DATE'); ?></label>';
-					html += '<div class="controls">';
-					html += '<div class="input-append">';
-					html += '<input type="text" style="width: 100px;" class="input-medium hasTooltip" value="" id="event_date_' + countDate + '" name="event_date_' + countDate + '">';
-					html += '<button id="event_date_' + countDate + '_img" class="btn" type="button"><i class="icon-calendar"></i></button>';
-					html += '</div>';
+					html += '<div class="controls eb-date-time-container">';
+
+					<?php
+						if (version_compare(JVERSION, '3.6.9', 'ge'))
+						{
+						?>
+							var datePicker = $('#date_picker_html_container').html();
+							html += datePicker.replace(/NEW_DATE_PICKER/g, "event_date_" + countDate);
+						<?php
+						}
+						else
+						{
+						?>
+							html += '<div class="input-append">';
+							html += '<input type="text" style="width: 100px;" class="input-medium hasTooltip" value="" id="event_date_' + countDate + '" name="event_date_' + countDate + '">';
+							html += '<button id="event_date_' + countDate + '_img" class="btn" type="button"><i class="icon-calendar"></i></button>';
+							html += '</div>';
+						<?php
+						}
+					?>
+
 					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 23, 1, 'event_date_hour_' . $i, ' class="input-mini event_date_hour" ', $eventDateHour)); ?><?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 55, 5, 'event_date_minute_' . $i, ' class="input-mini event_date_minute" ', $eventDateMinute, '%02d')); ?>';
 					html += '</div>';
 					html += '</div>';
-					//event end date
-					html += '<div class="control-group">';
+
+					// Event End Date
+					html += '<div class="control-group eb-date-time-container">';
 					html += '<label class="control-label"><?php echo JText::_('EB_EVENT_END_DATE'); ?></label>';
 					html += '<div class="controls">';
-					html += '<div class="input-append">';
-					html += '<input type="text" style="width: 100px;" class="input-medium hasTooltip" value="" id="event_end_date_' + countDate + '" name="event_end_date_' + countDate + '">';
-					html += '<button id="event_end_date_' + countDate + '_img" class="btn" type="button"><i class="icon-calendar"></i></button>';
-					html += '</div>';
+
+					<?php
+					if (version_compare(JVERSION, '3.6.9', 'ge'))
+					{
+					?>
+						var datePicker = $('#date_picker_html_container').html();
+						html += datePicker.replace(/NEW_DATE_PICKER/g, "event_end_date_" + countDate);
+					<?php
+					}
+					else
+					{
+					?>
+						html += '<div class="input-append">';
+						html += '<input type="text" style="width: 100px;" class="input-medium hasTooltip" value="" id="event_end_date_' + countDate + '" name="event_end_date_' + countDate + '">';
+						html += '<button id="event_end_date_' + countDate + '_img" class="btn" type="button"><i class="icon-calendar"></i></button>';
+						html += '</div>';
+					<?php
+					}
+					?>
+
 					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 23, 1, 'event_end_date_hour_' . $i, ' class="input-mini event_end_date_hour" ', $eventEndDateHour)); ?> <?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 55, 5, 'event_end_date_minute_' . $i, ' class="input-mini event_end_date_minute" ', $eventEndDateMinute, '%02d')); ?>';
 					html += '</div>';
 					html += '</div>';
-					//registranstart date
-					html += '<div class="control-group">';
+
+					// Registration Start Date
+					html += '<div class="control-group eb-date-time-container">';
 					html += '<label class="control-label"><?php echo JText::_('EB_REGISTRATION_START_DATE'); ?></label>';
 					html += '<div class="controls">';
-					html += '<div class="input-append">';
-					html += '<input type="text" style="width: 100px;" class="input-medium hasTooltip" value="" id="registration_start_date_' + countDate + '" name="registration_start_date_' + countDate + '">';
-					html += '<button id="registration_start_date_' + countDate + '_img" class="btn" type="button"><i class="icon-calendar"></i></button>';
-					html += '</div>';
+
+					<?php
+					if (version_compare(JVERSION, '3.6.9', 'ge'))
+					{
+					?>
+						var datePicker = $('#date_picker_html_container').html();
+						html += datePicker.replace(/NEW_DATE_PICKER/g, "registration_start_date_" + countDate);
+					<?php
+					}
+					else
+					{
+					?>
+						html += '<div class="input-append">';
+						html += '<input type="text" style="width: 100px;" class="input-medium hasTooltip" value="" id="registration_start_date_' + countDate + '" name="registration_start_date_' + countDate + '">';
+						html += '<button id="registration_start_date_' + countDate + '_img" class="btn" type="button"><i class="icon-calendar"></i></button>';
+						html += '</div>';
+					<?php
+					}
+					?>
+
 					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 23, 1, 'registration_start_date_hour_' . $i, ' class="registration_start_date_hour input-mini" ', $registrationStartDateHour)); ?> <?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 55, 5, 'registration_start_date_minute_' . $i, ' class="registration_start_date_minute input-mini" ', $registrationStartDateMinute, '%02d')); ?>';
 					html += '</div>';
 					html += '</div>';
-					//cut of date
-					html += '<div class="control-group">';
+
+					// Cut of date
+					html += '<div class="control-group eb-date-time-container">';
 					html += '<label class="control-label"><?php echo JText::_('EB_CUT_OFF_DATE'); ?></label>';
 					html += '<div class="controls">';
-					html += '<div class="input-append">';
-					html += '<input type="text" style="width: 100px;" class="input-medium hasTooltip" value="" id="cut_off_date_' + countDate + '" name="cut_off_date_' + countDate + '">';
-					html += '<button id="cut_off_date_' + countDate + '_img" class="btn" type="button"><i class="icon-calendar"></i></button>';
-					html += '</div>';
+
+					<?php
+					if (version_compare(JVERSION, '3.6.9', 'ge'))
+					{
+					?>
+						var datePicker = $('#date_picker_html_container').html();
+						html += datePicker.replace(/NEW_DATE_PICKER/g, "cut_off_date_" + countDate);
+					<?php
+					}
+					else
+					{
+					?>
+						html += '<div class="input-append">';
+						html += '<input type="text" style="width: 100px;" class="input-medium hasTooltip" value="" id="cut_off_date_' + countDate + '" name="cut_off_date_' + countDate + '">';
+						html += '<button id="cut_off_date_' + countDate + '_img" class="btn" type="button"><i class="icon-calendar"></i></button>';
+						html += '</div>';
+					<?php
+					}
+					?>
+
 					html += '<?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 23, 1, 'cut_off_date_hour_' . $i, ' class="cut_off_date_hour input-mini" ', $cutOffDateHour)); ?> <?php echo preg_replace(array('/\r/', '/\n/'), '', JHtml::_('select.integerlist', 0, 55, 5, 'cut_off_date_minute_' . $i, ' class="cut_off_date_minute input-mini" ', $cutOffDateMinute, '%02d')); ?>';
 					html += '</div>';
 					html += '</div>';
@@ -482,6 +553,7 @@ class plgEventBookingDates extends JPlugin
 					html += '<button type="button" class="btn btn-danger" onclick="removeEventContainer(' + countDate + ')"><i class="icon-remove"></i><?php echo JText::_('EB_REMOVE'); ?></button>';
 					html += '</div>';
 					html += '</fieldset>';
+
 					$('#advance-date_content').append(html);
 					var countNumber = countDate;
 					countNumber++;
@@ -495,54 +567,66 @@ class plgEventBookingDates extends JPlugin
 					$("#date_" + countDate + " .cut_off_date_hour").attr("name", "cut_off_date_hour_" + countDate);
 					$("#date_" + countDate + " .cut_off_date_minute").attr("name", "cut_off_date_minute_" + countDate);
 					$("#date_" + countDate + " .location_id").attr("name", "location_id_" + countDate);
-					Calendar.setup({
-						// Id of the input field
-						inputField: "event_date_" + countDate,
-						// Format of the input field
-						ifFormat: "%Y-%m-%d",
-						// Trigger for the calendar (button ID)
-						button: "event_date_" + countDate + "_img",
-						// Alignment (defaults to "Bl")
-						align: "Tl",
-						singleClick: true,
-						firstDay: 0
-					});
-					Calendar.setup({
-						// Id of the input field
-						inputField: "registration_start_date_" + countDate,
-						// Format of the input field
-						ifFormat: "%Y-%m-%d",
-						// Trigger for the calendar (button ID)
-						button: "registration_start_date_" + countDate + "_img",
-						// Alignment (defaults to "Bl")
-						align: "Tl",
-						singleClick: true,
-						firstDay: 0
-					});
-					Calendar.setup({
-						// Id of the input field
-						inputField: "event_end_date_" + countDate,
-						// Format of the input field
-						ifFormat: "%Y-%m-%d",
-						// Trigger for the calendar (button ID)
-						button: "event_end_date_" + countDate + "_img",
-						// Alignment (defaults to "Bl")
-						align: "Tl",
-						singleClick: true,
-						firstDay: 0
-					});
-					Calendar.setup({
-						// Id of the input field
-						inputField: "cut_off_date_" + countDate,
-						// Format of the input field
-						ifFormat: "%Y-%m-%d",
-						// Trigger for the calendar (button ID)
-						button: "cut_off_date_" + countDate + "_img",
-						// Alignment (defaults to "Bl")
-						align: "Tl",
-						singleClick: true,
-						firstDay: 0
-					});
+
+					<?php
+						if (version_compare(JVERSION, '3.6.9', 'ge'))
+						{
+							echo EventbookingHelperHtml::getCalendarSetupJs();
+						}
+						else
+						{
+						?>
+							Calendar.setup({
+								// Id of the input field
+								inputField: "event_date_" + countDate,
+								// Format of the input field
+								ifFormat: "%Y-%m-%d",
+								// Trigger for the calendar (button ID)
+								button: "event_date_" + countDate + "_img",
+								// Alignment (defaults to "Bl")
+								align: "Tl",
+								singleClick: true,
+								firstDay: 0
+							});
+							Calendar.setup({
+								// Id of the input field
+								inputField: "registration_start_date_" + countDate,
+								// Format of the input field
+								ifFormat: "%Y-%m-%d",
+								// Trigger for the calendar (button ID)
+								button: "registration_start_date_" + countDate + "_img",
+								// Alignment (defaults to "Bl")
+								align: "Tl",
+								singleClick: true,
+								firstDay: 0
+							});
+							Calendar.setup({
+								// Id of the input field
+								inputField: "event_end_date_" + countDate,
+								// Format of the input field
+								ifFormat: "%Y-%m-%d",
+								// Trigger for the calendar (button ID)
+								button: "event_end_date_" + countDate + "_img",
+								// Alignment (defaults to "Bl")
+								align: "Tl",
+								singleClick: true,
+								firstDay: 0
+							});
+							Calendar.setup({
+								// Id of the input field
+								inputField: "cut_off_date_" + countDate,
+								// Format of the input field
+								ifFormat: "%Y-%m-%d",
+								// Trigger for the calendar (button ID)
+								button: "cut_off_date_" + countDate + "_img",
+								// Alignment (defaults to "Bl")
+								align: "Tl",
+								singleClick: true,
+								firstDay: 0
+							});
+						<?php
+						}
+					?>
 					countDate++;
 					$('#count_event_dates').val(countDate);
 				})

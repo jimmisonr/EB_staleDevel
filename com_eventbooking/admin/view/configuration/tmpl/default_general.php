@@ -553,14 +553,6 @@ defined( '_JEXEC' ) or die ;
 		</div>
 		<div class="control-group" data-showon='<?php echo EventbookingHelperHtml::renderShowOn(array('accept_term' => '1')); ?>'>
 			<div class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('term_condition_by_event', JText::_('EB_TERM_AND_CONDITION_BY_EVENT'), JText::_('EB_TERM_AND_CONDITION_BY_EVENT_EXPLAIN')); ?>
-			</div>
-			<div class="controls">
-				<?php echo EventbookingHelperHtml::getBooleanInput('term_condition_by_event', $config->term_condition_by_event); ?>
-			</div>
-		</div>
-		<div class="control-group" data-showon='<?php echo EventbookingHelperHtml::renderShowOn(array('accept_term' => '1')); ?>'>
-			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('article_id', JText::_('EB_DEFAULT_TERM_AND_CONDITION')); ?>
 			</div>
 			<div class="controls">
