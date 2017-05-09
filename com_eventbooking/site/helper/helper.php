@@ -1196,6 +1196,8 @@ class EventbookingHelper
 		if ($couponCode)
 		{
 			$negEventId = -1 * $event->id;
+			$nullDateQuoted = $db->quote($db->getNullDate());
+
 			//Validate the coupon
 			$query->clear()
 				->select('*')
@@ -1203,8 +1205,8 @@ class EventbookingHelper
 				->where('published = 1')
 				->where('`access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
 				->where('code = ' . $db->quote($couponCode))
-				->where('(valid_from = "0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to = "0000-00-00" OR valid_to >= NOW())')
+				->where('(valid_from = ' . $nullDateQuoted . ' OR valid_from <= NOW())')
+				->where('(valid_to = ' . $nullDateQuoted . ' OR valid_to >= NOW())')
 				->where('(times = 0 OR times > used)')
 				->where('discount > used_amount')
 				->where('enable_for IN (0, 1)')
@@ -1536,14 +1538,15 @@ class EventbookingHelper
 		if ($couponCode)
 		{
 			$negEventId = -1 * $event->id;
+			$nullDateQuoted = $db->quote($db->getNullDate());
 			$query->clear()
 				->select('*')
 				->from('#__eb_coupons')
 				->where('published = 1')
 				->where('`access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
 				->where('code = ' . $db->quote($couponCode))
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
+				->where('(valid_from = ' . $nullDateQuoted . ' OR valid_from <= NOW())')
+				->where('(valid_to = ' . $nullDateQuoted . ' OR valid_to >= NOW())')
 				->where('(times = 0 OR times > used)')
 				->where('discount > used_amount')
 				->where('enable_for IN (0, 2)')
@@ -1909,14 +1912,16 @@ class EventbookingHelper
 
 		if ($couponCode)
 		{
+			$nullDateQuoted = $db->quote($db->getNullDate());
+
 			$query->clear()
 				->select('*')
 				->from('#__eb_coupons')
 				->where('published = 1')
 				->where('`access` IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
 				->where('code = ' . $db->quote($couponCode))
-				->where('(valid_from="0000-00-00" OR valid_from <= NOW())')
-				->where('(valid_to="0000-00-00" OR valid_to >= NOW())')
+				->where('(valid_from = ' . $nullDateQuoted . ' OR valid_from <= NOW())')
+				->where('(valid_to = ' . $nullDateQuoted . ' OR valid_to >= NOW())')
 				->where('user_id IN (0, ' . $user->id . ')')
 				->where('(times = 0 OR times > used)')
 				->where('discount > used_amount')
