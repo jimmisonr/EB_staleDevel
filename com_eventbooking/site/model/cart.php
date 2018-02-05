@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -100,21 +100,25 @@ class EventbookingModelCart extends RADModel
 		$fieldSuffix            = EventbookingHelper::getFieldSuffix();
 		if (!$user->id && $config->user_registration)
 		{
-			$userId          = EventbookingHelper::saveRegistration($data);
+			$userId          = EventbookingHelperRegistration::saveRegistration($data);
 			$data['user_id'] = $userId;
 		}
-		$rowFields = EventbookingHelper::getFormFields(0, 4);
+		$rowFields = EventbookingHelperRegistration::getFormFields(0, 4);
 		$form      = new RADForm($rowFields);
 		$form->bind($data);
 		$data['collect_records_data'] = true;
 
-		if (is_callable('EventbookingHelperOverrideHelper::calculateCartRegistrationFee'))
+		if (is_callable('EventbookingHelperOverrideRegistration::calculateCartRegistrationFee'))
+		{
+			$fees = EventbookingHelperOverrideRegistration::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+		}
+		elseif (is_callable('EventbookingHelperOverrideHelper::calculateCartRegistrationFee'))
 		{
 			$fees = EventbookingHelperOverrideHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
 		}
 		else
 		{
-			$fees = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+			$fees = EventbookingHelperRegistration::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
 		}
 
 		// Save the active language
@@ -146,6 +150,8 @@ class EventbookingModelCart extends RADModel
 
 		$count  = 0;
 		$userIp = EventbookingHelper::getUserIp();
+
+		$registraitonCode = '';
 
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
@@ -180,6 +186,7 @@ class EventbookingModelCart extends RADModel
 			$row->group_id      = 0;
 			$row->published     = 0;
 			$row->register_date = gmdate('Y-m-d H:i:s');
+
 			if (isset($data['user_id']))
 			{
 				$row->user_id = $data['user_id'];
@@ -188,35 +195,24 @@ class EventbookingModelCart extends RADModel
 			{
 				$row->user_id = $user->get('id');
 			}
+
 			$row->number_registrants = $quantities[$i];
 			$row->event_id           = $eventId;
+			$row->registration_code  = EventbookingHelperRegistration::getRegistrationCode();
+			$row->ticket_qrcode      = EventbookingHelperRegistration::getTicketQrCode();
+
 			if ($i == 0)
 			{
 				$row->cart_id                = 0;
 				$row->coupon_discount_amount = $fees['coupon_discount_amount'];
-
-				//Store registration code
-				while (true)
-				{
-					$registrationCode = JUserHelper::genRandomPassword(10);
-					$query->clear();
-					$query->select('COUNT(*)')
-						->from('#__eb_registrants')
-						->where('registration_code=' . $db->quote($registrationCode));
-					$db->setQuery($query);
-					$total = $db->loadResult();
-					if (!$total)
-					{
-						$row->registration_code = $registrationCode;
-						break;
-					}
-				}
+				$registraitonCode            = $row->registration_code;
 			}
 			else
 			{
 				$row->cart_id                = $cartId;
 				$row->coupon_discount_amount = 0;
 			}
+
 			$row->id       = 0;
 			$row->language = $language;
 			$row->store();
@@ -234,15 +230,16 @@ class EventbookingModelCart extends RADModel
 					$count++;
 
 					/* @var EventbookingTableRegistrant $rowMember */
-					$rowMember                 = JTable::getInstance('EventBooking', 'Registrant');
-					$rowMember->group_id       = $row->id;
-					$rowMember->transaction_id = $row->transaction_id;
-					$rowMember->event_id       = $row->event_id;
-					$rowMember->payment_method = $row->payment_method;
-					$rowMember->user_id        = $row->user_id;
-					$rowMember->register_date  = $row->register_date;
-					$rowMember->user_ip        = $row->user_ip;
-
+					$rowMember                     = JTable::getInstance('EventBooking', 'Registrant');
+					$rowMember->group_id           = $row->id;
+					$rowMember->transaction_id     = $row->transaction_id;
+					$rowMember->event_id           = $row->event_id;
+					$rowMember->payment_method     = $row->payment_method;
+					$rowMember->user_id            = $row->user_id;
+					$rowMember->register_date      = $row->register_date;
+					$rowMember->user_ip            = $row->user_ip;
+					$rowMember->ticket_qrcode      = EventbookingHelperRegistration::getTicketQrCode();
+					$rowMember->registration_code  = EventbookingHelperRegistration::getRegistrationCode();
 					$rowMember->total_amount       = $membersTotalAmount[$eventId][$j];
 					$rowMember->discount_amount    = $membersDiscountAmount[$eventId][$j];
 					$rowMember->late_fee           = $membersLateFee[$eventId][$j];
@@ -265,8 +262,8 @@ class EventbookingModelCart extends RADModel
 			$dispatcher->trigger('onAfterStoreRegistrant', array($row));
 		}
 
-		$query->clear();
-		$query->select('title' . $fieldSuffix . ' AS title')
+		$query->clear()
+			->select($db->quoteName('title' . $fieldSuffix, 'title'))
 			->from('#__eb_events')
 			->where('id IN (' . implode(',', $items) . ')')
 			->order('FIND_IN_SET(id, "' . implode(',', $items) . '")');
@@ -299,7 +296,7 @@ class EventbookingModelCart extends RADModel
 		}
 
 		$session = JFactory::getSession();
-		$session->set('eb_registration_code', $row->registration_code);
+		$session->set('eb_registration_code', $registraitonCode);
 		if ($fees['amount'] > 0)
 		{
 			require_once JPATH_COMPONENT . '/payments/' . $paymentMethod . '.php';
@@ -316,12 +313,14 @@ class EventbookingModelCart extends RADModel
 			$row->load($cartId);
 
 			$query->clear()
-				->select('params')
+				->select('title, params')
 				->from('#__eb_payment_plugins')
 				->where('name = ' . $db->quote($paymentMethod));
 			$db->setQuery($query);
-			$params       = new Registry($db->loadResult());
+			$plugin       = $db->loadObject();
+			$params       = new Registry($plugin->params);
 			$paymentClass = new $paymentMethod($params);
+			$paymentClass->setTitle(JText::_($plugin->title));
 
 			// Convert payment amount to USD if the currency is not supported by payment gateway
 			$currency = $config->currency_code;

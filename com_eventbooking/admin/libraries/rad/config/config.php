@@ -41,8 +41,8 @@ class RADConfig
 		for ($i = 0, $n = count($rows); $i < $n; $i++)
 		{
 			$row   = $rows[$i];
-			$key   = $row->config_key;
-			$value = $row->config_value;
+			$key   = $row->{$keyField};
+			$value = $row->{$valueField};
 
 			$this->data[$key] = $value;
 		}

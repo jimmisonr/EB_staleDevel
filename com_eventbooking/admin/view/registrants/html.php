@@ -3,10 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 class EventbookingViewRegistrantsHtml extends RADViewList
@@ -19,35 +19,22 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
 
-		$rows      = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
-		$options   = array();
-		$options[] = JHtml::_('select.option', 0, JText::_('EB_SELECT_EVENT'), 'id', 'title');
+		$rows                           = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
+		$this->lists['filter_event_id'] = EventbookingHelperHtml::getEventsDropdown($rows, 'filter_event_id', 'onchange="submit();"', $this->state->filter_event_id);
 
-		if ($config->show_event_date)
-		{
-			for ($i = 0, $n = count($rows); $i < $n; $i++)
-			{
-				$row       = $rows[$i];
-				$options[] = JHtml::_('select.option', $row->id,
-					$row->title . ' (' . JHtml::_('date', $row->event_date, $config->date_format, null) . ')' . '', 'id', 'title');
-			}
-		}
-		else
-		{
-			$options = array_merge($options, $rows);
-		}
-		$this->lists['filter_event_id'] = JHtml::_('select.genericlist', $options, 'filter_event_id', ' class="inputbox" onchange="submit();"', 'id', 'title', $this->state->filter_event_id);
-		$options                        = array();
-		$options[]                      = JHtml::_('select.option', -1, JText::_('EB_REGISTRATION_STATUS'));
-		$options[]                      = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
-		$options[]                      = JHtml::_('select.option', 1, JText::_('EB_PAID'));
+		$options   = array();
+		$options[] = JHtml::_('select.option', -1, JText::_('EB_REGISTRATION_STATUS'));
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
+		$options[] = JHtml::_('select.option', 1, JText::_('EB_PAID'));
+
 		if ($config->activate_waitinglist_feature)
 		{
 			$options[] = JHtml::_('select.option', 3, JText::_('EB_WAITING_LIST'));
 		}
+
 		$options[] = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
 
-		$this->lists['filter_published'] = JHtml::_('select.genericlist', $options, 'filter_published', ' class="inputbox" onchange="submit()" ', 'value', 'text',
+		$this->lists['filter_published'] = JHtml::_('select.genericlist', $options, 'filter_published', ' class="input-medium" onchange="submit()" ', 'value', 'text',
 			$this->state->filter_published);
 
 		if ($config->activate_checkin_registrants)
@@ -56,34 +43,43 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 			$options[]                        = JHtml::_('select.option', -1, JText::_('EB_CHECKIN_STATUS'));
 			$options[]                        = JHtml::_('select.option', 1, JText::_('EB_CHECKED_IN'));
 			$options[]                        = JHtml::_('select.option', 0, JText::_('EB_NOT_CHECKED_IN'));
-			$this->lists['filter_checked_in'] = JHtml::_('select.genericlist', $options, 'filter_checked_in', ' class="inputbox" onchange="submit()" ', 'value', 'text',
+			$this->lists['filter_checked_in'] = JHtml::_('select.genericlist', $options, 'filter_checked_in', ' class="input-medium" onchange="submit()" ', 'value', 'text',
 				$this->state->filter_checked_in);
 		}
 
-		$query->select('id, name, title, is_core')
-			->from('#__eb_fields')
-			->where('published = 1')
-			->where('show_on_registrants = 1')
-			->where('name != "first_name"')
-			->order('ordering');
-		$db->setQuery($query);
-		$fields = $db->loadObjectList('id');
+
+		$rowFields = EventbookingHelperRegistration::getAllEventFields($this->state->filter_event_id);
+		$fields    = [];
+
+		foreach ($rowFields as $rowField)
+		{
+			if ($rowField->show_on_registrants != 1 || in_array($rowField->name, ['first_name', 'last_name', 'email']))
+			{
+				continue;
+			}
+
+			$fields[$rowField->id] = $rowField;
+		}
 
 		if (count($fields))
 		{
 			$this->fieldsData = $this->model->getFieldsData(array_keys($fields));
 		}
 
-		$query->clear()
-			->select('COUNT(*)')
+		list($ticketTypes, $tickets) = $this->model->getTicketsData();
+
+		$query->select('COUNT(*)')
 			->from('#__eb_payment_plugins')
 			->where('published=1');
 		$db->setQuery($query);
+		$totalPlugins = (int) $db->loadResult();
 
 		$this->config       = $config;
-		$this->totalPlugins = (int) $db->loadResult();
-		$this->coreFields   = EventbookingHelper::getPublishedCoreFields();
+		$this->totalPlugins = $totalPlugins;
+		$this->coreFields   = EventbookingHelperRegistration::getPublishedCoreFields();
 		$this->fields       = $fields;
+		$this->ticketTypes  = $ticketTypes;
+		$this->tickets      = $tickets;
 	}
 
 	/**
@@ -93,6 +89,14 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 	protected function addToolbar()
 	{
 		parent::addToolbar();
+
+		$config = EventbookingHelper::getConfig();
+
+		if ($config->activate_checkin_registrants)
+		{
+			JToolbarHelper::checkin('checkin_multiple_registrants');
+			JToolbarHelper::unpublish('reset_check_in', JText::_('EB_CHECKOUT'), true);
+		}
 
 		// Instantiate a new JLayoutFile instance and render the batch button
 		$layout = new JLayoutFile('joomla.toolbar.batch');
@@ -104,12 +108,14 @@ class EventbookingViewRegistrantsHtml extends RADViewList
 		JToolbarHelper::custom('resend_email', 'envelope', 'envelope', 'EB_RESEND_EMAIL', true);
 		JToolbarHelper::custom('export', 'download', 'download', 'EB_EXPORT_REGISTRANTS', false);
 
-
-		$config = EventbookingHelper::getConfig();
-
 		if ($config->activate_certificate_feature)
 		{
 			JToolbarHelper::custom('download_certificates', 'download', 'download', 'EB_DOWNLOAD_CERTIFICATES', true);
+		}
+
+		if ($config->activate_waitinglist_feature)
+		{
+			JToolbarHelper::custom('request_payment', 'envelope', 'envelope', 'EB_REQUEST_PAYMENT', true);
 		}
 	}
 }

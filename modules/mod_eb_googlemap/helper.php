@@ -3,7 +3,7 @@
  * @package        Joomla
  * @subpackage     Event Booking
  * @author         Tuan Pham Ngoc
- * @copyright      Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright      Copyright (C) 2010 - 2018 Ossolution Team
  * @license        GNU/GPL, see LICENSE.php
  */
 
@@ -36,23 +36,33 @@ class modEventBookingGoogleMapHelper
 	 */
 	public function loadAllLocations()
 	{
-		$user  = JFactory::getUser();
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
+		$user   = JFactory::getUser();
+		$config = EventbookingHelper::getConfig();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
 
 		$categoryIds    = $this->params->get('category_ids');
+		$locationIds    = $this->params->get('location_ids');
 		$numberEvents   = $this->params->get('number_events', 15);
 		$hidePastEvents = $this->params->get('hide_past_events', 1);
 		$currentDate    = JHtml::_('date', 'Now', 'Y-m-d');
 
-		$nullDate = $db->quote($db->getNullDate());
-		$nowDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d H:i:s'));
+		$nullDate    = $db->quote($db->getNullDate());
+		$nowDate     = $db->quote(EventbookingHelper::getServerTimeFromGMTTime());
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
-		$query->select('id, name, `lat`, `long`, address, city, state, zip, country')
+		$query->select('id, `lat`, `long`, address, city, state, zip, country')
+			->select($db->quoteName('name' . $fieldSuffix, 'name'))
 			->from('#__eb_locations')
 			->where('`lat` != ""')
 			->where('`long` != ""')
 			->where('published = 1');
+
+		if ($locationIds)
+		{
+			$query->where('id IN (' . implode(',', $locationIds) . ')');
+		}
+
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
 
@@ -79,7 +89,14 @@ class modEventBookingGoogleMapHelper
 
 			if ($hidePastEvents)
 			{
-				$query->where('DATE(a.event_date) >= ' . $db->quote($currentDate));
+				if ($config->show_until_end_date)
+				{
+					$query->where('(DATE(a.event_date) >= ' . $db->quote($currentDate) . ' OR DATE(a.event_end_date) >= ' . $db->quote($currentDate) . ')');
+				}
+				else
+				{
+					$query->where('(DATE(a.event_date) >= ' . $db->quote($currentDate) . ' OR DATE(a.cut_off_date) >= ' . $db->quote($currentDate) . ')');
+				}
 			}
 
 			$db->setQuery($query, 0, $numberEvents);
@@ -115,19 +132,50 @@ class modEventBookingGoogleMapHelper
 		$disableZoom = $this->params->get('disable_zoom', 1) == 1 ? 'false' : 'true';
 		JFactory::getDocument()->addScript('https://maps.googleapis.com/maps/api/js?key=' . $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4'));
 
-		if (trim($this->params->get('center_coordinates')))
+		// Calculate center location of the map
+		$input  = JFactory::getApplication()->input;
+		$option = $input->getCmd('option');
+		$view   = $input->getCmd('view');
+
+		if ($option == 'com_eventbooking' && $view == 'location')
 		{
-			$homeCoordinates = trim($this->params->get('center_coordinates'));
+			$activeLocation = EventbookingHelperDatabase::getLocation($input->getInt('location_id'));
+
+			if ($activeLocation)
+			{
+				$homeCoordinates = $activeLocation->lat . ',' . $activeLocation->long;
+			}
+		}
+
+		if (empty($homeCoordinates))
+		{
+			if (trim($this->params->get('center_coordinates')))
+			{
+				$homeCoordinates = trim($this->params->get('center_coordinates'));
+			}
+            elseif (trim($config->center_coordinates))
+			{
+				$homeCoordinates = $config->center_coordinates;
+			}
+			else
+			{
+				$homeCoordinates = $this->location->lat . ',' . $this->location->long;
+			}
+		}
+
+		if (file_exists(JPATH_ROOT . '/modules/mod_eb_googlemap/asset/marker/map_marker.png'))
+		{
+			$markerUri = $rootUri . 'modules/mod_eb_googlemap/asset/marker/map_marker.png';
 		}
 		else
-		{
-			$homeCoordinates = $this->location->lat . ',' . $this->location->long;
-		}
+        {
+	        $markerUri = $rootUri . 'modules/mod_eb_googlemap/asset/marker/marker.png';
+        }
 		?>
-		<script type="text/javascript">
-			Eb.jQuery(document).ready(function ($) {
-				var markerArray = [];
-				var myHome = new google.maps.LatLng(<?php echo $homeCoordinates; ?>);
+        <script type="text/javascript">
+            Eb.jQuery(document).ready(function ($) {
+                var markerArray = [];
+                var myHome = new google.maps.LatLng(<?php echo $homeCoordinates; ?>);
 				<?php
 				for($i = 0; $i < count($locations); $i++)
 				{
@@ -137,36 +185,36 @@ class modEventBookingGoogleMapHelper
 					continue;
 				}
 				?>
-				var eventListing<?php echo $location->id?> = new google.maps.LatLng(<?php echo $location->lat; ?>, <?php echo $location->long; ?>);
+                var eventListing<?php echo $location->id?> = new google.maps.LatLng(<?php echo $location->lat; ?>, <?php echo $location->long; ?>);
 				<?php
 				}
 				?>
-				var mapOptions = {
-					zoom: <?php echo $zoomLevel; ?>,
-					streetViewControl: true,
-					scrollwheel: <?php echo $disableZoom; ?>,
-					mapTypeControl: true,
-					panControl: true,
-					mapTypeId: google.maps.MapTypeId.ROADMAP,
-					center: myHome,
-				};
-				var map = new google.maps.Map(document.getElementById("map<?php echo $this->module->id; ?>"), mapOptions);
-				var infoWindow = new google.maps.InfoWindow();
+                var mapOptions = {
+                    zoom: <?php echo $zoomLevel; ?>,
+                    streetViewControl: true,
+                    scrollwheel: <?php echo $disableZoom; ?>,
+                    mapTypeControl: true,
+                    panControl: true,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    center: myHome,
+                };
+                var map = new google.maps.Map(document.getElementById("map<?php echo $this->module->id; ?>"), mapOptions);
+                var infoWindow = new google.maps.InfoWindow();
 
-				function makeMarker(options) {
-					var pushPin = new google.maps.Marker({map: map});
-					pushPin.setOptions(options);
-					google.maps.event.addListener(pushPin, 'click', function () {
-						infoWindow.setOptions(options);
-						infoWindow.open(map, pushPin);
-					});
-					markerArray.push(pushPin);
-					return pushPin;
-				}
+                function makeMarker(options) {
+                    var pushPin = new google.maps.Marker({map: map});
+                    pushPin.setOptions(options);
+                    google.maps.event.addListener(pushPin, 'click', function () {
+                        infoWindow.setOptions(options);
+                        infoWindow.open(map, pushPin);
+                    });
+                    markerArray.push(pushPin);
+                    return pushPin;
+                }
 
-				google.maps.event.addListener(map, 'click', function () {
-					infoWindow.close();
-				});
+                google.maps.event.addListener(map, 'click', function () {
+                    infoWindow.close();
+                });
 				<?php
 				foreach($locations as $location)
 				{
@@ -176,22 +224,20 @@ class modEventBookingGoogleMapHelper
 					continue;
 				}
 				?>
-				makeMarker({
-					position: eventListing<?php echo $location->id?>,
-					title: "<?php echo addslashes($location->title);?>",
-					content: '<div class="row-fluid"><ul><?php foreach ($events as $event)
+                makeMarker({
+                    position: eventListing<?php echo $location->id?>,
+                    title: "<?php echo addslashes($location->name);?>",
+                    content: '<div class="row-fluid"><ul><?php foreach ($events as $event)
 					{
 						echo '<li><h4>' . JHtml::link(EventbookingHelperRoute::getEventRoute($event->id, $event->catid, $this->Itemid), addslashes($event->title)) . '</h4></li>';
 					}?></ul></div>',
-					icon: new google.maps.MarkerImage('<?php echo $rootUri; ?>modules/mod_eb_googlemap/asset/marker/marker.png')
-				});
+                    icon: new google.maps.MarkerImage('<?php echo $markerUri;?>')
+                });
 				<?php
 				}
 				?>
-			});
-		</script>
+            });
+        </script>
 		<?php
 	}
 }
-
-?>

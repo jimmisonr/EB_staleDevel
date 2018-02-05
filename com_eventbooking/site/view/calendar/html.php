@@ -3,26 +3,24 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
+
+use Joomla\Utilities\ArrayHelper;
 
 class EventbookingViewCalendarHtml extends RADViewHtml
 {
 	public function display()
 	{
-		$app    = JFactory::getApplication();
-		$active = $app->getMenu()->getActive();
-		$params = EventbookingHelper::getViewParams($active, array('calendar'));
-
-		$config           = EventbookingHelper::getConfig();
-		$showCalendarMenu = $config->activate_weekly_calendar_view || $config->activate_daily_calendar_view;
-
+		$config                 = EventbookingHelper::getConfig();
 		$this->currentDateData  = EventbookingModelCalendar::getCurrentDateData();
-		$this->showCalendarMenu = $showCalendarMenu;
+		$this->showCalendarMenu = $config->activate_weekly_calendar_view || $config->activate_daily_calendar_view;
 		$this->config           = $config;
+
+		$this->findAndSetActiveMenuItem();
 
 		#Support Weekly and Daily
 		$layout = $this->getLayout();
@@ -40,6 +38,9 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 			return;
 		}
 
+		$this->setLayout('default');
+
+		/* @var EventbookingModelCalendar $model */
 		$model = $this->getModel();
 		$rows  = $model->getData();
 
@@ -68,20 +69,13 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 
 		foreach ($listMonth as $key => $monthName)
 		{
-			if ($key < 9)
-			{
-				$value = "0" . ($key + 1);
-			}
-			else
-			{
-				$value = $key + 1;
-			}
-
+			$value     = $key + 1;
 			$options[] = JHtml::_('select.option', $value, $monthName);
 		}
 
-		$this->searchMonth = JHtml::_('select.genericlist', $options, 'month', 'class="input-medium" onchange="submit();" ', 'value', 'text', $month);
-		$options           = array();
+		$this->searchMonth = JHtml::_('select.genericlist', $options, 'month', 'class="input-medium" onchange="submit();" ', 'value', 'text', (int) $month);
+
+		$options = array();
 
 		for ($i = $year - 3; $i < ($year + 5); $i++)
 		{
@@ -90,12 +84,18 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 
 		$this->searchYear = JHtml::_('select.genericlist', $options, 'year', 'class="input-small" onchange="submit();" ', 'value', 'text', $year);
 
-		EventbookingHelperHtml::prepareDocument($params);
-
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$message     = EventbookingHelper::getMessages();
 
-		if (strlen($message->{'intro_text' . $fieldSuffix}))
+		$categoryIds = array_filter(ArrayHelper::toInteger($this->model->getParams()->get('category_ids')));
+
+		if (count($categoryIds) == 1)
+		{
+			$categoryId = $categoryIds[0];
+			$category   = EventbookingHelperDatabase::getCategory($categoryId);
+			$introText  = $category->description;
+		}
+		elseif (strlen($message->{'intro_text' . $fieldSuffix}))
 		{
 			$introText = $message->{'intro_text' . $fieldSuffix};
 		}
@@ -104,19 +104,13 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 			$introText = $message->intro_text;
 		}
 
-		if ($active && isset($active->query['layout']) && $active->query['layout'] == 'weekly')
-		{
-			$layoutQuery = '&layout=default';
-		}
-		else
-		{
-			$layoutQuery = '';
-		}
 
-		$this->listMonth   = $listMonth;
-		$this->params      = $params;
-		$this->introText   = $introText;
-		$this->layoutQuery = $layoutQuery;
+
+		$this->listMonth = $listMonth;
+		$this->params    = $this->getParams();
+		$this->introText = $introText;
+
+		$this->setDocumentMetadata();
 
 		parent::display();
 	}
@@ -126,19 +120,10 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 	 */
 	protected function displayWeeklyView()
 	{
-		$config = EventbookingHelper::getConfig();
-		$model  = $this->getModel();
-		$rows   = $model->getEventsByWeek();
+		/* @var EventbookingModelCalendar $model */
+		$model = $this->getModel();
 
-		if ($config->process_plugin)
-		{
-			foreach ($rows as $row)
-			{
-				$row->short_description = JHtml::_('content.prepare', $row->short_description);
-			}
-		}
-
-		$this->events            = $rows;
+		$this->events            = $model->getEventsByWeek();
 		$this->first_day_of_week = $model->getState('date');
 
 		parent::display();
@@ -150,17 +135,11 @@ class EventbookingViewCalendarHtml extends RADViewHtml
 	protected function displayDailyView()
 	{
 		EventbookingHelperJquery::colorbox('eb-colorbox-addlocation');
-		$config = EventbookingHelper::getConfig();
-		$model  = $this->getModel();
-		$rows   = $model->getEventsByDaily();
-		if ($config->process_plugin)
-		{
-			foreach ($rows as $row)
-			{
-				$row->short_description = JHtml::_('content.prepare', $row->short_description);
-			}
-		}
-		$this->events = $rows;
+
+		/* @var EventbookingModelCalendar $model */
+		$model = $this->getModel();
+
+		$this->events = $model->getEventsByDaily();
 		$this->day    = $model->getState('day');
 
 		parent::display();

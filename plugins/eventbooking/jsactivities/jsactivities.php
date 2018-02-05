@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -18,8 +18,8 @@ class plgEventBookingJSactivities extends JPlugin
 		{
 			return;
 		}
-		jimport('joomla.utilities.date');
-		require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
+		
+		jimport('joomla.utilities.date');	
 		$itemId = EventbookingHelper::getItemid();
 		EventbookingHelper::loadLanguage();
 		$user  = JFactory::getUser();

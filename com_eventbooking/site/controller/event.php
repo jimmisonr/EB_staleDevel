@@ -3,15 +3,16 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
-// no direct access
 defined('_JEXEC') or die;
 
 class EventbookingControllerEvent extends EventbookingController
 {
+	use EventbookingControllerCaptcha;
+
 	public function __construct(RADInput $input = null, array $config = array())
 	{
 		parent::__construct($input, $config);
@@ -46,7 +47,9 @@ class EventbookingControllerEvent extends EventbookingController
 			throw new Exception('You do not have submit event permission, please contact Administrator', 403);
 		}
 
-		if ($config->enable_captcha && $user->id == 0 && !$this->validateCaptcha())
+		if ($config->enable_captcha
+			&& ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1')
+			&& !$this->validateCaptcha($this->input))
 		{
 			$this->app->enqueueMessage(JText::_('EB_INVALID_CAPTCHA_ENTERED'), 'warning');
 			$this->input->set('view', 'event');
@@ -69,11 +72,11 @@ class EventbookingControllerEvent extends EventbookingController
 			$msg = JText::_('EB_EVENT_SAVING_ERROR') . $e->getMessage();
 		}
 
-		$return = base64_decode($this->input->getString('return'));
+		$return = base64_decode($this->input->getBase64('return'));
 
-		if ($return)
+		if ($return && JUri::isInternal($return))
 		{
-			$this->setRedirect($return);
+			$this->setRedirect($return, $msg);
 		}
 		elseif ($user->id)
 		{
@@ -126,9 +129,9 @@ class EventbookingControllerEvent extends EventbookingController
 
 		$model->publish($id, $state);
 
-		$return = base64_decode($this->input->getString('return'));
+		$return = base64_decode($this->input->getBase64('return'));
 
-		if ($return)
+		if ($return && JUri::isInternal($return))
 		{
 			$this->setRedirect($return);
 		}
@@ -155,7 +158,7 @@ class EventbookingControllerEvent extends EventbookingController
 			$config = EventbookingHelper::getConfig();
 			$user   = JFactory::getUser();
 
-			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1') && !$this->validateCaptcha())
+			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1') && !$this->validateCaptcha($this->input))
 			{
 				$this->app->enqueueMessage(JText::_('EB_INVALID_CAPTCHA_ENTERED'), 'warning');
 				$this->input->set('view', 'invite');
@@ -233,41 +236,15 @@ class EventbookingControllerEvent extends EventbookingController
 	 */
 	public function cancel()
 	{
-		$return = base64_decode($this->input->getString('return'));
+		$return = base64_decode($this->input->getBase64('return'));
 
-		if ($return)
+		if ($return && JUri::isInternal($return))
 		{
 			$this->setRedirect($return);
 		}
 		else
 		{
-			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=events&Itemid=' . $this->input->getInt('Itemid', 0), false));
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('events', $this->input->getInt('Itemid', 0)), false));
 		}
-	}
-
-	/**
-	 * Method to validate captcha
-	 *
-	 * @return bool|mixed
-	 */
-	protected function validateCaptcha()
-	{
-		$input         = $this->input;
-		$captchaPlugin = $this->app->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-
-		if (!$captchaPlugin)
-		{
-			// Hardcode to recaptcha, reduce support request
-			$captchaPlugin = 'recaptcha';
-		}
-
-		$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
-
-		if ($plugin)
-		{
-			return JCaptcha::getInstance($captchaPlugin)->checkAnswer($input->post->get('recaptcha_response_field', '', 'string'));
-		}
-
-		return true;
 	}
 }

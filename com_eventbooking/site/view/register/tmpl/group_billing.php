@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -65,14 +65,7 @@ else
 
 	foreach ($fields as $field)
 	{
-		if ($field->name == 'zip')
-		{
-			echo $field->getControlGroup($bootstrapHelper, 'field_zip_input');
-		}
-		else
-		{
-			echo $field->getControlGroup($bootstrapHelper);
-		}
+		echo $field->getControlGroup($bootstrapHelper);
 
 		if ($field->type == "Date")
 		{
@@ -105,7 +98,25 @@ else
 
 	$articleId = $this->event->article_id ? $this->event->article_id : $this->config->article_id;
 
-	if ($this->config->accept_term == 1 && $articleId)
+	if ($this->event->enable_terms_and_conditions != 2)
+	{
+		$enableTermsAndConditions =  $this->event->enable_terms_and_conditions;
+	}
+	else
+	{
+		$enableTermsAndConditions = $this->config->accept_term;
+	}
+
+	if ($this->event->collect_member_information === '')
+	{
+		$collectMemberInformation = $this->config->collect_member_information;
+	}
+	else
+	{
+		$collectMemberInformation = $this->event->collect_member_information;
+	}
+
+	if ($enableTermsAndConditions && $articleId)
 	{
 		$layoutData['articleId'] = $articleId;
 
@@ -258,7 +269,7 @@ else
 						success: function(html) {
 							$('#eb-group-members-information .eb-form-content').html(html);
 							$('#eb-group-billing .eb-form-content').slideUp('slow');
-							<?php ($this->config->collect_member_information) ? $idAjax = 'eb-group-members-information' : $idAjax = 'eb-number-group-members';?>
+							<?php ($collectMemberInformation) ? $idAjax = 'eb-group-members-information' : $idAjax = 'eb-number-group-members';?>
 							$('#<?php echo $idAjax; ?> .eb-form-content').slideDown('slow');
 						},
 						error: function(xhr, ajaxOptions, thrownError) {
@@ -276,7 +287,7 @@ else
 					 opacity: 0.3
 				});
 				<?php
-					if ($this->config->collect_member_information)
+					if ($collectMemberInformation)
 					{
 					?>
 						$('html, body').animate({scrollTop:$('#eb-group-members-information').position().top}, 'slow');

@@ -3,16 +3,16 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
 defined('_JEXEC') or die;
 $nullDate = JFactory::getDbo()->getNullDate();
 ?>
-<table width="100%" class="os_table" cellspacing="2" cellpadding="2">
+<table width="100%" class="os_table" cellspacing="0" cellpadding="0">
 	<tr>
-		<td class="heading" colspan="2">
+		<td class="eb-heading" colspan="2">
 			<?php echo JText::_('EB_GENERAL_INFORMATION') ; ?>
 		</td>
 	</tr>
@@ -40,7 +40,7 @@ $nullDate = JFactory::getDbo()->getNullDate();
 					}
 					else
 					{
-						echo JHTML::_('date', $rowEvent->event_date, $config->event_date_format, null) ;
+						echo JHtml::_('date', $rowEvent->event_date, $config->event_date_format, null) ;
 					}
 				?>
 			</td>
@@ -64,25 +64,10 @@ $nullDate = JFactory::getDbo()->getNullDate();
 		{
 			$location = $rowLocation ;
 			$locationInformation = array();
+
 			if ($location->address)
 			{
 				$locationInformation[] = $location->address;
-			}
-			if ($location->city)
-			{
-				$locationInformation[] = $location->city;
-			}
-			if ($location->state)
-			{
-				$locationInformation[] = $location->state;
-			}
-			if ($location->zip)
-			{
-				$locationInformation[] = $location->zip;
-			}
-			if ($location->country)
-			{
-				$locationInformation[] = $location->country;
 			}
 		?>
 		<tr>
@@ -105,7 +90,7 @@ $nullDate = JFactory::getDbo()->getNullDate();
 		</td>
 	</tr>
 	<?php
-	$showBillingStep = EventbookingHelper::showBillingStep($row->event_id);
+	$showBillingStep = EventbookingHelperRegistration::showBillingStep($row->event_id);
 	if ($showBillingStep)
 	{
 	?>
@@ -266,19 +251,29 @@ $nullDate = JFactory::getDbo()->getNullDate();
 		<?php
 		}
 	}
-	if ($config->collect_member_information && count($rowMembers))
+
+	if ($rowEvent->collect_member_information === '')
+	{
+		$collectMemberInformation = $config->collect_member_information;
+	}
+	else
+	{
+		$collectMemberInformation = $rowEvent->collect_member_information;
+	}
+
+	if ($collectMemberInformation && count($rowMembers))
 	{
 	?>
 		<tr>
-			<td class="heading" colspan="2">
+			<td class="eb-heading" colspan="2">
 				<?php echo JText::_('EB_MEMBERS_INFORMATION') ; ?>
 			</td>
 		</tr>
 		<tr>
 			<td colspan="2">
-				<table width="100%" class="os_member_list">
+				<table width="100%" class="os_member_list" cellspacing="0" cellpadding="0">
 					<?php
-						$rowFields = EventbookingHelper::getFormFields($row->event_id, 2);
+						$rowFields = EventbookingHelperRegistration::getFormFields($row->event_id, 2);
 						for ($i = 0 , $n  = count($rowMembers); $i < $n; $i++)
 						{
 							$memberForm = new RADForm($rowFields);
@@ -287,7 +282,7 @@ $nullDate = JFactory::getDbo()->getNullDate();
 								echo "<tr>\n" ;
 							}
 							$rowMember = $rowMembers[$i] ;
-							$memberData = EventbookingHelper::getRegistrantData($rowMember, $rowFields);
+							$memberData = EventbookingHelperRegistration::getRegistrantData($rowMember, $rowFields);
 							$memberForm->bind($memberData);
 							$memberForm->buildFieldsDependency();
 							$fields = $memberForm->getFields();
@@ -301,7 +296,7 @@ $nullDate = JFactory::getDbo()->getNullDate();
 							$memberForm->setFields($fields);
 						?>
 							<td>
-								<table class="os_table" width="100%" cellspacing="3" cellpadding="3">
+								<table class="os_table" width="100%" cellspacing="0" cellpadding="0">
 									<tr>
 										<td colspan="2" class="os_row_heading"><?php echo JText::sprintf('EB_MEMBER_INFORMATION', $i + 1) ; ?></td>
 									</tr>

@@ -48,7 +48,7 @@ INSERT INTO `#__eb_menus` (`id`, `menu_name`, `menu_parent_id`, `menu_link`, `pu
 (18, 'EB_CONFIGURATION', 0, 'index.php?option=com_eventbooking&view=configuration', 1, 9, 'cog'),
 
 (19, 'EB_TOOLS', 0, NULL, 1, 10, 'tools'),
-(20, 'EB_PURGE_URLS', 19, 'index.php?option=com_eventbooking&task=reset_urls', 1, 1, 'refresh'),
-(21, 'EB_FIX_DATABASE', 19, 'index.php?option=com_eventbooking&task=upgrade', 1, 2, 'ok'),
-(22, 'EB_SHARE_TRANSLATION', 19, 'index.php?option=com_eventbooking&task=share_translation', 1, 4, 'heart'),
+(20, 'EB_PURGE_URLS', 19, 'index.php?option=com_eventbooking&task=tool.reset_urls', 1, 1, 'refresh'),
+(21, 'EB_FIX_DATABASE', 19, 'index.php?option=com_eventbooking&task=update.update', 1, 2, 'ok'),
+(22, 'EB_SHARE_TRANSLATION', 19, 'index.php?option=com_eventbooking&task=tool.share_translation', 1, 4, 'heart'),
 (32, 'EB_EMAILS_LOG', 19, 'index.php?option=com_eventbooking&view=emails', 1, 3, 'envelope');

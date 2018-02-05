@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -23,36 +23,36 @@ class EventbookingViewRegistrantlistHtml extends RADViewHtml
 
 		$state   = $this->model->getState();
 		$eventId = $state->id;
+
 		if ($eventId)
 		{
 			$rows = $this->model->getData();
 
-			$config  = EventbookingHelper::getConfig();
-			$db      = JFactory::getDbo();
-			$query   = $db->getQuery(true);
+			$config = EventbookingHelper::getConfig();
 
-			// Check to see whether we need to display custom fields data for this event
-			$query->select('custom_field_ids')
-				->from('#__eb_events')
-				->where('id = ' . $eventId);
-			$db->setQuery($query);
-			$customFieldIds = $db->loadResult();
-			$customFieldIds = trim($customFieldIds);
+			$event = EventbookingHelperDatabase::getEvent($eventId);
+
+			$customFieldIds = trim($event->custom_field_ids);
+
 			if (!$customFieldIds)
 			{
 				$customFieldIds = trim($config->registrant_list_custom_field_ids);
 			}
+
 			if ($customFieldIds)
 			{
+				$db          = JFactory::getDbo();
+				$query       = $db->getQuery(true);
 				$fields      = explode(',', $customFieldIds);
 				$fieldTitles = array();
 				$fieldSuffix = EventbookingHelper::getFieldSuffix();
-				$query->clear();
-				$query->select('id, name,title' . $fieldSuffix . ' AS title, is_core')
+				$query->select('id, name, is_core')
+					->select($db->quoteName('title' . $fieldSuffix, 'title'))
 					->from('#__eb_fields')
 					->where('id IN (' . $customFieldIds . ')');
-				$db->setQuery($query);	
+				$db->setQuery($query);
 				$rowFields = $db->loadObjectList();
+
 				foreach ($rowFields as $rowField)
 				{
 					$fieldTitles[$rowField->id] = $rowField->title;
@@ -67,12 +67,14 @@ class EventbookingViewRegistrantlistHtml extends RADViewHtml
 			{
 				$displayCustomField = false;
 			}
+
 			$this->items              = $rows;
 			$this->pagination         = $this->model->getPagination();
 			$this->config             = $config;
 			$this->displayCustomField = $displayCustomField;
 			$this->bootstrapHelper    = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
-			$this->coreFields         = EventbookingHelper::getPublishedCoreFields();
+			$this->coreFields         = EventbookingHelperRegistration::getPublishedCoreFields();
+			$this->event              = $event;
 
 			parent::display();
 		}

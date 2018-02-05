@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="Events Archive Default Layout">
+	<layout title="Events Archive - Default layout">
 		<message>
-			Display past events from a category or from all categories
+			Display past events from a category or from all categories in default layout
 		</message>
 	</layout>
 	<state>
-		<name>Events Archive</name>
+		<name>Events Archive - Default layout</name>
 		<description>Display past events from a category or from all categories in default layout</description>
 		<fields name="request">			
 			<fieldset name="request"

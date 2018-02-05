@@ -3,12 +3,13 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
+// Require library + register autoloader
 require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
 
 EventbookingHelper::loadLanguage();
@@ -27,7 +28,7 @@ if ($option != 'com_eventbooking')
 		JHtml::_('jquery.framework');
 	}
 
-	JHtml::_('script', JUri::root() . '/media/com_eventbooking/assets/js/noconflict.js', false, false);
+	JHtml::_('script', JUri::root() . '/media/com_eventbooking/assets/js/eventbookingjq.js', false, false);
 
 	if ($config->calendar_theme)
 	{
@@ -46,6 +47,9 @@ if ($option != 'com_eventbooking')
 	}
 }
 
+$document->addScriptDeclaration(
+	'var siteUrl = "' . EventbookingHelper::getSiteUrl() . '";'
+);
 $document->addScript($rootUrl . '/media/com_eventbooking/assets/js/minicalendar.js');
 EventbookingHelper::addLangLinkForAjax();
 
@@ -85,7 +89,12 @@ $itemId = (int) $params->get('item_id');
 
 if (!$itemId)
 {
-	$itemId = EventbookingHelper::getItemid();
+	$itemId = EventbookingHelperRoute::findView('calendar');
+
+	if (!$itemId)
+	{
+		$itemId = EventbookingHelper::getItemid();
+	}
 }
 
 require JModuleHelper::getLayoutPath('mod_eb_minicalendar', 'default');

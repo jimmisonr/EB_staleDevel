@@ -3,10 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 JHtml::_('bootstrap.framework');
 JHtml::_('behavior.framework') ;
@@ -20,18 +20,27 @@ $span5Class          = $bootstrapHelper->getClassMapping('span5');
 
 $config = EventbookingHelper::getConfig();
 $mapApiKye = $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4');
-$http     = JHttpFactory::getHttp();
-$url      = "https://maps.googleapis.com/maps/api/geocode/json?address=" . str_replace(' ', '+', $config->default_country) . "&key=" . $mapApiKye;
-$response = $http->get($url);
-if ($response->code == 200)
+
+if ($config->center_coordinates)
 {
-	$output_deals = json_decode($response->body);
-	$latLng = $output_deals->results[0]->geometry->location;
-	$coordinates = $latLng->lat.','.$latLng->lng;
+	$coordinates = $config->center_coordinates;
 }
 else
 {
-	$coordinates = '37.09024,-95.712891';
+	$http     = JHttpFactory::getHttp();
+	$url      = "https://maps.googleapis.com/maps/api/geocode/json?address=" . str_replace(' ', '+', $config->default_country) . "&key=" . $mapApiKye;
+	$response = $http->get($url);
+
+	if ($response->code == 200)
+	{
+		$output_deals = json_decode($response->body);
+		$latLng       = $output_deals->results[0]->geometry->location;
+		$coordinates  = $latLng->lat . ',' . $latLng->lng;
+	}
+	else
+	{
+		$coordinates = '37.09024,-95.712891';
+	}
 }
 ?>
 <script src="https://maps.google.com/maps/api/js?key=<?php echo $mapApiKye; ?>" type="text/javascript"></script>
@@ -145,47 +154,35 @@ else
     			<ul id="eventmaps_results" style="display:none;"></ul>
     		</div>
     	</div>
-    
-    	<div class="<?php echo $controlGroupClass;  ?>">
-    		<label class="<?php echo $controlLabelClass; ?>">
-    			<?php echo JText::_('EB_CITY'); ?>
-    			<span class="required">*</span>
-    		</label>
-    		<div class="<?php echo $controlsClass; ?>">
-    			<input class="input-large validate[required]" type="text" name="city" id="city" size="30" maxlength="250" value="" />
-    		</div>
-    	</div>
-    
-    	<div class="<?php echo $controlGroupClass;  ?>">
-    		<label class="<?php echo $controlLabelClass; ?>">
-    			<?php echo JText::_('EB_STATE'); ?>
-    			<span class="required">*</span>
-    		</label>
-    		<div class="<?php echo $controlsClass; ?>">
-    			<input class="text_area" type="text" name="state" id="state" size="30" maxlength="250" value="" />
-    		</div>
-    	</div>
-    
-    	<div class="<?php echo $controlGroupClass;  ?>">
-    		<label class="<?php echo $controlLabelClass; ?>">
-    			<?php echo JText::_('EB_ZIP'); ?>
-    			<span class="required">*</span>
-    		</label>
-    		<div class="<?php echo $controlsClass; ?>">
-    			<input class="input-large validate[required]" type="text" name="zip" id="zip" size="20" maxlength="250" value="" />
-    		</div>
-    	</div>
-    
-    	<div class="<?php echo $controlGroupClass;  ?>">
-    		<label class="<?php echo $controlLabelClass; ?>">
-    			<?php echo JText::_('EB_COUNTRY'); ?>
-    			<span class="required">*</span>
-    		</label>
-    		<div class="<?php echo $controlsClass; ?>">
-    			<?php echo $this->lists['country'] ; ?>
-    		</div>
-    	</div>
-    
+	    <?php
+	    if (JModuleHelper::isEnabled('mod_eb_cities'))
+	    {
+		?>
+		    <div class="control-group">
+			    <label class="control-label">
+				    <?php echo JText::_('EB_CITY'); ?>
+			    </label>
+			    <div class="controls">
+				    <input class="text_area" type="text" name="city" id="city" size="30" maxlength="250" value="<?php echo $this->item->city;?>" />
+			    </div>
+		    </div>
+		<?php
+	    }
+
+	    if (JModuleHelper::isEnabled('mod_eb_states'))
+	    {
+		?>
+		    <div class="control-group">
+			    <label class="control-label">
+				    <?php echo JText::_('EB_STATE'); ?>
+			    </label>
+			    <div class="controls">
+				    <input class="text_area" type="text" name="state" id="state" size="30" maxlength="250" value="<?php echo $this->item->state;?>" />
+			    </div>
+		    </div>
+		<?php
+	    }
+	    ?>
     	<div class="<?php echo $controlGroupClass;  ?>">
     		<label class="<?php echo $controlLabelClass; ?>">
     			<?php echo JText::_('EB_COORDINATES'); ?>

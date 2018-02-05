@@ -3,12 +3,17 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
-// no direct access
 defined( '_JEXEC' ) or die;
+
+if ($config->display_event_in_tooltip)
+{
+	JHtml::_('bootstrap.tooltip');
+	JFactory::getDocument()->addStyleDeclaration(".hasTip{display:block !important}");
+}
 
 EventbookingHelperJquery::equalHeights();
 
@@ -68,7 +73,7 @@ $rootUri    = JUri::root(true);
 						<?php
 						foreach ($currentDay["events"] as $key=> $event)
 						{
-							$color =   EventbookingHelper::getColorCodeOfEvent($event->id);
+							$mainCategory = EventbookingHelper::getEventMainCategory($event->id);
 							$eventIds[] = $event->id;
 
 							if ($config->show_thumb_in_calendar && $event->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $event->thumb))
@@ -86,9 +91,57 @@ $rootUri    = JUri::root(true);
 							{
 								$eventId = $event->parent_id;
 							}
+
+							$eventClasses = [];
+
+							if ($config->display_event_in_tooltip)
+							{
+								$eventClasses[]  = 'eb_event_link hasTooltip hasTip';
+
+								EventbookingHelperData::preProcessEventData(array($event), 'list');
+
+								$layoutData = array(
+									'item'           => $event,
+									'config'         => $config,
+									'nullDate'       => JFactory::getDbo()->getNullDate(),
+									'Itemid'         => $Itemid,
+								);
+
+								$eventProperties = EventbookingHelperHtml::loadCommonLayout('common/tmpl/calendar_tooltip.php', $layoutData);
+								$eventLinkTitle =  JHtml::tooltipText('', $eventProperties, false, true);
+							}
+							else
+							{
+								$eventClasses[]  = 'eb_event_link';
+								$eventLinkTitle     = $event->title;
+							}
+
+							$eventInlineStyle = '';
+
+							if ($mainCategory->text_color || $mainCategory->color_code)
+							{
+								$eventInlineStyle = ' style="';
+
+								if ($mainCategory->text_color)
+								{
+									$eventInlineStyle .= 'color:#'.$mainCategory->text_color.';';
+								}
+
+								if ($mainCategory->color_code)
+								{
+									$eventInlineStyle .= 'background-color:#'.$mainCategory->color_code.';';
+								}
+
+								$eventInlineStyle .='"';
+							}
+
+							if ($event->event_capacity > 0 && $event->total_registrants >= $event->event_capacity)
+                            {
+                                $eventClasses[] = ' eb-event-full';
+                            }
 							?>
 							<div class="date day_cell">
-								<a class="eb_event_link" href="<?php echo JRoute::_(EventbookingHelperRoute::getEventRoute($eventId, isset($categoryId) ? $categoryId : 0, $Itemid)); ?>" title="<?php echo $event->title; ?>" <?php if ($color) echo 'style="background-color:#'.$color.';"' ; ?>>
+								<a class="<?php echo implode(' ', $eventClasses); ?>" href="<?php echo JRoute::_(EventbookingHelperRoute::getEventRoute($eventId, isset($categoryId) ? $categoryId : 0, $Itemid)); ?>" title="<?php echo $eventLinkTitle; ?>"<?php if ($eventInlineStyle) echo $eventInlineStyle; ; ?>>
 									<img border="0" align="top" title="<?php echo $event->title; ?>" src="<?php echo $thumbSource; ?>" />
 									<?php
 										if ($config->show_event_time && strpos($event->event_date, '00:00:00') === false)

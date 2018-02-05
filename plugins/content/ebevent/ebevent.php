@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 defined('_JEXEC') or die;
@@ -49,12 +49,15 @@ class plgContentEBEvent extends JPlugin
 	 */
 	public function displayEvent(&$matches)
 	{
-		$id = $matches[1];
+		// Require library + register autoloader
 		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
+
 		EventbookingHelper::loadLanguage();
+
+		$id      = $matches[1];
 		$request = array('option' => 'com_eventbooking', 'view' => 'event', 'id' => $id, 'limit' => 0, 'hmvc_call' => 1, 'Itemid' => EventbookingHelper::getItemid());
 		$input   = new RADInput($request);
-		$config  = EventbookingHelper::getComponentSettings('site');
+		$config  = require JPATH_ADMINISTRATOR . '/components/com_eventbooking/config.php';
 		ob_start();
 
 		//Initialize the controller, execute the task

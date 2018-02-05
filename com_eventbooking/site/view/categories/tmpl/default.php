@@ -3,46 +3,35 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
+
+$description = $this->category ? $this->category->description: $this->introText;
 ?>
 <div id="eb-categories-page" class="eb-container">
 	<?php
-		if (!$this->categoryId)
-		{
-			$pageHeading = $this->params->get('page_heading') ? $this->params->get('page_heading') : JText::_('EB_CATEGORIES');
-		?>
-			<h1 class="eb-page-heading"><?php echo $pageHeading;?></h1>
-			<?php
-				if (EventbookingHelper::isValidMessage($this->introText))
-				{
-				?>
-					<div class="eb-description"><?php echo $this->introText;?></div>
-				<?php
-				}
-			?>
-		<?php
-		}
-		else
+		if ($this->params->get('show_page_heading'))
 		{
 		?>
-			<div id="eb-category">
-				<h1 class="eb-page-heading"><?php echo $this->category->name;?></h1>
-				<?php
-					if($this->category->description != '')
-					{
-					?>
-						<div class="eb-description"><?php echo $this->category->description;?></div>
-					<?php
-					}
-				?>
-			</div>
+			<h1 class="eb-page-heading"><?php echo $this->params->get('page_heading');?></h1>
 		<?php
 		}
-		echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/categories.php', array('categories' => $this->items, 'categoryId' => $this->categoryId, 'config' => $this->config, 'Itemid' => $this->Itemid));
+
+		if ($description)
+		{
+		?>
+			<div class="eb-description"><?php echo $description;?></div>
+		<?php
+		}
+
+		if (count($this->items))
+		{
+			echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/categories.php', array('categories' => $this->items, 'categoryId' => $this->categoryId, 'config' => $this->config, 'Itemid' => $this->Itemid));
+		}
+
 		if ($this->pagination->total > $this->pagination->limit)
 		{
 		?>

@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -233,7 +233,7 @@ defined('_JEXEC') or die;
 
 						if ($item->early_bird_discount_amount > 0 && $item->early_bird_discount_date != $nullDate)
 						{
-							echo '<em>' . JText::sprintf('EB_UNTIl_DATE', JHtml::_('date', $item->early_bird_discount_date, $config->date_format, null)) . '</em>';
+							echo ' <em>' . JText::sprintf('EB_UNTIl_DATE', JHtml::_('date', $item->early_bird_discount_date, $config->date_format, null)) . '</em>';
 						}
 					}
 					else
@@ -379,17 +379,6 @@ defined('_JEXEC') or die;
 						<div itemprop="name"><?php echo $location->name; ?></div>
 						<div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
 							<span itemprop="streetAddress"><?php echo $location->address; ?></span>
-							<?php
-							if ($location->city && $location->state && $location->zip)
-							{
-							?>
-								<span itemprop="addressLocality"><?php echo $location->city; ?></span>,
-								<span itemprop="addressRegion"><?php echo $location->state; ?></span>
-								<span itemprop="postalCode"><?php echo $location->zip; ?></span>
-								<span itemprop="addressCountry"><?php echo $location->country; ?></span>
-							<?php
-							}
-							?>
 						</div>
 					</div>
 					<?php

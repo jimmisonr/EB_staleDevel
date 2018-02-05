@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -16,33 +16,45 @@ $mapApiKye = $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy
 
 if ($this->item->id)
 {
-	$coordinates = $this->item->lat.','.$this->item->long;
+	$coordinates = $this->item->lat . ',' . $this->item->long;
 }
 else
 {
-	$http     = JHttpFactory::getHttp();
-	$url      = "https://maps.googleapis.com/maps/api/geocode/json?address=" . str_replace(' ', '+', $config->default_country) . "&key=" . $mapApiKye;
-	$response = $http->get($url);
-	if ($response->code == 200)
+	if ($config->center_coordinates)
 	{
-		$output_deals = json_decode($response->body);
-		$latLng = $output_deals->results[0]->geometry->location;
-		$coordinates = $latLng->lat.','.$latLng->lng;
+		$coordinates = $config->center_coordinates;
 	}
 	else
 	{
-		$coordinates = '37.09024,-95.712891';
+		$http     = JHttpFactory::getHttp();
+		$url      = "https://maps.googleapis.com/maps/api/geocode/json?address=" . str_replace(' ', '+', $config->default_country) . "&key=" . $mapApiKye;
+		$response = $http->get($url);
+
+		if ($response->code == 200)
+		{
+			$output_deals = json_decode($response->body);
+			$latLng       = $output_deals->results[0]->geometry->location;
+			$coordinates  = $latLng->lat . ',' . $latLng->lng;
+		}
+		else
+		{
+			$coordinates = '37.09024,-95.712891';
+		}
 	}
 }
 
 $editor = JFactory::getEditor();
+$translatable = JLanguageMultilang::isEnabled() && count($this->languages);
+if ($translatable)
+{
+	JHtml::_('behavior.tabstate');
+}
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function(pressbutton) {
 		var form = document.adminForm;
 		if (pressbutton == 'cancel') {
 			Joomla.submitform( pressbutton );
-			return;
 		} else {
 			//Should validate the information here
 			if (form.name.value == "") {
@@ -159,6 +171,13 @@ $editor = JFactory::getEditor();
 </script>
 <form action="index.php?option=com_eventbooking&view=location" method="post" name="adminForm" id="adminForm" class="form form-horizontal">
 <div class="row-fluid">
+	<?php
+	if ($translatable)
+	{
+		echo JHtml::_('bootstrap.startTabSet', 'field', array('active' => 'general-page'));
+		echo JHtml::_('bootstrap.addTab', 'field', 'general-page', JText::_('EB_GENERAL', true));
+	}
+	?>
 	<div class="span6">
 		<div class="control-group">
 			<label class="control-label">
@@ -166,6 +185,62 @@ $editor = JFactory::getEditor();
 			</label>
 			<div class="controls">
 				<input class="text_area" type="text" name="name" id="name" size="50" maxlength="250" value="<?php echo $this->item->name;?>" />
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_ALIAS'); ?>
+			</label>
+			<div class="controls">
+				<input class="text_area" type="text" name="alias" id="alias" size="50" maxlength="250" value="<?php echo $this->item->alias;?>" />
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_ADDRESS'); ?>
+			</label>
+			<div class="controls">
+				<input class="input-xlarge" type="text" name="address" id="address" size="70" autocomplete="off" onkeyup="getLocations(this.value)" onblur="clearLocations();" maxlength="250" value="<?php echo $this->item->address;?>" />
+				<ul id="eventmaps_results" style="display:none;"></ul>
+			</div>
+		</div>
+
+		<?php
+			if (EventbookingHelper::isModuleEnabled('mod_eb_cities'))
+			{
+			?>
+				<div class="control-group">
+					<label class="control-label">
+						<?php echo JText::_('EB_CITY'); ?>
+					</label>
+					<div class="controls">
+						<input class="text_area" type="text" name="city" id="city" size="30" maxlength="250" value="<?php echo $this->item->city;?>" />
+					</div>
+				</div>
+			<?php
+			}
+
+			if (EventbookingHelper::isModuleEnabled('mod_eb_states'))
+			{
+			?>
+				<div class="control-group">
+					<label class="control-label">
+						<?php echo JText::_('EB_STATE'); ?>
+					</label>
+					<div class="controls">
+						<input class="text_area" type="text" name="state" id="state" size="30" maxlength="250" value="<?php echo $this->item->state;?>" />
+					</div>
+				</div>
+			<?php
+			}
+		?>
+
+		<div class="control-group">
+			<label class="control-label">
+				<?php echo JText::_('EB_COORDINATES'); ?>
+			</label>
+			<div class="controls">
+				<input class="text_area" type="text" name="coordinates" id="coordinates" size="30" maxlength="250" value="<?php echo $this->item->lat.','.$this->item->long;?>" />
 			</div>
 		</div>
 		<div class="control-group">
@@ -182,55 +257,6 @@ $editor = JFactory::getEditor();
 			</label>
 			<div class="controls">
 				<?php echo EventbookingHelper::getUserInput($this->item->user_id) ; ?>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo JText::_('EB_ADDRESS'); ?>
-			</label>
-			<div class="controls">
-				<input class="input-xlarge" type="text" name="address" id="address" size="70" autocomplete="off" onkeyup="getLocations(this.value)" onblur="clearLocations();" maxlength="250" value="<?php echo $this->item->address;?>" />
-				<ul id="eventmaps_results" style="display:none;"></ul>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo JText::_('EB_CITY'); ?>
-			</label>
-			<div class="controls">
-				<input class="text_area" type="text" name="city" id="city" size="30" maxlength="250" value="<?php echo $this->item->city;?>" />
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo JText::_('EB_STATE'); ?>
-			</label>
-			<div class="controls">
-				<input class="text_area" type="text" name="state" id="state" size="30" maxlength="250" value="<?php echo $this->item->state;?>" />
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo JText::_('EB_ZIP'); ?>
-			</label>
-			<div class="controls">
-				<input class="text_area" type="text" name="zip" id="zip" size="20" maxlength="250" value="<?php echo $this->item->zip;?>" />
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo JText::_('EB_COUNTRY'); ?>
-			</label>
-			<div class="controls">
-				<?php echo $this->lists['country'] ; ?>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">
-				<?php echo JText::_('EB_COORDINATES'); ?>
-			</label>
-			<div class="controls">
-				<input class="text_area" type="text" name="coordinates" id="coordinates" size="30" maxlength="250" value="<?php echo $this->item->lat.','.$this->item->long;?>" />
 			</div>
 		</div>
 		<div class="control-group">
@@ -278,6 +304,51 @@ $editor = JFactory::getEditor();
 			<div id="map-canvas" style="width: 95%; height: 400px"></div>
 		</div>
 	</div>
+
+	<?php
+	if ($translatable)
+	{
+		echo JHtml::_('bootstrap.endTab');
+		echo JHtml::_('bootstrap.addTab', 'field', 'translation-page', JText::_('EB_TRANSLATION', true));
+		echo JHtml::_('bootstrap.startTabSet', 'field-translation', array('active' => 'translation-page-'.$this->languages[0]->sef));
+
+		foreach ($this->languages as $language)
+		{
+			$sef = $language->sef;
+			echo JHtml::_('bootstrap.addTab', 'field-translation', 'translation-page-' . $sef, $language->title . ' <img src="' . JUri::root() . 'media/com_eventbooking/flags/' . $sef . '.png" />');
+			?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo  JText::_('EB_NAME'); ?>
+				</label>
+				<div class="controls">
+					<input class="input-xlarge" type="text" name="name_<?php echo $sef; ?>" id="title_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'name_'.$sef}; ?>" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo  JText::_('EB_ALIAS'); ?>
+				</label>
+				<div class="controls">
+					<input class="input-xlarge" type="text" name="alias_<?php echo $sef; ?>" id="alias_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'alias_'.$sef}; ?>" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_DESCRIPTION'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $editor->display('description_' . $sef, $this->item->{'description_' . $sef}, '100%', '250', '75', '10'); ?>
+				</div>
+			</div>
+			<?php
+			echo JHtml::_('bootstrap.endTab');
+		}
+		echo JHtml::_('bootstrap.endTabSet');
+		echo JHtml::_('bootstrap.endTab');
+		echo JHtml::_('bootstrap.endTabSet');
+	}
+	?>
 </div>
 <div class="clearfix"></div>
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />

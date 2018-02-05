@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -138,10 +138,20 @@ JHtml::_('formbehavior.chosen', 'select');
 					<a href="<?php echo $link; ?>"><?php echo $row->title ; ?></a>
 				</td>
 				<?php
-					if ($this->config->show_event_date) {
+					if ($this->config->show_event_date)
+					{
 					?>
 						<td>
-							<?php echo JHtml::_('date', $row->event_date, $this->config->date_format, null) ; ?>
+							<?php
+							if ($row->event_date == EB_TBC_DATE)
+							{
+								echo JText::_('EB_TBC');
+							}
+							else
+							{
+								echo JHtml::_('date', $row->event_date, $this->config->date_format, null);
+							}
+							?>
 						</td>
 					<?php
 					}
@@ -161,12 +171,26 @@ JHtml::_('formbehavior.chosen', 'select');
 				?>
 					<td style="text-align: right;">
 						<?php
-						if ($row->payment_status == 0)
+						if ($row->payment_status != 1 && $row->published != 2)
 						{
+							// Check to see if there is an online payment method available for this event
+							if ($row->payment_methods)
+							{
+								$hasOnlinePaymentMethods = count(array_intersect($this->onlinePaymentPlugins, explode(',', $row->payment_methods)));
+							}
+							else
+							{
+								$hasOnlinePaymentMethods = count($this->onlinePaymentPlugins);
+							}
+
 							echo EventbookingHelper::formatCurrency($row->amount - $row->deposit_amount, $this->config);
-						?>
-							<a class="btn btn-primary" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=payment&registrant_id='.$row->id.'&Itemid='.$this->Itemid); ?>"><?php echo JText::_('EB_MAKE_PAYMENT'); ?></a>
-						<?php
+
+							if ($hasOnlinePaymentMethods)
+							{
+							?>
+								<a class="btn btn-primary" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=payment&registrant_id='.$row->id.'&Itemid='.$this->Itemid); ?>"><?php echo JText::_('EB_MAKE_PAYMENT'); ?></a>
+							<?php
+							}
 						}
 						?>
 					</td>
@@ -188,6 +212,34 @@ JHtml::_('formbehavior.chosen', 'select');
 								break;
 							case 3:
 								echo JText::_('EB_WAITING_LIST');
+
+								// If there is space, we will display payment link here to allow users to make payment to become registrants
+								if ($this->config->enable_waiting_list_payment && $row->group_id == 0)
+								{
+									$event = EventbookingHelperDatabase::getEvent($row->event_id);
+
+									if ($event->event_capacity == 0 || ($event->event_capacity - $event->total_registrants >= $row->number_registrants))
+									{
+										// Check to see if there is an online payment method available for this event
+										if ($row->payment_methods)
+										{
+											$hasOnlinePaymentMethods = count(array_intersect($this->onlinePaymentPlugins, explode(',', $row->payment_methods)));
+										}
+										else
+										{
+											$hasOnlinePaymentMethods = count($this->onlinePaymentPlugins);
+										}
+
+										if ($hasOnlinePaymentMethods)
+										{
+										?>
+											<a class="btn btn-primary" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=payment&layout=registration&order_number='.$row->registration_code.'&Itemid='.$this->Itemid); ?>"><?php echo JText::_('EB_MAKE_PAYMENT'); ?></a>
+										<?php
+										}
+									}
+								}
+
+
 								break;
 						}
 					?>
@@ -201,7 +253,7 @@ JHtml::_('formbehavior.chosen', 'select');
 							if ($row->invoice_number)
 							{
 							?>
-								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_invoice&id='.($row->cart_id ? $row->cart_id : ($row->group_id ? $row->group_id : $row->id))); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo EventbookingHelper::formatInvoiceNumber($row->invoice_number, $this->config) ; ?></a>
+								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_invoice&id='.($row->cart_id ? $row->cart_id : ($row->group_id ? $row->group_id : $row->id))); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo EventbookingHelper::formatInvoiceNumber($row->invoice_number, $this->config, $row) ; ?></a>
 							<?php
 							}
 							?>
@@ -214,7 +266,7 @@ JHtml::_('formbehavior.chosen', 'select');
 					?>
 						<td class="center">
 							<?php
-							if ($row->ticket_code)
+							if ($row->ticket_code && $row->payment_status == 1)
 							{
 							?>
 								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_ticket&id='.$row->id); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo $row->ticket_number ? EventbookingHelperTicket::formatTicketNumber($row->ticket_prefix, $row->ticket_number, $this->config) : JText::_('EB_DOWNLOAD_TICKETS');?></a>

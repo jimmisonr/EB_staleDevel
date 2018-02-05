@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -24,7 +24,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	<?php echo str_replace('[EVENT_TITLE]', $this->event->title, $this->inviteMessage) ; ?>
 </div>
 <div class="clearfix"></div>
-<form name="adminForm" id="adminForm" method="post" action="index.php?tmpl=component" class="form form-horizontal">
+<form name="adminForm" id="adminForm" method="post" action="<?php echo JRoute::_('index.php?Itemid=' . $this->Itemid . '&tmpl=component'); ?>" class="form form-horizontal">
 	<div class="<?php echo $controlGroupClass; ?>">
 		<label class="<?php echo $controlLabelClass; ?>">
 			<?php echo JText::_('EB_NAME'); ?>
@@ -97,7 +97,6 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 	<input type="hidden" name="option" value="com_eventbooking" />
 	<input type="hidden" name="task" value="event.send_invite" />
 	<input type="hidden" name="event_id" value="<?php echo $this->event->id; ?>" />
-	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 </form>
 </div>

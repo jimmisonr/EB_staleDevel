@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -396,6 +396,20 @@ $selectedState = '';
 		<?php
 		}
 
+		if ($this->canChangeStatus)
+		{
+		?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_PAYMENT_STATUS'); ?>
+				</label>
+				<div class="controls">
+					<?php echo $this->lists['payment_status'];?>
+				</div>
+			</div>
+		<?php
+		}
+
 		if ($this->canChangeStatus && $this->item->id && $this->item->total_amount > 0)
 		{
 		?>
@@ -423,7 +437,7 @@ $selectedState = '';
 				$rowMember  = $this->rowMembers[$i];
 				$memberId   = $rowMember->id;
 				$form       = new RADForm($this->memberFormFields);
-				$memberData = EventbookingHelper::getRegistrantData($rowMember, $this->memberFormFields);
+				$memberData = EventbookingHelperRegistration::getRegistrantData($rowMember, $this->memberFormFields);
 				$form->setEventId($this->item->event_id);
 				$form->bind($memberData);
 				$form->setFieldSuffix($i + 1);
@@ -522,7 +536,7 @@ $selectedState = '';
 					var userId = $('#user_id').val();
 					var eventId = $('#event_id').val();
 					$.ajax({
-						type : 'POST',
+						type : 'GET',
 						url : 'index.php?option=com_eventbooking&task=get_profile_data&user_id=' + userId + '&event_id=' +eventId,
 						dataType: 'json',
 						success : function(json){
@@ -560,7 +574,12 @@ $selectedState = '';
 
 			Joomla.submitbutton = function(pressbutton)
 			{
-				if (pressbutton == 'registrant.cancel')
+				if (pressbutton == 'registrant.cancel_edit')
+				{
+					jQuery("#adminForm").validationEngine('detach');
+					Joomla.submitform(pressbutton);
+				}
+				else if (pressbutton == 'registrant.cancel')
 				{
 					if (confirm("<?php echo JText::_('EB_CANCEL_REGISTRATION_CONFIRM'); ?>"))
 					{

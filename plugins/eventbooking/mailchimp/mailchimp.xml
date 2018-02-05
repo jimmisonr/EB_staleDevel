@@ -7,7 +7,7 @@
     <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
     <authorEmail>contact@joomdonation.com</authorEmail>
     <authorUrl>www.joomdonation.com</authorUrl>
-    <version>2.14.2</version>
+    <version>3.2.1</version>
     <description>This plugin is used to add registrants to Mailchimp when they register for an event in Events Booking
         extension.
     </description>
@@ -31,6 +31,7 @@
                     <option value="0">No</option>
                     <option value="1">Yes</option>
                 </field>
+                <field name="default_list_ids" type="text" size="60" default="" label="Default Lists" description="Enter IDs of the lists which will be selected by default when you add new event, comma separated" />
             </fieldset>
         </fields>
     </config>

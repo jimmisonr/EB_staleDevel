@@ -4,7 +4,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 class EventbookingHelperDatabase
@@ -45,34 +45,43 @@ class EventbookingHelperDatabase
 	 */
 	public static function getEvent($id, $currentDate = null)
 	{
-		$db          = JFactory::getDbo();
-		$query       = $db->getQuery(true);
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		static $events = [];
 
-		if (empty($currentDate))
+		if (!array_key_exists($id, $events))
 		{
-			$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+			$db          = JFactory::getDbo();
+			$query       = $db->getQuery(true);
+			$fieldSuffix = EventbookingHelper::getFieldSuffix();
+
+			if (empty($currentDate))
+			{
+				$currentDate = EventbookingHelper::getServerTimeFromGMTTime();
+			}
+
+			$currentDate = $db->quote($currentDate);
+
+			$query->select('a.*, IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
+				->from('#__eb_events AS a')
+				->select("DATEDIFF(event_date, $currentDate) AS number_event_dates")
+				->select("DATEDIFF($currentDate, a.late_fee_date) AS late_fee_date_diff")
+				->select("TIMESTAMPDIFF(MINUTE, registration_start_date, $currentDate) AS registration_start_minutes")
+				->select("TIMESTAMPDIFF(MINUTE, cut_off_date, $currentDate) AS cut_off_minutes")
+				->select("DATEDIFF(early_bird_discount_date, $currentDate) AS date_diff")
+				->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
+				->where('a.id=' . (int) $id);
+
+			if ($fieldSuffix)
+			{
+				self::getMultilingualFields($query, array('a.title', 'a.short_description', 'a.description', 'a.meta_keywords', 'a.meta_description'), $fieldSuffix);
+			}
+
+			$query->group('a.id');
+			$db->setQuery($query);
+
+			return $db->loadObject();
 		}
 
-		$query->select('a.*, IFNULL(SUM(b.number_registrants), 0) AS total_registrants')
-			->from('#__eb_events AS a')
-			->select("DATEDIFF(event_date, '$currentDate') AS number_event_dates")
-			->select("DATEDIFF('$currentDate', a.late_fee_date) AS late_fee_date_diff")
-			->select("TIMESTAMPDIFF(MINUTE, registration_start_date, '$currentDate') AS registration_start_minutes")
-			->select("TIMESTAMPDIFF(MINUTE, cut_off_date, '$currentDate') AS cut_off_minutes")
-			->select("DATEDIFF(early_bird_discount_date, '$currentDate') AS date_diff")
-			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
-			->where('a.id=' . (int) $id);
-
-		if ($fieldSuffix)
-		{
-			self::getMultilingualFields($query, array('a.title', 'a.short_description', 'a.description', 'a.meta_keywords', 'a.meta_description'), $fieldSuffix);
-		}
-
-		$query->group('a.id');
-		$db->setQuery($query);
-
-		return $db->loadObject();
+		return $events[$id];
 	}
 
 	/**
@@ -89,6 +98,14 @@ class EventbookingHelperDatabase
 		$query->select('*')
 			->from('#__eb_locations')
 			->where('id=' . (int) $id);
+
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, ['name', 'alias', 'description'], $fieldSuffix);
+		}
+
 		$db->setQuery($query);
 
 		return $db->loadObject();
@@ -151,7 +168,7 @@ class EventbookingHelperDatabase
 			->order($order);
 		if ($hidePastEvents)
 		{
-			$currentDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
 			$query->where('(DATE(event_date) >= ' . $currentDate . ' OR DATE(event_end_date) >= ' . $currentDate . ')');
 		}
 		$db->setQuery($query);

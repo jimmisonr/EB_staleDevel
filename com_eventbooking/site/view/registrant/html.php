@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -16,7 +16,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		$rootUri  = JUri::root(true);
 		$document = JFactory::getDocument();
 		$user     = JFactory::getUser();
-		$config   = EventbookingHelper::getConfig();
+		$config   = clone EventbookingHelper::getConfig();
 		$db       = JFactory::getDbo();
 		$query    = $db->getQuery(true);
 
@@ -28,6 +28,12 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
 		$document->addScript($rootUri . '/media/com_eventbooking/assets/js/paymentmethods.js');
 		$document->addScript($rootUri . '/media/com_eventbooking/assets/js/ajaxupload.js');
+		$customJSFile = JPATH_ROOT . '/media/com_eventbooking/assets/js/custom.js';
+
+		if (file_exists($customJSFile) && filesize($customJSFile) > 0)
+		{
+			$document->addScript($rootUri . '/media/com_eventbooking/assets/js/custom.js');
+		}
 
 		$item = $this->model->getData();
 
@@ -35,23 +41,34 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 
 		if ($item->id)
 		{
-			$query->select('*, title' . $fieldSuffix . ' AS title')
+			$query->select('*')
 				->from('#__eb_events')
 				->where('id=' . $item->event_id);
+
+			if ($fieldSuffix)
+			{
+				$query->select($db->quoteName('title' . $fieldSuffix, 'title'));
+			}
+
 			$db->setQuery($query);
 			$event       = $db->loadObject();
 			$this->event = $event;
 
+			if ($event->collect_member_information !== '')
+			{
+				$config->collect_member_information = $event->collect_member_information;
+			}
+
 			if ($item->is_group_billing)
 			{
-				$rowFields = EventbookingHelper::getFormFields($item->event_id, 1, $item->language);
+				$rowFields = EventbookingHelperRegistration::getFormFields($item->event_id, 1, $item->language);
 			}
 			else
 			{
-				$rowFields = EventbookingHelper::getFormFields($item->event_id, 0, $item->language);
+				$rowFields = EventbookingHelperRegistration::getFormFields($item->event_id, 0, $item->language);
 			}
 
-			$data = EventbookingHelper::getRegistrantData($item, $rowFields);
+			$data = EventbookingHelperRegistration::getRegistrantData($item, $rowFields);
 
 			$query->clear()
 				->select('*')
@@ -65,7 +82,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		}
 		else
 		{
-			$rowFields = EventbookingHelper::getFormFields($item->event_id, 0);
+			$rowFields = EventbookingHelperRegistration::getFormFields($item->event_id, 0);
 
 			$useDefault = true;
 			$data       = array();
@@ -74,7 +91,15 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 
 		if ($userId && $user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
 		{
-			$canChangeStatus = true;
+			if ($config->only_show_registrants_of_event_owner && $item->id)
+			{
+				// Users can only change status of the event which he created
+				$canChangeStatus = $this->event->created_by == $user->id;
+			}
+			else
+			{
+				$canChangeStatus = true;
+			}
 
 			$options   = array();
 			$options[] = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
@@ -103,32 +128,8 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 
 		if (empty($item->id))
 		{
-			//Build list of event dropdown
-			$options = array();
-			$query->clear()
-				->select('id, title' . $fieldSuffix . ' AS title, event_date')
-				->from('#__eb_events')
-				->where('published=1')
-				->order('title');
-			$db->setQuery($query);
-			$options[] = JHtml::_('select.option', '', JText::_('Select Event'), 'id', 'title');
-
-			$rows = $db->loadObjectList();
-
-			if ($config->show_event_date)
-			{
-				foreach ($rows as $row)
-				{
-					$options[] = JHtml::_('select.option', $row->id, $row->title . ' (' . JHtml::_('date', $row->event_date, $config->date_format) . ')' .
-						'', 'id', 'title');
-				}
-			}
-			else
-			{
-				$options = array_merge($options, $rows);
-			}
-
-			$lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id', ' class="inputbox validate[required]" ', 'id', 'title', $item->event_id);
+			$rows              = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
+			$lists['event_id'] = EventbookingHelperHtml::getEventsDropdown($rows, 'event_id', 'class="inputbox validate[required]"', $item->event_id);
 		}
 
 		if ($config->collect_member_information && !$rowMembers && $item->number_registrants > 1)
@@ -147,7 +148,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 
 		if (count($rowMembers))
 		{
-			$this->memberFormFields = EventbookingHelper::getFormFields($item->event_id, 2, $item->language);
+			$this->memberFormFields = EventbookingHelperRegistration::getFormFields($item->event_id, 2, $item->language);
 		}
 
 		if ($config->activate_checkin_registrants)
@@ -155,9 +156,30 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 			$lists['checked_in'] = JHtml::_('select.booleanlist', 'checked_in', ' class="inputbox" ', $item->checked_in);
 		}
 
+		$options   = array();
+		$options[] = JHtml::_('select.option', -1, JText::_('EB_PAYMENT_STATUS'));
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_PARTIAL_PAYMENT'));
+
+		if (strpos($item->payment_method, 'os_offline') !== false)
+		{
+			$options[] = JHtml::_('select.option', 2, JText::_('EB_DEPOSIT_PAID'));
+		}
+
+		$options[]               = JHtml::_('select.option', 1, JText::_('EB_FULL_PAYMENT'));
+		$lists['payment_status'] = JHtml::_('select.genericlist', $options, 'payment_status', ' class="inputbox" ', 'value', 'text',
+			$item->payment_status);
+
 		if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking') || empty($item->published))
 		{
-			$canChangeFeeFields = true;
+			if ($config->only_show_registrants_of_event_owner && $item->id)
+			{
+				// Users can only change status of the event which he created
+				$canChangeFeeFields = $this->event->created_by == $user->id;
+			}
+			else
+			{
+				$canChangeFeeFields = true;
+			}
 		}
 		else
 		{
@@ -204,7 +226,7 @@ class EventbookingViewRegistrantHtml extends RADViewHtml
 		$this->canChangeStatus    = $canChangeStatus;
 		$this->form               = $form;
 		$this->rowMembers         = $rowMembers;
-		$this->return             = $this->input->->get->get('return', '', 'string');
+		$this->return             = $this->input->get->getBase64('return');
 		$this->canChangeFeeFields = $canChangeFeeFields;
 
 		$this->addToolbar();

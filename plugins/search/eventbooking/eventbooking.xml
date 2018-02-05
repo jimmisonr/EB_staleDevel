@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>contact@joomdonation.com</authorEmail>
 	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>2.14.2</version>  
+	<version>3.2.1</version>  
 	<description>Allows Searching events added by Event Booking component via standard Joomla search</description>
 	<files>
 		<filename plugin="eventbooking">eventbooking.php</filename>
@@ -16,6 +16,9 @@
 		<fields name="params">
 			<fieldset name="basic">
 				<field name="search_limit" type="text" size="5" default="50" label="Search Limit" description="Number of Search items to return"/>
+				<field name="item_id" type="text"
+					   label="Itemid" description="ID of the menu item which you want to be used for search result links">
+				</field>
 			</fieldset>
 		</fields>
 	</config>	

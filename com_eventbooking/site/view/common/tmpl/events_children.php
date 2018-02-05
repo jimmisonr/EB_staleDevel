@@ -3,7 +3,7 @@
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright    	Copyright (C) 2010 - 2018 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -83,7 +83,7 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 		for ($i = 0 , $n = count($items) ; $i < $n; $i++)
 		{
 			$item = $items[$i] ;
-			$canRegister = EventbookingHelper::acceptRegistration($item);
+			$canRegister = EventbookingHelperRegistration::acceptRegistration($item);
 
 			if ($item->cut_off_date != $nullDate)
 			{
@@ -188,15 +188,15 @@ $btnClass            = $bootstrapHelper->getClassMapping('btn');
 						}
 						elseif ($config->show_discounted_price)
 						{
-							$price = $item->discounted_price ;
+							$price = EventbookingHelper::formatCurrency($item->discounted_price, $config, $item->currency_symbol);
 						}
 						else
 						{
-							$price = $item->individual_price ;
+							$price = EventbookingHelper::formatCurrency($item->individual_price, $config, $item->currency_symbol);
 						}
 						?>
 							<td class="<?php echo $hiddenPhoneClass; ?>">
-								<?php echo EventbookingHelper::formatCurrency($price, $config, $item->currency_symbol); ?>
+								<?php echo $price; ?>
 							</td>
 						<?php
 					}

@@ -19,6 +19,13 @@ class Pkg_EventbookingInstallerScript
 
 			return false;
 		}
+
+		if (version_compare(PHP_VERSION, '5.4.0', '<'))
+		{
+			JError::raiseWarning(null, 'Events Booking requires PHP 5.4.0+ to work. Please contact your hosting provider, ask them to update PHP version for your hosting account.');
+
+			return false;
+		}
 	}
 
 	/**
@@ -35,10 +42,11 @@ class Pkg_EventbookingInstallerScript
 	{
 		$this->installType = 'update';
 	}
-
+	
 	public function postflight($type, $parent)
 	{
-		JFactory::getApplication()->redirect(
-			JRoute::_('index.php?option=com_eventbooking&task=update_db_schema&install_type=' . $this->installType, false));
+		$app = JFactory::getApplication();
+		$app->setUserState('com_installer.redirect_url', 'index.php?option=com_eventbooking&task=update.update&install_type=' . $this->installType);
+		$app->input->set('return', base64_encode('index.php?option=com_eventbooking&task=update.update&install_type=' . $this->installType));
 	}
 }

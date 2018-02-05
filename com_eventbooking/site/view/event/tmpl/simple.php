@@ -3,28 +3,26 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 JHtml::_('behavior.tooltip');
+JHtml::_('behavior.modal');
+
 $editor = JFactory::getEditor() ;
-$format = 'Y-m-d' ;
 EventbookingHelperJquery::validateForm();
 $bootstrapHelper = new EventbookingHelperBootstrap($this->config->twitter_bootstrap_version);
 $controlGroupClass = $bootstrapHelper->getClassMapping('control-group');
 $controlLabelClass = $bootstrapHelper->getClassMapping('control-label');
 $controlsClass     = $bootstrapHelper->getClassMapping('controls');
+$iconCalendar      = $bootstrapHelper->getClassMapping('icon-calendar');
+$rowFluidClass     = $bootstrapHelper->getClassMapping('row-fluid');
 ?>
-<style>
-	.calendar {
-		vertical-align: bottom;
-	}
-</style>
-<form action="index.php?option=com_eventbooking&view=event" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data" class="form form-horizontal">
-<div id="eb-submit-event-simple" class="row-fluid eb-container">
+<form action="<?php echo JRoute::_('index.php?Itemid=' . $this->Itemid); ?>" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data" class="form form-horizontal">
+<div id="eb-submit-event-simple" class="<?php echo $rowFluidClass; ?> eb-container">
 		<div class="eb_form_header" style="width:100%;">
 			<div style="float: left; width: 40%;"><?php echo JText::_('EB_ADD_EDIT_EVENT'); ?></div>
 			<div style="float: right; width: 50%; text-align: right;">
@@ -33,6 +31,15 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			</div>
 		</div>
 		<div class="clearfix"></div>
+
+    <?php
+        if (count($this->plugins))
+        {
+	        echo JHtml::_('bootstrap.startTabSet', 'event', array('active' => 'basic-information-page'));
+	        echo JHtml::_('bootstrap.addTab', 'event', 'basic-information-page', JText::_('EB_BASIC_INFORMATION', true));
+        }
+    ?>
+
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>"><?php echo JText::_('EB_TITLE') ; ?></label>
 			<div class="<?php echo $controlsClass; ?>">
@@ -63,10 +70,24 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			<div class="<?php echo $controlsClass; ?>">
 				<input type="file" class="inputbox" name="thumb_image" size="60" />
 				<?php
-				if ($this->item->thumb)
+				if ($this->item->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $this->item->thumb))
 				{
+					$baseUri = JUri::base(true);
+
+					if ($this->item->image && file_exists(JPATH_ROOT . '/' . $this->item->image))
+					{
+						$largeImageUri = $baseUri . '/' . $this->item->image;
+					}
+					elseif (file_exists(JPATH_ROOT . '/media/com_eventbooking/images/' . $this->item->thumb))
+					{
+						$largeImageUri = $baseUri . '/media/com_eventbooking/images/' . $this->item->thumb;
+					}
+					else
+					{
+						$largeImageUri = $baseUri . '/media/com_eventbooking/images/thumbs/' . $this->item->thumb;
+					}
 				?>
-					<a href="<?php echo JURI::root().'media/com_eventbooking/images/'.$this->item->thumb; ?>" class="modal"><img src="<?php echo JURI::root().'media/com_eventbooking/images/thumbs/'.$this->item->thumb; ?>" class="img_preview" /></a>
+					<a href="<?php echo $largeImageUri; ?>" class="modal"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $this->item->thumb; ?>" class="img_preview" /></a>
 					<input type="checkbox" name="del_thumb" value="1" /><?php echo JText::_('EB_DELETE_CURRENT_THUMB'); ?>
 				<?php
 				}
@@ -92,7 +113,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				<?php echo JText::_('EB_EVENT_START_DATE'); ?>
 			</label>
 			<div class="<?php echo $controlsClass; ?>">
-				<?php echo JHtml::_('calendar', ($this->item->event_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_date, $format, null), 'event_date', 'event_date', '%Y-%m-%d', array('class' =>  'validate[required]')) ; ?>
+				<?php echo str_replace('icon-calendar', $iconCalendar, JHtml::_('calendar', ($this->item->event_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_date, 'Y-m-d', null), 'event_date', 'event_date', '%Y-%m-%d', array('class' =>  'validate[required]'))); ?>
 				<?php echo $this->lists['event_date_hour'].' '.$this->lists['event_date_minute']; ?>
 			</div>
 		</div>
@@ -101,7 +122,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				<?php echo JText::_('EB_EVENT_END_DATE'); ?>
 			</label>
 			<div class="<?php echo $controlsClass; ?>">
-				<?php echo JHtml::_('calendar', ($this->item->event_end_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_end_date, $format, null), 'event_end_date', 'event_end_date') ; ?>
+				<?php echo str_replace('icon-calendar', $iconCalendar, JHtml::_('calendar', ($this->item->event_end_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->event_end_date, 'Y-m-d', null), 'event_end_date', 'event_end_date')); ?>
 				<?php echo $this->lists['event_end_date_hour'].' '.$this->lists['event_end_date_minute'] ; ?>
 			</div>
 		</div>
@@ -111,7 +132,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				<?php echo JText::_('EB_REGISTRATION_START_DATE'); ?>
 			</label>
 			<div class="<?php echo $controlsClass; ?>">
-				<?php echo JHtml::_('calendar', ($this->item->registration_start_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->registration_start_date, $format, null), 'registration_start_date', 'registration_start_date') ; ?>
+				<?php echo str_replace('icon-calendar', $iconCalendar, JHtml::_('calendar', ($this->item->registration_start_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->registration_start_date, 'Y-m-d', null), 'registration_start_date', 'registration_start_date')) ; ?>
 				<?php echo $this->lists['registration_start_hour'].' '.$this->lists['registration_start_minute'] ; ?>
 			</div>
 		</div>
@@ -151,7 +172,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'EB_CUT_OFF_DATE' );?>::<?php echo JText::_('EB_CUT_OFF_DATE_EXPLAIN'); ?>"><?php echo JText::_('EB_CUT_OFF_DATE') ; ?></span>
 			</label>
 			<div class="<?php echo $controlsClass; ?>">
-				<?php echo JHtml::_('calendar', ($this->item->cut_off_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->cut_off_date, $format, null), 'cut_off_date', 'cut_off_date') ; ?>
+				<?php echo JHtml::_('calendar', ($this->item->cut_off_date == $this->nullDate) ? '' : JHtml::_('date', $this->item->cut_off_date, 'Y-m-d', null), 'cut_off_date', 'cut_off_date') ; ?>
 			</div>
 		</div>
 		<div class="<?php echo $controlGroupClass;  ?>">
@@ -171,6 +192,21 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				<input type="text" name="notification_emails" class="inputbox" size="70" value="<?php echo $this->item->notification_emails ; ?>" />
 			</div>
 		</div>
+		<?php
+		if ($this->config->activate_deposit_feature)
+		{
+		?>
+			<div class="<?php echo $controlGroupClass; ?>">
+				<div class="<?php echo $controlLabelClass; ?>">
+					<?php echo JText::_('EB_DEPOSIT_AMOUNT'); ?>
+				</div>
+				<div class="<?php echo $controlsClass; ?>">
+					<input type="text" name="deposit_amount" id="deposit_amount" class="input-mini" size="5" value="<?php echo $this->item->deposit_amount; ?>"/>&nbsp;&nbsp;<?php echo $this->lists['deposit_type']; ?>
+				</div>
+			</div>
+		<?php
+		}
+		?>
 		<div class="<?php echo $controlGroupClass;  ?>">
 			<label class="<?php echo $controlLabelClass; ?>">
 				<?php echo JText::_('EB_PAYPAL_EMAIL'); ?>
@@ -221,7 +257,18 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				<label class="<?php echo $controlLabelClass; ?>">
 					<?php echo JText::_('EB_PUBLISHED'); ?>
 				</label>
-				<?php echo $this->lists['published']; ?>
+				<div class="<?php echo $controlsClass; ?>">
+					<?php
+						if (isset($this->lists['published']))
+						{
+							echo $this->lists['published'];
+						}
+						else
+						{
+							echo EventbookingHelperHtml::getBooleanInput('published', $this->item->published);
+						}
+					?>
+				</div>
 			</div>
 		<?php
 		}
@@ -256,6 +303,22 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				</div>
 			<?php
 			}
+
+            if (count($this->plugins))
+            {
+                echo JHtml::_('bootstrap.endTab');
+                $count = 0;
+
+                foreach ($this->plugins as $plugin)
+                {
+                    $count++;
+                    echo JHtml::_('bootstrap.addTab', 'event', 'tab_' . $count, JText::_($plugin['title'], true));
+                    echo $plugin['form'];
+                    echo JHtml::_('bootstrap.endTab');
+                }
+
+                echo JHtml::_('bootstrap.endTabSet');
+            }
 		?>
 </div>
 	<script type="text/javascript">
@@ -275,13 +338,14 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 
 		function cancelEvent()
 		{
-			location.href   ="<?php echo JRoute::_('index.php?option=com_eventbooking&task=event.cancel&Itemid=' . $this->Itemid, false); ?>";
+			location.href = "<?php echo JRoute::_('index.php?option=com_eventbooking&task=event.cancel&Itemid=' . $this->Itemid . '&return=' . $this->return, false); ?>";
 		}
 	</script>
 	<input type="hidden" name="option" value="com_eventbooking" />
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
-	<input type="hidden" name="task" value="save" />
+	<input type="hidden" name="task" value="event.save" />
 	<input type="hidden" name="return" value="<?php echo $this->return; ?>" />
-	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
+    <input type="hidden" name="activate_tickets_pdf" value="<?php echo $this->item->activate_tickets_pdf; ?>"/>
+    <input type="hidden" name="send_tickets_via_email" value="<?php echo $this->item->send_tickets_via_email; ?>"/>
 	<?php echo JHtml::_( 'form.token' ); ?>
 </form>

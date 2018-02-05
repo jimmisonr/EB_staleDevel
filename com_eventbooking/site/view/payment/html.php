@@ -3,20 +3,23 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 class EventbookingViewPaymentHtml extends RADViewHtml
 {
+	use EventbookingViewCaptcha;
+
 	/**
 	 * Display interface to user
 	 */
 	public function display()
 	{
 		$layout = $this->getLayout();
+
 		if ($layout == 'complete')
 		{
 			$this->displayPaymentComplete();
@@ -26,17 +29,29 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 
 		// Load common js code
 		$document = JFactory::getDocument();
+		$rootUri  = JUri::root(true);
 		$document->addScriptDeclaration(
 			'var siteUrl = "' . EventbookingHelper::getSiteUrl() . '";'
 		);
-		$document->addScript(JUri::root(true) . '/media/com_eventbooking/assets/js/paymentmethods.js');
+		$document->addScript($rootUri . '/media/com_eventbooking/assets/js/paymentmethods.js');
+
+		$customJSFile = JPATH_ROOT . '/media/com_eventbooking/assets/js/custom.js';
+
+		if (file_exists($customJSFile) && filesize($customJSFile) > 0)
+		{
+			$document->addScript($rootUri . '/media/com_eventbooking/assets/js/custom.js');
+		}
+
 		EventbookingHelper::addLangLinkForAjax();
 
-		$config                = EventbookingHelper::getConfig();
-		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+		if ($layout == 'registration')
+		{
+			$this->displayRegistrationPayment();
 
-		$input        = $this->input;
-		$registrantId = $input->getInt('registrant_id');
+			return;
+		}
+
+		$registrantId = $this->input->getInt('registrant_id');
 
 		$db    = JFactory::getDbo();
 		$query = $db->getQuery(true);
@@ -45,6 +60,7 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 			->where('id = ' . $registrantId);
 		$db->setQuery($query);
 		$rowRegistrant = $db->loadObject();
+
 		if (empty($rowRegistrant))
 		{
 			echo JText::_('EB_INVALID_REGISTRATION_RECORD');
@@ -60,25 +76,128 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 		}
 
 		$event = EventbookingHelperDatabase::getEvent($rowRegistrant->event_id);
+		$this->setBaseFormData($rowRegistrant, $event);
 
-		$config    = EventbookingHelper::getConfig();
-		$user      = JFactory::getUser();
-		$userId    = $user->get('id');
-		$rowFields = EventbookingHelper::getDepositPaymentFormFields();
-
-		$captchaInvalid = $input->getInt('captcha_invalid', 0);
-		if ($captchaInvalid)
+		if (count($this->methods) == 0)
 		{
-			$data = $input->post->getData();
+			echo JText::_('EB_ENABLE_PAYMENT_METHODS');
+
+			return;
+		}
+
+		if (is_callable('EventbookingHelperOverrideRegistration::calculateRemainderFees'))
+		{
+			$fees = EventbookingHelperOverrideRegistration::calculateRemainderFees($rowRegistrant, $this->paymentMethod);
 		}
 		else
 		{
-			$data = EventbookingHelper::getRegistrantData($rowRegistrant, $rowFields);
+			$fees = EventbookingHelperRegistration::calculateRemainderFees($rowRegistrant, $this->paymentMethod);
+		}
+
+		$this->loadCaptcha();
+
+		// Assign these parameters
+		$this->fees          = $fees;
+		$this->onClickHandle = 'calculateRemainderFee();';
+
+		parent::display();
+	}
+
+	/**
+	 * Display form which allow users to click on to complete payment for a registration
+	 *
+	 * @return void
+	 */
+	protected function displayRegistrationPayment()
+	{
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+
+		$registrationCode = $this->input->getString('order_number') ?: $this->input->getString('registration_code');
+
+		$query->select('*')
+			->from('#__eb_registrants')
+			->where('registration_code = ' . $db->quote($registrationCode));
+		$db->setQuery($query);
+		$rowRegistrant = $db->loadObject();
+
+		if (empty($rowRegistrant))
+		{
+			echo JText::_('EB_INVALID_REGISTRATION_RECORD');
+
+			return;
+		}
+
+		if ($rowRegistrant->published == 1)
+		{
+			echo JText::_('EB_PAYMENT_WAS_COMPLETED');
+
+			return;
+		}
+
+		$event = EventbookingHelperDatabase::getEvent($rowRegistrant->event_id);
+
+		// Validate and make sure there is still space available to join
+		if ($event->event_capacity > 0 && ($event->event_capacity - $event->total_registrants < $rowRegistrant->number_registrants))
+		{
+			echo JText::_('EB_EVENT_IS_FULL_COULD_NOT_JOIN');;
+
+			return;
+		}
+
+		$this->setBaseFormData($rowRegistrant, $event);
+
+
+		if (count($this->methods) == 0)
+		{
+			echo JText::_('EB_ENABLE_PAYMENT_METHODS');
+
+			return;
+		}
+
+		if (is_callable('EventbookingHelperOverrideRegistration::calculateRegistrationFees'))
+		{
+			$fees = EventbookingHelperOverrideRegistration::calculateRegistrationFees($rowRegistrant, $this->paymentMethod);
+		}
+		else
+		{
+			$fees = EventbookingHelperRegistration::calculateRegistrationFees($rowRegistrant, $this->paymentMethod);
+		}
+
+		// Assign these parameters
+		$this->fees          = $fees;
+		$this->onClickHandle = 'calculateRegistrationFee();';
+
+		parent::display();
+	}
+
+	/**
+	 * Method to calculate and set base form data
+	 *
+	 * @param EventbookingTableRegistrant $rowRegistrant
+	 * @param EventbookingTableEvent      $event
+	 */
+	protected function setBaseFormData($rowRegistrant, $event)
+	{
+		$config    = EventbookingHelper::getConfig();
+		$user      = JFactory::getUser();
+		$userId    = $user->get('id');
+		$rowFields = EventbookingHelperRegistration::getDepositPaymentFormFields();
+
+		$captchaInvalid = $this->input->getInt('captcha_invalid', 0);
+
+		if ($captchaInvalid)
+		{
+			$data = $this->input->post->getData();
+		}
+		else
+		{
+			$data = EventbookingHelperRegistration::getRegistrantData($rowRegistrant, $rowFields);
 
 			// IN case there is no data, get it from URL (get for example)
 			if (empty($data))
 			{
-				$data = $input->getData();
+				$data = $this->input->getData();
 			}
 		}
 
@@ -86,9 +205,11 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 		{
 			//Load the name from Joomla default name
 			$name = $user->name;
+
 			if ($name)
 			{
 				$pos = strpos($name, ' ');
+
 				if ($pos !== false)
 				{
 					$data['first_name'] = substr($name, 0, $pos);
@@ -101,10 +222,12 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 				}
 			}
 		}
+
 		if ($userId && !isset($data['email']))
 		{
 			$data['email'] = $user->email;
 		}
+
 		if (!isset($data['country']) || !$data['country'])
 		{
 			$data['country'] = $config->default_country;
@@ -112,6 +235,7 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 
 		//Get data
 		$form = new RADForm($rowFields);
+
 		if ($captchaInvalid)
 		{
 			$useDefault = false;
@@ -120,12 +244,13 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 		{
 			$useDefault = true;
 		}
+
 		$form->bind($data, $useDefault);
 
-		$paymentMethod = $input->post->getString('payment_method', os_payments::getDefautPaymentMethod(trim($event->payment_methods)));
+		$paymentMethod = $this->input->post->getString('payment_method', os_payments::getDefautPaymentMethod(trim($event->payment_methods)));
 
-		$expMonth           = $input->post->getInt('exp_month', date('m'));
-		$expYear            = $input->post->getInt('exp_year', date('Y'));
+		$expMonth           = $this->input->post->getInt('exp_month', date('m'));
+		$expYear            = $this->input->post->getInt('exp_year', date('Y'));
 		$lists['exp_month'] = JHtml::_('select.integerlist', 1, 12, 1, 'exp_month', ' class="input-small" ', $expMonth, '%02d');
 		$currentYear        = date('Y');
 		$lists['exp_year']  = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
@@ -139,21 +264,39 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 			return;
 		}
 
-		$this->loadCaptcha();
+		// Check to see if there is payment processing fee or not
+		$showPaymentFee = false;
+
+		foreach ($methods as $method)
+		{
+			if ($method->paymentFee)
+			{
+				$showPaymentFee = true;
+				break;
+			}
+		}
+
+		if (empty($paymentMethod) && count($methods))
+		{
+			$paymentMethod = $methods[0]->getName();
+		}
 
 		// Assign these parameters
-		$this->paymentMethod = $paymentMethod;
-		$this->config        = $config;
-		$this->event         = $event;
-		$this->methods       = $methods;
-		$this->lists         = $lists;
-		$this->message       = EventbookingHelper::getMessages();
-		$this->fieldSuffix   = EventbookingHelper::getFieldSuffix();
-		$this->message       = EventbookingHelper::getMessages();
-		$this->form          = $form;
-		$this->rowRegistrant = $rowRegistrant;
+		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
+		$this->paymentMethod   = $paymentMethod;
+		$this->config          = $config;
+		$this->event           = $event;
+		$this->methods         = $methods;
+		$this->lists           = $lists;
+		$this->message         = EventbookingHelper::getMessages();
+		$this->fieldSuffix     = EventbookingHelper::getFieldSuffix();
+		$this->message         = EventbookingHelper::getMessages();
+		$this->form            = $form;
+		$this->rowRegistrant   = $rowRegistrant;
+		$this->showPaymentFee  = $showPaymentFee;
+		$this->currencySymol   = $event->currency_symbol ?: $config->currency_symbol;
 
-		parent::display();
+		$this->loadCaptcha();
 	}
 
 	/**
@@ -191,7 +334,7 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 			return;
 		}
 
-		$replaces = EventbookingHelper::buildDepositPaymentTags($row, $config);
+		$replaces = EventbookingHelperRegistration::buildDepositPaymentTags($row, $config);
 
 		foreach ($replaces as $key => $value)
 		{
@@ -202,48 +345,5 @@ class EventbookingViewPaymentHtml extends RADViewHtml
 		$this->message = $thankMessage;
 
 		parent::display();
-	}
-
-	/**
-	 * Load captcha for registration form
-	 *
-	 * @param bool $initOnly
-	 *
-	 * @throws Exception
-	 */
-	protected function loadCaptcha($initOnly = false)
-	{
-		$config      = EventbookingHelper::getConfig();
-		$user        = JFactory::getUser();
-		$showCaptcha = 0;
-
-		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
-		{
-			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			if (!$captchaPlugin)
-			{
-				// Hardcode to recaptcha, reduce support request
-				$captchaPlugin = 'recaptcha';
-			}
-			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
-			if ($plugin)
-			{
-				$showCaptcha = 1;
-				if ($initOnly)
-				{
-					JCaptcha::getInstance($captchaPlugin)->initialise('dynamic_recaptcha_1');
-				}
-				else
-				{
-					$this->captcha = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
-				}
-			}
-			else
-			{
-				JFactory::getApplication()->enqueueMessage(JText::_('EB_CAPTCHA_NOT_ACTIVATED_IN_YOUR_SITE'), 'error');
-			}
-		}
-
-		$this->showCaptcha = $showCaptcha;
 	}
 }

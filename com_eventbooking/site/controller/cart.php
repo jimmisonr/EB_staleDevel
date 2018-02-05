@@ -3,14 +3,16 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 class EventbookingControllerCart extends EventbookingController
 {
+	use EventbookingControllerCaptcha;
+
 	/**
 	 * Add the selected events to shopping cart
 	 *
@@ -137,7 +139,7 @@ class EventbookingControllerCart extends EventbookingController
 	{
 		$errors = array();
 
-		if (!$this->validateCaptcha())
+		if (!$this->validateCaptcha($this->input))
 		{
 			$errors[] = JText::_('EB_INVALID_CAPTCHA_ENTERED');
 		}
@@ -211,17 +213,21 @@ class EventbookingControllerCart extends EventbookingController
 		$data['coupon_code'] = $input->getString('coupon_code', '');
 		$cart                = new EventbookingHelperCart();
 		$response            = array();
-		$rowFields           = EventbookingHelper::getFormFields(0, 4);
+		$rowFields           = EventbookingHelperRegistration::getFormFields(0, 4);
 		$form                = new RADForm($rowFields);
 		$form->bind($data);
 
-		if (is_callable('EventbookingHelperOverrideHelper::calculateCartRegistrationFee'))
+		if (is_callable('EventbookingHelperOverrideRegistration::calculateCartRegistrationFee'))
+		{
+			$fees = EventbookingHelperOverrideRegistration::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+		}
+		elseif (is_callable('EventbookingHelperOverrideHelper::calculateCartRegistrationFee'))
 		{
 			$fees = EventbookingHelperOverrideHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
 		}
 		else
 		{
-			$fees = EventbookingHelper::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
+			$fees = EventbookingHelperRegistration::calculateCartRegistrationFee($cart, $form, $data, $config, $paymentMethod);
 		}
 
 		$response['total_amount']           = EventbookingHelper::formatAmount($fees['total_amount'], $config);
@@ -231,6 +237,7 @@ class EventbookingControllerCart extends EventbookingController
 		$response['amount']                 = EventbookingHelper::formatAmount($fees['amount'], $config);
 		$response['deposit_amount']         = EventbookingHelper::formatAmount($fees['deposit_amount'], $config);
 		$response['coupon_valid']           = $fees['coupon_valid'];
+		$response['payment_amount']         = round($fees['amount'], 2);
 
 		echo json_encode($response);
 
@@ -248,7 +255,7 @@ class EventbookingControllerCart extends EventbookingController
 	{
 		$errors = array();
 
-		$rowFields = EventbookingHelper::getFormFields(0, 4);
+		$rowFields = EventbookingHelperRegistration::getFormFields(0, 4);
 
 		foreach ($rowFields as $rowField)
 		{
@@ -327,39 +334,6 @@ class EventbookingControllerCart extends EventbookingController
 			{
 				$result['success'] = false;
 				$result['message'] = JText::_('EB_EMAIL_USED_BY_DIFFERENT_USER');
-			}
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Validate captcha on registration form
-	 *
-	 * @return bool|mixed
-	 */
-	private function validateCaptcha()
-	{
-		$result = true;
-
-		$user   = JFactory::getUser();
-		$config = EventbookingHelper::getConfig();
-
-		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
-		{
-			$captchaPlugin = $this->app->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-
-			if (!$captchaPlugin)
-			{
-				// Hardcode to recaptcha, reduce support request
-				$captchaPlugin = 'recaptcha';
-			}
-
-			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
-
-			if ($plugin)
-			{
-				$result = JCaptcha::getInstance($captchaPlugin)->checkAnswer($this->input->post->get('recaptcha_response_field', '', 'string'));
 			}
 		}
 

@@ -3,10 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 class EventbookingViewCancelHtml extends RADViewHtml
@@ -22,12 +22,22 @@ class EventbookingViewCancelHtml extends RADViewHtml
 		$message     = EventbookingHelper::getMessages();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
-		$query->select('b.title' . $fieldSuffix . ' AS event_title')
+		$query->select('a.published')
+			->select($db->quoteName('b.title' . $fieldSuffix, 'event_title'))
 			->from('#__eb_registrants AS a')
 			->innerJoin('#__eb_events AS b ON a.event_id = b.id')
-			->where('a.id=' . $id);
+			->where('a.id = ' . $id);
 		$db->setQuery($query);
-		$eventTitle = $db->loadResult();
+		$event = $db->loadObject();
+
+		if ($event->published == 1)
+		{
+			// Redirect to registration complete page, workaround for PayPal bug
+			JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_eventbooking&view=complete&Itemid=' . $this->Itemid, false));
+		}
+
+
+		$eventTitle = $event->event_title;
 
 		if (strlen(trim(strip_tags($message->{'cancel_message' . $fieldSuffix}))))
 		{

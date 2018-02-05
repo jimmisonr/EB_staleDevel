@@ -3,28 +3,16 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
-// no direct access
 defined('_JEXEC') or die;
-
-EventbookingHelperJquery::colorbox('a.eb-modal');
 
 $item = $this->item ;
 $url = JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, 0, $this->Itemid), false);
-$canRegister = EventbookingHelper::acceptRegistration($item) ;
+$canRegister = EventbookingHelperRegistration::acceptRegistration($item) ;
 $socialUrl = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')).JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, 0, $this->Itemid));
-
-if ($this->config->use_https)
-{
-	$ssl = 1 ;
-}
-else
-{
-	$ssl = 0 ;
-}
 
 /* @var EventbookingHelperBootstrap $bootstrapHelper*/
 $bootstrapHelper   = $this->bootstrapHelper;
@@ -33,6 +21,7 @@ $iconOkClass       = $bootstrapHelper->getClassMapping('icon-ok');
 $iconRemoveClass   = $bootstrapHelper->getClassMapping('icon-remove');
 $iconDownloadClass = $bootstrapHelper->getClassMapping('icon-download');
 $btnClass          = $bootstrapHelper->getClassMapping('btn');
+$iconPrint         = $bootstrapHelper->getClassMapping('icon-print');
 $return = base64_encode(JUri::getInstance()->toString());
 
 if ($item->cut_off_date != JFactory::getDbo()->getNullDate())
@@ -82,7 +71,7 @@ if ($this->showTaskBar)
 		'waitingList'       => $waitingList,
 		'return'            => $return,
 		'showInviteFriend'  => true,
-		'ssl'               => $ssl,
+		'ssl'               => (int) $this->config->use_https,
 		'Itemid'            => $this->Itemid,
 		'btnClass'          => $btnClass,
 		'iconOkClass'       => $iconOkClass,
@@ -101,13 +90,13 @@ if ($this->showTaskBar)
 			<?php
 			if ($this->config->get('show_print_button', '1') === '1' && !$this->print)
 			{
-				$uri = JUri::getInstance();
+				$uri = clone JUri::getInstance();
 				$uri->setVar('tmpl', 'component');
 				$uri->setVar('print', '1');
 			?>
 				<div id="pop-print" class="btn hidden-print">
 					<a href="<?php echo $uri->toString();?> " rel="nofollow" target="_blank">
-						<span class="icon-print"></span>
+                        <span class="<?php echo $iconPrint; ?>"></span>
 					</a>
 				</div>
 			<?php
@@ -120,7 +109,7 @@ if ($this->showTaskBar)
 			// Facebook, twitter, Gplus share buttons
 			if ($this->config->show_fb_like_button)
 			{
-				echo $this->loadTemplate('share');
+				echo $this->loadTemplate('share', ['socialUrl' => $socialUrl]);
 			}
 
 			if ($this->showTaskBar && in_array($this->config->get('register_buttons_position', 0), array(1,2)))
@@ -137,16 +126,30 @@ if ($this->showTaskBar)
 
 		<div class="eb-description-details clearfix" itemprop="description">
 			<?php
+				$baseUri = JUri::base(true);
+
 				if ($this->config->get('show_image_in_event_detail', 1) && $this->config->display_large_image && $item->image && file_exists(JPATH_ROOT . '/' . $item->image))
 				{
 				?>
-					<img src="<?php echo JUri::base(true) . '/' . $item->image; ?>" class="eb-event-large-image img-polaroid"/>
+					<img src="<?php echo $baseUri. '/' . $item->image; ?>" class="eb-event-large-image img-polaroid"/>
 				<?php
 				}
 				elseif ($this->config->get('show_image_in_event_detail', 1) && $item->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $item->thumb))
 				{
+					if ($item->image && file_exists(JPATH_ROOT . '/' . $item->image))
+					{
+						$largeImageUri = $baseUri . '/' . $item->image;
+					}
+					elseif (file_exists(JPATH_ROOT . '/media/com_eventbooking/images/' . $item->thumb))
+					{
+						$largeImageUri = $baseUri . '/media/com_eventbooking/images/' . $item->thumb;
+					}
+					else
+					{
+						$largeImageUri = $baseUri . '/media/com_eventbooking/images/thumbs/' . $item->thumb;
+					}
 				?>
-					<a href="<?php echo JUri::base(true).'/media/com_eventbooking/images/'.$item->thumb; ?>" class="eb-modal"><img src="<?php echo JUri::base(true).'/media/com_eventbooking/images/thumbs/'.$item->thumb; ?>" class="eb-thumb-left"/></a>
+					<a href="<?php echo $largeImageUri; ?>" class="eb-modal"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $item->thumb; ?>" class="eb-thumb-left" alt="<?php echo $item->title; ?>"/></a>
 				<?php
 				}
 
@@ -158,7 +161,7 @@ if ($this->showTaskBar)
 			<?php
 			if (!empty($this->items))
 			{
-				echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/events_children.php', array('items' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate, 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'categoryId' => $this->item->category_id, 'bootstrapHelper' => $this->bootstrapHelper));
+				echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/events_children.php', array('items' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate, 'ssl' => (int) $this->config->use_https, 'viewLevels' => $this->viewLevels, 'categoryId' => $this->item->category_id, 'bootstrapHelper' => $this->bootstrapHelper));
 			}
 			else
 			{
@@ -199,7 +202,7 @@ if ($this->showTaskBar)
 							}
 							else
 							{
-								$loginLink = 'index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString());
+								$loginLink = JRoute::_('index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString()));
 								$msg       = str_replace('[LOGIN_LINK]', $loginLink, JText::_('EB_LOGIN_TO_REGISTER'));
 							}
 						}
@@ -288,11 +291,9 @@ if ($this->showTaskBar)
 	</div>
 </div>
 
-<form name="adminForm" id="adminForm" action="index.php" method="post">
-	<input type="hidden" name="option" value="com_eventbooking" />
+<form name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&Itemid=' . $this->Itemid); ?>" method="post">
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="id" value="" />
-	<input type="hidden" name="Itemid" value="<?php echo $this->Itemid; ?>" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 </form>
 

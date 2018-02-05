@@ -3,32 +3,12 @@
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright    	Copyright (C) 2010 - 2018 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined( '_JEXEC' ) or die ;
 
-$width = (int) $this->config->map_width ;
-if (!$width)
-{
-	$width = 500 ;
-}
-$height = (int) $this->config->map_height ;
-if (!$height)
-{
-	$height = 450 ;
-}
-$param = null ;
-if ($this->config->use_https)
-{
-	$ssl = 1;
-}
-else
-{
-	$ssl = 0;
-}
-EventbookingHelperJquery::colorbox('eb-colorbox-map', $width.'px', $height.'px', 'true', 'false');
 $getDirectionLink = 'http://maps.google.com/maps?f=d&daddr='.$this->location->lat.','.$this->location->long.'('.addslashes($this->location->address.', '.$this->location->city.', '.$this->location->state.', '.$this->location->zip.', '.$this->location->country).')' ;
 EventbookingHelperJquery::colorbox('eb-modal');
 ?>
@@ -37,7 +17,7 @@ EventbookingHelperJquery::colorbox('eb-modal');
 	<?php
 	if (count($this->items))
 	{
-		echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/events_table.php', array('items' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate, 'ssl' => $ssl, 'viewLevels' => $this->viewLevels, 'categoryId' => 0, 'bootstrapHelper' => $this->bootstrapHelper));
+		echo EventbookingHelperHtml::loadCommonLayout('common/tmpl/events_table.php', array('items' => $this->items, 'config' => $this->config, 'Itemid' => $this->Itemid, 'nullDate' => $this->nullDate, 'ssl' => (int) $this->config->use_https, 'viewLevels' => $this->viewLevels, 'categoryId' => 0, 'bootstrapHelper' => $this->bootstrapHelper));
 	}
 	else 
 	{
@@ -45,6 +25,7 @@ EventbookingHelperJquery::colorbox('eb-modal');
 		<p class="text-info"><?php echo JText::_('EB_NO_EVENTS_FOUND') ?></p>
 	<?php	
 	}
+
 	if ($this->pagination->total > $this->pagination->limit)
 	{
 	?>

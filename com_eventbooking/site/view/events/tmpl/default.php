@@ -3,13 +3,13 @@
  * @package        Joomla
  * @subpackage     Event Booking
  * @author         Tuan Pham Ngoc
- * @copyright      Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright      Copyright (C) 2010 - 2018 Ossolution Team
  * @license        GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
+
 JHtml::_('formbehavior.chosen', 'select');
-$return = base64_encode(JUri::getInstance()->toString());
 ?>
 <h1 class="eb-page-heading"><?php echo JText::_('EB_USER_EVENTS'); ?></h1>
 <form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=events&Itemid='.$this->Itemid); ; ?>">
@@ -21,7 +21,10 @@ $return = base64_encode(JUri::getInstance()->toString());
 				<button onclick="this.form.submit();" class="btn"><?php echo JText::_( 'EB_GO' ); ?></button>
 			</td >
 			<td style="float: right;">
-				<?php echo $this->lists['filter_category_id'] ; ?>
+				<?php
+                    echo $this->lists['filter_category_id'];
+                    echo $this->lists['filter_events'];
+                ?>
 			</td>
 		</tr>
 	</table>
@@ -55,7 +58,7 @@ $return = base64_encode(JUri::getInstance()->toString());
 			<tfoot>
 				<tr>
 					<td colspan="6">
-						<?php echo $this->pagination->getPagesLinks(); ?>
+						<div class="pagination"><?php echo $this->pagination->getPagesLinks(); ?></div>
 					</td>
 				</tr>
 			</tfoot>
@@ -73,22 +76,27 @@ $return = base64_encode(JUri::getInstance()->toString());
 								<?php echo $row->title ; ?>
 							</a>
 							<span class="pull-right">
-								<a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id='.$row->id.'&Itemid='.$this->Itemid.'&return='.$return); ?>"><i class="icon-pencil"></i><?php echo JText::_('EB_EDIT'); ?></a>
+								<a class="btn" href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id=' . $row->id . '&Itemid=' . $this->Itemid . '&return=' . $this->return); ?>"><i class="icon-pencil"></i><?php echo JText::_('EB_EDIT'); ?></a>
 								<?php
-								if ($row->published == 1)
-								{
-									$link = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id='.$row->id.'&Itemid='.$this->Itemid.'&return='.$return);
-									$text = JText::_('EB_UNPUBLISH');
-									$class = 'icon-unpublish';
-								}
-								else
-								{
-									$link = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id='.$row->id.'&Itemid='.$this->Itemid.'&return='.$return);
-									$text = JText::_('EB_PUBLISH');
-									$class = 'icon-publish';
-								}
+                                if (EventbookingHelperAcl::canChangeEventStatus($row->id))
+                                {
+                                    if ($row->published == 1)
+                                    {
+                                        $link = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id=' . $row->id . '&Itemid=' . $this->Itemid . '&return=' . $this->return, false);
+                                        $text = JText::_('EB_UNPUBLISH');
+                                        $class = 'icon-unpublish';
+                                    }
+                                    else
+                                    {
+                                        $link = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id=' . $row->id . '&Itemid=' . $this->Itemid . '&return=' . $this->return, false);
+                                        $text = JText::_('EB_PUBLISH');
+                                        $class = 'icon-publish';
+                                    }
 								?>
-								<a class="btn" href="<?php echo $link ; ?>"><i class="<?php echo $class;?>"></i><?php echo $text ; ?></a>
+                                    <a class="btn" href="<?php echo $link ; ?>"><i class="<?php echo $class;?>"></i><?php echo $text ; ?></a>
+                                <?php
+                                }
+                                ?>
 							</span>
 						</td>
 						<td>

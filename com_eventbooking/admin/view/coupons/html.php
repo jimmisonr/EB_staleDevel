@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -15,25 +15,10 @@ class EventbookingViewCouponsHtml extends RADViewList
 	{
 		parent::prepareView();
 
-		$config              = EventbookingHelper::getConfig();
-		$rows      = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
-		$options   = array();
-		$options[] = JHtml::_('select.option', 0, JText::_('EB_ALL_EVENTS'), 'id', 'title');
-		if ($config->show_event_date)
-		{
-			for ($i = 0, $n = count($rows); $i < $n; $i++)
-			{
-				$row       = $rows[$i];
-				$options[] = JHtml::_('select.option', $row->id,
-					$row->title . ' (' . JHtml::_('date', $row->event_date, $config->date_format) . ')' . '', 'id', 'title');
-			}
-		}
-		else
-		{
-			$options = array_merge($options, $rows);
-		}
-		$this->lists['filter_event_id'] = JHtml::_('select.genericlist', $options, 'filter_event_id', 'class="inputbox" onchange="submit();" ',
-			'id', 'title', $this->state->filter_event_id);
+		$config = EventbookingHelper::getConfig();
+		$rows   = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
+
+		$this->lists['filter_event_id'] = EventbookingHelperHtml::getEventsDropdown($rows, 'filter_event_id', 'onchange="submit();"', $this->state->filter_event_id);
 
 		$discountTypes       = array(0 => '%', 1 => $config->get('currency_symbol', '$'));
 		$this->discountTypes = $discountTypes;

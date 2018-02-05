@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -89,6 +89,21 @@ $format = 'Y-m-d';
 			<input type="text" name="max_group_number" id="max_group_number" class="input-mini" size="10" value="<?php echo $this->item->max_group_number; ?>"/>
 		</div>
 	</div>
+    <?php
+    if (!$this->config->multiple_booking)
+    {
+    ?>
+        <div class="control-group">
+            <label class="control-label">
+			    <?php echo JText::_('EB_MEMBERS_DISCOUNT_APPLY_FOR'); ?>
+            </label>
+            <div class="controls">
+			    <?php echo $this->lists['members_discount_apply_for']; ?>
+            </div>
+        </div>
+    <?php
+    }
+    ?>
 	<div class="control-group">
 		<label class="control-label">
 			<?php echo JText::_('ENABLE_COUPON'); ?>
@@ -103,6 +118,30 @@ $format = 'Y-m-d';
 		</label>
 		<div class="controls">
 			<?php echo $this->lists['activate_waiting_list']; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_COLLECT_MEMBER_INFORMATION'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['collect_member_information']; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_PREVENT_DUPLICATE'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['prevent_duplicate_registration']; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_SEND_NOTIFICATION_EMAILS'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['send_emails']; ?>
 		</div>
 	</div>
 	<?php
@@ -168,19 +207,20 @@ $format = 'Y-m-d';
 			<input type="text" name="remind_before_x_days" class="input-mini" size="5" value="<?php echo $this->item->remind_before_x_days; ?>"/> days
 		</div>
 	</div>
-	<?php
-	if ($this->config->term_condition_by_event)
-	{
-	?>
-		<div class="control-group">
+	<div class="control-group">
 			<label class="control-label">
-				<?php echo JText::_('EB_TERMS_CONDITIONS'); ?>
-			</label>
-			<div class="controls">
-				<?php echo EventbookingHelper::getArticleInput($this->item->article_id); ?>
-			</div>
+			<?php echo JText::_('EB_ENABLE_TERMS_CONDITIONS'); ?>
+		</label>
+		<div class="controls">
+			<?php echo $this->lists['enable_terms_and_conditions']; ?>
 		</div>
-	<?php
-	}
-	?>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo JText::_('EB_TERMS_CONDITIONS'); ?>
+		</label>
+		<div class="controls">
+			<?php echo EventbookingHelper::getArticleInput($this->item->article_id); ?>
+		</div>
+	</div>
 </fieldset>

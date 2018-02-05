@@ -233,7 +233,18 @@ class RADModelAdmin extends RADModel
 
 		// Pre-process the input data
 		$this->beforeStore($row, $input, $isNew);
-		$data = $input->getData();
+		
+		$user = JFactory::getUser();
+		
+		if ($user->authorise('core.admin'))			
+		{
+			$data = $input->getData(RAD_INPUT_ALLOWRAW);
+		}
+		else 
+		{
+			$data = $input->getData();
+		}		
+		
 		$row->bind($data, $ignore);
 		$this->prepareTable($row, $input->get('task'), $input->getInt('source_id'));
 

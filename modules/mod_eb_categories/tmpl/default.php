@@ -3,7 +3,7 @@
  * @package        Joomla
  * @subpackage     Event Booking
  * @author         Tuan Pham Ngoc
- * @copyright      Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright      Copyright (C) 2010 - 2018 Ossolution Team
  * @license        GNU/GPL, see LICENSE.php
  */
 
@@ -17,9 +17,24 @@ if (count($rows))
 		<?php				
 			foreach ($rows  as $row)
 			{
+				if (!$config->show_empty_cat && !$row->total_events)
+				{
+					continue ;
+				}
 			?>
 				<li>
-					<a href="<?php echo JRoute::_(EventbookingHelperRoute::getCategoryRoute($row->id, $itemId)); ?>"><?php echo $row->name; ?></a>
+					<a href="<?php echo JRoute::_(EventbookingHelperRoute::getCategoryRoute($row->id, $itemId)); ?>">
+						<?php
+							echo $row->name;
+
+							if ($config->show_number_events)
+							{
+							?>
+								<span class="number_events">( <?php echo $row->total_events .' '. ($row->total_events > 1 ? JText::_('EB_EVENTS') : JText::_('EB_EVENT')) ?>)</span>
+							<?php
+							}
+						?>
+					</a>
 				</li>
 			<?php	
 			}

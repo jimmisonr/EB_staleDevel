@@ -5,9 +5,9 @@
   <author>Tuan Pham Ngoc</author>
   <authorEmail>tuanpn@joomdonation.com</authorEmail>
   <authorUrl>http://www.joomdonation.com</authorUrl>
-  <copyright>Copyright (C) 2010 - 2017 Ossolution Team</copyright>
+  <copyright>Copyright (C) 2010 - 2018 Ossolution Team</copyright>
   <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
-  <version>2.14.2</version>  
+  <version>3.2.1</version>  
   <description>Event Booking is a simple, secure, extendable, intuititive event registration extension for Joomla 2.5 and Joomla 3.x</description> 
   <scriptfile>install.eventbooking.php</scriptfile>
   <install>
@@ -24,6 +24,7 @@
 	<folder>images</folder>	
 	<folder>flags</folder>
 	<folder>invoices</folder>
+	<folder>fullcalendar</folder>
 	<folder>certificates</folder>
     <folder>icsfiles</folder>
 	<folder>assets</folder>
@@ -73,7 +74,7 @@
 		<filename>eventbooking.php</filename>		
 		<filename>config.xml</filename>
 		<filename>access.xml</filename>
-		<filename>config.json</filename>
+		<filename>config.php</filename>
 		<folder>controller</folder>		
 		<folder>assets</folder>		
 		<folder>model</folder>

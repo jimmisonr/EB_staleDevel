@@ -38,7 +38,7 @@ class RADFormFieldMessage extends RADFormField
 	 *
 	 * @see RADFormField::getControlGroup()
 	 */
-	public function getControlGroup($bootstrapHelper = null)
+	public function getControlGroup($bootstrapHelper = null, $controlId = null)
 	{
 		return $this->getInput($bootstrapHelper);
 	}

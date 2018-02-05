@@ -3,7 +3,7 @@
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright    	Copyright (C) 2010 - 2018 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -162,17 +162,21 @@ if (count($this->items))
 			}
 			if ($this->config->show_price_in_table_layout)
 			{
-				if ($this->config->show_discounted_price)
+				if ($item->price_text)
 				{
-					$price = $item->discounted_price ;
+					$price = $item->price_text;
+				}
+                elseif ($this->config->show_discounted_price)
+				{
+					$price = EventbookingHelper::formatCurrency($item->discounted_price, $this->config, $item->currency_symbol);
 				}
 				else
 				{
-					$price = $item->individual_price ;
+					$price = EventbookingHelper::formatCurrency($item->individual_price, $this->config, $item->currency_symbol);
 				}
 				?>
 				<td class="hidden-phone">
-					<?php echo EventbookingHelper::formatCurrency($price, $config, $item->currency_symbol); ?>
+					<?php echo $price; ?>
 				</td>
 			<?php
 			}

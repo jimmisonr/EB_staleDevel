@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -171,7 +171,7 @@ if (EventbookingHelperAcl::checkEditEvent($item->id))
 ?>
 	<li>
 		<a class="<?php echo $btnClass; ?>"
-		   href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id=' . $item->id . '&Itemid=' . $Itemid . '&return=' . $return); ?>">
+		   href="<?php echo JRoute::_('index.php?option=com_eventbooking&view=event&layout=form&id=' . $item->id . '&Itemid=' . $Itemid . '&return=' . $return, false); ?>">
 			<i class="<?php echo $iconPencilClass; ?>"></i>
 			<?php echo JText::_('EB_EDIT'); ?>
 		</a>
@@ -183,13 +183,13 @@ if (EventbookingHelperAcl::canChangeEventStatus($item->id))
 {
 	if ($item->published == 1)
 	{
-		$link  = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id=' . $item->id . '&Itemid=' . $Itemid . '&return=' . $return);
+		$link  = JRoute::_('index.php?option=com_eventbooking&task=event.unpublish&id=' . $item->id . '&Itemid=' . $Itemid . '&return=' . $return, false);
 		$text  = JText::_('EB_UNPUBLISH');
 		$class = $iconRemoveClass;
 	}
 	else
 	{
-		$link  = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id=' . $item->id . '&Itemid=' . $Itemid . '&return=' . $return);
+		$link  = JRoute::_('index.php?option=com_eventbooking&task=event.publish&id=' . $item->id . '&Itemid=' . $Itemid . '&return=' . $return, false);
 		$text  = JText::_('EB_PUBLISH');
 		$class = $iconOkClass;
 	}

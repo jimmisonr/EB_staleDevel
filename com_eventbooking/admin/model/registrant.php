@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -49,6 +49,7 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 		$emailSubject = $input->getString('subject');
 		$emailMessage = $input->get('message', '', 'raw');
 
+
 		if (empty($cid))
 		{
 			throw new Exception('Please select registrants to send mass mail');
@@ -70,6 +71,35 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 		$siteUrl = EventbookingHelper::getSiteUrl();
 		$db      = JFactory::getDbo();
 		$query   = $db->getQuery(true);
+
+		// Upload file
+		$attachment = $input->files->get('attachment', null, 'raw');
+
+		if ($attachment['name'])
+		{
+			$allowedExtensions = $config->attachment_file_types;
+
+			if (!$allowedExtensions)
+			{
+				$allowedExtensions = 'doc|docx|ppt|pptx|pdf|zip|rar|bmp|gif|jpg|jepg|png|swf|zipx';
+			}
+
+			$allowedExtensions = explode('|', $allowedExtensions);
+			$allowedExtensions = array_map('trim', $allowedExtensions);
+			$allowedExtensions = array_map('strtolower', $allowedExtensions);
+			$fileName          = $attachment['name'];
+			$fileExt           = JFile::getExt($fileName);
+
+			if (in_array(strtolower($fileExt), $allowedExtensions))
+			{
+				$fileName = JFile::makeSafe($fileName);
+				$mailer->addAttachment($attachment['tmp_name'], $fileName);
+			}
+			else
+			{
+				throw new Exception(JText::sprintf('Attachment file type %s is not allowed', $fileExt));
+			}
+		}
 
 		if ($config->from_name)
 		{
@@ -148,31 +178,26 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 					// Build this tag
 					if ($config->multiple_booking)
 					{
-						$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+						$rowFields = EventbookingHelperRegistration::getFormFields($row->id, 4);
 					}
 					elseif ($row->is_group_billing)
 					{
-						$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+						$rowFields = EventbookingHelperRegistration::getFormFields($row->event_id, 1);
 					}
 					else
 					{
-						$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+						$rowFields = EventbookingHelperRegistration::getFormFields($row->event_id, 0);
 					}
 
 					$form = new RADForm($rowFields);
-					$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+					$data = EventbookingHelperRegistration::getRegistrantData($row, $rowFields);
 					$form->bind($data);
 					$form->buildFieldsDependency();
-					$registrationDetail = EventbookingHelper::getEmailContent($config, $row, true, $form);
+					$registrationDetail = EventbookingHelperRegistration::getEmailContent($config, $row, true, $form);
 					$message            = str_replace("[REGISTRATION_DETAIL]", $registrationDetail, $message);
 				}
 
-				if (strpos($message, '[QRCODE]') !== false)
-				{
-					EventbookingHelper::generateQrcode($row->id);
-					$imgTag  = '<img src="' . $siteUrl . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
-					$message = str_ireplace("[QRCODE]", $imgTag, $message);
-				}
+				$message = EventbookingHelperRegistration::processQRCODE($row, $message);
 
 				if (JMailHelper::isEmailAddress($email))
 				{
@@ -196,6 +221,7 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 		$registrants = EventbookingHelperData::getDataFromFile($file);
 
 		$imported = 0;
+		$todayDate = JFactory::getDate()->toSql();
 
 		if (count($registrants))
 		{
@@ -216,6 +242,11 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 				/* @var EventbookingTableRegistrant $row */
 				$row = $this->getTable();
 
+				if (!empty($registrant['id']))
+				{
+					$row->load($registrant['id']);
+				}
+
 				if ($registrant['register_date'])
 				{
 					try
@@ -225,12 +256,12 @@ class EventbookingModelRegistrant extends EventbookingModelCommonRegistrant
 					}
 					catch (Exception $e)
 					{
-
+						$registrant['register_date'] = $todayDate;
 					}
 				}
 				else
 				{
-					$registrant ['register_date'] = '';
+					$registrant ['register_date'] = $todayDate;
 				}
 
 				if ($registrant['payment_method'] && isset($plugins[$registrant['payment_method']]))

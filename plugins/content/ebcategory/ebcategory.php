@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 defined('_JEXEC') or die;
@@ -40,8 +40,9 @@ class plgContentEbCategory extends JPlugin
 	 */
 	public function displayEvents($matches)
 	{
-
+		// Require library + register autoloader
 		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
+
 		EventbookingHelper::loadLanguage();
 		$categoryId = (int) $matches[1];
 		$request    = array('option' => 'com_eventbooking', 'view' => 'category', 'id' => $categoryId, 'hmvc_call' => 1, 'Itemid' => EventbookingHelper::getItemid());
@@ -55,8 +56,8 @@ class plgContentEbCategory extends JPlugin
 		}
 		$request['limitstart'] = $limitStart;
 
-		$input      = new RADInput($request);
-		$config     = EventbookingHelper::getComponentSettings('site');
+		$input  = new RADInput($request);
+		$config = require JPATH_ADMINISTRATOR . '/components/com_eventbooking/config.php';
 		ob_start();
 
 		//Initialize the controller, execute the task

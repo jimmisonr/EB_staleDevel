@@ -108,7 +108,8 @@ class RADModelList extends RADModel
 			->insert('filter_search', 'string')
 			->insert('filter_state', 'string')
 			->insert('filter_access', 'int', 0)
-			->insert('filter_language', 'string');
+			->insert('filter_language', 'string')
+			->insert('filter_full_ordering', 'string');
 
 		if (isset($config['search_fields']))
 		{

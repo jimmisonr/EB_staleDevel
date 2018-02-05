@@ -3,7 +3,7 @@
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright    	Copyright (C) 2010 - 2018 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -14,7 +14,9 @@ class EventbookingControllerMessage extends EventbookingController
 	public function save()
 	{
 		$data = $this->input->getData(RAD_INPUT_ALLOWRAW);
-		$model = $this->getModel();
+		unset($data['option'], $data['view'], $data['task']);
+
+		$model = $this->getModel('Message', array('ignore_request' => true));
 		$model->store($data);
 
 		$task = $this->getTask();

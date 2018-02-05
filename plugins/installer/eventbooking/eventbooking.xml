@@ -4,10 +4,10 @@
     <author>Tuan Pham Ngoc</author>
     <authorEmail>tuanpn@joomdonation.com</authorEmail>
     <authorUrl>http://www.joomdonation.com</authorUrl>
-    <copyright>Copyright (C) 2010 - 2017 Ossolution Team</copyright>
+    <copyright>Copyright (C) 2010 - 2018 Ossolution Team</copyright>
     <license>GNU General Public License version 3, or later</license>
     <creationDate>August 2016</creationDate>
-    <version>2.14.2</version>
+    <version>3.2.1</version>
     <description>Allows the installation of Events Booking updates. This plugin MUST be installed for the Events Booking updates to be installed under your Joomla site. Otherwise you will see the updates but you will not be able to install them.</description>
     <files>
         <filename plugin="eventbooking">eventbooking.php</filename>        

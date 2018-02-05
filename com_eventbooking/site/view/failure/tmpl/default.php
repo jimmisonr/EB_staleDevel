@@ -3,7 +3,7 @@
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright    	Copyright (C) 2010 - 2018 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -24,11 +24,6 @@ defined( '_JEXEC' ) or die ;
 		<td>
 			<p class="info"><?php echo $this->reason; ?></p>
 		</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<input type="button" class="btn btn-primary" value="<?php echo JText::_('EB_BACK'); ?>" onclick="window.history.go(-1);" />
-		</td>
-	</tr>
+	</tr>	
 </table>
 </div>

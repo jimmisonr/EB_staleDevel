@@ -3,10 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 use Joomla\Utilities\ArrayHelper;
@@ -29,6 +29,25 @@ class EventbookingModelCalendar extends RADModel
 		'a.thumb',
 		'a.alias',
 		'a.featured',
+		'a.short_description',
+		'a.individual_price',
+		'a.price_text',
+		'a.discount_type',
+		'a.discount',
+		'a.early_bird_discount_type',
+		'a.early_bird_discount_date',
+		'a.early_bird_discount_amount',
+		'a.discount_groups',
+		'a.discount_amounts',
+		'a.fixed_group_price',
+		'a.late_fee_type',
+		'a.late_fee_date',
+		'a.late_fee_amount',
+		'a.registration_start_date',
+		'a.cut_off_date',
+		'a.currency_symbol',
+		'a.currency_code',
+		'a.registration_type'
 	);
 
 	/**
@@ -43,12 +62,12 @@ class EventbookingModelCalendar extends RADModel
 
 		$this->state->insert('year', 'int', 0)
 			->insert('month', 'int', 0)
-			->insert('default_month', 'int', 0)
-			->insert('default_year', 'int', 0)
 			->insert('date', 'string', '')
 			->insert('day', 'string', '')
 			->insert('id', 'int', 0)
 			->insert('mini_calendar', 'int', 0);
+
+		$this->params = EventbookingHelper::getViewParams(JFactory::getApplication()->getMenu()->getActive(), array('calendar'));
 	}
 
 	/**
@@ -58,20 +77,22 @@ class EventbookingModelCalendar extends RADModel
 	 */
 	public function getData()
 	{
-		$app             = JFactory::getApplication();
+		$config          = EventbookingHelper::getConfig();
 		$db              = $this->getDbo();
 		$query           = $db->getQuery(true);
-		$config          = EventbookingHelper::getConfig();
 		$fieldSuffix     = EventbookingHelper::getFieldSuffix();
 		$date            = JFactory::getDate('now', JFactory::getConfig()->get('offset'));
-		$year            = $this->state->year ? $this->state->year : $this->state->default_year;
-		$month           = $this->state->month ? $this->state->month : $this->state->default_month;
 		$currentDateData = self::getCurrentDateData();
 
-		// Exclude categories
-		$excludeCategoryIds = JFactory::getApplication()->getParams()->get('exclude_category_ids');
-		$excludeCategoryIds = ArrayHelper::toInteger($excludeCategoryIds);
-		$excludeCategoryIds = array_filter($excludeCategoryIds);
+		$params             = EventbookingHelper::getViewParams(JFactory::getApplication()->getMenu()->getActive(), array('calendar'));
+		$categoryIds        = $params->get('category_ids');
+		$excludeCategoryIds = $params->get('exclude_category_ids');
+		$year               = $this->state->get('year') ?: $params->get('default_year');
+		$month              = $this->state->get('month') ?: $params->get('default_month');
+
+
+		$categoryIds        = array_filter(ArrayHelper::toInteger($categoryIds));
+		$excludeCategoryIds = array_filter(ArrayHelper::toInteger($excludeCategoryIds));
 
 		if (!$year)
 		{
@@ -106,13 +127,27 @@ class EventbookingModelCalendar extends RADModel
 
 		if ($fieldSuffix)
 		{
-			EventbookingHelperDatabase::getMultilingualFields($query, array('a.title'), $fieldSuffix);
+			EventbookingHelperDatabase::getMultilingualFields($query, array('a.title', 'a.short_description'), $fieldSuffix);
 		}
 
-		if ($this->state->id)
+		if ($categoryId = $this->state->get('id'))
 		{
-			$catId = $this->state->id;
-			$query->where("a.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id = $catId)");
+			$query->where('a.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id = ' . $categoryId . ')');
+		}
+
+		if ($this->params->get('hide_children_events', 0))
+		{
+			$query->where('tbl.parent_id = 0');
+		}
+
+		if ($categoryIds)
+		{
+			$query->where('a.id IN (SELECT event_id FROM #__eb_event_categories WHERE category_id IN (' . implode(',', $categoryIds) . '))');
+		}
+
+		if ($excludeCategoryIds && !$this->state->mini_calendar)
+		{
+			$query->where('a.id NOT IN (SELECT event_id FROM #__eb_event_categories WHERE category_id IN (' . implode(',', $excludeCategoryIds) . '))');
 		}
 
 		if ($config->show_multiple_days_event_in_calendar && !$this->state->mini_calendar)
@@ -124,7 +159,9 @@ class EventbookingModelCalendar extends RADModel
 			$query->where("`event_date` BETWEEN $startDate AND $endDate");
 		}
 
-		if ($config->hide_past_events)
+		$hidePastEventsParam = $this->params->get('hide_past_events', 2);
+
+		if ($hidePastEventsParam == 1 || ($hidePastEventsParam == 2 && $config->hide_past_events))
 		{
 			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
 
@@ -136,16 +173,6 @@ class EventbookingModelCalendar extends RADModel
 			{
 				$query->where('(DATE(a.event_date) >= ' . $currentDate . ' OR DATE(a.cut_off_date) >= ' . $currentDate . ')');
 			}
-		}
-
-		if (!empty($excludeCategoryIds))
-		{
-			$query->where('a.id NOT IN (SELECT event_id FROM #__eb_event_categories WHERE category_id IN (' . implode(',', $excludeCategoryIds) . '))');
-		}
-
-		if ($app->getLanguageFilter())
-		{
-			$query->where('a.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
 		}
 
 		$db->setQuery($query);
@@ -195,7 +222,8 @@ class EventbookingModelCalendar extends RADModel
 			$rows = $db->loadObjectList();
 		}
 
-		if (empty($rows) && $app->input->getMethod() == 'GET' && !$this->state->mini_calendar)
+		// Uncomment the code below if you want the system auto-run to the next month having events automatically
+		/*if (empty($rows) && $app->input->getMethod() == 'GET' && !$this->state->mini_calendar)
 		{
 			$query->clear()
 				->select('MONTH(event_date) AS next_event_month')
@@ -227,7 +255,7 @@ class EventbookingModelCalendar extends RADModel
 			{
 				$app->enqueueMessage(JText::_('EB_NO_UPCOMING_EVENTS'));
 			}
-		}
+		}*/
 
 		return $rows;
 	}
@@ -271,12 +299,13 @@ class EventbookingModelCalendar extends RADModel
 		$endDate = $db->quote($date->toSql(true));
 		$query->select(static::$fields)
 			->select('a.short_description')
-			->select('b.name AS location_name')
+			->select($db->quoteName('b.name' . $fieldSuffix, 'location_name'))
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')
 			->where('a.published = 1')
 			->where("(a.event_date BETWEEN $startDate AND $endDate)")
 			->where('a.access IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')');
+
 
 		if ($fieldSuffix)
 		{
@@ -305,8 +334,9 @@ class EventbookingModelCalendar extends RADModel
 
 		foreach ($events as $event)
 		{
-			$weekDay              = (date('w', strtotime($event->event_date)) - $startDay + 7) % 7;
-			$eventArr[$weekDay][] = $event;
+			$event->short_description = JHtml::_('content.prepare', $event->short_description);
+			$weekDay                  = (date('w', strtotime($event->event_date)) - $startDay + 7) % 7;
+			$eventArr[$weekDay][]     = $event;
 		}
 
 		return $eventArr;
@@ -341,7 +371,7 @@ class EventbookingModelCalendar extends RADModel
 		$endDate   = $db->quote($day . " 23:59:59");
 		$query->select(static::$fields)
 			->select('a.short_description, a.location_id')
-			->select('b.name AS location_name')
+			->select($db->quoteName('b.name' . $fieldSuffix, 'location_name'))
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_locations AS b ON b.id = a.location_id')
 			->where('a.published = 1')
@@ -368,10 +398,16 @@ class EventbookingModelCalendar extends RADModel
 		}
 
 		$query->order('a.event_date ASC, a.ordering ASC');
-
 		$db->setQuery($query);
+		$rows = $db->loadObjectList();
 
-		return $db->loadObjectList();
+		for ($i = 0, $n = count($rows); $i < $n; $i++)
+		{
+			$row                    = $rows[$i];
+			$row->short_description = JHtml::_('content.prepare', $row->short_description);
+		}
+
+		return $rows;
 	}
 
 	/**

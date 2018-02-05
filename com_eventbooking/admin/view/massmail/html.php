@@ -3,36 +3,34 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 class EventbookingViewMassmailHtml extends RADViewHtml
 {
 	public function display()
 	{
-		$config    = EventbookingHelper::getConfig();
-		$rows      = EventbookingHelperDatabase::getAllEvents();
+		$config = EventbookingHelper::getConfig();
+
 		$options   = array();
-		$options[] = JHtml::_('select.option', 0, JText::_('Select Event'), 'id', 'title');
-		if ($config->show_event_date)
+		$options[] = JHtml::_('select.option', -1, JText::_('EB_DEFAULT_STATUS'));
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_PENDING'));
+		$options[] = JHtml::_('select.option', 1, JText::_('EB_PAID'));
+
+		if ($config->activate_waitinglist_feature)
 		{
-			for ($i = 0, $n = count($rows); $i < $n; $i++)
-			{
-				$row       = $rows[$i];
-				$options[] = JHtml::_('select.option', $row->id, $row->title . ' (' . JHtml::_('date', $row->event_date, $config->date_format, null) . ')' .
-					'', 'id', 'title');
-			}
+			$options[] = JHtml::_('select.option', 3, JText::_('EB_WAITING_LIST'));
 		}
-		else
-		{
-			$options = array_merge($options, $rows);
-		}
-		$lists             = array();
-		$lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id', '', 'id', 'title');
-		$this->lists       = $lists;
+
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_CANCELLED'));
+
+		$lists['published'] = JHtml::_('select.genericlist', $options, 'published', 'class="input-xlarge"', 'value', 'text', $this->input->getInt('published', -1));
+		$lists['event_id']  = EventbookingHelperHtml::getEventsDropdown(EventbookingHelperDatabase::getAllEvents(), 'event_id', 'class="input-xlarge"');
+
+		$this->lists = $lists;
 
 		parent::display();
 	}

@@ -50,7 +50,7 @@ $config = EventbookingHelper::getConfig();
 			<?php echo  JText::_('EB_SENT_AT'); ?>
 		</div>
 		<div class="controls">
-			<?php echo JHtml::_('date', $row->sent_at, $config->date_format.' H:i'); ?>
+			<?php echo JHtml::_('date', $this->item->sent_at, $config->date_format.' H:i'); ?>
 		</div>
 	</div>				
 	<div class="control-group">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="2.5.0" type="module" method="upgrade">
+<extension type="module" version="3.5" client="site" method="upgrade">
 	<name>Events Booking - View</name>
 	<author>Tuan Pham Ngoc</author>
 	<authorEmail>contact@joomdonation.com</authorEmail>
@@ -7,7 +7,7 @@
 	<copyright>Copyright (C) 2012 - 2015 Ossolution Team</copyright>
 	<license>GNU General Public License version 3, or later</license>
 	<creationDate>Aug 2015</creationDate>
-	<version>2.14.2</version>  
+	<version>3.2.1</version>  
 	<description>This module is used to display any view in Events Booking extension.</description>
 	<files>
 		<filename module="mod_eb_view">mod_eb_view.php</filename>		

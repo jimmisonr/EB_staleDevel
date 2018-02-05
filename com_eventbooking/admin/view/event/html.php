@@ -3,9 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
+
 // no direct access
 defined('_JEXEC') or die;
 
@@ -61,15 +62,16 @@ class EventbookingViewEventHtml extends RADViewItem
 
 		if ($item->id)
 		{
-			$query->clear();
-			$query->select('category_id')
+			$query->clear()
+				->select('category_id')
 				->from('#__eb_event_categories')
 				->where('event_id=' . $item->id)
 				->where('main_category=1');
 			$db->setQuery($query);
 			$mainCategoryId = $db->loadResult();
-			$query->clear();
-			$query->select('category_id')
+
+			$query->clear()
+				->select('category_id')
 				->from('#__eb_event_categories')
 				->where('event_id=' . $item->id)
 				->where('main_category=0');
@@ -125,7 +127,13 @@ class EventbookingViewEventHtml extends RADViewItem
 		$this->lists['registration_type'] = JHtml::_('select.genericlist', $options, 'registration_type', ' class="input-xlarge" ', 'value', 'text', $item->registration_type);
 
 		$options   = array();
-		$options[] = JHtml::_('select.option', 0, JText::_('EB_USE_GLOBAL_CONFIGURATION'));
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_EACH_MEMBER'));
+		$options[] = JHtml::_('select.option', 1, JText::_('EB_EACH_REGISTRATION'));
+
+		$this->lists['members_discount_apply_for'] = JHtml::_('select.genericlist', $options, 'members_discount_apply_for', '', 'value', 'text', $item->members_discount_apply_for);
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_USE_GLOBAL'));
 		$options[] = JHtml::_('select.option', 1, JText::_('EB_INDIVIDUAL_ONLY'));
 		$options[] = JHtml::_('select.option', 2, JText::_('EB_GROUP_ONLY'));
 		$options[] = JHtml::_('select.option', 3, JText::_('EB_INDIVIDUAL_GROUP'));
@@ -135,7 +143,7 @@ class EventbookingViewEventHtml extends RADViewItem
 		$options   = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('No'));
 		$options[] = JHtml::_('select.option', 1, JText::_('Yes'));
-		$options[] = JHtml::_('select.option', 2, JText::_('EB_USE_GLOBAL_CONFIGURATION'));
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_USE_GLOBAL'));
 
 		$this->lists['activate_waiting_list'] = JHtml::_('select.genericlist', $options, 'activate_waiting_list', ' class="inputbox" ', 'value', 'text', $item->activate_waiting_list);
 
@@ -225,8 +233,9 @@ class EventbookingViewEventHtml extends RADViewItem
 		$this->lists['payment_methods'] = JHtml::_('select.genericlist', array_merge($options, $db->loadObjectList()), 'payment_methods[]', ' class="inputbox" multiple="multiple" ', 'id', 'title', explode(',', $item->payment_methods));
 
 		$currencies = require_once JPATH_ROOT . '/components/com_eventbooking/helper/currencies.php';
-		$options    = array();
-		$options[]  = JHtml::_('select.option', '', JText::_('EB_SELECT_CURRENCY'));
+		ksort($currencies);
+		$options   = array();
+		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_CURRENCY'));
 
 		foreach ($currencies as $code => $title)
 		{
@@ -239,6 +248,31 @@ class EventbookingViewEventHtml extends RADViewItem
 			' multiple="multiple" size="6" ', false);
 
 		$this->lists['available_attachment'] = EventbookingHelper::attachmentList(explode('|', $item->attachment), $config);
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('JNO'));
+		$options[] = JHtml::_('select.option', 1, JText::_('JYES'));
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_USE_GLOBAL'));
+
+		$this->lists['enable_terms_and_conditions'] = JHtml::_('select.genericlist', $options, 'enable_terms_and_conditions', ' class="inputbox" ', 'value', 'text', $item->enable_terms_and_conditions);
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', '', JText::_('EB_USE_GLOBAL'));
+		$options[] = JHtml::_('select.option', 0, JText::_('JNO'));
+		$options[] = JHtml::_('select.option', 1, JText::_('JYES'));
+
+		$this->lists['prevent_duplicate_registration'] = JHtml::_('select.genericlist', $options, 'prevent_duplicate_registration', '', 'value', 'text', $item->prevent_duplicate_registration);
+		$this->lists['collect_member_information']     = JHtml::_('select.genericlist', $options, 'collect_member_information', '', 'value', 'text', $item->collect_member_information);
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', -1, JText::_('EB_USE_GLOBAL'));
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_ENABLE'));
+		$options[] = JHtml::_('select.option', 1, JText::_('EB_ONLY_TO_ADMIN'));
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_ONLY_TO_REGISTRANT'));
+		$options[] = JHtml::_('select.option', 3, JText::_('EB_DISABLE'));
+
+		$this->lists['send_emails'] = JHtml::_('select.genericlist', $options, 'send_emails', ' class="inputbox"', 'value', 'text',
+			$this->item->send_emails);
 
 		#Plugin support
 		JPluginHelper::importPlugin('eventbooking');

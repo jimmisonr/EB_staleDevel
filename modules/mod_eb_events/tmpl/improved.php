@@ -3,14 +3,14 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
 // no direct access
 defined('_JEXEC') or die;
 
-JHtml::_('script', JUri::root().'media/com_eventbooking/assets/js/noconflict.js', false, false);	
+JHtml::_('script', JUri::root().'media/com_eventbooking/assets/js/eventbookingjq.js', false, false);	
 
 if ($showLocation)
 {

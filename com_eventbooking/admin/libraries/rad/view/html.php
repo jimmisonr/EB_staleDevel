@@ -71,6 +71,13 @@ class RADViewHtml extends RADView
 	protected $deviceType = 'desktop';
 
 	/**
+	 * The menu parameter of the view, for frontend
+	 *
+	 * @var \Joomla\Registry\Registry
+	 */
+	protected $params;
+
+	/**
 	 * Method to instantiate the view.
 	 *
 	 * @param array $config A named configuration array for object construction
@@ -336,5 +343,136 @@ class RADViewHtml extends RADView
 		$this->paths = $paths;
 
 		return $this;
+	}
+
+	/**
+	 * Get page params of the given view
+	 *
+	 * @param array $views
+	 * @param array $query
+	 *
+	 * @return \Joomla\Registry\Registry
+	 */
+	protected function getParams($views = array(), $query = array())
+	{
+		// Default to current view
+		if (empty($views))
+		{
+			$views = array($this->getName());
+		}
+
+		$active = JFactory::getApplication()->getMenu()->getActive();
+
+		if ($active && isset($active->query['view']) && in_array($active->query['view'], $views))
+		{
+			$params = $active->params;
+
+			if ($active->query['view'] != $this->getName() || array_diff($query, $active->query))
+			{
+				$params->set('page_title', '');
+				$params->set('page_heading', '');
+				$params->set('show_page_heading', true);
+			}
+
+			return $params;
+		}
+
+		return new \Joomla\Registry\Registry;
+	}
+
+	/**
+	 * Set document meta data
+	 *
+	 * @return void
+	 */
+	protected function setDocumentMetadata()
+	{
+		// Do not change document meta data on an HMVC call
+		if ($this->input->getInt('hmvc_call'))
+		{
+			return;
+		}
+
+		/* @var JDocumentHtml $document */
+		$document         = JFactory::getDocument();
+		$siteNamePosition = JFactory::getConfig()->get('sitename_pagetitles');
+		$siteName         = JFactory::getConfig()->get('sitename');
+
+		if ($pageTitle = $this->params->get('page_title'))
+		{
+			if ($siteNamePosition == 0)
+			{
+				$document->setTitle($pageTitle);
+			}
+			elseif ($siteNamePosition == 1)
+			{
+				$document->setTitle($siteName . ' - ' . $pageTitle);
+			}
+			else
+			{
+				$document->setTitle($pageTitle . ' - ' . $siteName);
+			}
+		}
+
+		if ($this->params->get('menu-meta_keywords'))
+		{
+			$document->setMetaData('keywords', $this->params->get('menu-meta_keywords'));
+		}
+
+		if ($this->params->get('menu-meta_description'))
+		{
+			$document->setDescription($this->params->get('menu-meta_description'));
+		}
+
+		if ($this->params->get('robots'))
+		{
+			$document->setMetaData('robots', $this->params->get('robots'));
+		}
+	}
+
+	/**
+	 * Add feed links to current view
+	 *
+	 * @return void
+	 */
+	protected function addFeedLinks()
+	{
+		/* @var JDocumentHtml $document */
+		$document = JFactory::getDocument();
+		$link     = '&format=feed&limitstart=';
+		$attribs  = array('type' => 'application/rss+xml', 'title' => 'RSS 2.0');
+		$document->addHeadLink(JRoute::_($link . '&type=rss'), 'alternate', 'rel', $attribs);
+		$attribs = array('type' => 'application/atom+xml', 'title' => 'Atom 1.0');
+		$document->addHeadLink(JRoute::_($link . '&type=atom'), 'alternate', 'rel', $attribs);
+	}
+
+	/**
+	 * Set active menu item used for links generated within the view
+	 *
+	 * @return void
+	 */
+	protected function findAndSetActiveMenuItem()
+	{
+		// Attempt to find the correct menu item for the view if required
+		$active = JFactory::getApplication()->getMenu()->getActive();
+
+		if ($active && isset($active->query['view']))
+		{
+			$view = $active->query['view'];
+		}
+		else
+		{
+			$view = '';
+		}
+
+		if ($view != strtolower($this->getName()))
+		{
+			$menuId = EventbookingHelperRoute::findView('calendar');
+
+			if ($menuId)
+			{
+				$this->Itemid = $menuId;
+			}
+		}
 	}
 }

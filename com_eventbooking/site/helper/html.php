@@ -1,9 +1,10 @@
 <?php
+
 /**
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 abstract class EventbookingHelperHtml
@@ -52,11 +53,14 @@ abstract class EventbookingHelperHtml
 	 *
 	 * @return string
 	 */
-	public static function getCalendarSetupJs($fields)
+	public static function getCalendarSetupJs($fields = array())
 	{
 		if (version_compare(JVERSION, '3.6.9', 'ge'))
 		{
-			return 'JoomlaCalendar.init(".field-calendar");';
+			return 'elements = document.querySelectorAll(".field-calendar");
+                    for (i = 0; i < elements.length; i++) {
+                    JoomlaCalendar.init(elements[i]);
+                    }';
 		}
 		else
 		{
@@ -100,7 +104,8 @@ abstract class EventbookingHelperHtml
 		$query = $db->getQuery(true);
 		$query->select('id, parent AS parent_id, name AS title')
 			->from('#__eb_categories')
-			->where('published=1');
+			->where('published=1')
+			->order('name');
 		$db->setQuery($query);
 		$rows     = $db->loadObjectList();
 		$children = array();
@@ -257,6 +262,39 @@ abstract class EventbookingHelperHtml
 	}
 
 	/**
+	 * Render radio group input
+	 *
+	 * @param $name
+	 * @param $options
+	 * @param $value
+	 *
+	 * @return string
+	 */
+	public static function getRadioGroupInput($name, $options, $value)
+	{
+		$html = array();
+
+		// Start the radio field output.
+		$html[] = '<fieldset id="' . $name . '" class="radio btn-group btn-group-yesno">';
+
+		$count = 0;
+
+		foreach ($options as $optionValue => $optionText)
+		{
+			$checked = ($optionValue == $value) ? ' checked="checked"' : '';
+			$html[]  = '<input type="radio" id="' . $name . $count . '" name="' . $name . '" value="' . $optionValue . '"' . $checked . ' />';
+			$html[]  = '<label for="' . $name . $count . '">' . $optionText . '</label>';
+
+			$count++;
+		}
+
+		// End the radio field output.
+		$html[] = '</fieldset>';
+
+		return implode($html);
+	}
+
+	/**
 	 * Get available fields tags using in the email messages & invoice
 	 *
 	 * @param bool $defaultTags
@@ -366,26 +404,12 @@ abstract class EventbookingHelperHtml
 		{
 			$locationInformation   = array();
 			$locationInformation[] = $rowLocation->name;
+
 			if ($rowLocation->address)
 			{
 				$locationInformation[] = $rowLocation->address;
 			}
-			if ($rowLocation->city)
-			{
-				$locationInformation[] = $rowLocation->city;
-			}
-			if ($rowLocation->state)
-			{
-				$locationInformation[] = $rowLocation->state;
-			}
-			if ($rowLocation->zip)
-			{
-				$locationInformation[] = $rowLocation->zip;
-			}
-			if ($rowLocation->country)
-			{
-				$locationInformation[] = $rowLocation->country;
-			}
+
 			$data['location'] = implode(', ', $locationInformation);
 		}
 		else
@@ -644,6 +668,14 @@ abstract class EventbookingHelperHtml
 		echo $html;
 	}
 
+	/**
+	 * Get media input field type
+	 *
+	 * @param string $value
+	 * @param string $fieldName
+	 *
+	 * @return string
+	 */
 	public static function getMediaInput($value, $fieldName = 'image')
 	{
 		JHtml::_('jquery.framework');
@@ -660,5 +692,37 @@ abstract class EventbookingHelperHtml
 		$field->setup($element, $value);
 
 		return $field->input;
+	}
+
+	/**
+	 * Get events list dropdown
+	 *
+	 * @param array  $rows
+	 * @param string $name
+	 * @param string $attributes
+	 * @param mixed  $selected
+	 *
+	 * @return string
+	 */
+	public static function getEventsDropdown($rows, $name, $attributes = '', $selected = 0)
+	{
+		$config    = EventbookingHelper::getConfig();
+		$options   = [];
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_SELECT_EVENT'), 'id', 'title');
+
+		if ($config->show_event_date)
+		{
+			foreach ($rows as $row)
+			{
+				$eventDate = JHtml::_('date', $row->event_date, $config->date_format, null);
+				$options[] = JHtml::_('select.option', $row->id, $row->title . ' (' . $eventDate . ')', 'id', 'title');
+			}
+		}
+		else
+		{
+			$options = array_merge($options, $rows);
+		}
+
+		return JHtml::_('select.genericlist', $options, $name, $attributes, 'id', 'title', $selected);
 	}
 }

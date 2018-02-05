@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -18,11 +18,6 @@ JHtml::_('behavior.tabstate');
 $translatable = JLanguageMultilang::isEnabled() && count($this->languages);
 $editor       = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 ?>
-<style>
-	.calendar {
-		vertical-align: bottom;
-	}
-</style>
 <form action="index.php?option=com_eventbooking&view=event" method="post" name="adminForm" id="adminForm"
       class="form form-horizontal" enctype="multipart/form-data">
 	<?php echo JHtml::_('bootstrap.startTabSet', 'event', array('active' => 'basic-information-page')); ?>
@@ -43,6 +38,22 @@ $editor       = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 			?>
 			<fieldset class="adminform">
 				<legend class="adminform"><?php echo JText::_('EB_META_DATA'); ?></legend>
+				<div class="control-group">
+					<label class="control-label">
+						<?php echo JText::_('EB_PAGE_TITLE'); ?>
+					</label>
+					<div class="controls">
+						<input class="input-large" type="text" name="page_title" id="page_title" size="" maxlength="250" value="<?php echo $this->item->page_title; ?>"/>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">
+						<?php echo JText::_('EB_PAGE_HEADING'); ?>
+					</label>
+					<div class="controls">
+						<input class="input-large" type="text" name="page_heading" id="page_heading" size="" maxlength="250" value="<?php echo $this->item->page_heading; ?>"/>
+					</div>
+				</div>
 				<div class="control-group">
 					<label class="control-label">
 						<?php echo JText::_('EB_META_KEYWORDS'); ?>
@@ -114,6 +125,10 @@ $editor       = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 	echo $this->loadTemplate('advanced_settings', array('editor' => $editor));
 	echo JHtml::_('bootstrap.endTab');
 
+	echo JHtml::_('bootstrap.addTab', 'event', 'messages-page', JText::_('EB_MESSAGES', true));
+	echo $this->loadTemplate('messages', array('editor' => $editor));
+	echo JHtml::_('bootstrap.endTab');
+
 	if ($translatable)
 	{
 		echo $this->loadTemplate('translation', array('editor' => $editor));
@@ -130,6 +145,14 @@ $editor       = JEditor::getInstance(JFactory::getConfig()->get('editor'));
 			echo $plugin['form'];
 			echo JHtml::_('bootstrap.endTab');
 		}
+	}
+
+	// Add support for custom settings layout
+	if (file_exists(__DIR__ . '/default_custom_settings.php'))
+	{
+		echo JHtml::_('bootstrap.addTab', 'event', 'custom-settings-page', JText::_('EB_EVENT_CUSTOM_SETTINGS', true));
+		echo $this->loadTemplate('custom_settings', array('editor' => $editor));
+		echo JHtml::_('bootstrap.endTab');
 	}
 
 	echo JHtml::_('bootstrap.endTabSet');

@@ -16,6 +16,9 @@ define('RAD_INPUT_ALLOWHTML', 4);
  * @package       RAD
  * @subpackage    Input
  * @since         1.0
+ *
+ * @property-read    RADInput $get
+ * @property-read    RADInput $post
  */
 class RADInput extends JInput
 {

@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -11,17 +11,37 @@
 defined('_JEXEC') or die;
 
 /* @var JDocumentHtml $document */
-$document = JFactory::getDocument();
-$document->addCustomTag('<meta property="og:title" content="' . $this->item->title . '"/>');
+$document      = JFactory::getDocument();
+$rootUri       = JUri::root();
+$largeImageUri = '';
 
-if ($this->item->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $this->item->thumb))
+$document->setMetaData('og:title', $this->item->title, 'property');
+
+if ($this->item->image && file_exists(JPATH_ROOT . '/' . $this->item->image))
 {
-	$document->addCustomTag('<meta property="og:image" content="' . JUri::base() . 'media/com_eventbooking/images/thumbs/' . $this->item->thumb . '"/>');
+	$largeImageUri = $rootUri . $this->item->image;
+}
+elseif ($this->item->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/' . $this->item->thumb))
+{
+	$largeImageUri = $rootUri . 'media/com_eventbooking/images/' . $this->item->thumb;
+}
+elseif ($this->item->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $this->item->thumb))
+{
+	$largeImageUri = $rootUri . 'media/com_eventbooking/images/thumbs/' . $this->item->thumb;
 }
 
-$document->addCustomTag('<meta property="og:url" content="' . JUri::getInstance()->toString() . '"/>');
-$document->addCustomTag('<meta property="og:description" content="' . $this->item->title . '"/>');
-$document->addCustomTag('<meta property="og:site_name" content="' . JFactory::getConfig()->get('sitename') . '"/>');
+if ($largeImageUri)
+{
+	$document->setMetaData('og:image', $largeImageUri, 'property');
+}
+
+$document->setMetaData('og:url', JUri::getInstance()->toString(), 'property');
+
+$description = !empty($this->item->meta_description) ? $this->item->meta_description : $this->item->description;
+$description = JHtml::_('string.truncate', $description, 200, true, false);
+$document->setMetaData('og:description', $description, 'property');
+
+$document->setMetaData('og:site_name', JFactory::getConfig()->get('sitename'), 'property');
 ?>
 <div class="sharing clearfix">
 	<!-- FB -->

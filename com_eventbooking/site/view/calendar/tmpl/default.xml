@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="Calendar">
+	<layout title="Calendar - Monthly Layout">
 		<message>
-			Display events calendar in Event Booking
+			Display events in monthly calendar
 		</message>
 	</layout>
 	<state>
-		<name>Calendar</name>
-		<description>Display events calendar in Event Booking</description>		
-		<fields name="request">			
-			<fieldset name="request">
-				<field name="default_month" type="list" default="0" label="Default Month" description="Choose the month you want to display events from. If you don't choose any month, the current month will be used">
-					<option value="0">Current Month</option>
+		<name>Calendar - Monthly Layout</name>
+		<description>Display events in monthly calendar</description>
+		<fields name="params">
+			<fieldset name="basic" addfieldpath="/administrator/components/com_eventbooking/elements">
+				<field name="category_ids" type="ebcategory" multiple="true" label="Categories" description="Select categories which you want to display events from. If no categories selected, events from all categories will be displayed" />
+				<field name="exclude_category_ids" type="ebcategory" multiple="true" label="Exclude Categories" description="Select categories which you want to exclude events from" />
+				<field name="default_month" type="list" default="" label="Default Month" description="Choose the month you want to display events from. If you don't choose any month, the current month will be used">
+					<option value="">Current Month</option>
 					<option value="1">January</option>
 					<option value="2">February</option>
 					<option value="3">March</option>
@@ -24,13 +26,19 @@
 					<option value="10">October</option>
 					<option value="11">November</option>
 					<option value="12">December</option>
-					</field>
-					<field name="default_year" type="text" label="Default Year" size="5" description="Enter the year you want to display events from. If you leave this empty, the current year will be used"></field>
-			</fieldset>	
-		</fields>
-		<fields name="params">
-			<fieldset name="basic" addfieldpath="/administrator/components/com_eventbooking/elements">
-				<field name="exclude_category_ids" type="ebcategory" multiple="true" label="Exclude Categories" description="Select categories which you want to exclude events from" />
+				</field>
+				<field name="default_year" type="text" label="Default Year" size="5" description="Enter the year you want to display events from. If you leave this empty, the current year will be used"></field>
+				<field name="hide_past_events" type="list" default="2" label="Hide Past Events"
+					   description="Choose to show/hide past events for this menu item">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+					<option value="2">Use Configuration</option>
+				</field>
+				<field name="hide_children_events" type="list" default="0" label="Hide Children Events"
+					   description="Choose to show/hide children events for this menu item">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
 			</fieldset>
 		</fields>
 	</state>

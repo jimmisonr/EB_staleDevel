@@ -3,16 +3,23 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 
 class EventbookingModelList extends RADModelList
 {
+	/**
+	 * Menu parameters
+	 *
+	 * @var \Joomla\Registry\Registry
+	 */
+	protected $params;
+
 	/**
 	 * Fields which will be returned from SQL query
 	 *
@@ -66,6 +73,8 @@ class EventbookingModelList extends RADModelList
 		'tbl.featured',
 		'tbl.has_multiple_ticket_types',
 		'tbl.activate_waiting_list',
+		'tbl.collect_member_information',
+		'tbl.prevent_duplicate_registration',
 	);
 
 	/**
@@ -73,10 +82,23 @@ class EventbookingModelList extends RADModelList
 	 *
 	 * @var array
 	 */
-	public static $translatableFields = array(
+	protected static $translatableFields = array(
 		'tbl.title',
 		'tbl.short_description',
 		'tbl.description',
+		'tbl.price_text',
+		'tbl.registration_handle_url',
+	);
+
+	/**
+	 * The fields which can be used for soring events
+	 *
+	 * @var array
+	 */
+	public static $sortableFields = array(
+		'tbl.event_date',
+		'tbl.ordering',
+		'tbl.title',
 	);
 
 	/**
@@ -92,12 +114,16 @@ class EventbookingModelList extends RADModelList
 
 		$this->state->insert('id', 'int', 0);
 
-		$ebConfig   = EventbookingHelper::getConfig();
-		$listLength = (int) $ebConfig->number_events;
+		$ebConfig     = EventbookingHelper::getConfig();
+		$this->params = EventbookingHelper::getViewParams(JFactory::getApplication()->getMenu()->getActive(), array($this->getName()));
 
-		if ($listLength)
+		if ((int) $this->params->get('display_num'))
 		{
-			$this->state->setDefault('limit', $listLength);
+			$this->setState('limit', (int) $this->params->get('display_num'));
+		}
+		elseif ((int ) $ebConfig->number_events)
+		{
+			$this->state->setDefault('limit', (int) $ebConfig->number_events);
 		}
 
 		if ($ebConfig->order_events == 2)
@@ -117,6 +143,30 @@ class EventbookingModelList extends RADModelList
 		{
 			$this->state->set('filter_order_Dir', 'ASC');
 		}
+	}
+
+	/**
+	 * Method to get the current parent category
+	 *
+	 * @return stdClass|null
+	 * @throws Exception
+	 */
+	public function getCategory()
+	{
+		if ($categoryId = (int) $this->getState('id'))
+		{
+			$category = EventbookingHelperDatabase::getCategory($categoryId);
+
+			if ($category)
+			{
+				// Process content plugin for category description
+				$category->description = JHtml::_('content.prepare', $category->description);
+			}
+
+			return $category;
+		}
+
+		return null;
 	}
 
 	/**
@@ -143,8 +193,9 @@ class EventbookingModelList extends RADModelList
 	 */
 	protected function buildQueryColumns(JDatabaseQuery $query)
 	{
+		$db          = $this->getDbo();
 		$config      = EventbookingHelper::getConfig();
-		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$currentDate = $this->getDbo()->quote(EventbookingHelper::getServerTimeFromGMTTime());
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
 		$fieldsToSelect = static::$fields;
@@ -155,12 +206,13 @@ class EventbookingModelList extends RADModelList
 		}
 
 		$query->select($fieldsToSelect)
-			->select("DATEDIFF(tbl.early_bird_discount_date, '$currentDate') AS date_diff")
-			->select("DATEDIFF('$currentDate', tbl.late_fee_date) AS late_fee_date_diff")
-			->select("DATEDIFF(tbl.event_date, '$currentDate') AS number_event_dates")
-			->select("TIMESTAMPDIFF(MINUTE, tbl.registration_start_date, '$currentDate') AS registration_start_minutes")
-			->select("TIMESTAMPDIFF(MINUTE, tbl.cut_off_date, '$currentDate') AS cut_off_minutes")
-			->select('c.name AS location_name, c.address AS location_address')
+			->select("DATEDIFF(tbl.early_bird_discount_date, $currentDate) AS date_diff")
+			->select("DATEDIFF($currentDate, tbl.late_fee_date) AS late_fee_date_diff")
+			->select("DATEDIFF(tbl.event_date, $currentDate) AS number_event_dates")
+			->select("TIMESTAMPDIFF(MINUTE, tbl.registration_start_date, $currentDate) AS registration_start_minutes")
+			->select("TIMESTAMPDIFF(MINUTE, tbl.cut_off_date, $currentDate) AS cut_off_minutes")
+			->select($db->quoteName('c.name' . $fieldSuffix, 'location_name'))
+			->select('c.address AS location_address')
 			->select('IFNULL(SUM(b.number_registrants), 0) AS total_registrants');
 
 		if ($config->show_event_creator)
@@ -170,7 +222,7 @@ class EventbookingModelList extends RADModelList
 
 		if ($fieldSuffix)
 		{
-			EventbookingHelperDatabase::getMultilingualFields($query, array('tbl.title', 'tbl.short_description', 'tbl.description'), $fieldSuffix);
+			EventbookingHelperDatabase::getMultilingualFields($query, static::$translatableFields, $fieldSuffix);
 		}
 
 		return $this;
@@ -215,15 +267,13 @@ class EventbookingModelList extends RADModelList
 		$state  = $this->getState();
 		$config = EventbookingHelper::getConfig();
 
-		if ($config->show_children_events_under_parent_event)
+		if ($this->params->get('hide_children_events', 0) || $config->show_children_events_under_parent_event)
 		{
 			$query->where('tbl.parent_id = 0');
 		}
 
-		if (!$user->authorise('core.admin', 'com_eventbooking'))
-		{
-			$query->where('tbl.published=1')->where('tbl.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
-		}
+		$query->where('tbl.published = 1')
+			->where('tbl.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
 
 		$categoryId = $this->state->id ? $this->state->id : $this->state->category_id;
 
@@ -266,52 +316,13 @@ class EventbookingModelList extends RADModelList
 			$query->where("(LOWER(tbl.title) LIKE $search OR LOWER(tbl.short_description) LIKE $search OR LOWER(tbl.description) LIKE $search)");
 		}
 
-		$name = strtolower($this->getName());
-
-		$hidePastEventsCategory = false;
-
-		if ($name == 'category')
-		{
-			$hidePastEventsParam = $app->getParams()->get('hide_past_events', 2);
-
-			if ($hidePastEventsParam == 1 || ($hidePastEventsParam == 2 && $config->hide_past_events))
-			{
-				$hidePastEventsCategory = true;
-			}
-		}
-
-		if ($name == 'archive')
-		{
-			$query->where('DATE(tbl.event_date) < CURDATE()');
-		}
-		elseif ($config->hide_past_events || ($name == 'upcomingevents') || $hidePastEventsCategory)
-		{
-			$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
-
-			if ($config->show_children_events_under_parent_event)
-			{
-				$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.cut_off_date) >= ' . $currentDate . ' OR DATE(tbl.max_end_date) >= ' . $currentDate . ')');
-			}
-			else
-			{
-				if ($config->show_until_end_date)
-				{
-					$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.event_end_date) >= ' . $currentDate . ')');
-				}
-				else
-				{
-					$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.cut_off_date) >= ' . $currentDate . ')');
-				}
-			}
-		}
-
 		if ($app->getLanguageFilter())
 		{
 			$query->where('tbl.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ', "")');
 		}
 
 		$nullDate = $db->quote($db->getNullDate());
-		$nowDate  = $db->quote(JHtml::_('date', 'Now', 'Y-m-d H:i:s'));
+		$nowDate  = $db->quote(EventbookingHelper::getServerTimeFromGMTTime());
 		$query->where('(tbl.publish_up = ' . $nullDate . ' OR tbl.publish_up <= ' . $nowDate . ')')
 			->where('(tbl.publish_down = ' . $nullDate . ' OR tbl.publish_down >= ' . $nowDate . ')');
 
@@ -349,17 +360,70 @@ class EventbookingModelList extends RADModelList
 	 */
 	protected function buildQueryOrder(JDatabaseQuery $query)
 	{
-		$sort      = $this->state->filter_order;
+		$config = EventbookingHelper::getConfig();
+
+		$sort = $this->state->filter_order;
+
+		if (!in_array($sort, static::$sortableFields))
+		{
+			$sort = 'tbl.event_date';
+		}
+
 		$direction = strtoupper($this->state->filter_order_Dir);
 
-		// Featured events has highest ordering
-		$query->order('tbl.featured DESC');
+		if (!in_array($direction, ['ASC', 'DESC']))
+		{
+			$direction = '';
+		}
+
+		// Display featured events at the top if configured
+		if ($config->display_featured_events_on_top)
+		{
+			$query->order('tbl.featured DESC');
+		}
 
 		if ($sort)
 		{
-			$query->order($sort . ' ' . $direction);
+			$query->order(trim($sort . ' ' . $direction));
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Method to apply hide past events filter
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return void
+	 */
+	protected function applyHidePastEventsFilter(JDatabaseQuery $query)
+	{
+		$db          = $this->getDbo();
+		$config      = EventbookingHelper::getConfig();
+		$currentDate = $db->quote(JHtml::_('date', 'Now', 'Y-m-d'));
+
+		if ($config->show_children_events_under_parent_event)
+		{
+			if ($config->show_until_end_date)
+			{
+				$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.event_end_date) >= ' . $currentDate . ' OR DATE(tbl.max_end_date) >= ' . $currentDate . ')');
+			}
+			else
+			{
+				$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.cut_off_date) >= ' . $currentDate . ' OR DATE(tbl.max_end_date) >= ' . $currentDate . ')');
+			}
+		}
+		else
+		{
+			if ($config->show_until_end_date)
+			{
+				$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.event_end_date) >= ' . $currentDate . ')');
+			}
+			else
+			{
+				$query->where('(DATE(tbl.event_date) >= ' . $currentDate . ' OR DATE(tbl.cut_off_date) >= ' . $currentDate . ')');
+			}
+		}
 	}
 }

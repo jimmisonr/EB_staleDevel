@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -78,6 +78,14 @@ if (!empty($this->registrants))
 			       value="<?php echo $this->item->discount; ?>"/>&nbsp;&nbsp;<?php echo $this->lists['coupon_type']; ?>
 		</div>
 	</div>
+    <div class="control-group">
+        <label class="control-label">
+			<?php echo JText::_('EB_CATEGORIES'); ?>
+        </label>
+        <div class="controls">
+            <?php echo $this->lists['category_id']; ?>
+        </div>
+    </div>
 	<div class="control-group">
 		<label class="control-label">
 			<?php echo JText::_('EB_COUPON_ASSIGNMENT'); ?>
@@ -180,7 +188,8 @@ if (!empty($this->registrants))
 			<?php echo  JText::_('EB_USER'); ?>
 		</label>
 		<div class="controls">
-			<?php echo EventbookingHelper::getUserInput($this->item->user_id, 'user_id', (int) $this->item->id); ?>
+			<?php // Note, the third parameter of the method is hardcoded to prevent onchange event, do not remove it.?>
+			<?php echo EventbookingHelper::getUserInput($this->item->user_id, 'user_id', 100); ?>
 		</div>
 	</div>
 	<div class="control-group">

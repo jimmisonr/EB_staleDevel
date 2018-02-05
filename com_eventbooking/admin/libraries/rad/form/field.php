@@ -250,7 +250,12 @@ abstract class RADFormField
 	 */
 	public function getAttribute($name)
 	{
-		return $this->attributes[$name];
+		if (isset($this->attributes[$name]))
+		{
+			return $this->attributes[$name];
+		}
+
+		return '';
 	}
 
 	/**

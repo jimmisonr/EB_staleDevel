@@ -3,10 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 class EventbookingModelCategories extends RADModelList
@@ -24,6 +24,7 @@ class EventbookingModelCategories extends RADModelList
 			->set('filter_order', 'tbl.ordering');
 
 		$listLength = (int) EventbookingHelper::getConfigValue('number_categories');
+
 		if ($listLength)
 		{
 			$this->state->setDefault('limit', $listLength);
@@ -31,26 +32,44 @@ class EventbookingModelCategories extends RADModelList
 	}
 
 	/**
-	 * Method to get categories data
+	 * Method to get the current parent category
 	 *
-	 * @access public
-	 * @return array
+	 * @return stdClass|null
+	 * @throws Exception
 	 */
-	public function getData()
+	public function getCategory()
 	{
-		// Lets load the content if it doesn't already exist
-		if (empty($this->data))
+		if ($categoryId = (int) $this->getState('id'))
 		{
-			$rows = parent::getData();
-			for ($i = 0, $n = count($rows); $i < $n; $i++)
+			$category = EventbookingHelperDatabase::getCategory($categoryId);
+
+			if ($category)
 			{
-				$row               = $rows[$i];
-				$row->total_events = EventbookingHelper::getTotalEvent($row->id);
+				// Process content plugin for category description
+				$category->description = JHtml::_('content.prepare', $category->description);
 			}
-			$this->data = $rows;
+
+			return $category;
 		}
 
-		return $this->data;
+		return null;
+	}
+
+	/**
+	 * Get additional data for categories before it is returned
+	 *
+	 * @param array $rows
+	 *
+	 * @return void
+	 */
+	protected function beforeReturnData($rows)
+	{
+		for ($i = 0, $n = count($rows); $i < $n; $i++)
+		{
+			$row               = $rows[$i];
+			$row->total_events = EventbookingHelper::getTotalEvent($row->id);
+			$row->description  = JHtml::_('content.prepare', $row->description);
+		}
 	}
 
 	/**
@@ -66,6 +85,7 @@ class EventbookingModelCategories extends RADModelList
 
 		// Adding support for multilingual site
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+
 		if ($fieldSuffix)
 		{
 			EventbookingHelperDatabase::getMultilingualFields($query, array('name', 'description'), $fieldSuffix);

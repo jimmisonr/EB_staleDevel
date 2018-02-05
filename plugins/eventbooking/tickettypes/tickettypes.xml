@@ -6,11 +6,28 @@
     <author>Tuan Pham Ngoc</author>
     <authorEmail>tuanpn@joomdonation.com</authorEmail>
     <authorUrl>http://www.joomdonation.com</authorUrl>
-    <copyright>Copyright (C) 2010 - 2017 Ossolution Team</copyright>
+    <copyright>Copyright (C) 2010 - 2018 Ossolution Team</copyright>
     <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
-    <version>2.14.2</version>
+    <version>3.2.1</version>
     <description>This plugin allows you to add different ticket types for your events</description>
     <files>
         <filename plugin="tickettypes">tickettypes.php</filename>
-    </files>    
+    </files>
+    <config>
+        <fields name="params">
+            <fieldset name="basic">
+                <field
+                        name="show_on_frontend"
+                        type="radio"
+                        label="Show on frontend"
+                        description="If set to Yes, this plugin will be available on frontend event submission form"
+                        class="btn-group btn-group-yesno"
+                        default="0"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+            </fieldset>
+        </fields>
+    </config>
 </extension>

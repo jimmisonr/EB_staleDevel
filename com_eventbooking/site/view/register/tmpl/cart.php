@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -96,7 +96,7 @@ $layoutData = array(
 				for ($i = 0 ; $i < $item->quantity; $i++)
 				{
 					$count++;
-					$rowFields = EventbookingHelper::getFormFields($item->id, 2);
+					$rowFields = EventbookingHelperRegistration::getFormFields($item->id, 2);
 					$form      = new RADForm($rowFields);
 					$form->setFieldSuffix($count);
 					$form->bind($this->formData, $this->useDefault);
@@ -147,14 +147,7 @@ $layoutData = array(
 
 		foreach ($fields as $field)
 		{
-			if ($field->name == 'zip')
-			{
-				echo $field->getControlGroup($bootstrapHelper, 'field_zip_input');
-			}
-			else
-			{
-				echo $field->getControlGroup($bootstrapHelper);
-			}
+			echo $field->getControlGroup($bootstrapHelper);
 		}
 
 		if ($this->totalAmount > 0 || $this->form->containFeeFields())

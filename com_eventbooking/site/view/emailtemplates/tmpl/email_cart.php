@@ -3,132 +3,34 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 defined('_JEXEC') or die;
 ?>
-<style type="text/css">
-<?php echo file_get_contents(JPATH_ROOT.'/media/com_eventbooking/assets/bootstrap/css/bootstrap.css') ; ?>
-.price_col {
-	width : 10%;
-	text-align: right ;
-}
-.order_col {
-	width : 13%;
-	text-align: center ;
-}
-table.item_list {	
-	margin-top: 10px;
-}
-table.doc_list {
-	
-}
-.no_col {
-	width: 5%;
-}
-.date_col {
-	width: 20% ;
-}
-.capacity_col {
-	width: 8%;
-}
-.registered_col {
-	width: 8% ;
-}
-.list_first_name {
-	width: 9% ;
-}
-.list_last_name {
-	width: 9% ;
-}
-.list_event {
-	
-}
-.list_event_date {
-	width: 10% ;
-}
-.list_email {
-	width: 10% ;
-}
-.list_registrant_number {
-	width: 8% ;
-}
-.list_amount {
-	text-align: right ;
-	width: 6% ;
-}
-.list_id {
-	text-align: center ;
-	width: 0% ;
-}
-/**CSS for cart page**/
-.col_no {
-	width: 5% ;
-}
-.col_action {
-	width : 10% ;
-	text-align: center ;
-}
-.col_quantity {
-	width : 12% ;
-	text-align: center ;
-}
-.col_price {
-	text-align: right ;
-	width: 10% ;
-}
-.quantity_box {
-	text-align: center ;
-}
-span.total_amount {
-	font-weight: bold ;
-}
-.col_subtotal {
-	text-align: right ;
-}
-.qty_title, .eb_rate {
-	font-weight: bold ;	
-} 
-span.error {
-	color : red ;
-	font-size: 150% ;
-}
-.col_event_date {
-	width: 17% ;
-	text-align: center ;
-}
-span.view_list {
-	font-weight: bold ;
-}
-.col_event {
-	text-align: left ;
-}
-</style>
-
-<table class="item_list table table-striped table-bordered table-condensed">
+<table class="table table-striped table-bordered table-condensed" cellspacing="0" cellpadding="0">
 	<thead>
 	<tr>		
-		<th class="sectiontableheader col_event">
+		<th class="col_event text-left">
 			<?php echo JText::_('EB_EVENT'); ?>
 		</th>		
 		<?php
 			if ($config->show_event_date) 
 			{
 			?>
-				<th class="col_event_date">
+				<th class="col_event_date text-center">
 					<?php echo JText::_('EB_EVENT_DATE'); ?>
 				</th>
 			<?php		
 			}
 		?>
-		<th class="col_price">
+		<th class="col_price text-right">
 			<?php echo JText::_('EB_PRICE'); ?>
 		</th>									
-		<th class="col_quantity">
+		<th class="col_quantity text-center">
 			<?php echo JText::_('EB_QUANTITY'); ?>
 		</th>																
-		<th class="col_quantity">
+		<th class="col_quantity text-right">
 			<?php echo JText::_('EB_SUB_TOTAL'); ?>
 		</th>
 	</tr>
@@ -140,7 +42,7 @@ span.view_list {
 		for ($i = 0 , $n = count($items) ; $i < $n; $i++) 
 		{
 			$item = $items[$i] ;			
-			$rate = EventBookingHelper::getRegistrationRate($item->event_id, $item->number_registrants);
+			$rate = EventbookingHelper::getRegistrationRate($item->event_id, $item->number_registrants);
 			$total += $item->number_registrants*$rate ;
             $url = JUri::getInstance()->toString(array('scheme', 'user', 'pass', 'host')).JRoute::_(EventbookingHelperRoute::getEventRoute($item->event_id, 0, $Itemid));
 		?>
@@ -152,7 +54,7 @@ span.view_list {
 					if ($config->show_event_date) 
 					{
 					?>
-						<td class="col_event_date">
+						<td class="col_event_date text-center">
 							<?php 
 							    if ($item->event_date == EB_TBC_DATE) 
 								{
@@ -160,20 +62,29 @@ span.view_list {
 							    } 
 							    else 
 								{
-							        echo JHTML::_('date', $item->event_date,  $config->event_date_format, null);
+									if (strpos($item->event_date, '00:00:00') !== false)
+									{
+										$dateFormat = $config->date_format;
+									}
+									else
+									{
+										$dateFormat = $config->event_date_format;
+									}
+
+							        echo JHtml::_('date', $item->event_date,  $dateFormat, null);
 							    }    
 							?>							
 						</td>	
 					<?php	
 					}
 				?>
-				<td class="col_price">
+				<td class="col_price text-right">
 					<?php echo EventbookingHelper::formatAmount($rate, $config); ?>
 				</td>
-				<td class="col_quantity">
+				<td class="col_quantity text-center">
 					<?php echo $item->number_registrants ; ?>
 				</td>																										
-				<td class="col_price">
+				<td class="col_price text-right">
 					<?php echo EventbookingHelper::formatAmount($rate*$item->number_registrants, $config); ?>
 				</td>						
 			</tr>
@@ -183,7 +94,7 @@ span.view_list {
 	?>			
 	</tbody>					
 </table>	
-<table width="100%" class="os_table" cellspacing="2" cellpadding="2">	
+<table width="100%" class="os_table" cellspacing="0" cellpadding="0">	
 <?php
 	if ($config->collect_member_information_in_cart)
 	{
@@ -191,7 +102,7 @@ span.view_list {
 		$query = $db->getQuery(true);
 		foreach ($items as $item)
 		{
-			$rowFields = EventbookingHelper::getFormFields($item->event_id, 2);
+			$rowFields = EventbookingHelperRegistration::getFormFields($item->event_id, 2);
 			$query->clear()
 					->select('*')
 					->from('#__eb_registrants')
@@ -206,7 +117,7 @@ span.view_list {
 			{
 				$i++;
 				$memberForm = new RADForm($rowFields);
-				$memberData = EventbookingHelper::getRegistrantData($rowMember, $rowFields);
+				$memberData = EventbookingHelperRegistration::getRegistrantData($rowMember, $rowFields);
 				$memberForm->bind($memberData);
 				$memberForm->buildFieldsDependency();
 				$fields = $memberForm->getFields();

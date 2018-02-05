@@ -991,7 +991,8 @@ CREATE TABLE IF NOT EXISTS `#__eb_waiting_lists` (
   PRIMARY KEY (`id`)
 ) CHARACTER SET `utf8`;
 CREATE TABLE IF NOT EXISTS `#__eb_messages` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `message_key` varchar(50) DEFAULT NULL,
-  `message` text
+  `message` text,
+  PRIMARY KEY (`id`)
 ) CHARACTER SET `utf8`;

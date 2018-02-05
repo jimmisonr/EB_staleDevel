@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -20,12 +20,13 @@ class EventbookingControllerScan extends EventbookingController
 
 		if ($ticketCode)
 		{
-			$db    = JFactory::getDbo();
-			$query = $db->getQuery(true);
+			$db         = JFactory::getDbo();
+			$query      = $db->getQuery(true);
+			$ticketCode = $db->quote($ticketCode);
 			$query->select('a.*, b.title AS event_title')
 				->from('#__eb_registrants AS a')
 				->innerJoin('#__eb_events AS b ON a.event_id = b.id')
-				->where('a.ticket_code = ' . $db->quote($ticketCode));
+				->where('(a.ticket_qrcode = ' . $ticketCode . ' OR a.ticket_code = ' . $ticketCode . ')');
 			$db->setQuery($query);
 			$rowRegistrant = $db->loadObject();
 
@@ -33,7 +34,7 @@ class EventbookingControllerScan extends EventbookingController
 			{
 				/* @var EventbookingModelRegistrant $model */
 				$model  = $this->getModel('Registrant');
-				$result = $model->checkin($rowRegistrant->id);
+				$result = $model->checkinRegistrant($rowRegistrant->id);
 
 				switch ($result)
 				{
@@ -43,8 +44,15 @@ class EventbookingControllerScan extends EventbookingController
 					case 1:
 						$message = JText::_('EB_REGISTRANT_ALREADY_CHECKED_IN');
 						break;
+					case 3:
+						$message = JText::_('EB_CHECKED_IN_FAIL_REGISTRATION_CANCELLED');
+						break;
 					case 2:
 						$message = JText::_('EB_CHECKED_IN_SUCCESSFULLY');
+						$success = true;
+						break;
+					case 4:
+						$message = JText::_('EB_CHECKED_IN_REGISTRATION_PENDING');
 						$success = true;
 						break;
 				}

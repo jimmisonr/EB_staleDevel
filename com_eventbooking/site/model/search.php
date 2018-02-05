@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -27,5 +27,24 @@ class EventbookingModelSearch extends EventbookingModelList
 			->insert('search', 'string', '')
 			->insert('filter_city', 'string', '')
 			->insert('filter_state', 'string', '');
+	}
+
+	/**
+	 * Builds a WHERE clause for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
+	 */
+	protected function buildQueryWhere(JDatabaseQuery $query)
+	{
+		$config = EventbookingHelper::getConfig();
+
+		if ($config->hide_past_events)
+		{
+			$this->applyHidePastEventsFilter($query);
+		}
+
+		return parent::buildQueryWhere($query);
 	}
 }

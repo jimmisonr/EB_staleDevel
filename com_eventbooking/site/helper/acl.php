@@ -136,7 +136,7 @@ class EventbookingHelperAcl
 			{
 				return true;
 			}
-			
+
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('created_by')
@@ -188,12 +188,15 @@ class EventbookingHelperAcl
 			return false;
 		}
 
+		$currentDate = $db->quote(EventbookingHelper::getServerTimeFromGMTTime('Now', 'Y-m-d'));
+		$nullDate = $db->quote($db->getNullDate());
+
 		$query->clear()
 			->select('COUNT(*)')
 			->from('#__eb_events')
 			->where('id = ' . $eventId)
 			->where('enable_cancel_registration = 1')
-			->where('DATEDIFF(cancel_before_date, NOW()) >= 0');
+			->where('(DATE(cancel_before_date) >= ' . $currentDate . ' OR (cancel_before_date = ' . $nullDate . ' AND DATE(cancel_before_date) >= ' . $nullDate . '))');
 		$db->setQuery($query);
 		$total = $db->loadResult();
 

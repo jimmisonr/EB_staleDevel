@@ -3,24 +3,24 @@
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright    	Copyright (C) 2010 - 2018 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined( '_JEXEC' ) or die ;
 
 $hiddenPhoneClass    = $bootstrapHelper->getClassMapping('hidden-phone');
 $btnClass            = $bootstrapHelper->getClassMapping('btn');
 $baseUri             = JUri::base(true);
 ?>
-<table class="table table-striped table-bordered table-condensed">
+<table class="table table-striped table-bordered table-condensed eb-responsive-table">
 	<thead>
 		<tr>
 		<?php
 			if ($config->show_image_in_table_layout)
 			{
 			?>
-				<th class="hidden-phone">
+				<th class="<?php echo $hiddenPhoneClass; ?>">
 					<?php echo JText::_('EB_EVENT_IMAGE'); ?>
 				</th>
 			<?php
@@ -36,17 +36,16 @@ $baseUri             = JUri::base(true);
 			if ($config->show_event_end_date_in_table_layout)
 			{
 			?>
-				<th class="date_col <?php echo $hiddenPhoneClass; ?>">
+				<th class="date_col">
 					<?php echo JText::_('EB_EVENT_END_DATE'); ?>
 				</th>
 			<?php
 			}
 
-
 			if ($config->show_location_in_category_view)
 			{
 			?>
-				<th class="location_col <?php echo $hiddenPhoneClass; ?>">
+				<th class="location_col">
 					<?php echo JText::_('EB_LOCATION'); ?>
 				</th>
 			<?php
@@ -55,7 +54,7 @@ $baseUri             = JUri::base(true);
 			if ($config->show_price_in_table_layout)
 			{
 			?>
-				<th class="table_price_col <?php echo $hiddenPhoneClass; ?>">
+				<th class="table_price_col">
 					<?php echo JText::_('EB_INDIVIDUAL_PRICE'); ?>
 				</th>
 			<?php
@@ -64,7 +63,7 @@ $baseUri             = JUri::base(true);
 			if ($config->show_capacity)
 			{
 			?>
-				<th class="capacity_col <?php echo $hiddenPhoneClass; ?>">
+				<th class="capacity_col">
 					<?php echo JText::_('EB_CAPACITY'); ?>
 				</th>
 			<?php
@@ -73,7 +72,7 @@ $baseUri             = JUri::base(true);
 			if ($config->show_registered)
 			{
 			?>
-				<th class="registered_col <?php echo $hiddenPhoneClass; ?>">
+				<th class="registered_col">
 					<?php echo JText::_('EB_REGISTERED'); ?>
 				</th>
 			<?php
@@ -82,7 +81,7 @@ $baseUri             = JUri::base(true);
 			if ($config->show_available_place)
 			{
 			?>
-				<th class="center available-place-col <?php echo $hiddenPhoneClass; ?>">
+				<th class="center available-place-col">
 					<?php echo JText::_('EB_AVAILABLE_PLACE'); ?>
 				</th>
 			<?php
@@ -95,8 +94,9 @@ $baseUri             = JUri::base(true);
 	</thead>
 	<tbody>
 	<?php
-		$loginLink          = 'index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString());
+		$loginLink          = JRoute::_('index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString()), false);
 		$loginToRegisterMsg = str_replace('[LOGIN_LINK]', $loginLink, JText::_('EB_LOGIN_TO_REGISTER'));
+		$linkThumbToEvent   = $config->get('link_thumb_to_event_detail_page', 1);
 
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
@@ -111,7 +111,7 @@ $baseUri             = JUri::base(true);
 				$activateWaitingList = $item->activate_waiting_list;
 			}
 
-			$canRegister = EventbookingHelper::acceptRegistration($item);
+			$canRegister = EventbookingHelperRegistration::acceptRegistration($item);
 
 			if ($item->cut_off_date != $nullDate)
 			{
@@ -135,6 +135,8 @@ $baseUri             = JUri::base(true);
 			{
 				$isMultipleDate = true;
 			}
+
+			$detailUrl =  JRoute::_(EventbookingHelperRoute::getEventRoute($item->id, $categoryId, $Itemid));
 		?>
 			<tr class="eb-category-<?php echo $item->category_id; ?><?php if ($item->featured) echo ' eb-featured-event'; ?>">
 				<?php
@@ -145,9 +147,30 @@ $baseUri             = JUri::base(true);
 						<?php
 							if ($item->thumb)
 							{
-							?>
-								<a href="<?php echo $baseUri . '/media/com_eventbooking/images/' . $item->thumb; ?>" class="eb-modal"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $item->thumb; ?>" class="eb_thumb-left"/></a>
-							<?php
+								if ($linkThumbToEvent)
+								{
+								?>
+									<a href="<?php echo $detailUrl; ?>"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $item->thumb; ?>" class="eb_thumb-left" alt="<?php echo $item->title; ?>"/></a>
+								<?php
+								}
+								else
+								{
+									if ($item->image && file_exists(JPATH_ROOT . '/' . $item->image))
+									{
+										$largeImageUri = $baseUri . '/' . $item->image;
+									}
+									elseif (file_exists(JPATH_ROOT . '/media/com_eventbooking/images/' . $item->thumb))
+									{
+										$largeImageUri = $baseUri . '/media/com_eventbooking/images/' . $item->thumb;
+									}
+									else
+									{
+										$largeImageUri = $baseUri . '/media/com_eventbooking/images/thumbs/' . $item->thumb;
+									}
+								?>
+									<a href="<?php echo $largeImageUri; ?>" class="eb-modal"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $item->thumb; ?>" class="eb_thumb-left" alt="<?php echo $item->title; ?>"/></a>
+								<?php
+								}
 							}
 							else
 							{
@@ -158,7 +181,7 @@ $baseUri             = JUri::base(true);
 					<?php
 					}
 				?>
-				<td>
+				<td class="tdno<?php echo $i; ?>" data-content="<?php echo JText::_('EB_EVENT_TITLE'); ?>">
 					<?php
 						if ($config->hide_detail_button !== '1')
 						{
@@ -172,7 +195,7 @@ $baseUri             = JUri::base(true);
 						}
 					?>
 				</td>
-				<td>
+				<td class="tdno<?php echo $i; ?>" data-content="<?php echo JText::_('EB_EVENT_DATE'); ?>">
 					<?php
 						if ($item->event_date == EB_TBC_DATE)
 						{
@@ -197,7 +220,7 @@ $baseUri             = JUri::base(true);
 					if ($config->show_event_end_date_in_table_layout)
 					{
 					?>
-						<td>
+						<td class="tdno<?php echo $i; ?>" data-content="<?php echo JText::_('EB_EVENT_END_DATE'); ?>">
 							<?php
 								if ($item->event_end_date == EB_TBC_DATE)
 								{
@@ -224,7 +247,7 @@ $baseUri             = JUri::base(true);
 					if ($config->show_location_in_category_view)
 					{
 					?>
-					<td class="<?php echo $hiddenPhoneClass; ?>">
+					<td class="tdno<?php echo $i; ?>" data-content="<?php echo JText::_('EB_LOCATION'); ?>">
 						<?php
 							if ($item->location_id)
 							{
@@ -267,15 +290,15 @@ $baseUri             = JUri::base(true);
 						}
 						elseif ($config->show_discounted_price)
 						{
-							$price = $item->discounted_price ;
+							$price = EventbookingHelper::formatCurrency($item->discounted_price, $config, $item->currency_symbol);
 						}
 						else
 						{
-							$price = $item->individual_price ;
+							$price = EventbookingHelper::formatCurrency($item->individual_price, $config, $item->currency_symbol);
 						}
 					?>
-						<td class="<?php echo $hiddenPhoneClass; ?>">
-							<?php echo EventbookingHelper::formatCurrency($price, $config, $item->currency_symbol); ?>
+						<td class="tdno<?php echo $i; ?>" data-content="<?php echo JText::_('EB_INDIVIDUAL_PRICE'); ?>">
+							<?php echo $price; ?>
 						</td>
 					<?php
 					}
@@ -283,7 +306,7 @@ $baseUri             = JUri::base(true);
 					if ($config->show_capacity)
 					{
 					?>
-						<td class="center <?php echo $hiddenPhoneClass; ?>">
+						<td class="center tdno<?php echo $i; ?>" data-content="<?php echo JText::_('EB_CAPACITY'); ?>">
 							<?php
 								if ($item->event_capacity)
 								{
@@ -301,7 +324,7 @@ $baseUri             = JUri::base(true);
 					if ($config->show_registered)
 					{
 					?>
-						<td class="center <?php echo $hiddenPhoneClass; ?>">
+						<td class="center tdno<?php echo $i; ?>" data-content="<?php echo JText::_('EB_REGISTERED'); ?>">
 							<?php
 								if ($item->registration_type != 3)
 								{
@@ -320,7 +343,7 @@ $baseUri             = JUri::base(true);
 					if ($config->show_available_place)
 					{
 					?>
-						<td class="center <?php echo $hiddenPhoneClass; ?>">
+						<td class="center tdno<?php echo $i; ?>" data-content="<?php echo JText::_('EB_AVAILABLE_PLACE'); ?>">
 							<?php
 								if ($item->event_capacity)
 								{
@@ -423,6 +446,19 @@ $baseUri             = JUri::base(true);
 								</ul>
 							</div>
 							<?php
+							}
+							elseif ($item->registration_start_date != $nullDate && $item->registration_start_minutes < 0)
+							{
+								if (strpos($item->registration_start_date, '00:00:00') !== false)
+								{
+									$dateFormat = $config->date_format;
+								}
+								else
+								{
+									$dateFormat = $config->event_date_format;
+								}
+
+								echo JText::sprintf('EB_REGISTRATION_STARTED_ON', JHtml::_('date', $item->registration_start_date, $dateFormat, null));
 							}
 							elseif($waitingList)
 							{

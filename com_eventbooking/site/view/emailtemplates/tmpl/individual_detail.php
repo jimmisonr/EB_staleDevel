@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -88,7 +88,16 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 					}
 					else
 					{
-						echo JHtml::_('date', $rowEvent->event_date, $config->event_date_format, null) ;
+						if (strpos($rowEvent->event_date, '00:00:00') !== false)
+						{
+							$dateFormat = $config->date_format;
+						}
+						else
+						{
+							$dateFormat = $config->event_date_format;
+						}
+
+						echo JHtml::_('date', $rowEvent->event_date, $dateFormat, null) ;
 					}
 				?>
 			</div>
@@ -96,13 +105,21 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 		<?php
 			if ($rowEvent->event_end_date != $nullDate)
 			{
+				if (strpos($rowEvent->event_end_date, '00:00:00') !== false)
+				{
+					$dateFormat = $config->date_format;
+				}
+				else
+				{
+					$dateFormat = $config->event_date_format;
+				}
 			?>
 				<div class="<?php echo $controlGroupClass; ?>">
 					<label class="<?php echo $controlLabelClass; ?>">
 						<?php echo JText::_('EB_EVENT_END_DATE') ?>
 					</label>
 					<div class="<?php echo $controlsClass; ?>">
-						<?php echo JHtml::_('date', $rowEvent->event_end_date, $config->event_date_format, null); ?>
+						<?php echo JHtml::_('date', $rowEvent->event_end_date, $dateFormat, null); ?>
 					</div>
 				</div>
 			<?php
@@ -115,22 +132,6 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 			if ($location->address)
 			{
 				$locationInformation[] = $location->address;
-			}
-			if ($location->city)
-			{
-				$locationInformation[] = $location->city;
-			}
-			if ($location->state)
-			{
-				$locationInformation[] = $location->state;
-			}
-			if ($location->zip)
-			{
-				$locationInformation[] = $location->zip;
-			}
-			if ($location->country)
-			{
-				$locationInformation[] = $location->country;
 			}
 		?>
 			<div class="<?php echo $controlGroupClass; ?>">

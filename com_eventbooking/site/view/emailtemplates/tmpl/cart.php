@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -47,7 +47,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			for ($i = 0 , $n = count($items) ; $i < $n; $i++)
 			{
 				$item = $items[$i] ;
-				$rate = EventbookingHelper::getRegistrationRate($item->event_id, $item->number_registrants);
+				$rate = EventbookingHelperRegistration::getRegistrationRate($item->event_id, $item->number_registrants);
 				$total += $item->number_registrants*$rate;
 				$url = JRoute::_(EventbookingHelperRoute::getEventRoute($item->event_id, 0, $Itemid));
 			?>
@@ -67,7 +67,16 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 									}
 									else
 									{
-										echo JHtml::_('date', $item->event_date,  $config->event_date_format, null);
+										if (strpos($item->event_date, '00:00:00') !== false)
+										{
+											$dateFormat = $config->date_format;
+										}
+										else
+										{
+											$dateFormat = $config->event_date_format;
+										}
+
+										echo JHtml::_('date', $item->event_date,  $dateFormat, null);
 									}
 								?>
 							</td>
@@ -96,7 +105,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 			$query = $db->getQuery(true);
 			foreach($items as $item)
 			{
-				$rowFields = EventbookingHelper::getFormFields($item->event_id, 2);
+				$rowFields = EventbookingHelperRegistration::getFormFields($item->event_id, 2);
 				$query->clear()
 						->select('*')
 						->from('#__eb_registrants')
@@ -111,7 +120,7 @@ $controlsClass     = $bootstrapHelper->getClassMapping('controls');
 				{
 					$i++;
 					$memberForm = new RADForm($rowFields);
-					$memberData = EventbookingHelper::getRegistrantData($rowMember, $rowFields);
+					$memberData = EventbookingHelperRegistration::getRegistrantData($rowMember, $rowFields);
 					$memberForm->bind($memberData);
 					$memberForm->buildFieldsDependency();
 					$fields = $memberForm->getFields();

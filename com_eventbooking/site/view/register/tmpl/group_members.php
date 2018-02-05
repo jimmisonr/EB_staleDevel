@@ -3,7 +3,7 @@
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright    	Copyright (C) 2010 - 2018 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
 
@@ -67,15 +67,12 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 	$form = new RADForm($this->rowFields);
 	$form->setFieldSuffix($i);
 
-	//Bill form data
-	if (count($this->membersData))
+	if (!isset($this->membersData['country_' . $i]))
 	{
-		$form->bind($this->membersData);
+		$this->membersData['country_' . $i] = $this->defaultCountry;
 	}
-	else
-	{
-		$form->bind(array('country_'.$i => $this->defaultCountry), true);
-	}
+
+	$form->bind($this->membersData, $this->useDefaultValueForFields);
 
 	$form->buildFieldsDependency();
 
@@ -122,9 +119,18 @@ for ($i = 1 ; $i <= $this->numberRegistrants; $i++)
 	}
 }
 
-$articleId  = $this->event->article_id ? $this->event->article_id : $this->config->article_id ;
+$articleId  = $this->event->article_id ? $this->event->article_id : $this->config->article_id;
 
-if (!$this->showBillingStep && $this->config->accept_term ==1 && $articleId)
+if ($this->event->enable_terms_and_conditions != 2)
+{
+	$enableTermsAndConditions =  $this->event->enable_terms_and_conditions;
+}
+else
+{
+	$enableTermsAndConditions = $this->config->accept_term;
+}
+
+if (!$this->showBillingStep && $enableTermsAndConditions && $articleId)
 {
 	if (JLanguageMultilang::isEnabled())
 	{

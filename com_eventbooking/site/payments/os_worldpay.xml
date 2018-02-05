@@ -4,11 +4,11 @@
 	<title>Worldpay</title>
     <author>Tuan Pham Ngoc</author>
     <creationDate>07-01-2016</creationDate>
-    <copyright>Copyright 2010-2016 Ossolution Team</copyright>
+    <copyright>Copyright 2010 - 2018 Ossolution Team</copyright>
     <license>http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU/GPL version 2</license>
     <authorEmail>contact@joomdonation.com</authorEmail>
     <authorUrl>www.joomdonation.com</authorUrl>
-    <version>2.14.2</version>
+    <version>3.2.1</version>
 	<description>Worldpay Payment Plugin For Events Booking Extension</description>	
 	<config>	
 		<fields name="params">

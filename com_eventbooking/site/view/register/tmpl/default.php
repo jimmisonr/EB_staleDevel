@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -49,7 +49,7 @@ else
 	$msg = str_replace('[AMOUNT]', EventbookingHelper::formatCurrency($this->amount, $this->config, $this->event->currency_symbol), $msg);
 }
 
-$replaces = EventbookingHelper::buildEventTags($this->event, $this->config);
+$replaces = EventbookingHelperRegistration::buildEventTags($this->event, $this->config);
 
 foreach ($replaces as $key => $value)
 {
@@ -87,7 +87,7 @@ $layoutData = array(
 	'controlsClass'     => $controlsClass,
 );
 ?>
-<div id="eb-individual-registration-page" class="eb-container">
+<div id="eb-individual-registration-page" class="eb-container<?php echo $this->waitingList ? ' eb-waitinglist-individual-registration-form' : '';?>">
 	<h1 class="eb-page-heading"><?php echo $headerText; ?></h1>
 	<?php
 	if (strlen($msg))
@@ -97,7 +97,7 @@ $layoutData = array(
 	<?php
 	}
 
-	if (!$this->waitingList && !empty($this->ticketTypes))
+	if (!empty($this->ticketTypes))
 	{
 		echo $this->loadTemplate('tickets');
 	}
@@ -129,14 +129,7 @@ $layoutData = array(
 
 		foreach ($fields as $field)
 		{
-			if ($field->name == 'zip')
-			{
-				echo $field->getControlGroup($bootstrapHelper, 'field_zip_input');
-			}
-			else
-			{
-				echo $field->getControlGroup($bootstrapHelper);
-			}
+			echo $field->getControlGroup($bootstrapHelper);
 		}
 
 		if ($this->totalAmount > 0 || !empty($this->ticketTypes) || $this->form->containFeeFields())
@@ -165,7 +158,16 @@ $layoutData = array(
 
 	$articleId  = $this->event->article_id ? $this->event->article_id : $this->config->article_id ;
 
-	if ($this->config->accept_term ==1 && $articleId)
+	if ($this->event->enable_terms_and_conditions != 2)
+	{
+		$enableTermsAndConditions =  $this->event->enable_terms_and_conditions;
+	}
+	else
+	{
+		$enableTermsAndConditions = $this->config->accept_term;
+	}
+
+	if ($enableTermsAndConditions && $articleId)
 	{
 		$layoutData['articleId'] = $articleId;
 
@@ -235,7 +237,7 @@ $layoutData = array(
 
 							// Check and make sure at least one ticket type quantity is selected
 							<?php
-							if (!$this->waitingList && !empty($this->ticketTypes))
+							if (!empty($this->ticketTypes))
 							{
 							?>
 								var ticketTypesValue = '';

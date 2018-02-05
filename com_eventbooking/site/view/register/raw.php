@@ -1,17 +1,20 @@
 <?php
+
 /**
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-class EventbookingViewRegisterRaw extends RADViewHtml
+class EventbookingViewRegisterRaw extends EventbookingViewRegisterBase
 {
+	use EventbookingViewCaptcha;
+
 	/**
 	 * Display Group registration forms to user
 	 *
-	 * @throws Exception
+	 * @return void
 	 */
 	public function display()
 	{
@@ -88,6 +91,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$this->Itemid            = $input->getInt('Itemid', 0);
 		$this->event             = $event;
 		$this->config            = EventbookingHelper::getConfig();
+
 		parent::display();
 	}
 
@@ -95,56 +99,40 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 	 * Display form allow registrant to enter information of group members
 	 *
 	 * @param $event
-	 * @param $input
 	 *
 	 * @throws Exception
 	 */
 	public function displayGroupMembersForm($event)
 	{
-		$session           = JFactory::getSession();
-		$config            = EventbookingHelper::getConfig();
-		$numberRegistrants = (int) $session->get('eb_number_registrants', '');
+		$session                  = JFactory::getSession();
+		$user                     = JFactory::getUser();
+		$config                   = EventbookingHelper::getConfig();
+		$numberRegistrants        = (int) $session->get('eb_number_registrants', '');
+		$rowFields                = EventbookingHelperRegistration::getFormFields($event->id, 2);
+		$useDefaultValueForFields = true;
 
 		//Get Group members form data
 		$membersData = $session->get('eb_group_members_data', null);
 
 		if ($membersData)
 		{
-			$membersData = unserialize($membersData);
+			$membersData              = unserialize($membersData);
+			$useDefaultValueForFields = false;
+		}
+		elseif ($user->id && $config->populate_group_members_data)
+		{
+			$membersData = $this->getMembersData($event->id, $rowFields);
 		}
 		else
 		{
 			$membersData = array();
 		}
 
-		$this->showBillingStep = EventbookingHelper::showBillingStep($event->id);
-
-		$showCaptcha = 0;
+		$this->showBillingStep = EventbookingHelperRegistration::showBillingStep($event->id);
 
 		if (!$this->showBillingStep)
 		{
-			$user = JFactory::getUser();
-
-			if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
-			{
-				$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-
-				if (!$captchaPlugin)
-				{
-					// Hardcode to recaptcha, reduce support request
-					$captchaPlugin = 'recaptcha';
-				}
-
-				// Check to make sure Captcha is enabled
-				$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
-
-				if ($plugin)
-				{
-					$showCaptcha         = 1;
-					$this->captcha       = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
-					$this->captchaPlugin = $captchaPlugin;
-				}
-			}
+			$this->loadCaptcha();
 		}
 
 		// Waiting List
@@ -164,16 +152,15 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 			$this->bypassNumberMembersStep = true;
 		}
 
-		$this->numberRegistrants = $numberRegistrants;
-		$this->membersData       = $membersData;
-		$this->eventId           = $event->id;
-		$this->event             = $event;
-		$this->config            = $config;
-		$this->showCaptcha       = $showCaptcha;
-		$this->defaultCountry    = $config->default_country;
-		$this->waitingList       = $waitingList;
-
-		$this->rowFields = EventbookingHelper::getFormFields($event->id, 2);
+		$this->numberRegistrants        = $numberRegistrants;
+		$this->membersData              = $membersData;
+		$this->eventId                  = $event->id;
+		$this->event                    = $event;
+		$this->config                   = $config;
+		$this->defaultCountry           = $config->default_country;
+		$this->waitingList              = $waitingList;
+		$this->useDefaultValueForFields = $useDefaultValueForFields;
+		$this->rowFields                = $rowFields;
 
 		parent::display();
 	}
@@ -193,7 +180,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$userId           = $user->get('id');
 		$config           = EventbookingHelper::getConfig();
 		$eventId          = $event->id;
-		$rowFields        = EventbookingHelper::getFormFields($eventId, 1);
+		$rowFields        = EventbookingHelperRegistration::getFormFields($eventId, 1);
 		$groupBillingData = $session->get('eb_group_billing_data', null);
 
 		if ($groupBillingData)
@@ -237,7 +224,7 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 			}
 			else
 			{
-				$data = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);
+				$data = EventbookingHelperRegistration::getFormData($rowFields, $eventId, $userId, $config);
 			}
 
 			// IN case there is no data, get it from URL (get for example)
@@ -247,45 +234,9 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 			}
 		}
 
-		if ($userId && !isset($data['first_name']))
-		{
-			//Load the name from Joomla default name
-			$name = $user->name;
-
-			if ($name)
-			{
-				$pos = strpos($name, ' ');
-
-				if ($pos !== false)
-				{
-					$data['first_name'] = substr($name, 0, $pos);
-					$data['last_name']  = substr($name, $pos + 1);
-				}
-				else
-				{
-					$data['first_name'] = $name;
-					$data['last_name']  = '';
-				}
-			}
-		}
-
-		if ($userId && !isset($data['email']))
-		{
-			$data['email'] = $user->email;
-		}
-
-		if ($config->get('auto_populate_form_data') === '0')
-		{
-			$data = array();
-		}
-
-		if (!isset($data['country']) || !$data['country'])
-		{
-			$data['country'] = $config->default_country;
-		}
+		$this->setCommonViewData($config, $data, 'calculateGroupRegistrationFee();');
 
 		// Waiting List
-
 		if (($event->event_capacity > 0) && ($event->event_capacity <= $event->total_registrants))
 		{
 			$waitingList = true;
@@ -313,39 +264,36 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 
 		if ($waitingList)
 		{
-			if (is_callable('EventbookingHelperOverrideHelper::calculateGroupRegistrationFees'))
+			if (is_callable('EventbookingHelperOverrideRegistration::calculateGroupRegistrationFees'))
+			{
+				$fees = EventbookingHelperOverrideRegistration::calculateGroupRegistrationFees($event, $form, $data, $config, null);
+			}
+			elseif (is_callable('EventbookingHelperOverrideHelper::calculateGroupRegistrationFees'))
 			{
 				$fees = EventbookingHelperOverrideHelper::calculateGroupRegistrationFees($event, $form, $data, $config, null);
 			}
 			else
 			{
-				$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, null);
+				$fees = EventbookingHelperRegistration::calculateGroupRegistrationFees($event, $form, $data, $config, null);
 			}
 		}
 		else
 		{
-			if (is_callable('EventbookingHelperOverrideHelper::calculateGroupRegistrationFees'))
+			if (is_callable('EventbookingHelperOverrideRegistration::calculateGroupRegistrationFees'))
+			{
+				$fees = EventbookingHelperOverrideRegistration::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			}
+			elseif (is_callable('EventbookingHelperOverrideHelper::calculateGroupRegistrationFees'))
 			{
 				$fees = EventbookingHelperOverrideHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
 			}
 			else
 			{
-				$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+				$fees = EventbookingHelperRegistration::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
 			}
 		}
 
-		$expMonth           = $input->post->getInt('exp_month', date('m'));
-		$expYear            = $input->post->getInt('exp_year', date('Y'));
-		$lists['exp_month'] = JHtml::_('select.integerlist', 1, 12, 1, 'exp_month', ' class="input-small" ', $expMonth, '%02d');
-		$currentYear        = date('Y');
-		$lists['exp_year']  = JHtml::_('select.integerlist', $currentYear, $currentYear + 10, 1, 'exp_year', 'class="input-small"', $expYear);
-		$methods            = os_payments::getPaymentMethods(trim($event->payment_methods));
-		$options            = array();
-		$options[]          = JHtml::_('select.option', 'Visa', 'Visa');
-		$options[]          = JHtml::_('select.option', 'MasterCard', 'MasterCard');
-		$options[]          = JHtml::_('select.option', 'Discover', 'Discover');
-		$options[]          = JHtml::_('select.option', 'Amex', 'American Express');
-		$lists['card_type'] = JHtml::_('select.genericlist', $options, 'card_type', ' class="inputbox" ', 'value', 'text');
+		$methods = os_payments::getPaymentMethods(trim($event->payment_methods));
 
 		if (($event->enable_coupon == 0 && $config->enable_coupon) || $event->enable_coupon == 2 || $event->enable_coupon == 3)
 		{
@@ -361,36 +309,15 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 
 		if ($config->activate_deposit_feature && $event->deposit_amount > 0)
 		{
-			$options               = array();
-			$options[]             = JHtml::_('select.option', 0, JText::_('EB_FULL_PAYMENT'));
-			$options[]             = JHtml::_('select.option', 1, JText::_('EB_DEPOSIT_PAYMENT'));
-			$lists['payment_type'] = JHtml::_('select.genericlist', $options, 'payment_type', ' class="input-large" onchange="showDepositAmount(this);" ', 'value', 'text', $paymentType);
-			$depositPayment        = 1;
+			$depositPayment = 1;
 		}
 		else
 		{
 			$depositPayment = 0;
 		}
 
-		$showCaptcha = 0;
-
-		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
-		{
-			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-			if (!$captchaPlugin)
-			{
-				// Hardcode to recaptcha, reduce support request
-				$captchaPlugin = 'recaptcha';
-			}
-			// Check to make sure Captcha is enabled
-			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
-			if ($plugin)
-			{
-				$showCaptcha         = 1;
-				$this->captcha       = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
-				$this->captchaPlugin = $captchaPlugin;
-			}
-		}
+		// Load captcha
+		$this->loadCaptcha();
 
 		// Check to see if there is payment processing fee or not
 		$showPaymentFee = false;
@@ -419,18 +346,17 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 
 		// Assign these parameters
 		$this->paymentMethod        = $paymentMethod;
-		$this->lists                = $lists;
 		$this->config               = $config;
 		$this->event                = $event;
 		$this->methods              = $methods;
 		$this->enableCoupon         = $enableCoupon;
 		$this->userId               = $userId;
-		$this->lists                = $lists;
 		$this->depositPayment       = $depositPayment;
 		$this->paymentType          = $paymentType;
-		$this->showCaptcha          = $showCaptcha;
 		$this->captchaInvalid       = $captchaInvalid;
 		$this->form                 = $form;
+		$this->showPaymentFee       = $showPaymentFee;
+		$this->waitingList          = $waitingList;
 		$this->totalAmount          = $fees['total_amount'];
 		$this->taxAmount            = $fees['tax_amount'];
 		$this->discountAmount       = $fees['discount_amount'];
@@ -439,9 +365,116 @@ class EventbookingViewRegisterRaw extends RADViewHtml
 		$this->depositAmount        = $fees['deposit_amount'];
 		$this->paymentProcessingFee = $fees['payment_processing_fee'];
 		$this->bundleDiscountAmount = $fees['bundle_discount_amount'];
-		$this->showPaymentFee       = $showPaymentFee;
-		$this->waitingList          = $waitingList;
 
 		parent::display();
+	}
+
+	/**
+	 * Get members data from previous registration to fill-in group members form
+	 *
+	 * @param int   $eventId
+	 * @param array $rowFields
+	 *
+	 * @return array
+	 */
+	protected function getMembersData($eventId, $rowFields)
+	{
+		$membersData = array();
+
+		$config = EventbookingHelper::getConfig();
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+
+		// First, try to get Members Data from previous registration of this event
+		$query->select('id')
+			->from('#__eb_registrants')
+			->where('user_id = ' . $user->id)
+			->where('event_id = ' . $eventId)
+			->where('is_group_billing = 1')
+			->where('(published = 1 OR payment_method LIKE "os_offline%")')
+			->order('id');
+		$db->setQuery($query);
+		$groupId = $db->loadResult();
+
+		// If no registration found, get data from a different any event
+		if (!$groupId)
+		{
+			$query->clear()
+				->select('id')
+				->from('#__eb_registrants')
+				->where('user_id = ' . $user->id)
+				->where('is_group_billing = 1')
+				->where('(published = 1 OR payment_method LIKE "os_offline%")')
+				->order('id DESC');
+			$db->setQuery($query);
+			$groupId = $db->loadResult();
+		}
+
+		if ($groupId)
+		{
+			$query->clear()
+				->select('*')
+				->from('#__eb_registrants')
+				->where('group_id = ' . $groupId);
+			$db->setQuery($query);
+			$rowMembers = $db->loadObjectList();
+
+			for ($i = 0, $n = count($rowMembers); $i < $n; $i++)
+			{
+				$rowMember  = $rowMembers[$i];
+				$memberData = EventbookingHelperRegistration::getRegistrantData($rowMember, $rowFields);
+
+				foreach ($memberData as $key => $value)
+				{
+					$index                            = $i + 1;
+					$membersData[$key . '_' . $index] = $value;
+				}
+			}
+		}
+		else
+		{
+			// User current user profile data to fill-in for first group member
+			$data = EventbookingHelperRegistration::getFormData($rowFields, $eventId, $user->id);
+
+			if ($user->id && !isset($data['first_name']))
+			{
+				//Load the name from Joomla default name
+				$name = $user->name;
+
+				if ($name)
+				{
+					$pos = strpos($name, ' ');
+
+					if ($pos !== false)
+					{
+						$data['first_name'] = substr($name, 0, $pos);
+						$data['last_name']  = substr($name, $pos + 1);
+					}
+					else
+					{
+						$data['first_name'] = $name;
+						$data['last_name']  = '';
+					}
+				}
+			}
+
+			if ($user->id && !isset($data['email']))
+			{
+				$data['email'] = $user->email;
+			}
+
+			if (empty($data['country']))
+			{
+				$data['country'] = $config->default_country;
+			}
+
+			foreach ($data as $key => $value)
+			{
+				$membersData[$key . '_1'] = $value;
+			}
+		}
+
+		return $membersData;
 	}
 }

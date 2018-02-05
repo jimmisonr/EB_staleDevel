@@ -8,8 +8,8 @@
  */
 defined('_JEXEC') or die('');
 
-require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
-require_once JPATH_ROOT . '/components/com_eventbooking/helper/database.php';
+// Require library + register autoloader
+require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
 
 EventbookingHelper::loadLanguage();
 
@@ -42,15 +42,15 @@ if (empty($text))
 
 $text = htmlspecialchars($text, ENT_COMPAT, 'UTF-8');
 
-$db    = JFactory::getDbo();
-$query = $db->getQuery(true);
+$db          = JFactory::getDbo();
+$query       = $db->getQuery(true);
+$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
 //Build Category Drodown
 if ($showCategory)
 {
-	$fieldSuffix = EventbookingHelper::getFieldSuffix();
 	$query->select('id, parent AS parent_id')
-		->select("name" . $fieldSuffix . " AS title")
+		->select($db->quoteName('name' . $fieldSuffix, 'title'))
 		->from('#__eb_categories')
 		->where('published = 1')
 		->where('`access` IN (' . implode(',', JFactory::getUser()->getAuthorisedViewLevels()) . ')')
@@ -107,7 +107,8 @@ if ($showLocation)
 	$config = EventbookingHelper::getConfig();
 
 	$query->clear()
-		->select('a.id, a.name')
+		->select('a.id')
+		->select($db->quoteName('a.name' . $fieldSuffix, 'name'))
 		->from('#__eb_locations AS a')
 		->where('a.published = 1')
 		->order('a.name');
@@ -140,6 +141,8 @@ if ($showLocation)
 	$options              = array_merge($options, $db->loadObjectList());
 	$lists['location_id'] = JHtml::_('select.genericlist', $options, 'location_id', ' class="inputbox location_box" ', 'id', 'name', $locationId);
 }
+
+$presetCategoryId = (int) $params->get('category_id');
 
 $itemId = (int) $params->get('item_id');
 

@@ -3,14 +3,14 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
 defined('_JEXEC') or die;
 $nullDate = JFactory::getDbo()->getNullDate();
 ?>
-<table class="os_table" width="100%" cellspacing="3" cellpadding="3">
+<table class="os_table" width="100%" cellspacing="0" cellpadding="0">
 	<tr>
 		<td class="title_cell">
 			<?php echo  JText::_('EB_EVENT_TITLE') ?>
@@ -62,22 +62,6 @@ $nullDate = JFactory::getDbo()->getNullDate();
 		if ($location->address)
 		{
 			$locationInformation[] = $location->address;
-		}
-		if ($location->city)
-		{
-			$locationInformation[] = $location->city;
-		}
-		if ($location->state)
-		{
-			$locationInformation[] = $location->state;
-		}
-		if ($location->zip)
-		{
-			$locationInformation[] = $location->zip;
-		}
-		if ($location->country)
-		{
-			$locationInformation[] = $location->country;
 		}
 		?>
 		<tr>

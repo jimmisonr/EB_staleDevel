@@ -1,18 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="Up-coming Events Table Layout">
-		<message>
-			Displays a list of up-coming events using table layout
-		</message>
-	</layout>
-	<state>
-		<name>Up-coming Events Table Layout</name>
-		<description>Displays a list of up-coming events using table layout</description>		
-		<fields name="request">			
-			<fieldset name="request"
-				addfieldpath="/administrator/components/com_eventbooking/elements">
-				<field name="id" type="ebcategory" size="3" default="0" label="Select Category" description="Choose the category which you want to display events" />
-			</fieldset>	
-		</fields>		
-	</state>
+    <layout title="Upcoming events - Table layout">
+        <message>
+            Displays list of upcoming events using table layout
+        </message>
+    </layout>
+    <state>
+        <name>Upcoming events - Table layout</name>
+        <description>Displays list of upcoming events using table layout</description>
+        <fields name="request">
+            <fieldset name="request"
+                      addfieldpath="/administrator/components/com_eventbooking/elements">
+                <field name="id" type="ebcategory" size="3" default="0" label="Select Category"
+                       description="Choose the category which you want to display events"/>
+            </fieldset>
+        </fields>
+        <fields name="params">
+            <fieldset name="basic">
+                <field name="hide_children_events" type="list" default="0" label="Hide Children Events"
+                       description="Choose to show/hide children events for this menu item">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </field>
+                <field name="display_num" type="text" default="10" label="Number events"
+                       description="Number of events will be shown on the page"/>
+                <field name="menu_item_id" type="text"
+                       label="Override Menu Item ID"
+                       description="If you want the system to use different menu item to generate links from this page, enter ID of that menu item here. In most case, leave it empty"
+                       default="">
+                </field>
+            </fieldset>
+        </fields>
+    </state>
 </metadata>

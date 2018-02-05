@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -54,7 +54,7 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 					echo $this->lists['filter_location_id'];
 					echo $this->lists['filter_state'];
 					echo $this->lists['filter_access'];
-					echo $this->lists['filter_past_events'];
+					echo $this->lists['filter_events'];
 					echo $this->pagination->getLimitBox();
 				?>
 			</div>
@@ -241,5 +241,17 @@ JHtml::_('searchtools.form', '#adminForm', $customOptions);
 				$('#filter_state').addClass('input-medium').removeClass('inputbox');
 			})
 		})(jQuery);
+
+        Joomla.submitbutton = function(pressbutton)
+        {
+            Joomla.submitform( pressbutton );
+
+            if (pressbutton == 'export')
+            {
+                var form = document.adminForm;
+                form.task.value = '';
+            }
+        }
+
 	</script>
 </form>

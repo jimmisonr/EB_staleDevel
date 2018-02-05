@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -15,19 +15,19 @@ if (!empty($ticketTypes))
 {
 ?>
 	<h3 class="eb-heading"><?php echo JText::_('EB_TICKET_INFORMATION'); ?></h3>
-	<table class="table table-striped table-bordered table-condensed">
+	<table class="table table-striped table-bordered table-condensed" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
 			<th>
 				<?php echo JText::_('EB_TICKET_TYPE'); ?>
 			</th>
-			<th class="eb-text-right">
+			<th class="text-right">
 				<?php echo JText::_('EB_PRICE'); ?>
 			</th>
-			<th class="center">
+			<th class="text-center">
 				<?php echo JText::_('EB_QUANTITY'); ?>
 			</th>
-			<th class="eb-text-right">
+			<th class="text-right">
 				<?php echo JText::_('EB_SUB_TOTAL'); ?>
 			</th>
 		</tr>
@@ -41,13 +41,13 @@ if (!empty($ticketTypes))
 				<td>
 					<?php echo JText::_($ticketType->title); ?>
 				</td>
-				<td class="eb-text-right">
+				<td class="text-right">
 					<?php echo EventbookingHelper::formatCurrency($ticketType->price, $config); ?>
 				</td>
-				<td class="center">
+				<td class="text-center">
 					<?php echo $ticketType->quantity; ?>
 				</td>
-				<td class="eb-text-right">
+				<td class="text-right">
 					<?php echo EventbookingHelper::formatCurrency($ticketType->price*$ticketType->quantity, $config); ?>
 				</td>
 			</tr>
@@ -59,7 +59,7 @@ if (!empty($ticketTypes))
 <?php
 }
 ?>
-<table width="100%" class="os_table" cellspacing="2" cellpadding="2">
+<table width="100%" class="os_table" cellspacing="0" cellpadding="0">
 	<tr>
 		<td class="title_cell">
 			<?php echo  JText::_('EB_EVENT_TITLE') ?>
@@ -84,7 +84,16 @@ if (!empty($ticketTypes))
 				}
 				else
 				{
-					echo JHtml::_('date', $rowEvent->event_date, $config->event_date_format, null) ;
+					if (strpos($rowEvent->event_date, '00:00:00') !== false)
+					{
+						$dateFormat = $config->date_format;
+					}
+					else
+					{
+						$dateFormat = $config->event_date_format;
+					}
+
+					echo JHtml::_('date', $rowEvent->event_date, $dateFormat, null) ;
 				}
 			?>
 		</td>
@@ -92,18 +101,27 @@ if (!empty($ticketTypes))
 	<?php
 		if ($rowEvent->event_end_date != $nullDate)
 		{
+			if (strpos($rowEvent->event_end_date, '00:00:00') !== false)
+			{
+				$dateFormat = $config->date_format;
+			}
+			else
+			{
+				$dateFormat = $config->event_date_format;
+			}
 		?>
 			<tr>
 				<td class="title_cell">
 					<?php echo  JText::_('EB_EVENT_END_DATE') ?>
 				</td>
 				<td class="field_cell">
-					<?php echo JHtml::_('date', $rowEvent->event_end_date, $config->event_date_format, null); ?>
+					<?php echo JHtml::_('date', $rowEvent->event_end_date, $dateFormat, null); ?>
 				</td>
 			</tr>
 		<?php
 		}
 	}
+
 	if ($config->show_event_location_in_email && $rowLocation)
 	{
 		$location = $rowLocation ;
@@ -111,22 +129,6 @@ if (!empty($ticketTypes))
 		if ($location->address)
 		{
 			$locationInformation[] = $location->address;
-		}
-		if ($location->city)
-		{
-			$locationInformation[] = $location->city;
-		}
-		if ($location->state)
-		{
-			$locationInformation[] = $location->state;
-		}
-		if ($location->zip)
-		{
-			$locationInformation[] = $location->zip;
-		}
-		if ($location->country)
-		{
-			$locationInformation[] = $location->country;
 		}
 	?>
 		<tr>

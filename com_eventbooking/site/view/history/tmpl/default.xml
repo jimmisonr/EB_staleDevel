@@ -2,7 +2,7 @@
 <metadata>
 	<layout title="Registration History">
 		<message>
-			Display List Of Events which the current user registered
+			Display List Of events which the current user registered
 		</message>
 	</layout>
 	<state>

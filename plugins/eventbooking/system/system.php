@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -84,9 +84,9 @@ class plgEventbookingSystem extends JPlugin
 	 */
 	private function processInvoiceNumber($row)
 	{
-		if (EventbookingHelper::needInvoice($row))
+		if (EventbookingHelperRegistration::needInvoice($row))
 		{
-			$invoiceNumber       = EventbookingHelper::getInvoiceNumber();
+			$invoiceNumber       = EventbookingHelperRegistration::getInvoiceNumber($row);
 			$row->invoice_number = $invoiceNumber;
 			$row->store();
 			$db    = JFactory::getDbo();
@@ -251,7 +251,7 @@ class plgEventbookingSystem extends JPlugin
 
 				if ($rowRegistrant->is_group_billing)
 				{
-					$ticketCode = self::getTicketCode();
+					$ticketCode = EventbookingHelperRegistration::getTicketCode();
 
 					$query->clear()
 						->update('#__eb_registrants')
@@ -276,7 +276,7 @@ class plgEventbookingSystem extends JPlugin
 
 					foreach ($memberIds as $memberId)
 					{
-						$ticketCode = self::getTicketCode();
+						$ticketCode = EventbookingHelperRegistration::getTicketCode();
 
 						$query->clear()
 							->update('#__eb_registrants')
@@ -291,7 +291,7 @@ class plgEventbookingSystem extends JPlugin
 				}
 				else
 				{
-					$ticketCode = self::getTicketCode();
+					$ticketCode = EventbookingHelperRegistration::getTicketCode();
 
 					$query->clear()
 						->update('#__eb_registrants')
@@ -311,36 +311,5 @@ class plgEventbookingSystem extends JPlugin
 		}
 
 		$row->store();
-	}
-
-	/**
-	 * Generate Random Ticket Code
-	 *
-	 * @return string
-	 */
-	protected function getTicketCode()
-	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-
-		$ticketCode = '';
-
-		while (true)
-		{
-			$ticketCode = md5(JUserHelper::genRandomPassword(16));
-			$query->clear()
-				->select('COUNT(*)')
-				->from('#__eb_registrants')
-				->where('ticket_code = ' . $db->quote($ticketCode));
-			$db->setQuery($query);
-			$total = $db->loadResult();
-
-			if (!$total)
-			{
-				break;
-			}
-		}
-
-		return $ticketCode;
 	}
 }

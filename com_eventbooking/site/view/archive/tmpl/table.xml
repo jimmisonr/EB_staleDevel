@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="Events Archive Table Layout">
+	<layout title="Events Archive - Table layout">
 		<message>
-			Display past events from a category or from all categories in table layout
+			Display past events from a category or from all categories in Table layout
 		</message>
 	</layout>
 	<state>
-		<name>Events Archive</name>
-		<description>Display past events from a category or from all categories in table layout</description>
+		<name>Events Archive - Table layout</name>
+		<description>Display past events from a category or from all categories in Table layout</description>
 		<fields name="request">			
 			<fieldset name="request"
 				addfieldpath="/administrator/components/com_eventbooking/elements">

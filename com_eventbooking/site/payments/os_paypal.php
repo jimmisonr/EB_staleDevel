@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -36,9 +36,25 @@ class os_paypal extends RADPayment
 		$this->setParameter('cmd', '_xclick');
 		$this->setParameter('no_shipping', 1);
 		$this->setParameter('no_note', 1);
-		$this->setParameter('lc', 'US');
 		$this->setParameter('charset', 'utf-8');
 		$this->setParameter('tax', 0);
+
+		$locale = $params->get('paypal_locale');
+
+		if (empty($locale))
+		{
+			if (JLanguageMultilang::isEnabled())
+			{
+				$locale = JFactory::getLanguage()->getTag();
+				$locale = str_replace('-', '_', $locale);
+			}
+			else
+			{
+				$locale = 'en_US';
+			}
+		}
+
+		$this->setParameter('lc', $locale);
 	}
 
 	/**
@@ -115,14 +131,14 @@ class os_paypal extends RADPayment
 				return false;
 			}
 
-			$row = JTable::getInstance('EventBooking', 'Registrant');
+			$row = JTable::getInstance('Registrant', 'EventbookingTable');
 
 			if (!$row->load($id))
 			{
 				return false;
 			}
 
-			if ($row->published && $row->payment_status)
+			if ($row->published == 1 && $row->payment_status)
 			{
 				return false;
 			}
@@ -217,6 +233,11 @@ class os_paypal extends RADPayment
 	 */
 	protected function validate()
 	{
+		if ($this->params->get('use_new_paypal_ipn_verification') && function_exists('curl_init'))
+		{
+			return $this->validateIPN();
+		}
+
 		$errNum                 = "";
 		$errStr                 = "";
 		$urlParsed              = parse_url($this->url);
@@ -259,4 +280,48 @@ class os_paypal extends RADPayment
 
 		return false;
 	}
+
+
+	/**
+	 * Validate PayPal IPN using PayPal library
+	 *
+	 * @return bool
+	 */
+	protected function validateIPN()
+	{
+		JLoader::register('PaypalIPN', JPATH_ROOT . '/components/com_eventbooking/payments/paypal/PayPalIPN.php');
+
+		$ipn = new PaypalIPN;
+
+		// Use sandbox URL if test mode is configured
+		if (!$this->mode)
+		{
+			$ipn->useSandbox();
+		}
+
+		// Disable use custom certs
+		$ipn->usePHPCerts();
+
+		$this->notificationData = $_POST;
+
+		try
+		{
+			$valid = $ipn->verifyIPN();
+			$this->logGatewayData($ipn->getResponse());
+
+			if (!$this->mode || $valid)
+			{
+				return true;
+			}
+
+			return false;
+		}
+		catch (Exception $e)
+		{
+			$this->logGatewayData($e->getMessage());
+
+			return false;
+		}
+	}
+
 }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="module" version="1.5.0" position="left" method="upgrade">
+<extension type="module" version="3.5" client="site" method="upgrade">
     <name>Events Booking - Google Map</name>
     <author>Tuan Pham Ngoc</author>
     <authorEmail>tuanpn@joomdonation.com</authorEmail>
     <authorUrl></authorUrl>
-    <version>2.14.2</version>  
+    <version>3.2.1</version>  
     <creationDate>Feb 2014</creationDate>
     <copyright>2014</copyright>
     <license></license>
@@ -23,7 +23,7 @@
 				<field
 						name="center_coordinates"
 						type="text"
-						default="100"
+						default=""
 						label="Center Coordinates"
 						description="Center Coordinates of the map, for example 37.09024,-95.712891. Default to the coordinates of the location of first event" />
 				<field
@@ -58,6 +58,13 @@
 					label="Select category" 
 					description="" />
 				<field
+						name="location_ids"
+						type="eblocation"
+						multiple="true"
+						default=""
+						label="Select Locations"
+						description="" />
+				<field
 					name="hide_past_events"
 					type="radio"
 					default="1"
@@ -77,6 +84,8 @@
 					<option value="1">JYES</option>
 					<option value="0">JNO</option>
 				</field>
+				<field name="Itemid" type="text"
+					   label="Menu Item ID" description="Menu Item ID" default="" />
 			</fieldset>
 		</fields>
 	</config>

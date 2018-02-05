@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-    <layout title="Registrants List">
+    <layout title="Registrants list">
         <message>
             Displays list of registrants from one event
         </message>
     </layout>
     <state>
-        <name>Registrants List</name>
+        <name>Registrants list</name>
         <description>Displays list of registrants from one event</description>
         <fields name="request">
             <fieldset name="request"

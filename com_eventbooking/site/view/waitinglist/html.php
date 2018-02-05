@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -48,25 +48,29 @@ class EventbookingViewWaitinglistHtml extends RADViewHtml
 
 		if ($rowRegistrant->is_group_billing)
 		{
-			$rowFields = EventbookingHelper::getFormFields($rowEvent->id, 1);
+			$rowFields = EventbookingHelperRegistration::getFormFields($rowEvent->id, 1);
 		}
 		else
 		{
-			$rowFields = EventbookingHelper::getFormFields($rowEvent->id, 0);
+			$rowFields = EventbookingHelperRegistration::getFormFields($rowEvent->id, 0);
 		}
 
 		$form = new RADForm($rowFields);
-		$data = EventbookingHelper::getRegistrantData($rowRegistrant, $rowFields);
+		$data = EventbookingHelperRegistration::getRegistrantData($rowRegistrant, $rowFields);
 		$form->bind($data);
 		$form->buildFieldsDependency();
 
-		if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
+		if (is_callable('EventbookingHelperOverrideRegistration::buildTags'))
+		{
+			$replaces = EventbookingHelperOverrideRegistration::buildTags($rowRegistrant, $form, $rowEvent, $config);
+		}
+		elseif (is_callable('EventbookingHelperOverrideHelper::buildTags'))
 		{
 			$replaces = EventbookingHelperOverrideHelper::buildTags($rowRegistrant, $form, $rowEvent, $config);
 		}
 		else
 		{
-			$replaces = EventbookingHelper::buildTags($rowRegistrant, $form, $rowEvent, $config);
+			$replaces = EventbookingHelperRegistration::buildTags($rowRegistrant, $form, $rowEvent, $config);
 		}
 
 		foreach ($replaces as $key => $value)

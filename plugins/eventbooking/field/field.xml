@@ -6,7 +6,7 @@
     <author>Tuan Pham Ngoc</author>
     <authorEmail>tuanpn@joomdonation.com</authorEmail>
     <authorUrl>http://www.joomdonation.com</authorUrl>
-    <copyright>Copyright (C) 2010 - 2017 Ossolution Team</copyright>
+    <copyright>Copyright (C) 2010 - 2018 Ossolution Team</copyright>
     <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
     <version>2.3.0</version>
     <description>This plugin will custom fee field for each event based on pricing options entered in event's custom fields section. It is useful in case your event has different price options like Adult Children Price</description>

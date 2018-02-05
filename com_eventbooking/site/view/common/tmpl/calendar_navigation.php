@@ -3,18 +3,11 @@
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright    	Copyright (C) 2010 - 2018 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
-// no direct access
-defined( '_JEXEC' ) or die ;
-$menuLayout = 'layout';
-$activeMenu = JFactory::getApplication()->getMenu()->getActive();
 
-if ($activeMenu && !empty($activeMenu->query['layout']))
-{
-	$menuLayout = $activeMenu->query['layout'];
-}
+defined( '_JEXEC' ) or die ;
 ?>
 <div class="eb-topmenu-calendar">
 	<ul class="eb-menu-calendar nav nav-pills">
@@ -24,7 +17,7 @@ if ($activeMenu && !empty($activeMenu->query['layout']))
 				$year = $currentDateData['year'];
 			?>
 			<a class="calendar_link<?php if ($layout == 'default') echo ' active'; ?>"
-			   href="<?php echo JRoute::_("index.php?option=com_eventbooking&view=calendar" . ($menuLayout == 'default' ? '' : '&layout=default') . "&month=$month&year=$year&Itemid=$Itemid"); ?>"
+			   href="<?php echo JRoute::_("index.php?option=com_eventbooking&view=calendar&layout=default&month=$month&year=$year&Itemid=$Itemid"); ?>"
 			   class="calendar_link active" rel="nofollow">
 				<?php echo JText::_('EB_MONTHLY_VIEW')?>
 			</a>

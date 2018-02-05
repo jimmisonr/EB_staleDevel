@@ -3,89 +3,203 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
-class EventbookingViewCategoriesHtml extends RADViewHtml
+/**
+ * Class EventbookingViewCategoriesHtml
+ *
+ * @property EventbookingModelCategories $model
+ */
+class EventbookingViewCategoriesHtml extends RADViewList
 {
-	public function display()
-	{
-		$app    = JFactory::getApplication();
-		$active = $app->getMenu()->getActive();
-		$params = EventbookingHelper::getViewParams($active, array('categories'));
+	/**
+	 * ID of parent category
+	 * @var int
+	 */
+	protected $categoryId;
 
-		$config     = EventbookingHelper::getConfig();
-		$model      = $this->getModel();
-		$items      = $model->getData();
-		$pagination = $model->getPagination();
-		$categoryId = (int) $model->getState('id');
+	/**
+	 * The parent category
+	 *
+	 * @var stdClass
+	 */
+	protected $category = null;
+
+	/**
+	 * Component config
+	 *
+	 * @var RADConfig
+	 */
+	protected $config;
+
+	/**
+	 * Prepare data for the view for rendering
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	protected function prepareView()
+	{
+		parent::prepareView();
 
 		// If category id is passed, make sure it is valid and the user is allowed to access
-		if ($categoryId)
+		if ($categoryId = $this->state->get('id'))
 		{
-			$category = EventbookingHelperDatabase::getCategory($categoryId);
-			if (empty($category) || !in_array($category->access, JFactory::getUser()->getAuthorisedViewLevels()))
+			$this->category = $this->model->getCategory();
+
+			if (empty($this->category))
 			{
-				$app->redirect('index.php', JText::_('EB_INVALID_CATEGORY_OR_NOT_AUTHORIZED'));
+				throw new Exception(JText::_('JGLOBAL_CATEGORY_NOT_FOUND'), 404);
 			}
 
-			$this->category = $category;
-		}
-
-		// Build page title if it has not been set from menu title
-		if (!$params->get('page_title'))
-		{
-			if (!empty($category))
+			if (!in_array($this->category->access, JFactory::getUser()->getAuthorisedViewLevels()))
 			{
-				$pageTitle = JText::_('EB_SUB_CATEGORIES_PAGE_TITLE');
-				$pageTitle = str_replace('[CATEGORY_NAME]', $category->name, $pageTitle);
-			}
-			else
-			{
-				$pageTitle = JText::_('EB_CATEGORIES_PAGE_TITLE');
-			}
-
-			$params->set('page_title', $pageTitle);
-		}
-
-		EventbookingHelperHtml::prepareDocument($params, isset($category) ? $category : null);
-
-		// Process content plugin  for categories
-		if ($config->process_plugin)
-		{
-			for ($i = 0, $n = count($items); $i < $n; $i++)
-			{
-				$item              = $items[$i];
-				$item->description = JHtml::_('content.prepare', $item->description);
-			}
-			if (!empty($category))
-			{
-				$category->description = JHtml::_('content.prepare', $category->description);
+				throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
 			}
 		}
 
+		// Calculate page intro text
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 		$message     = EventbookingHelper::getMessages();
 
-		if (strlen($message->{'intro_text' . $fieldSuffix}))
+		if ($fieldSuffix && EventbookingHelper::isValidMessage($message->{'intro_text' . $fieldSuffix}))
 		{
 			$introText = $message->{'intro_text' . $fieldSuffix};
 		}
-		else
+		elseif (EventbookingHelper::isValidMessage($message->intro_text))
 		{
 			$introText = $message->intro_text;
 		}
+		else
+		{
+			$introText = '';
+		}
 
+		$this->config     = EventbookingHelper::getConfig();
 		$this->categoryId = $categoryId;
-		$this->config     = $config;
-		$this->items      = $items;
-		$this->pagination = $pagination;
-		$this->params     = $params;
 		$this->introText  = $introText;
 
-		parent::display();
+		$this->prepareDocument();
+
+		if ($this->getLayout() == 'events')
+		{
+			for ($i = 0, $n = count($this->items); $i < $n; $i++)
+			{
+				$item = $this->items[$i];
+
+				$model = new EventbookingModelUpcomingevents(
+					[
+						'table_prefix'    => '#__eb_',
+						'remember_states' => false,
+						'ignore_request'  => true,
+					]
+				);
+
+				$item->events = $model->setState('limitstart', 0)
+					->setState('limit', $this->params->get('number_events_per_category', 20))
+					->setState('id', $item->id)
+					->getData();
+			}
+
+			// Load required javascript code
+			$this->loadAssets();
+		}
+
+		$this->findAndSetActiveMenuItem();
+	}
+
+	/**
+	 * Prepare view parameters
+	 *
+	 * @return void
+	 */
+	protected function prepareDocument()
+	{
+		$this->params = $this->getParams();
+
+
+		if ($this->category)
+		{
+			// Page title
+			if ($this->category->page_title)
+			{
+				$pageTitle = $this->category->page_title;
+			}
+			else
+			{
+				$pageTitle = JText::_('EB_SUB_CATEGORIES_PAGE_TITLE');
+				$pageTitle = str_replace('[CATEGORY_NAME]', $this->category->name, $pageTitle);
+			}
+
+			$this->params->set('page_title', $pageTitle);
+
+			// Page heading
+			$this->params->set('show_page_heading', 1);
+			$this->params->set('page_heading', $this->category->page_heading ?: $this->category->name);
+
+			// Meta keywords and description
+			if ($this->category->meta_keywords)
+			{
+				$this->params->set('menu-meta_keywords', $this->category->meta_keywords);
+			}
+
+			if ($this->category->meta_description)
+			{
+				$this->params->set('menu-meta_description', $this->category->meta_description);
+			}
+		}
+		else
+		{
+			$this->params->def('page_title', JText::_('EB_CATEGORIES_PAGE_TITLE'));
+			$this->params->def('page_heading', JText::_('EB_CATEGORIES'));
+		}
+
+		$this->setDocumentMetadata();
+	}
+
+	/**
+	 * Load assets (javascript/css) for this specific view
+	 *
+	 * @return void
+	 */
+	protected function loadAssets()
+	{
+		if ($this->config->multiple_booking)
+		{
+			if ($this->deviceType == 'mobile')
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '100%', '450px', 'false', 'false');
+			}
+			else
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', 'false', 'false', 'false', 'false');
+			}
+		}
+
+		if ($this->config->show_list_of_registrants)
+		{
+			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
+		}
+
+		if ($this->config->show_location_in_category_view || ($this->getLayout() == 'timeline'))
+		{
+			$width  = (int) $this->config->get('map_width', 800);
+			$height = (int) $this->config->get('map_height', 600);
+
+			if ($this->deviceType == 'mobile')
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-map', '100%', $height . 'px', 'true', 'false');
+			}
+			else
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
+			}
+		}
+
+		EventbookingHelperJquery::colorbox('a.eb-modal');
 	}
 }

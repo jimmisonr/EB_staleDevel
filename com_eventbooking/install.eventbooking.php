@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -217,6 +217,22 @@ class com_eventbookingInstallerScript
 					}
 				}
 			}
+		}
+		
+		// Create folders to store categories and events images
+		if (!JFolder::exists(JPATH_ROOT . '/images/com_eventbooking'))
+		{
+			JFolder::create(JPATH_ROOT . '/images/com_eventbooking');
+		}
+
+		if (!JFolder::exists(JPATH_ROOT . '/images/com_eventbooking/categories'))
+		{
+			JFolder::create(JPATH_ROOT . '/images/com_eventbooking/categories');
+		}
+
+		if (!JFolder::exists(JPATH_ROOT . '/images/com_eventbooking/categories/thumb'))
+		{
+			JFolder::create(JPATH_ROOT . '/images/com_eventbooking/thumb');
 		}
 	}
 }

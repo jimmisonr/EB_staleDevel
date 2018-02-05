@@ -3,10 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 class EventbookingController extends RADController
@@ -37,7 +37,7 @@ class EventbookingController extends RADController
 			$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/css/font-awesome.css');
 		}
 
-		JHtml::_('script', 'media/com_eventbooking/assets/js/noconflict.js', false, false);
+		JHtml::_('script', 'media/com_eventbooking/assets/js/eventbookingjq.js', false, false);
 
 		if ($config->calendar_theme)
 		{
@@ -59,11 +59,6 @@ class EventbookingController extends RADController
 
 		switch ($task)
 		{
-			case 'add_registrant':
-			case 'edit_registrant':
-				$this->input->set('view', 'registrant');
-				$this->input->set('layout', 'default');
-				break;
 			case 'view_category':
 				$this->input->set('view', 'category');
 				break;
@@ -207,20 +202,34 @@ class EventbookingController extends RADController
 		$arrayToJs    = array();
 		$arrayToJs[0] = $validateId;
 
-		if ($config->prevent_duplicate_registration && !$config->multiple_booking)
+		if (!$config->multiple_booking)
 		{
-			$query->select('COUNT(id)')
-				->from('#__eb_registrants')
-				->where('event_id = ' . $eventId)
-				->where('email = ' . $db->quote($email))
-				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
-			$db->setQuery($query);
-			$total = $db->loadResult();
+			$event = EventbookingHelperDatabase::getEvent($eventId);
 
-			if ($total)
+			if ($event->prevent_duplicate_registration === '')
 			{
-				$arrayToJs[1] = false;
-				$arrayToJs[2] = JText::_('EB_EMAIL_REGISTER_FOR_EVENT_ALREADY');
+				$preventDuplicateRegistration = $config->prevent_duplicate_registration;
+			}
+			else
+			{
+				$preventDuplicateRegistration = $event->prevent_duplicate_registration;
+			}
+
+			if ($preventDuplicateRegistration)
+			{
+				$query->select('COUNT(id)')
+					->from('#__eb_registrants')
+					->where('event_id = ' . $eventId)
+					->where('email = ' . $db->quote($email))
+					->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
+				$db->setQuery($query);
+				$total = $db->loadResult();
+
+				if ($total)
+				{
+					$arrayToJs[1] = false;
+					$arrayToJs[2] = JText::_('EB_EMAIL_REGISTER_FOR_EVENT_ALREADY');
+				}
 			}
 		}
 
@@ -321,12 +330,16 @@ class EventbookingController extends RADController
 		$allFieldIds = EventbookingHelper::getAllDependencyFields($fieldId);
 
 		$query->select('*')
-			->select('title' . $languageSuffix . ' AS title')
-			->select('depend_on_options' . $languageSuffix . ' AS depend_on_options')
 			->from('#__eb_fields')
 			->where('published=1')
 			->where('id IN (' . implode(',', $allFieldIds) . ')')
 			->order('ordering');
+
+		if ($languageSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, ['title', 'depend_on_options'], $languageSuffix);
+		}
+
 		$db->setQuery($query);
 		$rowFields    = $db->loadObjectList();
 		$masterFields = array();
@@ -492,8 +505,8 @@ class EventbookingController extends RADController
 
 		if ($userId && $eventId)
 		{
-			$rowFields = EventbookingHelper::getFormFields($eventId, 0);
-			$data      = EventbookingHelper::getFormData($rowFields, $eventId, $userId, $config);
+			$rowFields = EventbookingHelperRegistration::getFormFields($eventId, 0);
+			$data      = EventbookingHelperRegistration::getFormData($rowFields, $eventId, $userId, $config);
 		}
 
 		if ($userId && !isset($data['first_name']))

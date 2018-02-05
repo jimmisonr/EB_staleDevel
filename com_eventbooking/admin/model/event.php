@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -27,16 +27,6 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 		if (count($events))
 		{
 			$config = EventbookingHelper::getConfig();
-
-			if (!$config->thumb_width)
-			{
-				$config->thumb_width = 200;
-			}
-
-			if (!$config->thumb_height)
-			{
-				$config->thumb_height = 200;
-			}
 
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
@@ -115,6 +105,16 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 							$event['thumb'] = $fileName;
 						}
 					}
+				}
+
+				if (!isset($event['access']))
+				{
+					$event['access'] = 1;
+				}
+
+				if (!isset($event['registration_access']))
+				{
+					$event['registration_access'] = 1;
 				}
 
 				$row->bind($event, array('id'));

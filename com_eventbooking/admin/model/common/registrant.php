@@ -3,10 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 /**
@@ -69,11 +69,11 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			$published = $row->published;
 			if ($row->is_group_billing)
 			{
-				$rowFields = EventbookingHelper::getFormFields($data['event_id'], 1);
+				$rowFields = EventbookingHelperRegistration::getFormFields($data['event_id'], 1);
 			}
 			else
 			{
-				$rowFields = EventbookingHelper::getFormFields($data['event_id'], 0);
+				$rowFields = EventbookingHelperRegistration::getFormFields($data['event_id'], 0);
 			}
 
 			if ($user->authorise('eventbooking.registrantsmanagement', 'com_eventbooking') || empty($row->published))
@@ -119,7 +119,18 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 					$data['number_registrants'] = $row->number_registrants;
 					$data['re_calculate_fee']   = true;
 
-					$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $row->payment_method);
+					if (is_callable('EventbookingHelperOverrideRegistration::calculateGroupRegistrationFees'))
+					{
+						$fees = EventbookingHelperOverrideRegistration::calculateGroupRegistrationFees($event, $form, $data, $config, $row->payment_method);
+					}
+					elseif (is_callable('EventbookingHelperOverrideHelper::calculateGroupRegistrationFees'))
+					{
+						$fees = EventbookingHelperOverrideHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $row->payment_method);
+					}
+					else
+					{
+						$fees = EventbookingHelperRegistration::calculateGroupRegistrationFees($event, $form, $data, $config, $row->payment_method);
+					}
 
 					$row->total_amount    = round($fees['total_amount'], 2);
 					$row->discount_amount = round($fees['discount_amount'], 2);
@@ -148,7 +159,19 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 						$data['coupon_code'] = $db->loadResult();
 					}
 
-					$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $row->payment_method);
+					if (is_callable('EventbookingHelperOverrideRegistration::calculateIndividualRegistrationFees'))
+					{
+						$fees = EventbookingHelperOverrideRegistration::calculateIndividualRegistrationFees($event, $form, $data, $config, $row->payment_method);
+					}
+					elseif (is_callable('EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees'))
+					{
+						$fees = EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $row->payment_method);
+					}
+					else
+					{
+						$fees = EventbookingHelperRegistration::calculateIndividualRegistrationFees($event, $form, $data, $config, $row->payment_method);
+					}
+
 
 					$row->total_amount    = round($fees['total_amount'], 2);
 					$row->discount_amount = round($fees['discount_amount'], 2);
@@ -156,6 +179,12 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 					$row->amount          = round($fees['amount'], 2);
 				}
 			}
+
+			if (!$row->registration_code)
+			{
+				$row->registration_code = EventbookingHelperRegistration::getRegistrationCode();
+			}
+
 			$row->store();
 			$form = new RADForm($rowFields);
 			$form->storeData($row->id, $data, $excludeFeeFields);
@@ -183,11 +212,18 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				$query->clear();
 			}
 
+			$event = EventbookingHelperDatabase::getEvent($row->event_id);
+
+			if ($event->collect_member_information !== '')
+			{
+				$config->collect_member_information = $event->collect_member_information;
+			}
+
 			//Store group members data
 			if ($row->number_registrants > 1 && $config->collect_member_information)
 			{
 				$ids              = (array) $data['ids'];
-				$memberFormFields = EventbookingHelper::getFormFields($row->event_id, 2);
+				$memberFormFields = EventbookingHelperRegistration::getFormFields($row->event_id, 2);
 				for ($i = 0; $i < $row->number_registrants; $i++)
 				{
 					$memberId = $ids[$i];
@@ -201,8 +237,14 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 					$rowMember->transaction_id = $row->transaction_id;
 					if (!$memberId)
 					{
-						$rowMember->group_id = $row->id;
-						$rowMember->user_id  = $row->user_id;
+						$rowMember->group_id           = $row->id;
+						$rowMember->user_id            = $row->user_id;
+						$rowMember->number_registrants = 1;
+					}
+
+					if (!$rowMember->registration_code)
+					{
+						$rowMember->registration_code = EventbookingHelperRegistration::getRegistrationCode();
 					}
 
 					$memberForm = new RADForm($memberFormFields);
@@ -260,21 +302,29 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 				//Registration is cancelled, send notification emails to waiting list
 				if ($config->activate_waitinglist_feature)
 				{
-					EventbookingHelper::notifyWaitingList($row, $config);
+					EventbookingHelperMail::sendWaitingListNotificationEmail($row, $config);
 				}
 			}
 			$input->set('id', $row->id);
 		}
 		else
 		{
+			jimport('joomla.user.helper');
+
 			// In case number registrants is empty, we set it default to 1
 			$data['number_registrants'] = (int) $data['number_registrants'];
+
 			if (empty($data['number_registrants']))
 			{
 				$data['number_registrants'] = 1;
 			}
+
+			$data['transaction_id'] = strtoupper(JUserHelper::genRandomPassword());
+
 			$row->bind($data);
-			$rowFields = EventbookingHelper::getFormFields($data['event_id'], 0);
+			$row->registration_code = EventbookingHelperRegistration::getRegistrationCode();
+
+			$rowFields = EventbookingHelperRegistration::getFormFields($data['event_id'], 0);
 			$form      = new RADForm($rowFields);
 			$form->bind($data);
 
@@ -288,7 +338,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 			// In case total amount is not entered, calculate it automatically
 			if (empty($row->total_amount))
 			{
-				$rate              = EventbookingHelper::getRegistrationRate($data['event_id'], $data['number_registrants']);
+				$rate              = EventbookingHelperRegistration::getRegistrationRate($data['event_id'], $data['number_registrants']);
 				$row->total_amount = $row->amount = $rate * $data['number_registrants'] + $form->calculateFee();
 			}
 
@@ -310,11 +360,15 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 
 			$this->storeRegistrantTickets($row, $data);
 
+			$app = JFactory::getApplication();
+			JPluginHelper::importPlugin('eventbooking');
+
+			$app->triggerEvent('onAfterStoreRegistrant', array($row));
+
 			if ($row->published == 1)
 			{
 				// Trigger event and send emails
-				JPluginHelper::importPlugin('eventbooking');
-				JFactory::getApplication()->triggerEvent('onAfterPaymentSuccess', array($row));
+				$app->triggerEvent('onAfterPaymentSuccess', array($row));
 			}
 
 			// In case individual registration, we will send notification email to registrant
@@ -371,6 +425,37 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 		}
 
 		return true;
+	}
+
+	/**
+	 * Resend confirmation email to registrant
+	 *
+	 * @param $id
+	 *
+	 * @return bool True if email is successfully delivered
+	 * @throws Exception
+	 */
+	public function sendPaymentRequestEmail($id)
+	{
+		/* @var EventbookingTableRegistrant $row */
+		$row = $this->getTable();
+		$row->load($id);
+
+		if ($row->group_id > 0)
+		{
+			// We don't send email to group members, return false
+			throw new Exception('Request payment email could not be ent to group members');
+		}
+
+		if ($row->published == 1)
+		{
+			// We don't send request payment email to paid registration
+			throw new Exception('Request payment can only be sent to waiting list or pending registration');
+		}
+
+		$config = EventbookingHelper::getConfig();
+
+		EventbookingHelperMail::sendRequestPaymentEmail($row, $config);
 	}
 
 	/**
@@ -525,10 +610,127 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	}
 
 	/**
+	 * Checkin registrant
+	 *
+	 * @param int  $id
+	 * @param bool $checkinAllGroupMembers
+	 *
+	 * @return int
+	 */
+	public function checkinRegistrant($id, $checkinAllGroupMembers = false)
+	{
+		/* @var EventbookingTableRegistrant $row */
+		$row = $this->getTable();
+
+		if (!$row->load($id))
+		{
+			return 0;
+		}
+
+		if ($row->checked_in)
+		{
+			return 1;
+		}
+
+		if ($row->published == 2)
+		{
+			return 3;
+		}
+
+		$db    = $this->getDbo();
+		$query = $db->getQuery(true);
+
+		if ($row->is_group_billing)
+		{
+			// Check in group billing record
+			if ($checkinAllGroupMembers)
+			{
+				$row->checked_in_count = $row->number_registrants;
+				$row->checked_in       = 1;
+				$row->store();
+
+				// Check in all other group members belong to this group
+				$query->update('#__eb_registrants')
+					->set('checked_in_count = 1')
+					->set('checked_in = 1')
+					->where('group_id = ' . $row->id);
+				$db->setQuery($query);
+				$db->execute();
+			}
+			else
+			{
+				// Get the next group member and check in that member
+				$query->select('id')
+					->from('#__eb_registrants')
+					->where('group_id = ' . $row->id)
+					->where('checked_in = 0')
+					->order('id');
+				$db->setQuery($query);
+				$nextGroupMemberId = $db->loadResult();
+
+				if ($nextGroupMemberId > 0)
+				{
+					/* @var EventbookingTableRegistrant $groupMember */
+					$groupMember = $this->getTable();
+					$groupMember->load($nextGroupMemberId);
+					$groupMember->checked_in_count = 1;
+					$groupMember->checked_in       = 1;
+					$groupMember->store();
+				}
+
+				$row->checked_in_count = $row->checked_in_count + 1;
+
+				if ($row->checked_in_count >= $row->number_registrants)
+				{
+					$row->checked_in_count = $row->number_registrants;
+					$row->checked_in       = 1;
+				}
+
+				$row->store();
+			}
+		}
+		elseif ($row->group_id > 0)
+		{
+			// Check in a group member record
+			$row->checked_in       = 1;
+			$row->checked_in_count = 1;
+
+			// Get the group billing record
+			/* @var EventbookingTableRegistrant $group */
+			$group = $this->getTable();
+			$group->load($row->group_id);
+			$group->checked_in_count = $group->checked_in_count + 1;
+
+			if ($group->checked_in_count >= $group->number_registrants)
+			{
+				$group->checked_in_count = $group->number_registrants;
+				$group->checked_in       = 1;
+			}
+
+			$group->store();
+		}
+		else
+		{
+			// Check-in individual registration record
+			$row->checked_in       = 1;
+			$row->checked_in_count = 1;
+			$row->store();
+		}
+
+		if ($row->published == 1)
+		{
+			return 2;
+		}
+
+		return 4;
+	}
+
+
+	/**
 	 * Check-in a registration record
 	 *
-	 * @param $id
-	 * @pram  $group
+	 * @param  int  $id
+	 * @param  bool $group
 	 *
 	 * @return int
 	 */
@@ -567,6 +769,24 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 	}
 
 	/**
+	 * Method to batch checkin registrants
+	 *
+	 * @param array $cid
+	 *
+	 * @return void
+	 */
+	public function batchCheckin($cid)
+	{
+		$db    = $this->getDbo();
+		$query = $db->getQuery(true);
+		$query->update('#__eb_registrants')
+			->set('checked_in = 1')
+			->where('id IN (' . implode(',', $cid) . ')');
+		$db->setQuery($query);
+		$db->execute();
+	}
+
+	/**
 	 * Reset check-in status for the registration record
 	 *
 	 * @param $id
@@ -579,7 +799,7 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 		$row = $this->getTable();
 		$row->load($id);
 
-		if (empty($row))
+		if (!$row->load($id))
 		{
 			throw new Exception(JText::sprintf('Error checkin registration record %s', $id));
 		}
@@ -588,6 +808,34 @@ class EventbookingModelCommonRegistrant extends RADModelAdmin
 		$row->checked_in       = 0;
 
 		$row->store();
+
+		if ($row->is_group_billing)
+		{
+			// Uncheckin all group members
+			$db    = $this->getDbo();
+			$query = $db->getQuery(true);
+			$query->update('#__eb_registrants')
+				->set('checked_in = 0')
+				->set('checked_in_count = 0')
+				->where('group_id = ' . $row->id);
+			$db->setQuery($query);
+			$db->execute();
+		}
+		elseif ($row->group_id > 0)
+		{
+			/* @var EventbookingTableRegistrant $group */
+			$group = $this->getTable();
+			$group->load($row->group_id);
+			$group->checked_in_count = $group->checked_in_count - 1;
+
+			if ($group->checked_in_count < 0)
+			{
+				$group->checked_in_count = 0;
+			}
+
+			$group->checked_in = 0;
+			$group->store();
+		}
 	}
 
 	/**

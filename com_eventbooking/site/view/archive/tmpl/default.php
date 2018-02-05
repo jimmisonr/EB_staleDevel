@@ -3,13 +3,15 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
 defined('_JEXEC') or die;
 JHtml::_('behavior.modal', 'a.eb-modal');
 $nullDate = JFactory::getDbo()->getNullDate();
+$config   = $this->config;
+
 ?>
 <div id="eb-events-archive-page" class="eb-container">
 <h1 class="eb-page-heading"><?php echo JText::_('EB_EVENTS_ARCHIVE'); ?></h1>
@@ -234,13 +236,17 @@ if(count($this->items))
 											</td>
 											<td class="eb-event-property-value">
 												<?php
-												if ($event->individual_price > 0)
+												if ($event->price_text)
+												{
+													echo $event->price_text;
+												}
+                                                elseif ($event->individual_price > 0)
 												{
 													echo EventbookingHelper::formatCurrency($event->individual_price, $config, $event->currency_symbol);
 												}
 												else
 												{
-													echo '<span class="eb_price">' . JText::_('EB_FREE') . '</span>';
+													echo '<span class="eb_free">' . JText::_('EB_FREE') . '</span>';
 												}
 												?>
 											</td>
@@ -248,6 +254,7 @@ if(count($this->items))
 									<?php
 									}
 								}
+
 								if (isset($event->paramData))
 								{
 									foreach ($event->paramData as $paramItem)

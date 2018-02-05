@@ -3,10 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 use Joomla\Utilities\ArrayHelper;
@@ -36,7 +36,7 @@ class EventbookingControllerLocation extends EventbookingController
 				$msg = JText::_('EB_ERROR_SAVING_LOCATION') . ':' . $e->getMessage();
 			}
 
-			$this->setRedirect(JRoute::_('index.php?option=com_eventbooking&view=locations&Itemid=' . $this->input->getInt('Itemid', 0)), $msg);
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('locations', $this->input->getInt('Itemid', 0)), false), $msg);
 		}
 	}
 

@@ -3,16 +3,22 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
+
 // no direct access
+
 defined('_JEXEC') or die;
+
 $hiddenPhoneClass = $this->bootstrapHelper->getClassMapping('hidden-phone');
 $cols = 3;
+
+$pageHeading = JText::_('EB_REGISTRANT_LIST');
+$pageHeading = str_replace('[EVENT_TITLE]', $this->event->title, $pageHeading);
 ?>
 <div id="eb-registrants-list-page" class="eb-container">
-<h1 class="eb_title"><?php echo JText::_('EB_REGISTRANT_LIST'); ?></h1>
+<h1 class="eb_title"><?php echo $pageHeading; ?></h1>
 <?php
 if (count($this->items))
 {
@@ -91,7 +97,7 @@ if (count($this->items))
 				{
 				?>
 					<td colspan="<?php echo $cols; ?>">
-						<?php echo $this->pagination->getPagesLinks();?>
+                        <div class="pagination"><?php echo $this->pagination->getPagesLinks();?></div>
 					</td>
 				<?php
 				}

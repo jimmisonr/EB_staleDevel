@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -29,14 +29,23 @@ class os_offline extends RADPayment
 	{
 		$app    = JFactory::getApplication();
 		$Itemid = $app->input->getInt('Itemid', 0);
-		$config = EventbookingHelper::getConfig();
 
-		if ($row->is_group_billing)
+		if ($this->params->get('published') == 1)
 		{
-			EventbookingHelper::updateGroupRegistrationRecord($row->id);
+			$this->onPaymentSuccess($row, $row->transaction_id);
+		}
+		else
+		{
+			$config = EventbookingHelper::getConfig();
+
+			if ($row->is_group_billing)
+			{
+				EventbookingHelperRegistration::updateGroupRegistrationRecord($row->id);
+			}
+
+			EventbookingHelper::sendEmails($row, $config);
 		}
 
-		EventbookingHelper::sendEmails($row, $config);
 
 		if (JPluginHelper::isEnabled('system', 'cache'))
 		{

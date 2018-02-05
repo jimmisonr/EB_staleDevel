@@ -3,10 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
@@ -15,12 +15,29 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 {
 	public function display()
 	{
-		if (!JFactory::getUser()->id)
+		$user = JFactory::getUser();
+
+		if (!$user->id)
 		{
-			$redirectUrl = JRoute::_('index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString()));
-			JFactory::getApplication()->redirect($redirectUrl);
+			$app    = JFactory::getApplication();
+			$active = $app->getMenu()->getActive();
+			$option = isset($active->query['option']) ? $active->query['option'] : '';
+			$view   = isset($active->query['view']) ? $active->query['view'] : '';
+
+			if ($option == 'com_eventbooking' && $view == 'history')
+			{
+				$returnUrl = 'index.php?Itemid=' . $active->id;
+			}
+			else
+			{
+				$returnUrl = JUri::getInstance()->toString();
+			}
+
+			$redirectUrl = JRoute::_('index.php?option=com_users&view=login&return=' . base64_encode($returnUrl), false);
+			$app->redirect($redirectUrl);
 		}
 
+		/* @var EventbookingModelHistory $model */
 		$model              = $this->getModel();
 		$state              = $model->getState();
 		$config             = EventbookingHelper::getConfig();
@@ -29,25 +46,15 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 		$lists['order']     = $state->filter_order;
 
 		//Get list of events
-		$rows      = EventbookingHelperDatabase::getAllEvents();
-		$options   = array();
-		$options[] = JHtml::_('select.option', 0, JText::_('EB_SELECT_EVENT'), 'id', 'title');
-		if ($config->show_event_date)
-		{
-			for ($i = 0, $n = count($rows); $i < $n; $i++)
-			{
-				$row       = $rows[$i];
-				$options[] = JHtml::_('select.option', $row->id,
-					$row->title . ' (' . JHtml::_('date', $row->event_date, $config->date_format, null) . ')' . '', 'id', 'title');
-			}
-		}
-		else
-		{
-			$options = array_merge($options, $rows);
-		}
-
-		$lists['filter_event_id'] = JHtml::_('select.genericlist', $options, 'filter_event_id', 'class="input-xlarge" onchange="submit();"', 'id', 'title',
-			$state->filter_event_id);
+		$db    = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('a.id, a.title, a.event_date')
+			->from('#__eb_events AS a')
+			->where('a.id IN (SELECT event_id FROM #__eb_registrants AS b WHERE (b.user_id = ' . $user->id . ' OR b.email = ' . $db->quote($user->email) . ') AND (b.published >= 1 OR b.payment_method LIKE "os_offline%"))')
+			->order('a.title');
+		$db->setQuery($query);
+		$rows                     = $db->loadObjectList();
+		$lists['filter_event_id'] = EventbookingHelperHtml::getEventsDropdown($rows, 'filter_event_id', 'class="input-xlarge" onchange="submit();"', $state->filter_event_id);
 
 		$items = $model->getData();
 
@@ -59,7 +66,7 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 		{
 			foreach ($items as $item)
 			{
-				if ($item->payment_status == 0)
+				if ($item->payment_status != 1)
 				{
 					$showDueAmountColumn = true;
 					break;
@@ -84,11 +91,19 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 				$item->show_download_certificate = true;
 			}
 
-			if ($item->ticket_number)
+			if ($item->ticket_number && $item->payment_status == 1)
 			{
 				$showDownloadTicket = true;
 			}
 		}
+
+		// Select none offline payment plugins
+		$query->clear()
+			->select('id')
+			->from('#__eb_payment_plugins')
+			->where('published = 1')
+			->where('name NOT LIKE "os_offline%"');
+		$db->setQuery($query);
 
 		$this->state                   = $state;
 		$this->lists                   = $lists;
@@ -98,6 +113,7 @@ class EventbookingViewHistoryHtml extends RADViewHtml
 		$this->showDueAmountColumn     = $showDueAmountColumn;
 		$this->showDownloadCertificate = $showDownloadCertificate;
 		$this->showDownloadTicket      = $showDownloadTicket;
+		$this->onlinePaymentPlugins    = $db->loadColumn();
 
 		parent::display();
 	}

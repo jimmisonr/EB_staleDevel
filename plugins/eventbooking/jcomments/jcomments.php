@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -14,8 +14,7 @@ class plgEventBookingJcomments extends JPlugin
 {
 	public function __construct(& $subject, $config)
 	{
-		parent::__construct($subject, $config);
-		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/table');
+		parent::__construct($subject, $config);		
 	}
 
 	public function onEventDisplay($row)

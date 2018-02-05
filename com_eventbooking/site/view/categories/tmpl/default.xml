@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="Categories List">
+	<layout title="Categories - Default layout">
 		<message>
-			Displays a list of categories
+			Displays a list of categories in default layout
 		</message>
 	</layout>
 	<state>
-		<name>Categories List</name>
-		<description>Displays a list of categories</description>		
+		<name>Categories - Default layout</name>
+		<description>Displays a list of categories in default layout</description>
 		<fields name="request">			
 			<fieldset name="request"
 				addfieldpath="/administrator/components/com_eventbooking/elements">

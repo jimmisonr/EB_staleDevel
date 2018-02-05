@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -129,9 +129,10 @@ class EventbookingHelperData
 	/**
 	 * Build the data used for rendering calendar
 	 *
-	 * @param $rows
-	 * @param $year
-	 * @param $month
+	 * @param array $rows
+	 * @param int   $year
+	 * @param int   $month
+	 * @param bool  $mini
 	 *
 	 * @return array
 	 */
@@ -184,11 +185,10 @@ class EventbookingHelperData
 
 		for ($a = $start; $a > 0; $a--)
 		{
-			$data["dates"][$dayCount]                 = array();
-			$data["dates"][$dayCount]["monthType"]    = "prior";
-			$data["dates"][$dayCount]["month"]        = $priorMonth;
-			$data["dates"][$dayCount]["year"]         = $priorYear;
-			$data["dates"][$dayCount]['countDisplay'] = 0;
+			$data["dates"][$dayCount]              = array();
+			$data["dates"][$dayCount]["monthType"] = "prior";
+			$data["dates"][$dayCount]["month"]     = $priorMonth;
+			$data["dates"][$dayCount]["year"]      = $priorYear;
 			$dayCount++;
 		}
 
@@ -199,11 +199,10 @@ class EventbookingHelperData
 
 		for ($d = 1; $d <= $end; $d++)
 		{
-			$data["dates"][$dayCount]                 = array();
-			$data["dates"][$dayCount]['countDisplay'] = 0;
-			$data["dates"][$dayCount]["monthType"]    = "current";
-			$data["dates"][$dayCount]["month"]        = $month;
-			$data["dates"][$dayCount]["year"]         = $year;
+			$data["dates"][$dayCount]              = array();
+			$data["dates"][$dayCount]["monthType"] = "current";
+			$data["dates"][$dayCount]["month"]     = $month;
+			$data["dates"][$dayCount]["year"]      = $year;
 
 			if ($month == $todayMonth && $year == $todayYear && $d == $todayDay)
 			{
@@ -241,15 +240,12 @@ class EventbookingHelperData
 		$followMonth = $date->format('m');
 		$followYear  = $date->format('Y');
 
-		$data["followingMonth"] = array();
-
 		for ($d = 1; $d <= $days; $d++)
 		{
-			$data["dates"][$dayCount]                 = array();
-			$data["dates"][$dayCount]["monthType"]    = "following";
-			$data["dates"][$dayCount]["month"]        = $followMonth;
-			$data["dates"][$dayCount]["year"]         = $followYear;
-			$data["dates"][$dayCount]['countDisplay'] = 0;
+			$data["dates"][$dayCount]              = array();
+			$data["dates"][$dayCount]["monthType"] = "following";
+			$data["dates"][$dayCount]["month"]     = $followMonth;
+			$data["dates"][$dayCount]["year"]      = $followYear;
 			$dayCount++;
 		}
 
@@ -263,6 +259,11 @@ class EventbookingHelperData
 	 */
 	public static function calculateDiscount($rows)
 	{
+		if (EventbookingHelper::isMethodOverridden('EventbookingHelperOverrideData', 'calculateDiscount'))
+		{
+			return EventbookingHelperOverrideData::calculateDiscount($rows);
+		}
+
 		$db       = JFactory::getDbo();
 		$query    = $db->getQuery(true);
 		$user     = JFactory::getUser();
@@ -305,7 +306,7 @@ class EventbookingHelperData
 
 				if ($userId > 0)
 				{
-					$discountRate = EventbookingHelper::calculateMemberDiscount($row->discount_amounts, $row->discount_groups);
+					$discountRate = EventbookingHelperRegistration::calculateMemberDiscount($row->discount_amounts, $row->discount_groups);
 
 					if ($discountRate > 0)
 					{
@@ -391,13 +392,18 @@ class EventbookingHelperData
 	public static function getParentCategories($categoryId)
 	{
 		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
 		$parents     = array();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
 		while (true)
 		{
-			$sql = "SELECT id, name'.$fieldSuffix.' AS name, parent FROM #__eb_categories WHERE id = " . $categoryId . " AND published=1";
-			$db->setQuery($sql);
+			$query->clear()
+				->select('id, parent')
+				->select($db->quoteName('name' . $fieldSuffix, 'name'))
+				->where('id = ' . $categoryId)
+				->where('published = 1');
+			$db->setQuery($query);
 			$row = $db->loadObject();
 
 			if ($row)
@@ -479,7 +485,10 @@ class EventbookingHelperData
 		$db          = JFactory::getDbo();
 		$query       = $db->getQuery(true);
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$query->select('id, name' . $fieldSuffix . ' AS name, parent')->from('#__eb_categories')->where('published=1');
+		$query->select('id, parent')
+			->select($db->quoteName('name' . $fieldSuffix, 'name'))
+			->from('#__eb_categories')
+			->where('published = 1');
 		$db->setQuery($query);
 		$categories = $db->loadObjectList('id');
 		$paths      = array();
@@ -512,11 +521,18 @@ class EventbookingHelperData
 		self::calculateDiscount($rows);
 
 		// Get categories data for each events
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
 		$query->select('*')
 			->from('#__eb_locations');
+
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, ['name', 'alias', 'description'], $fieldSuffix);
+		}
+
 		$db->setQuery($query);
 		$locations = $db->loadObjectList('id');
 
@@ -526,7 +542,7 @@ class EventbookingHelperData
 			->innerJoin('#__eb_event_categories AS b ON a.id = b.category_id')
 			->order('b.id');
 
-		if ($fieldSuffix = EventbookingHelper::getFieldSuffix())
+		if ($fieldSuffix)
 		{
 			EventbookingHelperDatabase::getMultilingualFields($query, array('a.name', 'a.alias'), $fieldSuffix);
 		}
@@ -704,10 +720,11 @@ class EventbookingHelperData
 	 * @param array     $rowFields
 	 * @param array     $fieldValues
 	 * @param int       $eventId
+	 * @param bool      $forImport
 	 *
 	 * @return array
 	 */
-	public static function prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId = 0)
+	public static function prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId = 0, $forImport = false)
 	{
 		$showGroup = false;
 
@@ -769,8 +786,17 @@ class EventbookingHelperData
 			}
 		}
 
-		$headers = array(JText::_('EB_EVENT'));
-		$fields  = array('title');
+		$headers = [JText::_('EB_ID'), JText::_('EB_EVENT')];
+		$fields  = ['id'];
+
+		if ($forImport)
+		{
+			$fields[] = 'event_id';
+		}
+		else
+		{
+			$fields[] = 'title';
+		}
 
 		if ($config->show_event_date)
 		{
@@ -778,11 +804,15 @@ class EventbookingHelperData
 			$fields[]  = 'event_date';
 		}
 
+		$headers[] = JText::_('EB_USER_ID');
+		$fields[]  = 'user_id';
+
 		if ($showGroup)
 		{
 			$headers[] = JText::_('EB_GROUP');
 			$fields[]  = 'registration_group_name';
 		}
+
 		if (count($rowFields))
 		{
 			foreach ($rowFields as $rowField)
@@ -836,7 +866,7 @@ class EventbookingHelperData
 		$headers[] = JText::_('EB_REGISTRATION_DATE');
 		$fields[]  = 'register_date';
 
-		if ($showPaymentMethodColumn)
+		if ($showPaymentMethodColumn || $forImport)
 		{
 			$headers[] = JText::_('EB_PAYMENT_METHOD');
 			$fields[]  = 'payment_method';
@@ -851,9 +881,24 @@ class EventbookingHelperData
 		}
 
 		$headers[] = JText::_('EB_TRANSACTION_ID');
-		$headers[] = JText::_('EB_PAYMENT_STATUS');
 		$fields[]  = 'transaction_id';
-		$fields[]  = 'payment_status';
+
+		if ($config->activate_deposit_feature)
+		{
+			$headers[] = JText::_('EB_DEPOSIT_PAYMENT_TRANSACTION_ID');
+			$fields[]  = 'deposit_payment_transaction_id';
+		}
+
+		$headers[] = JText::_('EB_PAYMENT_STATUS');
+
+		if ($forImport)
+		{
+			$fields[] = 'published';
+		}
+		else
+		{
+			$fields[] = 'payment_status';
+		}
 
 		if ($config->activate_checkin_registrants)
 		{
@@ -866,9 +911,6 @@ class EventbookingHelperData
 			$headers[] = JText::_('EB_INVOICE_NUMBER');
 			$fields[]  = 'invoice_number';
 		}
-
-		$headers[] = JText::_('EB_ID');
-		$fields[]  = 'id';
 
 		foreach ($rows as $row)
 		{
@@ -946,18 +988,6 @@ class EventbookingHelperData
 
 			$row->register_date = JHtml::_('date', $row->register_date, $config->date_format);
 
-			if ($showPaymentMethodColumn)
-			{
-				if ($row->payment_method && isset($plugins[$row->payment_method]))
-				{
-					$row->payment_method = JText::_($plugins[$row->payment_method]->title);
-				}
-				else
-				{
-					$row->payment_method = '';
-				}
-			}
-
 			if ($config->activate_tickets_pdf)
 			{
 				if ($row->ticket_number)
@@ -970,43 +1000,55 @@ class EventbookingHelperData
 				}
 			}
 
-			switch ($row->published)
+			if (!$forImport)
 			{
-				case 0:
-					$row->payment_status = JText::_('EB_PENDING');
-					break;
-				case 1:
-					$row->payment_status = JText::_('EB_PAID');
-					break;
-				case 2:
-					$row->payment_status = JText::_('EB_CANCELLED');
-					break;
-				case 3:
-					$row->payment_status = JText::_('EB_WAITING_LIST');
-					break;
-				default:
-					break;
-			}
-
-			if ($row->checked_in)
-			{
-				$row->checked_in = JText::_('JYES');
-			}
-			else
-			{
-				$row->checked_in = JText::_('JNO');
-			}
-
-			if ($config->activate_invoice_feature)
-			{
-
-				if ($row->invoice_number)
+				switch ($row->published)
 				{
-					$row->invoice_number = EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config);
+					case 0:
+						$row->payment_status = JText::_('EB_PENDING');
+						break;
+					case 1:
+						$row->payment_status = JText::_('EB_PAID');
+						break;
+					case 2:
+						$row->payment_status = JText::_('EB_CANCELLED');
+						break;
+					case 3:
+						$row->payment_status = JText::_('EB_WAITING_LIST');
+						break;
+					default:
+						break;
+				}
+
+				if ($row->checked_in)
+				{
+					$row->checked_in = JText::_('JYES');
 				}
 				else
 				{
-					$row->invoice_number = '';
+					$row->checked_in = JText::_('JNO');
+				}
+
+				if ($config->activate_invoice_feature)
+				{
+
+					if ($row->invoice_number)
+					{
+						$row->invoice_number = EventbookingHelper::formatInvoiceNumber($row->invoice_number, $config, $row);
+					}
+					else
+					{
+						$row->invoice_number = '';
+					}
+				}
+
+				if ($row->payment_method && isset($plugins[$row->payment_method]))
+				{
+					$row->payment_method = JText::_($plugins[$row->payment_method]->title);
+				}
+				else
+				{
+					$row->payment_method = '';
 				}
 			}
 		}

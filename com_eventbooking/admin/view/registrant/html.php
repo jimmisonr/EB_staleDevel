@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -30,47 +30,54 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		$document->addScriptDeclaration('var siteUrl="' . EventbookingHelper::getSiteUrl() . '";');
 		EventbookingHelper::addLangLinkForAjax();
 
-		$db        = JFactory::getDbo();
-		$query     = $db->getQuery(true);
-		$config    = EventbookingHelper::getConfig();
-		$rows      = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
-		$options[] = JHtml::_('select.option', 0, JText::_('Select Event'), 'id', 'title');
-		if ($config->show_event_date)
+		$db     = JFactory::getDbo();
+		$query  = $db->getQuery(true);
+		$config = EventbookingHelper::getConfig();
+
+		$rows  = EventbookingHelperDatabase::getAllEvents($config->sort_events_dropdown, $config->hide_past_events_from_events_dropdown);
+		$event = EventbookingHelperDatabase::getEvent((int) $this->item->event_id);
+
+		if ($config->hide_past_events_from_events_dropdown && $this->item->id)
 		{
-			for ($i = 0, $n = count($rows); $i < $n; $i++)
+			$eventExists = false;
+
+			foreach ($rows as $row)
 			{
-				$row       = $rows[$i];
-				$options[] = JHtml::_('select.option', $row->id, $row->title . ' (' . JHtml::_('date', $row->event_date, $config->date_format, null) . ')' .
-					'', 'id', 'title');
+				if ($row->id == $this->item->event_id)
+				{
+					$eventExists = true;
+					break;
+				}
+			}
+
+			if (!$eventExists)
+			{
+				$rows[] = $event;
 			}
 		}
-		else
-		{
-			$options = array_merge($options, $rows);
-		}
 
-		$this->lists['event_id'] = JHtml::_('select.genericlist', $options, 'event_id', ' class="inputbox" ', 'id', 'title', $this->item->event_id);
-		$event                   = EventbookingHelperDatabase::getEvent((int) $this->item->event_id);
+		$this->lists['event_id'] = EventbookingHelperHtml::getEventsDropdown($rows, 'event_id', '', $this->item->event_id);
+
 		if ($this->item->id)
 		{
 			if ($this->item->is_group_billing)
 			{
-				$rowFields = EventbookingHelper::getFormFields($this->item->event_id, 1, $this->item->language);
+				$rowFields = EventbookingHelperRegistration::getFormFields($this->item->event_id, 1, $this->item->language);
 			}
 			else
 			{
-				$rowFields = EventbookingHelper::getFormFields($this->item->event_id, 0, $this->item->language);
+				$rowFields = EventbookingHelperRegistration::getFormFields($this->item->event_id, 0, $this->item->language);
 			}
 		}
 		else
 		{
 			//Default, we just display individual registration form
-			$rowFields = EventbookingHelper::getFormFields($this->item->event_id, 0);
+			$rowFields = EventbookingHelperRegistration::getFormFields($this->item->event_id, 0);
 		}
 		$form = new RADForm($rowFields);
 		if ($this->item->id)
 		{
-			$data = EventbookingHelper::getRegistrantData($this->item, $rowFields);
+			$data = EventbookingHelperRegistration::getRegistrantData($this->item, $rowFields);
 			$form->bind($data, false);
 		}
 		else
@@ -103,6 +110,12 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		{
 			$rowMembers = array();
 		}
+
+		if ($event->collect_member_information !== '')
+		{
+			$config->collect_member_information = $event->collect_member_information;
+		}
+
 		if ($config->collect_member_information && !$rowMembers && $this->item->number_registrants > 1)
 		{
 			$rowMembers = array();
@@ -116,9 +129,15 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 			}
 		}
 
-		$options                       = array();
-		$options[]                     = JHtml::_('select.option', -1, JText::_('EB_PAYMENT_STATUS'));
-		$options[]                     = JHtml::_('select.option', 0, JText::_('EB_PARTIAL_PAYMENT'));
+		$options   = array();
+		$options[] = JHtml::_('select.option', -1, JText::_('EB_PAYMENT_STATUS'));
+		$options[] = JHtml::_('select.option', 0, JText::_('EB_PARTIAL_PAYMENT'));
+
+		if (strpos($this->item->payment_method, 'os_offline') !== false)
+		{
+			$options[] = JHtml::_('select.option', 2, JText::_('EB_DEPOSIT_PAID'));
+		}
+
 		$options[]                     = JHtml::_('select.option', 1, JText::_('EB_FULL_PAYMENT'));
 		$this->lists['payment_status'] = JHtml::_('select.genericlist', $options, 'payment_status', ' class="inputbox" ', 'value', 'text',
 			$this->item->payment_status);
@@ -127,18 +146,20 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 		$options   = array();
 		$options[] = JHtml::_('select.option', '', JText::_('EB_PAYMENT_METHOD'), 'name', 'title');
 		$query->clear()
-			->select('name, title')
+			->select('name, title, params')
 			->from('#__eb_payment_plugins')
 			->where('published = 1')
 			->order('ordering');
 		$db->setQuery($query);
-		$options                       = array_merge($options, $db->loadObjectList());
+		$methods = $db->loadObjectList();
+
+		$options                       = array_merge($options, $methods);
 		$this->lists['payment_method'] = JHtml::_('select.genericlist', $options, 'payment_method', ' class="inputbox" ', 'name', 'title',
 			$this->item->payment_method ? $this->item->payment_method : 'os_offline');
 
 		if (count($rowMembers))
 		{
-			$this->memberFormFields = EventbookingHelper::getFormFields($this->item->event_id, 2, $this->item->language);
+			$this->memberFormFields = EventbookingHelperRegistration::getFormFields($this->item->event_id, 2, $this->item->language);
 		}
 
 		if ($config->activate_checkin_registrants)
@@ -164,10 +185,27 @@ class EventbookingViewRegistrantHtml extends RADViewItem
 			$this->registrantTickets = $registrantTickets;
 		}
 
-		$this->config     = $config;
-		$this->event      = $event;
-		$this->rowMembers = $rowMembers;
-		$this->form       = $form;
+
+		$showPaymentFee = false;
+
+		foreach ($methods as $method)
+		{
+			$params            = new Joomla\Registry\Registry($method->params);
+			$paymentFeeAmount  = (float) $params->get('payment_fee_amount');
+			$paymentFeePercent = (float) $params->get('payment_fee_percent');
+
+			if ($paymentFeeAmount != 0 || $paymentFeePercent != 0)
+			{
+				$showPaymentFee = true;
+				break;
+			}
+		}
+
+		$this->config         = $config;
+		$this->event          = $event;
+		$this->rowMembers     = $rowMembers;
+		$this->form           = $form;
+		$this->showPaymentFee = $showPaymentFee;
 	}
 
 	/**

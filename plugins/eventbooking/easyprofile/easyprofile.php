@@ -3,7 +3,7 @@
  * @package        Joomla
  * @subpackage     Events Booking
  * @author         Tuan Pham Ngoc
- * @copyright      Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright      Copyright (C) 2010 - 2018 Ossolution Team
  * @license        GNU/GPL, see LICENSE.php
  */
 defined('_JEXEC') or die;
@@ -101,18 +101,18 @@ class plgEventbookingEasyprofile extends JPlugin
 			$config = EventbookingHelper::getConfig();
 			if ($config->multiple_booking)
 			{
-				$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+				$rowFields = EventbookingHelperRegistration::getFormFields($row->id, 4);
 			}
 			elseif ($row->is_group_billing)
 			{
-				$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+				$rowFields = EventbookingHelperRegistration::getFormFields($row->event_id, 1);
 			}
 			else
 			{
-				$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+				$rowFields = EventbookingHelperRegistration::getFormFields($row->event_id, 0);
 			}
 
-			$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+			$data = EventbookingHelperRegistration::getRegistrantData($row, $rowFields);
 
 			$fieldValues = array();
 
@@ -131,6 +131,11 @@ class plgEventbookingEasyprofile extends JPlugin
 						$fieldValues[$rowField->field_mapping] = $fieldValue;
 					}
 				}
+			}
+
+			if (!count($fieldValues))
+			{
+				return;
 			}
 
 			// Write Jsn User

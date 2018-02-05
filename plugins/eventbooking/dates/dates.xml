@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>services@joomdonation.com</authorEmail>
 	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>2.14.2</version>  
+	<version>3.2.1</version>  
 	<description>This plugin allow adding additional dates to an existing event.</description>
 	<files>
 		<filename plugin="dates">dates.php</filename>
@@ -16,6 +16,17 @@
         <fields name="params">
             <fieldset name="basic">
                 <field name="max_number_dates" type="text" size="60" default="3" label="Max Number Dates" description="Enter max number of dates you can add to an event" />
+				<field
+						name="show_on_frontend"
+						type="radio"
+						label="Show on frontend"
+						description="If set to Yes, this plugin will be available on frontend event submission form"
+						class="btn-group btn-group-yesno"
+						default="0"
+				>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
             </fieldset>
         </fields>
     </config>		

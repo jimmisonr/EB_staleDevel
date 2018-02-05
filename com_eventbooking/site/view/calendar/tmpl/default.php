@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -45,7 +45,7 @@ else
 	<?php
 	}
 	?>
-	<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=calendar' . $this->layoutQuery . '&Itemid=' . $this->Itemid); ?>">
+	<form method="post" name="adminForm" id="adminForm" action="<?php echo JRoute::_('index.php?option=com_eventbooking&view=calendar&Itemid=' . $this->Itemid); ?>">
 			<div id="eb-calendarwrap">
 				<?php
 						if ($this->showCalendarMenu)
@@ -60,8 +60,8 @@ else
 									'month' => $this->month,
 									'previousMonth' => $previousMonth,
 									'nextMonth' => $nextMonth,
-									'previousMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar' . $this->layoutQuery . '&month=' . $previousMonth . '&year=' . $previousYear . '&Itemid=' . $this->Itemid),
-									'nextMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar' . $this->layoutQuery . '&month=' . $nextMonth . '&year=' . $nextYear . '&next=1&Itemid=' . $this->Itemid),
+									'previousMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar&month=' . $previousMonth . '&year=' . $previousYear . '&Itemid=' . $this->Itemid),
+									'nextMonthLink' => JRoute::_('index.php?option=com_eventbooking&view=calendar&month=' . $nextMonth . '&year=' . $nextYear . '&next=1&Itemid=' . $this->Itemid),
 									'listMonth' => $this->listMonth,
 									'searchMonth' => $this->searchMonth,
 									'searchYear' => $this->searchYear,

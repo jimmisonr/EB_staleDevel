@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -74,7 +74,7 @@ class EventbookingHelperTicket
 
 		if ($fieldSuffix = EventbookingHelper::getFieldSuffix($row->language))
 		{
-			EventbookingHelperDatabase::getMultilingualFields($query, array('title'), $fieldSuffix);
+			EventbookingHelperDatabase::getMultilingualFields($query, array('title', 'short_description', 'description'), $fieldSuffix);
 		}
 
 
@@ -109,7 +109,16 @@ class EventbookingHelperTicket
 			$backgroundImagePath = '';
 		}
 
-		if ($row->is_group_billing && $config->collect_member_information)
+		if ($rowEvent->collect_member_information === '')
+		{
+			$collectMemberInformation = $config->collect_member_information;
+		}
+		else
+		{
+			$collectMemberInformation = $rowEvent->collect_member_information;
+		}
+
+		if ($row->is_group_billing && $collectMemberInformation)
 		{
 			$query->clear()
 				->select('*')
@@ -127,24 +136,29 @@ class EventbookingHelperTicket
 					$pdf->Image($backgroundImagePath, $rowEvent->ticket_bg_left, $rowEvent->ticket_bg_top);
 				}
 
-				$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+				$rowFields = EventbookingHelperRegistration::getFormFields($row->event_id, 0);
 
 				$form = new RADForm($rowFields);
-				$data = EventbookingHelper::getRegistrantData($rowMember, $rowFields);
+				$data = EventbookingHelperRegistration::getRegistrantData($rowMember, $rowFields);
 				$form->bind($data);
 				$form->buildFieldsDependency();
 
-				if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
+				if (is_callable('EventbookingHelperOverrideRegistration::buildTags'))
+				{
+					$replaces = EventbookingHelperOverrideRegistration::buildTags($rowMember, $form, $rowEvent, $config);
+				}
+				elseif (is_callable('EventbookingHelperOverrideHelper::buildTags'))
 				{
 					$replaces = EventbookingHelperOverrideHelper::buildTags($rowMember, $form, $rowEvent, $config);
 				}
 				else
 				{
-					$replaces = EventbookingHelper::buildTags($rowMember, $form, $rowEvent, $config);
+					$replaces = EventbookingHelperRegistration::buildTags($rowMember, $form, $rowEvent, $config);
 				}
 
 				$replaces['ticket_number']     = self::formatTicketNumber($rowEvent->ticket_prefix, $rowMember->ticket_number, $config);
 				$replaces['registration_date'] = JHtml::_('date', $row->register_date, $config->date_format);
+				$replaces['event_title']       = $rowEvent->title;
 
 				$output = $ticketLayout;
 
@@ -154,7 +168,7 @@ class EventbookingHelperTicket
 					$output = str_ireplace("[$key]", $value, $output);
 				}
 
-				$output = static::processQRCODE($rowMember, $output);
+				$output = EventbookingHelperRegistration::processQRCODE($rowMember, $output, false);
 
 				$pdf->writeHTML($output, true, false, false, false, '');
 			}
@@ -170,33 +184,38 @@ class EventbookingHelperTicket
 
 			if ($config->multiple_booking)
 			{
-				$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+				$rowFields = EventbookingHelperRegistration::getFormFields($row->id, 4);
 			}
 			elseif ($row->is_group_billing)
 			{
-				$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+				$rowFields = EventbookingHelperRegistration::getFormFields($row->event_id, 1);
 			}
 			else
 			{
-				$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+				$rowFields = EventbookingHelperRegistration::getFormFields($row->event_id, 0);
 			}
 
 			$form = new RADForm($rowFields);
-			$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+			$data = EventbookingHelperRegistration::getRegistrantData($row, $rowFields);
 			$form->bind($data);
 			$form->buildFieldsDependency();
 
-			if (is_callable('EventbookingHelperOverrideHelper::buildTags'))
+			if (is_callable('EventbookingHelperOverrideRegistration::buildTags'))
+			{
+				$replaces = EventbookingHelperOverrideRegistration::buildTags($row, $form, $rowEvent, $config);
+			}
+			elseif (is_callable('EventbookingHelperOverrideHelper::buildTags'))
 			{
 				$replaces = EventbookingHelperOverrideHelper::buildTags($row, $form, $rowEvent, $config);
 			}
 			else
 			{
-				$replaces = EventbookingHelper::buildTags($row, $form, $rowEvent, $config);
+				$replaces = EventbookingHelperRegistration::buildTags($row, $form, $rowEvent, $config);
 			}
 
 			$replaces['ticket_number']     = self::formatTicketNumber($rowEvent->ticket_prefix, $row->ticket_number, $config);
 			$replaces['registration_date'] = JHtml::_('date', $row->register_date, $config->date_format);
+			$replaces['event_title']       = $rowEvent->title;
 
 			foreach ($replaces as $key => $value)
 			{
@@ -204,7 +223,7 @@ class EventbookingHelperTicket
 				$ticketLayout = str_ireplace("[$key]", $value, $ticketLayout);
 			}
 
-			$ticketLayout = static::processQRCODE($row, $ticketLayout);
+			$ticketLayout = EventbookingHelperRegistration::processQRCODE($row, $ticketLayout, false);
 
 			$pdf->writeHTML($ticketLayout, true, false, false, false, '');
 		}
@@ -221,13 +240,7 @@ class EventbookingHelperTicket
 	 */
 	public static function generateTicketQrcode($row)
 	{
-		$filename = $row->ticket_code . '.png';
-
-		if (!file_exists(JPATH_ROOT . '/media/com_eventbooking/qrcodes/' . $filename))
-		{
-			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/vendor/phpqrcode/qrlib.php';
-			QRcode::png($row->ticket_code, JPATH_ROOT . '/media/com_eventbooking/qrcodes/' . $filename);
-		}
+		EventbookingHelperRegistration::generateTicketQrcode($row);
 	}
 
 	/**
@@ -240,20 +253,6 @@ class EventbookingHelperTicket
 	 */
 	protected static function processQRCODE($row, $output)
 	{
-		if (strpos($output, '[QRCODE]') !== false)
-		{
-			EventbookingHelper::generateQrcode($row->id);
-			$imgTag = '<img src="media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
-			$output = str_ireplace("[QRCODE]", $imgTag, $output);
-		}
-
-		if ($row->ticket_code && strpos($output, '[TICKET_QRCODE]') !== false)
-		{
-			static::generateTicketQrcode($row);
-			$imgTag = '<img src="media/com_eventbooking/qrcodes/' . $row->ticket_code . '.png" border="0" />';
-			$output = str_ireplace("[TICKET_QRCODE]", $imgTag, $output);
-		}
-
-		return $output;
+		return EventbookingHelperRegistration::processQRCODE($row, $output, false);
 	}
 }

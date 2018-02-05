@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -18,18 +18,6 @@ defined( '_JEXEC' ) or die ;
 			</div>
 			<div class="controls">
 				<input type="text" name="download_id" class="input-xlarge" value="<?php echo $config->get('download_id', ''); ?>" size="60" />
-			</div>
-		</div>
-		<div class="control-group">
-			<div class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('map_api_key', JText::_('EB_MAP_API_KEY')); ?>
-			</div>
-			<div class="controls">
-				<input type="text" name="map_api_key" class="input-xlarge" value="<?php echo $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4'); ?>" size="60" />
-				<p class="text-warning" style="margin-top: 10px;">
-					Google now requires a KEY for their API . Events Booking ships with a default API Key. With this key, Google will allows 25,000 map loads per day for all the websites which has Events Booking installed. That should be OK, however, if you are worry about this limit, please
-					<a href="https://console.developers.google.com/flows/enableapi?apiid=maps_backend,geocoding_backend,directions_backend,distance_matrix_backend,elevation_backend&keyType=CLIENT_SIDE&reusekey=true" target="_blank"><strong>CLICK HERE</strong></a> to register for an own API Key, then enter the received key into this config option.
-				</p>
 			</div>
 		</div>
 		<div class="control-group">
@@ -80,14 +68,7 @@ defined( '_JEXEC' ) or die ;
 				<input type="text" name="max_number_of_children_events" class="input-small" value="<?php echo $config->get('max_number_of_children_events', 30); ?>" size="60" />
 			</div>
 		</div>
-		<div class="control-group">
-			<div class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('calendar_start_date', JText::_('EB_CALENDAR_START_DATE')); ?>
-			</div>
-			<div class="controls">
-				<?php echo $this->lists['calendar_start_date']; ?>
-			</div>
-		</div>
+
 		<div class="control-group">
 			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('use_https', JText::_('EB_ACTIVATE_HTTPS'), JText::_('EB_ACTIVATE_HTTPS_EXPLAIN')); ?>
@@ -291,6 +272,14 @@ defined( '_JEXEC' ) or die ;
 				<input type="text" name="from_email" class="inputbox" value="<?php echo $config->from_email; ?>" size="50" />
 			</div>
 		</div>
+        <div class="control-group">
+            <div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('reply_to_email', JText::_('EB_REPLY_TO'), JText::_('EB_REPLY_TO_EXPLAIN')); ?>
+            </div>
+            <div class="controls">
+                <input type="text" name="reply_to_email" class="inputbox" value="<?php echo $config->reply_to_email; ?>" size="50" />
+            </div>
+        </div>
 		<div class="control-group">
 			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('notification_emails', JText::_('EB_NOTIFICATION_EMAILS'), JText::_('EB_NOTIFICATION_EMAILS_EXPLAIN')); ?>
@@ -332,6 +321,53 @@ defined( '_JEXEC' ) or die ;
 			</div>
 		</div>
 	</fieldset>
+	<fieldset class="form-horizontal">
+		<legend><?php echo JText::_('EB_MAP_SETTINGS'); ?></legend>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('map_api_key', JText::_('EB_MAP_API_KEY')); ?>
+			</div>
+			<div class="controls">
+				<input type="text" name="map_api_key" class="input-xlarge" value="<?php echo $config->get('map_api_key', 'AIzaSyDIq19TVV4qOX2sDBxQofrWfjeA7pebqy4'); ?>" size="60" />
+				<p class="text-warning" style="margin-top: 10px;">
+					Google now requires a KEY for their API . Events Booking ships with a default API Key. With this key, Google will allows 25,000 map loads per day for all the websites which has Events Booking installed. That should be OK, however, if you are worry about this limit, please
+					<a href="https://console.developers.google.com/flows/enableapi?apiid=maps_backend,geocoding_backend,directions_backend,distance_matrix_backend,elevation_backend&keyType=CLIENT_SIDE&reusekey=true" target="_blank"><strong>CLICK HERE</strong></a> to register for an own API Key, then enter the received key into this config option.
+				</p>
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('center_coordinates', JText::_('EB_CENTER_COORDINATES'), JText::_('EB_CENTER_COORDINATES_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<input type="text" name="center_coordinates" class="inputbox" value="<?php echo $config->get('center_coordinates'); ?>" />
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('zoom_level', JText::_('EB_ZOOM_LEVEL'), JText::_('EB_ZOOM_LEVEL_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<?php echo JHtml::_('select.integerlist', 1, 21, 1, 'zoom_level', 'class="inputbox"', $config->zoom_level); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('map_width', JText::_('EB_MAP_WIDTH'), JText::_('EB_MAP_WIDTH_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<input type="text" name="map_width" class="inputbox" value="<?php echo $config->map_width ; ?>" />
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('map_height', JText::_('EB_MAP_HEIGHT'), JText::_('EB_MAP_HEIGHT_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<input type="text" name="map_height" class="inputbox" value="<?php echo $config->map_height ; ?>" />
+			</div>
+		</div>
+	<fieldset>
 </div>
 <div class="span6">
 	<fieldset class="form-horizontal">
@@ -365,6 +401,14 @@ defined( '_JEXEC' ) or die ;
 			</div>
 			<div class="controls">
 				<?php echo EventbookingHelperHtml::getBooleanInput('auto_populate_form_data', $config->get('auto_populate_form_data', 1)); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('populate_group_members_data', JText::_('EB_POPULATE_GROUP_MEMBERS_DATA'), JText::_('EB_POPULATE_GROUP_MEMBER_DATA_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<?php echo EventbookingHelperHtml::getBooleanInput('populate_group_members_data', $config->get('populate_group_members_data', 0)); ?>
 			</div>
 		</div>
 		<div class="control-group">
@@ -447,6 +491,14 @@ defined( '_JEXEC' ) or die ;
 				<?php echo EventbookingHelperHtml::getBooleanInput('activate_waitinglist_feature', $config->activate_waitinglist_feature); ?>
 			</div>
 		</div>
+		<div class="control-group" data-showon='<?php echo EventbookingHelperHtml::renderShowOn(array('activate_waitinglist_feature' => '1')); ?>'>
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('enable_waiting_list_payment', JText::_('EB_ENABLE_WAITING_LIST_PAYMENT'), JText::_('EB_ENABLE_WAITING_LIST_PAYMENT_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<?php echo EventbookingHelperHtml::getBooleanInput('enable_waiting_list_payment', $config->enable_waiting_list_payment); ?>
+			</div>
+		</div>
 		<div class="control-group">
 			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('unpublish_event_when_full', JText::_('EB_UNPUBLISH_EVENT_WHEN_FULL'), JText::_('EB_UNPUBLISH_EVENT_WHEN_FULL_EXPLAIN')); ?>
@@ -527,6 +579,22 @@ defined( '_JEXEC' ) or die ;
 				<?php echo EventbookingHelperHtml::getBooleanInput('include_group_members_in_registrants', $config->get('include_group_members_in_registrants', 0)); ?>
 			</div>
 		</div>
+        <div class="control-group">
+            <div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('include_group_billing_in_registrants_list', JText::_('EB_INCLUDE_GROUP_BILLING_IN_REGISTRANTS_LIST'), JText::_('EB_INCLUDE_GROUP_BILLING_IN_REGISTRANTS_LIST_EXPLAIN')); ?>
+            </div>
+            <div class="controls">
+				<?php echo EventbookingHelperHtml::getBooleanInput('include_group_billing_in_registrants_list', $config->get('include_group_billing_in_registrants_list', $config->get('include_group_billing_in_registrants', 1))); ?>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('include_group_members_in_registrants_list', JText::_('EB_INCLUDE_GROUP_MEMBERS_IN_REGISTRANTS_LIST'), JText::_('EB_INCLUDE_GROUP_MEMBERS_IN_REGISTRANTS_LIST_EXPLAIN')); ?>
+            </div>
+            <div class="controls">
+				<?php echo EventbookingHelperHtml::getBooleanInput('include_group_members_in_registrants_list', $config->get('include_group_members_in_registrants_list', $config->get('include_group_members_in_registrants', 0))); ?>
+            </div>
+        </div>
 		<div class="control-group">
 			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('show_billing_step_for_free_events', JText::_('EB_SHOW_BILLING_STEP_FOR_FREE_EVENTS'), JText::_('EB_SHOW_BILLING_STEP_FOR_FREE_EVENTS_EXPLAIN')); ?>
@@ -553,18 +621,53 @@ defined( '_JEXEC' ) or die ;
 		</div>
 		<div class="control-group" data-showon='<?php echo EventbookingHelperHtml::renderShowOn(array('accept_term' => '1')); ?>'>
 			<div class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('term_condition_by_event', JText::_('EB_TERM_AND_CONDITION_BY_EVENT'), JText::_('EB_TERM_AND_CONDITION_BY_EVENT_EXPLAIN')); ?>
-			</div>
-			<div class="controls">
-				<?php echo EventbookingHelperHtml::getBooleanInput('term_condition_by_event', $config->term_condition_by_event); ?>
-			</div>
-		</div>
-		<div class="control-group" data-showon='<?php echo EventbookingHelperHtml::renderShowOn(array('accept_term' => '1')); ?>'>
-			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('article_id', JText::_('EB_DEFAULT_TERM_AND_CONDITION')); ?>
 			</div>
 			<div class="controls">
 				<?php echo EventbookingHelper::getArticleInput($config->article_id); ?>
+			</div>
+		</div>
+	</fieldset>
+	<fieldset class="form-horizontal">
+		<legend><?php echo JText::_('EB_IMAGE_SETTINGS'); ?></legend>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('resize_image_method', JText::_('EB_RESIZE_IMAGE_METHOD')); ?>
+			</div>
+			<div class="controls">
+				<?php echo $this->lists['resize_image_method'];?>
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('thumb_width', JText::_('EB_EVENT_THUMB_WIDTH'), JText::_('EB_EVENT_THUMB_WIDTH_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<input type="text" name="thumb_width" class="inputbox" value="<?php echo $config->thumb_width ; ?>" />
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('thumb_height', JText::_('EB_EVENT_THUMB_HEIGHT'), JText::_('EB_EVENT_THUMB_HEIGHT_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<input type="text" name="thumb_height" class="inputbox" value="<?php echo $config->thumb_height ; ?>" />
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('category_thumb_width', JText::_('EB_CATEGORY_THUMB_WIDTH'), JText::_('EB_CATEGORY_THUMB_WIDTH_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<input type="text" name="category_thumb_width" class="inputbox" value="<?php echo $config->category_thumb_width ; ?>" />
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('category_thumb_height', JText::_('EB_CATEGORY_THUMB_HEIGHT'), JText::_('EB_CATEGORY_THUMB_HEIGHT_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<input type="text" name="category_thumb_height" class="inputbox" value="<?php echo $config->category_thumb_height ; ?>" />
 			</div>
 		</div>
 	</fieldset>
@@ -612,54 +715,6 @@ defined( '_JEXEC' ) or die ;
 		</div>
 		<div class="control-group">
 			<div class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('zoom_level', JText::_('EB_ZOOM_LEVEL'), JText::_('EB_ZOOM_LEVEL_EXPLAIN')); ?>
-			</div>
-			<div class="controls">
-				<?php echo JHtml::_('select.integerlist', 1, 14, 1, 'zoom_level', 'class="inputbox"', $config->zoom_level); ?>
-			</div>
-		</div>
-		<div class="control-group">
-			<div class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('map_width', JText::_('EB_MAP_WIDTH'), JText::_('EB_MAP_WIDTH_EXPLAIN')); ?>
-			</div>
-			<div class="controls">
-				<input type="text" name="map_width" class="inputbox" value="<?php echo $config->map_width ; ?>" />
-			</div>
-		</div>
-		<div class="control-group">
-			<div class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('map_height', JText::_('EB_MAP_HEIGHT'), JText::_('EB_MAP_HEIGHT_EXPLAIN')); ?>
-			</div>
-			<div class="controls">
-				<input type="text" name="map_height" class="inputbox" value="<?php echo $config->map_height ; ?>" />
-			</div>
-		</div>
-		<div class="control-group">
-			<div class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('resize_image_method', JText::_('EB_RESIZE_IMAGE_METHOD')); ?>
-			</div>
-			<div class="controls">
-				<?php echo $this->lists['resize_image_method'];?>
-			</div>
-		</div>
-		<div class="control-group">
-			<div class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('thumb_width', JText::_('EB_THUMB_WIDTH'), JText::_('EB_THUMB_WIDTH_EXPLAIN')); ?>
-			</div>
-			<div class="controls">
-				<input type="text" name="thumb_width" class="inputbox" value="<?php echo $config->thumb_width ; ?>" />
-			</div>
-		</div>
-		<div class="control-group">
-			<div class="control-label">
-				<?php echo EventbookingHelperHtml::getFieldLabel('thumb_height', JText::_('EB_THUMB_HEIGHT'), JText::_('EB_THUMB_HEIGHT_EXPLAIN')); ?>
-			</div>
-			<div class="controls">
-				<input type="text" name="thumb_height" class="inputbox" value="<?php echo $config->thumb_height ; ?>" />
-			</div>
-		</div>
-		<div class="control-group">
-			<div class="control-label">
 				<?php echo EventbookingHelperHtml::getFieldLabel('csv_delimiter', JText::_('EB_CSV_DELIMITTER')); ?>
 			</div>
 			<div class="controls">
@@ -680,6 +735,14 @@ defined( '_JEXEC' ) or die ;
 			</div>
 			<div class="controls">
 				<textarea name="conversion_tracking_code" class="input-xlarge" rows="10"><?php echo $config->conversion_tracking_code;?></textarea>
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo EventbookingHelperHtml::getFieldLabel('check_new_version_in_dashboard', JText::_('EB_CHECK_NEW_VERSION_IN_DASHBOARD'), JText::_('EB_SHOW_VERSION_CHECK_IN_DASHBOARD_EXPLAIN')); ?>
+			</div>
+			<div class="controls">
+				<?php echo EventbookingHelperHtml::getBooleanInput('check_new_version_in_dashboard', isset($config->check_new_version_in_dashboard) ? $config->check_new_version_in_dashboard : 1); ?>
 			</div>
 		</div>
 		<div class="control-group">

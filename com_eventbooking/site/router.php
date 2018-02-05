@@ -3,11 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
-// no direct access
 defined('_JEXEC') or die;
 
 JLoader::register('RADConfig', JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/config/config.php');
@@ -32,32 +31,28 @@ class EventbookingRouter extends JComponentRouterBase
 	 */
 	public function build(&$query)
 	{
-		$segments = array();
-		$db       = JFactory::getDbo();
-		$dbQuery  = $db->getQuery(true);
+		$segments    = array();
+		$fieldSuffix = EventbookingHelper::getFieldSuffix();
+		$db          = JFactory::getDbo();
+		$dbQuery     = $db->getQuery(true);
 
 		//Store the query string to use in the parseRouter method
 		$queryArr = $query;
 
-		$app  = JFactory::getApplication();
-		$menu = $app->getMenu();
-
 		//We need a menu item.  Either the one specified in the query, or the current active one if none specified
 		if (empty($query['Itemid']))
 		{
-			$menuItem      = $menu->getActive();
-			$menuItemGiven = false;
+			$menuItem = $this->menu->getActive();
 		}
 		else
 		{
-			$menuItem      = $menu->getItem($query['Itemid']);
-			$menuItemGiven = true;
-		}
+			$menuItem = $this->menu->getItem($query['Itemid']);
 
-		// If the given menu item doesn't belong to our component, unset the Itemid from query array
-		if ($menuItemGiven && isset($menuItem) && $menuItem->component != 'com_eventbooking')
-		{
-			unset($query['Itemid']);
+			// If the given menu item doesn't belong to our component, unset the Itemid from query array
+			if ($menuItem && $menuItem->component != 'com_eventbooking')
+			{
+				unset($query['Itemid']);
+			}
 		}
 
 		if (empty($menuItem->query['view']))
@@ -65,46 +60,50 @@ class EventbookingRouter extends JComponentRouterBase
 			$menuItem->query['view'] = '';
 		}
 
-		//Are we dealing with the current view which is attached to a menu item?
-		if (($menuItem instanceof stdClass)
+		// Dealing with top level views in query string
+		if ($menuItem
 			&& isset($query['view'])
-			&& isset($query['id'])
 			&& $menuItem->query['view'] == $query['view']
-			&& isset($query['id']) && $menuItem->query['id'] == intval($query['id'])
+			&& in_array($query['view'], ['calendar', 'fullcalendar', 'events', 'registrants', 'locations', 'massmail'])
 		)
 		{
 			unset($query['view']);
+		}
+
+		//Are we dealing with the current view [category, event] which is attached to a menu item?
+		if ($menuItem
+			&& isset($query['view'], $query['id'], $menuItem->query['id'])
+			&& $menuItem->query['view'] == $query['view']
+			&& $menuItem->query['id'] == intval($query['id'])
+		)
+		{
+			unset($query['view']);
+			unset($query['id']);
+
 			if (isset($query['catid']))
 			{
 				unset($query['catid']);
 			}
-			unset($query['id']);
-			if (isset($query['layout']))
-			{
-				unset($query['layout']);
-			}
 		}
 
-		if (($menuItem instanceof stdClass)
-			&& isset($query['view'])
-			&& $menuItem->query['view'] == $query['view']
-			&& (in_array($menuItem->query['view'], array('calendar', 'events')))
-		)
-		{
-			unset($query['view']);
-		}
-
-		//Dealing with the catid parameter in the link to event.
-		if (($menuItem instanceof stdClass)
-			&& (in_array($menuItem->query['view'], array('category', 'upcomingevents')))
+		//Dealing with the catid parameter in the link to event from category or upcoming event page
+		if ($menuItem
+			&& in_array($menuItem->query['view'], array('category', 'upcomingevents'))
 			&& isset($query['catid'])
 			&& $menuItem->query['id'] == intval($query['catid'])
 		)
 		{
-			if (isset($query['catid']))
-			{
-				unset($query['catid']);
-			}
+			unset($query['catid']);
+		}
+
+		// Dealing with layout parameter in calendar view
+		if ($menuItem
+			&& $menuItem->query['view'] == 'calendar'
+			&& isset($query['layout'])
+			&& ((empty($menuItem->query['layout']) && $query['layout'] == 'default') || ($menuItem->query['layout'] == $query['layout']))
+		)
+		{
+			unset($query['layout']);
 		}
 
 		$view    = isset($query['view']) ? $query['view'] : '';
@@ -116,45 +115,47 @@ class EventbookingRouter extends JComponentRouterBase
 
 		switch ($view)
 		{
-			case 'calendar':
-				$segments[] = JText::_('EB_CALENDAR');
-				break;
 			case 'categories':
 			case 'category':
 				if ($id)
 				{
 					$segments = array_merge($segments, EventbookingHelperRoute::getCategoriesPath($id, 'alias'));
 				}
-				unset($query['id']);
+
+				unset($query['view'], $query['id']);
 				break;
 			case 'event':
 				if ($id)
 				{
 					$segments[] = EventbookingHelperRoute::getEventTitle($id);
 				}
+
 				if ($layout == 'form')
 				{
-					$segments[] = 'Edit';
+					$segments[] = 'edit';
 					unset($query['layout']);
 				}
 				else
 				{
-					if ($catId)
+					$config = EventbookingHelper::getConfig();
+
+					if ($catId && $config->insert_category != 2)
 					{
 						$segments = array_merge(EventbookingHelperRoute::getCategoriesPath($catId, 'alias'), $segments);
 					}
 				}
-				unset($query['id']);
+
+				unset($query['view'], $query['id']);
 				break;
 			case 'location':
 				if ($layout == 'form' || $layout == 'popup')
 				{
 					if ($id)
 					{
-						$dbQuery->clear();
-						$dbQuery->select('name')
+						$dbQuery->clear()
+							->select($db->quoteName('alias' . $fieldSuffix))
 							->from('#__eb_locations')
-							->where('id=' . (int) $id);
+							->where('id = ' . (int) $id);
 						$db->setQuery($dbQuery);
 						$segments[] = $id . '-' . $db->loadResult();
 						$segments[] = 'edit';
@@ -162,8 +163,9 @@ class EventbookingRouter extends JComponentRouterBase
 					}
 					else
 					{
-						$segments[] = 'Add Location';
+						$segments[] = 'add location';
 					}
+
 					if ($layout == 'form')
 					{
 						unset($query['layout']);
@@ -173,82 +175,99 @@ class EventbookingRouter extends JComponentRouterBase
 				{
 					if (isset($query['location_id']))
 					{
-						$dbQuery->clear();
-						$dbQuery->select('name')
+						$dbQuery->clear()
+							->select($db->quoteName('alias' . $fieldSuffix))
 							->from('#__eb_locations')
-							->where('id=' . (int) $query['location_id']);
+							->where('id = ' . (int) $query['location_id']);
 						$db->setQuery($dbQuery);
 						$segments[] = $db->loadResult();
 						unset($query['location_id']);
 					}
 				}
+				unset($query['view']);
 				break;
 			case 'map':
 				if (isset($query['location_id']))
 				{
-					$dbQuery->clear();
-					$dbQuery->select('name')
+					$dbQuery->clear()
+						->select($db->quoteName('alias' . $fieldSuffix))
 						->from('#__eb_locations')
-						->where('id=' . (int) $query['location_id']);
+						->where('id = ' . (int) $query['location_id']);
 					$db->setQuery($dbQuery);
 					$segments[] = $db->loadResult();
 					unset($query['location_id']);
 				}
-				$segments[] = 'View Map';
+
+				$segments[] = 'view map';
+				unset($query['view']);
 				break;
 			case 'cart':
-				$segments[] = 'View Cart';
+				$segments[] = 'view cart';
+				unset($query['view']);
 				break;
 			case 'invite':
 				if ($id)
 				{
 					$segments[] = EventbookingHelperRoute::getEventTitle($id);
 				}
-				$segments[] = 'Invite Friend';
-				unset($query['id']);
+
+				$segments[] = 'invite friend';
+				unset($query['view'], $query['id']);
 				break;
 			case 'password':
 				if ($eventId)
 				{
 					$segments[] = EventbookingHelperRoute::getEventTitle($eventId);
 				}
+
 				$segments[] = 'password validation';
-				unset($query['id']);
+				unset($query['view'], $query['id']);
 				break;
 			case 'registrantlist':
 				if ($id)
 				{
 					$segments[] = EventbookingHelperRoute::getEventTitle($id);
 				}
-				$segments[] = 'Registrants List';
-				unset($query['id']);
+				$segments[] = 'registrants list';
+				unset($query['view'], $query['id']);
 				break;
 			case 'waitinglist':
-				$segments[] = 'Join Waitinglist successfull';
+				$segments[] = 'join waitinglist successfull';
+				unset($query['view']);
 				break;
 			case 'failure':
-				$segments[] = 'Registration Failure';
+				$segments[] = 'registration failure';
+				unset($query['view']);
 				break;
 			case 'cancel':
-				$segments[] = 'Registration Cancel';
+				$segments[] = 'registration cancel';
+				unset($query['view']);
 				break;
 			case 'complete':
 				$segments[] = 'Registration Complete';
+				unset($query['view']);
 				break;
 			case 'registrationcancel':
-				$segments[] = 'Registration Cancelled';
+				$segments[] = 'registration cancelled';
+				unset($query['view']);
 				break;
 			case 'search':
 				$segments[] = 'search result';
-				break;
-			case 'registrant':
-				$segments[] = 'Edit Registrant';
-				break;
-			case 'users':
-				$segments[] = 'users list';
+				unset($query['view']);
 				break;
 			case 'payment':
-				$segments[] = 'payment deposit';
+				if ($layout == 'registration')
+				{
+					$segments[] = 'registration payment';
+				}
+				elseif ($layout == 'complete')
+				{
+					$segments[] = 'payment-complete';
+				}
+				else
+				{
+					$segments[] = 'remainder payment';
+				}
 
 				if (isset($query['registrant_id']))
 				{
@@ -256,14 +275,17 @@ class EventbookingRouter extends JComponentRouterBase
 					unset($query['registrant_id']);
 				}
 
-				if ($layout == 'complete')
+				if (isset($query['registration_code']))
 				{
-					$segments[] = 'payment-complete';
+					$segments[] = $query['registration_code'];
+					unset($query['registration_code']);
+				}
+
+				if (isset($query['layout']))
+				{
 					unset($query['layout']);
 				}
-				break;
-			case 'events':
-				$segments[] = 'my events';
+				unset($query['view']);
 				break;
 		}
 
@@ -274,7 +296,7 @@ class EventbookingRouter extends JComponentRouterBase
 				{
 					$segments[] = EventbookingHelperRoute::getEventTitle($eventId);
 				}
-				$segments[] = 'Individual Registration';
+				$segments[] = 'individual registration';
 				unset($query['task']);
 				break;
 			case 'register.group_registration':
@@ -282,11 +304,11 @@ class EventbookingRouter extends JComponentRouterBase
 				{
 					$segments[] = EventbookingHelperRoute::getEventTitle($eventId);
 				}
-				$segments[] = 'Group Registration';
+				$segments[] = 'group registration';
 				unset($query['task']);
 				break;
 			case 'group_billing':
-				$segments[] = 'Group Billing';
+				$segments[] = 'group billing';
 				unset($query['task']);
 				break;
 			case 'event.download_ical':
@@ -295,10 +317,6 @@ class EventbookingRouter extends JComponentRouterBase
 					$segments[] = EventbookingHelperRoute::getEventTitle($eventId);
 				}
 				$segments[] = 'download_ical';
-				unset($query['task']);
-				break;
-			case 'edit_registrant':
-				$segments[] = 'Edit Registrant';
 				unset($query['task']);
 				break;
 			case 'event.unpublish':
@@ -334,10 +352,7 @@ class EventbookingRouter extends JComponentRouterBase
 				unset($query['task']);
 				break;
 		}
-		if (isset($query['view']))
-		{
-			unset($query['view']);
-		}
+
 		if (isset($query['event_id']))
 		{
 			unset($query['event_id']);
@@ -347,19 +362,20 @@ class EventbookingRouter extends JComponentRouterBase
 		{
 			unset($query['catid']);
 		}
+
 		if (count($segments))
 		{
 			$unProcessedVariables = array(
 				'option',
 				'Itemid',
 				'category_id',
-				'registration_code',
 				'search',
 				'filter_city',
 				'filter_state',
 				'start',
 				'limitstart',
 				'limit',
+				'print',
 			);
 
 			if ($view != 'location' && $view != 'map')
@@ -374,21 +390,23 @@ class EventbookingRouter extends JComponentRouterBase
 					unset($queryArr[$variable]);
 				}
 			}
-			$queryString = http_build_query($queryArr);
+
+			$queryString = $db->quote(http_build_query($queryArr));
 			$segments    = array_map('JApplication::stringURLSafe', $segments);
-			$key         = md5(implode('/', $segments));
-			$dbQuery     = $db->getQuery(true);
-			$dbQuery->select('COUNT(*)')
+			$key         = $db->quote(md5(implode('/', $segments)));
+			$dbQuery->clear()
+				->select('COUNT(*)')
 				->from('#__eb_urls')
-				->where('md5_key="' . $key . '"');
+				->where('md5_key = ' . $key);
 			$db->setQuery($dbQuery);
 			$total = $db->loadResult();
+
 			if (!$total)
 			{
-				$dbQuery->clear();
-				$dbQuery->insert('#__eb_urls')
-					->columns('md5_key, `query`')
-					->values("'$key', '$queryString'");
+				$dbQuery->clear()
+					->insert('#__eb_urls')
+					->columns($db->quoteName(['md5_key', 'query', 'view', 'record_id']))
+					->values(implode(',', [$key, $queryString, $db->quote($view), (int) $id]));
 				$db->setQuery($dbQuery);
 				$db->execute();
 			}
@@ -403,12 +421,14 @@ class EventbookingRouter extends JComponentRouterBase
 	 * @param   array &$segments The segments of the URL to parse.
 	 *
 	 * @return  array  The URL attributes to be used by the application.
+	 * @throws  Exception
 	 *
 	 * @since   2.8.1
 	 */
 	public function parse(&$segments)
 	{
 		$vars = array();
+
 		if (count($segments))
 		{
 			$db    = JFactory::getDbo();
@@ -416,16 +436,27 @@ class EventbookingRouter extends JComponentRouterBase
 			$query = $db->getQuery(true);
 			$query->select('`query`')
 				->from('#__eb_urls')
-				->where('md5_key="' . $key . '"');
+				->where('md5_key = ' . $db->quote($key));
 			$db->setQuery($query);
 			$queryString = $db->loadResult();
+
 			if ($queryString)
 			{
 				parse_str(html_entity_decode($queryString), $vars);
 			}
+			else
+			{
+				$method = strtoupper(JFactory::getApplication()->input->getMethod());
+
+				if ($method == 'GET')
+				{
+					throw new Exception('Page not found', 404);
+				}
+			}
 		}
 
 		$item = JFactory::getApplication()->getMenu()->getActive();
+
 		if ($item)
 		{
 			if (!empty($vars['view']) && !empty($item->query['view']) && $vars['view'] == $item->query['view'])

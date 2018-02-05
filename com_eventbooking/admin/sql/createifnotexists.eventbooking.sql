@@ -68,3 +68,9 @@ CREATE TABLE IF NOT EXISTS `#__eb_urls` (
   `query` text,
   PRIMARY KEY (`id`)
 ) CHARACTER SET `utf8`;
+CREATE TABLE IF NOT EXISTS `#__eb_coupon_categories` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `coupon_id` int(11) DEFAULT '0',
+  `category_id` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) CHARACTER SET `utf8`;

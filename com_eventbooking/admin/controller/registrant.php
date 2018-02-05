@@ -3,11 +3,13 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
+
+use Joomla\Utilities\ArrayHelper;
 
 class EventbookingControllerRegistrant extends EventbookingController
 {
@@ -38,11 +40,15 @@ class EventbookingControllerRegistrant extends EventbookingController
 	public function resend_email()
 	{
 		$cid = $this->input->get('cid', array(), 'array');
-		$id  = (int) $cid[0];
-
+		$cid = ArrayHelper::toInteger($cid);
 		/* @var EventbookingModelRegistrant $model */
 		$model = $this->getModel();
-		$ret   = $model->resendEmail($id);
+		$ret   = true;
+
+		foreach ($cid as $id)
+		{
+			$ret = $model->resendEmail($id);
+		}
 
 		if ($ret)
 		{
@@ -51,6 +57,36 @@ class EventbookingControllerRegistrant extends EventbookingController
 		else
 		{
 			$this->setMessage(JText::_('EB_COULD_NOT_RESEND_EMAIL_TO_GROUP_MEMBER'), 'notice');
+		}
+
+		$this->setRedirect('index.php?option=com_eventbooking&view=registrants');
+	}
+
+	/**
+	 * Send payment request to selected registrant
+	 *
+	 * @return void
+	 */
+	public function request_payment()
+	{
+		$cid = $this->input->get('cid', array(), 'array');
+		$cid = ArrayHelper::toInteger($cid);
+
+		/* @var EventbookingModelRegistrant $model */
+		$model = $this->getModel();
+
+		try
+		{
+			foreach ($cid as $id)
+			{
+				$model->sendPaymentRequestEmail($id);
+			}
+
+			$this->setMessage(JText::_('EB_REQUEST_PAYMENT_EMAIL_SENT_SUCCESSFULLY'));
+		}
+		catch (Exception $e)
+		{
+			$this->setMessage($e->getMessage(), 'warning');
 		}
 
 		$this->setRedirect('index.php?option=com_eventbooking&view=registrants');
@@ -87,7 +123,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 		}
 
 		$eventId   = (int) $model->getState('filter_event_id');
-		$rowFields = EventbookingHelper::getAllEventFields($eventId);
+		$rowFields = EventbookingHelperRegistration::getAllEventFields($eventId);
 		$fieldIds  = array();
 		foreach ($rowFields as $rowField)
 		{
@@ -105,7 +141,14 @@ class EventbookingControllerRegistrant extends EventbookingController
 			list($fields, $headers) = EventbookingHelperData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
 		}
 
-		EventbookingHelperData::excelExport($fields, $rows, 'registrants_list', $headers);
+		if (is_callable('EventbookingHelperOverrideData::excelExport'))
+		{
+			EventbookingHelperOverrideData::excelExport($fields, $rows, 'registrants_list', $headers);
+		}
+		else
+		{
+			EventbookingHelperData::excelExport($fields, $rows, 'registrants_list', $headers);
+		}
 	}
 
 	/**
@@ -139,7 +182,7 @@ class EventbookingControllerRegistrant extends EventbookingController
 		}
 
 		$eventId   = (int) $model->getState('filter_event_id');
-		$rowFields = EventbookingHelper::getAllEventFields($eventId);
+		$rowFields = EventbookingHelperRegistration::getAllEventFields($eventId);
 		$fieldIds  = array();
 
 		foreach ($rowFields as $rowField)
@@ -151,34 +194,26 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		if (is_callable('EventbookingHelperOverrideData::prepareRegistrantsExportData'))
 		{
-			list($fields, $headers) = EventbookingHelperOverrideData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
+			list($fields, $headers) = EventbookingHelperOverrideData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId, true);
 		}
 		else
 		{
-			list($fields, $headers) = EventbookingHelperData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
+			list($fields, $headers) = EventbookingHelperData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId, true);
 		}
-
-		$fields[0] = 'event_id';
 
 		for ($i = 0, $n = count($fields); $i < $n; $i++)
 		{
-			if ($fields[$i] == 'registration_group_name' || $fields[$i] == 'id')
+			if ($fields[$i] == 'registration_group_name')
 			{
 				unset($fields[$i]);
 
 				continue;
 			}
-
-			if ($fields[$i] == 'payment_status')
-			{
-				$fields[$i] = 'published';
-			}
 		}
 
-		array_unshift($fields, 'id');
 		reset($fields);
 
-		EventbookingHelperData::excelExport($fields, $rows, 'registrants_list');
+		EventbookingHelperData::excelExport($fields, $rows, 'registrants_list', $fields);
 	}
 
 	/**
@@ -188,6 +223,36 @@ class EventbookingControllerRegistrant extends EventbookingController
 	{
 		$id = $this->input->getInt('id');
 		EventbookingHelper::downloadInvoice($id);
+	}
+
+	/**
+	 * Method to checkin multiple registrants
+	 *
+	 * @return void
+	 */
+	public function checkin_multiple_registrants()
+	{
+		$cid = $this->input->get('cid', array(), 'array');
+
+		$cid = ArrayHelper::toInteger($cid);
+
+		if (count($cid))
+		{
+			/* @var EventbookingModelRegistrant $model */
+			$model = $this->getModel();
+
+			try
+			{
+				$model->batchCheckin($cid);
+				$this->setMessage(JText::_('EB_CHECKIN_REGISTRANTS_SUCCESSFULLY'));
+			}
+			catch (Exception $e)
+			{
+				$this->setMessage($e->getMessage(), 'error');
+			}
+		}
+
+		$this->setRedirect('index.php?option=com_eventbooking&view=registrants');
 	}
 
 	/*
@@ -246,7 +311,11 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 		try
 		{
-			$model->resetCheckin($cid[0]);
+			foreach ($cid as $id)
+			{
+				$model->resetCheckin($id);
+			}
+
 			$this->setMessage(JText::_('EB_RESET_CHECKIN_SUCCESSFULLY'));
 		}
 		catch (Exception $e)
@@ -325,8 +394,6 @@ class EventbookingControllerRegistrant extends EventbookingController
 
 	public function download_ticket()
 	{
-		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/table/registrant.php';
-
 		$config = EventbookingHelper::getConfig();
 
 		$row = JTable::getInstance('registrant', 'EventbookingTable');

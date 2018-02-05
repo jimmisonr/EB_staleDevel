@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -52,7 +52,13 @@ class EventbookingHelperCart
 					}
 					else
 					{
-						$quantities[$i] += 1;
+						$event = EventbookingHelperDatabase::getEvent($id);
+
+						if (!$event->event_capacity || (($event->event_capacity - $event->total_registrants) > $quantities[$i]))
+						{
+							$quantities[$i] += 1;
+						}
+
 					}
 					break;
 				}
@@ -75,6 +81,7 @@ class EventbookingHelperCart
 		$cart       = $session->get('eb_cart');
 		$quantities = $cart['quantities'];
 		$items      = $cart['items'];
+
 		if (count($cid))
 		{
 			foreach ($cid as $id)
@@ -97,7 +104,12 @@ class EventbookingHelperCart
 							}
 							else
 							{
-								$quantities[$i] += 1;
+								$event = EventbookingHelperDatabase::getEvent($id);
+
+								if (!$event->event_capacity || (($event->event_capacity - $event->total_registrants) > $quantities[$i]))
+								{
+									$quantities[$i] += 1;
+								}
 							}
 							break;
 						}
@@ -240,7 +252,7 @@ class EventbookingHelperCart
 		$total      = 0;
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
-			$total += $quantities[$i] * EventbookingHelper::getRegistrationRate($items[$i], $quantities[$i]);
+			$total += $quantities[$i] * EventbookingHelperRegistration::getRegistrationRate($items[$i], $quantities[$i]);
 		}
 
 		return $total;
@@ -253,28 +265,45 @@ class EventbookingHelperCart
 	 */
 	public function getEvents()
 	{
-		$db   = JFactory::getDbo();
+		$db          = JFactory::getDbo();
+		$query       = $db->getQuery(true);
 		$items       = $this->getItems();
 		$quantities  = $this->getQuantities();
 		$quantityArr = array();
+		$events      = array();
+
 		for ($i = 0, $n = count($items); $i < $n; $i++)
 		{
 			$quantityArr[$items[$i]] = $quantities[$i];
 		}
+
 		if (count($items))
 		{
-			$config   = EventbookingHelper::getConfig();
-			$user     = JFactory::getUser();
-			$nullDate = $db->getNullDate();
+			$config      = EventbookingHelper::getConfig();
+			$user        = JFactory::getUser();
+			$nullDate    = $db->getNullDate();
 			$fieldSuffix = EventbookingHelper::getFieldSuffix();
-			$sql = 'SELECT a.*, a.title' . $fieldSuffix . ' AS title , DATEDIFF(a.early_bird_discount_date, NOW()) AS date_diff, SUM(b.number_registrants) AS total_registrants  FROM #__eb_events AS a LEFT JOIN #__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published=1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3)))) WHERE a.id IN (' .
-				implode(',', $items) . ') GROUP BY a.id ORDER BY FIND_IN_SET(a.id, "' . implode(',', $items) . '")';
-			$db->setQuery($sql);
+			$query->select('a.*')
+				->select('DATEDIFF(a.early_bird_discount_date, NOW()) AS date_diff')
+				->select('SUM(b.number_registrants) AS total_registrants')
+				->from('#__eb_events AS a')
+				->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id = 0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
+				->where('a.id IN (' . implode(',', $items) . ')')
+				->group('a.id')
+				->order('FIND_IN_SET(a.id, "' . implode(',', $items) . '")');
+
+			if ($fieldSuffix)
+			{
+				EventbookingHelperDatabase::getMultilingualFields($query, ['a.title'], $fieldSuffix);
+			}
+
+			$db->setQuery($query);
 			$events = $db->loadObjectList();
+
 			for ($i = 0, $n = count($events); $i < $n; $i++)
 			{
 				$event       = $events[$i];
-				$event->rate = EventbookingHelper::getRegistrationRate($event->id, $quantityArr[$event->id]);
+				$event->rate = EventbookingHelperRegistration::getRegistrationRate($event->id, $quantityArr[$event->id]);
 				if ($config->show_discounted_price)
 				{
 					$discount = 0;
@@ -292,7 +321,7 @@ class EventbookingHelperCart
 
 					if ($user->id)
 					{
-						$discountRate = EventbookingHelper::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
+						$discountRate = EventbookingHelperRegistration::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
 						if ($discountRate > 0)
 						{
 							if ($event->discount_type == 1)
@@ -312,12 +341,9 @@ class EventbookingHelperCart
 					}
 					$event->discounted_rate = $event->rate - $discount;
 				}
+
 				$event->quantity = $quantityArr[$event->id];
 			}
-		}
-		else
-		{
-			$events = array();
 		}
 
 		return $events;
@@ -351,7 +377,7 @@ class EventbookingHelperCart
 			// Member discount
 			if ($user->id)
 			{
-				$discountRate = EventbookingHelper::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
+				$discountRate = EventbookingHelperRegistration::calculateMemberDiscount($event->discount_amounts, $event->discount_groups);
 				if ($discountRate > 0)
 				{
 					if ($event->discount_type == 1)

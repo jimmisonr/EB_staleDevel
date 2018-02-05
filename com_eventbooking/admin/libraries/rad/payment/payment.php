@@ -212,8 +212,8 @@ abstract class RADPayment
 	/**
 	 *  This method is called when payment for the registration is success, it needs to be used by all payment class
 	 *
-	 * @param JTable $row
-	 * @param string $transactionId
+	 * @param EventbookingTableRegistrant $row
+	 * @param string                      $transactionId
 	 */
 	protected function onPaymentSuccess($row, $transactionId)
 	{
@@ -221,8 +221,11 @@ abstract class RADPayment
 
 		if ($row->process_deposit_payment)
 		{
+			$row->payment_processing_fee += $row->deposit_payment_processing_fee;
+			$row->amount += $row->deposit_payment_processing_fee;
 			$row->deposit_payment_transaction_id = $transactionId;
 			$row->payment_status                 = 1;
+
 			$row->store();
 
 			JPluginHelper::importPlugin('eventbooking');
@@ -240,7 +243,7 @@ abstract class RADPayment
 
 			if ($row->is_group_billing)
 			{
-				EventbookingHelper::updateGroupRegistrationRecord($row->id);
+				EventbookingHelperRegistration::updateGroupRegistrationRecord($row->id);
 			}
 
 			JPluginHelper::importPlugin('eventbooking');
@@ -282,7 +285,7 @@ abstract class RADPayment
 		}
 		else
 		{
-			$redirectHeading = JText::_('EB_REDIRECT_HEADING');
+			$redirectHeading = JText::sprintf('EB_REDIRECT_HEADING', $this->getTitle());
 		}
 		?>
 		<div class="payment-heading"><?php echo $redirectHeading; ?></div>

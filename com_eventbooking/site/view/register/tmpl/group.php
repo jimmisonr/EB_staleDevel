@@ -3,7 +3,7 @@
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright    	Copyright (C) 2010 - 2018 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -11,7 +11,7 @@ defined( '_JEXEC' ) or die ;
 
 if (version_compare(JVERSION, '3.6.9', 'ge'))
 {
-	JHtml::_('calendar');
+	JHtml::_('calendar', '', 'id', 'name');
 }
 else
 {
@@ -59,7 +59,7 @@ else
 	}
 }
 
-$replaces = EventbookingHelper::buildEventTags($this->event, $this->config);
+$replaces = EventbookingHelperRegistration::buildEventTags($this->event, $this->config);
 
 foreach ($replaces as $key => $value)
 {
@@ -71,7 +71,7 @@ foreach ($replaces as $key => $value)
 	}
 }
 ?>
-<div id="eb-group-registration-form" class="eb-container">
+<div id="eb-group-registration-form" class="eb-container<?php echo $this->waitingList ? ' eb-waitinglist-group-registration-form' : '';?>">
 	<h1 class="eb-page-title"><?php echo $headerText; ?></h1>
 	<?php
 	if (strlen($msg))
@@ -95,7 +95,16 @@ foreach ($replaces as $key => $value)
 	<?php
 	}
 
-	if ($this->config->collect_member_information)
+	if ($this->event->collect_member_information === '')
+	{
+		$collectMemberInformation = $this->config->collect_member_information;
+	}
+	else
+	{
+		$collectMemberInformation = $this->event->collect_member_information;
+	}
+
+	if ($collectMemberInformation)
 	{
 	?>
 		<div id="eb-group-members-information">
@@ -137,7 +146,7 @@ foreach ($replaces as $key => $value)
 		}
 		elseif($this->bypassNumberMembersStep)
 		{
-			if ($this->config->collect_member_information)
+			if ($collectMemberInformation)
 			{
 				$defaultStep = 'group_members';
 			}

@@ -3,7 +3,7 @@
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright    	Copyright (C) 2010 - 2018 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -30,6 +30,15 @@ if (strlen($msg))
 ?>
 	<div class="eb-message"><?php echo $msg ; ?></div>
 <?php
+}
+
+if ($this->event->collect_member_information === '')
+{
+	$collectMemberInformation = $this->config->collect_member_information;
+}
+else
+{
+	$collectMemberInformation = $this->event->collect_member_information;
 }
 ?>
 <form name="eb-form-number-group-members" id="eb-form-number-group-members" autocomplete="off" class="form form-horizontal">
@@ -66,7 +75,7 @@ if (strlen($msg))
 					},
 					success: function(html) {
 						<?php
-							if ($this->config->collect_member_information)
+							if ($collectMemberInformation)
 							{
 							?>
 								$('#eb-group-members-information .eb-form-content').html(html);

@@ -3,10 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 class EventbookingModelMassmail extends RADModel
@@ -14,13 +14,15 @@ class EventbookingModelMassmail extends RADModel
 	/**
 	 * Send email to all registrants of event
 	 *
-	 * @param $data
+	 * @param RADInput $input
 	 *
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function send($data)
+	public function send($input)
 	{
+		$data = $input->getData();
+
 		if ($data['event_id'] >= 1)
 		{
 			$mailer  = JFactory::getMailer();
@@ -28,6 +30,39 @@ class EventbookingModelMassmail extends RADModel
 			$siteUrl = EventbookingHelper::getSiteUrl();
 			$db      = JFactory::getDbo();
 			$query   = $db->getQuery(true);
+
+			$published          = isset($data['published']) ? $data['published'] : -1;
+			$sendToGroupBilling = isset($data['send_to_group_billing']) ? $data['send_to_group_billing'] : 1;
+			$sendToGroupMembers = isset($data['send_to_group_members']) ? $data['send_to_group_members'] : 1;
+
+			// Upload file
+			$attachment = $input->files->get('attachment', null, 'raw');
+
+			if ($attachment['name'])
+			{
+				$allowedExtensions = $config->attachment_file_types;
+
+				if (!$allowedExtensions)
+				{
+					$allowedExtensions = 'doc|docx|ppt|pptx|pdf|zip|rar|bmp|gif|jpg|jepg|png|swf|zipx';
+				}
+
+				$allowedExtensions = explode('|', $allowedExtensions);
+				$allowedExtensions = array_map('trim', $allowedExtensions);
+				$allowedExtensions = array_map('strtolower', $allowedExtensions);
+				$fileName          = $attachment['name'];
+				$fileExt           = JFile::getExt($fileName);
+
+				if (in_array(strtolower($fileExt), $allowedExtensions))
+				{
+					$fileName = JFile::makeSafe($fileName);
+					$mailer->addAttachment($attachment['tmp_name'], $fileName);
+				}
+				else
+				{
+					throw new Exception(JText::sprintf('Attachment file type %s is not allowed', $fileExt));
+				}
+			}
 
 			if ($config->from_name)
 			{
@@ -38,6 +73,8 @@ class EventbookingModelMassmail extends RADModel
 				$fromName = JFactory::getConfig()->get('fromname');
 			}
 
+			$languageLoaded = false;
+
 			if ($config->from_email)
 			{
 				$fromEmail = $config->from_email;
@@ -45,6 +82,15 @@ class EventbookingModelMassmail extends RADModel
 			else
 			{
 				$fromEmail = JFactory::getConfig()->get('mailfrom');
+			}
+
+			if (!empty($data['bcc_email']) && JMailHelper::isEmailAddress($data['bcc_email']))
+			{
+				$bccEmail = $data['bcc_email'];
+			}
+			else
+			{
+				$bccEmail = null;
 			}
 
 			$event                         = EventbookingHelperDatabase::getEvent((int) $data['event_id']);
@@ -56,22 +102,50 @@ class EventbookingModelMassmail extends RADModel
 
 			if ($event->location_id)
 			{
-				$location                   = EventbookingHelperDatabase::getLocation($event->location_id);
-				$replaces['event_location'] = $location->name . ' (' . $location->address . ', ' . $location->city . ', ' . $location->zip . ', ' . $location->country . ')';
+				$location = EventbookingHelperDatabase::getLocation($event->location_id);
+
+				if ($location->address)
+				{
+					$replaces['event_location'] = $location->name . ' (' . $location->address . ')';
+				}
+				else
+				{
+					$replaces['event_location'] = $location->name;
+				}
 			}
 			else
 			{
 				$replaces['event_location'] = '';
 			}
 
-
 			$query->clear()
 				->select('*')
 				->from('#__eb_registrants')
-				->where('event_id = ' . (int) $data['event_id'])
-				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
+				->where('event_id = ' . (int) $data['event_id']);
+
+			if ($published == -1)
+			{
+				$query->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
+			}
+			else
+			{
+				$query->where('published = ' . $published);
+			}
+
+			if (!$sendToGroupBilling)
+			{
+				$query->where('is_group_billing = 0');
+			}
+
+
+			if (!$sendToGroupMembers)
+			{
+				$query->where('group_id = 0');
+			}
 
 			$db->setQuery($query);
+
+
 			$rows    = $db->loadObjectList();
 			$emails  = array();
 			$subject = $data['subject'];
@@ -121,6 +195,7 @@ class EventbookingModelMassmail extends RADModel
 				$mailer->addAttachment($ics->save(JPATH_ROOT . '/media/com_eventbooking/icsfiles/', $fileName));
 			}
 
+
 			foreach ($rows as $row)
 			{
 				$message = $body;
@@ -136,39 +211,40 @@ class EventbookingModelMassmail extends RADModel
 					// Process [REGISTRATION_DETAIL] tag if it is used in the message
 					if (strpos($message, '[REGISTRATION_DETAIL]') !== false)
 					{
+						if (!$languageLoaded)
+						{
+							EventbookingHelper::loadComponentLanguage(JFactory::getLanguage()->getTag(), true);
+							$languageLoaded = true;
+						}
+
 						// Build this tag
 						if ($config->multiple_booking)
 						{
-							$rowFields = EventbookingHelper::getFormFields($row->id, 4);
+							$rowFields = EventbookingHelperRegistration::getFormFields($row->id, 4);
 						}
 						elseif ($row->is_group_billing)
 						{
-							$rowFields = EventbookingHelper::getFormFields($row->event_id, 1);
+							$rowFields = EventbookingHelperRegistration::getFormFields($row->event_id, 1);
 						}
 						else
 						{
-							$rowFields = EventbookingHelper::getFormFields($row->event_id, 0);
+							$rowFields = EventbookingHelperRegistration::getFormFields($row->event_id, 0);
 						}
 
 						$form = new RADForm($rowFields);
-						$data = EventbookingHelper::getRegistrantData($row, $rowFields);
+						$data = EventbookingHelperRegistration::getRegistrantData($row, $rowFields);
 						$form->bind($data);
 						$form->buildFieldsDependency();
-						$registrationDetail = EventbookingHelper::getEmailContent($config, $row, true, $form);
+						$registrationDetail = EventbookingHelperRegistration::getEmailContent($config, $row, true, $form);
 						$message            = str_replace("[REGISTRATION_DETAIL]", $registrationDetail, $message);
 					}
 
-					if (strpos($message, '[QRCODE]') !== false)
-					{
-						EventbookingHelper::generateQrcode($row->id);
-						$imgTag  = '<img src="' . $siteUrl . 'media/com_eventbooking/qrcodes/' . $row->id . '.png" border="0" />';
-						$message = str_ireplace("[QRCODE]", $imgTag, $message);
-					}
+					$message = EventbookingHelperRegistration::processQRCODE($row, $message);
 
 					if (JMailHelper::isEmailAddress($email))
 					{
 						$emails[] = $email;
-						$mailer->sendMail($fromEmail, $fromName, $email, $subject, $message, 1);
+						$mailer->sendMail($fromEmail, $fromName, $email, $subject, $message, 1, null, $bccEmail);
 						$mailer->clearAllRecipients();
 					}
 				}

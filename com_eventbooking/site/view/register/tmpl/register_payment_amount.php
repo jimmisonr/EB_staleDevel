@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -272,7 +272,7 @@ if ($this->depositPayment)
 			?>
 		</div>
 	</div>
-	<div class="<?php echo $controlGroupClass; ?>">
+	<div class="<?php echo $controlGroupClass; ?> payment-calculation">
 		<label class="<?php echo $controlLabelClass; ?>" for="payment_type">
 			<?php echo JText::_('EB_PAYMENT_TYPE'); ?>
 		</label>

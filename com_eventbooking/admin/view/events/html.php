@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -25,11 +25,11 @@ class EventbookingViewEventsHtml extends RADViewList
 			'id', 'name', $this->state->filter_location_id);
 
 		$options                           = array();
-		$options[]                         = JHtml::_('select.option', -1, JText::_('EB_PAST_EVENTS'));
-		$options[]                         = JHtml::_('select.option', 0, JText::_('EB_HIDE'));
-		$options[]                         = JHtml::_('select.option', 1, JText::_('EB_SHOW'));
-		$this->lists['filter_past_events'] = JHtml::_('select.genericlist', $options, 'filter_past_events', ' class="input-medium" onchange="submit();" ',
-			'value', 'text', $this->state->filter_past_events);
+		$options[]                         = JHtml::_('select.option', 0, JText::_('EB_EVENTS_FILTER'));
+		$options[]                         = JHtml::_('select.option', 1, JText::_('EB_HIDE_PAST_EVENTS'));
+		$options[]                         = JHtml::_('select.option', 2, JText::_('EBH_HIDE_CHILDREN_EVENTS'));
+		$this->lists['filter_events'] = JHtml::_('select.genericlist', $options, 'filter_events', ' class="input-medium" onchange="submit();" ',
+			'value', 'text', $this->state->filter_events);
 
 		$this->config = EventbookingHelper::getConfig();
 	}

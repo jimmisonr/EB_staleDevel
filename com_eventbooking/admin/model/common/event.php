@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -27,17 +27,43 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 	public function store($input, $ignore = array())
 	{
 		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
 		$config = EventbookingHelper::getConfig();
 		$db     = $this->getDbo();
 		$query  = $db->getQuery(true);
 
-		if ($app->isAdmin())
+		if ($app->isAdmin() || $user->authorise('core.admin'))
 		{
 			$data = $input->getData(RAD_INPUT_ALLOWRAW);
 		}
 		else
 		{
 			$data = $input->getData();
+
+			// Performing basic filter
+			$data['short_description'] = $input->post->get('short_description', '', 'raw');
+			$data['description']       = $input->post->get('description', '', 'raw');
+
+			$data['short_description'] = JComponentHelper::filterText($data['short_description']);
+			$data['description']       = JComponentHelper::filterText($data['description']);
+		}
+
+		if (!$this->state->id)
+		{
+			// Generate data from config if not set from add/edit event form
+			$defaultValuesMapping = [
+				'published'         => 'default_event_status',
+				'registration_type' => 'registration_type',
+				'access'            => 'access',
+			];
+
+			foreach ($defaultValuesMapping as $eventField => $configKey)
+			{
+				if (!isset($data[$eventField]) && isset($config->{$configKey}))
+				{
+					$data[$eventField] = $config->{$configKey};
+				}
+			}
 		}
 
 		if (!empty($data['currency_code']) && empty($data['currency_symbol']) && $data['currency_code'] != $config->currency_code)
@@ -46,6 +72,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		}
 
 		$languages = EventbookingHelper::getLanguages();
+
 		if (JLanguageMultilang::isEnabled() && count($languages))
 		{
 			$translableFields = array(
@@ -80,168 +107,25 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			}
 		}
 
-		$thumbImage = $input->files->get('thumb_image');
-
-		if ($thumbImage['name'])
-		{
-			$fileExt        = StringHelper::strtoupper(JFile::getExt($thumbImage['name']));
-			$supportedTypes = array('JPG', 'PNG', 'GIF', 'JPEG');
-
-			if (in_array($fileExt, $supportedTypes))
-			{
-				if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . StringHelper::strtolower($thumbImage['name'])))
-				{
-					$fileName = time() . '_' . StringHelper::strtolower($thumbImage['name']);
-				}
-				else
-				{
-					$fileName = StringHelper::strtolower($thumbImage['name']);
-				}
-
-				$imagePath = JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName;
-				$thumbPath = JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $fileName;
-				JFile::upload($_FILES['thumb_image']['tmp_name'], $imagePath);
-				JFile::copy($imagePath, JPATH_ROOT . '/images/com_eventbooking/' . $fileName);
-
-				if (!$config->thumb_width)
-				{
-					$config->thumb_width = 200;
-				}
-
-				if (!$config->thumb_height)
-				{
-					$config->thumb_height = 200;
-				}
-
-				$image = new JImage($imagePath);
-
-				if ($config->get('resize_image_method') == 'crop_resize')
-				{
-					$image->cropResize($config->thumb_width, $config->thumb_height, false)
-						->toFile($thumbPath);
-				}
-				else
-				{
-					$image->resize($config->thumb_width, $config->thumb_height, false)
-						->toFile($thumbPath);
-				}
-
-				$data['thumb'] = $fileName;
-				$data['image'] = 'images/com_eventbooking/' . $fileName;
-			}
-		}
+		// Upload and resize event image
+		$this->uploadAndResizeImage($input, $data, $config);
 
 		if (JFactory::getApplication()->isAdmin())
 		{
-			if (!empty($data['image']))
+			if (isset($data['discount_groups']))
 			{
-				$fileName = basename($data['image']);
-
-				if (!JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName))
-				{
-					JFile::copy(JPATH_ROOT . '/' . $data['image'], JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName);
-				}
-
-				$thumbPath = JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $fileName;
-
-				if (!JFile::exists($thumbPath))
-				{
-					if (!$config->thumb_width)
-					{
-						$config->thumb_width = 200;
-					}
-					if (!$config->thumb_height)
-					{
-						$config->thumb_height = 200;
-					}
-
-					$image = new JImage(JPATH_ROOT . '/' . $data['image']);
-
-					if ($config->get('resize_image_method') == 'crop_resize')
-					{
-						$image->cropResize($config->thumb_width, $config->thumb_height, false)
-							->toFile($thumbPath);
-					}
-					else
-					{
-						$image->resize($config->thumb_width, $config->thumb_height, false)
-							->toFile($thumbPath);
-					}
-				}
-
-				$data['thumb'] = $fileName;
-				$data['image'] = 'images/com_eventbooking/' . $fileName;
+				$data['discount_groups'] = implode(',', $data['discount_groups']);
 			}
 			else
 			{
-				$data['thumb'] = '';
+				$data['discount_groups'] = '';
 			}
 		}
 
-		if (isset($data['discount_groups']))
-		{
-			$data['discount_groups'] = implode(',', $data['discount_groups']);
-		}
-		else
-		{
-			$data['discount_groups'] = '';
-		}
+		// Process attachment
+		$this->processAttachment($input, $data, $config);
 
-		//Process attachment
-		if (JFactory::getApplication()->isSite())
-		{
-			$attachment = $thumbImage = $input->files->get('attachment');
-		}
-		else
-		{
-			$attachment = $thumbImage = $input->files->get('attachment', null, 'raw');
-		}
-
-		if ($attachment['name'])
-		{
-			$pathUpload        = JPATH_ROOT . '/media/com_eventbooking';
-			$allowedExtensions = $config->attachment_file_types;
-			if (!$allowedExtensions)
-			{
-				$allowedExtensions = 'doc|docx|ppt|pptx|pdf|zip|rar|bmp|gif|jpg|jepg|png|swf|zipx';
-			}
-			$allowedExtensions = explode('|', $allowedExtensions);
-			$allowedExtensions = array_map('trim', $allowedExtensions);
-			$allowedExtensions = array_map('strtolower', $allowedExtensions);
-			$fileName          = $attachment['name'];
-			$fileExt           = JFile::getExt($fileName);
-			if (in_array(strtolower($fileExt), $allowedExtensions))
-			{
-				$fileName = JFile::makeSafe($fileName);
-
-				if (JFactory::getApplication()->isAdmin())
-				{
-					JFile::upload($attachment['tmp_name'], $pathUpload . '/' . $fileName, false, true);
-				}
-				else
-				{
-					JFile::upload($attachment['tmp_name'], $pathUpload . '/' . $fileName);
-				}
-
-				$data['attachment'] = $fileName;
-			}
-			else
-			{
-				// Throw notice, but still allow saving the event
-				$data['attachment'] = '';
-			}
-		}
-
-		if (empty($data['attachment']) && !empty($data['available_attachment']))
-		{
-			$data['attachment'] = $data['available_attachment'];
-			if (is_array($data['attachment']))
-			{
-				$data['attachment'] = implode('|', $data['attachment']);
-			}
-		}
-
-		//Init default data
+		// Sanitize data
 		$this->sanitizeData($data);
 
 		$task = $input->getCmd('task');
@@ -337,13 +221,13 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				$user            = JFactory::getUser();
 				$row->created_by = $user->get('id');
 			}
-			$eventDateHour = $data['event_date_hour'];
-			$row->event_date .= ' ' . $eventDateHour . ':' . $data['event_date_minute'] . ':00';
-			$eventDateHour = $data['event_end_date_hour'];
+			$eventDateHour       = $data['event_date_hour'];
+			$row->event_date     .= ' ' . $eventDateHour . ':' . $data['event_date_minute'] . ':00';
+			$eventDateHour       = $data['event_end_date_hour'];
 			$row->event_end_date .= ' ' . $eventDateHour . ':' . $data['event_end_date_minute'] . ':00';
 
 			$row->registration_start_date .= ' ' . $data['registration_start_hour'] . ':' . $data['registration_start_minute'] . ':00';
-			$row->cut_off_date .= ' ' . $data['cut_off_hour'] . ':' . $data['cut_off_minute'] . ':00';
+			$row->cut_off_date            .= ' ' . $data['cut_off_hour'] . ':' . $data['cut_off_minute'] . ':00';
 
 			$eventCustomField = EventbookingHelper::getConfigValue('event_custom_field');
 			if ($eventCustomField)
@@ -424,14 +308,14 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			throw new Exception($db->getErrorMsg());
 		}
 
-		$row->event_type = 1;
-		$eventDateHour   = $data['event_date_hour'];
-		$row->event_date .= ' ' . $eventDateHour . ':' . $data['event_date_minute'] . ':00';
-		$eventDateHour = $data['event_end_date_hour'];
-		$row->weekdays = implode(',', $data['weekdays']);
-		$row->event_end_date .= ' ' . $eventDateHour . ':' . $data['event_end_date_minute'] . ':00';
+		$row->event_type              = 1;
+		$eventDateHour                = $data['event_date_hour'];
+		$row->event_date              .= ' ' . $eventDateHour . ':' . $data['event_date_minute'] . ':00';
+		$eventDateHour                = $data['event_end_date_hour'];
+		$row->weekdays                = implode(',', $data['weekdays']);
+		$row->event_end_date          .= ' ' . $eventDateHour . ':' . $data['event_end_date_minute'] . ':00';
 		$row->registration_start_date .= ' ' . $data['registration_start_hour'] . ':' . $data['registration_start_minute'] . ':00';
-		$row->cut_off_date .= ' ' . $data['cut_off_hour'] . ':' . $data['cut_off_minute'] . ':00';
+		$row->cut_off_date            .= ' ' . $data['cut_off_hour'] . ':' . $data['cut_off_minute'] . ':00';
 		//Adjust event start date and event end date
 		if ($data['recurring_type'] == 1)
 		{
@@ -514,6 +398,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		else
 		{
 			$row->event_date = $eventDates[0];
+
 			if ($eventDuration)
 			{
 				$row->event_end_date = strftime('%Y-%m-%d %H:%M:%S', strtotime($row->event_date) + $eventDuration);
@@ -524,10 +409,13 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 			}
 
 		}
+
 		$eventCustomField = EventbookingHelper::getConfigValue('event_custom_field');
+
 		if ($eventCustomField)
 		{
 			$params = $data['params'];
+
 			if (is_array($params))
 			{
 				$row->custom_fields = json_encode($params);
@@ -550,6 +438,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		$this->storeEventCategories($row->id, $data, $isNew);
 
 		// Create children events
+		$languages = EventbookingHelper::getLanguages();
 
 		if (!$this->state->id)
 		{
@@ -593,6 +482,19 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 				$rowChildEvent->recurring_occurrencies = 0;
 				$rowChildEvent->created_by             = $row->created_by;
 				$rowChildEvent->alias                  = $rowChildEvent->title . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null);
+
+				if (JLanguageMultilang::isEnabled())
+				{
+					// Build alias alias for other languages
+					if (count($languages))
+					{
+						foreach ($languages as $language)
+						{
+							$sef                              = $language->sef;
+							$rowChildEvent->{'alias_' . $sef} = JApplicationHelper::stringURLSafe($rowChildEvent->{'title_' . $sef} . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null));
+						}
+					}
+				}
 
 				$this->prepareTable($rowChildEvent, $task);
 
@@ -655,8 +557,10 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					'discount',
 					'discount_groups',
 					'discount_amounts',
+					'enable_cancel_registration',
 					'early_bird_discount_amount',
 					'early_bird_discount_type',
+					'deposit_type',
 					'deposit_amount',
 					'paypal_email',
 					'notification_emails',
@@ -789,6 +693,19 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 					$rowChildEvent->created_by             = $row->created_by;
 					$rowChildEvent->alias                  = $rowChildEvent->title . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null);
 
+					if (JLanguageMultilang::isEnabled())
+					{
+						// Build alias alias for other languages
+						if (count($languages))
+						{
+							foreach ($languages as $language)
+							{
+								$sef                              = $language->sef;
+								$rowChildEvent->{'alias_' . $sef} = JApplicationHelper::stringURLSafe($rowChildEvent->{'title_' . $sef} . '-' . JHtml::_('date', $rowChildEvent->event_date, $config->date_format, null));
+							}
+						}
+					}
+
 					$this->prepareTable($rowChildEvent, $task);
 
 					$rowChildEvent->store();
@@ -846,27 +763,33 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 	public function initData()
 	{
 		parent::initData();
-		$db                                   = $this->getDbo();
-		$config                               = EventbookingHelper::getConfig();
-		$this->data->event_date               = $db->getNullDate();
-		$this->data->event_end_date           = $db->getNullDate();
-		$this->data->registration_start_date  = $db->getNullDate();
-		$this->data->late_fee_date            = $db->getNullDate();
-		$this->data->cut_off_date             = $db->getNullDate();
-		$this->data->registration_type        = isset($config->registration_type) ? $config->registration_type : 0;
-		$this->data->access                   = isset($config->access) ? $config->access : 1;
-		$this->data->registration_access      = isset($config->registration_access) ? $config->registration_access : 1;
-		$this->data->cancel_before_date       = $db->getNullDate();
-		$this->data->early_bird_discount_date = $db->getNullDate();
-		$this->data->article_id               = $config->article_id;
-		$this->data->recurring_type           = 0;
-		$this->data->number_days              = '';
-		$this->data->number_weeks             = '';
-		$this->data->number_months            = '';
-		$this->data->recurring_frequency      = 0;
-		$this->data->recurring_end_date       = $db->getNullDate();
-		$this->data->ordering                 = 0;
-		$this->data->published                = isset($config->default_event_status) ? $config->default_event_status : 0;
+
+		$db     = $this->getDbo();
+		$config = EventbookingHelper::getConfig();
+
+		$this->data->event_date                  = $db->getNullDate();
+		$this->data->event_end_date              = $db->getNullDate();
+		$this->data->registration_start_date     = $db->getNullDate();
+		$this->data->late_fee_date               = $db->getNullDate();
+		$this->data->cut_off_date                = $db->getNullDate();
+		$this->data->registration_type           = isset($config->registration_type) ? $config->registration_type : 0;
+		$this->data->access                      = isset($config->access) ? $config->access : 1;
+		$this->data->registration_access         = isset($config->registration_access) ? $config->registration_access : 1;
+		$this->data->cancel_before_date          = $db->getNullDate();
+		$this->data->early_bird_discount_date    = $db->getNullDate();
+		$this->data->article_id                  = $config->article_id;
+		$this->data->recurring_type              = 0;
+		$this->data->number_days                 = '';
+		$this->data->number_weeks                = '';
+		$this->data->number_months               = '';
+		$this->data->recurring_frequency         = 0;
+		$this->data->recurring_end_date          = $db->getNullDate();
+		$this->data->ordering                    = 0;
+		$this->data->published                   = isset($config->default_event_status) ? $config->default_event_status : 0;
+		$this->data->enable_terms_and_conditions = 2;
+		$this->data->send_emails                 = -1;
+		$this->data->activate_tickets_pdf        = $config->get('activate_tickets_pdf', 0);
+		$this->data->send_tickets_via_email      = $config->get('send_tickets_via_email', 0);
 	}
 
 	/**
@@ -956,6 +879,14 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 		$query->clear()
 			->delete('#__eb_ticket_types')
 			->where('event_id IN (' . $cids . ')');
+		$db->setQuery($query);
+		$db->execute();
+
+		// Delete the URLs related to event
+		$query->clear()
+			->delete('#__eb_urls')
+			->where($db->quoteName('view') . '=' . $db->quote('event'))
+			->where('record_id IN (' . $cids . ')');
 		$db->setQuery($query);
 		$db->execute();
 
@@ -1112,6 +1043,7 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 	{
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
+
 		if (!$isNew)
 		{
 			$query->delete('#__eb_event_group_prices')->where('event_id=' . $eventId);
@@ -1121,18 +1053,213 @@ class EventbookingModelCommonEvent extends RADModelAdmin
 
 		$prices            = $data['price'];
 		$registrantNumbers = $data['registrant_number'];
+
 		for ($i = 0, $n = count($prices); $i < $n; $i++)
 		{
 			$price            = $prices[$i];
 			$registrantNumber = $registrantNumbers[$i];
+
 			if (($registrantNumber > 0) && ($price > 0))
 			{
-				$query->clear();
-				$query->insert('#__eb_event_group_prices')
+				$query->clear()
+					->insert('#__eb_event_group_prices')
 					->columns('event_id, registrant_number, price')
 					->values("$eventId, $registrantNumber, $price");
 				$db->setQuery($query);
 				$db->execute();
+			}
+		}
+	}
+
+	/**
+	 * Upload and resize image for event
+	 *
+	 * @param RADInput  $input
+	 * @param array     $data
+	 * @param RADConfig $config
+	 */
+	protected function uploadAndResizeImage($input, &$data, $config)
+	{
+		$thumbImage = $input->files->get('thumb_image');
+
+		if ($thumbImage['name'])
+		{
+			$fileExt        = StringHelper::strtoupper(JFile::getExt($thumbImage['name']));
+			$supportedTypes = array('JPG', 'PNG', 'GIF', 'JPEG');
+
+			if (in_array($fileExt, $supportedTypes))
+			{
+				if (JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . StringHelper::strtolower($thumbImage['name'])))
+				{
+					$fileName = time() . '_' . StringHelper::strtolower($thumbImage['name']);
+				}
+				else
+				{
+					$fileName = StringHelper::strtolower($thumbImage['name']);
+				}
+
+				// Replace space in filename with underscore
+				$fileName = preg_replace('/\s+/', '_', $fileName);
+
+				$imagePath = JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName;
+				$thumbPath = JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $fileName;
+				JFile::upload($thumbImage['tmp_name'], $imagePath);
+				JFile::copy($imagePath, JPATH_ROOT . '/images/com_eventbooking/' . $fileName);
+
+				$image = new JImage($imagePath);
+
+				if ($fileExt == 'PNG')
+				{
+					$imageType = IMAGETYPE_PNG;
+				}
+				elseif ($fileExt == 'GIF')
+				{
+					$imageType = IMAGETYPE_GIF;
+				}
+				elseif (in_array($fileExt, ['JPG', 'JPEG']))
+				{
+					$imageType = IMAGETYPE_JPEG;
+				}
+				else
+				{
+					$imageType = '';
+				}
+
+				if ($config->get('resize_image_method') == 'crop_resize')
+				{
+					$image->cropResize($config->thumb_width, $config->thumb_height, false)
+						->toFile($thumbPath, $imageType);
+				}
+				else
+				{
+					$image->resize($config->thumb_width, $config->thumb_height, false)
+						->toFile($thumbPath, $imageType);
+				}
+
+				$data['thumb'] = $fileName;
+				$data['image'] = 'images/com_eventbooking/' . $fileName;
+			}
+		}
+
+		if (JFactory::getApplication()->isAdmin())
+		{
+			if (!empty($data['image']))
+			{
+				$fileName = basename($data['image']);
+
+				if (!JFile::exists(JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName))
+				{
+					JFile::copy(JPATH_ROOT . '/' . $data['image'], JPATH_ROOT . '/media/com_eventbooking/images/' . $fileName);
+				}
+
+				$thumbPath = JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $fileName;
+
+				$fileExt = StringHelper::strtoupper(JFile::getExt($fileName));
+
+				if ($fileExt == 'PNG')
+				{
+					$imageType = IMAGETYPE_PNG;
+				}
+				elseif ($fileExt == 'GIF')
+				{
+					$imageType = IMAGETYPE_GIF;
+				}
+				elseif (in_array($fileExt, ['JPG', 'JPEG']))
+				{
+					$imageType = IMAGETYPE_JPEG;
+				}
+				else
+				{
+					$imageType = '';
+				}
+
+				$image = new JImage(JPATH_ROOT . '/' . $data['image']);
+
+				if ($config->get('resize_image_method') == 'crop_resize')
+				{
+					$image->cropResize($config->thumb_width, $config->thumb_height, false)
+						->toFile($thumbPath, $imageType);
+				}
+				else
+				{
+					$image->resize($config->thumb_width, $config->thumb_height, false)
+						->toFile($thumbPath, $imageType);
+				}
+
+
+				$data['thumb'] = $fileName;
+			}
+			else
+			{
+				$data['thumb'] = '';
+			}
+		}
+	}
+
+	/**
+	 * Upload attachment and store attachment filename into data array
+	 *
+	 * @param RADInput  $input
+	 * @param array     $data
+	 * @param RADConfig $config
+	 */
+	protected function processAttachment($input, &$data, $config)
+	{
+		//Process attachment
+		if (JFactory::getApplication()->isSite())
+		{
+			$attachment = $input->files->get('attachment');
+		}
+		else
+		{
+			$attachment = $input->files->get('attachment', null, 'raw');
+		}
+
+		if ($attachment['name'])
+		{
+			$pathUpload        = JPATH_ROOT . '/media/com_eventbooking';
+			$allowedExtensions = $config->attachment_file_types;
+
+			if (!$allowedExtensions)
+			{
+				$allowedExtensions = 'doc|docx|ppt|pptx|pdf|zip|rar|bmp|gif|jpg|jepg|png|swf|zipx';
+			}
+
+			$allowedExtensions = explode('|', $allowedExtensions);
+			$allowedExtensions = array_map('trim', $allowedExtensions);
+			$allowedExtensions = array_map('strtolower', $allowedExtensions);
+			$fileName          = $attachment['name'];
+			$fileExt           = JFile::getExt($fileName);
+
+			if (in_array(strtolower($fileExt), $allowedExtensions))
+			{
+				$fileName = JFile::makeSafe($fileName);
+
+				if (JFactory::getApplication()->isAdmin())
+				{
+					JFile::upload($attachment['tmp_name'], $pathUpload . '/' . $fileName, false, true);
+				}
+				else
+				{
+					JFile::upload($attachment['tmp_name'], $pathUpload . '/' . $fileName);
+				}
+
+				$data['attachment'] = $fileName;
+			}
+			else
+			{
+				// Throw notice, but still allow saving the event
+				$data['attachment'] = '';
+			}
+		}
+
+		if (empty($data['attachment']) && !empty($data['available_attachment']))
+		{
+			$data['attachment'] = $data['available_attachment'];
+
+			if (is_array($data['attachment']))
+			{
+				$data['attachment'] = implode('|', $data['attachment']);
 			}
 		}
 	}

@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -82,6 +82,7 @@ class EventbookingControllerEvent extends EventbookingController
 			'cut_off_date',
 			'registration_start_date',
 			'individual_price',
+			'price_text',
 			'tax_rate',
 			'event_capacity',
 			'registration_type',
@@ -112,6 +113,7 @@ class EventbookingControllerEvent extends EventbookingController
 			'early_bird_discount_amount',
 			'early_bird_discount_type',
 			'early_bird_discount_date',
+			'tbl.enable_terms_and_conditions',
 		);
 
 		if ($config->event_custom_field)

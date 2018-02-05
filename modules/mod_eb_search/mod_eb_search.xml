@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="module" version="1.6.0" method="upgrade">
+<extension type="module" version="3.5" client="site" method="upgrade">
 	<name>Events Booking - Search Events</name>
 	<author>Tuan Pham Ngoc</author>
 	<authorEmail>contact@joomdonation.com</authorEmail>
@@ -18,6 +18,9 @@
 			<fieldset name="basic">
 				<field name="moduleclass_sfx" type="text"
 				label="Module Class Suffix" description="PARAMMODULECLASSSUFFIX">
+				</field>
+				<field name="category_id" type="text"
+					   label="Category ID" description="If you enter a category ID here, the system will only search for event from this category only">
 				</field>
 				<field name="show_category" type="radio"
 					label="Show Category" description="Choose to show/hide category from down in the search module" default="1">

@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -19,7 +19,7 @@ defined('_JEXEC') or die;
  */
 ?>
 <h3 class="eb-heading"><?php echo JText::_('EB_EXISTING_USER_LOGIN'); ?></h3>
-<form method="post" action="index.php" name="eb-login-form" id="eb-login-form" autocomplete="off" class="form form-horizontal">
+<form method="post" action="<?php echo JRoute::_('index.php?option=com_users&task=user.login'); ?>" name="eb-login-form" id="eb-login-form" autocomplete="off" class="form form-horizontal">
 	<div class="<?php echo $controlGroupClass;  ?>">
 		<label class="<?php echo $controlLabelClass; ?>" for="username">
 			<?php echo  JText::_('EB_USERNAME') ?><span class="required">*</span>
@@ -49,8 +49,6 @@ defined('_JEXEC') or die;
 	<?php
 	}
 	?>
-	<input type="hidden" name="option" value="com_users" />
-	<input type="hidden" name="task" value="user.login" />
 	<input type="hidden" name="return" id="return_url" value="<?php echo base64_encode(JUri::getInstance()->toString()); ?>" />
 	<?php echo JHtml::_( 'form.token' ); ?>
 </form>

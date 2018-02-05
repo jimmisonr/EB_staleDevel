@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -45,6 +45,7 @@ defined('_JEXEC') or die;
  * @property $invoice_number
  * @property $registration_code
  * @property $ticket_code
+ * @property $ticket_qrcode
  * @property $ticket_number
  * @property $params
  * @property $cart_id
@@ -54,6 +55,9 @@ defined('_JEXEC') or die;
  * @property $language
  * @property $checked_in
  * @property $checked_in_count
+ * @property $process_deposit_payment
+ * @property $deposit_payment_processing_fee
+ * @property $deposit_payment_transaction_id
  */
 class EventbookingTableRegistrant extends JTable
 {

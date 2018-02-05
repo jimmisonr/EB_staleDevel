@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -17,8 +17,8 @@ class plgEventBookingMailchimp extends JPlugin
 	public function __construct(& $subject, $config)
 	{
 		parent::__construct($subject, $config);
-		JFactory::getLanguage()->load('plg_eventbooking_mailchimp', JPATH_ADMINISTRATOR);
-		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/table');
+		
+		JFactory::getLanguage()->load('plg_eventbooking_mailchimp', JPATH_ADMINISTRATOR);		
 	}
 
 	/**
@@ -175,7 +175,16 @@ class plgEventBookingMailchimp extends JPlugin
 		}
 
 		$params  = new Registry($row->params);
-		$listIds = explode(',', $params->get('mailchimp_list_ids', ''));
+
+		if($row->id)
+		{
+			$listIds = explode(',', $params->get('mailchimp_list_ids', ''));
+		}
+		else
+		{
+			$lists = explode(',', $this->params->get('default_list_ids', ''));
+		}
+
 		$options = array();
 		$lists   = $lists['data'];
 

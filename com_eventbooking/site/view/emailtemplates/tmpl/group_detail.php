@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -44,7 +44,16 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 					}
 					else
 					{
-						echo JHtml::_('date', $rowEvent->event_date, $config->event_date_format, null) ;
+						if (strpos($rowEvent->event_date, '00:00:00') !== false)
+						{
+							$dateFormat = $config->date_format;
+						}
+						else
+						{
+							$dateFormat = $config->event_date_format;
+						}
+
+						echo JHtml::_('date', $rowEvent->event_date, $dateFormat, null) ;
 					}
 				?>
 			</div>
@@ -52,13 +61,21 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 		<?php
 			if ($rowEvent->event_end_date != $nullDate)
 			{
+				if (strpos($rowEvent->event_end_date, '00:00:00') !== false)
+				{
+					$dateFormat = $config->date_format;
+				}
+				else
+				{
+					$dateFormat = $config->event_date_format;
+				}
 			?>
 				<div class="<?php echo $controlGroupClass; ?>">
 					<label class="<?php echo $controlLabelClass; ?>">
 						<?php echo JText::_('EB_EVENT_END_DATE') ?>
 					</label>
 					<div class="<?php echo $controlsClass; ?>">
-						<?php echo JHtml::_('date', $rowEvent->event_end_date, $config->event_date_format, null); ?>
+						<?php echo JHtml::_('date', $rowEvent->event_end_date, $dateFormat, null); ?>
 					</div>
 				</div>
 			<?php
@@ -71,22 +88,6 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 			if ($location->address)
 			{
 				$locationInformation[] = $location->address;
-			}
-			if ($location->city)
-			{
-				$locationInformation[] = $location->city;
-			}
-			if ($location->state)
-			{
-				$locationInformation[] = $location->state;
-			}
-			if ($location->zip)
-			{
-				$locationInformation[] = $location->zip;
-			}
-			if ($location->country)
-			{
-				$locationInformation[] = $location->country;
 			}
 		?>
 			<div class="<?php echo $controlGroupClass;  ?>">
@@ -109,7 +110,7 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 		</div>
 	</div>
 	<?php
-		$showBillingStep = EventbookingHelper::showBillingStep($row->event_id);
+		$showBillingStep = EventbookingHelperRegistration::showBillingStep($row->event_id);
 		if ($showBillingStep)
 		{
 		?>
@@ -256,14 +257,24 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 			<?php
 			}
 		}
-		if ($config->collect_member_information && count($rowMembers))
+
+		if ($rowEvent->collect_member_information === '')
+		{
+			$collectMemberInformation = $config->collect_member_information;
+		}
+		else
+		{
+			$collectMemberInformation = $rowEvent->collect_member_information;
+		}
+
+		if ($collectMemberInformation && count($rowMembers))
 		{
 		?>
 			<div class="<?php echo $controlGroupClass;  ?>">
 				<h3 class="eb-heading"><?php echo JText::_('EB_MEMBERS_INFORMATION') ; ?></h3>
 			</div>
 			<?php
-				$rowFields = EventbookingHelper::getFormFields($row->event_id, 2);
+				$rowFields = EventbookingHelperRegistration::getFormFields($row->event_id, 2);
 				for ($i = 0 , $n  = count($rowMembers); $i < $n; $i++)
 				{
 					$memberForm = new RADForm($rowFields);
@@ -274,7 +285,7 @@ $nullDate          = JFactory::getDbo()->getNullDate();
 					}
 
 
-					$memberData = EventbookingHelper::getRegistrantData($rowMember, $rowFields);
+					$memberData = EventbookingHelperRegistration::getRegistrantData($rowMember, $rowFields);
 					$memberForm->bind($memberData);
 
 					//Build dependency

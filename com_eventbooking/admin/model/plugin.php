@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -57,41 +57,42 @@ class EventbookingModelPlugin extends RADModelAdmin
 		jimport('joomla.filesystem.folder');
 		jimport('joomla.filesystem.archive');
 		$db = $this->getDbo();
+
 		if ($plugin['error'] || $plugin['size'] < 1)
 		{
 			throw new Exception(JText::_('Upload plugin package error'));
-
-			return false;
 		}
 
 		$tmpPath = JFactory::getConfig()->get('tmp_path');
-		
+
 		if (!JFolder::exists($tmpPath))
 		{
 			$tmpPath = JPATH_ROOT . '/tmp';
 		}
-		
+
 		$destinationDir = $tmpPath . '/' . $plugin['name'];
 
-		$uploaded       = JFile::upload($plugin['tmp_name'], $destinationDir, false, true);		
-		
+		$uploaded = JFile::upload($plugin['tmp_name'], $destinationDir, false, true);
+
 		if (!$uploaded)
 		{
 			throw new Exception(JText::_('Upload plugin package'));
-
-			return false;
 		}
+
 		// Temporary folder to extract the archive into
 		$tmpDir     = uniqid('install_');
 		$extractDir = JPath::clean(dirname($destinationDir) . '/' . $tmpDir);
 		$result     = JArchive::extract($destinationDir, $extractDir);
+
 		if (!$result)
 		{
 			throw new Exception(JText::_('Could not extract plugin package'));
 
 			return false;
 		}
+
 		$dirList = array_merge(JFolder::files($extractDir, ''), JFolder::folders($extractDir, ''));
+
 		if (count($dirList) == 1)
 		{
 			if (JFolder::exists($extractDir . '/' . $dirList[0]))
@@ -99,23 +100,23 @@ class EventbookingModelPlugin extends RADModelAdmin
 				$extractDir = JPath::clean($extractDir . '/' . $dirList[0]);
 			}
 		}
+
 		//Now, search for xml file
 		$xmlFiles = JFolder::files($extractDir, '.xml$', 1, true);
+
 		if (empty($xmlFiles))
 		{
 			throw new Exception(JText::_('Could not find xml file in the package'));
-
-			return false;
 		}
 
 		$file = $xmlFiles[0];
 		$root = JFactory::getXML($file, true);
+
 		if ($root->getName() !== 'install')
 		{
 			throw new Exception(JText::_('Invalid xml file for payment plugin installation function'));
-
-			return false;
 		}
+
 		$row          = $this->getTable();
 		$name         = (string) $root->name;
 		$title        = (string) $root->title;
@@ -127,12 +128,14 @@ class EventbookingModelPlugin extends RADModelAdmin
 		$authorUrl    = (string) $root->authorUrl;
 		$version      = (string) $root->version;
 		$description  = (string) $root->description;
-		$query        = $db->getQuery(true);
+
+		$query = $db->getQuery(true);
 		$query->select('id')
 			->from('#__eb_payment_plugins')
 			->where('name="' . $name . '"');
 		$db->setQuery($query);
 		$pluginId = (int) $db->loadResult();
+
 		if ($pluginId)
 		{
 			$row->load($pluginId);
@@ -162,13 +165,17 @@ class EventbookingModelPlugin extends RADModelAdmin
 			$row->published     = 0;
 			$row->ordering      = $row->getNextOrder('published=1');
 		}
+
 		$row->store();
+
 		$pluginDir = JPATH_ROOT . '/components/com_eventbooking/payments';
 		JFile::move($file, $pluginDir . '/' . basename($file));
 		$files = $root->files->children();
+
 		for ($i = 0, $n = count($files); $i < $n; $i++)
 		{
 			$file = $files[$i];
+
 			if ($file->getName() == 'filename')
 			{
 				$fileName = $file;
@@ -177,25 +184,19 @@ class EventbookingModelPlugin extends RADModelAdmin
 			elseif ($file->getName() == 'folder')
 			{
 				$folderName = $file;
+
 				if (JFolder::exists($extractDir . '/' . $folderName))
 				{
+					if (JFolder::exists($pluginDir . '/' . $folderName))
+					{
+						JFolder::delete($pluginDir . '/' . $folderName);
+					}
+
 					JFolder::move($extractDir . '/' . $folderName, $pluginDir . '/' . $folderName);
 				}
 			}
 		}
 
-		$languageFolder = JPATH_ROOT . '/' . 'language';
-		$files          = $root->languages->children();
-		for ($i = 0, $n = count($files); $i < $n; $i++)
-		{
-			$fileName          = $files[$i];
-			$pos               = strpos($fileName, '.');
-			$languageSubFolder = substr($fileName, 0, $pos);
-			if (!JFile::exists($languageFolder . '/' . $languageSubFolder . '/' . $fileName))
-			{
-				JFile::copy($extractDir . '/' . $fileName, $languageFolder . '/' . $languageSubFolder . '/' . $fileName);
-			}
-		}
 		JFolder::delete($extractDir);
 
 		return true;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Form Field class for the Joomla RAD.
  * Supports a checkbox list custom field.
@@ -111,7 +112,7 @@ class RADFormFieldCheckboxes extends RADFormField
 		}
 		else
 		{
-			$values = explode(",", empty($this->row->values) ? 'Yes' : $this->row->values);
+			$values = array($this->row->values);
 		}
 
 		$quantityValues = explode("\r\n", $this->row->quantity_values);

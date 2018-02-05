@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -55,7 +55,14 @@ defined('_JEXEC') or die;
 		<?php
 		if ($config->show_available_place)
 		{
-			$available = $ticketType->capacity - $ticketType->registered;
+			if ($ticketType->capacity)
+			{
+				$available = $ticketType->capacity - $ticketType->registered;
+			}
+			else
+			{
+				$available = JText::_('EB_UNLIMITED');
+			}
 		?>
 			<td class="center">
 				<?php echo $available; ?>

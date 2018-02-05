@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -12,8 +12,7 @@ defined('_JEXEC') or die;
 class plgSystemEBDepositReminder extends JPlugin
 {
 	public function onAfterRender()
-	{
-		error_reporting(0);
+	{		
 		if (file_exists(JPATH_ROOT . '/components/com_eventbooking/eventbooking.php'))
 		{
 			$bccEmail                = $this->params->get('bcc_email', '');
@@ -78,7 +77,9 @@ class plgSystemEBDepositReminder extends JPlugin
 				return;
 			}
 
+			// Require library + register autoloader
 			require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
+			
 			EventbookingHelperMail::sendDepositReminder($numberDays, $numberEmailSendEachTime, $bccEmail);
 		}
 

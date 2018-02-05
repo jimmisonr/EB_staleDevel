@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -25,6 +25,7 @@ class EventbookingModelLocation extends RADModelAdmin
 		{
 			$row->user_id = JFactory::getUser()->id;
 		}
+
 		$coordinates = $input->get('coordinates', '', 'none');
 		$coordinates = explode(',', $coordinates);
 		$row->lat    = $coordinates[0];

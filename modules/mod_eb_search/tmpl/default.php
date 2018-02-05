@@ -17,7 +17,7 @@ $output = '<input name="search" id="search_eb_box" maxlength="50"  class="inputb
     		</td>
     	</tr>
     	<?php
-    	    if ($showCategory)
+    	    if ($showCategory && !$presetCategoryId)
 	        {
     	    ?>
     	    	<tr>
@@ -57,6 +57,14 @@ $output = '<input name="search" id="search_eb_box" maxlength="50"  class="inputb
     </script>
 
 	<input type="hidden" name="layout" value="<?php echo $layout; ?>" />
+    <?php
+        if ($presetCategoryId)
+        {
+        ?>
+            <input type="hidden" name="category_id" value="<?php echo $presetCategoryId; ?>" />
+        <?php
+        }
+    ?>
 </form>
 <style type="text/css">
 #eb_search_form td {

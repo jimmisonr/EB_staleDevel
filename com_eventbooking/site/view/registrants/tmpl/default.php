@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -51,15 +51,22 @@ $rootUri = JUri::root(true);
 	<fieldset class="filters btn-toolbar clearfix">
 		<div class="filter-search btn-group pull-left">
 			<label for="filter_search" class="element-invisible"><?php echo JText::_('EB_FILTER_SEARCH_REGISTRANTS_DESC');?></label>
-			<input type="text" name="filter_search" id="filter_search" placeholder="<?php echo JText::_('JSEARCH_FILTER'); ?>" value="<?php echo $this->escape($this->lists['search']); ?>" class="hasTooltip" title="<?php echo JHtml::tooltipText('EB_SEARCH_REGISTRANTS_DESC'); ?>" />
+			<input type="text" name="filter_search" id="filter_search" placeholder="<?php echo JText::_('JSEARCH_FILTER'); ?>" value="<?php echo $this->escape($this->state->filter_search); ?>" class="hasTooltip" title="<?php echo JHtml::tooltipText('EB_SEARCH_REGISTRANTS_DESC'); ?>" />
 		</div>
 		<div class="btn-group pull-left">
 			<button type="submit" class="btn hasTooltip" title="<?php echo JHtml::tooltipText('JSEARCH_FILTER_SUBMIT'); ?>"><span class="icon-search"></span></button>
 			<button type="button" class="btn hasTooltip" title="<?php echo JHtml::tooltipText('JSEARCH_FILTER_CLEAR'); ?>" onclick="document.getElementById('filter_search').value='';this.form.submit();"><span class="icon-remove"></span></button>
 		</div>
 		<div class="btn-group pull-left hidden-phone">
-			<?php echo $this->lists['filter_event_id'] ; ?>
-			<?php echo $this->lists['filter_published'] ; ?>
+			<?php
+				echo $this->lists['filter_event_id'] ;
+				echo $this->lists['filter_published'];
+
+				if ($this->config->activate_checkin_registrants)
+				{
+					echo $this->lists['filter_checked_in'];
+				}
+			?>
 		</div>
 	</fieldset>
 <?php
@@ -109,6 +116,26 @@ $rootUri = JUri::root(true);
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_AMOUNT'), 'tbl.amount', $this->state->filter_order_Dir, $this->state->filter_order); ?>
 				</th>
 				<?php
+				foreach ($this->fields as $field)
+				{
+					$cols++;
+
+					if ($field->is_core)
+					{
+					?>
+						<th class="title">
+							<?php echo JHtml::_('grid.sort', JText::_($field->title), 'tbl.' . $field->name, $this->state->filter_order_Dir, $this->state->filter_order); ?>
+						</th>
+					<?php
+					}
+					else
+					{
+					?>
+						<th class="title"><?php echo $field->title; ?></th>
+					<?php
+					}
+				}
+
 				if ($this->config->activate_deposit_feature)
 				{
 					$cols++;
@@ -213,7 +240,16 @@ $rootUri = JUri::root(true);
 					{
 					?>
 						<td>
-							<?php echo JHtml::_('date', $row->event_date, $this->config->date_format, null) ; ?>
+							<?php
+							if ($row->event_date == EB_TBC_DATE)
+							{
+								echo JText::_('EB_TBC');
+							}
+							else
+							{
+								echo JHtml::_('date', $row->event_date, $this->config->date_format, null);
+							}
+							?>
 						</td>
 					<?php
 					}
@@ -228,13 +264,28 @@ $rootUri = JUri::root(true);
 					<?php echo EventbookingHelper::formatAmount($row->amount, $this->config); ?>
 				</td>
 				<?php
-				if ($this->config->activate_deposit_feature) {
+				foreach ($this->fields as $field)
+				{
+					$fieldValue = isset($this->fieldsData[$row->id][$field->id]) ? $this->fieldsData[$row->id][$field->id] : '';
+					?>
+					<td>
+						<?php echo $fieldValue; ?>
+					</td>
+					<?php
+				}
+
+				if ($this->config->activate_deposit_feature)
+				{
 				?>
 					<td>
 						<?php
 						if($row->payment_status == 1)
 						{
 							echo JText::_('EB_FULL_PAYMENT');
+						}
+						elseif ($row->payment_status == 2)
+						{
+							echo JText::_('EB_DEPOSIT_PAID');
 						}
 						else
 						{
@@ -281,7 +332,7 @@ $rootUri = JUri::root(true);
 						if ($row->invoice_number)
 						{
 						?>
-							<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_invoice&id='.($row->cart_id ? $row->cart_id : ($row->group_id ? $row->group_id : $row->id))); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo EventbookingHelper::formatInvoiceNumber($row->invoice_number, $this->config) ; ?></a>
+							<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_invoice&id='.($row->cart_id ? $row->cart_id : ($row->group_id ? $row->group_id : $row->id))); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo EventbookingHelper::formatInvoiceNumber($row->invoice_number, $this->config, $row) ; ?></a>
 						<?php
 						}
 						?>

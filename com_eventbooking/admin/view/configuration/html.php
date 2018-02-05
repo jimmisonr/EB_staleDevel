@@ -3,11 +3,13 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
+
+jimport('joomla.filesystem.folder');
 
 class EventbookingViewConfigurationHtml extends RADViewHtml
 {
@@ -102,6 +104,16 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options[] = JHtml::_('select.option', 'tree', JText::_('EB_TREE'));
 		$options[] = JHtml::_('select.option', 'dark', JText::_('EB_DARK'));
 
+		// Add support for custom themes
+		$files        = JFolder::files(JPATH_ROOT . '/media/com_eventbooking/assets/css/themes', '.css');
+		$customThemes = array_diff($files, ['default.css', 'fire.css', 'leaf.css', 'sky.css', 'tree.css', 'dark.css', 'ocean.css']);
+
+		foreach ($customThemes as $theme)
+		{
+			$theme     = substr($theme, 0, strlen($theme) - 4);
+			$options[] = JHtml::_('select.option', $theme, $theme);
+		}
+
 		$lists['calendar_theme'] = JHtml::_('select.genericlist', $options, 'calendar_theme', ' class="inputbox" ', 'value', 'text',
 			$config->calendar_theme);
 
@@ -179,8 +191,11 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$lists['resize_image_method'] = JHtml::_('select.genericlist', $options, 'resize_image_method', '', 'value', 'text', $config->get('resize_image_method', 'resize'));
 
 		$currencies = require_once JPATH_ROOT . '/components/com_eventbooking/helper/currencies.php';
-		$options    = array();
-		$options[]  = JHtml::_('select.option', '', JText::_('EB_SELECT_CURRENCY'));
+
+		ksort($currencies);
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT_CURRENCY'));
 
 		foreach ($currencies as $code => $title)
 		{
@@ -192,6 +207,7 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 		$options   = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_ALL_NESTED_CATEGORIES'));
 		$options[] = JHtml::_('select.option', 1, JText::_('EB_ONLY_LAST_ONE'));
+		$options[] = JHtml::_('select.option', 2, JText::_('EB_NO'));
 
 		$lists['insert_category'] = JHtml::_('select.genericlist', $options, 'insert_category', ' class="inputbox"', 'value', 'text',
 			$config->insert_category);
@@ -246,6 +262,8 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 			'kozgopromedium',
 			'kozminproregular',
 			'msungstdlight',
+			'opensans',
+			'cid0jp',
 		);
 
 		foreach ($additionalFonts as $fontName)
@@ -279,9 +297,52 @@ class EventbookingViewConfigurationHtml extends RADViewHtml
 			$config->default_ticket_layout = $config->certificate_layout;
 		}
 
+		// Default menu item settings
+		$menus     = JFactory::getApplication()->getMenu('site');
+		$component = JComponentHelper::getComponent('com_eventbooking');
+		$items     = $menus->getItems('component_id', $component->id);
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT'));
+
+		foreach ($items as $item)
+		{
+			if (!empty($item->query['view']) && in_array($item->query['view'], ['calendar', 'categories', 'upcomingevents', 'category', 'archive']))
+			{
+				$options[] = JHtml::_('select.option', $item->id, str_repeat('- ', $item->level) . $item->title);
+			}
+		}
+
+		$lists['default_menu_item'] = JHtml::_('select.genericlist', $options, 'default_menu_item', '', 'value', 'text', $config->default_menu_item);
+		$languages                  = EventbookingHelper::getLanguages();
+
+		if (JLanguageMultilang::isEnabled() && count($languages))
+		{
+			foreach ($languages as $language)
+			{
+				$attributes = ['component_id', 'language'];
+				$values     = [$component->id, [$language->lang_code, '*']];
+				$items      = $menus->getItems($attributes, $values);
+
+				$options   = array();
+				$options[] = JHtml::_('select.option', '', JText::_('EB_SELECT'));
+
+				foreach ($items as $item)
+				{
+					if (!empty($item->query['view']) && in_array($item->query['view'], ['calendar', 'categories', 'upcomingevents', 'category', 'archive']))
+					{
+						$options[] = JHtml::_('select.option', $item->id, str_repeat('- ', $item->level) . $item->title);
+					}
+				}
+
+				$key         = 'default_menu_item_' . $language->lang_code;
+				$lists[$key] = JHtml::_('select.genericlist', $options, $key, '', 'value', 'text', $config->{$key});
+			}
+		}
+
 		$this->lists     = $lists;
 		$this->config    = $config;
-		$this->languages = EventbookingHelper::getLanguages();
+		$this->languages = $languages;
 
 		$this->addToolbar();
 

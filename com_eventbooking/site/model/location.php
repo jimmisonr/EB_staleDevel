@@ -3,10 +3,10 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 class EventbookingModelLocation extends EventbookingModelList
@@ -21,6 +21,27 @@ class EventbookingModelLocation extends EventbookingModelList
 		parent::__construct($config);
 
 		$this->state->insert('location_id', 'int', 0);
+	}
+
+	/**
+	 * Builds a WHERE clause for the query
+	 *
+	 * @param JDatabaseQuery $query
+	 *
+	 * @return $this
+	 */
+	protected function buildQueryWhere(JDatabaseQuery $query)
+	{
+		$config = EventbookingHelper::getConfig();
+
+		$hidePastEventsParam = $this->params->get('hide_past_events', 2);
+
+		if ($hidePastEventsParam == 1 || ($hidePastEventsParam == 2 && $config->hide_past_events))
+		{
+			$this->applyHidePastEventsFilter($query);
+		}
+
+		return parent::buildQueryWhere($query);
 	}
 
 	/**
@@ -54,25 +75,50 @@ class EventbookingModelLocation extends EventbookingModelList
 	{
 		$row          = $this->getTable();
 		$user         = JFactory::getUser();
-		$row->user_id = $user->id;
-        $coordinates = explode(',', $data['coordinates']);
-       	$row->lat  =  $coordinates[0];
-		$row->long =  $coordinates[1];
+		$coordinates  = explode(',', $data['coordinates']);
+		
 		if ($data['id'])
 		{
 			$row->load($data['id']);
 		}
+		
+		$row->lat     = $coordinates[0];
+		$row->long    = $coordinates[1];
+		$row->user_id = $user->id;
+		
 		if (!$row->bind($data))
 		{
 			$this->setError($this->db->getErrorMsg());
 
 			return false;
 		}
+
+		if (empty($row->alias))
+		{
+			$row->alias = JApplicationHelper::stringURLSafe($row->name);
+		}
+
 		if (!$row->store())
 		{
 			$this->setError($this->db->getErrorMsg());
 
 			return false;
+		}
+
+		// Check and make sure this alias is valid
+		$db    = $this->getDbo();
+		$query = $db->getQuery(true);
+		$query->select('COUNT(*)')
+			->from('#__eb_locations')
+			->where('id != ' . $row->id)
+			->where($db->quoteName('alias') . ' = ' . $db->quote($row->alias));
+		$db->setQuery($query);
+		$count = $db->loadResult();
+
+		if ($count)
+		{
+			$row->alias = $row->id . '-' . $row->alias;
+			$row->store();
 		}
 
 		$data['id'] = $row->id;
@@ -98,6 +144,7 @@ class EventbookingModelLocation extends EventbookingModelList
 				->where('id IN (' . $cids . ')')
 				->where('user_id = ' . (int) JFactory::getUser()->id);
 			$db->setQuery($query);
+
 			if (!$db->execute())
 			{
 				return false;

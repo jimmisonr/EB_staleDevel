@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -20,13 +20,19 @@ else
 {
 	$showLastName = false;
 }
+
+$nullDate = JFactory::getDbo()->getNullDate();
 ?>
-<form action="index.php?option=com_eventbooking&view=registrants" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_eventbooking&view=registrants" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data">
 	<div id="j-main-container">
 		<div id="filter-bar" class="btn-toolbar">
 			<div class="filter-search btn-group pull-left">
 				<label for="filter_search" class="element-invisible"><?php echo JText::_('EB_FILTER_SEARCH_REGISTRANTS_DESC');?></label>
 				<input type="text" name="filter_search" id="filter_search" placeholder="<?php echo JText::_('JSEARCH_FILTER'); ?>" value="<?php echo $this->escape($this->state->filter_search); ?>" class="hasTooltip" title="<?php echo JHtml::tooltipText('EB_SEARCH_REGISTRANTS_DESC'); ?>" />
+				<?php
+					echo JHtml::_('calendar', $this->state->filter_from_date != $nullDate ? $this->state->filter_from_date : '', 'filter_from_date', 'filter_from_date', '%Y-%m-%d', array('class' => 'input-small', 'placeholder' => JText::_('EB_FROM')));
+					echo JHtml::_('calendar', $this->state->filter_to_date != $nullDate ? $this->state->filter_to_date : '', 'filter_to_date', 'filter_to_date', '%Y-%m-%d', array('class' => 'input-small', 'placeholder' => JText::_('EB_TO')));
+				?>
 			</div>
 			<div class="btn-group pull-left">
 				<button type="submit" class="btn hasTooltip" title="<?php echo JHtml::tooltipText('JSEARCH_FILTER_SUBMIT'); ?>"><span class="icon-search"></span></button>
@@ -81,9 +87,20 @@ else
 				<th width="10%" class="title" nowrap="nowrap">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_EMAIL'), 'tbl.email', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
-				<th width="8%" class="title" nowrap="nowrap">
+				<th class="title" nowrap="nowrap">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_NUMBER_REGISTRANTS'), 'tbl.number_registrants', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
+				<?php
+					if (count($this->tickets))
+					{
+						$colSpan++;
+					?>
+						<th width="10%" class="title" nowrap="nowrap">
+							<?php echo JText::_('EB_TICKETS'); ?>
+						</th>
+					<?php
+					}
+				?>
 				<th width="10%" class="title" nowrap="nowrap">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_REGISTRATION_DATE'), 'tbl.register_date', $this->state->filter_order_Dir, $this->state->filter_order ); ?>
 				</th>
@@ -269,9 +286,18 @@ else
 					<?php
 					if ($this->config->show_event_date)
 					{
-						?>
+					?>
 						<td class="text_center">
-							<?php echo JHtml::_('date', $row->event_date, $this->config->date_format, null) ; ?>
+							<?php
+							if ($row->event_date == EB_TBC_DATE)
+							{
+								echo JText::_('EB_TBC');
+							}
+							else
+							{
+								echo JHtml::_('date', $row->event_date, $this->config->date_format, null);
+							}
+							?>
 						</td>
 					<?php
 					}
@@ -282,6 +308,30 @@ else
 					<td class="center" style="font-weight: bold;">
 						<?php echo $row->number_registrants; ?>
 					</td>
+					<?php
+						if (count($this->tickets))
+						{
+							$ticketsOutput = array();
+
+							if (!empty($this->tickets[$row->id]))
+							{
+								$tickets = $this->tickets[$row->id];
+
+								foreach ($this->ticketTypes as $ticketType)
+								{
+									if (!empty($tickets[$ticketType->id]))
+									{
+										$ticketsOutput[] = $ticketType->title . ': ' . $tickets[$ticketType->id];
+									}
+								}
+							}
+						?>
+							<td>
+								<?php echo implode("<br />", $ticketsOutput); ?>
+							</td>
+						<?php
+						}
+					?>
 					<td class="center">
 						<?php echo JHtml::_('date', $row->register_date, $this->config->date_format); ?>
 					</td>
@@ -307,6 +357,10 @@ else
 							if($row->payment_status == 1)
 							{
 								echo JText::_('EB_FULL_PAYMENT');
+							}
+							elseif($row->payment_status == 2)
+							{
+								echo JText::_('EB_DEPOSIT_PAID');
 							}
 							else
 							{
@@ -371,7 +425,7 @@ else
 							if ($row->invoice_number)
 							{
 							?>
-								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_invoice&id='.($row->cart_id ? $row->cart_id : ($row->group_id ? $row->group_id : $row->id))); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo EventbookingHelper::formatInvoiceNumber($row->invoice_number, $this->config) ; ?></a>
+								<a href="<?php echo JRoute::_('index.php?option=com_eventbooking&task=registrant.download_invoice&id='.($row->cart_id ? $row->cart_id : ($row->group_id ? $row->group_id : $row->id))); ?>" title="<?php echo JText::_('EB_DOWNLOAD'); ?>"><?php echo EventbookingHelper::formatInvoiceNumber($row->invoice_number, $this->config, $row) ; ?></a>
 							<?php
 							}
 							?>
@@ -410,7 +464,8 @@ else
 		Joomla.submitbutton = function(pressbutton) 
 		{
 			var form = document.adminForm;
-			if (pressbutton == 'add') 
+
+			if (pressbutton == 'add')
 			{
 				if (form.filter_event_id.value == 0)
 				{
@@ -419,7 +474,8 @@ else
 					return;	
 				}					
 			}
-			Joomla.submitform( pressbutton );		
+
+			Joomla.submitform( pressbutton );
 		}		
 	</script>	
 </form>

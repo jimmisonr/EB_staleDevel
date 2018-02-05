@@ -74,6 +74,13 @@ class RADModel
 	public $rememberStates = false;
 
 	/**
+	 * Model parameters
+	 *
+	 * @var \Joomla\Registry\Registry
+	 */
+	protected $params;
+
+	/**
 	 * @param string $name   The name of model to instantiate
 	 *
 	 * @param string $prefix Prefix for the model class name, ComponentnameModel
@@ -229,29 +236,41 @@ class RADModel
 	 */
 	public function populateState($input)
 	{
-		$data = $input->getData();
+		$properties = $this->state->getProperties();
 
-		// Try to get the state properties data from user session
-		if ($this->rememberStates)
+		if (count($properties))
 		{
-			$properties = $this->state->getProperties();
+			$stateData = array();
 
-			if (count($properties))
+			if ($this->rememberStates)
 			{
 				$context = $this->option . '.' . $input->get('view', $this->config['default_view']) . '.';
+
 				foreach ($properties as $property)
 				{
 					$newState = $this->getUserStateFromRequest($input, $context . $property, $property);
 
 					if ($newState != null)
 					{
-						$data[$property] = $newState;
+						$stateData[$property] = $newState;
 					}
 				}
 			}
-		}
+			else
+			{
+				foreach ($properties as $property)
+				{
+					$newState = $input->get($property, null, 'none');
 
-		$this->setState($data);
+					if ($newState != null)
+					{
+						$stateData[$property] = $newState;
+					}
+				}
+			}
+
+			$this->setState($stateData);
+		}
 	}
 
 	/**
@@ -384,6 +403,26 @@ class RADModel
 		return $this->name;
 	}
 
+	/**
+	 * Method to get menu parameters
+	 *
+	 * @return \Joomla\Registry\Registry
+	 */
+	public function getParams()
+	{
+		return $this->params;
+	}
+
+	/**
+	 * Method to set menu parameters
+	 *
+	 * @param \Joomla\Registry\Registry $params
+	 */
+	public function setParams($params)
+	{
+		$this->params = $params;
+	}
+	
 	/**
 	 * Supports a simple form Fluent Interfaces.
 	 * Allows you to set states by

@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -36,7 +36,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 		$db          = $this->getDbo();
 		$query       = $db->getQuery(true);
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$currentDate = EventbookingHelper::getServerTimeFromGMTTime();
 		$query->select('a.*')
 			->select("DATEDIFF(event_date, '$currentDate') AS number_event_dates")
 			->select("DATEDIFF('$currentDate', a.late_fee_date) AS late_fee_date_diff")
@@ -47,7 +47,6 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 			->from('#__eb_events AS a')
 			->leftJoin('#__eb_registrants AS b ON (a.id = b.event_id AND b.group_id=0 AND (b.published = 1 OR (b.payment_method LIKE "os_offline%" AND b.published NOT IN (2,3))))')
 			->where('a.id = ' . $this->state->id)
-			->where('a.published = 1')
 			->group('a.id');
 
 		if ($config->show_event_creator)
@@ -58,7 +57,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 
 		if ($fieldSuffix)
 		{
-			EventbookingHelperDatabase::getMultilingualFields($query, array('title', 'short_description', 'description', 'meta_keywords', 'meta_description'), $fieldSuffix);
+			EventbookingHelperDatabase::getMultilingualFields($query, array('title', 'short_description', 'description', 'meta_keywords', 'meta_description', 'price_text', 'registration_handle_url'), $fieldSuffix);
 		}
 
 		$db->setQuery($query);
@@ -86,7 +85,7 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
 
-		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$currentDate = EventbookingHelper::getServerTimeFromGMTTime();
 		$query->select(EventbookingModelList::$fields)
 			->select("DATEDIFF(tbl.early_bird_discount_date, '$currentDate') AS date_diff")
 			->select("DATEDIFF('$currentDate', tbl.late_fee_date) AS late_fee_date_diff")
@@ -134,5 +133,23 @@ class EventbookingModelEvent extends EventbookingModelCommonEvent
 		}
 
 		return $rows;
+	}
+
+	/**
+	 * Update hits data for the given event
+	 *
+	 * @param int $eventId
+	 *
+	 * @return void
+	 */
+	public function updateHits($eventId)
+	{
+		$db    = $this->getDbo();
+		$query = $db->getQuery(true);
+		$query->update('#__eb_events')
+			->set('hits = hits + 1')
+			->where('id = ' . (int) $eventId);
+		$db->setQuery($query);
+		$db->execute();
 	}
 }

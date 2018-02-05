@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -34,7 +34,11 @@ JToolBarHelper::title(JText::_('EB_DASHBOARD'), 'generic.png');
 					$this->quickiconButton('index.php?option=com_eventbooking&view=massmail', 'icon-48-eventbooking-massmail.png', JText::_('EB_MASS_MAIL'));
                     $this->quickiconButton('index.php?option=com_eventbooking&view=countries', 'icon-48-countries.png', JText::_('EB_COUNTRIES'));
 					$this->quickiconButton('index.php?option=com_eventbooking&view=states', 'icon-48-states.png', JText::_('EB_STATES'));
-					$this->quickiconButton('index.php?option=com_eventbooking', 'icon-48-download.png', JText::_('EB_UPDATE_CHECKING'), 'update-check');
+
+					if ($this->config->check_new_version_in_dashboard !== '0')
+					{
+						$this->quickiconButton('index.php?option=com_eventbooking', 'icon-48-download.png', JText::_('EB_UPDATE_CHECKING'), 'update-check');
+					}
 				?>
 			</div>
 		</td>
@@ -60,39 +64,45 @@ JToolBarHelper::title(JText::_('EB_DASHBOARD'), 'generic.png');
 		margin:0px !important
 	}
 </style>
-<script type="text/javascript">
-    var upToDateImg = '<?php echo JUri::base(true).'/components/com_eventbooking/assets/icons/icon-48-jupdate-uptodate.png' ?>';
-    var updateFoundImg = '<?php echo JUri::base(true).'/components/com_eventbooking/assets/icons/icon-48-jupdate-updatefound.png';?>';
-    var errorFoundImg = '<?php echo JUri::base(true).'/components/com_eventbooking/assets/icons/icon-48-deny.png';?>';
-    jQuery(document).ready(function() {
-        jQuery.ajax({
-            type: 'POST',
-            url: 'index.php?option=com_eventbooking&task=check_update',
-            dataType: 'json',
-            success: function(msg, textStatus, xhr)
-            {
-                if (msg.status == 1)
-                {
-                    jQuery('#update-check').find('img').attr('src', upToDateImg).attr('title', msg.message);
-                    jQuery('#update-check').find('span').text(msg.message);
-                }
-                else if (msg.status == 2)
-                {
-                    jQuery('#update-check').find('img').attr('src', updateFoundImg).attr('title', msg.message);
-                    jQuery('#update-check').find('a').attr('href', 'index.php?option=com_installer&view=update');
-                    jQuery('#update-check').find('span').text(msg.message);
-                }
-                else
-                {
-                    jQuery('#update-check').find('img').attr('src', errorFoundImg);
-                    jQuery('#update-check').find('span').text('<?php echo JText::_('EB_UPDATE_CHECKING_ERROR'); ?>');
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown)
-            {
-                jQuery('#update-check').find('img').attr('src', errorFoundImg);
-                jQuery('#update-check').find('span').text('<?php echo JText::_('EB_UPDATE_CHECKING_ERROR'); ?>');
-            }
-        });
-    });
-</script>
+<?php
+if ($this->config->check_new_version_in_dashboard !== '0')
+{
+?>
+	<script type="text/javascript">
+		var upToDateImg = '<?php echo JUri::base(true).'/components/com_eventbooking/assets/icons/icon-48-jupdate-uptodate.png' ?>';
+		var updateFoundImg = '<?php echo JUri::base(true).'/components/com_eventbooking/assets/icons/icon-48-jupdate-updatefound.png';?>';
+		var errorFoundImg = '<?php echo JUri::base(true).'/components/com_eventbooking/assets/icons/icon-48-deny.png';?>';
+		jQuery(document).ready(function() {
+			jQuery.ajax({
+				type: 'POST',
+				url: 'index.php?option=com_eventbooking&task=check_update',
+				dataType: 'json',
+				success: function(msg, textStatus, xhr)
+				{
+					if (msg.status == 1)
+					{
+						jQuery('#update-check').find('img').attr('src', upToDateImg).attr('title', msg.message);
+						jQuery('#update-check').find('span').text(msg.message);
+					}
+					else if (msg.status == 2)
+					{
+						jQuery('#update-check').find('img').attr('src', updateFoundImg).attr('title', msg.message);
+						jQuery('#update-check').find('a').attr('href', 'index.php?option=com_installer&view=update');
+						jQuery('#update-check').find('span').text(msg.message);
+					}
+					else
+					{
+						jQuery('#update-check').find('img').attr('src', errorFoundImg);
+						jQuery('#update-check').find('span').text('<?php echo JText::_('EB_UPDATE_CHECKING_ERROR'); ?>');
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown)
+				{
+					jQuery('#update-check').find('img').attr('src', errorFoundImg);
+					jQuery('#update-check').find('span').text('<?php echo JText::_('EB_UPDATE_CHECKING_ERROR'); ?>');
+				}
+			});
+		});
+	</script>
+<?php
+}

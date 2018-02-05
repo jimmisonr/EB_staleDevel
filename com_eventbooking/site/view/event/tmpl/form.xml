@@ -2,11 +2,11 @@
 <metadata>
 	<layout title="Submit Event">
 		<message>
-			Display Form which allow users to submit an event
+			Display form which allow users to submit events
 		</message>
 	</layout>
 	<state>
 		<name>Submit Event</name>
-		<description>Display Form which allow users to submit an event</description>		
+		<description>Display form which allow users to submit events</description>
 	</state>
 </metadata>

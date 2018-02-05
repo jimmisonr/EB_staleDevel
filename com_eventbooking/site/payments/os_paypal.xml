@@ -8,7 +8,7 @@
 	<license>http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU/GPL version 2</license>
 	<authorEmail>contact@joomdonation.com</authorEmail>
 	<authorUrl>www.joomdonation.com</authorUrl>
-	<version>2.14.2</version>
+	<version>3.2.1</version>
 	<description>Paypal Payment Plugin For Events Booking Extension</description>	
 	<config>	
 		<fields name="params">
@@ -19,8 +19,20 @@
 				</field>
 				<field name="paypal_id" type="text" size="40" label="Paypal Email" description="Enter your Paypal ID or Paypal Email" default=""></field>
 				<field name="icon" type="text" size="40" label="Icon" description="If you want to show icon instead of payment method title on registration form, upload it to media/com_eventbooking/assets/images/paymentmethods folder and enter the name of the file here. For example os_paypal.png" default=""></field>
+				<field name="paypal_locale" type="text" size="40" label="Locale" description="PayPal Locale" default="en_US"></field>
                 <field name="payment_fee_amount" type="text" label="Payment Processing Fee ($)" description=""></field>
                 <field name="payment_fee_percent" type="text" label="Payment Processing Fee (%)" description=""></field>
+				<field
+						name="use_new_paypal_ipn_verification"
+						type="radio"
+						label="Use new PayPal IPN verification"
+						description="If set to Yes, Membership Pro will use new URL ipnpb.paypal.com for IPN post back verification which is recommended by PayPal. Before set it to Yes, please make sure your server support TLS 1.2, contact your hosting provider and ask them to be sure if needed"
+						class="btn-group btn-group-yesno"
+						default="0"
+				>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
                 <field name="ipn_log" type="list" label="Log IPN messages" description="This is only used for debug purpose when requested. Please set it to No unless requested by our support team" default="0">
                     <option value="0">No</option>
                     <option value="1">Yes</option>

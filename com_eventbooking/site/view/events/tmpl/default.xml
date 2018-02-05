@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="My Submitted Events">
+	<layout title="User's events">
 		<message>
-			Display List Of Events which were submited by the logged in user
+			Display list Of events which are submitted by the current logged in user
 		</message>
 	</layout>
 	<state>
-		<name>My Events</name>
-		<description>Display List Of Events which were submitted by the logged in user</description>
-		<params></params>						
+		<name>User's events</name>
+		<description>Display list Of events which are submitted by the current logged in user</description>
 	</state>
 </metadata>

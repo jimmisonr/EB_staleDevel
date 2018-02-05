@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -47,18 +47,6 @@ if (!function_exists('curl_init'))
 				<th class="text_left">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_ADDRESS'), 'tbl.address', $this->state->filter_order_Dir, $this->state->filter_order); ?>
 				</th>
-				<th class="text_left">
-					<?php echo JHtml::_('grid.sort',  JText::_('EB_CITY'), 'tbl.city', $this->state->filter_order_Dir, $this->state->filter_order); ?>
-				</th>
-				<th class="text_left">
-					<?php echo JHtml::_('grid.sort',  JText::_('EB_STATE'), 'tbl.state', $this->state->filter_order_Dir, $this->state->filter_order); ?>
-				</th>
-				<th class="title text_left">
-					<?php echo JHtml::_('grid.sort',  JText::_('EB_ZIP'), 'tbl.zip', $this->state->filter_order_Dir, $this->state->filter_order); ?>
-				</th>
-				<th class="title text_left">
-					<?php echo JHtml::_('grid.sort',  JText::_('EB_COUNTRY'), 'tbl.country', $this->state->filter_order_Dir, $this->state->filter_order); ?>
-				</th>
 				<th class="title center">
 					<?php echo JHtml::_('grid.sort',  JText::_('EB_LATITUDE'), 'tbl.lat', $this->state->filter_order_Dir, $this->state->filter_order); ?>
 				</th>
@@ -75,7 +63,7 @@ if (!function_exists('curl_init'))
 			</thead>
 			<tfoot>
 			<tr>
-				<td colspan="11">
+				<td colspan="7">
 					<?php echo $this->pagination->getListFooter(); ?>
 				</td>
 			</tr>
@@ -101,18 +89,6 @@ if (!function_exists('curl_init'))
 					</td>
 					<td>
 						<?php echo $row->address ; ?>
-					</td>
-					<td>
-						<?php echo $row->city ; ?>
-					</td>
-					<td>
-						<?php echo $row->state ; ?>
-					</td>
-					<td>
-						<?php echo $row->zip ; ?>
-					</td>
-					<td>
-						<?php echo $row->country ; ?>
 					</td>
 					<td class="center">
 						<?php echo $row->lat ; ?>

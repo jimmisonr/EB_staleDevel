@@ -9,6 +9,9 @@ define('EB_TBC_DATE', '2099-12-31 00:00:00');
 JLoader::registerPrefix('RAD', dirname(__FILE__));
 $app = JFactory::getApplication();
 JLoader::registerPrefix('Eventbooking', JPATH_BASE . '/components/com_eventbooking');
+JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/table');
+
+require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/table/eventbooking.php';
 
 if ($app->isAdmin())
 {
@@ -23,13 +26,15 @@ if ($app->isAdmin())
 	JLoader::register('EventbookingHelperMail', JPATH_ROOT . '/components/com_eventbooking/helper/mail.php');
 	JLoader::register('EventbookingHelperTicket', JPATH_ROOT . '/components/com_eventbooking/helper/ticket.php');
 	JLoader::register('EventbookingHelperAcl', JPATH_ROOT . '/components/com_eventbooking/helper/acl.php');
+	JLoader::register('EventbookingHelperRegistration', JPATH_ROOT . '/components/com_eventbooking/helper/registration.php');
 
 	// Register override classes
 	$possibleOverrides = array(
-		'EventbookingHelperOverrideHelper' => 'helper.php',
-		'EventbookingHelperOverrideMail'   => 'mail.php',
-		'EventbookingHelperOverrideJquery' => 'jquery.php',
-		'EventbookingHelperOverrideData'   => 'data.php',
+		'EventbookingHelperOverrideHelper'       => 'helper.php',
+		'EventbookingHelperOverrideMail'         => 'mail.php',
+		'EventbookingHelperOverrideJquery'       => 'jquery.php',
+		'EventbookingHelperOverrideData'         => 'data.php',
+		'EventbookingHelperOverrideRegistration' => 'registration.php',
 	);
 
 	foreach ($possibleOverrides as $className => $filename)
@@ -39,8 +44,7 @@ if ($app->isAdmin())
 }
 else
 {
-	JLoader::register('EventbookingModelRegistrants', JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/registrants.php');
-	JLoader::register('EventbookingModelEvents', JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/events.php');
+	JLoader::register('EventbookingModelMassmail', JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/massmail.php');
 }
 
 JLoader::register('os_payments', JPATH_ROOT . '/components/com_eventbooking/payments/os_payments.php');

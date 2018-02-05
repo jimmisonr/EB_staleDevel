@@ -3,11 +3,12 @@
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright    	Copyright (C) 2010 - 2018 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined( '_JEXEC' ) or die ;
+
 $return = base64_encode(JUri::getInstance()->toString());
 $baseUri = JUri::base(true);
 ?>
@@ -23,8 +24,9 @@ $baseUri = JUri::base(true);
 		$iconRemoveClass   = $bootstrapHelper->getClassMapping('icon-remove');
 		$iconDownloadClass = $bootstrapHelper->getClassMapping('icon-download');
 
-		$loginLink          = 'index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString());
+		$loginLink          = JRoute::_('index.php?option=com_users&view=login&return=' . base64_encode(JUri::getInstance()->toString()), false);
 		$loginToRegisterMsg = str_replace('[LOGIN_LINK]', $loginLink, JText::_('EB_LOGIN_TO_REGISTER'));
+		$linkThumbToEvent   = $config->get('link_thumb_to_event_detail_page', 1);
 
 		for ($i = 0 , $n = count($events) ;  $i < $n ; $i++)
 		{
@@ -39,7 +41,7 @@ $baseUri = JUri::base(true);
 				$activateWaitingList = $event->activate_waiting_list;
 			}
 
-			$canRegister = EventbookingHelper::acceptRegistration($event);
+			$canRegister = EventbookingHelperRegistration::acceptRegistration($event);
 
 			if ($event->cut_off_date != $nullDate)
 			{
@@ -136,11 +138,32 @@ $baseUri = JUri::base(true);
 					<div class="<?php echo $rowFluidClass; ?>">
 					<div class="eb-description-details <?php echo $span7Class; ?>" itemprop="description">
 						<?php
-							if ($event->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$event->thumb))
+							if ($event->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $event->thumb))
 							{
-							?>
-								<a href="<?php echo $baseUri . '/media/com_eventbooking/images/' . $event->thumb; ?>" class="eb-modal"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $event->thumb; ?>" class="eb-thumb-left"/></a>
-							<?php
+								if ($linkThumbToEvent)
+								{
+								?>
+									<a href="<?php echo $detailUrl; ?>"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $event->thumb; ?>" class="eb-thumb-left" alt="<?php echo $event->title; ?>"/></a>
+								<?php
+								}
+								else
+								{
+									if ($event->image && file_exists(JPATH_ROOT . '/' . $event->image))
+									{
+										$largeImageUri = $baseUri . '/' . $event->image;
+									}
+									elseif (file_exists(JPATH_ROOT . '/media/com_eventbooking/images/' . $event->thumb))
+									{
+										$largeImageUri = $baseUri . '/media/com_eventbooking/images/' . $event->thumb;
+									}
+									else
+									{
+										$largeImageUri = $baseUri . '/media/com_eventbooking/images/thumbs/' . $event->thumb;
+									}
+									?>
+										<a href="<?php echo $largeImageUri; ?>" class="eb-modal"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $event->thumb; ?>" class="eb-thumb-left" alt="<?php echo $event->title; ?>"/></a>
+									<?php
+								}
 							}
 
 							echo $event->short_description;

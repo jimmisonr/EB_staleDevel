@@ -2,11 +2,11 @@
 <metadata>
 	<layout title="Shopping Cart">
 		<message>
-			Display events which users added to cart
+			Display events which user added to cart
 		</message>
 	</layout>
 	<state>
 		<name>Shopping Cart</name>
-		<description>Display events which users added to cart</description>				
+		<description>Display events which user added to cart</description>
 	</state>
 </metadata>

@@ -3,11 +3,13 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
+
+use Joomla\Utilities\ArrayHelper;
 
 class EventbookingControllerRegistrant extends RADControllerAdmin
 {
@@ -29,7 +31,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 
 		$document->addStyleSheet($rootUrl . '/media/com_eventbooking/assets/css/style.css');
 
-		JHtml::_('script', EventbookingHelper::getURL() . 'media/com_eventbooking/assets/js/noconflict.js', false, false);
+		JHtml::_('script', EventbookingHelper::getURL() . 'media/com_eventbooking/assets/js/eventbookingjq.js', false, false);
 
 		if (file_exists(JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css') && filesize(JPATH_ROOT . '/media/com_eventbooking/assets/css/custom.css') > 0)
 		{
@@ -46,7 +48,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 	{
 		parent::save();
 
-		if ($return = $this->input->getString('return', ''))
+		if ($return = $this->input->getBase64('return', ''))
 		{
 			$this->setRedirect(base64_decode($return));
 		}
@@ -82,17 +84,26 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 
 		if ($id)
 		{
-			$query->select('a.id, a.title' . $fieldSuffix . ' AS title, b.user_id, cancel_before_date, DATEDIFF(cancel_before_date, NOW()) AS number_days')
+			$query->select('a.id, b.user_id, cancel_before_date, DATEDIFF(cancel_before_date, NOW()) AS number_days')
 				->from('#__eb_events AS a')
 				->innerJoin('#__eb_registrants AS b ON a.id = b.event_id')
 				->where('b.id = ' . $id);
 		}
 		else
 		{
-			$query->select('a.id, a.title' . $fieldSuffix . ' AS title, b.id AS registrant_id, b.user_id, cancel_before_date, DATEDIFF(cancel_before_date, NOW()) AS number_days')
+			$query->select('a.id, b.id AS registrant_id, b.user_id, cancel_before_date, DATEDIFF(cancel_before_date, NOW()) AS number_days')
 				->from('#__eb_events AS a')
 				->innerJoin('#__eb_registrants AS b ON a.id = b.event_id')
 				->where('b.registration_code = ' . $db->quote($registrationCode));
+		}
+
+		if ($fieldSuffix)
+		{
+			EventbookingHelperDatabase::getMultilingualFields($query, ['a.title'], $fieldSuffix);
+		}
+		else
+		{
+			$query->select('a.title');
 		}
 
 		$db->setQuery($query);
@@ -131,7 +142,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 	 */
 	public function cancel_edit()
 	{
-		if ($return = $this->input->getString('return', ''))
+		if ($return = $this->input->getBase64('return', ''))
 		{
 			$this->setRedirect(base64_decode($return));
 		}
@@ -155,9 +166,8 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 			JFactory::getApplication()->redirect('index.php', JText::_('You do not have permission to download the invoice'));
 		}
 
-		$id = $this->input->getInt('id', 0);
-		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_eventbooking/table');
-		$row = JTable::getInstance('eventbooking', 'Registrant');
+		$id = $this->input->getInt('id', 0);		
+		$row = JTable::getInstance('Registrant', 'EventbookingTable');
 		$row->load($id);
 		$canDownload = false;
 
@@ -209,8 +219,6 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 	 */
 	public function download_certificate()
 	{
-		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/table/registrant.php';
-
 		$row    = JTable::getInstance('registrant', 'EventbookingTable');
 		$user   = JFactory::getUser();
 		$db     = JFactory::getDbo();
@@ -259,7 +267,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 		}
 
 		// Compare current date with event end date
-		$currentDate = JHtml::_('date', 'Now', 'Y-m-d H:i:s');
+		$currentDate = EventbookingHelper::getServerTimeFromGMTTime();
 		$query->clear()
 			->select('*')
 			->select("TIMESTAMPDIFF(MINUTE, event_end_date, '$currentDate') AS event_end_date_minutes")
@@ -288,8 +296,6 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 	 */
 	public function download_ticket()
 	{
-		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/table/registrant.php';
-
 		$row    = JTable::getInstance('registrant', 'EventbookingTable');
 		$user   = JFactory::getUser();
 		$config = EventbookingHelper::getConfig();
@@ -327,7 +333,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 			throw new Exception(JText::_('You do not have permission to download the ticket'), 403);
 		}
 
-		if ($row->published == 0)
+		if ($row->published == 0 || $row->payment_status != 1)
 		{
 			throw new Exception(JText::_('Ticket is only allowed for confirmed/paid registrants'), 403);
 		}
@@ -374,7 +380,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 			return;
 		}
 
-		$rowFields = EventbookingHelper::getAllEventFields($eventId);
+		$rowFields = EventbookingHelperRegistration::getAllEventFields($eventId);
 		$fieldIds  = array();
 
 		foreach ($rowFields as $rowField)
@@ -384,9 +390,23 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 
 		$fieldValues = $model->getFieldsData($fieldIds);
 
-		list($fields, $headers) = EventbookingHelperData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
+		if (is_callable('EventbookingHelperOverrideData::prepareRegistrantsExportData'))
+		{
+			list($fields, $headers) = EventbookingHelperOverrideData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
+		}
+		else
+		{
+			list($fields, $headers) = EventbookingHelperData::prepareRegistrantsExportData($rows, $config, $rowFields, $fieldValues, $eventId);
+		}
 
-		EventbookingHelperData::excelExport($fields, $rows, 'registrants_list', $headers);
+		if (is_callable('EventbookingHelperOverrideData::excelExport'))
+		{
+			EventbookingHelperOverrideData::excelExport($fields, $rows, 'registrants_list', $headers);
+		}
+		else
+		{
+			EventbookingHelperData::excelExport($fields, $rows, 'registrants_list', $headers);
+		}
 	}
 
 	/**
@@ -397,12 +417,16 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 		$this->csrfProtection();
 
 		$cid = $this->input->get('cid', array(), 'array');
-		$id  = (int) $cid[0];
+		$cid = ArrayHelper::toInteger($cid);
 
 		/* @var EventbookingModelRegistrant $model */
-
 		$model = $this->getModel();
-		$ret   = $model->resendEmail($id);
+		$ret   = true;
+
+		foreach ($cid as $id)
+		{
+			$ret = $model->resendEmail($id);
+		}
 
 		if ($ret)
 		{
@@ -428,7 +452,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 			/* @var EventbookingModelRegistrant $model */
 			$model  = $this->getModel();
 			$id     = $this->input->getInt('id');
-			$result = $model->checkin($id);
+			$result = $model->checkinRegistrant($id);
 
 			switch ($result)
 			{
@@ -441,6 +465,35 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 				case 2:
 					$message = JText::_('EB_CHECKED_IN_SUCCESSFULLY');
 					break;
+				case 3:
+					$message = JText::_('EB_CHECKED_IN_FAIL_REGISTRATION_CANCELLED');
+					break;
+				case 4:
+					$message = JText::_('EB_CHECKED_IN_REGISTRATION_PENDING');
+					break;
+			}
+
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('*')
+				->from('#__eb_registrants')
+				->where('id = ' . $id);
+			$db->setQuery($query);
+			$rowRegistrant = $db->loadObject();
+
+			if ($rowRegistrant)
+			{
+				$replaces = array(
+					'FIRST_NAME'    => $rowRegistrant->first_name,
+					'LAST_NAME'     => $rowRegistrant->last_name,
+					'EVENT_TITLE'   => $rowRegistrant->event_title,
+					'REGISTRANT_ID' => $rowRegistrant->id,
+				);
+
+				foreach ($replaces as $key => $value)
+				{
+					$message = str_ireplace('[' . $key . ']', $value, $message);
+				}
 			}
 
 			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', null)), $message);
@@ -467,7 +520,7 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 
 			try
 			{
-				$model->checkin($id, true);
+				$model->checkinRegistrant($id, true);
 				$this->setMessage(JText::_('EB_CHECKIN_SUCCESSFULLY'));
 			}
 			catch (Exception $e)
@@ -485,6 +538,8 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 
 	/**
 	 * Reset check in for a registrant
+	 *
+	 * @throws Exception
 	 */
 	public function reset_check_in()
 	{
@@ -513,6 +568,76 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 		{
 			throw new Exception('You do not have permission to checkin registrant', 403);
 		}
+	}
+
+	public function check_out()
+	{
+		if (JFactory::getUser()->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
+		{
+			$cid = $this->input->get('cid', array(), 'array');
+
+			/* @var EventbookingModelRegistrant $model */
+			$model = $this->getModel();
+
+			try
+			{
+				foreach ($cid as $id)
+				{
+					$model->resetCheckin($id);
+				}
+
+				$this->setMessage(JText::_('EB_CHECKOUT_REGISTRANTS_SUCCESSFULLY'));
+			}
+			catch (Exception $e)
+			{
+				$this->setMessage($e->getMessage(), 'error');
+			}
+
+			$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', null)));
+		}
+		else
+		{
+			throw new Exception('You do not have permission to checkin registrant', 403);
+		}
+	}
+
+	/**
+	 * Method to checkin multiple registrants
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 */
+	public function checkin_multiple_registrants()
+	{
+		JSession::checkToken();
+
+		$cid = $this->input->get('cid', array(), 'array');
+
+		$cid = ArrayHelper::toInteger($cid);
+
+		if (!JFactory::getUser()->authorise('eventbooking.registrantsmanagement', 'com_eventbooking'))
+		{
+			throw new Exception('You do not have permission to checkin registrant', 403);
+		}
+
+		if (count($cid))
+		{
+			/* @var EventbookingModelRegistrant $model */
+			$model = $this->getModel();
+
+			try
+			{
+				$model->batchCheckin($cid);
+				$this->setMessage(JText::_('EB_CHECKIN_REGISTRANTS_SUCCESSFULLY'));
+			}
+			catch (Exception $e)
+			{
+				$this->setMessage($e->getMessage(), 'error');
+			}
+		}
+
+		$this->setRedirect(JRoute::_(EventbookingHelperRoute::getViewRoute('registrants', null)));
 	}
 
 	/**
@@ -588,10 +713,8 @@ class EventbookingControllerRegistrant extends RADControllerAdmin
 
 		if (!empty($data['id']))
 		{
-			$user  = JFactory::getUser();
 			$db    = JFactory::getDbo();
 			$query = $db->getQuery(true);
-
 			$query->select('COUNT(*)')
 				->from('#__eb_registrants')
 				->where('id = ' . (int) $data['id'])

@@ -1,9 +1,10 @@
 <?php
+
 /**
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 class EventbookingHelperBootstrap
@@ -69,8 +70,10 @@ class EventbookingHelperBootstrap
 				'img-polaroid'    => 'img-polaroid',
 				'control-label'   => 'control-label',
 				'controls'        => 'controls',
-				'icon-location'	  => 'icon-location',
-				'icon-map-marker'	  => 'icon-location icon-map-marker',
+				'icon-location'   => 'icon-location',
+				'icon-map-marker' => 'icon-location icon-map-marker',
+				'icon-calendar'   => 'icon-calendar',
+				'icon-print'      => 'icon-print',
 			);
 		}
 		else
@@ -107,7 +110,9 @@ class EventbookingHelperBootstrap
 				'img-polaroid'    => 'img-thumbnail',
 				'control-label'   => 'col-sm-3 control-label',
 				'controls'        => 'col-sm-9',
-				'icon-location'	  => 'icon-location',
+				'icon-location'   => 'icon-location',
+				'icon-calendar'   => 'fa fa-calendar',
+				'icon-print'      => 'fa fa-print',
 			);
 		}
 	}
@@ -115,7 +120,7 @@ class EventbookingHelperBootstrap
 	/**
 	 * Get the mapping of a given class
 	 *
-	 * @param $class The input class
+	 * @param string $class The input class
 	 *
 	 * @return string The mapped class
 	 */

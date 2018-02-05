@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-    <layout title="Category Columns Layout">
+    <layout title="Category - Columns layout">
         <message>
             Displays a list of events from a category using column layout
         </message>
     </layout>
     <state>
-        <name>Category Columns Layout</name>
+        <name>Category - Columns layout</name>
         <description>Displays a list of events from a category using columns layout</description>
         <fields name="request">
             <fieldset name="request"
@@ -24,6 +24,11 @@
                     <option value="1">Yes</option>
                     <option value="2">Use Configuration</option>
                 </field>
+                <field name="hide_children_events" type="list" default="0" label="Hide Children Events"
+                       description="Choose to show/hide children events for this menu item">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </field>
                 <field name="menu_filter_order" type="list" default="" label="Order By"
                        description="Choose how to sort/order events for this menu item">
                     <option value="">Use Configuration</option>
@@ -35,6 +40,13 @@
                     <option value="">Use Configuration</option>
                     <option value="ASC">ASC</option>
                     <option value="DESC">DESC</option>
+                </field>
+                <field name="display_num" type="text" default="10" label="Number events"
+                       description="Number of events will be shown on the page"/>
+                <field name="menu_item_id" type="text"
+                       label="Override Menu Item ID"
+                       description="If you want the system to use different menu item to generate links from this page, enter ID of that menu item here. In most case, leave it empty"
+                       default="">
                 </field>
             </fieldset>
         </fields>

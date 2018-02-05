@@ -3,7 +3,7 @@
  * @package        	Joomla
  * @subpackage		Event Booking
  * @author  		Tuan Pham Ngoc
- * @copyright    	Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright    	Copyright (C) 2010 - 2018 Ossolution Team
  * @license        	GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -23,6 +23,7 @@ $iconCalendarClass = $bootstrapHelper->getClassMapping('icon-calendar');
 $iconMapMakerClass = $bootstrapHelper->getClassMapping('icon-map-marker');
 $return = base64_encode(JUri::getInstance()->toString());
 $baseUri = JUri::base(true);
+$linkThumbToEvent   = $config->get('link_thumb_to_event_detail_page', 1);
 ?>
 <div id="eb-events" class="eb-events-timeline">
 	<?php
@@ -39,7 +40,7 @@ $baseUri = JUri::base(true);
 				$activateWaitingList = $event->activate_waiting_list;
 			}
 
-			$canRegister = EventbookingHelper::acceptRegistration($event);
+			$canRegister = EventbookingHelperRegistration::acceptRegistration($event);
 			$detailUrl = JRoute::_(EventbookingHelperRoute::getEventRoute($event->id, @$category->id, $Itemid));
 
 			if ($event->cut_off_date != $nullDate)
@@ -234,17 +235,6 @@ $baseUri = JUri::base(true);
 									<div itemprop="name"><?php echo $location->name; ?></div>
 									<div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
 										<span itemprop="streetAddress"><?php echo $location->address; ?></span>
-										<?php
-										if ($location->city && $location->state && $location->zip)
-										{
-										?>
-											<span itemprop="addressLocality"><?php echo $location->city; ?></span>,
-											<span itemprop="addressRegion"><?php echo $location->state; ?></span>
-											<span itemprop="postalCode"><?php echo $location->zip; ?></span>
-											<span itemprop="addressCountry"><?php echo $location->country; ?></span>
-										<?php
-										}
-										?>
 									</div>
 								</div>
 								<?php
@@ -259,40 +249,45 @@ $baseUri = JUri::base(true);
 						}
 					?>
 				</div>
-				<div class="<?php echo $span4Class; ?>">
-					<div class="eb-event-price-container btn-primary">
-						<?php
-							if ($config->show_discounted_price)
-							{
-								$price = $event->discounted_price;
-							}
-							else
-							{
-								$price = $event->individual_price;
-							}
+				<?php
+				if ($config->show_discounted_price)
+				{
+					$price = $event->discounted_price;
+				}
+				else
+				{
+					$price = $event->individual_price;
+				}
 
-							if ($event->price_text)
-							{
-							?>
-								<span class="eb-individual-price"><?php echo $event->price_text; ?></span>
-							<?php
-							}
-							elseif ($price > 0)
-							{
-								$symbol        = $event->currency_symbol ? $event->currency_symbol : $config->currency_symbol;
-							?>
-								<span class="eb-individual-price"><?php echo EventbookingHelper::formatCurrency($price, $config, $symbol);?></span>
-							<?php
-							}
-							elseif ($config->show_price_for_free_event)
-							{
-							?>
-								<span class="eb-individual-price"><?php echo JText::_('EB_FREE'); ?></span>
-							<?php
-							}
-						?>
+				if ($event->price_text)
+				{
+					$priceDisplay = $event->price_text;
+				}
+				elseif ($price > 0)
+				{
+					$symbol        = $event->currency_symbol ? $event->currency_symbol : $config->currency_symbol;
+					$priceDisplay  = EventbookingHelper::formatCurrency($price, $config, $symbol);
+				}
+				elseif ($config->show_price_for_free_event)
+				{
+					$priceDisplay = JText::_('EB_FREE');
+				}
+				else
+				{
+					$priceDisplay = '';
+				}
+
+				if ($priceDisplay)
+				{
+				?>
+					<div class="<?php echo $span4Class; ?>">
+						<div class="eb-event-price-container btn-primary">
+							<span class="eb-individual-price"><?php echo $priceDisplay; ?></span>
+						</div>
 					</div>
-				</div>
+				<?php
+				}
+				?>
 			</div>
 			<?php
 				if (in_array($config->get('register_buttons_position', 0), array(1,2)))
@@ -319,13 +314,34 @@ $baseUri = JUri::base(true);
 				<?php
 				}
 			?>
-			<div class="eb-description-details" itemprop="description">
+			<div class="eb-description-details clearfix" itemprop="description">
 				<?php
-					if ($event->thumb && file_exists(JPATH_ROOT.'/media/com_eventbooking/images/thumbs/'.$event->thumb))
+					if ($event->thumb && file_exists(JPATH_ROOT . '/media/com_eventbooking/images/thumbs/' . $event->thumb))
 					{
-					?>
-						<a href="<?php echo $baseUri . '/media/com_eventbooking/images/' . $event->thumb; ?>" class="eb-modal"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $event->thumb; ?>" class="eb-thumb-left"/></a>
-					<?php
+						if ($linkThumbToEvent)
+						{
+						?>
+							<a href="<?php echo $detailUrl; ?>"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $event->thumb; ?>" class="eb-thumb-left" alt="<?php echo $event->title; ?>" /></a>
+						<?php
+						}
+						else
+						{
+							if ($event->image && file_exists(JPATH_ROOT . '/' . $event->image))
+							{
+								$largeImageUri = $baseUri . '/' . $event->image;
+							}
+							elseif (file_exists(JPATH_ROOT . '/media/com_eventbooking/images/' . $event->thumb))
+							{
+								$largeImageUri = $baseUri . '/media/com_eventbooking/images/' . $event->thumb;
+							}
+							else
+							{
+								$largeImageUri = $baseUri . '/media/com_eventbooking/images/thumbs/' . $event->thumb;
+							}
+							?>
+								<a href="<?php echo $largeImageUri; ?>" class="eb-modal"><img src="<?php echo $baseUri . '/media/com_eventbooking/images/thumbs/' . $event->thumb; ?>" class="eb-thumb-left" alt="<?php echo $event->title; ?>" /></a>
+							<?php
+						}
 					}
 
 					echo $event->short_description;

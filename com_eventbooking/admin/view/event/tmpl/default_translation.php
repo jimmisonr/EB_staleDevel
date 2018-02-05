@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -44,6 +44,22 @@ foreach ($this->languages as $language)
 	</div>
 	<div class="control-group">
 		<label class="control-label">
+			<?php echo  JText::_('EB_PRICE_TEXT'); ?>
+		</label>
+		<div class="controls">
+			<input class="input-xlarge" type="text" name="price_text_<?php echo $sef; ?>" id="price_text_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'price_text_'.$sef}; ?>" />
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_CUSTOM_REGISTRATION_HANDLE_URL'); ?>
+		</label>
+		<div class="controls">
+			<input class="input-xlarge" type="text" name="registration_handle_url_<?php echo $sef; ?>" id="registration_handle_url_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'registration_handle_url_'.$sef}; ?>" />
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
 			<?php echo JText::_('EB_SHORT_DESCRIPTION'); ?>
 		</label>
 		<div class="controls">
@@ -56,6 +72,30 @@ foreach ($this->languages as $language)
 		</label>
 		<div class="controls">
 			<?php echo $editor->display( 'description_'.$sef,  $this->item->{'description_'.$sef} , '100%', '250', '75', '10' ) ; ?>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_PAGE_TITLE'); ?>
+		</label>
+		<div class="controls">
+			<input class="input-xlarge" type="text" name="page_title_<?php echo $sef; ?>" id="page_title_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'page_title_'.$sef}; ?>" />
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_PAGE_HEADING'); ?>
+		</label>
+		<div class="controls">
+			<input class="input-xlarge" type="text" name="page_heading_<?php echo $sef; ?>" id="page_heading_<?php echo $sef; ?>" size="" maxlength="250" value="<?php echo $this->item->{'page_heading_'.$sef}; ?>" />
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">
+			<?php echo  JText::_('EB_META_DESCRIPTION'); ?>
+		</label>
+		<div class="controls">
+			<textarea rows="5" cols="30" class="input-lage" name="meta_description_<?php echo $sef; ?>"><?php echo $this->item->{'meta_description_'.$sef}; ?></textarea>
 		</div>
 	</div>
 	<div class="control-group">

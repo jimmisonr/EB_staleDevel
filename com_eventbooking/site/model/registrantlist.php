@@ -3,13 +3,15 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
-class EventbookingModelRegistrantlist extends EventbookingModelRegistrants
+JLoader::register('EventbookingModelCommonRegistrants', JPATH_ADMINISTRATOR . '/components/com_eventbooking/model/common/registrants.php');
+
+class EventbookingModelRegistrantlist extends EventbookingModelCommonRegistrants
 {
 	/**
 	 * Instantiate the model.
@@ -32,10 +34,21 @@ class EventbookingModelRegistrantlist extends EventbookingModelRegistrants
 	 */
 	protected function buildQueryWhere(JDatabaseQuery $query)
 	{
-		parent::buildQueryWhere($query);
+		$config = EventbookingHelper::getConfig();
 
-		$query->where('tbl.published NOT IN (2,3)');
+		if (!$config->get('include_group_billing_in_registrants_list', $config->get('include_group_billing_in_registrants', 1)))
+		{
+			$query->where(' tbl.is_group_billing = 0 ');
+		}
 
-		return $this;
+		if (!$config->get('include_group_members_in_registrants_list', $config->get('include_group_members_in_registrants', 0)))
+		{
+			$query->where(' tbl.group_id = 0 ');
+		}
+
+		$query->where('tbl.published NOT IN (2,3)')
+			->where('(tbl.published >= 1 OR tbl.payment_method LIKE "os_offline%")');
+
+		return parent::buildQueryWhere($query);
 	}
 }

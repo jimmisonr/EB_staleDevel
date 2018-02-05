@@ -3,144 +3,117 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
-defined('_JEXEC') or die;
 
 use Joomla\Registry\Registry;
 
+defined('_JEXEC') or die;
+
 class EventbookingViewEventHtml extends RADViewHtml
 {
+	use EventbookingViewCaptcha;
+
+	/**
+	 * Event Data
+	 *
+	 * @var \stdClass
+	 */
+	protected $item;
+
+	/**
+	 * Model state
+	 *
+	 * @var RADModelState
+	 */
+	protected $state;
+
+	/**
+	 * Children events of the current event
+	 *
+	 * @var array
+	 */
+	protected $items;
+
+	/**
+	 * Component config
+	 *
+	 * @var RADConfig
+	 */
+	protected $config;
+
+	/**
+	 * ID of current user
+	 *
+	 * @var int
+	 */
+	protected $userId;
+
+	/**
+	 * The access levels of the current user
+	 *
+	 * @var array
+	 */
+	protected $viewLevels;
+
+	/**
+	 * The value represent database null date
+	 *
+	 * @var string
+	 */
+	protected $nullDate;
+
+	/**
+	 * Render event view
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
 	public function display()
 	{
-		$layout = $this->getLayout();
-
-		if ($layout == 'form')
+		if ($this->getLayout() == 'form')
 		{
 			$this->displayForm();
 
 			return;
 		}
 
-		$app    = JFactory::getApplication();
-		$active = $app->getMenu()->getActive();
 		$user   = JFactory::getUser();
 		$config = EventbookingHelper::getConfig();
-		$model  = $this->getModel();
-		$state  = $model->getState();
-		$item   = $model->getEventData();
+
+		/* @var EventbookingModelEvent $model */
+		$model = $this->getModel();
+		$item  = $model->getEventData();
 
 		// Check to make sure the event is valid and user is allowed to access to it
-		if (empty($item) || !$item->published || !in_array($item->access, $user->getAuthorisedViewLevels()))
+		if (empty($item))
 		{
-			$app->redirect('index.php', JText::_('EB_INVALID_EVENT'));
+			throw new \Exception(JText::_('EB_EVENT_NOT_FOUND'), 404);
 		}
+
+		if (!$item->published && !$user->authorise('core.admin', 'com_eventbooking') && $item->created_by != $user->id)
+		{
+			throw new \Exception(JText::_('EB_EVENT_NOT_FOUND'), 404);
+		}
+
+		if (!in_array($item->access, $user->getAuthorisedViewLevels()))
+		{
+			throw new \Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
+
+		// Update Hits
+		$model->updateHits($item->id);
 
 		//Use short description in case user don't enter long description
-		if (strlen(trim(strip_tags($item->description, '<img>'))) == 0)
+		if (!EventbookingHelper::isValidMessage($item->description))
 		{
 			$item->description = $item->short_description;
-		}
-
-		// Update hits
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->update('#__eb_events')
-			->set('hits = hits + 1')
-			->where('id = ' . $item->id);
-		$db->setQuery($query);
-		$db->execute();
-
-		$categoryId = $state->catid;
-		if ($active)
-		{
-			$pathway = $app->getPathway();
-			if (isset($active->query['view']) && ($active->query['view'] == 'categories' || $active->query['view'] == 'category'))
-			{
-				$parentId = (int) $active->query['id'];
-				if ($categoryId)
-				{
-					$paths = EventbookingHelperData::getCategoriesBreadcrumb($categoryId, $parentId);
-					for ($i = count($paths) - 1; $i >= 0; $i--)
-					{
-						$category = $paths[$i];
-						$pathUrl  = EventbookingHelperRoute::getCategoryRoute($category->id, $this->Itemid);
-						$pathway->addItem($category->name, $pathUrl);
-					}
-					$pathway->addItem($item->title);
-				}
-			}
-			elseif (isset($active->query['view']) && ($active->query['view'] == 'calendar' || $active->query['view'] == 'upcomingevents'))
-			{
-				$pathway->addItem($item->title);
-			}
 		}
 
 		if ($item->location_id)
 		{
 			$this->location = $item->location;
-		}
-
-		$params = EventbookingHelper::getViewParams($active, array('event'));
-
-		// Process page meta data
-		if (!$params->get('page_title'))
-		{
-			$pageTitle = JText::_('EB_EVENT_PAGE_TITLE');
-			$pageTitle = str_replace('[EVENT_TITLE]', $item->title, $pageTitle);
-			$category  = EventbookingHelperDatabase::getCategory($item->category_id);
-			$pageTitle = str_replace('[CATEGORY_NAME]', $category->name, $pageTitle);
-			$params->set('page_title', $pageTitle);
-		}
-
-		EventbookingHelperHtml::prepareDocument($params, $item);
-
-		if ($config->multiple_booking)
-		{
-			if ($this->deviceType == 'mobile')
-			{
-				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '100%', '450px', 'false', 'false');
-			}
-			else
-			{
-				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', 'false', 'false', 'false', 'false');
-			}
-		}
-
-		if ($config->show_list_of_registrants)
-		{
-			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
-		}
-
-		$width  = (int) $config->get('map_width', 800);
-		$height = (int) $config->get('map_height', 600);
-		if ($this->deviceType == 'mobile')
-		{
-			EventbookingHelperJquery::colorbox('eb-colorbox-map', '100%', $height . 'px', 'true', 'false');
-		}
-		else
-		{
-			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
-		}
-
-		if ($config->show_invite_friend)
-		{
-			EventbookingHelperJquery::colorbox('eb-colorbox-invite');
-		}
-
-		JPluginHelper::importPlugin('eventbooking');
-		$dispatcher = JEventDispatcher::getInstance();
-		$plugins    = $dispatcher->trigger('onEventDisplay', array($item));
-
-		if ($this->input->get('tmpl', '') == 'component')
-		{
-			$this->showTaskBar = false;
-		}
-		else
-		{
-			$this->showTaskBar = true;
 		}
 
 		if ($item->event_type == 1 && $config->show_children_events_under_parent_event)
@@ -153,33 +126,173 @@ class EventbookingViewEventHtml extends RADViewHtml
 			$this->paramData = $item->paramData;
 		}
 
+		if ($this->input->get('tmpl', '') == 'component')
+		{
+			$this->showTaskBar = false;
+		}
+		else
+		{
+			$this->showTaskBar = true;
+		}
+
+		JPluginHelper::importPlugin('eventbooking');
+		$dispatcher = JEventDispatcher::getInstance();
+		$plugins    = $dispatcher->trigger('onEventDisplay', array($item));
+
 		$this->viewLevels      = $user->getAuthorisedViewLevels();
 		$this->item            = $item;
+		$this->state           = $model->getState();
 		$this->config          = $config;
 		$this->userId          = $user->id;
-		$this->plugins         = $plugins;
 		$this->nullDate        = JFactory::getDbo()->getNullDate();
+		$this->plugins         = $plugins;
 		$this->rowGroupRates   = EventbookingHelperDatabase::getGroupRegistrationRates($item->id);
 		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
 		$this->print           = $this->input->getInt('print', 0);
+
+		// Prepare document meta data
+		$this->prepareDocument();
 
 		parent::display();
 	}
 
 	/**
+	 * Method to prepare document before it is rendered
+	 *
+	 * @return void
+	 */
+	protected function prepareDocument()
+	{
+		$this->params = $this->getParams();
+
+		// Process page meta data
+		if (!$this->params->get('page_title'))
+		{
+			if ($this->item->page_title)
+			{
+				$pageTitle = $this->item->page_title;
+			}
+			else
+			{
+				$pageTitle = JText::_('EB_EVENT_PAGE_TITLE');
+				$pageTitle = str_replace('[EVENT_TITLE]', $this->item->title, $pageTitle);
+				$pageTitle = str_replace('[CATEGORY_NAME]', $this->item->category_name, $pageTitle);
+			}
+
+			$this->params->set('page_title', $pageTitle);
+		}
+
+		$this->params->def('page_heading', $this->item->title);
+
+		$this->params->def('menu-meta_keywords', $this->item->meta_keywords);
+
+		$this->params->def('menu-meta_description', $this->item->meta_description);
+
+		// Load document assets
+		$this->loadAssets();
+
+		// Build document pathway
+		$this->buildPathway();
+
+		// Set page meta data
+		$this->setDocumentMetadata();
+	}
+
+	/**
+	 * Load assets (javascript/css) for this specific view
+	 *
+	 * @return void
+	 */
+	protected function loadAssets()
+	{
+		if ($this->config->multiple_booking)
+		{
+			if ($this->deviceType == 'mobile')
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '100%', '450px', 'false', 'false');
+			}
+			else
+			{
+				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', 'false', 'false', 'false', 'false');
+			}
+		}
+
+		if ($this->config->show_list_of_registrants)
+		{
+			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
+		}
+
+		$width  = (int) $this->config->get('map_width', 800);
+		$height = (int) $this->config->get('map_height', 600);
+
+		if ($this->deviceType == 'mobile')
+		{
+			EventbookingHelperJquery::colorbox('eb-colorbox-map', '100%', $height . 'px', 'true', 'false');
+		}
+		else
+		{
+			EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
+		}
+
+		if ($this->config->show_invite_friend)
+		{
+			EventbookingHelperJquery::colorbox('eb-colorbox-invite');
+		}
+
+		EventbookingHelperJquery::colorbox('a.eb-modal');
+	}
+
+	/**
+	 * Method to build document pathway
+	 *
+	 * @return void
+	 */
+	protected function buildPathway()
+	{
+		$app     = JFactory::getApplication();
+		$active  = $app->getMenu()->getActive();
+		$pathway = $app->getPathway();
+
+		if (isset($active->query['view']) && ($active->query['view'] == 'categories' || $active->query['view'] == 'category'))
+		{
+			$categoryId = (int) $this->state->get('catid');
+
+			if ($categoryId)
+			{
+				$parentId = (int) $active->query['id'];
+				$paths    = EventbookingHelperData::getCategoriesBreadcrumb($categoryId, $parentId);
+
+				for ($i = count($paths) - 1; $i >= 0; $i--)
+				{
+					$category = $paths[$i];
+					$pathUrl  = EventbookingHelperRoute::getCategoryRoute($category->id, $this->Itemid);
+					$pathway->addItem($category->name, $pathUrl);
+				}
+
+				$pathway->addItem($this->item->title);
+			}
+		}
+		elseif (isset($active->query['view']) && in_array($active->query['view'], ['calendar', 'upcomingevents']))
+		{
+			$pathway->addItem($this->item->title);
+		}
+	}
+
+	/**
 	 * Display form which allows add/edit event
 	 *
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	protected function displayForm()
 	{
 		EventbookingHelperJquery::colorbox('eb-colorbox-addlocation');
 
+		$app         = JFactory::getApplication();
+		$user        = JFactory::getUser();
+		$config      = EventbookingHelper::getConfig();
 		$db          = JFactory::getDbo();
 		$query       = $db->getQuery(true);
-		$user        = JFactory::getUser();
 		$item        = $this->model->getData();
-		$config      = EventbookingHelper::getConfig();
 		$fieldSuffix = EventbookingHelper::getFieldSuffix();
 
 		if ($config->submit_event_form_layout == 'simple')
@@ -200,12 +313,26 @@ class EventbookingViewEventHtml extends RADViewHtml
 		{
 			if (!$user->id)
 			{
-				$currentUrl = JUri::current();
-				JFactory::getApplication()->redirect('index.php?option=com_users&view=login&return=' . base64_encode($currentUrl));
+				$active = $app->getMenu()->getActive();
+
+				$option = isset($active->query['option']) ? $active->query['option'] : '';
+				$view   = isset($active->query['view']) ? $active->query['view'] : '';
+				$layout = isset($active->query['layout']) ? $active->query['layout'] : '';
+
+				if ($option == 'com_eventbooking' && $view == 'events' && $layout == 'form')
+				{
+					$returnUrl = 'index.php?Itemid=' . $active->id;
+				}
+				else
+				{
+					$returnUrl = JUri::getInstance()->toString();
+				}
+
+				$app->redirect('index.php?option=com_users&view=login&return=' . base64_encode($returnUrl));
 			}
 			else
 			{
-				JFactory::getApplication()->redirect(JUri::root(), JText::_('EB_NO_ADDING_EVENT_PERMISSION'));
+				$app->redirect(JUri::root(), JText::_('EB_NO_ADDING_EVENT_PERMISSION'));
 			}
 		}
 
@@ -232,11 +359,12 @@ class EventbookingViewEventHtml extends RADViewHtml
 
 		// Categories dropdown
 		$query->clear()
-			->select("id, parent AS parent_id, name" . $fieldSuffix . " AS title")
+			->select('id, parent AS parent_id')
+			->select($db->quoteName('name' . $fieldSuffix, 'title'))
 			->from('#__eb_categories')
 			->where('published = 1')
 			->where('submit_event_access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')')
-			->order('name' . $fieldSuffix);
+			->order($db->quoteName('name' . $fieldSuffix));
 
 		$db->setQuery($query);
 		$rows     = $db->loadObjectList();
@@ -311,6 +439,11 @@ class EventbookingViewEventHtml extends RADViewHtml
 			$item->discount_type);
 		$lists['early_bird_discount_type'] = JHtml::_('select.genericlist', $options, 'early_bird_discount_type', ' class="input-mini" ', 'value',
 			'text', $item->early_bird_discount_type);
+
+		if ($config->activate_deposit_feature)
+		{
+			$lists['deposit_type'] = JHtml::_('select.genericlist', $options, 'deposit_type', ' class="input-small" ', 'value', 'text', $item->deposit_type);
+		}
 
 		$options   = array();
 		$options[] = JHtml::_('select.option', 0, JText::_('EB_INDIVIDUAL_GROUP'));
@@ -393,24 +526,34 @@ class EventbookingViewEventHtml extends RADViewHtml
 			->where('`state` = 1')
 			->order('title');
 		$db->setQuery($query);
-		$rows                = $db->loadObjectList();
 		$options             = array();
 		$options[]           = JHtml::_('select.option', 0, JText::_('EB_SELECT_ARTICLE'), 'id', 'title');
-		$options             = array_merge($options, $rows);
+		$options             = array_merge($options, $db->loadObjectList());
 		$lists['article_id'] = JHtml::_('select.genericlist', $options, 'article_id', 'class="inputbox"', 'id', 'title', $item->article_id);
+
+		$options   = array();
+		$options[] = JHtml::_('select.option', 0, JText::_('JNO'));
+		$options[] = JHtml::_('select.option', 1, JText::_('JYES'));
+
+		$lists['published']                  = JHtml::_('select.genericlist', $options, 'published', ' class="input-medium" ', 'value', 'text', $item->published);
+		$lists['enable_cancel_registration'] = JHtml::_('select.genericlist', $options, 'enable_cancel_registration', ' class="input-medium" ', 'value', 'text', $item->enable_cancel_registration);
+		$lists['enable_auto_reminder']       = JHtml::_('select.genericlist', $options, 'enable_auto_reminder', ' class="input-medium" ', 'value', 'text', $item->enable_auto_reminder);
 
 		//Custom field handles
 		if ($config->event_custom_field)
 		{
-			$registry = new Registry();
+			$registry = new Registry;
 			$registry->loadString($item->custom_fields);
-			$data         = new stdClass();
+			$data         = new stdClass;
 			$data->params = $registry->toArray();
 			$form         = JForm::getInstance('pmform', JPATH_ROOT . '/components/com_eventbooking/fields.xml', array(), false, '//config');
 			$form->bind($data);
 			$this->form = $form;
 		}
 
+		// Support plugins
+		JPluginHelper::importPlugin('eventbooking');
+		$plugins = JFactory::getApplication()->triggerEvent('onEditEvent', array($item));
 
 		// Load captcha
 		$this->loadCaptcha();
@@ -420,55 +563,9 @@ class EventbookingViewEventHtml extends RADViewHtml
 		$this->lists    = $lists;
 		$this->nullDate = $db->getNullDate();
 		$this->config   = $config;
-		$this->return   = $this->input->getString('return');
+		$this->return   = $this->input->getBase64('return');
+		$this->plugins  = $plugins;
 
 		parent::display();
-	}
-
-	/**
-	 * Load captcha for registration form
-	 *
-	 * @param bool $initOnly
-	 *
-	 * @throws Exception
-	 */
-	protected function loadCaptcha($initOnly = false)
-	{
-		$config      = EventbookingHelper::getConfig();
-		$user        = JFactory::getUser();
-		$showCaptcha = 0;
-
-		if ($config->enable_captcha && $user->id == 0)
-		{
-			$captchaPlugin = JFactory::getApplication()->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
-
-			if (!$captchaPlugin)
-			{
-				// Hardcode to recaptcha, reduce support request
-				$captchaPlugin = 'recaptcha';
-			}
-
-			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
-
-			if ($plugin)
-			{
-				$showCaptcha = 1;
-
-				if ($initOnly)
-				{
-					JCaptcha::getInstance($captchaPlugin)->initialise('dynamic_recaptcha_1');
-				}
-				else
-				{
-					$this->captcha = JCaptcha::getInstance($captchaPlugin)->display('dynamic_recaptcha_1', 'dynamic_recaptcha_1', 'required');
-				}
-			}
-			else
-			{
-				JFactory::getApplication()->enqueueMessage(JText::_('EB_CAPTCHA_NOT_ACTIVATED_IN_YOUR_SITE'), 'error');
-			}
-		}
-
-		$this->showCaptcha = $showCaptcha;
 	}
 }

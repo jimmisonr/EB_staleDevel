@@ -2,11 +2,12 @@
 <metadata>
 	<layout title="Submit Location">
 		<message>
-			Display Form which allow users to submit an location
+			Display form which allow users to submit an location
 		</message>
 	</layout>
 	<state>
 		<name>Submit Location</name>
-		<description>Display Form which allow users to submit an location</description>		
+		<description>Display form which allow users to submit an location</description>
 	</state>
-</metadata>
+</metadata>
+

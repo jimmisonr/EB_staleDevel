@@ -126,18 +126,22 @@ class RADPaymentOmnipay extends OmnipayPayment
 	 * this method will update status of the order to success, trigger onPaymentSuccess event and send notification emails
 	 * to administrator(s) and customer
 	 *
-	 * @param JTable $row
-	 * @param string $transactionId
+	 * @param EventbookingTableRegistrant $row
+	 * @param string                      $transactionId
 	 *
 	 * @return void
 	 */
 	protected function onPaymentSuccess($row, $transactionId)
 	{
 		$config = EventbookingHelper::getConfig();
+
 		if ($row->process_deposit_payment)
 		{
+			$row->payment_processing_fee += $row->deposit_payment_processing_fee;
+			$row->amount += $row->deposit_payment_processing_fee;
 			$row->deposit_payment_transaction_id = $transactionId;
 			$row->payment_status                 = 1;
+
 			$row->store();
 
 			JPluginHelper::importPlugin('eventbooking');
@@ -155,7 +159,7 @@ class RADPaymentOmnipay extends OmnipayPayment
 
 			if ($row->is_group_billing)
 			{
-				EventbookingHelper::updateGroupRegistrationRecord($row->id);
+				EventbookingHelperRegistration::updateGroupRegistrationRecord($row->id);
 			}
 
 			JPluginHelper::importPlugin('eventbooking');
@@ -176,7 +180,7 @@ class RADPaymentOmnipay extends OmnipayPayment
 	 */
 	protected function onVerifyPaymentSuccess($id, $transactionId)
 	{
-		$row = JTable::getInstance('EventBooking', 'Registrant');
+		$row = JTable::getInstance('Registrant', 'EventbookingTable');
 		$row->load($id);
 
 		if (!$row->id)

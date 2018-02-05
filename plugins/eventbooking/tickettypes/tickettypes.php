@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
@@ -28,6 +28,11 @@ class plgEventBookingTicketTypes extends JPlugin
 	 */
 	public function onEditEvent($row)
 	{
+	    if (JFactory::getApplication()->isSite() && !$this->params->get('show_on_frontend'))
+		{
+			return;
+		}
+
 		ob_start();
 		$this->drawSettingForm($row);
 
@@ -46,9 +51,8 @@ class plgEventBookingTicketTypes extends JPlugin
 	public function onAfterSaveEvent($row, $data, $isNew)
 	{
 		// The plugin will only be available in the backend
-		$app = JFactory::getApplication();
 
-		if ($app->isSite())
+		if (JFactory::getApplication()->isSite() && !$this->params->get('show_on_frontend'))
 		{
 			return;
 		}
@@ -380,7 +384,7 @@ class plgEventBookingTicketTypes extends JPlugin
 							<td class="center"><?php echo $ticketType->registered; ?></td>
 							<td>
 								<button type="button" class="btn btn-danger"
-								        onclick="removeEventContainer(<?php echo $i; ?>)"><i
+								        onclick="removeOptionContainer(<?php echo $i; ?>)"><i
 										class="icon-remove"></i><?php echo JText::_('EB_REMOVE'); ?></button>
 							</td>
 						</tr>
@@ -394,7 +398,7 @@ class plgEventBookingTicketTypes extends JPlugin
 			</div>
 		</div>
 		<script language="JavaScript">
-			function removeEventContainer(id) {
+			function removeOptionContainer(id) {
 				if (confirm('<?php echo JText::_('EB_REMOVE_ITEM_CONFIRM'); ?>')) {
 					jQuery('#option_' + id).remove();
 				}
@@ -409,7 +413,7 @@ class plgEventBookingTicketTypes extends JPlugin
 					html += '<td><input type="text" class="input-mini" name="ticket_type_max_tickets_per_booking[]" value="" /></td>';
 					html += '<td><input type="text" class="input-xlarge" name="ticket_type_description[]" value="" /></td>';
 					html += '<td class="center">0</td>';
-					html += '<td><button type="button" class="btn btn-danger" onclick="removeEventContainer(' + countOption + ')"><i class="icon-remove"></i><?php echo JText::_('EB_REMOVE'); ?></button></td>';
+					html += '<td><button type="button" class="btn btn-danger" onclick="removeOptionContainer(' + countOption + ')"><i class="icon-remove"></i><?php echo JText::_('EB_REMOVE'); ?></button></td>';
 					html += '</tr>';
 					$('#additional_options').append(html);
 					countOption++;

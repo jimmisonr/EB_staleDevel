@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -14,9 +14,26 @@ $selectedState = '';
 JHtml::_('bootstrap.tooltip');
 $document = JFactory::getDocument();
 $document->addStyleDeclaration(".hasTip{display:block !important}");
+
+// Add support for custom settings layout
+if (file_exists(__DIR__ . '/default_custom_settings.php'))
+{
+	$hasCustomSettings = true;
+	JHtml::_('behavior.tabstate');
+}
+else
+{
+	$hasCustomSettings = false;
+}
 ?>
 <form action="index.php?option=com_eventbooking&view=registrant" method="post" name="adminForm" id="adminForm" class="form form-horizontal" enctype="multipart/form-data">
-<div class="row-fluid">
+	<?php
+	if ($hasCustomSettings)
+	{
+		echo JHtml::_('bootstrap.startTabSet', 'registrant', array('active' => 'general-page'));
+		echo JHtml::_('bootstrap.addTab', 'registrant', 'general-page', JText::_('EB_GENERAL', true));
+	}
+	?>
 	<div class="control-group">
 		<label class="control-label">
 			<?php echo  JText::_('EB_EVENT'); ?>
@@ -305,6 +322,20 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 		<?php
 		}
 
+		if ($this->item->deposit_payment_transaction_id)
+		{
+		?>
+			<div class="control-group">
+				<label class="control-label">
+					<?php echo JText::_('EB_DEPOSIT_PAYMENT_TRANSACTION_ID'); ?>
+				</label>
+				<div class="controls">
+					<input type="text" name="deposit_payment_transaction_id" value="<?php echo $this->item->deposit_payment_transaction_id;?>" />
+				</div>
+			</div>
+		<?php
+		}
+
 		if ($this->item->payment_method == "os_offline_creditcard")
 		{
 			$params = new \Joomla\Registry\Registry($this->item->params);
@@ -391,7 +422,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 			{
 				$rowMember = $this->rowMembers[$i] ;
 				$memberId = $rowMember->id ;
-				$memberData = EventbookingHelper::getRegistrantData($rowMember, $this->memberFormFields);
+				$memberData = EventbookingHelperRegistration::getRegistrantData($rowMember, $this->memberFormFields);
 				$style = '';
 			}
 			else
@@ -475,9 +506,18 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 	</table>	
 	<?php	
 	}
-	?>				
-</div>		
-<div class="clearfix"></div>	
+
+	// Add support for custom settings layout
+	if ($hasCustomSettings)
+	{
+		echo JHtml::_('bootstrap.endTab');
+		echo JHtml::_('bootstrap.addTab', 'registrant', 'custom-settings-page', JText::_('EB_REGISTRANT_CUSTOM_SETTINGS', true));
+		echo $this->loadTemplate('custom_settings');
+		echo JHtml::_('bootstrap.endTab');
+		echo JHtml::_('bootstrap.endTabSet');
+	}
+	?>
+	<div class="clearfix"></div>
 	<input type="hidden" name="id" value="<?php echo $this->item->id; ?>" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="group_member_id" value="0" />
@@ -574,7 +614,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 						var countryName = '';
 					}			
 					$.ajax({
-						type: 'POST',
+						type: 'GET',
 						url: siteUrl + 'index.php?option=com_eventbooking&task=get_states&country_name='+ countryName+'&field_name='+stateFieldId + '&state_name=' + defaultState,
 						success: function(data) {
 							$('#field_' + stateFieldId + ' .controls').html(data);
@@ -588,7 +628,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 					{
 						$('#' + countryFieldId).change(function(){
 							$.ajax({
-								type: 'POST',
+								type: 'GET',
 								url: siteUrl + 'index.php?option=com_eventbooking&task=get_states&country_name='+ $(this).val()+'&field_name=' + stateFieldId + '&state_name=' + defaultState,
 								success: function(data) {
 									$('#field_' + stateFieldId + ' .controls').html(data);
@@ -610,7 +650,7 @@ $document->addStyleDeclaration(".hasTip{display:block !important}");
 				var userId = $('#user_id_id').val();
 				var eventId = $('#event_id').val();
 				$.ajax({
-					type : 'POST',
+					type : 'GET',
 					url : 'index.php?option=com_eventbooking&task=get_profile_data&user_id=' + userId + '&event_id=' +eventId,
 					dataType: 'json',
 					success : function(json){

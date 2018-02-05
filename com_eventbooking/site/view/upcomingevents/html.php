@@ -3,129 +3,70 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
 // no direct access
 defined('_JEXEC') or die;
 
-class EventbookingViewUpcomingeventsHtml extends RADViewHtml
+class EventbookingViewUpcomingeventsHtml extends EventbookingViewCategoryHtml
 {
-	public function display()
+	/**
+	 * Method to prepare document before it is rendered
+	 *
+	 * @return void
+	 */
+	protected function prepareDocument()
 	{
-		$app    = JFactory::getApplication();
-		$active = $app->getMenu()->getActive();
-		$config = EventbookingHelper::getConfig();
-		$user   = JFactory::getUser();
-		$model  = $this->getModel();
-		$state  = $model->getState();
-		$items  = $model->getData();
+		// Correct active menu item in case the URL is typed directly on browser
+		$this->findAndSetActiveMenuItem();
 
-		// Check category access
-		if ($state->id)
-		{
-			$category = EventbookingHelperDatabase::getCategory($state->id);
+		$this->params = $this->getParams();
 
-			if (empty($category) || !in_array($category->access, JFactory::getUser()->getAuthorisedViewLevels()))
-			{
-				$app->redirect('index.php', JText::_('EB_INVALID_CATEGORY_OR_NOT_AUTHORIZED'));
-			}
-			if ($config->process_plugin && !empty($category->description))
-			{
-				$category->description = JHtml::_('content.prepare', $category->description);
-			}
-		}
-		else
-		{
-			$category = null;
-		}
-
-		$params = EventbookingHelper::getViewParams($active, array('upcomingevents'));
-
-		if (!$params->get('page_title'))
+		// Page title
+		if (!$this->params->get('page_title'))
 		{
 			$pageTitle = JText::_('EB_UPCOMING_EVENTS_PAGE_TITLE');
-			if ($category)
+
+			if ($this->category)
 			{
-				$pageTitle = str_replace('[CATEGORY_NAME]', $category->name, $pageTitle);
+				$pageTitle = str_replace('[CATEGORY_NAME]', $this->category->name, $pageTitle);
 			}
 
-			$params->set('page_title', $pageTitle);
+			$this->params->set('page_title', $pageTitle);
 		}
 
-		if (!$this->input->getInt('hmvc_call', 0))
+		// Page heading
+		$this->params->def('page_heading', JText::_('EB_UPCOMING_EVENTS'));
+
+		// Meta keywords and description
+		if (!$this->params->get('menu-meta_keywords') && !empty($this->category->meta_keywords))
 		{
-			EventbookingHelperHtml::prepareDocument($params, $category);
+			$this->params->set('menu-meta_keywords', $this->category->meta_keywords);
 		}
 
-		if ($config->multiple_booking)
+		if (!$this->params->get('menu-meta_description') && !empty($this->category->meta_description))
 		{
-			if ($this->deviceType == 'mobile')
-			{
-				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '100%', '450px', 'false', 'false');
-			}
-			else
-			{
-				EventbookingHelperJquery::colorbox('eb-colorbox-addcart', '800px', 'false', 'false', 'false', 'false');
-			}
+			$this->params->set('menu-meta_description', $this->category->meta_description);
 		}
 
-		if ($config->show_list_of_registrants)
+		// Load required assets for the view
+		$this->loadAssets();
+
+		// Set page meta data
+		$this->setDocumentMetadata();
+
+		// Add Feed links to document
+		if ($this->config->get('show_feed_link', 1))
 		{
-			EventbookingHelperJquery::colorbox('eb-colorbox-register-lists');
+			$this->addFeedLinks();
 		}
 
-		if ($config->show_location_in_category_view || ($this->getLayout() == 'timeline'))
+		// Use override menu item
+		if ($this->params->get('menu_item_id') > 0)
 		{
-			$width  = (int) $config->get('map_width', 800);
-			$height = (int) $config->get('map_height', 600);
-
-			if ($this->deviceType == 'mobile')
-			{
-				EventbookingHelperJquery::colorbox('eb-colorbox-map', '100%', $height . 'px', 'true', 'false');
-			}
-			else
-			{
-				EventbookingHelperJquery::colorbox('eb-colorbox-map', $width . 'px', $height . 'px', 'true', 'false');
-			}
+			$this->Itemid = $this->params->get('menu_item_id');
 		}
-
-		$fieldSuffix = EventbookingHelper::getFieldSuffix();
-		$message     = EventbookingHelper::getMessages();
-
-		if (strlen($message->{'intro_text' . $fieldSuffix}))
-		{
-			$introText = $message->{'intro_text' . $fieldSuffix};
-		}
-		else
-		{
-			$introText = $message->intro_text;
-		}
-
-		// Show Feed link
-		if ($config->get('show_feed_link', 1))
-		{
-			/* @var JDocumentHtml $document */
-			$document = JFactory::getDocument();
-			$link     = '&format=feed&limitstart=';
-			$attribs  = array('type' => 'application/rss+xml', 'title' => 'RSS 2.0');
-			$document->addHeadLink(JRoute::_($link . '&type=rss'), 'alternate', 'rel', $attribs);
-			$attribs = array('type' => 'application/atom+xml', 'title' => 'Atom 1.0');
-			$document->addHeadLink(JRoute::_($link . '&type=atom'), 'alternate', 'rel', $attribs);
-		}
-
-		$this->viewLevels      = $user->getAuthorisedViewLevels();
-		$this->userId          = $user->get('id');
-		$this->items           = $items;
-		$this->config          = $config;
-		$this->nullDate        = JFactory::getDbo()->getNullDate();
-		$this->category        = $category;
-		$this->pagination      = $model->getPagination();
-		$this->bootstrapHelper = new EventbookingHelperBootstrap($config->twitter_bootstrap_version);
-		$this->params          = $params;
-		$this->introText       = $introText;
-
-		parent::display();
 	}
 }

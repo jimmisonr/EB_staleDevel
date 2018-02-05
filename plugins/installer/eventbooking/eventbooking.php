@@ -23,7 +23,8 @@ class plgInstallerEventbooking extends JPlugin
 
 		// Get Download ID and append it to the URL
 
-		require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
+		// Require library + register autoloader
+		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
 		$config = EventbookingHelper::getConfig();
 
 		// Append the Download ID to the download URL

@@ -2,12 +2,12 @@
 <metadata>
 	<layout title="Event Detail">
 		<message>
-			Display detail information about the event
+			Display a single event
 		</message>
 	</layout>
 	<state>
 		<name>Event Detail</name>
-		<description>Display detail information about the event</description>		
+		<description>Display a single event</description>
 		<fields name="request">			
 			<fieldset name="request"
 				addfieldpath="/administrator/components/com_eventbooking/elements">

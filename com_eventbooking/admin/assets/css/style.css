@@ -1,6 +1,6 @@
 form.form-horizontal div.control-label
 {
-    width: 28% !important;
+    width: 25% !important;
 }
 form.form-horizontal div.control-label label
 {
@@ -44,9 +44,9 @@ form#adminForm fieldset.adminform {
 	margin: 0;
 }
 
-.form-horizontal .tab-content .controls {
+/*.form-horizontal .tab-content .controls {
 	margin: 0;
-}
+}*/
 
 table.admintable {
 	background-color: white ;	
@@ -288,11 +288,16 @@ span.eb-uploaded-file
 	padding-left:10px;
 	font-weight: bold;
 } 
-body.com_eventbooking.view-message div.controls
+body.com_eventbooking.view-message div.controls, body.com_eventbooking.view-massmail div.controls
 {
 	margin-left:28% !important;
 }
-.eb-date-time-container div.field-calendar
+.eb-date-time-container div.field-calendar, .filter-search .field-calendar
 {
 	display: inline !important;
+}
+
+.filter-search .field-calendar
+{
+	margin-left: 5px;
 }

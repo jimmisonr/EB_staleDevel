@@ -3,12 +3,13 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 
-// no direct access
 defined('_JEXEC') or die;
+
+use Joomla\Utilities\ArrayHelper;
 
 class EventbookingModelCoupon extends RADModelAdmin
 {
@@ -21,8 +22,9 @@ class EventbookingModelCoupon extends RADModelAdmin
 	 */
 	protected function afterStore($row, $input, $isNew)
 	{
-		$assignment = $input->getInt('assignment', 0);
-		$eventIds   = $input->get('event_id', array(), 'array');
+		$assignment  = $input->getInt('assignment', 0);
+		$categoryIds = array_filter(ArrayHelper::toInteger($input->get('category_id', array(), 'array')));
+		$eventIds    = array_filter(ArrayHelper::toInteger($input->get('event_id', array(), 'array')));
 
 		if ($assignment == 0 || count($eventIds) == 0)
 		{
@@ -31,6 +33,15 @@ class EventbookingModelCoupon extends RADModelAdmin
 		else
 		{
 			$row->event_id = 1;
+		}
+
+		if (count($categoryIds) == 0)
+		{
+			$row->category_id = -1;
+		}
+		else
+		{
+			$row->category_id = 1;
 		}
 
 		$row->store();
@@ -52,26 +63,42 @@ class EventbookingModelCoupon extends RADModelAdmin
 			$db->setQuery($query);
 			$db->execute();
 
-			$query->clear();
+			$query->clear()
+				->delete('#__eb_coupon_categories')
+				->where('coupon_id = ' . $couponId);
+			$db->setQuery($query)
+				->execute();
 		}
 
 		if ($row->event_id != -1)
 		{
-			$query->insert('#__eb_coupon_events')->columns('coupon_id, event_id');
+			$query->clear()
+				->insert('#__eb_coupon_events')
+				->columns('coupon_id, event_id');
 
 			for ($i = 0, $n = count($eventIds); $i < $n; $i++)
 			{
-				$eventId = (int) $eventIds[$i];
-
-				if ($eventId > 0)
-				{
-					$eventId *= $assignment;
-					$query->values("$couponId, $eventId");
-				}
+				$eventId = $eventIds[$i];
+				$eventId *= $assignment;
+				$query->values("$couponId, $eventId");
 			}
 
-			$db->setQuery($query);
-			$db->execute();
+			$db->setQuery($query)
+				->execute();
+		}
+
+		if ($row->category_id != -1)
+		{
+			$query->insert('#__eb_coupon_categories')->columns('coupon_id, category_id');
+
+			for ($i = 0, $n = count($categoryIds); $i < $n; $i++)
+			{
+				$categoryId = $categoryIds[$i];
+				$query->values("$couponId, $categoryId");
+			}
+
+			$db->setQuery($query)
+				->execute();
 		}
 	}
 
@@ -88,14 +115,20 @@ class EventbookingModelCoupon extends RADModelAdmin
 			$db    = $this->getDbo();
 			$query = $db->getQuery(true);
 			$cids  = implode(',', $cid);
+
 			$query->delete('#__eb_coupon_events')->where('coupon_id IN (' . $cids . ')');
-			$db->setQuery($query);
-			$db->execute();
-			//Do not allow deleting core fields
-			$query->clear();
-			$query->delete('#__eb_coupons')->where('id IN (' . $cids . ')');
-			$db->setQuery($query);
-			$db->execute();
+			$db->setQuery($query)
+				->execute();
+
+			$query->clear()
+				->delete('#__eb_coupon_categories')->where('coupon_id IN (' . $cids . ')');
+			$db->setQuery($query)
+				->execute();
+
+			$query->clear()
+				->delete('#__eb_coupons')->where('id IN (' . $cids . ')');
+			$db->setQuery($query)
+				->execute();
 		}
 
 		return true;
@@ -318,7 +351,7 @@ class EventbookingModelCoupon extends RADModelAdmin
 		for ($i = 1; $i <= $length; ++$i)
 		{
 			$makePass .= $salt[($shift + ord($random[$i])) % $base];
-			$shift += ord($random[$i]);
+			$shift    += ord($random[$i]);
 		}
 
 		return $makePass;

@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -18,8 +18,11 @@ class EventbookingControllerConfiguration extends EventbookingController
 	{
 		$data = $this->input->getData(RAD_INPUT_ALLOWRAW);
 
+		// Make sure no space character is saved to Download ID
+		$data['download_id'] = trim($data['download_id']);
+
 		/* @var EventbookingModelConfiguration $model */
-		$model = $this->getModel();
+		$model = $this->getModel('Configuration', array('ignore_request' => true));
 		$model->store($data);
 
 		$task = $this->getTask();

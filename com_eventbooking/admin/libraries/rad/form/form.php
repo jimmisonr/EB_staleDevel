@@ -401,8 +401,8 @@ class RADForm
 	 */
 	public function storeData($registrantId, $data, $excludeFeeFields = false)
 	{
-		jimport('joomla.filesystem.folder');
-		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_eventbooking/table');
+		jimport('joomla.filesystem.folder');		
+		
 		$rowFieldValue = JTable::getInstance('EventBooking', 'Fieldvalue');
 		$config        = EventbookingHelper::getConfig();
 		$dateFormat    = $config->date_field_format ? $config->date_field_format : '%Y-%m-%d';

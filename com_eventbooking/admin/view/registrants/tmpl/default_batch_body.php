@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 // no direct access
@@ -18,6 +18,14 @@ $editor = JFactory::getEditor();
 		</div>
 		<div class="controls">
 			<input type="text" name="subject" value="" size="70" class="input-xxlarge" />
+		</div>
+	</div>
+	<div class="control-group">
+		<div class="control-label">
+			<?php echo JText::_('EB_ATTACHMENT'); ?>
+		</div>
+		<div class="controls">
+			<input type="file" name="attachment" value="" size="70" class="input-xxlarge" />
 		</div>
 	</div>
 	<div class="control-group">

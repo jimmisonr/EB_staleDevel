@@ -3,14 +3,16 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
-// no direct access
+
 defined('_JEXEC') or die;
 
 class EventbookingControllerRegister extends EventbookingController
 {
+	use EventbookingControllerCaptcha;
+
 	/**
 	 * Check the entered event password and make sure the entered password is valid
 	 */
@@ -18,7 +20,7 @@ class EventbookingControllerRegister extends EventbookingController
 	{
 		$password = $this->input->get('password', '', 'none');
 		$eventId  = $this->input->getInt('event_id', 0);
-		$return   = $this->input->get('return', '', 'none');
+		$return   = $this->input->getBase64('return');
 
 		/* @var EventBookingModelRegister $model */
 		$model   = $this->getModel('Register');
@@ -110,8 +112,8 @@ class EventbookingControllerRegister extends EventbookingController
 
 		if ($config->simply_registration_process && $event->individual_price == 0 && $total == 0 && $user->id)
 		{
-			$rowFields = EventbookingHelper::getFormFields($eventId, 0);
-			$data      = EventbookingHelper::getFormData($rowFields, $eventId, $user->id, $config);
+			$rowFields = EventbookingHelperRegistration::getFormFields($eventId, 0);
+			$data      = EventbookingHelperRegistration::getFormData($rowFields, $eventId, $user->id, $config);
 			$name      = $user->name;
 			$pos       = strpos($name, ' ');
 
@@ -172,7 +174,7 @@ class EventbookingControllerRegister extends EventbookingController
 		$errors = array();
 
 		// Validate captcha
-		if (!$this->validateCaptcha())
+		if (!$this->validateCaptcha($this->input))
 		{
 			$errors[] = JText::_('EB_INVALID_CAPTCHA_ENTERED');
 		}
@@ -251,14 +253,35 @@ class EventbookingControllerRegister extends EventbookingController
 			}
 
 			// Validate ticket quantity before submitting
-			$quantityValid = true;
+			$ticketTypeSelected = false;
+			$quantityValid      = true;
 
 			foreach ($ticketTypes as $ticketType)
 			{
+
 				if (!empty($data['ticket_type_' . $ticketType->id]))
 				{
+					$ticketTypeSelected = true;
+				}
+
+				if (!empty($data['ticket_type_' . $ticketType->id]) && $ticketType->capacity > 0)
+				{
+					// Validate quantity
+					if ($ticketType->capacity && !$waitingListEnabled)
+					{
+						$availableQuantity = $ticketType->capacity - $ticketType->registered;
+					}
+					elseif($ticketType->max_tickets_per_booking)
+					{
+						$availableQuantity = $ticketType->max_tickets_per_booking;
+					}
+					else
+					{
+						// Hard code to max 10 tickets
+						$availableQuantity = 10;
+					}
+
 					$quantity          = $data['ticket_type_' . $ticketType->id];
-					$availableQuantity = $ticketType->capacity - $ticketType->registered;
 
 					if ($availableQuantity < $quantity)
 					{
@@ -268,8 +291,13 @@ class EventbookingControllerRegister extends EventbookingController
 				}
 			}
 
-			if (!$quantityValid)
+			if (!$quantityValid || !$ticketTypeSelected)
 			{
+				if (!$ticketTypeSelected)
+				{
+					$app->enqueueMessage(JText::_('EB_PLEASE_CHOOSE_TICKET_TYPE'), 'error');
+				}
+
 				$input->set('captcha_invalid', 1);
 				$input->set('view', 'register');
 				$input->set('layout', 'default');
@@ -313,7 +341,19 @@ class EventbookingControllerRegister extends EventbookingController
 		$config = EventbookingHelper::getConfig();
 		JFactory::getSession()->set('eb_number_registrants', $this->input->getInt('number_registrants'));
 
-		if ($config->collect_member_information)
+		$eventId = $this->input->getInt('event_id', 0);
+		$event   = EventbookingHelperDatabase::getEvent($eventId);
+
+		if ($event->collect_member_information === '')
+		{
+			$collectMemberInformation = $config->collect_member_information;
+		}
+		else
+		{
+			$collectMemberInformation = $event->collect_member_information;
+		}
+
+		if ($collectMemberInformation)
 		{
 			$this->input->set('view', 'register');
 			$this->input->set('layout', 'group_members');
@@ -335,7 +375,7 @@ class EventbookingControllerRegister extends EventbookingController
 		$membersData = $this->input->post->getData();
 		JFactory::getSession()->set('eb_group_members_data', serialize($membersData));
 		$eventId         = $this->input->getInt('event_id', 0);
-		$showBillingStep = EventbookingHelper::showBillingStep($eventId);
+		$showBillingStep = EventbookingHelperRegistration::showBillingStep($eventId);
 
 		if (!$showBillingStep)
 		{
@@ -368,7 +408,7 @@ class EventbookingControllerRegister extends EventbookingController
 
 		$errors = array();
 
-		if (!$this->validateCaptcha())
+		if (!$this->validateCaptcha($this->input))
 		{
 			$errors[] = JText::_('EB_INVALID_CAPTCHA_ENTERED');
 		}
@@ -388,7 +428,7 @@ class EventbookingControllerRegister extends EventbookingController
 				$membersData = array();
 			}
 
-			$memberFormFields = EventbookingHelper::getFormFields($eventId, 2);
+			$memberFormFields = EventbookingHelperRegistration::getFormFields($eventId, 2);
 
 			//Get data from first member
 			$firstMemberForm = new RADForm($memberFormFields);
@@ -421,21 +461,28 @@ class EventbookingControllerRegister extends EventbookingController
 			$errors[] = JText::_('Sorry, your session was expired. Please try again!');
 		}
 
-		// Validate number slots left
-		if ($event->activate_waiting_list == 2)
-		{
-			$waitingListEnabled = $config->activate_waitinglist_feature;
-		}
-		else
-		{
-			$waitingListEnabled = $event->activate_waiting_list;
-		}
-
-		if ($event->event_capacity && !$waitingListEnabled)
+		// Validate to prevent over booking
+		if ($event->event_capacity)
 		{
 			$numberRegistrantsAvailable = $event->event_capacity - $event->total_registrants;
 
-			if ($numberRegistrantsAvailable < $numberRegistrants)
+			// If there is space available, registration only possible if number registrants <= available places
+			if ($numberRegistrantsAvailable > 0 && $numberRegistrantsAvailable < $numberRegistrants)
+			{
+				$errors[] = JText::sprintf('EB_NUMBER_REGISTRANTS_ERROR', $numberRegistrants, $numberRegistrantsAvailable);
+			}
+
+			if ($event->activate_waiting_list == 2)
+			{
+				$waitingListEnabled = $config->activate_waitinglist_feature;
+			}
+			else
+			{
+				$waitingListEnabled = $event->activate_waiting_list;
+			}
+
+			// If there is no space available, registration can only continue if waiting list is enabled
+			if ($numberRegistrantsAvailable <= 0 && !$waitingListEnabled)
 			{
 				$errors[] = JText::sprintf('EB_NUMBER_REGISTRANTS_ERROR', $numberRegistrants, $numberRegistrantsAvailable);
 			}
@@ -483,6 +530,42 @@ class EventbookingControllerRegister extends EventbookingController
 	/**
 	 * Calculate registration fee, then update the information on registration form
 	 */
+	public function calculate_registration_fee()
+	{
+		$row           = JTable::getInstance('Registrant', 'EventbookingTable');
+		$registrantId  = $this->input->getInt('registrant_id', 0);
+		$paymentMethod = $this->input->getString('payment_method', '');
+
+		if ($row->load($registrantId))
+		{
+			if (is_callable('EventbookingHelperOverrideRegistration::calculateRegistrationFees'))
+			{
+				$fees = EventbookingHelperOverrideRegistration::calculateRegistrationFees($row, $paymentMethod);
+			}
+			else
+			{
+				$fees = EventbookingHelperRegistration::calculateRegistrationFees($row, $paymentMethod);
+			}
+		}
+		else
+		{
+			$fees = ['amount' => 0, 'payment_processing_fee' => 0, 'gross_amount' => 0];
+		}
+
+		$config                             = EventbookingHelper::getConfig();
+		$response                           = array();
+		$response['amount']                 = EventbookingHelper::formatAmount($fees['amount'], $config);
+		$response['payment_processing_fee'] = EventbookingHelper::formatAmount($fees['payment_processing_fee'], $config);
+		$response['gross_amount']           = EventbookingHelper::formatAmount($fees['gross_amount'], $config);
+
+		echo json_encode($response);
+
+		$this->app->close();
+	}
+
+	/**
+	 * Calculate registration fee, then update the information on registration form
+	 */
 	public function calculate_individual_registration_fee()
 	{
 		$config        = EventbookingHelper::getConfig();
@@ -490,17 +573,21 @@ class EventbookingControllerRegister extends EventbookingController
 		$data          = $this->input->post->getData();
 		$paymentMethod = $this->input->getString('payment_method', '');
 		$event         = EventbookingHelperDatabase::getEvent($eventId);
-		$rowFields     = EventbookingHelper::getFormFields($eventId, 0);
+		$rowFields     = EventbookingHelperRegistration::getFormFields($eventId, 0);
 		$form          = new RADForm($rowFields);
 		$form->bind($data);
 
-		if (is_callable('EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees'))
+		if (is_callable('EventbookingHelperOverrideRegistration::calculateIndividualRegistrationFees'))
+		{
+			$fees = EventbookingHelperOverrideRegistration::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		}
+		elseif (is_callable('EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees'))
 		{
 			$fees = EventbookingHelperOverrideHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
 		}
 		else
 		{
-			$fees = EventbookingHelper::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			$fees = EventbookingHelperRegistration::calculateIndividualRegistrationFees($event, $form, $data, $config, $paymentMethod);
 		}
 
 		$response                           = array();
@@ -511,6 +598,8 @@ class EventbookingControllerRegister extends EventbookingController
 		$response['amount']                 = EventbookingHelper::formatAmount($fees['amount'], $config);
 		$response['deposit_amount']         = EventbookingHelper::formatAmount($fees['deposit_amount'], $config);
 		$response['coupon_valid']           = $fees['coupon_valid'];
+		$response['payment_amount']         = round($fees['amount'], 2);
+
 
 		echo json_encode($response);
 
@@ -529,17 +618,21 @@ class EventbookingControllerRegister extends EventbookingController
 
 		$event = EventbookingHelperDatabase::getEvent($eventId);
 
-		$rowFields = EventbookingHelper::getFormFields($eventId, 1);
+		$rowFields = EventbookingHelperRegistration::getFormFields($eventId, 1);
 		$form      = new RADForm($rowFields);
 		$form->bind($data);
 
-		if (is_callable('EventbookingHelperOverrideHelper::calculateGroupRegistrationFees'))
+		if (is_callable('EventbookingHelperOverrideRegistration::calculateGroupRegistrationFees'))
+		{
+			$fees = EventbookingHelperOverrideRegistration::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+		}
+		elseif (is_callable('EventbookingHelperOverrideHelper::calculateGroupRegistrationFees'))
 		{
 			$fees = EventbookingHelperOverrideHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
 		}
 		else
 		{
-			$fees = EventbookingHelper::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
+			$fees = EventbookingHelperRegistration::calculateGroupRegistrationFees($event, $form, $data, $config, $paymentMethod);
 		}
 
 		$response                           = array();
@@ -550,6 +643,7 @@ class EventbookingControllerRegister extends EventbookingController
 		$response['amount']                 = EventbookingHelper::formatAmount($fees['amount'], $config);
 		$response['deposit_amount']         = EventbookingHelper::formatAmount($fees['deposit_amount'], $config);
 		$response['coupon_valid']           = $fees['coupon_valid'];
+		$response['payment_amount']         = round($fees['amount'], 2);
 
 		echo json_encode($response);
 
@@ -569,7 +663,7 @@ class EventbookingControllerRegister extends EventbookingController
 	{
 		$errors = array();
 
-		$rowFields = EventbookingHelper::getFormFields($eventId, $registrationType);
+		$rowFields = EventbookingHelperRegistration::getFormFields($eventId, $registrationType);
 
 		foreach ($rowFields as $rowField)
 		{
@@ -579,40 +673,32 @@ class EventbookingControllerRegister extends EventbookingController
 			}
 		}
 
-		return $errors;
-	}
-
-	/**
-	 * Validate captcha on registration form
-	 *
-	 * @return bool|mixed
-	 */
-	private function validateCaptcha()
-	{
-		$result = true;
-
-		$user   = JFactory::getUser();
-		$config = EventbookingHelper::getConfig();
-
-		if ($config->enable_captcha && ($user->id == 0 || $config->bypass_captcha_for_registered_user !== '1'))
+		if ($registrationType == 0 && JPluginHelper::isEnabled('eventbooking', 'updatetotalregistrants'))
 		{
-			$captchaPlugin = $this->app->getParams()->get('captcha', JFactory::getConfig()->get('captcha'));
+			$totalRegistrants = 0;
 
-			if (!$captchaPlugin)
+			foreach ($rowFields as $rowField)
 			{
-				// Hardcode to recaptcha, reduce support request
-				$captchaPlugin = 'recaptcha';
+				if (strpos($rowField->name, 'number_') === 0 && !empty($data[$rowField->name]))
+				{
+					$totalRegistrants += (int) $data[$rowField->name];
+				}
 			}
 
-			$plugin = JPluginHelper::getPlugin('captcha', $captchaPlugin);
+			$event = EventbookingHelperDatabase::getEvent($eventId);
 
-			if ($plugin)
+			if ($event->event_capacity > 0)
 			{
-				$result = JCaptcha::getInstance($captchaPlugin)->checkAnswer($this->input->post->get('recaptcha_response_field', '', 'string'));
+				$numberRegistrantsAvailable = $event->event_capacity - $event->total_registrants;
+
+				if ($numberRegistrantsAvailable > 0 && $numberRegistrantsAvailable < $totalRegistrants)
+				{
+					$errors[] = JText::sprintf('EB_NUMNER_REGISTRANTS_EXCEED_LIMIT', $numberRegistrantsAvailable, $totalRegistrants);
+				}
 			}
 		}
 
-		return $result;
+		return $errors;
 	}
 
 	/**
@@ -634,20 +720,34 @@ class EventbookingControllerRegister extends EventbookingController
 			'message' => '',
 		);
 
-		if ($config->prevent_duplicate_registration && !$config->multiple_booking)
+		if (!$config->multiple_booking)
 		{
-			$query->select('COUNT(id)')
-				->from('#__eb_registrants')
-				->where('event_id=' . $eventId)
-				->where('email="' . $email . '"')
-				->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
-			$db->setQuery($query);
-			$total = $db->loadResult();
+			$event = EventbookingHelperDatabase::getEvent($eventId);
 
-			if ($total)
+			if ($event->prevent_duplicate_registration === '')
 			{
-				$result['success'] = false;
-				$result['message'] = JText::_('EB_EMAIL_REGISTER_FOR_EVENT_ALREADY');
+				$preventDuplicateRegistration = $config->prevent_duplicate_registration;
+			}
+			else
+			{
+				$preventDuplicateRegistration = $event->prevent_duplicate_registration;
+			}
+
+			if ($preventDuplicateRegistration)
+			{
+				$query->select('COUNT(id)')
+					->from('#__eb_registrants')
+					->where('event_id=' . $eventId)
+					->where('email="' . $email . '"')
+					->where('(published=1 OR (payment_method LIKE "os_offline%" AND published NOT IN (2,3)))');
+				$db->setQuery($query);
+				$total = $db->loadResult();
+
+				if ($total)
+				{
+					$result['success'] = false;
+					$result['message'] = JText::_('EB_EMAIL_REGISTER_FOR_EVENT_ALREADY');
+				}
 			}
 		}
 

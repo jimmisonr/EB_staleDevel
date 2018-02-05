@@ -3,7 +3,7 @@
  * @package            Joomla
  * @subpackage         Event Booking
  * @author             Tuan Pham Ngoc
- * @copyright          Copyright (C) 2010 - 2017 Ossolution Team
+ * @copyright          Copyright (C) 2010 - 2018 Ossolution Team
  * @license            GNU/GPL, see LICENSE.php
  */
 defined('_JEXEC') or die;
@@ -41,11 +41,12 @@ class plgSearchEventBooking extends JPlugin
 
 	public function onContentSearch($text, $phrase = '', $ordering = '', $areas = null)
 	{
-		require_once JPATH_ROOT . '/components/com_eventbooking/helper/helper.php';
-		require_once JPATH_ROOT . '/components/com_eventbooking/helper/route.php';
+		// Require library + register autoloader
+		require_once JPATH_ADMINISTRATOR . '/components/com_eventbooking/libraries/rad/bootstrap.php';
+
 		$db     = JFactory::getDbo();
-		$Itemid = EventbookingHelper::getItemid();
 		$config = EventbookingHelper::getConfig();
+
 		if (is_array($areas))
 		{
 			if (!array_intersect($areas, array_keys($this->onContentSearchAreas())))
@@ -53,18 +54,32 @@ class plgSearchEventBooking extends JPlugin
 				return array();
 			}
 		}
+
 		// load plugin params info
+
+		if ($this->params->get('item_id'))
+		{
+			$Itemid = $this->params->get('item_id');
+		}
+		else
+		{
+			$Itemid = EventbookingHelper::getItemid();
+		}
+
 		$limit = $this->params->def('search_limit', 50);
 		$text  = trim($text);
+
 		if ($text == '')
 		{
 			return array();
 		}
+
 		$section = JText::_('Events');
+
 		switch ($phrase)
 		{
 			case 'exact':
-				$text      = $db->Quote('%' . $db->escape($text, true) . '%', false);
+				$text      = $db->quote('%' . $db->escape($text, true) . '%', false);
 				$wheres2   = array();
 				$wheres2[] = 'a.title LIKE ' . $text;
 				$wheres2[] = 'a.short_description LIKE ' . $text;
@@ -79,7 +94,7 @@ class plgSearchEventBooking extends JPlugin
 				$wheres = array();
 				foreach ($words as $word)
 				{
-					$word      = $db->Quote('%' . $db->escape($word, true) . '%', false);
+					$word      = $db->quote('%' . $db->escape($word, true) . '%', false);
 					$wheres2   = array();
 					$wheres2[] = 'a.title LIKE ' . $word;
 					$wheres2[] = 'a.short_description LIKE ' . $word;
@@ -104,9 +119,10 @@ class plgSearchEventBooking extends JPlugin
 			default:
 				$order = 'a.ordering ';
 		}
+
 		$user  = JFactory::getUser();
 		$query = 'SELECT a.id, a.category_id AS cat_id, a.title AS title, a.description AS text, event_date AS `created`, '
-			. $db->Quote($section) . ' AS section,'
+			. $db->quote($section) . ' AS section,'
 			. ' "1" AS browsernav'
 			. ' FROM #__eb_events AS a'
 			. ' WHERE (' . $where . ') AND a.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')'
@@ -115,6 +131,7 @@ class plgSearchEventBooking extends JPlugin
 			. ' ORDER BY ' . $order;
 		$db->setQuery($query, 0, $limit);
 		$rows = $db->loadObjectList();
+
 		if (count($rows))
 		{
 			foreach ($rows as $key => $row)

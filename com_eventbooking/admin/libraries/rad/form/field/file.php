@@ -35,7 +35,7 @@ class RADFormFieldFile extends RADFormField
 
 		if ($this->value && file_exists(JPATH_ROOT . '/media/com_eventbooking/files/' . $this->value))
 		{
-			$html .= '<span class="eb-uploaded-file" id="uploaded-file-' . $this->name . '"><a href="index.php?option=com_eventbooking&task=download_file&file_name=' . $this->value . '"><i class="icon-donwload"></i><strong>' . $this->value . '</strong></a></span>';
+			$html .= '<span class="eb-uploaded-file" id="uploaded-file-' . $this->name . '"><a href="' . JRoute::_('index.php?option=com_eventbooking&task=controller.download_file&file_name=' . $this->value) . '"><i class="icon-donwload"></i><strong>' . $this->value . '</strong></a></span>';
 		}
 		else
 		{
